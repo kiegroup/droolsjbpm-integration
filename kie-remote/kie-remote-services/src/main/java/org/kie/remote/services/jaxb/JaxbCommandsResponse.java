@@ -211,11 +211,7 @@ public class JaxbCommandsResponse {
             } else if( listType.equals(String.class) ) {
                 this.responses.add(new JaxbStringListResponse((List<String>)result, i, cmd));
             } else if( listType.equals(ProcessInstance.class) ) {
-               List<JaxbProcessInstanceResponse> procInstList = new ArrayList<JaxbProcessInstanceResponse>();
-               for( ProcessInstance procInst : (List<ProcessInstance>) result) { 
-                   procInstList.add(new JaxbProcessInstanceResponse(procInst));
-               }
-               this.responses.add(new JaxbProcessInstanceListResponse(procInstList, i, cmd));
+               this.responses.add(new JaxbProcessInstanceListResponse((List<ProcessInstance>) result, i, cmd));
             } else if( listType.equals(ProcessInstanceLog.class) 
                     || listType.equals(NodeInstanceLog.class)
                     || listType.equals(VariableInstanceLog.class) ) {

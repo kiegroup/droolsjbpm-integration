@@ -29,7 +29,6 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.ResumeTaskCommand;
@@ -41,12 +40,10 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.task.model.OrganizationalEntity;
-import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
-import org.kie.api.task.model.TaskSummary;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
-import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
+import org.kie.remote.services.rest.api.TaskResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
@@ -67,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/task")
 @RequestScoped
-public class TaskResourceImpl extends ResourceBase {
+public class TaskResourceImpl extends ResourceBase implements TaskResource {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResourceImpl.class);
     
@@ -83,7 +80,10 @@ public class TaskResourceImpl extends ResourceBase {
     @Inject
     protected IdentityProvider identityProvider;
    
-    private static String[] allowedOperations = { 
+    @Inject
+    protected QueryResourceImpl queryResource;
+   
+    private static final String[] allowedOperations = { 
         "activate", 
         "claim", 
         "claimnextavailable", 
@@ -100,18 +100,6 @@ public class TaskResourceImpl extends ResourceBase {
         "suspend", 
         "nominate", 
         "content"};
-
-    private static String [] allowedQueryParams = {
-        "workItemId",             // 0
-        "taskId",                 // 1
-        "businessAdministrator",  // 2
-        "potentialOwner",         // 3
-        "status",                 // 4
-        "taskOwner",              // 5
-        "processInstanceId",      // 6
-        "language",               // 7
-        "union"                   // 8
-    };
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
@@ -123,68 +111,23 @@ public class TaskResourceImpl extends ResourceBase {
         return restProcessJaxbCommandsRequest(cmdsRequest);
     }
 
-    @GET
-    @Path("/query")
+    @Override
+    @Deprecated
     public Response query() {
-        Map<String, String []> params = getRequestParams();
-        String oper = getRelativePath();
-        
-        for( String queryParam : params.keySet() ) { 
-            boolean allowed = false;
-            for( String allowedParam : allowedQueryParams ) { 
-                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam)) { 
-                   allowed = true;
-                   break;
-                } 
-            }
-            if( ! allowed ) { 
-                throw KieRemoteRestOperationException.badRequest(queryParam + " is an unknown and unsupported query param for the task query operation." );
-            }
-        }
-        
-        List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
-        List<Long> taskIds = getLongListParam(allowedQueryParams[1], false, params, "query", true);
-        List<Long> procInstIds = getLongListParam(allowedQueryParams[6], false, params, "query", true);
-        List<String> busAdmins = getStringListParamAsList(allowedQueryParams[2], false, params, "query");
-        List<String> potOwners = getStringListParamAsList(allowedQueryParams[3], false, params, "query");
-        List<String> taskOwners = getStringListParamAsList(allowedQueryParams[5], false, params, "query");
-        List<String> language = getStringListParamAsList(allowedQueryParams[7], false, params, "query");
-        
-        String unionStr = getStringParam(allowedQueryParams[8], false, params, "query");
-        boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
-        
-        List<String> statusStrList = getStringListParamAsList(allowedQueryParams[4], false, params, "query");
-        List<Status> statuses = convertStringListToStatusList(statusStrList);
-        
-        int [] pageInfo = getPageNumAndPageSize(params, oper);
-        int maxResults = getMaxNumResultsNeeded(pageInfo);
-        TaskCommand<?> queryCmd 
-            = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, 
-                    busAdmins, potOwners, taskOwners, 
-                    statuses, language, union, maxResults);
-        
-        List<TaskSummary> results = (List<TaskSummary>) doRestTaskOperation(null, queryCmd);
-        
-        logger.debug("{} results found.", results.size());
-        JaxbTaskSummaryListResponse resultList = paginateAndCreateResult(pageInfo, results, new JaxbTaskSummaryListResponse());
-        logger.debug("Returning {} results after pagination.", resultList.getList().size());
-        
-        return createCorrectVariant(resultList, headers);
+        return queryResource.taskSummaryQuery();
     }
-
-    @GET
-    @Path("/{taskId: [0-9-]+}")
+    
+    @Override
     public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        JaxbTask task = (JaxbTask) doRestTaskOperation(taskId, cmd);
+        JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
         if( task == null ) { 
             throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
         }
         return createCorrectVariant(task, headers);
     }
 
-    @POST
-    @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @Override
     public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
@@ -233,7 +176,7 @@ public class TaskResourceImpl extends ResourceBase {
             throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper);
         }
         
-        doRestTaskOperation(taskId, cmd);
+        doRestTaskOperationWithTaskId(taskId, cmd);
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
@@ -246,11 +189,10 @@ public class TaskResourceImpl extends ResourceBase {
         throw KieRemoteRestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
     
-    @GET
-    @Path("/{taskId: [0-9-]+}/content")
+    @Override
     public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = doRestTaskOperation(taskId, cmd);
+        Object result = doRestTaskOperationWithTaskId(taskId, cmd);
         if( result == null ) {
             throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
         }
@@ -267,11 +209,10 @@ public class TaskResourceImpl extends ResourceBase {
         return createCorrectVariant(content, headers);
     }
 
-    @GET
-    @Path("/{taskId: [0-9-]+}/showTaskForm")
+    @Override
     public Response taskId_form(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
-        Object result = doRestTaskOperation(taskId, cmd);
+        Object result = doRestTaskOperationWithTaskId(taskId, cmd);
 
         if (result != null) {
             String opener = "";
@@ -289,25 +230,22 @@ public class TaskResourceImpl extends ResourceBase {
         throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
-    @GET
-    @Path("/content/{contentId: [0-9-]+}")
+    @Override
     public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
-        JaxbContent content = (JaxbContent) doRestTaskOperation(null, cmd);
+        cmd.setUserId(identityProvider.getName());
+        JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
         if( content == null ) { 
             throw KieRemoteRestOperationException.notFound("Content " + contentId + " could not be found.");
         }
         return createCorrectVariant(new JaxbContent(content), headers);
     }
     
-    @POST
-    @Path("/history/bam/clear")
+    @Override
     public Response bam_clear() { 
-        doRestTaskOperation(null, new DeleteBAMTaskSummariesCommand());
+        doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
     }
  
-    private Object doRestTaskOperation(Long taskId, TaskCommand<?> cmd) { 
-        return processRequestBean.doRestTaskOperation(taskId, null, null, null, cmd);
-    }
+
 }

@@ -8,6 +8,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -21,60 +23,60 @@ public interface KieServer {
     
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getInfo();
+    public Response getInfo(@Context HttpHeaders headers);
     
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute( CommandScript command );
+    public Response execute(@Context HttpHeaders headers, CommandScript command );
     
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response listContainers();
+    public Response listContainers(@Context HttpHeaders headers);
     
     @GET
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getContainerInfo( @PathParam("id") String id );
+    public Response getContainerInfo( @Context HttpHeaders headers, @PathParam("id") String id );
     
     @PUT
     @Path("containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createContainer( @PathParam("id") String id, KieContainerResource container );
+    public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, KieContainerResource container );
     
     @DELETE
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response disposeContainer( @PathParam("id") String id );
+    public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id );
     
     @POST
     @Path("containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute( @PathParam("id") String id, String cmdPayload );
+    public Response execute( @Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload );
     
     @GET
     @Path("containers/{id}/release-id")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getReleaseId( @PathParam("id") String id);
+    public Response getReleaseId( @Context HttpHeaders headers, @PathParam("id") String id);
 
     @POST
     @Path("containers/{id}/release-id")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateReleaseId( @PathParam("id") String id, ReleaseId releaseId );
+    public Response updateReleaseId( @Context HttpHeaders headers, @PathParam("id") String id, ReleaseId releaseId );
     
     @GET
     @Path("containers/{id}/scanner")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getScannerInfo( @PathParam("id") String id );
+    public Response getScannerInfo( @Context HttpHeaders headers, @PathParam("id") String id );
     
     @POST
     @Path("containers/{id}/scanner")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateScanner( @PathParam("id") String id, KieScannerResource resource );
+    public Response updateScanner( @Context HttpHeaders headers, @PathParam("id") String id, KieScannerResource resource );
     
 } 

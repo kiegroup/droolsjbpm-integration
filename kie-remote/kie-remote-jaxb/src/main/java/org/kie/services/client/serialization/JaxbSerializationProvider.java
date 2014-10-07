@@ -205,6 +205,12 @@ public class JaxbSerializationProvider implements SerializationProvider {
         return new JaxbSerializationProvider(Arrays.asList(getAllBaseJaxbClasses(true)));
     }
     
+    public static JaxbSerializationProvider clientSideInstance(Class<?>... extraJaxbClasses) { 
+        HashSet<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses(true)));
+        jaxbClasses.addAll(Arrays.asList(extraJaxbClasses));
+        return new JaxbSerializationProvider(jaxbClasses);
+    }
+    
     public static JaxbSerializationProvider clientSideInstance(Collection<Class<?>> extraJaxbClassList) { 
         HashSet<Class<?>> jaxbClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses(true)));
         jaxbClasses.addAll(extraJaxbClassList);

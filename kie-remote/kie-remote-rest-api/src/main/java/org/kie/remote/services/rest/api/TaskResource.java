@@ -11,6 +11,7 @@ public interface TaskResource {
 
     @GET
     @Path("/query")
+    @Deprecated
     public Response query();
 
     @GET

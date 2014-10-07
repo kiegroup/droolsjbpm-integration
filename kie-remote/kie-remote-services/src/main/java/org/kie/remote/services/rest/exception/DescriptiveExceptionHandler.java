@@ -37,17 +37,6 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<KieRemoteRes
     @Context
     protected HttpHeaders headers;   
     
-    @Context 
-    private Providers providers;
-    
-
-    private static final String [] kieServicesRemotePaths = { 
-       "deployment",
-       "history",
-       "runtime",
-       "task" 
-    };
-    
     @Override
     public Response toResponse(KieRemoteRestOperationException e) {
         
@@ -64,17 +53,20 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<KieRemoteRes
         } else {
             responseBuilder = Response.serverError();
         }
-        
+       
+        boolean addException = true;
         JaxbRequestStatus requestStatus;
         switch(status) { 
         case 400:
             requestStatus = JaxbRequestStatus.BAD_REQUEST;
+            addException = false;
             break;
         case 403: 
             requestStatus = JaxbRequestStatus.FORBIDDEN;
             break;
         case 404: 
             requestStatus = JaxbRequestStatus.NOT_FOUND;
+            addException = false;
             break;
         case 409:
             requestStatus = JaxbRequestStatus.PERMISSIONS_CONFLICT;
@@ -86,30 +78,15 @@ public class DescriptiveExceptionHandler implements ExceptionMapper<KieRemoteRes
         }
        
         // Build and send response
-        JaxbRestRequestException response = new JaxbRestRequestException(uriInfo.getRequestUri().toString(), e, requestStatus);
+        Exception responseException = addException ? e : null;
+        JaxbRestRequestException response = new JaxbRestRequestException(uriInfo.getRequestUri().toString(), responseException, requestStatus);
         try {
             responseBuilder.entity(response.prettyPrint());
         } catch (JAXBException jaxbe) {
             responseBuilder.entity(JaxbRestRequestException.convertStackTraceToString(jaxbe));
         }
        
-        // Determine if the exception came from kie-services-remote or guvnor
-        // - if guvnor use JSON
-        boolean knowledgeStoreUrl = true;
-        String path = uriInfo.getRequestUri().toString().replaceAll( ".*/rest/", "");
-        for( String resourcePath : kieServicesRemotePaths ) { 
-            if( path.startsWith(resourcePath) ) { 
-                knowledgeStoreUrl = false;
-                break;
-            }
-        }
-        Variant variant;
-        if( knowledgeStoreUrl ) { 
-           variant = jsonVariant;
-        } else { 
-           variant = getVariant(headers); 
-        }
-        
+        Variant variant = getVariant(headers); 
         return responseBuilder.variant(variant).build();
     }
 

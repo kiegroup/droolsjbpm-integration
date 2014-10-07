@@ -20,6 +20,7 @@ import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.api.HistoryResource;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -41,34 +42,22 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 @Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
-public class HistoryResourceImpl extends ResourceBase {
+public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
 
     /* REST information */
     
     @Context
     private HttpHeaders headers;
    
-    /* KIE information and processing */
-    
-    @Inject
-    private ProcessRequestBean processRequestBean;
-    
-
-    private AuditLogService getAuditLogService() { 
-        return processRequestBean.getAuditLogService();
-    }
-    
     // Rest methods --------------------------------------------------------------------------------------------------------------
-    
-    @POST
-    @Path("/clear")
+   
+    @Override
     public Response clear() {
         getAuditLogService().clear();
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
-    @GET
-    @Path("/instances")
+    @Override
     public Response instances() {
         String oper = getRelativePath();
         Map<String, String []> params = getRequestParams();
@@ -81,8 +70,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
-    @GET
-    @Path("/instance/{procInstId: [0-9]+}")
+    @Override
     public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
         ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
         JaxbProcessInstanceLog jaxbProcLog = new JaxbProcessInstanceLog(procInstLog);
@@ -90,8 +78,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(jaxbProcLog, headers);
     }
 
-    @GET
-    @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}")
+    @Override
     public Response instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -113,8 +100,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
-    @GET
-    @Path("/instance/{procInstId: [0-9]+}/{oper: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
+    @Override
     public Response instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
             @PathParam("oper") String operation, @PathParam("logId") String logId) {
         Map<String, String []> params = getRequestParams();
@@ -135,8 +121,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
-    @GET
-    @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
+    @Override
     public Response process_procDefId(@PathParam("processDefId") String processId) {
         Map<String, String []> params = getRequestParams();
         Number statusParam = getNumberParam("status", false, params, getRelativePath(), false);
@@ -173,8 +158,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
-    @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}")
+    @Override
     public Response variable_varId(@PathParam("varId") String variableId) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -187,8 +171,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
     
-    @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
+    @Override
     public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -200,9 +183,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     } 
    
-    @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
-    // TODO: docs
+    @Override
     public Response variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
@@ -222,8 +203,7 @@ public class HistoryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
     
-    @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
+    @Override
     public Response variable_varId_value_valueVal_instances(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();

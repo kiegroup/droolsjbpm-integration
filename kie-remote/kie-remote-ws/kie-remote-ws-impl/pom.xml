@@ -14,10 +14,21 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-jaxb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.kie.remote.ws</groupId>
       <artifactId>kie-remote-ws-wsdl</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-services</artifactId>
@@ -47,6 +58,11 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
   

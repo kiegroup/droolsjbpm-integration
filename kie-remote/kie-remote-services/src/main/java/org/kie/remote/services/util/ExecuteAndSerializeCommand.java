@@ -9,31 +9,31 @@ import org.kie.api.task.model.Content;
 import org.kie.api.task.model.Task;
 import org.kie.internal.command.Context;
 
-public class ExecuteAndSerializeCommand extends TaskCommand<Object>{
+public class ExecuteAndSerializeCommand<T> extends TaskCommand<T>{
 
-    private TaskCommand command;
+    private TaskCommand<T> command;
 
-    public ExecuteAndSerializeCommand(){
+    public ExecuteAndSerializeCommand() {
 
     }
 
-    public ExecuteAndSerializeCommand(TaskCommand command) {
+    public ExecuteAndSerializeCommand(TaskCommand<T> command) {
         this.command = command;
     }
 
     @Override
-    public Object execute(Context context) {
-        Object cmdResult =  command.execute(context);
+    public T execute(Context context) {
+        T cmdResult =  command.execute(context);
         if( cmdResult == null ) {
             return null;
         }
         if( cmdResult instanceof Task) {
-            cmdResult = new JaxbTask((Task) cmdResult);
+            cmdResult = (T) new JaxbTask((Task) cmdResult);
         } else if( cmdResult instanceof Content) {
-            cmdResult = new JaxbContent((Content) cmdResult);
+            cmdResult = (T) new JaxbContent((Content) cmdResult);
         } else if (cmdResult instanceof Map) {
             Map output = (Map) cmdResult;
-            cmdResult = new JaxbContent();
+            cmdResult = (T) new JaxbContent();
             ((JaxbContent) cmdResult).setContentMap(output);
             ((JaxbContent) cmdResult).setId(-1L);
         }

@@ -26,7 +26,7 @@ public class RetryTrackerSingleton {
 
     private static final Logger logger = LoggerFactory.getLogger(RetryTrackerSingleton.class);
 
-    private final static int MSG_RETRY_CACHE_LIMIT = 1000;
+    private static final int MSG_RETRY_CACHE_LIMIT = 1000;
     private HashMap<String, Integer> msgIdRetryMap = new LinkedHashMap<String, Integer>() {
         /* generated serial version UID */
         private static final long serialVersionUID = 6031151588684920520L;
@@ -37,7 +37,7 @@ public class RetryTrackerSingleton {
 
     private Integer RETRY_LIMIT = null;
     private int RETRY_LIMIT_DEFAULT = 2;
-    private static String RETRY_LIMIT_NAME_PROPERTY = "kie.services.jms.retries.limit";
+    private static final String RETRY_LIMIT_NAME_PROPERTY = "kie.services.jms.retries.limit";
 
     @PostConstruct
     public void init() {

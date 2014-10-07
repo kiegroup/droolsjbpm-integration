@@ -26,7 +26,7 @@ public class RemoteApiTest extends Assert {
             restSessionFactory.newRuntimeEngine().getKieSession().getWorkItemManager().registerWorkItemHandler("test", wih);
             fail( "The above call should have failed.");
         } catch( UnsupportedOperationException uoe ) { 
-            assertEquals("The WorkItemManager.registerWorkItemHandler(..) method is not supported on the Remote Client instance.", uoe.getMessage());
+            assertTrue("Incorrect error message: " + uoe.getMessage(), uoe.getMessage().contains("not supported on the Remote Client instance."));
         }
     }
     

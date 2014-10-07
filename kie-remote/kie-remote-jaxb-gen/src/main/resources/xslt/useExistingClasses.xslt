@@ -10,10 +10,12 @@
 
 	<xsl:output method="xml" indent="yes" />
 
-    <!-- delete generated classes -->
+    <!-- 1. delete generated classes -->
     <xsl:template match="//xs:schema/xs:simpleType[@name='status']" />
+    <xsl:template match="//xs:schema/xs:complexType[@name='stringKeyObjectValueMap']" />
+    <xsl:template match="//xs:schema/xs:complexType[@name='stringKeyObjectValueEntry']" />
    
-    <!-- add existing classes -->
+    <!-- 2. add existing classes -->
     <xsl:template match="//xs:schema">
       <xs:schema 
         version="1.0" 
@@ -27,6 +29,20 @@
           <xs:annotation>
             <xs:appinfo>
               <jxb:class ref="org.kie.api.task.model.Status" />
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:complexType>
+        <xs:complexType name="stringKeyObjectValueMap">
+          <xs:annotation>
+            <xs:appinfo>
+              <jxb:class ref="org.kie.internal.jaxb.StringKeyObjectValueMap" />
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:complexType>
+        <xs:complexType name="stringKeyObjectValueEntry">
+          <xs:annotation>
+            <xs:appinfo>
+              <jxb:class ref="org.kie.internal.jaxb.StringKeyObjectValueMap" />
             </xs:appinfo>
           </xs:annotation>
         </xs:complexType>

@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.kie.api.command.Command;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
 
 @XmlRootElement(name = "task-content-response")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -27,7 +27,7 @@ public class JaxbTaskContentResponse implements JaxbCommandResponse<Map<String, 
     private String commandName;
 
     @XmlElement(name="content-map")
-    @XmlJavaTypeAdapter(StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, Object> contentMap = null;
 
     public JaxbTaskContentResponse() {

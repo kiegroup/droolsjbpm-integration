@@ -10,12 +10,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.kie.remote.services.rest.api.DeploymentsResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
 @Path("/deployment")
 @RequestScoped
-public class DeploymentsResourceImpl extends ResourceBase {
+public class DeploymentsResourceImpl extends ResourceBase implements DeploymentsResource {
 
     @Context
     private HttpHeaders headers;
@@ -27,8 +28,7 @@ public class DeploymentsResourceImpl extends ResourceBase {
   
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    @GET
-    // TODO: docs pagination
+    @Override
     public Response listDeployments() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
@@ -40,9 +40,7 @@ public class DeploymentsResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
    
-    @GET
-    @Path("/processes")
-    // DOCS: (+ pagination)
+    @Override
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();

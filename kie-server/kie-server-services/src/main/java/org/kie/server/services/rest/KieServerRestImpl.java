@@ -3,10 +3,14 @@ package org.kie.server.services.rest;
 import java.util.List;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Variant;
 
+import org.kie.remote.common.rest.RestEasy960Util;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
@@ -14,6 +18,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
+
+import static org.kie.remote.common.rest.RestEasy960Util.*;
 
 @Path("/server")
 public class KieServerRestImpl implements KieServer {
@@ -38,63 +44,81 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
-    public Response getInfo() {
-        return Response.ok(server.getInfo()).build();
+    public Response getInfo(HttpHeaders headers) {
+        return createCorrectVariant(server.getInfo(), headers);
     }
 
     @Override
-    public Response execute(CommandScript command) {
-        return Response.ok(new GenericEntity<List<ServiceResponse<? extends Object>>>(server.executeScript(command)) {
-        }).build();
+    public Response execute(HttpHeaders headers, CommandScript command) {
+        return createCorrectVariant(new GenericEntity<List<ServiceResponse<? extends Object>>>(server.executeScript(command)) {
+        }, headers);
     }
 
     @Override
-    public Response listContainers() {
-        return Response.ok(server.listContainers()).build();
+    public Response listContainers(HttpHeaders headers) {
+        return createCorrectVariant(server.listContainers(), headers);
     }
 
     @Override
-    public Response createContainer(String id, KieContainerResource container) {
+    public Response createContainer(HttpHeaders headers, String id, KieContainerResource container) {
         ServiceResponse<KieContainerResource> response = server.createContainer(id, container);
         if( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-            return Response.status(Status.CREATED).entity(response).build();
+            return createCorrectVariant(response, headers, Status.CREATED);
         }
-        return Response.status(Status.BAD_REQUEST).entity(response).build();
+        return createCorrectVariant(response, headers, Status.BAD_REQUEST);
     }
 
     @Override
-    public Response getContainerInfo(String id) {
-        return Response.ok(server.getContainerInfo(id)).build();
+    public Response getContainerInfo(HttpHeaders headers, String id) {
+        return createCorrectVariant(server.getContainerInfo(id), headers);
     }
 
     @Override
-    public Response disposeContainer(String id) {
-        return Response.ok(server.disposeContainer(id)).build();
+    public Response disposeContainer(HttpHeaders headers, String id) {
+        return createCorrectVariant(server.disposeContainer(id), headers);
     }
 
     @Override
-    public Response execute(String id, String cmdPayload) {
-        return Response.ok(server.callContainer(id, cmdPayload)).build();
+    public Response execute(HttpHeaders headers, String id, String cmdPayload) {
+        return createCorrectVariant(server.callContainer(id, cmdPayload), headers);
     }
 
     @Override
-    public Response getScannerInfo(String id) {
-        return Response.ok(server.getScannerInfo(id)).build();
+    public Response getScannerInfo(HttpHeaders headers, String id) {
+        return createCorrectVariant(server.getScannerInfo(id), headers);
     }
 
     @Override
-    public Response updateScanner(String id, KieScannerResource resource) {
-        return Response.ok(server.updateScanner(id, resource)).build();
+    public Response updateScanner(HttpHeaders headers, String id, KieScannerResource resource) {
+        return createCorrectVariant(server.updateScanner(id, resource), headers);
     };
 
     @Override
-    public Response getReleaseId(String id) {
-        return Response.ok(server.getContainerReleaseId(id)).build();
+    public Response getReleaseId(HttpHeaders headers, String id) {
+        return createCorrectVariant(server.getContainerReleaseId(id), headers);
     }
 
     @Override
-    public Response updateReleaseId(String id, ReleaseId releaseId) {
-        return Response.ok(server.updateContainerReleaseId(id, releaseId)).build();
+    public Response updateReleaseId(HttpHeaders headers, String id, ReleaseId releaseId) {
+        return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers);
+    }
+
+    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) {
+        return createCorrectVariant(responseObj, headers, null);
+    }
+
+    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
+        Response.ResponseBuilder responseBuilder = null;
+        Variant v = getVariant(headers);
+        if( v == null ) {
+            v = defaultVariant;
+        }
+        if( status != null ) {
+            responseBuilder = Response.status(status).entity(responseObj).variant(v);
+        } else {
+            responseBuilder = Response.ok(responseObj, v);
+        }
+        return responseBuilder.build();
     }
 
 }

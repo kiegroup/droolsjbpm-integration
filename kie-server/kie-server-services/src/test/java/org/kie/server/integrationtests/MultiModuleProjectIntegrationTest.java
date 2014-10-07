@@ -52,8 +52,4 @@ public class MultiModuleProjectIntegrationTest extends KieServerBaseIntegrationT
         assertResultContainsString(result2, "<message>Driving bus!</message>");
     }
 
-    protected void assertResultContainsString(String result, String expectedString) {
-        assertTrue("Expecting string '" + expectedString + "' in result, but got: " + result, result.contains(expectedString));
-    }
-
 }

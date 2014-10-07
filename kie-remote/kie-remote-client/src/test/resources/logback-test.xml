@@ -5,13 +5,17 @@
     <encoder>
       <!-- %l lowers performance -->
       <!--<pattern>%d [%t] %-5p %l%n  %m%n</pattern>-->
-      <pattern>%d [%t|%c] %-5p %m%n</pattern>
+      <pattern>%d [%t|%C] %-5p %m%n</pattern>
     </encoder>
   </appender>
 
   <!-- change to debug to see serializationTest output (JSON/JAXB/YAML strings) -->
   <logger name="org.kie.services" level="info"/>
   <logger name="org.kie.services.client.builder" level="info"/>
+
+  <!-- hibernate -->  
+  <logger name="org.hibernate" level="off" />
+  <logger name="org.hibernate.tool.hbm2ddl.DatabaseMetadata" level="error" />
   
   <!--  gen classes tests.. -->
   <logger name="org.kie.services.client.api.command" level="info" />

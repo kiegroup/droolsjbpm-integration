@@ -1,5 +1,6 @@
 package org.kie.services.client.serialization.jaxb.impl.query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -17,12 +18,12 @@ public class JaxbQueryProcessInstanceInfo {
     private JaxbProcessInstance processInstance;
     
     @XmlElement
-    private List<JaxbVariableInfo> variables;
+    private List<JaxbVariableInfo> variables = new ArrayList<JaxbVariableInfo>();
 
     public JaxbQueryProcessInstanceInfo() {
         // default for JAXB
     }
-    
+   
     public JaxbProcessInstance getProcessInstance() {
         return processInstance;
     }

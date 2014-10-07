@@ -13,6 +13,13 @@
   <artifactId>kie-examples-api</artifactId>
   <name>Kie API examples</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+  </dependencies>
+
   <packaging>pom</packaging>
   <modules>
     <module>kie-maven-example</module>

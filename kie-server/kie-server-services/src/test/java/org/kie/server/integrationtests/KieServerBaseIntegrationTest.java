@@ -1,12 +1,22 @@
 package org.kie.server.integrationtests;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -20,16 +30,34 @@ import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import javax.ws.rs.core.MediaType;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(Parameterized.class)
 public abstract class KieServerBaseIntegrationTest {
+    @Parameterized.Parameters(name = "{0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList( new Object[][] { {MediaType.APPLICATION_XML_TYPE}, {MediaType.APPLICATION_JSON_TYPE} } );
+    }
+
+    @Parameterized.Parameter
+    public MediaType MEDIA_TYPE;
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
+
+    protected static final String DEFAULT_USERNAME = "yoda";
+    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
 
     protected static String BASE_URI = System.getProperty("kie.server.base.uri");
 
@@ -43,6 +71,12 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected KieServicesClient client;
 
+    /*
+       Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
+       kjars depend on that parent, but it is not necessary to deploy it multiple times. This flag is set the first time
+       the parent project is deployed and the subsequent requests to deploy are just ignored, because the parent can
+       already be found in the maven repo.
+     */
     private static boolean commonParentDeployed = false;
 
     static {
@@ -93,7 +127,11 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private void startClient() throws Exception {
-        client = new KieServicesClient(BASE_URI);
+        if (LOCAL_SERVER) {
+            client = new KieServicesClient(BASE_URI, MEDIA_TYPE);
+        } else {
+            client = new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, MEDIA_TYPE);
+        }
     }
 
     private void startServer() throws Exception {
@@ -114,9 +152,9 @@ public abstract class KieServerBaseIntegrationTest {
         if (LOCAL_SERVER) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exists.
-            mvnArgs = new String[]{"clean", "install"};
+            mvnArgs = new String[]{"-B", "clean", "install"};
         } else {
-            mvnArgs = new String[]{"clean", "deploy"};
+            mvnArgs = new String[]{"-B", "clean", "deploy"};
         }
         int mvnRunResult = cli.doMain(mvnArgs, basedir, System.out, System.out);
         if (mvnRunResult != 0) {
@@ -130,6 +168,8 @@ public abstract class KieServerBaseIntegrationTest {
         // deploy only once as it is not needed to do that with every request
         if (!commonParentDeployed) {
             buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
+        } else {
+            logger.info("Common parent project already deployed!");
         }
     }
 
@@ -196,6 +236,36 @@ public abstract class KieServerBaseIntegrationTest {
     protected void assertSuccess(ServiceResponse<?> response) {
         ServiceResponse.ResponseType type = response.getType();
         assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS, type);
+    }
+
+    protected void assertResultContainsString(String result, String expectedString) {
+        assertTrue("Expecting string '" + expectedString + "' in result, but got: " + result, result.contains(expectedString));
+    }
+
+    protected void assertResultContainsStringRegex(String result, String regex) {
+        assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!" ,
+                Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
+    }
+
+    protected ClientRequest newRequest(String uriString) {
+        URI uri;
+        try {
+            uri = new URI(uriString);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Malformed URI was specified: '" + uriString + "'!", e);
+        }
+        if (LOCAL_SERVER) {
+            return new ClientRequest(uriString);
+        } else {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(
+                    new AuthScope(uri.getHost(), uri.getPort()),
+                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+            );
+            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
+            return new ClientRequest(uriString, executor);
+        }
     }
 
 }

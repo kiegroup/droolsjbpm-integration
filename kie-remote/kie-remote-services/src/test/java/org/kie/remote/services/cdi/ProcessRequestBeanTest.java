@@ -1,20 +1,19 @@
 package org.kie.remote.services.cdi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -35,9 +34,7 @@ import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.client.serialization.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
 public class ProcessRequestBeanTest {

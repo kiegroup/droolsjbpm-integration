@@ -27,13 +27,6 @@ public class HistoryWebServiceImpl extends ResourceBase implements HistoryWebSer
 
     final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
 
-    @Inject
-    private ProcessRequestBean processRequestBean;
-
-    private AuditLogService getAuditLogService() { 
-        return processRequestBean.getAuditLogService();
-    }
-        
     @Override
     public ProcessInstanceLogResponse findProcessInstanceLogs( HistoryInstanceLogRequest request ) throws HistoryWebServiceException {
         

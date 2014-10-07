@@ -38,28 +38,6 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 import org.kie.internal.task.api.model.SubTasksStrategy;
 
-
-
-/**
-* <p>Java class for getTaskOwnedByExpDateBeforeDateCommand complex type.
-* 
-* <p>The following schema fragment specifies the expected content contained within this class.
-* 
-* <pre>
-* &lt;complexType name="getTaskOwnedByExpDateBeforeDateCommand">
-*   &lt;complexContent>
-*     &lt;extension base="{}
-
-/**
- * FYI: information in this class must satisfy one of the following requirements: 
- * 
- * 1. Have both a getter and a setter method
- * 2. Have a getter method and be represented via a field
- * 3. The field must be 
- *
- * If you add a new field to this class, then it *MUST* be a 
- *
- */
 @XmlRootElement(name="task-summary")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlSeeAlso(value={Status.class, SubTasksStrategy.class})

@@ -22,6 +22,14 @@
           <artifactId>kie-maven-plugin</artifactId>
           <version>${version.org.kie}</version>
           <extensions>true</extensions>
+          <dependencies>
+            <!-- needed to compile ruleflow processes -->
+            <dependency>
+              <groupId>org.jbpm</groupId>
+              <artifactId>jbpm-bpmn2</artifactId>
+              <version>${version.org.kie}</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

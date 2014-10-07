@@ -12,13 +12,15 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.api.definition.process.Process;
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 
 @XmlRootElement(name="process-instance")
 @XmlAccessorType(XmlAccessType.FIELD)
-@JsonIgnoreProperties({"processName", "process", "result"})
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbProcessInstance implements ProcessInstance {
 
     @XmlElement(name="process-id")
@@ -42,6 +44,14 @@ public class JaxbProcessInstance implements ProcessInstance {
 
     public JaxbProcessInstance(ProcessInstance processInstance) { 
         initialize(processInstance);
+    }
+
+    public JaxbProcessInstance(ProcessInstanceLog processInstanceLog) { 
+        if( processInstanceLog != null ) { 
+            this.id = processInstanceLog.getProcessInstanceId();
+            this.processId = processInstanceLog.getProcessId();
+            this.state = processInstanceLog.getStatus();
+        }
     }
 
     protected void initialize(ProcessInstance processInstance) { 

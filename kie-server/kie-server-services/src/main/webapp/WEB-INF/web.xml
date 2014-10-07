@@ -23,4 +23,22 @@
     <param-name>resteasy.servlet.mapping.prefix</param-name>
     <param-value>/services/rest</param-value>
   </context-param>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>All web resources</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>kie-server</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>KIE Server</realm-name>
+  </login-config>
+  <security-role>
+    <role-name>kie-server</role-name>
+  </security-role>
+
 </web-app>

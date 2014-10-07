@@ -12,11 +12,6 @@
   <name>KIE Remote Services :: JAXB classes</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-common</artifactId>
-    </dependency>
-    
     <!-- kie -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -42,6 +37,14 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-xc</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+    </dependency> 
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+    </dependency> 
 
     <!-- logging -->
     <dependency>

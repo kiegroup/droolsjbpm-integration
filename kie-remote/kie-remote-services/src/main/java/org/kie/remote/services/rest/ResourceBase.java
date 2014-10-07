@@ -23,7 +23,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
+import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
@@ -46,8 +48,6 @@ import org.slf4j.LoggerFactory;
 public class ResourceBase {
 
     protected static final Logger logger = LoggerFactory.getLogger(ResourceBase.class);
-    
-    protected static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
    
     @Inject
     protected ProcessRequestBean processRequestBean;
@@ -57,21 +57,50 @@ public class ResourceBase {
     
     @Context
     private HttpServletRequest httpRequest;
-  
+
     /**
      * In order to be able to inject a mock instance for tests.
-     * @param httpRequest 
+     * @param processRequestBean
      */
-    protected void setHttpServletRequest(HttpServletRequest httpRequest) { 
-        this.httpRequest = httpRequest;
+    void setProcessRequestBean( ProcessRequestBean processRequestBean ) {
+        this.processRequestBean = processRequestBean;
     }
     
      /**
       * In order to be able to inject a mock instance for tests.
       * @param uriInfo
       */
-    protected void setUriInfo(UriInfo uriInfo) { 
+    void setUriInfo(UriInfo uriInfo) { 
         this.uriInfo = uriInfo;
+    }
+   
+    /**
+     * In order to be able to inject a mock instance for tests.
+     * @param httpRequest 
+     */
+    void setHttpServletRequest(HttpServletRequest httpRequest) { 
+        this.httpRequest = httpRequest;
+    }
+    
+    // Any query parameters used in REST calls (besides the query operations), should be added here 
+    
+    static String PAGE_LONG_PARAM = "page";
+    static String PAGE_SHORT_PARAM = "p";
+    static String SIZE_LONG_PARAM = "pagesize";
+    static String SIZE_SHORT_PARAM = "s";
+   
+    public static Set<String> paginationParams = new HashSet<String>();
+    static { 
+        paginationParams.add(PAGE_LONG_PARAM);
+        paginationParams.add(PAGE_SHORT_PARAM);
+        paginationParams.add(SIZE_LONG_PARAM);
+        paginationParams.add(SIZE_SHORT_PARAM);
+    };
+    
+    public static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
+    
+    protected AuditLogService getAuditLogService() { 
+        return processRequestBean.getAuditLogService();
     }
     
     // execute --------------------------------------------------------------------------------------------------------------------
@@ -340,19 +369,6 @@ public class ResourceBase {
     static int PAGE_NUM = 0;
     static int PAGE_SIZE = 1;
    
-    static String PAGE_LONG_PARAM = "page";
-    static String PAGE_SHORT_PARAM = "p";
-    static String SIZE_LONG_PARAM = "pageSize";
-    static String SIZE_SHORT_PARAM = "s";
-   
-    static Set<String> paginationParams = new HashSet<String>();
-    static { 
-        paginationParams.add(PAGE_LONG_PARAM);
-        paginationParams.add(PAGE_SHORT_PARAM);
-        paginationParams.add(SIZE_LONG_PARAM);
-        paginationParams.add(SIZE_SHORT_PARAM);
-    };
-    
     protected static int [] getPageNumAndPageSize(Map<String, String[]> params, String oper) {
         int [] pageInfo = new int[2];
         
@@ -409,7 +425,7 @@ public class ResourceBase {
     
     protected static int getMaxNumResultsNeeded(int [] pageInfo) { 
         int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
-        if( pageInfo[PAGE_NUM] == 0 ) { 
+        if( numResults == 0 ) { 
             numResults = 1000;
         } 
         return numResults;
@@ -483,5 +499,17 @@ public class ResourceBase {
         
         return jaxbProcDef;
     }
-   
+ 
+    // TODO: shouldn't this also take a process runtime id for per-process runtimes? 
+    protected <T> T doRestTaskOperation(TaskCommand<T> cmd) { 
+        return processRequestBean.doRestTaskOperation(null, null, null, null, cmd);
+    }
+    
+    protected <T> T doRestTaskOperationWithTaskId(Long taskId, TaskCommand<T> cmd) { 
+        return processRequestBean.doRestTaskOperation(taskId, null, null, null, cmd);
+    }
+    
+    protected <T> T doRestTaskOperationWithDeploymentId(String deploymentId, TaskCommand<T> cmd) { 
+        return processRequestBean.doRestTaskOperation(null, deploymentId, null, null, cmd);
+    }
 }

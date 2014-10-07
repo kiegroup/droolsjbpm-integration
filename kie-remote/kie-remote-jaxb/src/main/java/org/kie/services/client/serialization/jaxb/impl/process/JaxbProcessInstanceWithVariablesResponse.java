@@ -9,21 +9,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.services.client.serialization.jaxb.impl.map.StringObjectMapXmlAdapter;
+import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars-response")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso(value={JaxbProcessInstanceResponse.class})
+@XmlSeeAlso(value={JaxbProcessInstance.class})
+@JsonAutoDetect(getterVisibility=JsonAutoDetect.Visibility.NONE, fieldVisibility=JsonAutoDetect.Visibility.ANY)
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=StringObjectMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(value=StringKeyObjectValueMapXmlAdapter.class)
     private Map<String, String> variables;
     
     @XmlElement
-    private JaxbProcessInstanceResponse processInstance;
+    private JaxbProcessInstance processInstance;
     
     public JaxbProcessInstanceWithVariablesResponse() { 
         // Default Constructor
@@ -39,7 +41,16 @@ public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbRespon
     }
     
     protected void initialize(ProcessInstance processInstance, Map<String, String> vars) { 
-        this.setProcessInstance(processInstance);
+        JaxbProcessInstance xmlProcessInstance;
+        if( processInstance == null ) { 
+            return;
+        }
+        if( ! (processInstance instanceof JaxbProcessInstance) ) { 
+            xmlProcessInstance = new JaxbProcessInstance(processInstance);
+        }  else { 
+            xmlProcessInstance = (JaxbProcessInstance) processInstance;
+        }
+        this.processInstance = xmlProcessInstance;
         this.variables = vars;
     }
 
@@ -51,22 +62,12 @@ public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbRespon
         this.variables = variables;
     }
 
-    public ProcessInstance getProcessInstance() {
+    public JaxbProcessInstance getProcessInstance() {
         return processInstance;
     }
 
-    public void setProcessInstance(ProcessInstance processInstance) {
-        JaxbProcessInstanceResponse xmlProcessInstance;
-        if( processInstance == null ) { 
-            return;
-        }
-        if( ! (processInstance instanceof JaxbProcessInstanceResponse) ) { 
-            xmlProcessInstance = new JaxbProcessInstanceResponse(processInstance);
-        }  else { 
-            xmlProcessInstance = (JaxbProcessInstanceResponse) processInstance;
-        }
-        
-        this.processInstance = xmlProcessInstance;
+    public void setProcessInstance(JaxbProcessInstance jaxbProcessInstance) {
+        this.processInstance = jaxbProcessInstance;
     }
 
 }

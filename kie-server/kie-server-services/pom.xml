@@ -52,6 +52,7 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-client</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- core dependencies -->
@@ -79,8 +80,19 @@
       <!-- scope>provided</scope -->
     </dependency>
     <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+      <!-- scope>provided</scope -->
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-api</artifactId>
+    </dependency>
+
+    <!-- needed for ruleflow processes -->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-bpmn2</artifactId>
     </dependency>
 
     <dependency>
@@ -138,7 +150,10 @@
       <artifactId>resteasy-jaxb-provider</artifactId>
       <!-- scope>provided</scope -->
     </dependency>
-
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson-provider</artifactId>
+    </dependency>
     <!-- log -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -267,6 +282,7 @@
           <configuration>
             <properties>
               <cargo.servlet.port>${container.port}</cargo.servlet.port>
+              <cargo.servlet.users>yoda:usetheforce123@:kie-server</cargo.servlet.users>
             </properties>
           </configuration>
           <deployables>
@@ -373,6 +389,29 @@
       </build>
     </profile>
     <profile>
+      <id>jbossas71x</id>
+      <properties>
+        <jbossas71x.download.url>http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip</jbossas71x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration combine.self="append">
+              <container>
+                <containerId>jboss71x</containerId>
+                <type>installed</type>
+                <zipUrlInstaller>
+                  <url>${jbossas71x.download.url}</url>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>eap63x</id>
       <properties>
         <!-- The EAP 6.3.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
@@ -399,8 +438,16 @@
         </plugins>
       </build>
     </profile>
+    <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
+         a container that has already been started and it is not managed by cargo. It can also be used when doing
+         a "no-test" build, as the container should not be used in that case. -->
     <profile>
       <id>custom-container</id>
+      <activation>
+        <property>
+          <name>custom-container</name>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>

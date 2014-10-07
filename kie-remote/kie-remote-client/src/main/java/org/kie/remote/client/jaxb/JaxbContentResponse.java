@@ -65,7 +65,7 @@ public class JaxbContentResponse extends org.kie.remote.jaxb.gen.Content impleme
     
     public JaxbContentResponse(Content content, int i, Command<?> cmd) {
         this.id = content.getId();
-        this.serializedContent = content.getContent();
+        this.content = content.getContent();
         this.index = i;
         this.commandName = cmd.getClass().getSimpleName();
     }
@@ -77,7 +77,7 @@ public class JaxbContentResponse extends org.kie.remote.jaxb.gen.Content impleme
     @Override
     public void setResult(Content result) {
         this.id = result.getId();
-        this.serializedContent = result.getContent();
+        this.content = result.getContent();
     }
 
 }

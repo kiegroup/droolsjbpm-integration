@@ -20,6 +20,16 @@
 
     <!-- command sources -->
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
       <optional>true</optional>
@@ -34,6 +44,13 @@
       <artifactId>jbpm-audit</artifactId>
       <optional>true</optional>
     </dependency>
+
+    <!-- other dependencies -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <optional>true</optional>
+    </dependency> 
 
     <!-- test -->
     <dependency>
@@ -53,7 +70,6 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -172,7 +188,8 @@
                   <type>jar</type>
                   <overWrite>false</overWrite>
                   <outputDirectory>${basedir}/src/main/java</outputDirectory>
-                  <includes>org/jbpm/process/audit/command/*.java</includes>
+                  <includes>org/jbpm/process/audit/command/Find*.java,
+                    org/jbpm/process/audit/command/Clear*.java,</includes>
                 </artifactItem>
               </artifactItems>
               <includes>**/*.java</includes>
@@ -213,7 +230,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>1.5</version>
         <executions>
           <!-- 2. generate xsd's based on unpacked sources -->
           <execution>

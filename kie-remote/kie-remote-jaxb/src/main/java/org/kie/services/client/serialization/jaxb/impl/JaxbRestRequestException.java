@@ -51,13 +51,15 @@ public class JaxbRestRequestException {
     }
    
     private void initializeExceptionAndMessage(Exception e) { 
-       this.cause = e;
-       this.message = e.getClass().getSimpleName() + " thrown with message '" + e.getMessage() + "'";
-       if( e.getCause() != null ) { 
-           Throwable t = e.getCause();
-           this.message = t.getClass().getSimpleName() + " thrown with message '" + t.getMessage() + "'";
-       }
-       this.stackTrace = convertStackTraceToString(e);
+        if( e != null ) {
+            this.cause = e;
+            this.message = e.getClass().getSimpleName() + " thrown with message '" + e.getMessage() + "'";
+            if( e.getCause() != null ) { 
+                Throwable t = e.getCause();
+                this.message = t.getClass().getSimpleName() + " thrown with message '" + t.getMessage() + "'";
+            }
+            this.stackTrace = convertStackTraceToString(e);
+        }
     }
     
     public static String convertStackTraceToString(Throwable t) { 
@@ -101,7 +103,9 @@ public class JaxbRestRequestException {
 
     public void setCause(Exception cause) {
         this.cause = cause;
-        this.stackTrace = convertStackTraceToString(cause);
+        if( cause != null ) { 
+            this.stackTrace = convertStackTraceToString(cause);
+        }
     }
 
     public String getStackTrace() {

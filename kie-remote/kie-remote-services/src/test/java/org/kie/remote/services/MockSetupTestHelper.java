@@ -44,12 +44,12 @@ import org.mockito.stubbing.Answer;
 
 public class MockSetupTestHelper {
 
-    public final static String USER = "user";
-    public final static long TASK_ID = 1;
-    public final static String DEPLOYMENT_ID = "deployment";
+    public static final String USER = "user";
+    public static final long TASK_ID = 1;
+    public static final String DEPLOYMENT_ID = "deployment";
     
-    public final static boolean FOR_INDEPENDENT_TASKS = true;
-    public final static boolean FOR_PROCESS_TASKS = false;
+    public static final boolean FOR_INDEPENDENT_TASKS = true;
+    public static final boolean FOR_PROCESS_TASKS = false;
 
     public static void setupTaskMocks(TaskDeploymentIdTest test, boolean independentTask) {
         // DeploymentInfoBean
