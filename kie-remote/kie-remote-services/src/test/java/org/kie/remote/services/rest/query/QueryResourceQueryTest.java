@@ -1,6 +1,6 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.*;
+import static org.kie.remote.services.rest.query.QueryResourceData.QUERY_PARAM_DATE_FORMAT;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -11,14 +11,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.jbpm.process.audit.AuditLogService;
-import org.jbpm.process.audit.CommandBasedAuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
@@ -33,12 +31,13 @@ import org.kie.remote.services.rest.DeployResourceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("null")
 public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
 
     private static final Logger logger = LoggerFactory.getLogger(DeployResourceBase.class);
     
-    private static final String PROCESS_FILE = "BPMN2-HumanTaskWithVariables.bpmn2";
-    private static final String PROCESS_ID = "human-task-with-procvars";
+    private static final String PROCESS_FILE = "BPMN2-HumanTaskWithStringVariables.bpmn2";
+    private static final String PROCESS_ID = "org.var.human.task.string";
     private static final String USER_ID = "john";
 
     private KieSession ksession;
@@ -163,7 +162,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         .taskStatus(Status.Completed)
         .like().value("*-" + procInstId)
         .variableId("input*");
-        
+
         List<org.kie.api.runtime.manager.audit.VariableInstanceLog> varResult 
             = ((AuditLogService) engine.getAuditLogService()).queryVariableInstanceLogs(varLogQueryBuilder.getQueryData());
 
@@ -177,7 +176,6 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         
         RemoteServicesQueryCommandBuilder procLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
        
-        // DBG: remove these two lines
         ParametrizedQuery<ProcessInstanceLog> procQuery = auditLogService.processInstanceLogQuery().processInstanceId(procInstId).buildQuery();
         List<ProcessInstanceLog> procLogs = procQuery.getResultList();
         assertFalse( "No proc logs?!?", procLogs.isEmpty() );
@@ -206,9 +204,36 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         assertNotNull( "Null proc Result!", procResult );
         assertFalse( "No proc logs found.", procResult.isEmpty() );
         assertEquals( "Num proc logs found.", 1, procResult.size() );
-        org.kie.api.runtime.manager.audit.ProcessInstanceLog log = procResult.get(0);
-        assertEquals( "Incorrect proc inst id: " + log.getProcessInstanceId(), procInstId, log.getProcessInstanceId().longValue() );
-        assertEquals( "Incorrect external id: " + log.getExternalId(), deploymentId, log.getExternalId() );
+        org.kie.api.runtime.manager.audit.ProcessInstanceLog procLog = procResult.get(0);
+        assertEquals( "Incorrect proc inst id: " + procLog.getProcessInstanceId(), procInstId, procLog.getProcessInstanceId().longValue() );
+        assertEquals( "Incorrect external id: " + procLog.getExternalId(), deploymentId, procLog.getExternalId() );
+      
+        // variable value
+        org.kie.api.runtime.manager.audit.VariableInstanceLog varLog = varLogs.get(0);
+        varQuery = auditLogService.variableInstanceLogQuery()
+        .intersect()
+        .processInstanceId(procInstId)
+        .last()
+        .variableValue(varLog.getVariableId(), varLog.getValue())
+        .buildQuery();
+        
+        varLogs = varQuery.getResultList();
+        assertFalse( "No last var logs?!?", varLogs.isEmpty() );
+        assertEquals( "Num varlogs", 1, varLogs.size());
+        assertEquals( "Num varlogs", varLog, varLogs.get(0) );
+   
+        // variable value regex
+        varQuery = auditLogService.variableInstanceLogQuery()
+        .intersect()
+        .processInstanceId(procInstId)
+        .like()
+        .variableValue(varLog.getVariableId(), "*" + varLog.getValue().substring(3))
+        .buildQuery();
+        
+        varLogs = varQuery.getResultList();
+        assertFalse( "No last var logs?!?", varLogs.isEmpty() );
+        assertEquals( "Num varlogs", 1, varLogs.size());
+        assertEquals( "Num varlogs", varLog, varLogs.get(0) );
     }
 
 }

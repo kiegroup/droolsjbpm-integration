@@ -1,7 +1,7 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.getAllBaseJaxbClasses;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -1,6 +1,26 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.internal.query.QueryParameterIdentifiers.*;
+import static org.kie.internal.query.QueryParameterIdentifiers.ACTUAL_OWNER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.BUSINESS_ADMIN_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.CREATED_BY_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.END_DATE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.EXTERNAL_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.LAST_VARIABLE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_INSTANCE_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_INSTANCE_STATUS_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_VERSION_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.STAKEHOLDER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.START_DATE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.TASK_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.TASK_STATUS_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VALUE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VALUE_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VAL_SEPARATOR;
+import static org.kie.internal.query.QueryParameterIdentifiers.WORK_ITEM_ID_LIST;
 
 import java.util.Date;
 
@@ -8,8 +28,6 @@ import org.jbpm.process.audit.command.AuditVariableInstanceLogQueryCommand;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.kie.api.task.model.Status;
 import org.kie.internal.query.AbstractQueryBuilderImpl;
-import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
-import org.kie.internal.task.query.TaskQueryBuilder;
 
 public class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> {
 
@@ -204,11 +222,18 @@ public class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<
         return this;
     }
     
+    public RemoteServicesQueryCommandBuilder variableValue(String variableId, String value) {
+        String varValStr = variableId.length() + VAR_VAL_SEPARATOR + variableId + VAR_VAL_SEPARATOR + value;
+        addObjectParameter(VAR_VALUE_ID_LIST, "value for variable", varValStr);
+        return this;
+    }
+    
     public RemoteServicesQueryCommandBuilder last() {
         addObjectParameter(LAST_VARIABLE_LIST, "last variable value", Boolean.TRUE.booleanValue() );
         return this;
     }
 
+        
     // command generation
     
     public TaskQueryDataCommand createTaskQueryDataCommand() { 

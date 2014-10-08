@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.namespace.QName;
 
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 
@@ -33,7 +34,11 @@ public class JaxbVariableInfo {
     
     public JaxbVariableInfo(String name, Object value) { 
         this.name = name;
-        this.value = value;
+        if( value instanceof String ) { 
+            this.value = getStringJaxbElement((String) value);
+        } else { 
+            this.value = value;
+        }
     }
     
     public JaxbVariableInfo(String name, Object value, Date date) { 
@@ -42,7 +47,7 @@ public class JaxbVariableInfo {
     }
     
     public JaxbVariableInfo(VariableInstanceLog varLog) {
-        this(varLog.getVariableId(), varLog.getValue(), varLog.getDate());
+        this(varLog.getVariableId(), getStringJaxbElement(varLog.getValue()), varLog.getDate());
     }
     
     public String getName() {
@@ -54,13 +59,26 @@ public class JaxbVariableInfo {
     }
 
     public Object getValue() {
+        if( value == null ) { 
+            return value;
+        }
+        if( value instanceof JAXBElement ) { 
+            return ((JAXBElement) value).getValue();
+        }
         return value;
     }
 
     public void setValue( Object value ) {
+        if( value instanceof String ) { 
+           this.value = getStringJaxbElement((String) value); 
+        }
         this.value = value;
     }
 
+    private static JAXBElement<String> getStringJaxbElement(String value) { 
+        return new JAXBElement<String>(new QName("string"), String.class, value);
+    }
+    
     public Date getModificationDate() {
         return lastModificationDate;
     }

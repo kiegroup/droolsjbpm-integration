@@ -52,12 +52,14 @@ public class QueryResourceData {
 
     static final String [] varInstQueryParams = { 
        "varid", "varvalue", 
-       // "var", "varregex"
+       "var", "varregex",
+       "all"
     };
     
     static final String [] varInstQueryParamsShort = { 
        "vid", "vv", 
-       // null, "vr"
+       null, "vr",
+       null
     };
     
     public static final String [] metaRuntimeParams = { 
@@ -75,8 +77,8 @@ public class QueryResourceData {
     protected static final int GENERAL_END = 4;
     protected static final int TASK_END = 11;
     protected static final int PROCESS_END = 15;
-    protected static final int VARIABLE_END = 17;
-    protected static final int META_END = 19;
+    protected static final int VARIABLE_END = 20;
+    protected static final int META_END = 22;
     
     static { 
         // there are faster ways to do this, but the checks here are very valuable

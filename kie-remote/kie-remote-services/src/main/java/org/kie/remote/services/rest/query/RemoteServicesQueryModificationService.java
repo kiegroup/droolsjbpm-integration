@@ -1,13 +1,13 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.internal.query.QueryParameterIdentifiers.*;
+import static org.kie.internal.query.QueryParameterIdentifiers.ACTUAL_OWNER_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.BUSINESS_ADMIN_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.CREATED_BY_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.END_DATE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.EXTERNAL_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.LAST_VARIABLE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_INSTANCE_STATUS_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_VERSION_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.STAKEHOLDER_ID_LIST;

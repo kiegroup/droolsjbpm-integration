@@ -62,7 +62,7 @@ public class ResourceBase {
      * In order to be able to inject a mock instance for tests.
      * @param processRequestBean
      */
-    void setProcessRequestBean( ProcessRequestBean processRequestBean ) {
+    public void setProcessRequestBean( ProcessRequestBean processRequestBean ) {
         this.processRequestBean = processRequestBean;
     }
     
@@ -99,7 +99,7 @@ public class ResourceBase {
     
     public static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
     
-    protected AuditLogService getAuditLogService() { 
+    public AuditLogService getAuditLogService() { 
         return processRequestBean.getAuditLogService();
     }
     
@@ -501,7 +501,7 @@ public class ResourceBase {
     }
  
     // TODO: shouldn't this also take a process runtime id for per-process runtimes? 
-    protected <T> T doRestTaskOperation(TaskCommand<T> cmd) { 
+    public <T> T doRestTaskOperation(TaskCommand<T> cmd) { 
         return processRequestBean.doRestTaskOperation(null, null, null, null, cmd);
     }
     

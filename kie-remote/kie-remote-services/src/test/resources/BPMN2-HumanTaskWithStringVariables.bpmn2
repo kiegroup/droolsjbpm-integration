@@ -14,7 +14,7 @@
   <bpmn2:itemDefinition id="_inputStrItem" structureRef="java.lang.String"/>
   <bpmn2:itemDefinition id="_task_string_item" structureRef="java.lang.String"/>
 
-  <bpmn2:process id="human-task-with-procvars" name="boolean" isExecutable="true">
+  <bpmn2:process id="org.var.human.task.string" name="boolean" isExecutable="true">
 
     <bpmn2:property id="inputStr" itemSubjectRef="_inputStrItem"/>
 

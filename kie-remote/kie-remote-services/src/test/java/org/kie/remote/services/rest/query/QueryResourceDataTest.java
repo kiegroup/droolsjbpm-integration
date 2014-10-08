@@ -49,7 +49,6 @@ public class QueryResourceDataTest extends QueryResourceData {
     
         assertFalse( "No params found", allParams.isEmpty() ); 
         
-        
         Set<String> params = new HashSet<String>();
         for( String [] paramArr : allParams ) { 
             for( String param : paramArr ) { 
