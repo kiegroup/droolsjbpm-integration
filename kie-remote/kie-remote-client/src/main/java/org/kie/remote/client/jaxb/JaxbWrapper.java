@@ -141,7 +141,10 @@ abstract class JaxbWrapper {
         public String getTaskType() {
             return this.task.getTaskType();
         }
-    
+   
+        public org.kie.remote.jaxb.gen.Task getInternalTask() { 
+           return this.task; 
+        }
     }
 
     /**
@@ -284,150 +287,175 @@ abstract class JaxbWrapper {
         public long getParentId() {
             return this.taskData.getParentId();
         }
+        
+        public org.kie.remote.jaxb.gen.TaskData getInternalTaskData() { 
+            return this.taskData;
+        }
     }
 
     static class JaxbAttachmentWrapper extends JaxbWrapper implements Attachment {
     
-        private final org.kie.remote.jaxb.gen.Attachment jaxbAttachment;
+        private final org.kie.remote.jaxb.gen.Attachment attachment;
         
         public JaxbAttachmentWrapper(org.kie.remote.jaxb.gen.Attachment jaxbAttachment) { 
             super(Attachment.class);
-            this.jaxbAttachment = jaxbAttachment;
+            this.attachment = jaxbAttachment;
         }
     
         @Override
         public Long getId() {
-            return this.jaxbAttachment.getId();
+            return this.attachment.getId();
         }
     
         @Override
         public String getName() {
-            return this.jaxbAttachment.getName();
+            return this.attachment.getName();
         }
     
         @Override
         public String getContentType() {
-            return this.jaxbAttachment.getContentType();
+            return this.attachment.getContentType();
         }
     
         @Override
         public Date getAttachedAt() {
-            return convertXmlGregCalToDate(this.jaxbAttachment.getAttachedAt());
+            return convertXmlGregCalToDate(this.attachment.getAttachedAt());
         }
     
         @Override
         public User getAttachedBy() {
-            return convertStringIdToUser(this.jaxbAttachment.getAttachedBy());
+            return convertStringIdToUser(this.attachment.getAttachedBy());
         }
     
         @Override
         public int getSize() {
-            return this.jaxbAttachment.getSize();
+            return this.attachment.getSize();
         }
     
         @Override
         public long getAttachmentContentId() {
-            return this.jaxbAttachment.getAttachmentContentId();
+            return this.attachment.getAttachmentContentId();
+        }
+        
+        public org.kie.remote.jaxb.gen.Attachment getInternalAttachment() { 
+            return this.attachment;
         }
     }
 
     static class JaxbCommentWrapper extends JaxbWrapper implements Comment {
     
-        private final org.kie.remote.jaxb.gen.Comment jaxbComment;
+        private final org.kie.remote.jaxb.gen.Comment comment;
     
         public JaxbCommentWrapper(org.kie.remote.jaxb.gen.Comment jaxbComment) {
             super(Comment.class);
-            this.jaxbComment = jaxbComment;
+            this.comment = jaxbComment;
         }
     
         @Override
         public Long getId() {
-            return this.jaxbComment.getId();
+            return this.comment.getId();
         }
     
         @Override
         public String getText() {
-            return this.jaxbComment.getText();
+            return this.comment.getText();
         }
     
         @Override
         public Date getAddedAt() {
-            return convertXmlGregCalToDate(this.jaxbComment.getAddedAt());
+            return convertXmlGregCalToDate(this.comment.getAddedAt());
         }
     
         @Override
         public User getAddedBy() {
-            return convertStringIdToUser(this.jaxbComment.getAddedBy());
+            return convertStringIdToUser(this.comment.getAddedBy());
+        }
+        
+        public org.kie.remote.jaxb.gen.Comment getInternalComment() { 
+            return this.comment;
         }
     }
 
     static class JaxbContentWrapper extends JaxbWrapper implements Content {
 
-        private final org.kie.remote.jaxb.gen.Content genContent;
+        private final org.kie.remote.jaxb.gen.Content content;
 
         public JaxbContentWrapper(org.kie.remote.jaxb.gen.Content content) {
             super(Content.class);
-            this.genContent = content;
+            this.content = content;
         }
 
         @Override
         public long getId() {
-            return genContent.getId();
+            return content.getId();
         }
 
         @Override
         public byte[] getContent() {
-            return genContent.getContent();
+            return content.getContent();
         }
+       
+        public org.kie.remote.jaxb.gen.Content getInternalContent() { 
+            return this.content;
+        }
+        
     }
 
     static class JaxbI18NTextWrapper extends JaxbWrapper implements I18NText {
     
-        private final org.kie.remote.jaxb.gen.I18NText jaxbText;
+        private final org.kie.remote.jaxb.gen.I18NText i18nText;
     
         public JaxbI18NTextWrapper(org.kie.remote.jaxb.gen.I18NText text) {
             super(I18NText.class);
-            this.jaxbText = text;
+            this.i18nText = text;
         }
     
         @Override
         public Long getId() {
-            return this.jaxbText.getId();
+            return this.i18nText.getId();
         }
     
         @Override
         public String getLanguage() {
-            return this.jaxbText.getLanguage();
+            return this.i18nText.getLanguage();
         }
     
         @Override
         public String getText() {
-            return this.jaxbText.getText();
+            return this.i18nText.getText();
+        }
+        
+        public org.kie.remote.jaxb.gen.I18NText getInternalI18nText() { 
+           return this.i18nText; 
         }
     }
 
     static class JaxbPeopleAssignmentsWrapper extends JaxbWrapper implements PeopleAssignments {
     
-        private final org.kie.remote.jaxb.gen.PeopleAssignments genPeopAssign;
+        private final org.kie.remote.jaxb.gen.PeopleAssignments peopleAssignments;
     
         public JaxbPeopleAssignmentsWrapper(org.kie.remote.jaxb.gen.PeopleAssignments peopAssign) {
             super(PeopleAssignments.class);
-            this.genPeopAssign = peopAssign;
+            this.peopleAssignments = peopAssign;
         }
     
         @Override
         public User getTaskInitiator() {
-            return convertStringIdToUser(genPeopAssign.getTaskInitiatorId());
+            return convertStringIdToUser(peopleAssignments.getTaskInitiatorId());
         }
     
         @Override
         public List<OrganizationalEntity> getPotentialOwners() {
-            return convertGenOrgEngListToOrgEntList(genPeopAssign.getPotentialOwners());
+            return convertGenOrgEngListToOrgEntList(peopleAssignments.getPotentialOwners());
         }
     
         @Override
         public List<OrganizationalEntity> getBusinessAdministrators() {
-            return convertGenOrgEngListToOrgEntList(genPeopAssign.getBusinessAdministrators());
+            return convertGenOrgEngListToOrgEntList(peopleAssignments.getBusinessAdministrators());
+        }
+        
+        public org.kie.remote.jaxb.gen.PeopleAssignments getInternalPeopleAssignments() { 
+            return this.peopleAssignments;
         }
     }
 
