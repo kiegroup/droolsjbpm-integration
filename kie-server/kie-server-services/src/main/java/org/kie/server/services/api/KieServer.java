@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
@@ -35,56 +36,78 @@ public interface KieServer {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute(@Context HttpHeaders headers, CommandScript command );
+    @ApiOperation(value="Executes a script (sequence of commands) on the server", response=ServiceResponse.class)
+    public Response execute(@Context HttpHeaders headers,
+                            @ApiParam(value = "Script to be executed",required=true) CommandScript script );
     
     @GET
     @Path("/containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @ApiOperation(value="Lists all existing KieContainers",response=Response.class)
+    @ApiOperation(value="Lists all existing KieContainers",response=ServiceResponse.class)
     public Response listContainers(@Context HttpHeaders headers);
     
     @GET
     @Path("/containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getContainerInfo( @Context HttpHeaders headers, @PathParam("id") String id );
+    @ApiOperation(value="Retrieves the Kie Container resource information", response=ServiceResponse.class)
+    public Response getContainerInfo( @Context HttpHeaders headers,
+                                      @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id );
     
     @PUT
     @Path("/containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, KieContainerResource container );
+    @ApiOperation(value="Creates a new Kie Container", response=ServiceResponse.class)
+    public Response createContainer( @Context HttpHeaders headers,
+                                     @ApiParam(value = "Id of the Kie Container to create",required=true) @PathParam("id") String id,
+                                     @ApiParam(value = "Container configuration",required=true) KieContainerResource container );
     
     @DELETE
     @Path("/containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id );
+    @ApiOperation(value="Disposes an existing Kie Container", response=ServiceResponse.class)
+    public Response disposeContainer( @Context HttpHeaders headers,
+                                      @ApiParam(value = "Id of the Kie Container to dispose",required=true) @PathParam("id") String id );
     
     @POST
     @Path("/containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute( @Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload );
+    @ApiOperation(value="Executes a script of commands on the given container", response=ServiceResponse.class)
+    public Response execute( @Context HttpHeaders headers,
+                             @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id,
+                             @ApiParam(value = "Commands to execute",required=true) String cmdPayload );
     
     @GET
     @Path("/containers/{id}/release-id")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getReleaseId( @Context HttpHeaders headers, @PathParam("id") String id);
+    @ApiOperation(value="Retrieves the configured release ID for the Kie Container", response=ServiceResponse.class)
+    public Response getReleaseId( @Context HttpHeaders headers,
+                                  @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id);
 
     @POST
     @Path("/containers/{id}/release-id")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateReleaseId( @Context HttpHeaders headers, @PathParam("id") String id, ReleaseId releaseId );
+    @ApiOperation(value="Updates the configured release ID for the Kie Container", response=ServiceResponse.class)
+    public Response updateReleaseId( @Context HttpHeaders headers,
+                                     @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id,
+                                     @ApiParam(value = "New release ID to be used",required=true) ReleaseId releaseId );
     
     @GET
     @Path("/containers/{id}/scanner")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getScannerInfo( @Context HttpHeaders headers, @PathParam("id") String id );
+    @ApiOperation(value="Retrieves the scanner resource attached to the Kie Container, if it is attached", response=ServiceResponse.class)
+    public Response getScannerInfo( @Context HttpHeaders headers,
+                                    @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id );
     
     @POST
     @Path("/containers/{id}/scanner")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateScanner( @Context HttpHeaders headers, @PathParam("id") String id, KieScannerResource resource );
+    @ApiOperation(value="Updates the scanner resource attached to the Kie Container, starting/stopping/disposing the scanner", response=ServiceResponse.class)
+    public Response updateScanner( @Context HttpHeaders headers,
+                                   @ApiParam(value = "Id of the Kie Container",required=true) @PathParam("id") String id,
+                                   @ApiParam(value = "Updates the scanner resource attached to the Kie Container. For instance, starts/stops/disposes the scanner.",required=true) KieScannerResource resource );
     
 } 

@@ -5,16 +5,22 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "create-container")
 @XmlAccessorType(XmlAccessType.NONE)
+@ApiModel(value = "create-container",
+          description = "Creates a new Kie Container on the server",
+          parent = KieServerCommand.class)
 public class CreateContainerCommand implements KieServerCommand {
 
     private static final long    serialVersionUID = -1803374525440238478L;
 
     @XmlElement
+    @ApiModelProperty(value="The container resource description", required = true)
     private KieContainerResource container;
 
     public CreateContainerCommand() {

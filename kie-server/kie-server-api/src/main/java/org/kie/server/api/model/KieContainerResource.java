@@ -4,13 +4,22 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
+
 @XmlRootElement(name = "kie-container")
+@ApiModel(description = "Kie Container resource description")
 public class KieContainerResource {
 
+    @ApiModelProperty(value="The ID of the container", required = true)
     private String             containerId;
+    @ApiModelProperty(value="The release ID the container was configured to use at creation time", required = true)
     private ReleaseId          releaseId;
+    @ApiModelProperty(value="The actual release ID the server resolved to, after start up and maven resolution. This is a read-only property set by the server", required = false)
     private ReleaseId          resolvedReleaseId;
+    @ApiModelProperty(value="The status of the container.", required = false)
     private KieContainerStatus status;
+    @ApiModelProperty(value="The scanner resource attached to this container, if it exists.", required = false)
     private KieScannerResource scanner;
 
     public KieContainerResource() {

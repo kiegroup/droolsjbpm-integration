@@ -19,7 +19,6 @@
   <servlet-mapping>
     <servlet-name>Resteasy</servlet-name>
     <url-pattern>/services/rest/*</url-pattern>
-    <url-pattern>/services/api-docs/*</url-pattern>
   </servlet-mapping>
   <context-param>
     <param-name>resteasy.servlet.mapping.prefix</param-name>
@@ -62,7 +61,7 @@
     <servlet-class>org.kie.server.services.rest.swagger.KieSwaggerJaxrsConfig</servlet-class>
     <init-param>
       <param-name>api.version</param-name>
-      <param-value>2.0.0</param-value>
+      <param-value>1.0.0</param-value>
     </init-param>
     <init-param>
       <param-name>swagger.api.basepath</param-name>
