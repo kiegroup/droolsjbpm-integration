@@ -13,20 +13,6 @@
   <name>KIE :: Execution Server :: API</name>
   <description>KIE Execution Server API</description>
 
-  <properties>
-    <version.com.wordnik.swagger>1.3.10</version.com.wordnik.swagger>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.wordnik</groupId>
-        <artifactId>swagger-annotations</artifactId>
-        <version>${version.com.wordnik.swagger}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- core dependencies -->
     <dependency>
