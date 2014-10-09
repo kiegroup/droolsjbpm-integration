@@ -9,11 +9,13 @@ import javax.naming.InitialContext;
 import javax.transaction.UserTransaction;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
+import org.drools.core.event.DefaultProcessEventListener;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.event.process.ProcessNodeTriggeredEvent;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
@@ -24,6 +26,9 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.TaskQueryService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -117,53 +122,57 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
         KieSession ksession = engine.getKieSession();
         TaskService taskService = engine.getTaskService();
 
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("owner", "john");
-
-        UserTransaction ut = null;
+        JtaTransactionManager jtaTxm = (JtaTransactionManager) context.getBean("jbpmTxManager");
+        TransactionStatus ut = null;
 
         try {
-            ut = beginTransaction();
+            ut = beginTransaction(jtaTxm);
 
             ProcessInstance processInstance = ksession.startProcess("expense", parameters);
 
             executeTasksByProcessByTaskName(processInstance.getId(), "create", taskService);
 
-            ut.commit();
-            ut = beginTransaction();
+            jtaTxm.commit(ut);
+            ut = beginTransaction(jtaTxm);
 
             executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
 
-            ut.commit();
-            ut = beginTransaction();
+            jtaTxm.commit(ut);
+            ut = beginTransaction(jtaTxm);
 
             //The problem happens here. There is no task "edit", but it should be.
             executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
 
-            ut.commit();
-            ut = beginTransaction();
+            jtaTxm.commit(ut);
+            ut = beginTransaction(jtaTxm);
 
             executeTasksByProcessByTaskName(processInstance.getId(), "edit", taskService);
 
-            ut.commit();
-            ut = beginTransaction();
+            jtaTxm.commit(ut);
+            ut = beginTransaction(jtaTxm);
 
             executeTasksByProcessByTaskName(processInstance.getId(), "delete", taskService);
 
-            ut.commit();
+            jtaTxm.commit(ut);
         } finally {
-            if (ut != null && javax.transaction.Status.STATUS_ACTIVE == ut.getStatus()) {
-                ut.rollback();
-            }
+//            if (ut != null && javax.transaction.Status.STATUS_ACTIVE == ut.getStatus()) {
+//                jtaTxm.rollback(ut);
+//            }
         }
     }
 
-    private UserTransaction beginTransaction() throws Exception {
-        UserTransaction ut = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
-        ut.begin();
+    private TransactionStatus beginTransaction(JtaTransactionManager jtaTxm) throws Exception {
+//        UserTransaction ut = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
+//        ut.begin();
+//
+//        return ut;
 
-        return ut;
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = jtaTxm.getTransaction(def);
+
+        return status;
     }
 
     private void executeTasksByProcessByTaskName(long processId, String taskName, TaskService taskService) {

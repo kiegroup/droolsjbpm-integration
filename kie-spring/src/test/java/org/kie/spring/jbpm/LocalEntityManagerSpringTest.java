@@ -2,6 +2,8 @@ package org.kie.spring.jbpm;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
@@ -29,9 +31,19 @@ public class LocalEntityManagerSpringTest extends AbstractJbpmSpringTest {
 
 
         context = new ClassPathXmlApplicationContext("jbpm/local-em/local-em-spring.xml");
+        EntityManager em = (EntityManager) context.getBean("jbpmEM");
+        // check that there is no sessions in db
+        List<?> sessions = em.createQuery("from SessionInfo").getResultList();
+        assertNotNull(sessions);
+        assertEquals(0, sessions.size());
 
         AbstractPlatformTransactionManager aptm = (AbstractPlatformTransactionManager) context.getBean( "jbpmTxManager" );
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
+
+        // after creating per process instance manager init creates temp session that shall be directly destroyed
+        sessions = em.createQuery("from SessionInfo").getResultList();
+        assertNotNull(sessions);
+        assertEquals(0, sessions.size());
 
         RuntimeEngine engine = manager.getRuntimeEngine(ProcessInstanceIdContext.get());
         KieSession ksession = engine.getKieSession();
