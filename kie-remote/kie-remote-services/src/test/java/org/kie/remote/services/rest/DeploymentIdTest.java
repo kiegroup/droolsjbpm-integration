@@ -1,9 +1,9 @@
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.DeployResourceBase.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.kie.remote.services.rest.DeployResourceBase.createDeploymentUnit;
 
 import java.util.regex.Pattern;
 
@@ -12,17 +12,19 @@ import javax.ws.rs.Path;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.Test;
+import org.kie.remote.services.rest.api.DeploymentResource;
+import org.kie.remote.services.rest.api.RuntimeResource;
 
 public class DeploymentIdTest extends DeploymentResourceImpl {
 
     @Test
     public void sameRegexUsedEverywhereTest() {
-        Path pathAnno = RuntimeResourceImpl.class.getAnnotation(Path.class);
+        Path pathAnno = RuntimeResource.class.getAnnotation(Path.class);
         String path = pathAnno.value();
         path = path.replace("/runtime/{deploymentId: ", "");
         String runRegex = path.substring(0, path.length()-1);
 
-        pathAnno = DeploymentResourceImpl.class.getAnnotation(Path.class);
+        pathAnno = DeploymentResource.class.getAnnotation(Path.class);
         path = pathAnno.value();
         path = path.replace("/deployment/{deploymentId: ", "");
         String depRegex = path.substring(0, path.length()-1);
@@ -32,7 +34,7 @@ public class DeploymentIdTest extends DeploymentResourceImpl {
 
     @Test
     public void deploymentIdRegexTest() {
-        Path pathAnno = DeploymentResourceImpl.class.getAnnotation(Path.class);
+        Path pathAnno = DeploymentResource.class.getAnnotation(Path.class);
         String path = pathAnno.value();
         path = path.replace("/deployment/{deploymentId: ", "");
         String regex = path.substring(0, path.length()-1);

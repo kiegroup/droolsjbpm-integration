@@ -46,6 +46,12 @@
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency> 
 
+    <!-- Swagger -->
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-annotations</artifactId>
+    </dependency> 
+    
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
