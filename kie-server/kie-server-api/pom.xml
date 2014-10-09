@@ -44,7 +44,6 @@
       <groupId>com.wordnik</groupId>
       <artifactId>swagger-annotations</artifactId>
     </dependency>
-
   </dependencies>
 
   <build>

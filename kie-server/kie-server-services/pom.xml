@@ -28,22 +28,6 @@
 
   </properties>
 
-  <!-- This section should be eventually moved to kie-parent-with-dependencies -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>tjws</artifactId>
-        <version>${version.org.jboss.resteasy}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-embedder</artifactId>
-        <version>${version.org.apache.maven}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- kie server dependencies -->
     <dependency>
