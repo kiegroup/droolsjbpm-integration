@@ -19,9 +19,6 @@
 
   <properties>
     <bugfix.version>1</bugfix.version>
-    <version.com.wordnik.swagger>1.3.10</version.com.wordnik.swagger>
-    <version.com.wordnik.swagger>1.3.10</version.com.wordnik.swagger>
-    <version.com.sun.jersey>1.18.1</version.com.sun.jersey>
   </properties>
 
   <modules>
@@ -35,24 +32,4 @@
     <!-- finish me.. :/ <module>kie-remote-osgi</module> -->
   </modules>
 
-  <dependencyManagement>
-    <dependencies>
-      <!-- add to k-p-w-d -->
-      <dependency>
-        <groupId>com.wordnik</groupId>
-        <artifactId>swagger-jaxrs_2.10</artifactId>
-        <version>${version.com.wordnik.swagger}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.wordnik</groupId>
-        <artifactId>swagger-core_2.10</artifactId>
-        <version>${version.com.wordnik.swagger}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.wordnik</groupId>
-        <artifactId>swagger-annotations</artifactId>
-        <version>${version.com.wordnik.swagger}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>
