@@ -39,11 +39,6 @@
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
 
-    <!-- swagger -->
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-annotations</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

@@ -119,10 +119,6 @@ public class KieRemoteRestOperationException extends RuntimeException {
         return new KieRemoteRestOperationException(msg, Status.NOT_FOUND);
     }
    
-    public static KieRemoteRestOperationException notFound(String msg, Exception e) { 
-        return new KieRemoteRestOperationException(msg, e, Status.NOT_FOUND);
-    }
-   
     // technical exception (including serialization problems)
     public static KieRemoteRestOperationException internalServerError(String msg) { 
         return new KieRemoteRestOperationException(msg, Status.INTERNAL_SERVER_ERROR);

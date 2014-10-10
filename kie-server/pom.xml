@@ -19,7 +19,26 @@
     <module>kie-server-api</module>
     <module>kie-server-client</module>
     <module>kie-server-services</module>
-    <module>kie-swagger-ui</module>
   </modules>
 
+  <!-- move to droolsjbpm-buildbootstrap! -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-server-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

@@ -25,8 +25,23 @@
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
     <!-- This property can be overriden when some other remote repo location should be used -->
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
-
   </properties>
+
+  <!-- This section should be eventually moved to kie-parent-with-dependencies -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>tjws</artifactId>
+        <version>2.3.7.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${version.org.apache.maven}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- kie server dependencies -->
@@ -151,40 +166,16 @@
       <!-- scope>provided</scope -->
     </dependency>
 
-    <!-- Swagger - REST documentation -->
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-core_2.10</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.wordnik</groupId>
-      <artifactId>swagger-jaxrs_2.10</artifactId>
-    </dependency>
-
-    <!-- hacking Swagger -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-    </dependency>
-    
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
-    
     <!-- test dependencies -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
@@ -204,12 +195,7 @@
         <directory>src/test/filtered-resources</directory>
         <filtering>true</filtering>
       </testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>false</filtering>
-      </testResource>
     </testResources>
-    
     <plugins>
       <plugin>
         <!-- we need to fork always as we have mixture of both arquillian 

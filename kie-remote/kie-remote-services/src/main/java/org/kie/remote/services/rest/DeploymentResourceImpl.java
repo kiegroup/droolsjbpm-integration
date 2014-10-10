@@ -4,6 +4,9 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -32,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's funtion.
  */
+@Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 public class DeploymentResourceImpl extends ResourceBase implements DeploymentResource {
 

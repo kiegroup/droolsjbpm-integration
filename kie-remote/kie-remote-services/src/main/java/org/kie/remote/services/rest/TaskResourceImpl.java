@@ -6,8 +6,10 @@ import java.util.Map;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -116,7 +118,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
     
     @Override
-    public Response getTask(long taskId) { 
+    public Response taskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
         if( task == null ) { 
@@ -126,7 +128,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
 
     @Override
-    public Response doTaskOperation(long taskId, String operation) { 
+    public Response taskId_oper(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
         String oper = getRelativePath();
@@ -188,7 +190,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
     
     @Override
-    public Response getTaskContentByTaskId(long taskId) { 
+    public Response taskId_content(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
         if( result == null ) {
@@ -208,7 +210,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
 
     @Override
-    public Response getTaskFormByTaskId(long taskId) {
+    public Response taskId_form(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
 
@@ -229,7 +231,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
     
     @Override
-    public Response getTaskContentByContentId(long contentId) { 
+    public Response content_contentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         cmd.setUserId(identityProvider.getName());
         JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
@@ -240,7 +242,7 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     }
     
     @Override
-    public Response clearTaskBamHistory() { 
+    public Response bam_clear() { 
         doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
     }

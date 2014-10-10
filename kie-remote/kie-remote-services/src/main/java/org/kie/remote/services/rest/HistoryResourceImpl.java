@@ -1,23 +1,26 @@
 package org.kie.remote.services.rest;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.jbpm.process.audit.NodeInstanceLog;
+import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.services.rest.api.HistoryResource;
+import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.api.HistoryResource;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
@@ -36,6 +39,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's funtion.
  */
+@Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
 public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
@@ -54,12 +58,11 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     }
 
     @Override
-    public Response getProcessInstanceLogs() {
+    public Response instances() {
         String oper = getRelativePath();
         Map<String, String []> params = getRequestParams();
         
         List<ProcessInstanceLog> procInstLogResults = getAuditLogService().findProcessInstances();
-        sortProcessInstanceLogs(procInstLogResults);
         
         List<Object> results = new ArrayList<Object>(procInstLogResults);
         JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
@@ -68,7 +71,7 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     }
 
     @Override
-    public Response getProcessInstanceLog(long procInstId) {
+    public Response instance_procInstId(@PathParam("procInstId") long procInstId) {
         ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
         JaxbProcessInstanceLog jaxbProcLog = new JaxbProcessInstanceLog(procInstLog);
         
@@ -76,57 +79,50 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     }
 
     @Override
-    public Response getInstanceLogsByProcInstId(Long instId, String logType) {
+    public Response instance_procInstid_oper(@PathParam("procInstId") Long procInstId, @PathParam("oper") String operation) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
         
-        List<? extends Object> varInstLogList;
-        if ("child".equalsIgnoreCase(logType)) {
-            Object result = getAuditLogService().findSubProcessInstances(instId);
-            varInstLogList = (List<Object>) result;
-            sortProcessInstanceLogs((List<ProcessInstanceLog>) varInstLogList);
-        } else if ("node".equalsIgnoreCase(logType)) {
-            Object result = getAuditLogService().findNodeInstances(instId);
-            varInstLogList = (List<Object>) result;
-            sortNodeInstanceLogs((List<NodeInstanceLog>) varInstLogList);
-        } else if ("variable".equalsIgnoreCase(logType)) {
-            Object result = getAuditLogService().findVariableInstances(instId);
-            varInstLogList = (List<Object>) result;
-            sortVariableInstanceLogs((List<VariableInstanceLog>) varInstLogList);
-        } else {
-            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper );
-        }
-
-        JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, (List<Object>) varInstLogList, new JaxbHistoryLogList());
-        
-        return createCorrectVariant(resultList, headers);
-    }
-
-    @Override
-    public Response getInstanceLogsByProcInstIdByLogId(Long procInstId, String operation, String logId) {
-        Map<String, String []> params = getRequestParams();
-        String oper = getRelativePath();
-        
-        List<? extends Object> varInstLogList;
-        if ("node".equalsIgnoreCase(operation)) {
-            Object result = getAuditLogService().findNodeInstances(procInstId, logId);
-            varInstLogList = (List<Object>) result;
-            sortNodeInstanceLogs((List<NodeInstanceLog>) varInstLogList);
+        Object result = null;
+        if ("child".equalsIgnoreCase(operation)) {
+            result = getAuditLogService().findSubProcessInstances(procInstId);
+        } else if ("node".equalsIgnoreCase(operation)) {
+            result = getAuditLogService().findNodeInstances(procInstId);
         } else if ("variable".equalsIgnoreCase(operation)) {
-            Object result = getAuditLogService().findVariableInstances(procInstId, logId);
-            varInstLogList = (List<Object>) result;
-            sortVariableInstanceLogs((List<VariableInstanceLog>) varInstLogList);
+            result = getAuditLogService().findVariableInstances(procInstId);
         } else {
             throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper );
         }
-        
-        JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, (List<Object>) varInstLogList, new JaxbHistoryLogList());
+
+        List<Object> varInstLogList = (List<Object>) result;
+        JaxbHistoryLogList resultList =  paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
     }
 
     @Override
-    public Response getProcessInstanceLogsByProcessId(String processId) {
+    public Response instance_procInstId_oper_logId(@PathParam("procInstId") Long procInstId,
+            @PathParam("oper") String operation, @PathParam("logId") String logId) {
+        Map<String, String []> params = getRequestParams();
+        String oper = getRelativePath();
+        
+        Object result = null;
+        if ("node".equalsIgnoreCase(operation)) {
+            result = getAuditLogService().findNodeInstances(procInstId, logId);
+        } else if ("variable".equalsIgnoreCase(operation)) {
+            result = getAuditLogService().findVariableInstances(procInstId, logId);
+        } else {
+            throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper );
+        }
+        
+        List<Object> varInstLogList = (List<Object>) result;
+        JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, varInstLogList, new JaxbHistoryLogList());
+        
+        return createCorrectVariant(resultList, headers);
+    }
+
+    @Override
+    public Response process_procDefId(@PathParam("processDefId") String processId) {
         Map<String, String []> params = getRequestParams();
         Number statusParam = getNumberParam("status", false, params, getRelativePath(), false);
         String oper = getRelativePath();
@@ -157,42 +153,38 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
                 }
             }
         }
-        
-        sortProcessInstanceLogs(filteredProcLogList);
         List<Object> results = new ArrayList<Object>(filteredProcLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
         return createCorrectVariant(resultList, headers);
     }
 
     @Override
-    public Response getVariableInstanceLogsByVariableId(String variableId) {
+    public Response variable_varId(@PathParam("varId") String variableId) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
         
-        List<VariableInstanceLog> varInstLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
-        sortVariableInstanceLogs(varInstLogList);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, null, params, oper);
         
-        List<Object> results = new ArrayList<Object>(varInstLogList);
+        List<Object> results = new ArrayList<Object>(varLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
     }
     
     @Override
-    public Response getVariableInstanceLogsByVariableIdByVariableValue(String variableId, String value) {
+    public Response variable_varId_value_valueVal(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
-        List<VariableInstanceLog> varInstLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
-        sortVariableInstanceLogs(varInstLogList);
+        List<VariableInstanceLog> varLogList = internalGetVariableInstancesByVarAndValue(variableId, value, params, oper);
         
-        List<Object> results = new ArrayList<Object>(varInstLogList);
+        List<Object> results = new ArrayList<Object>(varLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(params, oper, results, new JaxbHistoryLogList());
         
         return createCorrectVariant(resultList, headers);
     } 
    
     @Override
-    public Response getProcessInstanceLogsByVariableId(String variableId) {
+    public Response variable_varId_instances(@PathParam("varId") String variableId) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
 
@@ -212,7 +204,7 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     }
     
     @Override
-    public Response getProcessInstanceLogsByVariableIdByVariableValue(String variableId, String value) {
+    public Response variable_varId_value_valueVal_instances(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
 
@@ -265,66 +257,4 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         }
         return resultList;
     }
-
-    private void sortProcessInstanceLogs(List<ProcessInstanceLog> procInstLogList) { 
-        Collections.sort(procInstLogList, new Comparator<ProcessInstanceLog>() {
-    
-            @Override
-            public int compare( ProcessInstanceLog o1, ProcessInstanceLog o2 ) {
-                if( ! o1.getExternalId().equals(o2.getExternalId()) ) { 
-                   return o1.getExternalId().compareTo(o2.getExternalId());
-                }
-                if( ! o1.getProcessId().equals(o2.getProcessId()) ) { 
-                   return o1.getProcessId().compareTo(o2.getProcessId());
-                }
-                return o1.getProcessInstanceId().compareTo(o2.getProcessInstanceId());
-            }
-        });
-    }
-    
-
-    private void sortNodeInstanceLogs(List<NodeInstanceLog> procInstLogList) { 
-        Collections.sort(procInstLogList, new Comparator<NodeInstanceLog>() {
-    
-            @Override
-            public int compare( NodeInstanceLog o1, NodeInstanceLog o2 ) {
-                if( ! o1.getExternalId().equals(o2.getExternalId()) ) { 
-                   return o1.getExternalId().compareTo(o2.getExternalId());
-                }
-                if( ! o1.getProcessId().equals(o2.getProcessId()) ) { 
-                   return o1.getProcessId().compareTo(o2.getProcessId());
-                }
-                if( ! o1.getProcessInstanceId().equals(o2.getProcessInstanceId()) ) { 
-                   return o1.getProcessInstanceId().compareTo(o2.getProcessInstanceId());
-                }
-                if( ! o1.getNodeId().equals(o2.getNodeId()) ) { 
-                   return o1.getNodeId().compareTo(o2.getNodeId());
-                }
-                return o1.getNodeInstanceId().compareTo(o2.getNodeInstanceId());
-            }
-        });
-    }
-
-    private void sortVariableInstanceLogs(List<VariableInstanceLog> varInstLogList ) { 
-        Collections.sort(varInstLogList, new Comparator<VariableInstanceLog>() {
-
-            @Override
-            public int compare( VariableInstanceLog o1, VariableInstanceLog o2 ) {
-                if( ! o1.getExternalId().equals(o2.getExternalId()) ) { 
-                    return o1.getExternalId().compareTo(o2.getExternalId());
-                }
-                if( ! o1.getProcessId().equals(o2.getProcessId()) ) { 
-                    return o1.getProcessId().compareTo(o2.getProcessId());
-                }
-                if( ! o1.getProcessInstanceId().equals(o2.getProcessInstanceId()) ) { 
-                   return o1.getProcessInstanceId().compareTo(o2.getProcessInstanceId());
-                }
-                if( ! o1.getVariableId().equals(o2.getVariableId()) ) { 
-                   return o1.getVariableId().compareTo(o2.getVariableId());
-                }
-                return o1.getVariableInstanceId().compareTo(o2.getVariableInstanceId());
-            }
-        });
-    }
 }
-    

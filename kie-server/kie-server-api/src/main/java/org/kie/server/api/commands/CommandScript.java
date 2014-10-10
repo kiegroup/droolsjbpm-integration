@@ -28,18 +28,18 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.wordnik.swagger.annotations.ApiModel;
-import com.wordnik.swagger.annotations.ApiModelProperty;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "script")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "script")
-@ApiModel(value = "script", description = "a script (sequence of commands)")
+@XmlType(name = "script", propOrder = {"lookup", "commands"})
 public class CommandScript implements Serializable {
 
     private static final long serialVersionUID = 510l;
+
+    @XmlAttribute
+    private String lookup;
 
     @XmlElements({
                          @XmlElement(name = "create-container", type = CreateContainerCommand.class),
@@ -48,7 +48,6 @@ public class CommandScript implements Serializable {
                          @XmlElement(name = "call-container", type = CallContainerCommand.class)
                  })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    @ApiModelProperty(value="list of commands", allowableValues = "create-container,list-container,dispose-container,call-container", required = true)
     protected List<KieServerCommand> commands;
 
     public CommandScript() {
@@ -58,6 +57,11 @@ public class CommandScript implements Serializable {
         this.commands = commands;
     }
 
+    public CommandScript(List<KieServerCommand> commands, String lookup) {
+        this.commands = commands;
+        this.lookup = lookup;
+    }
+
     public List<KieServerCommand> getCommands() {
         if (commands == null) {
             commands = new ArrayList<KieServerCommand>();
@@ -65,7 +69,18 @@ public class CommandScript implements Serializable {
         return this.commands;
     }
 
+    public void setLookup(String lookup) {
+        this.lookup = lookup;
+    }
+
+    public String getLookup() {
+        return lookup;
+    }
+
     public String toString() {
-        return "CommandScriptImpl{commands=" + commands + '}';
+        return "CommandScriptImpl{" +
+                "lookup='" + lookup + '\'' +
+                ", commands=" + commands +
+                '}';
     }
 }

@@ -14,6 +14,7 @@ import org.kie.remote.services.rest.api.DeploymentsResource;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
 
+@Path("/deployment")
 @RequestScoped
 public class DeploymentsResourceImpl extends ResourceBase implements DeploymentsResource {
 
