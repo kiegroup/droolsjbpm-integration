@@ -133,18 +133,24 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper {
                 break;
             case 7: // potential owner
                 assert "potentialowner".equals(actionParamNameMap.get(action)): action + " : potentialowner";
+                setRegexOnOff(actionData, true, taskQueryBuilder, varInstLogQueryBuilder);
                 taskQueryBuilder.potentialOwner(data);
                 varInstLogQueryBuilder.potentialOwner(data);
+                setRegexOnOff(actionData, false, taskQueryBuilder, varInstLogQueryBuilder);
                 break;
             case 8: // task owner
                 assert "taskowner".equals(actionParamNameMap.get(action)): action + " : taskowner";
+                setRegexOnOff(actionData, true, taskQueryBuilder, varInstLogQueryBuilder);
                 taskQueryBuilder.taskOwner(data);
                 varInstLogQueryBuilder.taskOwner(data);
+                setRegexOnOff(actionData, false, taskQueryBuilder, varInstLogQueryBuilder);
                 break;
             case 9: // business admin
                 assert "businessadmin".equals(actionParamNameMap.get(action)): action + " : businessadmin";
+                setRegexOnOff(actionData, true, taskQueryBuilder, varInstLogQueryBuilder);
                 taskQueryBuilder.businessAdmin(data);
                 varInstLogQueryBuilder.businessAdmin(data);
+                setRegexOnOff(actionData, false, taskQueryBuilder, varInstLogQueryBuilder);
                 break;
             case 10: // task status
                 assert "taskstatus".equals(actionParamNameMap.get(action)): action + " : taskstatus";
@@ -238,13 +244,20 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper {
                 setRegexOnOff(actionData, false, taskQueryBuilder, varInstLogQueryBuilder);
                 break;
             case 17: // var
+                assert "var".equals(actionParamNameMap.get(action)): action + " : var";
+                taskQueryBuilder.variableValue(data[0], varValueMap.get(data[0]));
+                varInstLogQueryBuilder.variableValue(data[0], varValueMap.get(data[0]));
                 break;
             case 18: // varregex
+                assert "varregex".equals(actionParamNameMap.get(action)): action + " : varregex";
+                setRegexOnOff(actionData, true, taskQueryBuilder, varInstLogQueryBuilder);
+                taskQueryBuilder.variableValue(data[0], varRegexMap.get(data[0]));
+                varInstLogQueryBuilder.variableValue(data[0], varRegexMap.get(data[0]));
+                setRegexOnOff(actionData, false, taskQueryBuilder, varInstLogQueryBuilder);
                 break;
 
             default:
-                throw KieRemoteRestOperationException
-                        .internalServerError("Please contact the developers: state [" + action + "] should not be possible.");
+                throw KieRemoteRestOperationException.internalServerError("Please contact the developers: state [" + action + "] should not be possible.");
             }
             if( actionData.min || actionData.max || actionData.regex ) {
                 throw KieRemoteRestOperationException.notFound("Query parameter '" + actionData.paramName + "' is not supported.");
