@@ -1,7 +1,9 @@
 package org.kie.services.client.documentation;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
@@ -11,6 +13,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRuntimeEngineFactory;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.services.client.builder.objects.MyType;
 
 public class DocumentationApiExamples {
 
@@ -21,7 +24,7 @@ public class DocumentationApiExamples {
         RemoteJmsRuntimeEngineFactory remoteJmsFactory 
             = RemoteRuntimeEngineFactory.newJmsBuilder()
             .addDeploymentId(deploymentId)
-            .addJbossServerUrl(serverUrl)
+            .addJbossServerHostName(serverUrl.getHost())
             .addUserName(user)
             .addPassword(password)
             .buildFactory();
@@ -29,7 +32,10 @@ public class DocumentationApiExamples {
         // Interface with JMS api
         RuntimeEngine engine = remoteJmsFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
-        ProcessInstance processInstance = ksession.startProcess("com.burns.reactor.maintenance.cycle");
+        
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("paramName", new MyType("name", 23));
+        ProcessInstance processInstance = ksession.startProcess("com.burns.reactor.maintenance.cycle", params);
         long procId = processInstance.getId();
         TaskService taskService = engine.getTaskService();
         List<Long> tasks = taskService.getTasksByProcessInstanceId(procId);
@@ -56,8 +62,10 @@ public class DocumentationApiExamples {
         // Each opertion on a KieSession, TaskService or AuditLogService (client) instance 
         // sends a request for the operation to the server side and waits for the response
         // If something goes wrong on the server side, the client will throw an exception. 
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("paramName", new MyType("name", 23));
         ProcessInstance processInstance 
-            = ksession.startProcess("com.burns.reactor.maintenance.cycle");
+            = ksession.startProcess("com.burns.reactor.maintenance.cycle", params);
         long procId = processInstance.getId();
 
         String taskUserId = user;
