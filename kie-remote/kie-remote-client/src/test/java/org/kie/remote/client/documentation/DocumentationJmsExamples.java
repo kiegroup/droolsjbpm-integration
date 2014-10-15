@@ -1,4 +1,4 @@
-package org.kie.services.client.documentation;
+package org.kie.remote.client.documentation;
 
 
 import java.net.MalformedURLException;
