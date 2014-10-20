@@ -29,15 +29,7 @@
         </xs:appinfo>
       </xs:annotation> 
 
-      <xs:element name="CommandServiceException" type="tns:WebServiceFaultInfo"/>
-      
-      <xs:complexType name="WebServiceFaultInfo">
-        <xs:annotation>
-          <xs:appinfo>
-            <jxb:class ref="org.kie.remote.services.ws.common.WebServiceFaultInfo"/>
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:complexType>
+      <!-- COMMON -->
       
       <xs:complexType name="serializableServiceObject" abstract="true">
         <xs:annotation>
@@ -48,7 +40,20 @@
         <xs:sequence/>
       </xs:complexType>
 
-      <xs:element name="command-request" type="tns:jaxbCommandsRequest"/>
+      <!-- EXCEPTION -->
+  
+      <xs:element name="CommandServiceException" type="tns:WebServiceFaultInfo"/>
+      
+      <xs:complexType name="WebServiceFaultInfo">
+        <xs:annotation>
+          <xs:appinfo>
+            <jxb:class ref="org.kie.remote.services.ws.common.WebServiceFaultInfo"/>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:complexType>
+      
+      <!-- OPERATIONS -->
+      
       <xs:element name="execute" type="tns:execute"/>
       
       <xs:complexType name="execute">
@@ -57,15 +62,16 @@
         </xs:sequence>
       </xs:complexType>
 
+      <xs:element name="command-request" type="tns:jaxbCommandsRequest"/>
+      
       <xs:complexType name="jaxbCommandsRequest">
-         <xs:annotation>
+        <xs:annotation>
           <xs:appinfo>
             <jxb:class ref="org.kie.remote.client.jaxb.JaxbCommandsRequest"/>
           </xs:appinfo>
         </xs:annotation>
        </xs:complexType>
 
-      <xs:element name="command-response" type="tns:jaxbCommandsResponse"/>
       <xs:element name="executeResponse" type="tns:executeResponse"/>
 
       <xs:complexType name="executeResponse">
@@ -74,6 +80,8 @@
         </xs:sequence>
       </xs:complexType>
 
+      <xs:element name="command-response" type="tns:jaxbCommandsResponse"/>
+      
       <xs:complexType name="jaxbCommandsResponse">
         <xs:annotation>
           <xs:appinfo>
