@@ -111,10 +111,9 @@
             </goals>
             <configuration>
               <executable>${tool.wsimport}</executable>
-              <sourceDestDir>${project.build.directory}/classes/META-INF/wsdl</sourceDestDir>
+              <sourceDestDir>${project.basedir}/src/main/generated</sourceDestDir>
               <packageName>org.kie.remote.services.ws.command.generated</packageName>
               <target>2.1</target>
-              <!-- Following configuration will invoke wsimport once for each wsdl. -->
               <wsdlLocation>file:///wsdl/*</wsdlLocation>
               <wsdlDirectory>${project.build.directory}/classes/META-INF/wsdl</wsdlDirectory>
               <wsdlFiles>
