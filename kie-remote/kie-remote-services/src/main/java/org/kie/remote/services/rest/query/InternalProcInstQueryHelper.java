@@ -69,7 +69,21 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper {
             case 0: // processinstanceid
                 assert "processinstanceid".equals(actionParamNameMap.get(action)): action + " : processinstanceid";
                 longData = getLongs(action, data);
-                instLogQueryBuilder.processInstanceId(longData);
+                if( actionData.min || actionData.max ) {
+                    if( longData.length > 1 ) {
+                        throw KieRemoteRestOperationException.notFound("Only 1 '" + actionData.paramName
+                                + "' parameter is accepted");
+                    }
+                    if( actionData.min ) {
+                        instLogQueryBuilder.processInstanceIdMin(longData[0]);
+                        actionData.min = false;
+                    } else if( actionData.max ) {
+                        instLogQueryBuilder.processInstanceIdMax(longData[0]);
+                        actionData.max = false;
+                    }
+                } else {
+                    instLogQueryBuilder.processInstanceId(longData);
+                }
                 break;
             case 1: // processid
                 assert "processid".equals(actionParamNameMap.get(action)): action + " : processid";
