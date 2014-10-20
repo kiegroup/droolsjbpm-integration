@@ -90,6 +90,24 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper {
                 longData = getLongs(action, data);
                 taskQueryBuilder.processInstanceId(longData);
                 varInstLogQueryBuilder.processInstanceId(longData);
+                if( actionData.min || actionData.max ) {
+                    if( longData.length > 1 ) {
+                        throw KieRemoteRestOperationException.notFound("Only 1 '" + actionData.paramName
+                                + "' parameter is accepted");
+                    }
+                    if( actionData.min ) {
+                        varInstLogQueryBuilder.processInstanceIdMin(longData[0]);
+                        taskQueryBuilder.processInstanceIdMin(longData[0]);
+                        actionData.min = false;
+                    } else if( actionData.max ) {
+                        varInstLogQueryBuilder.processInstanceIdMax(longData[0]);
+                        taskQueryBuilder.processInstanceIdMax(longData[0]);
+                        actionData.max = false;
+                    }
+                } else {
+                    varInstLogQueryBuilder.processInstanceId(longData);
+                    taskQueryBuilder.processInstanceId(longData);
+                }
                 break;
             case 1: // processid
                 assert "processid".equals(actionParamNameMap.get(action)): action + " : processid";
