@@ -97,11 +97,11 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         
         String oper = "claim";
         doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.taskId_oper(TASK_ID, oper);
+        this.doTaskOperation(TASK_ID, oper);
         
         oper = "complete";
         doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.taskId_oper(TASK_ID, oper);
+        this.doTaskOperation(TASK_ID, oper);
         
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
@@ -130,11 +130,11 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         
         String oper = "claim";
         doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.taskId_oper(TASK_ID, oper);
+        this.doTaskOperation(TASK_ID, oper);
         
         oper = "complete";
         doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.taskId_oper(TASK_ID, oper);
+        this.doTaskOperation(TASK_ID, oper);
         
         // verify
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));

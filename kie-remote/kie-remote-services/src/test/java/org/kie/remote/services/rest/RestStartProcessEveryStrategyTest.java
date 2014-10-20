@@ -95,7 +95,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
                 .getRequestURI();
 
-        Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
+        Response resp = startProcessInstance(TEST_PROCESS_DEF_NAME);
         // verify ksession is called
         JaxbProcessInstanceResponse procInstResp = (JaxbProcessInstanceResponse) resp.getEntity();
         assertEquals("Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId());
@@ -107,7 +107,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         queryParams.put(PROC_INST_ID_PARAM_NAME, procInstParamVal);
         String [] signalParamVal = { "test" };
         queryParams.put("signal", signalParamVal);
-        resp = signal();
+        resp = signalProcessInstances();
 
         // verify ksession is called
         verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
@@ -121,14 +121,14 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
                 .getRequestURI();
 
-        Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
+        Response resp = startProcessInstance(TEST_PROCESS_DEF_NAME);
         // verify non-process contexts are used
         JaxbProcessInstanceResponse procInstResp = (JaxbProcessInstanceResponse) resp.getEntity();
         assertEquals("Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId());
 
         String [] signalParamVal = {"test"};
         queryParams.put("signal", signalParamVal);
-        resp = signal();
+        resp = signalProcessInstances();
 
         // verify ksession is called
         verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
@@ -140,14 +140,14 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
                 .getRequestURI();
 
-        Response resp = process_defId_start(TEST_PROCESS_DEF_NAME);
+        Response resp = startProcessInstance(TEST_PROCESS_DEF_NAME);
         // verify non-process contexts are used
         JaxbProcessInstanceResponse procInstResp = (JaxbProcessInstanceResponse) resp.getEntity();
         assertEquals("Invalid process instance id", TEST_PROCESS_INST_ID, procInstResp.getId());
 
         String [] signalParamVal = { "test" };
         queryParams.put("signal", signalParamVal);
-        resp = signal();
+        resp = signalProcessInstances();
 
         // verify ksession is called
         verify(processServiceMock, times(2)).execute(any(String.class),any(Command.class));
