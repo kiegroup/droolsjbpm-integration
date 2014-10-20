@@ -17,11 +17,26 @@
       <artifactId>kie-remote-jaxb</artifactId>
     </dependency>
 
-    <!-- Rest -->
+    <!-- REST -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
     </dependency>
+
+    <!-- swagger -->
+    <dependency>
+      <groupId>com.wordnik</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
   </dependencies>
-  
+ 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.wordnik</groupId>
+        <artifactId>swagger-annotations</artifactId>
+        <version>1.3.10</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement> 
 </project>
