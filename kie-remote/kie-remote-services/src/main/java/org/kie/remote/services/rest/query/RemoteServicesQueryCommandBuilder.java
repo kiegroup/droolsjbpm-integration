@@ -87,6 +87,26 @@ public class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<
     }
 
     /**
+     * Add one or more process instance ids as a criteria to the query
+     * @param processInstanceId
+     * @return the current instance
+     */
+    public RemoteServicesQueryCommandBuilder processInstanceIdMin( long processInstanceId ) {
+        addRangeParameter(PROCESS_INSTANCE_ID_LIST, "process instance id range, start", processInstanceId, true);
+        return this;
+    }
+
+    /**
+     * Add one or more process instance ids as a criteria to the query
+     * @param processInstanceId
+     * @return the current instance
+     */
+    public RemoteServicesQueryCommandBuilder processInstanceIdMax( long processInstanceId ) {
+        addRangeParameter(PROCESS_INSTANCE_ID_LIST, "process instance id range, end", processInstanceId, false);
+        return this;
+    }
+    
+    /**
      * Specify one more statuses (in the form of an int) as criteria.
      * @param status one or more int statuses
      * @return The current instance of this query builder

@@ -281,8 +281,16 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         assertNotNull( "null result", result );
         assertFalse( "empty result (all)", result.getProcessInstanceInfoList().isEmpty() );
         assertTrue( "not enough proc info's: " + result.getProcessInstanceInfoList().size(), result.getProcessInstanceInfoList().size() > 2 );
+        long procInstMin = Long.MAX_VALUE;
+        long procInstMax = -1l;
         for( JaxbQueryProcessInstanceInfo procInfo : result.getProcessInstanceInfoList() ) { 
            long procInstId = procInfo.getProcessInstance().getId();
+           if( procInstId > procInstMax ) { 
+               procInstMax = procInstId;
+           }
+           if( procInstId < procInstMin ) { 
+               procInstMin = procInstId;
+           }
            String procId = procInfo.getProcessInstance().getProcessId();
            boolean myType = procId.contains("object");
            for( JaxbVariableInfo varInfo : procInfo.getVariables() ) { 
@@ -337,5 +345,28 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
       
         roundTripJson(result);
         roundTripXml(result);
+        
+        queryParams.clear();
+        --procInstMax;
+        ++procInstMin;
+        addParams(queryParams, "piid_min", String.valueOf(procInstMin));
+        addParams(queryParams, "processinstanceid_max", String.valueOf(procInstMax));
+        result = queryProcInstHelper.queryProcessInstancesAndVariables(queryParams, pageInfo, maxResults);
+        assertNotNull( "null result", result );
+        assertFalse( "empty result", result.getProcessInstanceInfoList().isEmpty() );
+        assertEquals( "number results", procInstMax - procInstMin+1, result.getProcessInstanceInfoList().size() );
+        long findMin = Long.MAX_VALUE;
+        long findMax = -1;
+        for( JaxbQueryProcessInstanceInfo jaxbProcInfo : result.getProcessInstanceInfoList() ) { 
+           procInstId = jaxbProcInfo.getProcessInstance().getId();
+           if( procInstId > findMax ) { 
+               findMax = procInstId;
+           }
+           if( procInstId < findMin ) { 
+               findMin = procInstId;
+           }
+        }
+        assertEquals( "process instance id max", procInstMax, findMax );
+        assertEquals( "process instance id min", procInstMin, findMin );
     }
 }

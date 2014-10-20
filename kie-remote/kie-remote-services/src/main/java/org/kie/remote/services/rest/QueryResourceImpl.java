@@ -47,9 +47,7 @@ import org.kie.services.client.serialization.jaxb.impl.query.JaxbVariableInfo;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 
 /**
- * Not done.
- * 
- * Available starting with 6.2.0.Final
+ * Resource that does various query operations
  */
 
 @RequestScoped
@@ -101,7 +99,7 @@ public class QueryResourceImpl extends ResourceBase {
             = queryHelper.queryProcessInstancesAndVariables(params, pageInfo, maxNumResults);
         queryHelper.dispose();
 
-        return createCorrectVariant(null, headers);
+        return createCorrectVariant(result, headers);
     }
   
     private static final String[] allowedQueryParams = { 
