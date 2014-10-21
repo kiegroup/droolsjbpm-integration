@@ -1,20 +1,7 @@
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.actionParamNameMap;
-import static org.kie.remote.services.rest.query.QueryResourceData.getDates;
-import static org.kie.remote.services.rest.query.QueryResourceData.getInts;
-import static org.kie.remote.services.rest.query.QueryResourceData.getLongs;
-import static org.kie.remote.services.rest.query.QueryResourceData.getTaskStatuses;
-import static org.kie.remote.services.rest.query.QueryResourceData.metaRuntimeParams;
-import static org.kie.remote.services.rest.query.QueryResourceData.metaRuntimeParamsShort;
-import static org.kie.remote.services.rest.query.QueryResourceData.paramNameActionMap;
-
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -25,26 +12,15 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.process.audit.query.ProcInstLogQueryBuilderImpl;
 import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
-import org.jbpm.services.task.commands.TaskQueryDataCommand;
-import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
-import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.query.data.QueryData;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.InternalProcInstQueryHelper;
 import org.kie.remote.services.rest.query.InternalTaskQueryHelper;
-import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstance;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbVariableInfo;
-import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 
 /**
  * Resource that does various query operations

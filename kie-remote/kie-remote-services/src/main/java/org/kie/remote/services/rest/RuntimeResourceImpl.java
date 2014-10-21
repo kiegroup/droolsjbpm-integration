@@ -9,14 +9,9 @@ import java.util.Map.Entry;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
@@ -40,8 +35,6 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.services.jaxb.JaxbCommandsRequest;
-import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.api.RuntimeResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
@@ -67,7 +60,6 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
  * If the method is annotated by the @Path anno, but is the "root", then
  * give it a name that explains it's function.
  */
-@Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource {
 
@@ -92,22 +84,6 @@ public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource
 
 
     // Rest methods --------------------------------------------------------------------------------------------------------------
-
-    /**
-     * The "/execute" method, primarily for the classes in the kie-services-client jar. 
-     * </p>
-     * A pain to support.. 
-     * 
-     * @param cmdsRequest The {@link JaxbCommandsRequest} containing the {@link Command} and other necessary info.
-     * @return A {@link JaxbCommandsResponse} with the result from the {@link Command}
-     */
-    @POST
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
-    @Path("/execute")
-    public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return restProcessJaxbCommandsRequest(cmdsRequest);
-    } 
  
     @Override
     public Response getProcessDefinitionInfo(String processId) {

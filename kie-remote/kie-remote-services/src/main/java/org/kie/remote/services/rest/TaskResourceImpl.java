@@ -5,13 +5,8 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.drools.core.util.StringUtils;
@@ -39,8 +34,6 @@ import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Task;
-import org.kie.remote.services.jaxb.JaxbCommandsRequest;
-import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.api.TaskResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
@@ -60,7 +53,6 @@ import org.slf4j.LoggerFactory;
  * public void begin_varOne_middle_varTwo() { 
  * </pre>
  */
-@Path("/task")
 @RequestScoped
 public class TaskResourceImpl extends ResourceBase implements TaskResource {
 
@@ -100,14 +92,6 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         "content"};
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
-
-    @POST
-    @Consumes(MediaType.APPLICATION_XML)
-    @Produces(MediaType.APPLICATION_XML)
-    @Path("/execute")
-    public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
-        return restProcessJaxbCommandsRequest(cmdsRequest);
-    }
 
     @Override
     @Deprecated

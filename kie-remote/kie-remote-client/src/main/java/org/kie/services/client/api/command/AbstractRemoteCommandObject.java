@@ -369,14 +369,7 @@ public abstract class AbstractRemoteCommandObject {
      */
     private <T> T executeRestCommand( Command command ) {
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
-        String deploymentId = config.getDeploymentId();
-
-        KieRemoteHttpRequest httpRequest = config.createHttpRequest();
-        if( config.getExtraJaxbClasses().isEmpty() && (isTaskService || command instanceof AuditCommand) ) {
-            httpRequest = httpRequest.relativeRequest("/task/execute");
-        } else {
-            httpRequest = httpRequest.relativeRequest("/runtime/" + deploymentId + "/execute");
-        }
+        KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
 
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) {
