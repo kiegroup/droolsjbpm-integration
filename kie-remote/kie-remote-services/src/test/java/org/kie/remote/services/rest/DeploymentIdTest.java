@@ -1,19 +1,11 @@
 package org.kie.remote.services.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.kie.remote.services.rest.DeployResourceBase.createDeploymentUnit;
-
-import java.util.regex.Pattern;
-
-import javax.ws.rs.Path;
 
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.Test;
-import org.kie.remote.services.rest.api.DeploymentResource;
-import org.kie.remote.services.rest.api.RuntimeResource;
 
 public class DeploymentIdTest extends DeploymentResourceImpl {
 

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
+@SuppressWarnings("unchecked")
 public class ProcessRequestBeanTest {
 
     protected static final Logger logger = LoggerFactory.getLogger(ProcessRequestBean.class);

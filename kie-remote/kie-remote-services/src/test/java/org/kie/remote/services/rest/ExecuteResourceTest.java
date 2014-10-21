@@ -26,18 +26,16 @@ import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.remote.services.TaskDeploymentIdTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
+@SuppressWarnings("unchecked")
 public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDeploymentIdTest {
 
     private static final String USER = "user";
-
-    private DeploymentInfoBean runtimeMgrMgrMock;
 
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
@@ -47,12 +45,6 @@ public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDepl
 
     private AuditLogService auditLogService = mock(AuditLogService.class);
     
-    @Override
-    public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
-        this.runtimeMgrMgrMock = mock;
-    }
-
-
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
         this.processServiceMock = processServiceMock;

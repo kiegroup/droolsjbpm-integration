@@ -256,7 +256,10 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         assertEquals( "more than 1 task sum", 1, taskInfo.getTaskSummaries().size() );
         assertEquals( "more than 1 variable", 1, taskInfo.getVariables().size() );
         TaskSummary taskSum = taskInfo.getTaskSummaries().get(0);
+        assertNotNull( taskSum );
+        assertEquals( taskId, taskSum.getId().longValue() );
         JaxbVariableInfo varInfo = taskInfo.getVariables().get(0);
+        assertEquals( "inputStr", varInfo.getName() );
       
         roundTripJson(result);
         roundTripXml(result);

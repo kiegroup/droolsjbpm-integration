@@ -1,7 +1,5 @@
 package org.kie.remote.services.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_INDEPENDENT_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_PROCESS_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.TASK_ID;
@@ -20,41 +18,23 @@ import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.kie.services.api.IdentityProvider;
-import org.jbpm.process.audit.AuditLogService;
-import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
-import org.jbpm.process.audit.command.FindProcessInstancesCommand;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
-import org.jbpm.services.task.commands.ClaimTaskCommand;
-import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.remote.services.TaskDeploymentIdTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.jaxb.JaxbCommandsRequest;
-import org.kie.remote.services.jaxb.JaxbCommandsResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.shared.ServicesVersion;
 
 @SuppressWarnings("unchecked")
 public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implements TaskDeploymentIdTest {
     
     private static final String USER = "user";
 
-    private DeploymentInfoBean runtimeMgrMgrMock;
-
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
     
     private UriInfo uriInfoMock;
     private HttpServletRequest httpRequestMock;
-
-    @Override
-    public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
-        this.runtimeMgrMgrMock = mock;
-    }
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {

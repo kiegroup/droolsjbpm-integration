@@ -15,6 +15,7 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
+@SuppressWarnings("unchecked")
 public class NamespacesTest {
 
     Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.remote.services.ws"),

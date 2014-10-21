@@ -1,6 +1,6 @@
 package org.kie.remote.services.rest.jaxb;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import javax.xml.bind.JAXBContext;
 
@@ -22,7 +22,7 @@ public class UserClassSerialziationAnnotationUseTest {
         Class [] duplicateAClasses = { AClass.class, org.kie.remote.services.rest.jaxb.user.sub.AClass.class };
        
         boolean iaeThrown = false;
-        JAXBContext jaxbContext;
+        JAXBContext jaxbContext = null;
         try { 
             // No @XmlType(name=) or @XmlType(namespace=) used, and the classes have the same name!
             jaxbContext = JAXBContext.newInstance(duplicateAClasses);
@@ -30,6 +30,7 @@ public class UserClassSerialziationAnnotationUseTest {
             iaeThrown = true;
         }
         assertTrue( "A IllegalAnnotationsException was expected!", iaeThrown);
+        assertNull( jaxbContext );
         
         Class [] dupBClassesWithDiffNamespace = { BClass.class, org.kie.remote.services.rest.jaxb.user.sub.BClass.class };
         // a different namespace does work

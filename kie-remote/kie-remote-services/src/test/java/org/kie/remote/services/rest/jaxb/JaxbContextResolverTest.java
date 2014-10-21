@@ -40,6 +40,7 @@ import org.kie.services.client.serialization.SerializationException;
  * 
  *
  */
+@SuppressWarnings("unchecked")
 public class JaxbContextResolverTest {
 
     private JaxbContextResolver resolver;
