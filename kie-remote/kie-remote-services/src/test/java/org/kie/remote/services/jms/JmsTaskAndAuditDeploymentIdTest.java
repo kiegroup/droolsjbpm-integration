@@ -27,7 +27,6 @@ import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
 import org.kie.remote.services.TaskDeploymentIdTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
@@ -38,17 +37,10 @@ import org.kie.services.shared.ServicesVersion;
 @SuppressWarnings("unchecked")
 public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
 
-    private DeploymentInfoBean runtimeMgrMgrMock;
-
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
     
     private AuditLogService auditLogService = mock(AuditLogService.class);
-
-    @Override
-    public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
-        this.runtimeMgrMgrMock = mock;
-    }
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
@@ -61,8 +53,6 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
     }
 
     public void setupTestMocks() {
-        this.runtimeMgrMgr = runtimeMgrMgrMock;
-
         this.processRequestBean = new ProcessRequestBean();
         this.processRequestBean.setProcessService(processServiceMock);
         this.processRequestBean.setUserTaskService(userTaskServiceMock);

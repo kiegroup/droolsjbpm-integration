@@ -23,12 +23,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
-import org.kie.api.runtime.KieSession;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.remote.services.StartProcessEveryStrategyTest;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.powermock.api.mockito.PowerMockito;
@@ -37,10 +35,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ EmptyContext.class, ProcessInstanceIdContext.class })
+@SuppressWarnings("unchecked")
 public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl implements StartProcessEveryStrategyTest {
-
-    private DeploymentInfoBean runtimeMgrMgrMock;
-    private KieSession kieSessionMock;
 
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
@@ -48,10 +44,6 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
     private HttpServletRequest httpRequestMock;
 
     private Map<String, String[]> queryParams;
-
-    public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
-        this.runtimeMgrMgrMock = mock;
-    }
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {

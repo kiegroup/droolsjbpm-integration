@@ -1,6 +1,7 @@
 package org.kie.remote.services.jaxb;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("unchecked")
 public class VersionedJaxbCommandsRequestResponseTest {
 
     protected static final Logger logger = LoggerFactory.getLogger(VersionedJaxbCommandsRequestResponseTest.class);
@@ -84,6 +86,7 @@ public class VersionedJaxbCommandsRequestResponseTest {
         assertNotNull(newStringReq);
         assertEquals( 1, ((JaxbCommandsRequest) newStringReq).getCommands().size());
         Command<?> newCmd = ((JaxbCommandsRequest) newStringReq).getCommands().get(0);
+        assertNotNull( newCmd );
     }
    
     String cmdRespXmlStr = "<command-response>"
@@ -116,5 +119,7 @@ public class VersionedJaxbCommandsRequestResponseTest {
         assertNotNull(newStringResp);
         assertEquals( 2, ((JaxbCommandsResponse) newStringResp).getResponses().size());
         List<JaxbCommandResponse<?>> respList = ((JaxbCommandsResponse) newStringResp).getResponses();
+        assertNotNull( respList );
+        assertFalse( respList.isEmpty() );
     }
 }

@@ -40,6 +40,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({EmptyContext.class, ProcessInstanceIdContext.class})
+@SuppressWarnings("unchecked")
 public class JmsStartProcessEveryStrategyTest extends RequestMessageBean implements StartProcessEveryStrategyTest {
 
     private DeploymentInfoBean runtimeMgrMgrMock;

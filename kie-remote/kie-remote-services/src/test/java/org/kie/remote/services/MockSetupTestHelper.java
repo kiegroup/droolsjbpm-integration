@@ -1,8 +1,14 @@
 package org.kie.remote.services;
 
 import static org.kie.remote.services.StartProcessEveryStrategyTest.TEST_PROCESS_INST_ID;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.ArrayList;
@@ -13,7 +19,6 @@ import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
 import org.jbpm.runtime.manager.impl.PerRequestRuntimeManager;
 import org.jbpm.runtime.manager.impl.RuntimeEngineImpl;
 import org.jbpm.runtime.manager.impl.SingletonRuntimeManager;
-import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
@@ -52,9 +57,7 @@ public class MockSetupTestHelper {
     public static final boolean FOR_PROCESS_TASKS = false;
 
     public static void setupTaskMocks(TaskDeploymentIdTest test, boolean independentTask) {
-        // DeploymentInfoBean
         DeploymentInfoBean runtimeMgrMgrMock = spy(new DeploymentInfoBean());
-        test.setRuntimeMgrMgrMock(runtimeMgrMgrMock);
 
         RuntimeEngine runtimeEngineMock = mock(RuntimeEngine.class);
         doReturn(runtimeEngineMock).when(runtimeMgrMgrMock).getRuntimeEngine(anyString(), anyLong());
@@ -116,10 +119,6 @@ public class MockSetupTestHelper {
     }
 
     public static void setupProcessMocks(StartProcessEveryStrategyTest test, RuntimeStrategy strategy) {
-        // DeploymentInfoBean, runtime engine
-        DeploymentInfoBean runtimeMgrMgr = new DeploymentInfoBean();
-        test.setRuntimeMgrMgrMock(runtimeMgrMgr);
-      
         // dep unit (with runtime mgr): 
         // - deployed classes
         DeployedUnit depUnitMock = mock(DeployedUnit.class);
@@ -173,7 +172,7 @@ public class MockSetupTestHelper {
         doReturn(runtimeMgrMock).when(runtimeEngineMock).getManager();
         
         // add deployment unit
-        runtimeMgrMgr.addOnDeploy(new DeploymentEvent(DEPLOYMENT_ID, depUnitMock));
+//        runtimeMgrMgr.addOnDeploy(new DeploymentEvent(DEPLOYMENT_ID, depUnitMock));
         
         // ksession setup
         KieSession kieSessionMock = mock(KieSession.class);
