@@ -1251,6 +1251,9 @@ public class KieRemoteHttpRequest {
     public KieRemoteHttpResponse response() {
         if( this.response == null ) {
             this.response = new KieRemoteHttpResponse() {
+                
+                private String body = null;
+                
                 // @formatter:off
                 @Override
                 public InputStream stream() throws KieRemoteHttpRequestException { return responseStream(); }
@@ -1283,7 +1286,12 @@ public class KieRemoteHttpRequest {
                 @Override
                 public BufferedInputStream buffer() throws KieRemoteHttpRequestException { return responseBuffer(); }
                 @Override
-                public String body() throws KieRemoteHttpRequestException { return responseBody(); }
+                public String body() throws KieRemoteHttpRequestException { 
+                    if( body == null ) { 
+                        body = responseBody(); 
+                    } 
+                    return body;
+                }
                 // @formatter:on
             };
         }
