@@ -229,13 +229,13 @@ public class ProcessRequestBean {
      * @param processInstanceId The process instance id, if available.
      * @return The result of the {@link Command}.
      */
-    public Object doKieSessionOperation(Command<?> cmd, String deploymentId, Long processInstanceId) {
+    public <T> T doKieSessionOperation(Command<T> cmd, String deploymentId, Long processInstanceId) {
         if( deploymentId == null ) {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
 
         try {
-            Object result = processService.execute(deploymentId, cmd);
+            T result = processService.execute(deploymentId, cmd);
 
             return result;
         } catch (ProcessInstanceNotFoundException e) {

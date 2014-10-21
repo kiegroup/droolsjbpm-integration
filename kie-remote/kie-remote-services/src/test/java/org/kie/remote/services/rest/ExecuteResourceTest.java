@@ -12,14 +12,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.net.URISyntaxException;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.command.ClearHistoryLogsCommand;
 import org.jbpm.process.audit.command.FindProcessInstancesCommand;
@@ -36,11 +32,9 @@ import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
-import org.kie.services.shared.ServicesVersion;
 
-@SuppressWarnings("unchecked")
-public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implements TaskDeploymentIdTest {
-    
+public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDeploymentIdTest {
+
     private static final String USER = "user";
 
     private DeploymentInfoBean runtimeMgrMgrMock;
@@ -51,10 +45,13 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
     private UriInfo uriInfoMock;
     private HttpServletRequest httpRequestMock;
 
+    private AuditLogService auditLogService = mock(AuditLogService.class);
+    
     @Override
     public void setRuntimeMgrMgrMock(DeploymentInfoBean mock) {
         this.runtimeMgrMgrMock = mock;
     }
+
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
@@ -74,48 +71,70 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         httpRequestMock = mock(HttpServletRequest.class);
         setHttpServletRequest(httpRequestMock);
         
-        this.identityProvider = mock(IdentityProvider.class);
-        doReturn(USER).when(identityProvider).getName();
-
         this.processRequestBean = new ProcessRequestBean();
         this.processRequestBean.setProcessService(processServiceMock);
         this.processRequestBean.setUserTaskService(userTaskServiceMock);
-       
-        HttpHeaders headersMock = mock(HttpHeaders.class);
-        this.headers = headersMock; 
+    }
+
+    /**
+     * When doing operations with a non-process (independent) task, 
+     * the injected (non-runtime engine) taskService should be used. 
+     */
+    @Test
+    public void testRestExecuteCommandIndependentTaskProcessing() {
+        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
         
-        doReturn(new MultivaluedMapImpl<String, String>()).when(headersMock).getRequestHeaders();
+        JaxbCommandsRequest 
+        cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
+        this.execute(cmdsRequest);
+        cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
+        this.execute(cmdsRequest);
+       
+        // verify
+        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
     @Test
-    public void testRestUrlIndependentTaskProcessing() throws URISyntaxException {
-        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
-        
-        String oper = "claim";
-        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.doTaskOperation(TASK_ID, oper);
-        
-        oper = "complete";
-        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.doTaskOperation(TASK_ID, oper);
-        
-        verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
-    }
- 
-    @Test
-    public void testRestUrlProcessTaskProcessing() throws Exception {
+    public void testRestExecuteCommandProcessTaskProcessing() {
         setupTaskMocks(this, FOR_PROCESS_TASKS);
-        
-        String oper = "claim";
-        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.doTaskOperation(TASK_ID, oper);
-        
-        oper = "complete";
-        doReturn(new String("http://localhost:8080/test/rest/task/" + TASK_ID + "/" + oper)).when(httpRequestMock).getRequestURI();
-        this.doTaskOperation(TASK_ID, oper);
-        
+
+        JaxbCommandsRequest cmdsRequest = new JaxbCommandsRequest(new ClaimTaskCommand(TASK_ID, USER));
+        this.execute(cmdsRequest);
+        cmdsRequest = new JaxbCommandsRequest(new CompleteTaskCommand(TASK_ID, USER, null));
+        this.execute(cmdsRequest);
+    
         // verify
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
   
+    @Test
+    public void testRestAuditCommandWithoutDeploymentId() {
+        // setup
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
+        this.processRequestBean.setAuditLogService(auditLogService);
+
+        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        JaxbCommandsRequest 
+        cmdsRequest = new JaxbCommandsRequest(new FindProcessInstancesCommand());
+        JaxbCommandsResponse 
+        response = this.execute(cmdsRequest);
+       
+        // check result
+        assertEquals( "Number of response objects", 1, response.getResponses().size() );
+        JaxbCommandResponse<?> 
+        responseObj = response.getResponses().get(0);
+        assertFalse( "Command did not complete successfully", responseObj instanceof JaxbExceptionResponse );
+        
+        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        cmdsRequest = new JaxbCommandsRequest(new ClearHistoryLogsCommand());
+        response = this.execute(cmdsRequest);
+        
+        // check result
+        assertEquals( "Number of response objects", 0, response.getResponses().size() );
+        
+        // verify
+        verify(auditLogService, times(1)).findProcessInstances();
+        verify(auditLogService, times(1)).clear();
+    }
+   
 }
