@@ -110,13 +110,14 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
 
     @Override
     public RemoteJmsRuntimeEngineBuilder addJbossServerUrl(URL serverUrl) {
-        this.jbossServerHostName = serverUrl.getHost();
+        addJbossServerHostName(serverUrl.getHost());
         return this;
     }
 
     @Override
     public RemoteJmsRuntimeEngineBuilder addJbossServerHostName(String hostname) {
         this.jbossServerHostName = hostname;
+        addHostName(hostname);
         return this;
     }
 
