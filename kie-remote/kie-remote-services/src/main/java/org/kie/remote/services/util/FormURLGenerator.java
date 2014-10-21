@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class FormURLGenerator {
 
-    protected static final String KIE_WB_GWT_MODULE = "org.kie.workbench.KIEWebapp/KIEWebapp.html";
+    protected static final String KIE_WB_GWT_MODULE = "kie-wb.html";
     protected static final String FORM_PERSPECTIVE = "FormDisplayPerspective";
 
     public String generateFormProcessURL(String baseURL, String processId, String deploymentId, String opener) { 
