@@ -26,6 +26,8 @@ import org.w3c.dom.Element;
 public class KieImportDefinitionParser extends AbstractBeanDefinitionParser {
 
     private static final String ATTRIBUTE_RELEASEID_REF = "releaseId-ref";
+    private static final String ATTRIBUTE_SCANNER_ENABLED = "enableScanner";
+    private static final String ATTRIBUTE_SCANNER_INTERVAL = "scannerInterval";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -33,9 +35,25 @@ public class KieImportDefinitionParser extends AbstractBeanDefinitionParser {
         BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KieImportFactoryBean.class);
 
         String releaseIdRef = element.getAttribute(ATTRIBUTE_RELEASEID_REF);
-
         if ((releaseIdRef != null && releaseIdRef.trim().length() > 0)){
             factory.addPropertyReference("releaseId", releaseIdRef);
+            factory.addPropertyValue("releaseIdName", releaseIdRef);
+        }
+
+        String scannerEnabled = element.getAttribute(ATTRIBUTE_SCANNER_ENABLED);
+        final boolean scannerEnabledValue = "true".equalsIgnoreCase(scannerEnabled);
+        if (scannerEnabledValue) {
+            factory.addPropertyValue("scannerEnabled", true);
+            String scanningInterval = element.getAttribute(ATTRIBUTE_SCANNER_INTERVAL);
+            if (scanningInterval != null) {
+                try {
+                    int interval = Integer.parseInt(scanningInterval);
+                    factory.addPropertyValue(ATTRIBUTE_SCANNER_INTERVAL, interval);
+                } catch (Exception e) {
+                    //will never happen as the XSD would prevent non-integers
+                    throw new IllegalArgumentException("Scanner Interval attribute must be of type integer.");
+                }
+            }
         }
 
         return factory.getBeanDefinition();
