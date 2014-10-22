@@ -13,6 +13,12 @@
   <name>KIE :: Execution Server :: API</name>
   <description>KIE Execution Server API</description>
 
+  <properties>
+    <!-- This property needs to be overriden when running tests against different version of the WAR (e.g. running
+         SNAPSHOT tests against Beta3 WAR) -->
+    <kie.server.version>${project.version}</kie.server.version>
+  </properties>
+
   <dependencies>
     <!-- core dependencies -->
     <dependency>
