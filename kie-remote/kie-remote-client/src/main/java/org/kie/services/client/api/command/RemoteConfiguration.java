@@ -320,7 +320,7 @@ public final class RemoteConfiguration {
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setTimeout(long timeout) {
-        this.timeoutInMillisecs = timeout;
+        this.timeoutInMillisecs = timeout*1000;
     }
 
     public void setDeploymentId(String deploymentId) {
