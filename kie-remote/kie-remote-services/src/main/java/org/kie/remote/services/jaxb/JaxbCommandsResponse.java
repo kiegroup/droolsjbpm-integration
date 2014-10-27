@@ -1,7 +1,9 @@
 package org.kie.remote.services.jaxb;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -11,29 +13,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.drools.core.command.runtime.process.GetProcessIdsCommand;
-import org.drools.core.command.runtime.process.GetProcessInstancesCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
-import org.jbpm.process.audit.command.FindActiveProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindNodeInstancesCommand;
-import org.jbpm.process.audit.command.FindProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
-import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.process.audit.event.AuditEvent;
-import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
-import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
-import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
-import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.command.Command;
@@ -94,40 +80,6 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "var-inst-log", type = JaxbVariableInstanceLog.class)
             })
     private List<JaxbCommandResponse<?>> responses;
-
-    @XmlTransient
-    private static Map<Class, Class> cmdListTypes;
-    static { 
-        cmdListTypes = new HashMap<Class, Class>();
-        // tasksummary
-        cmdListTypes.put(GetTaskAssignedAsBusinessAdminCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTaskAssignedAsPotentialOwnerCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksByStatusByProcessInstanceIdCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksOwnedCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksByVariousFieldsCommand.class, TaskSummary.class);
-        
-        // long
-        cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
-        cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
-        
-        // string
-        cmdListTypes.put(GetProcessIdsCommand.class, String.class);
-        
-        // processInstance
-        cmdListTypes.put(GetProcessInstancesCommand.class, ProcessInstance.class);
-        
-        // processInstanceLog
-        cmdListTypes.put(FindProcessInstancesCommand.class, ProcessInstanceLog.class);
-        cmdListTypes.put(FindActiveProcessInstancesCommand.class, ProcessInstanceLog.class);
-        cmdListTypes.put(FindSubProcessInstancesCommand.class, ProcessInstanceLog.class);
-        
-        // variableInstanceLog
-        cmdListTypes.put(FindVariableInstancesByNameCommand.class, VariableInstanceLog.class);
-        cmdListTypes.put(FindVariableInstancesCommand.class, VariableInstanceLog.class);
-       
-        // nodeInstanceLog
-        cmdListTypes.put(FindNodeInstancesCommand.class, NodeInstanceLog.class);
-    }
 
     public JaxbCommandsResponse() {
         // Default constructor
@@ -201,7 +153,7 @@ public class JaxbCommandsResponse {
             }
         } else if (List.class.isInstance(result)) { 
             // Neccessary to determine return type of empty lists
-            Class listType = cmdListTypes.get(cmd.getClass());
+            Class listType = getListType(cmd);
             if( listType == null ) { 
                 unknownResultType = true;
             } else if( listType.equals(TaskSummary.class) ) { 
@@ -253,5 +205,38 @@ public class JaxbCommandsResponse {
             System.out.println( this.getClass().getSimpleName() + ": unknown result type " + result.getClass().getSimpleName() 
                     + " from command " + cmd.getClass().getSimpleName() + " added.");
         }
+    }
+
+    static Class getListType( Command cmd ) {
+        Class cmdClass = cmd.getClass();
+        Type genSuper = cmdClass.getGenericSuperclass();
+        if( genSuper != null ) {
+            if( genSuper instanceof ParameterizedType ) {
+                return getClassFromParameterizedListCmd(genSuper, cmdClass);
+            }
+        }
+        Type [] genInts = cmdClass.getGenericInterfaces();
+        if( genInts.length > 0 ) { 
+           if( genInts[0] instanceof ParameterizedType ) { 
+                return getClassFromParameterizedListCmd(genInts[0], cmdClass);
+           }
+        }
+        throw new IllegalStateException("No list type could be found for " + cmd.getClass().getSimpleName() );
+    }
+    
+    private static Class getClassFromParameterizedListCmd(Type genericIntOrSuper, Class cmdClass) { 
+        Type[] listTypes = ((ParameterizedType) genericIntOrSuper).getActualTypeArguments();
+        if( listTypes.length > 0 ) {
+            if( listTypes[0] instanceof ParameterizedType ) {
+                Type rawType = ((ParameterizedType) listTypes[0]).getRawType();
+                if( Collection.class.isAssignableFrom((Class) rawType) ) { 
+                    Type[] returnTypeParamTypes = ((ParameterizedType) listTypes[0]).getActualTypeArguments();
+                    if( returnTypeParamTypes.length > 0 ) {
+                        return (Class) returnTypeParamTypes[0];
+                    }
+                } 
+            } 
+        }
+        throw new IllegalStateException("No list type could be found for " + cmdClass.getSimpleName() );
     }
 }
