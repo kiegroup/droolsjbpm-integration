@@ -113,6 +113,7 @@ public class RuntimeEnvironmentFactoryBean implements FactoryBean, InitializingB
     // misc
     private ClassLoader classLoader;
     private GlobalSchedulerService schedulerService;
+    private boolean pessimisticLocking = false;
 
     @Override
     public Object getObject() throws Exception {
@@ -157,6 +158,9 @@ public class RuntimeEnvironmentFactoryBean implements FactoryBean, InitializingB
             .addEnvironmentEntry(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, entityManager)
             .addEnvironmentEntry("IS_JTA_TRANSACTION", false)
             .addEnvironmentEntry("IS_SHARED_ENTITY_MANAGER", true);
+        }
+        if( pessimisticLocking ) { 
+            builder.addEnvironmentEntry(EnvironmentName.USE_PESSIMISTIC_LOCKING, true);
         }
 
         // apply configuration if any
@@ -387,4 +391,13 @@ public class RuntimeEnvironmentFactoryBean implements FactoryBean, InitializingB
     public void setSchedulerService(GlobalSchedulerService schedulerService) {
         this.schedulerService = schedulerService;
     }
+
+    public boolean getPessimisticLocking() {
+        return pessimisticLocking;
+    }
+
+    public void setPessimisticLocking(boolean pessimisticLocking ) {
+        this.pessimisticLocking = pessimisticLocking;
+    }
+    
 }
