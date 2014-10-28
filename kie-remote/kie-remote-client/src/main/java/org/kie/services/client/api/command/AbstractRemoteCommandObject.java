@@ -27,6 +27,8 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
@@ -401,7 +403,20 @@ public abstract class AbstractRemoteCommandObject {
             if( responseStatus < 300 ) {
                 commandResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
             } else {
-                exceptionResponse = deserializeResponseContent(content, JaxbExceptionResponse.class);
+                String contentType = httpResponse.contentType();
+                if( contentType.equals(MediaType.APPLICATION_XML) ) { 
+                    exceptionResponse = deserializeResponseContent(content, JaxbExceptionResponse.class);
+                } else if( contentType.startsWith(MediaType.TEXT_HTML) ) { 
+                    exceptionResponse = new JaxbExceptionResponse();
+                    Document doc = Jsoup.parse(content);
+                    String body = doc.body().text();
+                    exceptionResponse.setMessage(body);
+                    exceptionResponse.setUrl(httpRequest.getUri().toString());
+                    exceptionResponse.setStackTrace("");
+                }
+                else { 
+                    throw new RemoteCommunicationException("Unable to deserialize response with content type '" + contentType + "'");
+                }
             }
         } catch( Exception e ) {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
