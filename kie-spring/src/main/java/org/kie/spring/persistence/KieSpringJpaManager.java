@@ -36,21 +36,34 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
         implements
         ProcessPersistenceContextManager {
 
+    private boolean pessimisticLocking = false;
 
     public KieSpringJpaManager(Environment env) {
         super(env);
 
+        Boolean usePessLocking = (Boolean) env.get(EnvironmentName.USE_PESSIMISTIC_LOCKING);
+        if( usePessLocking != null && usePessLocking ) { 
+            this.pessimisticLocking = true;
+        } 
+        
         getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
         // otherwise Spring will close it after the transaction finishes
     }
 
     public PersistenceContext getApplicationScopedPersistenceContext() {
-
-        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
+        return new JpaPersistenceContext(
+                getApplicationScopedEntityManager(), 
+                isJTA, 
+                pessimisticLocking, 
+                (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public PersistenceContext getCommandScopedPersistenceContext() {
-        return new JpaPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
+        return new JpaPersistenceContext(
+                (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), 
+                isJTA, 
+                pessimisticLocking, 
+                (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public void beginCommandScopedEntityManager() {
@@ -63,7 +76,11 @@ public class KieSpringJpaManager extends AbstractKieSpringJpaManager
     }
 
     public ProcessPersistenceContext getProcessPersistenceContext() {
-        return new JpaProcessPersistenceContext((EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
+        return new JpaProcessPersistenceContext(
+                (EntityManager) this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER), 
+                isJTA,
+                pessimisticLocking,
+                (TransactionManager) this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     public void endCommandScopedEntityManager() {
