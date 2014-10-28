@@ -144,50 +144,6 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         return new HashSet<Class>((Set<Class>) commandSetField.get(null));
     }
     
-    @Test
-    public void commandsWithListReturnTypesAreInCmdTypesList() throws Exception {
-        Set<Class> cmdSet = getAcceptedCommandClassSet();
-        // remove "meta" command types
-        assertTrue( "Removing " + GetTaskContentCommand.class.getSimpleName(), 
-                cmdSet.remove(GetTaskContentCommand.class)); // handled on ~l.244 of JaxbCommandsResponse
-
-        // retrieve cmd list types set
-        String cmdListTypesFieldName = "cmdListTypes";
-        Field cmdListTypesField = JaxbCommandsResponse.class.getDeclaredField(cmdListTypesFieldName);
-        assertNotNull("Unable to find " + JaxbCommandsResponse.class.getSimpleName() + "." + cmdListTypesFieldName + " field!",
-                cmdListTypesField);
-        cmdListTypesField.setAccessible(true);
-        Map<Class, Class> cmdListTypesMap = (Map<Class, Class>) cmdListTypesField.get(null);
-        assertNotNull(cmdListTypesFieldName + " value is null!", cmdListTypesMap);
-
-        // Check that all accepted commands with a list return type are in the cmd list types set
-        Set<Class> classesChecked = new HashSet<Class>();
-        classesChecked.addAll(cmdSet);
-        for( Class cmdClass : cmdSet ) {
-            Class origClass = cmdClass;
-            if( cmdClass.getInterfaces().length == 0 ) {
-                // no interfaces, look at superclass
-                Type superClass = cmdClass.getGenericSuperclass();
-                assertNotNull("No generic super class found for " + cmdClass.getSimpleName(), superClass);
-                assertTrue("Super class [" + superClass + "] of " + origClass.getSimpleName() + " should be a generic class!",
-                        superClass instanceof ParameterizedType);
-                checkIfClassShouldBeInCmdListTypes(origClass, (ParameterizedType) superClass, cmdListTypesMap, classesChecked);
-            } else {
-                assertTrue(origClass.getSimpleName() + " should have a generic interface!",
-                        cmdClass.getGenericInterfaces().length > 0);
-                for( Type genericCmdInterface : cmdClass.getGenericInterfaces() ) {
-                    if( genericCmdInterface instanceof ParameterizedType ) {
-                        ParameterizedType pType = ((ParameterizedType) genericCmdInterface);
-                        checkIfClassShouldBeInCmdListTypes(origClass, pType, cmdListTypesMap, classesChecked);
-                    }
-                }
-            }
-        }
-        if( !classesChecked.isEmpty() ) {
-            fail(classesChecked.iterator().next() + " was not checked!");
-        }
-    }
-
     private void checkIfClassShouldBeInCmdListTypes( Class origClass, ParameterizedType genericSuperClassOrInterface,
             Map<Class, Class> cmdListTypesMap, Set<Class> classesChecked ) {
         Type returnType = genericSuperClassOrInterface.getActualTypeArguments()[0];
