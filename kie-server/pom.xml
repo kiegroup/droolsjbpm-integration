@@ -19,6 +19,7 @@
     <module>kie-server-api</module>
     <module>kie-server-client</module>
     <module>kie-server-services</module>
+    <module>kie-server-distribution-wars</module>
   </modules>
 
   <!-- move to droolsjbpm-buildbootstrap! -->
