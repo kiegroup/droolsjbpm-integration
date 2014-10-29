@@ -1,29 +1,21 @@
 package org.kie.spring.jbpm;
 
-import java.util.List;
-import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
-
-import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.jbpm.process.audit.AuditLogService;
-import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.runtime.manager.InternalRuntimeManager;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+
+import java.util.List;
 
 import static junit.framework.Assert.*;
 
