@@ -59,6 +59,15 @@ public class KBaseFactoryBean
     public void setKBaseName(String name) {
         this.kBaseName = name;
     }
+    
+    /**
+     * Additional Setter to satisfy Spring Eclipse support (avoiding "No setter found" errors).
+     * @param name
+     *            The name.
+     */
+    public void setkBaseName(String name) {
+        this.kBaseName = name;
+    }    
 
     public String getId() {
         return id;
