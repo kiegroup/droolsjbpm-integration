@@ -98,6 +98,13 @@ public class KSessionFactoryBean
         this.kBaseName = kBaseName;
     }
 
+    /**
+     * Additional Setter to satisfy Spring Eclipse support (avoiding "No setter found" errors).
+     */
+    public void setkBaseName(String kBaseName) {
+        this.kBaseName = kBaseName;
+    }
+
     public List<Command<?>> getBatch() {
         return batch;
     }
@@ -127,6 +134,13 @@ public class KSessionFactoryBean
     }
 
     public void setKBase(KieBase kBase) {
+        this.kBase = kBase;
+    }
+
+    /**
+     * Additional Setter to satisfy Spring Eclipse support (avoiding "No setter found" errors).
+     */
+    public void setkBase(KieBase kBase) {
         this.kBase = kBase;
     }
 
