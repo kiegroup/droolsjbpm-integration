@@ -19,6 +19,7 @@ package org.kie.spring.factorybeans;
 
 import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.runtime.KieContainer;
 import org.kie.spring.KieObjectsResolver;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -40,7 +41,8 @@ public class KBaseFactoryBean
 
     private KieBase kBase;
     private ReleaseId releaseId;
-
+    protected boolean singleton = true;
+    protected KieContainer kieContainer;
 
     public ReleaseId getReleaseId() {
         return releaseId;
@@ -122,8 +124,20 @@ public class KBaseFactoryBean
         this.declarativeAgenda = declarativeAgenda;
     }
 
+    public KieContainer getKieContainer() {
+        return kieContainer;
+    }
+
+    public void setKieContainer(KieContainer kieContainer) {
+        this.kieContainer = kieContainer;
+    }
+
     public KieBase getObject() throws Exception {
-        return kBase;
+        if ( singleton) {
+            return kBase;
+        } else {
+            return kieContainer.newKieBase(kBaseName, null);
+        }
     }
 
     public Class<? extends KieBase> getObjectType() {
@@ -131,11 +145,21 @@ public class KBaseFactoryBean
     }
 
     public boolean isSingleton() {
-        return true;
+        return singleton;
+    }
+
+    public void setSingleton(boolean singleton) {
+        this.singleton = singleton;
+    }
+
+    public void setKieBase(KieBase kBase) {
+        this.kBase = kBase;
     }
 
     public void afterPropertiesSet() throws Exception {
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        kBase = kieObjectsResolver.resolveKBase(kBaseName, releaseId);
+        if ( singleton ) {
+            KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
+            kBase = kieObjectsResolver.resolveKBase(kBaseName, releaseId);
+        }
     }
 }
