@@ -25,6 +25,7 @@
 <!--    <property name="entityManager" ref="sharedEntityManagerBean"/>-->
     <property name="entityManagerFactory" ref="entityManagerFactoryBpmn"/>
     <property name="transactionManager" ref="txManager"/>
+    <property name="pessimisticLocking" value="true"/>
     <property name="assets">
       <map>
         <entry key-ref="process"><util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/></entry>

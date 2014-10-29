@@ -1,10 +1,15 @@
 package org.kie.spring.jbpm;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
+import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.persistence.SingleSessionCommandService;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
@@ -19,7 +24,6 @@ public class EntityManagerFactorySpringJpaTxManagerTest extends AbstractJbpmSpri
 
     @Test
     public void testSpringWithJpa() throws Exception{
-
         context = new ClassPathXmlApplicationContext("jbpm/jpa/jpa-spring.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
@@ -28,6 +32,8 @@ public class EntityManagerFactorySpringJpaTxManagerTest extends AbstractJbpmSpri
         KieSession ksession = engine.getKieSession();
         TaskService taskService = engine.getTaskService();
 
+        validatePessimisticLockingUse(ksession);
+        
         ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
 
         System.out.println("Process started");
@@ -57,4 +63,19 @@ public class EntityManagerFactorySpringJpaTxManagerTest extends AbstractJbpmSpri
         System.out.println("Process instance completed");
     }
 
+    private void validatePessimisticLockingUse(KieSession ksession) throws Exception { 
+        // do an ugly hack to get the info
+       CommandBasedStatefulKnowledgeSession cmdBasedKsession = (CommandBasedStatefulKnowledgeSession) ksession;
+       SingleSessionCommandService sscs = (SingleSessionCommandService) cmdBasedKsession.getCommandService();
+       // yes, this will break some day, and when it does, just delete this entire test, which isn't that good anyways.. :/ 
+       Field envField = SingleSessionCommandService.class.getDeclaredField("env");
+       envField.setAccessible(true);
+       Environment env = (Environment) envField.get(sscs);
+       
+       // verify  pessimistic lockings
+       Boolean pessLocking = (Boolean) env.get(EnvironmentName.USE_PESSIMISTIC_LOCKING);
+       assertNotNull( "Pessimistic locking not set in the environment: null object", pessLocking );
+       assertTrue( "Pessimistic locking not set in the environment: null object", pessLocking );
+    } 
+       
 }
