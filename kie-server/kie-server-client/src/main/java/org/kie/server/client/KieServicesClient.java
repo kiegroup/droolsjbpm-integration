@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ContextResolver;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -13,10 +14,12 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.util.GenericType;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
@@ -44,6 +47,12 @@ public class KieServicesClient {
 
     public KieServicesClient(String baseURI, String username, String password) {
         this( baseURI, username, password, MediaType.APPLICATION_XML_TYPE );
+    }
+
+    static {
+        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+        ContextResolver<ObjectMapper> contextResolver = new JacksonConfig();
+        factory.addContextResolver(contextResolver);
     }
 
     public KieServicesClient(String baseURI, String username, String password, MediaType mediaType) {
