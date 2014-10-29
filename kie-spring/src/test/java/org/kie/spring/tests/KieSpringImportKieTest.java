@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class KieSpringImportKieTest {
 
-    static ApplicationContext context = null;
+    protected static ApplicationContext context = null;
 
     @BeforeClass
     public static void setup() {

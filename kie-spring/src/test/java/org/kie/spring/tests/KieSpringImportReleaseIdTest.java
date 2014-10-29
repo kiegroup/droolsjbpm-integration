@@ -19,18 +19,12 @@ package org.kie.spring.tests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieBase;
 import org.kie.api.builder.ReleaseId;
-import org.kie.spring.beans.Person;
-import org.kie.spring.beans.annotations.BeanWithReleaseId;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
 
 public class KieSpringImportReleaseIdTest extends KieSpringImportKieTest {
-
-    static ApplicationContext context = null;
 
     @BeforeClass
     public static void setup() {
