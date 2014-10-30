@@ -91,7 +91,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public <T> T execute( Command<T> command ) {
-        return (T) unsupported(KieSession.class, Object.class);
+        return (T) executeCommand(command);
     }
 
     @Override
