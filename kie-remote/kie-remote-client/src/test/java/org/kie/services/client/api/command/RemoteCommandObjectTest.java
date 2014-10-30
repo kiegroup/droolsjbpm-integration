@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.jbpm.services.task.commands.AddTaskCommand;
 import org.junit.Test;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
@@ -79,9 +80,9 @@ public class RemoteCommandObjectTest {
     @Test
     public void isAcceptableCommandTest() throws Exception {
        assertTrue( "The .isAcceptedCommandClass method is not functioning correctly: generated classes", 
-               AcceptedClientCommands.isAcceptedCommandClass(org.kie.remote.jaxb.gen.AbortWorkItemCommand.class) );
+               AcceptedClientCommands.isAcceptedCommandClass(org.kie.remote.jaxb.gen.AddTaskCommand.class));
        assertFalse( "The .isAcceptedCommandClass method is not functioning correctly: original command classes", 
-               AcceptedClientCommands.isAcceptedCommandClass(org.drools.core.command.runtime.process.AbortWorkItemCommand.class) );
+               AcceptedClientCommands.isAcceptedCommandClass(org.jbpm.services.task.commands.AddTaskCommand.class));
     }
     
     @Test

@@ -32,7 +32,9 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
@@ -65,8 +67,8 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
     private InternalProcInstQueryHelper queryProcInstHelper;
 
     private static ObjectMapper jsonMapper = new ObjectMapper();
-    private static JaxbSerializationProvider jaxbClientMapper = JaxbSerializationProvider.clientSideInstance();
-    private static JaxbSerializationProvider jaxbServerMapper = JaxbSerializationProvider.serverSideInstance();
+    private static JaxbSerializationProvider jaxbClientMapper = ServerJaxbSerializationProvider.newInstance();
+    private static JaxbSerializationProvider jaxbServerMapper = ClientJaxbSerializationProvider.newInstance();
    
     public QueryResourceTest() {
         super(true, true, "org.jbpm.domain");

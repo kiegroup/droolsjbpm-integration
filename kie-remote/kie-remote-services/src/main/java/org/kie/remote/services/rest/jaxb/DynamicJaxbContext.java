@@ -1,11 +1,11 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
-import static org.kie.services.client.serialization.JaxbSerializationProvider.getAllBaseJaxbClasses;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +24,7 @@ import org.jbpm.services.cdi.Deploy;
 import org.jbpm.services.cdi.Undeploy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.DeploymentProcessedEvent;
+import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,7 @@ public class DynamicJaxbContext extends JAXBContext {
      */
     private static void setupDefaultJaxbContext() {
         try {
-            Class<?> [] types = getAllBaseJaxbClasses(false);
+            Class<?> [] types = ServerJaxbSerializationProvider.getAllBaseJaxbClasses();
             JAXBContext defaultJaxbContext = JAXBContext.newInstance(types);
 
             contextsCache.put(DEFAULT_JAXB_CONTEXT_ID, defaultJaxbContext);
@@ -206,7 +207,8 @@ public class DynamicJaxbContext extends JAXBContext {
         }
         
         // create set of all classes needed
-        Set<Class<?>> allClasses = new HashSet<Class<?>>(Arrays.asList(getAllBaseJaxbClasses(false)));
+        List<Class<?>> allClassList = Arrays.asList(ServerJaxbSerializationProvider.getAllBaseJaxbClasses());
+        Set<Class<?>> allClasses = new HashSet<Class<?>>(allClassList);
         allClasses.addAll(depClasses);
         Class [] allClassesArr = allClasses.toArray(new Class[allClasses.size()]);
 

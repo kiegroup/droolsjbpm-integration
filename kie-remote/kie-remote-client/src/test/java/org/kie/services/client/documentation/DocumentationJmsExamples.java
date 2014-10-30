@@ -20,13 +20,14 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.drools.core.command.runtime.process.StartProcessCommand;
-import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
+import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
+import org.kie.remote.jaxb.gen.StartProcessCommand;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationConstants;
@@ -57,10 +58,13 @@ public class DocumentationJmsExamples {
         }
 
         // Create JaxbCommandsRequest instance and add commands
-        Command<?> cmd = new StartProcessCommand(PROCESS_ID_1);
+        Command<?> cmd = new StartProcessCommand();
+        ((StartProcessCommand) cmd).setProcessId(PROCESS_ID_1);
         int oompaProcessingResultIndex = 0;
         JaxbCommandsRequest req = new JaxbCommandsRequest(DEPLOYMENT_ID, cmd);
-        req.getCommands().add(new GetTaskAssignedAsPotentialOwnerCommand(USER));
+        cmd = new GetTaskAssignedAsPotentialOwnerCommand();
+        ((GetTaskAssignedAsPotentialOwnerCommand) cmd).setUserId(USER);
+        req.getCommands().add(cmd);
         int loompaMonitoringResultIndex = 1;
 
         // Get JNDI context from server
@@ -140,7 +144,7 @@ public class DocumentationJmsExamples {
                 throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
             }
 
-            JaxbSerializationProvider serializationProvider = JaxbSerializationProvider.clientSideInstance();
+            JaxbSerializationProvider serializationProvider = ClientJaxbSerializationProvider.newInstance();
             // if necessary, add user-created classes here:
             // xmlSerializer.addJaxbClasses(MyType.class, AnotherJaxbAnnotatedType.class);
 
@@ -158,8 +162,7 @@ public class DocumentationJmsExamples {
                 msg.setIntProperty(SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME, JaxbSerializationProvider.JMS_SERIALIZATION_TYPE);
                 Collection<Class<?>> extraJaxbClasses = serializationProvider.getExtraJaxbClasses();
                 if (!extraJaxbClasses.isEmpty()) {
-                    String extraJaxbClassesPropertyValue = JaxbSerializationProvider
-                            .classSetToCommaSeperatedString(extraJaxbClasses);
+                    String extraJaxbClassesPropertyValue = serializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
                     msg.setStringProperty(SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME, extraJaxbClassesPropertyValue);
                     msg.setStringProperty(SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME, deploymentId);
                 }

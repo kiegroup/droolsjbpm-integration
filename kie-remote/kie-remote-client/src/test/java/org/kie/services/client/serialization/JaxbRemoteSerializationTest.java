@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -19,7 +20,9 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.services.client.AbstractRemoteSerializationTest;
+import org.kie.services.client.builder.objects.MyType;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -32,19 +35,22 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
 
     private static final String PROCESS_INSTANCE_ID_NAME = "process-instance-id";
 
-
     public TestType getType() {
         return TestType.JAXB;
     }
 
-    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.clientSideInstance();
+    protected JaxbSerializationProvider jaxbProvider = ClientJaxbSerializationProvider.newInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }
 
+    public JaxbRemoteSerializationTest() {
+        addClassesToSerializationProvider(MyType.class);
+    }
+    
     @Override
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(true, extraClass);
+        jaxbProvider.addJaxbClassesAndReinitialize(extraClass);
     }
 
     @Override
@@ -54,14 +60,13 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         return (T) jaxbProvider.deserialize(xmlObject);
     }
 
-
     @Test
     public void uniqueRootElementTest() throws Exception {
         Reflections reflections = new Reflections(
                 ClasspathHelper.forPackage("org.kie.services"),
                 new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
         Set<String> idSet = new HashSet<String>();
-        HashMap<String, Class> idClassMap = new HashMap<String, Class>();
+        Map<String, Class> idClassMap = new HashMap<String, Class>();
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
             if( ! jaxbClass.getPackage().getName().startsWith("org.kie") ) { 
                 continue;

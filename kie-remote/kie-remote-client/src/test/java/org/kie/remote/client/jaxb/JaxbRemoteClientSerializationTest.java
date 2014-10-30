@@ -8,13 +8,13 @@ public class JaxbRemoteClientSerializationTest extends AbstractRemoteClientSeria
 
     protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteClientSerializationTest.class); 
 
-    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.clientSideInstance();
+    protected JaxbSerializationProvider jaxbProvider = ClientJaxbSerializationProvider.newInstance();
     { 
         jaxbProvider.setPrettyPrint(true);
     }
 
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(true, extraClass);
+        jaxbProvider.addJaxbClassesAndReinitialize(extraClass);
     }
 
     public <T> T testRoundTrip(T in) throws Exception {
