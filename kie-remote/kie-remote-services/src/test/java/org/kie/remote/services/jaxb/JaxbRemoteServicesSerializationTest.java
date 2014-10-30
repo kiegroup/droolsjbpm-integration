@@ -18,10 +18,11 @@ import javax.xml.bind.annotation.XmlElements;
 import org.drools.core.command.runtime.process.GetProcessInstanceByCorrelationKeyCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.HaltCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.common.DisconnectedFactHandle;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
-import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
@@ -31,11 +32,14 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.AbstractJaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
+import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -56,13 +60,13 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
    
 
-    protected JaxbSerializationProvider jaxbProvider = JaxbSerializationProvider.serverSideInstance();
+    protected SerializationProvider jaxbProvider = ServerJaxbSerializationProvider.newInstance();
     { 
-        jaxbProvider.setPrettyPrint(true);
+        ((JaxbSerializationProvider) jaxbProvider).setPrettyPrint(true);
     }
 
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
-        jaxbProvider.addJaxbClasses(false, extraClass);
+        ((JaxbSerializationProvider) jaxbProvider).addJaxbClassesAndReinitialize(extraClass);
     }
 
     public <T> T testRoundTrip(T in) throws Exception {
@@ -297,5 +301,17 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
             assertTrue(e instanceof UnsupportedOperationException);
         }
     }
- 
+
+    @Test
+    public void factHandleTest() throws Exception {
+        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
+
+        InsertObjectCommand cmd = new InsertObjectCommand("The Sky is Green");
+        FactHandle factHandle = ksession.execute(cmd);
+       
+        addClassesToSerializationProvider(DisconnectedFactHandle.class);
+        JaxbOtherResponse jor = new JaxbOtherResponse(DisconnectedFactHandle.newFrom(factHandle), 0, cmd);
+        testRoundTrip(jor);
+    }
 }

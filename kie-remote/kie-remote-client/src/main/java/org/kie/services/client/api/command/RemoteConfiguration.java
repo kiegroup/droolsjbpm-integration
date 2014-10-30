@@ -11,6 +11,7 @@ import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
@@ -86,9 +87,9 @@ public final class RemoteConfiguration {
     
     public void initializeJaxbSerializationProvider() {
         if( extraJaxbClasses != null ) { 
-            jaxbSerializationProvider = JaxbSerializationProvider.clientSideInstance(extraJaxbClasses);
+            jaxbSerializationProvider = ClientJaxbSerializationProvider.newInstance(extraJaxbClasses);
         } else {  
-            jaxbSerializationProvider = JaxbSerializationProvider.clientSideInstance();
+            jaxbSerializationProvider = ClientJaxbSerializationProvider.newInstance();
         }
     }
 

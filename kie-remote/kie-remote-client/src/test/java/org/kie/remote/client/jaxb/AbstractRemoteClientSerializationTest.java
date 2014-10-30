@@ -79,6 +79,10 @@ public abstract class AbstractRemoteClientSerializationTest extends JbpmJUnitBas
                 "potentialOwners", // null
                 "createdOn", "activationTime", "expirationTime",
                 "subTaskStrategy"); // dates
+        
+        super.tearDown();
+        this.setupDataSource = false;
+        this.sessionPersistence = false;
     }
    
 }

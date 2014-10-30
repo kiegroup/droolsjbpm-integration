@@ -11,9 +11,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.drools.core.SessionConfiguration;
+import org.drools.core.base.evaluators.SetEvaluatorsDefinition;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.common.DisconnectedFactHandle;
 import org.drools.core.impl.EnvironmentFactory;
@@ -76,6 +79,8 @@ import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
+
 public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteSerializationTest.class);
@@ -94,43 +99,6 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
             new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
 
     // TESTS
-    
-    private static KieSession createKnowledgeSession(String processFile) throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        KieRepository kr = ks.getRepository();
-        KieFileSystem kfs = ks.newKieFileSystem();
-        if (processFile != null) {
-            Resource process = ResourceFactory.newClassPathResource(processFile);
-            kfs.write(process);
-        }
-    
-        KieBuilder kb = ks.newKieBuilder(kfs);
-        kb.buildAll();
-    
-        if (kb.getResults().hasMessages(Level.ERROR)) {
-            throw new RuntimeException("Build Errors:\n" + kb.getResults().toString());
-        }
-    
-        KieContainer kContainer = ks.newKieContainer(kr.getDefaultReleaseId());
-        KieBase kbase = kContainer.getKieBase();
-    
-        Environment env = EnvironmentFactory.newEnvironment();
-    
-        Properties defaultProps = new Properties();
-        defaultProps.setProperty("drools.processSignalManagerFactory", DefaultSignalManagerFactory.class.getName());
-        defaultProps.setProperty("drools.processInstanceManagerFactory", DefaultProcessInstanceManagerFactory.class.getName());
-        SessionConfiguration conf = new SessionConfiguration(defaultProps);
-    
-        KieSession ksession = (StatefulKnowledgeSession) kbase.newKieSession(conf, env);
-        return ksession;
-    }
-    
-    @After
-    public void after() throws Exception { 
-        super.tearDown();
-        this.setupDataSource = false;
-        this.sessionPersistence = false;
-    }
     
     /*
      * Tests
@@ -239,22 +207,8 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
     }
 
     @Test
-    public void factHandleTest() throws Exception {
-        // Only run with JAXB/XML
-        Assume.assumeTrue(getType().equals(TestType.JAXB));
-
-        KieSession ksession = createKnowledgeSession(null);
-
-        InsertObjectCommand cmd = new InsertObjectCommand("The Sky is Green");
-        FactHandle factHandle = ksession.execute(cmd);
-       
-        addClassesToSerializationProvider(DisconnectedFactHandle.class);
-        JaxbOtherResponse jor = new JaxbOtherResponse(DisconnectedFactHandle.newFrom(factHandle), 0, cmd);
-        testRoundTrip(jor);
-    }
-
-    @Test
     public void processInstanceWithVariablesTest() throws Exception {
+        Assume.assumeFalse(getType().equals(TestType.JAXB));
         this.setupDataSource = true;
         this.sessionPersistence = true;
         super.setUp();
@@ -283,6 +237,10 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         procInstList.add(new JaxbProcessInstanceResponse(processInstance));
         jpilp.setResult(procInstList);
         testRoundTrip(jpilp);
+       
+        super.tearDown();
+        this.setupDataSource = false;
+        this.sessionPersistence = false;
     }
 
     @Test

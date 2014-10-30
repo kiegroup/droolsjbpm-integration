@@ -1,18 +1,15 @@
 package org.kie.remote.services.jms;
 
+import static org.kie.services.client.serialization.JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
-import static org.kie.services.client.serialization.SerializationConstants.EXTRA_JAXB_CLASSES_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FORBIDDEN;
 
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -47,12 +44,12 @@ import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.remote.services.jms.security.JmsUserGroupAdapter;
 import org.kie.remote.services.jms.security.UserPassCallbackHandler;
 import org.kie.remote.services.rest.jaxb.DynamicJaxbContext;
 import org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter;
-import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
 import org.slf4j.Logger;
@@ -177,7 +174,7 @@ public class RequestMessageBean implements MessageListener {
         try {
             if (!message.propertyExists(SERIALIZATION_TYPE_PROPERTY_NAME)) {
                 // default is JAXB
-                serializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
+                serializationType = JMS_SERIALIZATION_TYPE;
             } else {
                 serializationType = message.getIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME);
             }
@@ -188,7 +185,7 @@ public class RequestMessageBean implements MessageListener {
 
         SerializationProvider serializationProvider;
         switch (serializationType) {
-        case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
+        case JMS_SERIALIZATION_TYPE:
             serializationProvider = getJaxbSerializationProvider(message);
             break;
         default:
@@ -253,7 +250,7 @@ public class RequestMessageBean implements MessageListener {
             String msgStrContent = null;
 
             switch (serializationType) {
-            case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
+            case JMS_SERIALIZATION_TYPE:
                 msgStrContent = ((BytesMessage) message).readUTF();
                 cmdMsg = (JaxbCommandsRequest) serializationProvider.deserialize(msgStrContent);
                 break;
@@ -280,7 +277,7 @@ public class RequestMessageBean implements MessageListener {
             } else { 
                 DynamicJaxbContext.setDeploymentJaxbContext(DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID);
             }
-            serializationProvider = JaxbSerializationProvider.newInstance(dynamicJaxbContext);
+            serializationProvider = ServerJaxbSerializationProvider.newInstance(dynamicJaxbContext);
         } catch (JMSException jmse) {
             throw new KieRemoteServicesInternalError("Unable to check or read JMS message for property.", jmse);
         } catch (SerializationException se) {
@@ -298,7 +295,7 @@ public class RequestMessageBean implements MessageListener {
 
             String msgStr;
             switch (serializationType) {
-            case JaxbSerializationProvider.JMS_SERIALIZATION_TYPE:
+            case JMS_SERIALIZATION_TYPE:
                 msgStr = (String) serializationProvider.serialize(jaxbResponse);
                 break;
             default:
