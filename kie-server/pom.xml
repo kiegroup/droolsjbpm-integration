@@ -20,6 +20,7 @@
     <module>kie-server-client</module>
     <module>kie-server-services</module>
     <module>kie-server-distribution-wars</module>
+    <module>kie-server-integ-tests</module>
   </modules>
 
   <!-- move to droolsjbpm-buildbootstrap! -->
