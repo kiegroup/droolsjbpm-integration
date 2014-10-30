@@ -54,6 +54,8 @@ import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 public abstract class JaxbSerializationProvider implements SerializationProvider {
 
     public final static int JMS_SERIALIZATION_TYPE = 0;
+    
+    public final static String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
   
     public static Set<Class<?>> KIE_JAXB_CLASS_SET;
     static { 

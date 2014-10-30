@@ -10,8 +10,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.kie.services.client.serialization.JaxbSerializationProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DynamicJaxbContextFilter implements Filter {
 
+    private static final Logger logger = LoggerFactory.getLogger(DynamicJaxbContextFilter.class);
     // private FilterConfig _filterConfig; // not used
   
     // "**" not accepted in URL's.. 
@@ -25,6 +30,7 @@ public class DynamicJaxbContextFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String deploymentId = getDeploymentId(httpRequest);
         DynamicJaxbContext.setDeploymentJaxbContext(deploymentId);
+        logger.debug("JAXBContext retrieved and set for for '{}'", deploymentId);
         try { 
             chain.doFilter(request, response);
         } finally { 
@@ -40,7 +46,13 @@ public class DynamicJaxbContextFilter implements Filter {
     // pkg static for tests
     static String getDeploymentId(HttpServletRequest request) {
         String deploymentId = null;
-       
+    
+        // extract from header
+        deploymentId = request.getHeader(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER); 
+        if( deploymentId != null ) { 
+           return deploymentId; 
+        }
+        
         // extract from the proper url
         String requestUri = request.getRequestURI();
         String [] urlParts = requestUri.split("/");
