@@ -372,6 +372,9 @@ public abstract class AbstractRemoteCommandObject {
     private <T> T executeRestCommand( Command command ) {
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
+        
+        // necessary for deserialization
+        httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, config.getDeploymentId());
 
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) {
