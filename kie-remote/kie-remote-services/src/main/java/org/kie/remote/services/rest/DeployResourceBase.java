@@ -244,6 +244,7 @@ public class DeployResourceBase extends ResourceBase {
         ctx.setData(JOB_TYPE, jobType);
         ctx.setData("businessKey", deploymentId);
         ctx.setData("retries", 0);
+	ctx.setData("owner", ExecutorService.EXECUTOR_ID);
        
         String jobTypeLower = jobType.toString().toLowerCase();
        
