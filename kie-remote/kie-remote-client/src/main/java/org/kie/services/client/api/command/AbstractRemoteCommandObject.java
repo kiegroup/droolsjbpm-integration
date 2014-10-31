@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -23,6 +22,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -250,28 +250,27 @@ public abstract class AbstractRemoteCommandObject {
             }
 
             // Create msg
-            BytesMessage msg;
+            TextMessage textMsg;
             JaxbSerializationProvider serializationProvider;
             try {
-                msg = session.createBytesMessage();
 
                 // serialize request
                 serializationProvider = config.getJaxbSerializationProvider();
                 String xmlStr = serializationProvider.serialize(req);
-                msg.writeUTF(xmlStr);
-
+                textMsg = session.createTextMessage(xmlStr);
+                
                 // set properties
                 // 1. corr id
-                msg.setJMSCorrelationID(corrId);
+                textMsg.setJMSCorrelationID(corrId);
                 // 2. serialization info
-                msg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
+                textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
                 Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses();
                 if( !extraJaxbClasses.isEmpty() ) {
                     if( deploymentId == null ) {
                         throw new MissingRequiredInfoException(
                                 "Deserialization of parameter classes requires a deployment id, which has not been configured.");
                     }
-                    msg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, deploymentId);
+                    textMsg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, deploymentId);
                 }
                 // 3. user/pass for task operations
                 String userName = config.getUserName();
@@ -285,8 +284,8 @@ public abstract class AbstractRemoteCommandObject {
                         throw new RemoteCommunicationException(
                                 "A password is required when sending task operation requests via JMS");
                     }
-                    msg.setStringProperty("username", userName);
-                    msg.setStringProperty("password", password);
+                    textMsg.setStringProperty("username", userName);
+                    textMsg.setStringProperty("password", password);
                 }
                 // 4. process instance id
             } catch( JMSException jmse ) {
@@ -297,7 +296,7 @@ public abstract class AbstractRemoteCommandObject {
 
             // send
             try {
-                producer.send(msg);
+                producer.send(textMsg);
             } catch( JMSException jmse ) {
                 throw new RemoteCommunicationException("Unable to send a JMS message.", jmse);
             }
@@ -317,7 +316,7 @@ public abstract class AbstractRemoteCommandObject {
             // extract response
             assert response != null: "Response is empty.";
             try {
-                String xmlStr = ((BytesMessage) response).readUTF();
+                String xmlStr = ((TextMessage) response).getText();
                 cmdResponse = (JaxbCommandsResponse) serializationProvider.deserialize(xmlStr);
             } catch( JMSException jmse ) {
                 throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
