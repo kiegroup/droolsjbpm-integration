@@ -17,7 +17,6 @@ import javax.annotation.Resource;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -26,6 +25,7 @@ import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.Subject;
@@ -251,7 +251,7 @@ public class RequestMessageBean implements MessageListener {
 
             switch (serializationType) {
             case JMS_SERIALIZATION_TYPE:
-                msgStrContent = ((BytesMessage) message).readUTF();
+                msgStrContent = ((TextMessage) message).getText();
                 cmdMsg = (JaxbCommandsRequest) serializationProvider.deserialize(msgStrContent);
                 break;
             default:
@@ -288,11 +288,8 @@ public class RequestMessageBean implements MessageListener {
 
     private static Message serializeResponse(Session session, String msgId, int serializationType,
             SerializationProvider serializationProvider, JaxbCommandsResponse jaxbResponse) {
-        BytesMessage byteMsg = null;
+        TextMessage textMsg = null;
         try {
-            byteMsg = session.createBytesMessage();
-            byteMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, serializationType);
-
             String msgStr;
             switch (serializationType) {
             case JMS_SERIALIZATION_TYPE:
@@ -301,7 +298,8 @@ public class RequestMessageBean implements MessageListener {
             default:
                 throw new KieRemoteServicesRuntimeException("Unknown serialization type when deserializing message " + msgId + ":" + serializationType);
             }
-            byteMsg.writeUTF(msgStr);
+            textMsg = session.createTextMessage(msgStr);
+            textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, serializationType);
         } catch (JMSException jmse) {
             String errMsg = "Unable to create response message or write to it [msg id: " + msgId + "].";
             throw new KieRemoteServicesRuntimeException(errMsg, jmse);
@@ -309,7 +307,7 @@ public class RequestMessageBean implements MessageListener {
             String errMsg = "Unable to serialize " + jaxbResponse.getClass().getSimpleName() + " to a String.";
             throw new KieRemoteServicesInternalError(errMsg, e);
         }
-        return byteMsg;
+        return textMsg;
     }
 
     // Runtime / KieSession / TaskService helper methods --------------------------------------------------------------------------

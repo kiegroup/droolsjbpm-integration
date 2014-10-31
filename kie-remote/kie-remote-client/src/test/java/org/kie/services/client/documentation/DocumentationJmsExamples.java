@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -17,6 +16,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -149,13 +149,12 @@ public class DocumentationJmsExamples {
             // xmlSerializer.addJaxbClasses(MyType.class, AnotherJaxbAnnotatedType.class);
 
             // Create msg
-            BytesMessage msg;
+            TextMessage msg;
             try {
-                msg = session.createBytesMessage();
 
                 // serialize request
                 String xmlStr = serializationProvider.serialize(req);
-                msg.writeUTF(xmlStr);
+                msg = session.createTextMessage(xmlStr);
 
                 // set properties
                 msg.setJMSCorrelationID(corrId);
@@ -194,7 +193,7 @@ public class DocumentationJmsExamples {
             // extract response
             assert response != null : "Response is empty.";
             try {
-                String xmlStr = ((BytesMessage) response).readUTF();
+                String xmlStr = ((TextMessage) response).getText();
                 cmdResponses = (JaxbCommandsResponse) serializationProvider.deserialize(xmlStr);
             } catch (JMSException jmse) {
                 throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
