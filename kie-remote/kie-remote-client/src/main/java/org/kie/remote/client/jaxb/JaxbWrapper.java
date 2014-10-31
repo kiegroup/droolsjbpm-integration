@@ -21,6 +21,13 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
 import org.kie.api.task.model.User;
+import org.kie.internal.task.api.model.Deadline;
+import org.kie.internal.task.api.model.Deadlines;
+import org.kie.internal.task.api.model.Delegation;
+import org.kie.internal.task.api.model.InternalPeopleAssignments;
+import org.kie.internal.task.api.model.InternalTask;
+import org.kie.internal.task.api.model.InternalTaskData;
+import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.jaxb.gen.Type;
 
 abstract class JaxbWrapper {
@@ -78,7 +85,7 @@ abstract class JaxbWrapper {
     /**
      * Represents a {@link Task} instance
      */
-    static class JaxbTaskWrapper extends JaxbWrapper implements Task {
+    static class JaxbTaskWrapper extends JaxbWrapper implements InternalTask {
     
         private final org.kie.remote.jaxb.gen.Task task;
     
@@ -142,11 +149,117 @@ abstract class JaxbWrapper {
             return this.task.getTaskType();
         }
    
-        public org.kie.remote.jaxb.gen.Task getInternalTask() { 
-           return this.task; 
+        @Override
+        public void setId( long id ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public Boolean isArchived() {
+            return unsupported(InternalTask.class, Boolean.class);
+        }
+
+        @Override
+        public void setArchived( Boolean archived ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public int getVersion() {
+            return unsupported(InternalTask.class, int.class);
+        }
+
+        @Override
+        public void setPriority( int priority ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setNames( List<I18NText> names ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setFormName( String formName ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public String getFormName() {
+            return this.task.getFormName();
+        }
+
+        @Override
+        public void setSubjects( List<I18NText> subjects ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setDescriptions( List<I18NText> descriptions ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setPeopleAssignments( PeopleAssignments peopleAssignments ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public Delegation getDelegation() {
+            return unsupported(InternalTask.class, Delegation.class);
+        }
+
+        @Override
+        public void setDelegation( Delegation delegation ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setTaskData( TaskData taskData ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public Deadlines getDeadlines() {
+            return unsupported(InternalTask.class, Deadlines.class);
+        } 
+
+        @Override
+        public void setDeadlines( Deadlines deadlines ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setTaskType( String taskType ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public SubTasksStrategy getSubTaskStrategy() {
+            return unsupported(InternalTask.class, SubTasksStrategy.class);
+        }
+
+        @Override
+        public void setSubTaskStrategy( SubTasksStrategy subTaskStrategy ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setName( String name ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setSubject( String subject ) {
+            unsupported(InternalTask.class, Void.class);
+        }
+
+        @Override
+        public void setDescription( String description ) {
+            unsupported(InternalTask.class, Void.class);
         }
     }
-
+   
     /**
      * Represents a {@link TaskData} instance
      */
@@ -288,9 +401,6 @@ abstract class JaxbWrapper {
             return this.taskData.getParentId();
         }
         
-        public org.kie.remote.jaxb.gen.TaskData getInternalTaskData() { 
-            return this.taskData;
-        }
     }
 
     static class JaxbAttachmentWrapper extends JaxbWrapper implements Attachment {
@@ -336,10 +446,6 @@ abstract class JaxbWrapper {
         public long getAttachmentContentId() {
             return this.attachment.getAttachmentContentId();
         }
-        
-        public org.kie.remote.jaxb.gen.Attachment getInternalAttachment() { 
-            return this.attachment;
-        }
     }
 
     static class JaxbCommentWrapper extends JaxbWrapper implements Comment {
@@ -370,10 +476,6 @@ abstract class JaxbWrapper {
         public User getAddedBy() {
             return convertStringIdToUser(this.comment.getAddedBy());
         }
-        
-        public org.kie.remote.jaxb.gen.Comment getInternalComment() { 
-            return this.comment;
-        }
     }
 
     static class JaxbContentWrapper extends JaxbWrapper implements Content {
@@ -395,10 +497,6 @@ abstract class JaxbWrapper {
             return content.getContent();
         }
        
-        public org.kie.remote.jaxb.gen.Content getInternalContent() { 
-            return this.content;
-        }
-        
     }
 
     static class JaxbI18NTextWrapper extends JaxbWrapper implements I18NText {
@@ -424,13 +522,9 @@ abstract class JaxbWrapper {
         public String getText() {
             return this.i18nText.getText();
         }
-        
-        public org.kie.remote.jaxb.gen.I18NText getInternalI18nText() { 
-           return this.i18nText; 
-        }
     }
 
-    static class JaxbPeopleAssignmentsWrapper extends JaxbWrapper implements PeopleAssignments {
+    static class JaxbPeopleAssignmentsWrapper extends JaxbWrapper implements InternalPeopleAssignments {
     
         private final org.kie.remote.jaxb.gen.PeopleAssignments peopleAssignments;
     
@@ -454,8 +548,49 @@ abstract class JaxbWrapper {
             return convertGenOrgEngListToOrgEntList(peopleAssignments.getBusinessAdministrators());
         }
         
-        public org.kie.remote.jaxb.gen.PeopleAssignments getInternalPeopleAssignments() { 
-            return this.peopleAssignments;
+        @Override
+        public void setTaskInitiator( User taskInitiator ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
+        }
+
+        @Override
+        public void setPotentialOwners( List<OrganizationalEntity> potentialOwners ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
+        }
+
+        @Override
+        public List<OrganizationalEntity> getExcludedOwners() {
+            return convertGenOrgEngListToOrgEntList(peopleAssignments.getExcludedOwners());
+        }
+
+        @Override
+        public void setExcludedOwners( List<OrganizationalEntity> excludedOwners ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
+        }
+
+        @Override
+        public List<OrganizationalEntity> getTaskStakeholders() {
+            return convertGenOrgEngListToOrgEntList(peopleAssignments.getTaskStakeholders());
+        }
+
+        @Override
+        public void setTaskStakeholders( List<OrganizationalEntity> taskStakeholders ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
+        }
+
+        @Override
+        public void setBusinessAdministrators( List<OrganizationalEntity> businessAdministrators ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
+        }
+
+        @Override
+        public List<OrganizationalEntity> getRecipients() {
+            return convertGenOrgEngListToOrgEntList(peopleAssignments.getRecipients());
+        }
+
+        @Override
+        public void setRecipients( List<OrganizationalEntity> recipients ) {
+            unsupported(InternalPeopleAssignments.class, Void.class);
         }
     }
 
