@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig.Feature;
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
@@ -31,6 +30,7 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.services.cdi.ProcessRequestBean;

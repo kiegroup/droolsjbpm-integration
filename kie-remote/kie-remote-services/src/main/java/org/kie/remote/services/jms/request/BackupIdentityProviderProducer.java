@@ -3,9 +3,9 @@ package org.kie.remote.services.jms.request;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.kie.services.impl.audit.ServicesAwareAuditEventBuilder;
 import org.jbpm.services.cdi.RequestScopedBackupIdentityProvider;
+import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.jms.RequestMessageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
