@@ -11,10 +11,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.InternalProcInstQueryHelper;

@@ -17,11 +17,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-import org.jbpm.kie.services.api.IdentityProvider;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.junit.Test;
+import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 
