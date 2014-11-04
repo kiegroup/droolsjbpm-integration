@@ -2,11 +2,9 @@ package org.kie.server.services.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -24,8 +22,6 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.StatelessKieSession;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -46,14 +42,14 @@ import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uberfire.io.IOService;
-import org.uberfire.io.impl.IOServiceNio2WrapperImpl;
-import org.uberfire.java.nio.IOException;
-import org.uberfire.java.nio.file.DirectoryStream;
-import org.uberfire.java.nio.file.DirectoryStream.Filter;
-import org.uberfire.java.nio.file.FileSystem;
-import org.uberfire.java.nio.file.Files;
-import org.uberfire.java.nio.file.Path;
+//import org.uberfire.io.IOService;
+//import org.uberfire.io.impl.IOServiceNio2WrapperImpl;
+//import org.uberfire.java.nio.IOException;
+//import org.uberfire.java.nio.file.DirectoryStream;
+//import org.uberfire.java.nio.file.DirectoryStream.Filter;
+//import org.uberfire.java.nio.file.FileSystem;
+//import org.uberfire.java.nio.file.Files;
+//import org.uberfire.java.nio.file.Path;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -64,8 +60,8 @@ public class KieServerImpl {
     private static final Logger             logger               = LoggerFactory.getLogger(KieServerRestImpl.class);
 
     private final KieContainersRegistryImpl context;
-    private IOService                       ios                  = null;
-    private FileSystem                      fs                   = null;
+//    private IOService                       ios                  = null;
+//    private FileSystem                      fs                   = null;
 
     public KieServerImpl() {
         //ios = initializeIOService();
@@ -74,36 +70,36 @@ public class KieServerImpl {
         //restoreContainers();
     }
 
-    private IOService initializeIOService() {
-        IOService ios = new IOServiceNio2WrapperImpl();
-        return ios;
-    }
-
-    private FileSystem initializeSystemFS(IOService ios) {
-        URI uri = URI.create("git://system-repo");
-        FileSystem fs = null;
-        try {
-            fs = ios.getFileSystem(uri);
-            if (fs == null) {
-                // new filesystem. create.
-                fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
-
-                    {
-                        put("init", true);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            // new filesystem. create.
-            fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
-
-                {
-                    put("init", true);
-                }
-            });
-        }
-        return fs;
-    }
+//    private IOService initializeIOService() {
+//        IOService ios = new IOServiceNio2WrapperImpl();
+//        return ios;
+//    }
+//
+//    private FileSystem initializeSystemFS(IOService ios) {
+//        URI uri = URI.create("git://system-repo");
+//        FileSystem fs = null;
+//        try {
+//            fs = ios.getFileSystem(uri);
+//            if (fs == null) {
+//                // new filesystem. create.
+//                fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
+//
+//                    {
+//                        put("init", true);
+//                    }
+//                });
+//            }
+//        } catch (Exception e) {
+//            // new filesystem. create.
+//            fs = ios.newFileSystem(uri, new HashMap<String, Object>() {
+//
+//                {
+//                    put("init", true);
+//                }
+//            });
+//        }
+//        return fs;
+//    }
 
     public List<ServiceResponse<? extends Object>> executeScript(CommandScript commands) {
         List<ServiceResponse<? extends Object>> response = new ArrayList<ServiceResponse<? extends Object>>();
@@ -164,7 +160,7 @@ public class KieServerImpl {
                         ci.getResource().setStatus(KieContainerStatus.FAILED);
                         return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ": " + e.getClass().getName() + ": " + e.getMessage());
                     } finally {
-                        persistContainer(ci);
+                        // persistContainer(ci);
                     }
                 } else {
                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " already exists.", previous.getResource());
@@ -557,74 +553,74 @@ public class KieServerImpl {
         }
     }
 
-    private void restoreContainers() {
-        DirectoryStream<Path> ds = null;
-        try {
-            Path containersPath = fs.getPath("/containers");
-            if (ios.exists(containersPath)) {
-                ds = ios.newDirectoryStream(containersPath, new Filter<Path>() {
-
-                    @Override
-                    public boolean accept(Path entry) throws IOException {
-                        return Files.isDirectory(entry);
-                    }
-                });
-                if (ds != null) {
-                    XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
-                    for (Path entry : ds) {
-                        BufferedReader reader = null;
-                        try {
-                            logger.info("Restoring state of kie container '" + entry.getFileName() + "'");
-                            reader = Files.newBufferedReader(entry.resolve(CONTAINER_STATE_FILE), Charset.forName("UTF-8"));
-                            KieContainerResource resource = (KieContainerResource) xs.fromXML(reader);
-                            restore(resource);
-                        } catch (Exception e) {
-                            logger.error("Error restoring kie container state", e);
-                        } finally {
-                            if (reader != null) {
-                                try {
-                                    reader.close();
-                                } catch (java.io.IOException e) {
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Error restoring kie server state", e);
-        } finally {
-            if (ds != null)
-                ds.close();
-        }
-    }
-
-    private void persistContainer(KieContainerInstance ci) {
-        if( fs != null ) {
-            BufferedWriter writer = null;
-            try {
-                logger.info("Persisting state for kie container '" + ci.getContainerId() + "'");
-                XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
-                Path file = fs.getPath("/containers/" + ci.getContainerId() + "/" + CONTAINER_STATE_FILE);
-                writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"));
-                xs.toXML(ci.getResource(), writer);
-            } catch (Exception e) {
-                logger.error("Error persisting state for kie container '" + ci.getContainerId() + "'", e);
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.close();
-                    } catch (java.io.IOException e) {
-                    }
-                }
-            }
-        }
-    }
-
-    private void restore(KieContainerResource resource) {
-        if( fs != null ) {
-            System.out.println(">>>>>>>>> RESTORING STATE FOR = " + resource);
-        }
-    }
+//    private void restoreContainers() {
+//        DirectoryStream<Path> ds = null;
+//        try {
+//            Path containersPath = fs.getPath("/containers");
+//            if (ios.exists(containersPath)) {
+//                ds = ios.newDirectoryStream(containersPath, new Filter<Path>() {
+//
+//                    @Override
+//                    public boolean accept(Path entry) throws IOException {
+//                        return Files.isDirectory(entry);
+//                    }
+//                });
+//                if (ds != null) {
+//                    XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
+//                    for (Path entry : ds) {
+//                        BufferedReader reader = null;
+//                        try {
+//                            logger.info("Restoring state of kie container '" + entry.getFileName() + "'");
+//                            reader = Files.newBufferedReader(entry.resolve(CONTAINER_STATE_FILE), Charset.forName("UTF-8"));
+//                            KieContainerResource resource = (KieContainerResource) xs.fromXML(reader);
+//                            restore(resource);
+//                        } catch (Exception e) {
+//                            logger.error("Error restoring kie container state", e);
+//                        } finally {
+//                            if (reader != null) {
+//                                try {
+//                                    reader.close();
+//                                } catch (java.io.IOException e) {
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error("Error restoring kie server state", e);
+//        } finally {
+//            if (ds != null)
+//                ds.close();
+//        }
+//    }
+//
+//    private void persistContainer(KieContainerInstance ci) {
+//        if( fs != null ) {
+//            BufferedWriter writer = null;
+//            try {
+//                logger.info("Persisting state for kie container '" + ci.getContainerId() + "'");
+//                XStream xs = XStreamXml.newXStreamMarshaller(KieServerImpl.class.getClassLoader());
+//                Path file = fs.getPath("/containers/" + ci.getContainerId() + "/" + CONTAINER_STATE_FILE);
+//                writer = Files.newBufferedWriter(file, Charset.forName("UTF-8"));
+//                xs.toXML(ci.getResource(), writer);
+//            } catch (Exception e) {
+//                logger.error("Error persisting state for kie container '" + ci.getContainerId() + "'", e);
+//            } finally {
+//                if (writer != null) {
+//                    try {
+//                        writer.close();
+//                    } catch (java.io.IOException e) {
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private void restore(KieContainerResource resource) {
+//        if( fs != null ) {
+//            System.out.println(">>>>>>>>> RESTORING STATE FOR = " + resource);
+//        }
+//    }
 
 }

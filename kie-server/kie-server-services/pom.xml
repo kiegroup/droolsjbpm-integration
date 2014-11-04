@@ -95,7 +95,9 @@
       <artifactId>jbpm-bpmn2</artifactId>
     </dependency>
 
-    <dependency>
+    <!-- the following dependencies will be added back later when
+         implementing configuration persistency -->
+    <!-- dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-io</artifactId>
       <exclusions>
@@ -133,7 +135,7 @@
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-nio2-fs</artifactId>
-    </dependency>
+    </dependency -->
 
     <!-- RestEasy dependencies -->
     <dependency>
