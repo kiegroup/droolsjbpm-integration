@@ -18,33 +18,15 @@ package org.kie.spring;
 
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
-import org.drools.core.impl.StatefulKnowledgeSessionImpl;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
-import org.kie.api.builder.KieModule;
-import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class KieObjectsResolver {
-
-    private KieContainerImpl defaultClasspathKContainer;
-
-    public KieObjectsResolver() {
-        init();
-    }
-
-    protected void init() {
-        KieServices ks = KieServices.Factory.get();
-        // defaultClasspathKContainer = (KieContainerImpl) ks.getKieClasspathContainer();
-    }
 
     public KieBase resolveKBase(String id, ReleaseId releaseId) {
         KieContainer kieContainer = resolveKContainer(releaseId);
@@ -72,18 +54,12 @@ public class KieObjectsResolver {
     }
 
     private KieContainer resolveKContainer(ReleaseId releaseId) {
-        KieContainer kieContainer = null;
         if (releaseId == null) {
-            kieContainer = defaultClasspathKContainer;
-            if (defaultClasspathKContainer == null) {
-                throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
-            }
-        } else {
-            KieServices ks = KieServices.Factory.get();
-            kieContainer = ks.newKieContainer(releaseId);
-            if ( kieContainer == null) {
-                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
-            }
+            throw new IllegalArgumentException("Cannot resolve a KieContainer using a null ReleaseId");
+        }
+        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        if ( kieContainer == null) {
+            throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
         }
         return kieContainer;
     }
