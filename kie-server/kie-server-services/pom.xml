@@ -95,48 +95,6 @@
       <artifactId>jbpm-bpmn2</artifactId>
     </dependency>
 
-    <!-- the following dependencies will be added back later when
-         implementing configuration persistency -->
-    <!-- dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-io</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.errai</groupId>
-          <artifactId>errai-ioc</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.errai</groupId>
-          <artifactId>errai-marshalling</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.errai</groupId>
-          <artifactId>errai-javax-enterprise</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.errai</groupId>
-          <artifactId>errai-bus</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-nio2-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-nio2-model</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-nio2-jgit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-nio2-fs</artifactId>
-    </dependency -->
-
     <!-- RestEasy dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
