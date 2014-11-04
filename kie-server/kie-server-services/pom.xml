@@ -8,40 +8,10 @@
   </parent>
 
   <artifactId>kie-server-services</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
   <name>KIE :: Execution Server :: Services</name>
   <description>KIE Execution Server Services</description>
-
-  <properties>
-    <!-- Following properties are used only for testing -->
-    <container.hostname>localhost</container.hostname>
-    <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
-         is not able to override the value of the property. The port number would then always be the same
-         (the default one, unless changed from outside) -->
-    <kie.server.context>kie-server-services</kie.server.context>
-    <kie.server.base.uri>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.uri>
-    <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
-    <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
-    <!-- This property can be overriden when some other remote repo location should be used -->
-    <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
-  </properties>
-
-  <!-- This section should be eventually moved to kie-parent-with-dependencies -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>tjws</artifactId>
-        <version>2.3.7.Final</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-embedder</artifactId>
-        <version>${version.org.apache.maven}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <!-- kie server dependencies -->
@@ -49,21 +19,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-server-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-server-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <!-- core dependencies -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-internal</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -72,27 +31,21 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
-      <!-- scope>provided</scope -->
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
-      <!-- scope>provided</scope -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-common</artifactId>
-      <!-- scope>provided</scope -->
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.aether</groupId>
-      <artifactId>aether-api</artifactId>
-    </dependency>
-
     <!-- needed for ruleflow processes -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- the following dependencies will be added back later when
@@ -131,17 +84,25 @@
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-nio2-jgit</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.uberfire</groupId>
       <artifactId>uberfire-nio2-fs</artifactId>
     </dependency -->
 
-    <!-- RestEasy dependencies -->
+    <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <!-- RestEasy JAX-RS dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <!-- scope>provided</scope -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -150,326 +111,31 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxb-provider</artifactId>
-      <!-- scope>provided</scope -->
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson-provider</artifactId>
+      <scope>runtime</scope>
     </dependency>
+
+
+
     <!-- log -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <!-- scope>provided</scope -->
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <!-- scope>provided</scope -->
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
-    <!-- test dependencies -->
-    <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>tjws</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-embedder</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
-  <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/filtered-resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <!-- we need to fork always as we have mixture of both arquillian 
-          tests and regular and to avoid clashing between them as both need to setup 
-          data source and bound it to JNDI -->
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkMode>always</forkMode>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>reserve-network-port</id>
-            <goals>
-              <goal>reserve-network-port</goal>
-            </goals>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <portNames>
-                <portName>container.port</portName>
-              </portNames>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-custom-maven-repo-dir</id>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <tasks>
-                <mkdir dir="${kie.server.testing.server.local.repo.dir}"/>
-                <mkdir dir="${kie.server.testing.remote.repo.dir}"/>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <kie.server.base.uri>${kie.server.base.uri}</kie.server.base.uri>
-          </systemPropertyVariables>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
-        <configuration>
-          <container>
-            <containerId>jetty8x</containerId> <!-- Jetty 9.x fails when deploying the war -->
-            <type>embedded</type>
-            <systemProperties>
-              <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
-            </systemProperties>
-          </container>
-          <configuration>
-            <properties>
-              <cargo.servlet.port>${container.port}</cargo.servlet.port>
-              <cargo.servlet.users>yoda:usetheforce123@:kie-server</cargo.servlet.users>
-            </properties>
-          </configuration>
-          <deployables>
-            <deployable>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>${project.artifactId}</artifactId>
-              <type>war</type>
-              <properties>
-                <context>${kie.server.context}</context>
-              </properties>
-              <pingURL>${kie.server.base.uri}</pingURL>
-              <pingTimeout>30000</pingTimeout>
-            </deployable>
-          </deployables>
-        </configuration>
-        <executions>
-          <execution>
-            <id>start-container</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop-container</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>tomcat7x</id>
-      <properties>
-        <tomcat7x.download.url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</tomcat7x.download.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="append">
-              <container>
-                <containerId>tomcat7x</containerId>
-                <type>installed</type>
-                <zipUrlInstaller>
-                  <url>${tomcat7x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>tomcat8x</id>
-      <properties>
-        <tomcat8x.download.url>https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.12/bin/apache-tomcat-8.0.12.zip</tomcat8x.download.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="append">
-              <container>
-                <containerId>tomcat8x</containerId>
-                <type>installed</type>
-                <zipUrlInstaller>
-                  <url>${tomcat8x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>wildfly8x</id>
-      <properties>
-        <wildfly8x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly8x.download.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="append">
-              <container>
-                <containerId>wildfly8x</containerId>
-                <type>installed</type>
-                <zipUrlInstaller>
-                  <url>${wildfly8x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>jbossas71x</id>
-      <properties>
-        <jbossas71x.download.url>http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip</jbossas71x.download.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="append">
-              <container>
-                <containerId>jboss71x</containerId>
-                <type>installed</type>
-                <zipUrlInstaller>
-                  <url>${jbossas71x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>eap63x</id>
-      <properties>
-        <!-- The EAP 6.3.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
-             and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
-             here or via system property when running the build (don't forget to use the `file://` prefix when
-             referencing the zip from local filesystem). -->
-        <eap63x.download.url>valid-url-for-eap-6.3.x-needs-to-be-specified-here-or-via-cmd-line</eap63x.download.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration combine.self="append">
-              <container>
-                <containerId>jboss74x</containerId>
-                <type>installed</type>
-                <zipUrlInstaller>
-                  <url>${eap63x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <!-- This profile basically disables any cargo related execution. It can be used when the tests should run on
-         a container that has already been started and it is not managed by cargo. It can also be used when doing
-         a "no-test" build, as the container should not be used in that case. -->
-    <profile>
-      <id>custom-container</id>
-      <activation>
-        <property>
-          <name>custom-container</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.cargo</groupId>
-            <artifactId>cargo-maven2-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>start-container</id>
-                <phase>none</phase>
-                <goals/> <!-- do nothing, container is not managed by cargo -->
-              </execution>
-              <execution>
-                <id>stop-container</id>
-                <phase>none</phase>
-                <goals/> <!-- do nothing, container is not managed by cargo -->
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
