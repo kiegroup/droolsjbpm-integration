@@ -1,22 +1,9 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.internal.query.QueryParameterIdentifiers.ACTUAL_OWNER_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.BUSINESS_ADMIN_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.CREATED_BY_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.END_DATE_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.EXTERNAL_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.LAST_VARIABLE_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_INSTANCE_STATUS_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_VERSION_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.STAKEHOLDER_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.START_DATE_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.TASK_ID_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.TASK_STATUS_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.VALUE_LIST;
-import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
+import static org.jbpm.process.audit.JPAAuditLogService.*;
+import static org.kie.internal.query.QueryParameterIdentifiers.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +18,13 @@ import org.kie.internal.query.QueryAndParameterAppender;
 import org.kie.internal.query.QueryModificationService;
 import org.kie.internal.query.data.QueryData;
 
+/**
+ * This is the {@link QueryModificationService} implementation for the REST remote services, 
+ * which allows us to do complicated queries that join<ul>
+ * <li>The process instance tables to the variable instance log tables</li>
+ * <li>Or the task tables to the variable instance log tables</li>
+ * </ul>
+ */
 public class RemoteServicesQueryModificationService implements QueryModificationService {
 
     public RemoteServicesQueryModificationService() {
@@ -61,6 +55,8 @@ public class RemoteServicesQueryModificationService implements QueryModification
         varInstLogNeededCriterias.add(VALUE_LIST);
         varInstLogNeededCriterias.add(OLD_VALUE_LIST);
         varInstLogNeededCriterias.add(EXTERNAL_ID_LIST);
+        varInstLogNeededCriterias.add(VARIABLE_INSTANCE_ID_LIST);
+        varInstLogNeededCriterias.add(VAR_VALUE_ID_LIST);
         
         // when doing a var inst log or proc inst log query, add task if these criteria are used
         taskNeededCriterias.add(TASK_ID_LIST);
@@ -121,7 +117,8 @@ public class RemoteServicesQueryModificationService implements QueryModification
     public void addTablesToQuery( StringBuilder queryBuilder, QueryData queryData ) {
         int type = determineQueryType(queryBuilder);
         Set<String> additionalTables = new HashSet<String>();
-       
+      
+        // make a list with all of the parameter list ids
         Set<String> parameterListIdsUsed = new HashSet<String>();
         if( ! queryData.intersectParametersAreEmpty() ) { 
            parameterListIdsUsed.addAll(queryData.getIntersectParameters().keySet());
@@ -132,7 +129,8 @@ public class RemoteServicesQueryModificationService implements QueryModification
         if( ! queryData.intersectRegexParametersAreEmpty() ) { 
            parameterListIdsUsed.addAll(queryData.getIntersectRegexParameters().keySet()); 
         }
-        
+       
+        // go through parameter list ids to see which tables need to be added
         for( String listId : parameterListIdsUsed ) { 
             if( type == TASK_SUMMARY_QUERY_TYPE ) { 
                 if( procInstLogNeededCriterias.contains(listId) ) { 
@@ -157,18 +155,20 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 break;
             }
         }
+       
+        // Add the extra tables
         for( String table : additionalTables ) { 
            queryBuilder.append(", " + table + "\n");
         }
     }
 
     @Override
-    public void addCriteriaToQuery( StringBuilder queryBuilder, QueryData queryData, 
-            QueryAndParameterAppender queryAppender ) {
+    public void addCriteriaToQuery( StringBuilder queryBuilder, QueryData queryData, QueryAndParameterAppender queryAppender ) {
         
        int type = determineQueryType(queryBuilder);
     
        boolean addLastVariableQueryClause = false;
+       boolean addVariableValueQueryClause = false;
        String varInstLogTableId = "l";
        if( type != VARIABLE_INSTANCE_LOG_QUERY_TYPE ) { 
            Set<String> queryDataParms = new HashSet<String>();
@@ -186,6 +186,12 @@ public class RemoteServicesQueryModificationService implements QueryModification
                    addLastVariableQueryClause = true;
                    break;
                }
+           }
+           for( String listId : queryDataParms ) { 
+              if( VAR_VALUE_ID_LIST.equals(listId) )  { 
+                  addVariableValueQueryClause = true;
+                  break;
+              }
            }
        }
        
@@ -233,13 +239,38 @@ public class RemoteServicesQueryModificationService implements QueryModification
                    taskCriteriaFieldClasses, taskCriteriaFields, taskCriteriaFieldJoinClauses,
                    ".taskData.processInstanceId = l.processInstanceId");
        }
-       
-       if( addLastVariableQueryClause ) { 
-           queryData.getIntersectParameters().remove(LAST_VARIABLE_LIST);
-           boolean whereAnd = queryAppender.getFirstUse() && type != TASK_SUMMARY_QUERY_TYPE;
-           queryBuilder.append("\n").append( (whereAnd ? "WHERE" : "AND" ) )
-           .append(" (").append(varInstLogTableId).append(".id IN (SELECT MAX(ll.id) FROM VariableInstanceLog ll ")
-           .append("GROUP BY ll.variableId, ll.processInstanceId))"); 
+       if( type != VARIABLE_INSTANCE_LOG_QUERY_TYPE ) { 
+           if( addLastVariableQueryClause ) { 
+               queryData.getIntersectParameters().remove(LAST_VARIABLE_LIST);
+               boolean addWhereClause = ! queryAppender.hasBeenUsed() && type != TASK_SUMMARY_QUERY_TYPE;
+               queryBuilder.append("\n").append( (addWhereClause ? "WHERE" : "AND" ) )
+               .append(" (").append(varInstLogTableId).append(".id IN (SELECT MAX(ll.id) FROM VariableInstanceLog ll ")
+               .append("GROUP BY ll.variableId, ll.processInstanceId))"); 
+               queryAppender.markAsUsed();
+               queryAppender.queryBuilderModificationCleanup();
+           }
+           if( addVariableValueQueryClause ) { 
+               if( ! queryData.intersectParametersAreEmpty() ) { 
+                   List<String> varValParameters = (List<String>) queryData.getIntersectParameters().remove(VAR_VALUE_ID_LIST);
+                   if( varValParameters != null && ! varValParameters.isEmpty() ) { 
+                      List<Object[]> varValCriteria = new ArrayList<Object[]>();
+                      checkVarValCriteria(varValParameters, false, false, varValCriteria);
+                      addVarValCriteria(! queryAppender.hasBeenUsed(), queryBuilder, queryAppender, varInstLogTableId, varValCriteria);
+                      queryAppender.markAsUsed();
+                      queryAppender.queryBuilderModificationCleanup();
+                   }
+               } 
+               if( ! queryData.intersectRegexParametersAreEmpty() ) { 
+                   List<String> varValRegexParameters = queryData.getIntersectRegexParameters().remove(VAR_VALUE_ID_LIST);
+                   if( varValRegexParameters != null && ! varValRegexParameters.isEmpty() ) { 
+                      List<Object[]> varValCriteria = new ArrayList<Object[]>();
+                      checkVarValCriteria(varValRegexParameters, false, true, varValCriteria);
+                      addVarValCriteria(! queryAppender.hasBeenUsed(), queryBuilder, queryAppender, varInstLogTableId, varValCriteria);
+                      queryAppender.markAsUsed();
+                      queryAppender.queryBuilderModificationCleanup();
+                   }
+               }
+           }
        }
     } 
 
@@ -260,6 +291,9 @@ public class RemoteServicesQueryModificationService implements QueryModification
         if( ! queryData.intersectParametersAreEmpty() ) { 
             for( Entry<String, List<? extends Object>> entry : queryData.getIntersectParameters().entrySet() ) { 
                 String listId = entry.getKey();
+                if( VAR_VALUE_ID_LIST.equals(listId) ) { 
+                    continue;
+                }
                 if( firstNeededCriterias.contains(listId) )   { 
                     addFirstTableJoinClause = true;
                     processedListIds.add(listId);
@@ -318,6 +352,9 @@ public class RemoteServicesQueryModificationService implements QueryModification
         if( ! queryData.intersectRegexParametersAreEmpty() ) { 
             for( Entry<String, List<String>> entry : queryData.getIntersectRegexParameters().entrySet() ) { 
                 String listId = entry.getKey();
+                if( VAR_VALUE_ID_LIST.equals(listId) ) { 
+                    continue;
+                }
                 if( firstNeededCriterias.contains(listId) )   { 
                     addFirstTableJoinClause = true;
                     processedListIds.add(listId);

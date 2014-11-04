@@ -18,9 +18,9 @@ package org.kie.remote.services.rest.query;
  * When we process these query parameters on the server side, the JAX-RS logic groups all of the values
  * for one parameter into a list or array.
  * </p>
- * This array of values (for the example above <code>[2,3]</code>) is then assigned to the {@link ActionData#paramData} field.
+ * This array of values (for the example above <code>[2,3]</code>) is then assigned to the {@link QueryAction#paramData} field.
  */
-public class ActionData {
+class QueryAction {
 
     public final String paramName;
     public final int action;
@@ -30,7 +30,7 @@ public class ActionData {
     public boolean min = false;
     public boolean max = false;
 
-    public ActionData(String param, int action, String[] data) {
+    public QueryAction(String param, int action, String[] data) {
         this.paramName = param;
         this.action = action;
         this.paramData = data;

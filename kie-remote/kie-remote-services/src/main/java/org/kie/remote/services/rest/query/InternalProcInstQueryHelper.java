@@ -1,19 +1,15 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.actionParamNameMap;
-import static org.kie.remote.services.rest.query.QueryResourceData.getDates;
-import static org.kie.remote.services.rest.query.QueryResourceData.getInts;
-import static org.kie.remote.services.rest.query.QueryResourceData.getLongs;
-
-import java.util.ArrayDeque;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.drools.core.util.StringUtils;
 import org.jbpm.process.audit.AuditLogService;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.kie.api.task.model.Status;
 import org.kie.internal.query.data.QueryData;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
@@ -22,210 +18,101 @@ import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessIns
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbVariableInfo;
 
-public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper {
+public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<JaxbQueryProcessInstanceResult> {
 
     public InternalProcInstQueryHelper(ResourceBase resourceBase) { 
         super(resourceBase);
     }
-   
-    public JaxbQueryProcessInstanceResult queryProcessInstancesAndVariables( Map<String, String[]> queryParams, int[] pageInfo,
-            int maxResults ) {
 
-        Map<String, String> varValueMap = new HashMap<String, String>();
-        Map<String, String> varRegexMap = new HashMap<String, String>();
-
-        // meta (in-memory or history variable values?)
-        Boolean workFlowInstanceVariables = determineWorkFlowInstanceVariableUse(queryParams);
-
-        Map<String, String> procVarValues;
-        if( workFlowInstanceVariables ) {
-            procVarValues = new HashMap<String, String>();
-        }
-      
-        boolean onlyRetrieveLastVarLogs = true;
-        String [] paramVals = queryParams.remove("all");
-        if( paramVals != null ) { 
-           onlyRetrieveLastVarLogs = false;
-        }
-        
-        ArrayDeque<ActionData> actionDataQueue = fillActionDataQueueFromQueryParams(queryParams, varValueMap, varRegexMap);
-      
+    /*
+     * (non-Javadoc)
+     * @see org.kie.remote.services.rest.query.AbstractInternalQueryHelper#createAndSetQueryBuilders(java.lang.String)
+     */
+    @Override
+    protected void createAndSetQueryBuilders(String identity) { 
         // setup queries
-        RemoteServicesQueryCommandBuilder instLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
+        RemoteServicesQueryCommandBuilder procInstLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
+        RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
+        setQueryBuilders(procInstLogQueryBuilder, varInstLogQueryBuilder);
+    }
+   
+    /*
+     * (non-Javadoc)
+     * @see org.kie.remote.services.rest.query.AbstractInternalQueryHelper#doQueryAndCreateResultObjects(boolean, boolean)
+     */
+    @Override
+    public JaxbQueryProcessInstanceResult doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables) { 
 
-        if( onlyRetrieveLastVarLogs ) { 
-            instLogQueryBuilder.last();
-        }
-        
-        int[] intData;
-        long[] longData;
-        Date[] dateData;
-        while( !actionDataQueue.isEmpty() ) {
-            ActionData actionData = actionDataQueue.poll();
-            String[] data = actionData.paramData;
-            int action = actionData.action;
-            switch ( action ) {
-            // general
-            case 0: // processinstanceid
-                assert "processinstanceid".equals(actionParamNameMap.get(action)): action + " : processinstanceid";
-                longData = getLongs(action, data);
-                if( actionData.min || actionData.max ) {
-                    if( longData.length > 1 ) {
-                        throw KieRemoteRestOperationException.notFound("Only 1 '" + actionData.paramName
-                                + "' parameter is accepted");
-                    }
-                    if( actionData.min ) {
-                        instLogQueryBuilder.processInstanceIdMin(longData[0]);
-                        actionData.min = false;
-                    } else if( actionData.max ) {
-                        instLogQueryBuilder.processInstanceIdMax(longData[0]);
-                        actionData.max = false;
-                    }
-                } else {
-                    instLogQueryBuilder.processInstanceId(longData);
-                }
-                break;
-            case 1: // processid
-                assert "processid".equals(actionParamNameMap.get(action)): action + " : processid";
-                setRegexOnOff(actionData, true, instLogQueryBuilder);
-                instLogQueryBuilder.processId(data);
-                setRegexOnOff(actionData, false, instLogQueryBuilder);
-                break;
-            case 2: // workitemid
-                assert "workitemid".equals(actionParamNameMap.get(action)): action + " : workitemid";
-                longData = getLongs(action, data);
-                instLogQueryBuilder.workItemId(longData);
-                break;
-            case 3: // deploymentid
-                assert "deploymentid".equals(actionParamNameMap.get(action)): action + " : deploymentid";
-                instLogQueryBuilder.deploymentId(data);
-                break;
-
-            // process instance
-            case 11: // process instance status
-                assert "processinstancestatus".equals(actionParamNameMap.get(action)): action + " : processinstancestatus";
-                intData = getInts(action, data);
-                instLogQueryBuilder.processInstanceStatus(intData);
-                break;
-            case 12: // process version
-                assert "processversion".equals(actionParamNameMap.get(action)): action + " : processversion";
-                setRegexOnOff(actionData, true, instLogQueryBuilder);
-                instLogQueryBuilder.processVersion(data);
-                setRegexOnOff(actionData, false, instLogQueryBuilder);
-                break;
-            case 13: // start date
-                assert "startdate".equals(actionParamNameMap.get(action)): action + " : startdate";
-                dateData = getDates(action, data);
-                if( actionData.min || actionData.max ) {
-                    if( dateData.length != 1 ) {
-                        throw KieRemoteRestOperationException.notFound("Only 1 '" + actionData.paramName
-                                + "' parameter is accepted");
-                    }
-                    if( actionData.min ) {
-                        instLogQueryBuilder.startDateMin(dateData[0]);
-                        actionData.min = false;
-                    } else if( actionData.max ) {
-                        instLogQueryBuilder.startDateMax(dateData[0]);
-                        actionData.max = false;
-                    }
-                } else {
-                    instLogQueryBuilder.startDate(dateData);
-                }
-                break;
-            case 14: // end date
-                assert "enddate".equals(actionParamNameMap.get(action)): action + " : enddate";
-                dateData = getDates(action, data);
-                if( actionData.min || actionData.max ) {
-                    if( dateData.length > 1 ) {
-                        throw KieRemoteRestOperationException.notFound("Only 1 '" + actionData.paramName
-                                + "' parameter is accepted");
-                    }
-                    if( actionData.min ) {
-                        instLogQueryBuilder.endDateMin(dateData[0]);
-                        actionData.min = false;
-                    } else if( actionData.max ) {
-                        instLogQueryBuilder.endDateMax(dateData[0]);
-                        actionData.max = false;
-                    }
-                } else {
-                    instLogQueryBuilder.startDate(dateData);
-                }
-                break;
-
-            // variable instance
-            case 15: // var id
-                assert "varid".equals(actionParamNameMap.get(action)): action + " : varid";
-                if( actionData.regex && workFlowInstanceVariables ) {
-                    String param = actionParamNameMap.get(action);
-                    throw KieRemoteRestOperationException.badRequest("Regular expresssions are not supported on the '" + param
-                            + "' parameter " + "when retrieving in-memory process variables");
-                }
-                setRegexOnOff(actionData, true, instLogQueryBuilder);
-                instLogQueryBuilder.variableId(data);
-                setRegexOnOff(actionData, false, instLogQueryBuilder);
-                instLogQueryBuilder.last();
-                break;
-            case 16: // var value
-                assert "varvalue".equals(actionParamNameMap.get(action)): action + " : varvalue";
-                if( actionData.regex && workFlowInstanceVariables ) {
-                    String param = actionParamNameMap.get(action);
-                    throw KieRemoteRestOperationException.badRequest("Regular expresssions are not supported on the '" + param
-                            + "' parameter when retrieving in-memory process variables");
-                }
-                setRegexOnOff(actionData, true, instLogQueryBuilder);
-                instLogQueryBuilder.value(data);
-                setRegexOnOff(actionData, false, instLogQueryBuilder);
-                break;
-            case 17: // var
-                assert "var".equals(actionParamNameMap.get(action)): action + " : var";
-                instLogQueryBuilder.variableValue(data[0], varValueMap.get(data[0]));
-                break;
-            case 18: // varregex
-                assert "varregex".equals(actionParamNameMap.get(action)): action + " : varregex";
-                setRegexOnOff(actionData, true, instLogQueryBuilder);
-                instLogQueryBuilder.variableValue(data[0], varRegexMap.get(data[0]));
-                setRegexOnOff(actionData, false, instLogQueryBuilder);
-                break;
-                
-            default:
-                throw KieRemoteRestOperationException
-                        .internalServerError("Please contact the developers: this state should not be possible.");
-            }
-            if( actionData.min || actionData.max || actionData.regex ) {
-                throw KieRemoteRestOperationException.notFound("Query parameter '" + actionData.paramName + "' is not supported.");
-            }
-        }
-
-        QueryData queryData = instLogQueryBuilder.getQueryData();
+        // setup
+        RemoteServicesQueryCommandBuilder procInstLogQueryBuilder = getQueryBuilders()[0];
+        RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = getQueryBuilders()[1];
         AuditLogService auditLogService = resourceBase.getAuditLogService();
-        List<VariableInstanceLog> varLogs = auditLogService.queryVariableInstanceLogs(queryData);
-        List<ProcessInstanceLog> procLogs = auditLogService.queryProcessInstanceLogs(queryData);
+      
+        if( onlyRetrieveLastVarLogs ) { 
+            if( variableCriteriaInQuery(procInstLogQueryBuilder.getQueryData()) ) { 
+                procInstLogQueryBuilder.last();
+            }
+            varInstLogQueryBuilder.last();
+        }
+       
+        // process instance queries
+        List<ProcessInstanceLog> procLogs = auditLogService.queryProcessInstanceLogs(procInstLogQueryBuilder.getQueryData());
+        List<VariableInstanceLog> varLogs = auditLogService.queryVariableInstanceLogs(varInstLogQueryBuilder.getQueryData());
+        
+        // UNFINISHED FEATURE: using in-memory/proces instance variabels instead of audit/history logs
         List<JaxbVariableInfo> procVars = null;
+        if( workFlowInstanceVariables ) {
+            for( VariableInstanceLog varLog : varLogs ) {
+                // TODO: retrieve process instance variables instead of log string values
+            }
+        }
 
+        // create result
         JaxbQueryProcessInstanceResult result = createProcessInstanceResult(procLogs, varLogs, procVars);
         return result;
     }
 
-    private static JaxbQueryProcessInstanceResult createProcessInstanceResult( List<ProcessInstanceLog> procLogs,
-            List<VariableInstanceLog> varLogs, List<JaxbVariableInfo> processVariables ) {
+
+    private JaxbQueryProcessInstanceResult createProcessInstanceResult( 
+            List<ProcessInstanceLog> procLogs,
+            List<VariableInstanceLog> varLogs, 
+            List<JaxbVariableInfo> processVariables ) {
         JaxbQueryProcessInstanceResult result = new JaxbQueryProcessInstanceResult();
 
         Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap = new HashMap<Long, JaxbQueryProcessInstanceInfo>();
         for( ProcessInstanceLog procLog : procLogs ) {
             long procInstId = procLog.getProcessInstanceId();
-            JaxbQueryProcessInstanceInfo taskInfo = getQueryProcessInstanceInfo(procInstId, procInstIdProcInstInfoMap);
-            taskInfo.setProcessInstance(new JaxbProcessInstance(procLog));
+            JaxbQueryProcessInstanceInfo procInfo = getQueryProcessInstanceInfo(procInstId, procInstIdProcInstInfoMap);
+            procInfo.setProcessInstance(new JaxbProcessInstance(procLog));
         }
         for( VariableInstanceLog varLog : varLogs ) {
             long procInstId = varLog.getProcessInstanceId();
-            JaxbQueryProcessInstanceInfo taskInfo = getQueryProcessInstanceInfo(procInstId, procInstIdProcInstInfoMap);
-            taskInfo.getVariables().add(new JaxbVariableInfo(varLog));
+            JaxbQueryProcessInstanceInfo procInfo = procInstIdProcInstInfoMap.get(procInstId);
+            if( procInfo == null ) { 
+                throwDebugExceptionWithQueryInformation();
+            }
+            procInfo.getVariables().add(new JaxbVariableInfo(varLog));
         }
 
         result.getProcessInstanceInfoList().addAll(procInstIdProcInstInfoMap.values());
         return result;
     }
 
+    private void throwDebugExceptionWithQueryInformation() { 
+        StringBuilder message = new StringBuilder("Please contact the developers: the following query retrieved variable instance logs without retrieving the associated process instance logs:\n");
+        QueryData queryData = getQueryBuilders()[0].getQueryData();
+        for( Entry<String,  List<? extends Object>> entry : queryData.getIntersectParameters().entrySet() ) { 
+           message.append( "[" + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
+        }
+        for( Entry<String,  List<? extends Object>> entry : queryData.getIntersectRangeParameters().entrySet() ) { 
+           message.append( "[ (m/m) " + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
+        }
+        for( Entry<String,  List<String>> entry : queryData.getIntersectRegexParameters().entrySet() ) { 
+           message.append( "[ (re) " + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
+        }
+        throw KieRemoteRestOperationException.internalServerError(message.toString()); 
+    }
+    
     private static JaxbQueryProcessInstanceInfo getQueryProcessInstanceInfo( long procInstId,
             Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap ) {
         JaxbQueryProcessInstanceInfo procInstInfo = procInstIdProcInstInfoMap.get(procInstId);
@@ -236,4 +123,44 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper {
         return procInstInfo;
     }
 
+
+    @Override
+    public void taskId(long[] longData) { 
+        badParameter(QueryResourceData.taskQueryParams[0]);
+    }
+    
+    @Override
+    public void initiator(String[] data) { 
+        badParameter(QueryResourceData.taskQueryParams[1]);
+    }
+    
+    @Override
+    public void stakeHolder(String[] data) { 
+        badParameter(QueryResourceData.taskQueryParams[2]);
+    }
+    
+    @Override
+    public void potentialOwner(String[] data) { 
+        badParameter(QueryResourceData.taskQueryParams[3]);
+    }
+    
+    @Override
+    public void taskOwner(String[] data) { 
+        badParameter(QueryResourceData.taskQueryParams[4]);
+    }
+    
+    @Override
+    public void businessAdmin(String[] data) { 
+        badParameter(QueryResourceData.taskQueryParams[5]);
+    }
+    
+    @Override
+    public void taskStatus(Status[] statuses) { 
+        badParameter(QueryResourceData.taskQueryParams[6]);
+    }
+   
+    public static void badParameter(String paramName) { 
+       throw KieRemoteRestOperationException.badRequest("'" + paramName 
+               + "' is not an accepted parameter for the rich process instance query operation" );
+    }
 }
