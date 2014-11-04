@@ -16,9 +16,6 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieProject;
 import org.kie.api.KieBase;
@@ -35,17 +32,6 @@ import org.osgi.service.blueprint.container.BlueprintListener;
 public class KieObjectsResolver implements BlueprintListener {
 
     private BundleContext bundleContext;
-    private KieContainerImpl defaultClasspathKContainer;
-    private KieServices ks;
-
-    public KieObjectsResolver() {
-        init();
-    }
-
-    protected void init() {
-        ks = KieServices.Factory.get();
-        defaultClasspathKContainer = (KieContainerImpl) ks.getKieClasspathContainer();
-    }
 
     public KieBase resolveKBase(String id, ReleaseId releaseId) {
         KieContainer kieContainer = resolveKContainer(releaseId);
@@ -74,18 +60,12 @@ public class KieObjectsResolver implements BlueprintListener {
     }
 
     private KieContainer resolveKContainer(ReleaseId releaseId) {
-        KieContainer kieContainer = null;
         if (releaseId == null) {
-            kieContainer = defaultClasspathKContainer;
-            if (defaultClasspathKContainer == null) {
-                throw new IllegalArgumentException("Could not find a KModule (defaultClasspathKContainer is null). ");
-            }
-        } else {
-            KieServices ks = KieServices.Factory.get();
-            kieContainer = ks.newKieContainer(releaseId);
-            if ( kieContainer == null) {
-                throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
-            }
+            throw new IllegalArgumentException("Cannot resolve a KieContainer using a null ReleaseId");
+        }
+        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        if ( kieContainer == null) {
+            throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
         }
         return kieContainer;
     }
