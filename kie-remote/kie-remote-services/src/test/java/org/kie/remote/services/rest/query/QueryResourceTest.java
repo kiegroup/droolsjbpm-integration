@@ -219,7 +219,7 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         
         // simple (everything) 
 
-        JaxbQueryTaskResult result = queryTaskHelper.queryTasksAndVariables(USER_ID, queryParams, pageInfo, maxResults);
+        JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo, maxResults);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getTaskInfoList().isEmpty() );
         assertTrue( "empty result", result.getTaskInfoList().size() > 2 );
@@ -237,7 +237,8 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
      
         addParams(queryParams, "processinstanceid", procInstId + ""); 
         addParams(queryParams, "processid_re", PROCESS_STRING_VAR_ID.substring(0, 10) + "*");
-        addParams(queryParams, "taskid", taskId + "");
+        addParams(queryParams, "taskid_min", taskId + "");
+        addParams(queryParams, "taskid_max", taskId + "");
         addParams(queryParams, "taskowner", USER_ID );
         addParams(queryParams, "tst", "Completed" );
        
@@ -250,7 +251,7 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         addParams(queryParams, "vid", "inputStr");
         addParams(queryParams, "vv_re", "check*");
         
-        result = queryTaskHelper.queryTasksAndVariables(USER_ID, queryParams, pageInfo, maxResults);
+        result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo, maxResults);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getTaskInfoList().isEmpty() );
         assertTrue( "more than 1 result", result.getTaskInfoList().size() == 1 );
@@ -270,7 +271,7 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
     private static void addParams(Map<String, String[]> params, String name, String... values ) { 
        params.put(name,  values);
     }
-    
+   
     @Test
     public void queryProcessRestCallTest() throws Exception  { 
         for( int i = 0; i < 3; ++i ) { 
@@ -282,7 +283,7 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
         
         // simple (everything) 
-        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryProcessInstancesAndVariables(queryParams, pageInfo, maxResults);
+        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo, maxResults);
         assertNotNull( "null result", result );
         assertFalse( "empty result (all)", result.getProcessInstanceInfoList().isEmpty() );
         assertTrue( "not enough proc info's: " + result.getProcessInstanceInfoList().size(), result.getProcessInstanceInfoList().size() > 2 );
@@ -340,7 +341,7 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         addParams(queryParams, "stdt_min", yesterdayStr);
         addParams(queryParams, "var_" + varName, varVal );
         
-        result = queryProcInstHelper.queryProcessInstancesAndVariables(queryParams, pageInfo, maxResults);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo, maxResults);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getProcessInstanceInfoList().isEmpty() );
         assertTrue( "more than 1 result", result.getProcessInstanceInfoList().size() == 1 );
@@ -350,13 +351,14 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
       
         roundTripJson(result);
         roundTripXml(result);
-        
+       
+        // more complicated
         queryParams.clear();
         --procInstMax;
         ++procInstMin;
         addParams(queryParams, "piid_min", String.valueOf(procInstMin));
         addParams(queryParams, "processinstanceid_max", String.valueOf(procInstMax));
-        result = queryProcInstHelper.queryProcessInstancesAndVariables(queryParams, pageInfo, maxResults);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo, maxResults);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getProcessInstanceInfoList().isEmpty() );
         assertEquals( "number results", procInstMax - procInstMin+1, result.getProcessInstanceInfoList().size() );
@@ -373,5 +375,27 @@ public class QueryResourceTest extends JbpmJUnitBaseTestCase {
         }
         assertEquals( "process instance id max", procInstMax, findMax );
         assertEquals( "process instance id min", procInstMin, findMin );
+        
+        // test bad parameter
+        addParams(queryParams, "taskowner", USER_ID );
+        boolean exThrown = false;
+        try { 
+            result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo, maxResults);
+        } catch( Exception e ) { 
+           exThrown = true; 
+        }
+        assertTrue( "Exception not thrown on invalid parameter 'taskowner'", exThrown);
+      
+        
+        // varregex test
+        queryParams.clear();
+        addParams(queryParams, "processinstanceid", procInstId + ""); 
+        addParams(queryParams, "processid_re", "*" + PROCESS_OBJ_VAR_ID.substring(10));
+       
+        addParams(queryParams, "vr_" + varName, "X" + varVal.substring(0, 3) + "*" );
+        
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo, maxResults);
+        assertNotNull( "null result", result );
+        assertTrue( "Expected empty result: " + result.getProcessInstanceInfoList().size(), result.getProcessInstanceInfoList().isEmpty() );
     }
 }

@@ -28,15 +28,19 @@ import org.jbpm.process.audit.command.AuditVariableInstanceLogQueryCommand;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.kie.api.task.model.Status;
 import org.kie.internal.query.AbstractQueryBuilderImpl;
+import org.kie.internal.query.data.QueryData;
 
-public class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> {
+/**
+ * This is the {@link AbstractQueryBuilderImpl} implementation used by the REST query operations
+ * to create the queries (the {@link QueryData} instances) needed. 
+ */
+class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> {
 
     private final String taskUserId;
     
     public RemoteServicesQueryCommandBuilder() {
         this.taskUserId = null;
         intersect();
-        last();
     }
     
     public RemoteServicesQueryCommandBuilder(String userId) { 
@@ -163,6 +167,26 @@ public class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<
         return this;
     }
 
+    /**
+     * Add the start of a range of task ids as a criteria to the query
+     * @param taskId the lower end of the range, inclusive
+     * @return the current instance
+     */
+    public RemoteServicesQueryCommandBuilder taskIdMin( long taskId ) {
+        addRangeParameter(TASK_ID_LIST, "task instance id range, start", taskId, true);
+        return this;
+    }
+    
+    /**
+     * Add the end of a range of task ids as a criteria to the query
+     * @param taskId the upper end of the range, inclusive
+     * @return the current instance
+     */
+    public RemoteServicesQueryCommandBuilder taskIdMax( long taskId ) {
+        addRangeParameter(TASK_ID_LIST, "task instance id range, start", taskId, false);
+        return this;
+    }
+    
     /**
      * Add one or more statuses as a criteria to the query
      * @param status
