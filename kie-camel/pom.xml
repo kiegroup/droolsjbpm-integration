@@ -104,6 +104,10 @@
     <!-- CXF deps -->
     <dependency>
       <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxws</artifactId>
     </dependency>
     <dependency>
