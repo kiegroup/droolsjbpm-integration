@@ -13,7 +13,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -93,7 +93,9 @@ public class KieServicesClient {
                     new AuthScope(uriObject.getHost(), uriObject.getPort()),
                     new UsernamePasswordCredentials(username, password)
             );
-            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+
+            DefaultHttpClient client = new DefaultHttpClient();
+            client.setCredentialsProvider(credentialsProvider);
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
             return new ClientRequest(uri, executor).accept(mediaType);
         }
