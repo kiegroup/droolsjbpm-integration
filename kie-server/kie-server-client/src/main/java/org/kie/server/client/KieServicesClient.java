@@ -28,9 +28,12 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KieServicesClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(KieServicesClient.class);
     
     private final String baseURI;
     private final String username;
@@ -50,9 +53,14 @@ public class KieServicesClient {
     }
 
     static {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        ContextResolver<ObjectMapper> contextResolver = new JacksonConfig();
-        factory.addContextResolver(contextResolver);
+
+        try {
+            ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+            ContextResolver<ObjectMapper> contextResolver = new JacksonConfig();
+            factory.addContextResolver(contextResolver);
+        } catch (Throwable e) {
+            logger.warn("Unable to add context resolver due to {}", e.getMessage());
+        }
     }
 
     public KieServicesClient(String baseURI, String username, String password, MediaType mediaType) {
