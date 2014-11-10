@@ -1,7 +1,9 @@
 package org.kie.remote.services.rest;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -50,7 +52,7 @@ public class QueryResourceImpl extends ResourceBase {
     @Path("/runtime/task")
     public Response queryTasks() {
         String oper = getRelativePath();
-        Map<String, String[]> params = getRequestParams();
+        Map<String, String[]> params = makeKeysLowerCase(getRequestParams());
         int[] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
@@ -66,7 +68,7 @@ public class QueryResourceImpl extends ResourceBase {
     @Path("/runtime/process")
     public Response queryProcessInstances() {
         String oper = getRelativePath();
-        Map<String, String[]> params = getRequestParams();
+        Map<String, String[]> params = makeKeysLowerCase(getRequestParams());
         int[] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
@@ -138,5 +140,16 @@ public class QueryResourceImpl extends ResourceBase {
         logger.debug("Returning {} results after pagination.", resultList.getList().size());
 
         return createCorrectVariant(resultList, headers);
+    }
+    
+    private static Map<String, String[]> makeKeysLowerCase(Map<String, String[]> params) { 
+        if( params == null || params.isEmpty() )  { 
+            return params;
+        }
+        Map<String, String[]> lowerCaseParams = new HashMap<String, String[]>(params.size());
+        for( Entry<String, String[]> entry : params.entrySet() ) { 
+           lowerCaseParams.put(entry.getKey().toLowerCase(), entry.getValue()) ;
+        }
+        return lowerCaseParams;
     }
 }
