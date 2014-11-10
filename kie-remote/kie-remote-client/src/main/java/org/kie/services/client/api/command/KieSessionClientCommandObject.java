@@ -32,7 +32,6 @@ import org.kie.api.time.SessionClock;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
-import org.kie.remote.jaxb.gen.DisconnectedFactHandle;
 import org.kie.remote.jaxb.gen.FireAllRulesCommand;
 import org.kie.remote.jaxb.gen.GetFactCountCommand;
 import org.kie.remote.jaxb.gen.GetGlobalCommand;
@@ -42,8 +41,6 @@ import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.SetGlobalCommand;
 import org.kie.remote.jaxb.gen.SignalEventCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
-import org.kie.remote.jaxb.gen.TraitTypeEnum;
-import org.kie.remote.jaxb.gen.UpdateCommand;
 import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession {
@@ -206,33 +203,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public void update( FactHandle handle, Object object ) {
-        UpdateCommand cmd = new UpdateCommand();
-        if( ! handle.getClass().getSimpleName().startsWith("Disconnected") ) { 
-            String methodName = (new Throwable()).getStackTrace()[1].getMethodName();
-            throw new UnsupportedOperationException("The " + methodName + " on the Remote Client " + KieSession.class.getSimpleName()
-                   + " only accepts DisconnectedFactHandle instances." );
-        }
-        cmd.setObject(object);
-        DisconnectedFactHandle discFactHandle = factHandleToGenDisconnectedFactHandle(handle);
-        cmd.setHandle(discFactHandle);
-        executeCommand(cmd);
-    }
-
-    static DisconnectedFactHandle factHandleToGenDisconnectedFactHandle(FactHandle handle) { 
-        DisconnectedFactHandle discHandle = new DisconnectedFactHandle();
-       try { 
-          Class origDiscFactHandleClass = Class.forName("org.drools.core.common.DisconnectedFactHandle");
-          discHandle.setId( getField("id", origDiscFactHandleClass, discHandle, Integer.class));
-          discHandle.setIdentityHashCode(getField("identityHashCode", origDiscFactHandleClass, discHandle, Integer.class));
-          discHandle.setObjectHashCode(getField("objectHashCode", origDiscFactHandleClass, discHandle, Integer.class));
-          discHandle.setRecency(getField("recency", origDiscFactHandleClass, discHandle, Long.class));
-          discHandle.setObject(getField("object", origDiscFactHandleClass, discHandle, Object.class));
-          Object obj = getField("traitType", origDiscFactHandleClass, discHandle, Object.class);
-          discHandle.setTraitType(TraitTypeEnum.fromValue(obj.toString()));
-       } catch( Exception e ) { 
-          throw new RuntimeException("Unable to serialize fact handle :" + e.getMessage(), e); 
-       }
-       return discHandle;
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
