@@ -2,6 +2,7 @@ package org.kie.remote.services.rest.jaxb;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -10,6 +11,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jbpm.kie.services.api.DeploymentIdResolver;
+
+import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,9 @@ public class DynamicJaxbContextFilter implements Filter {
   
     // "**" not accepted in URL's.. 
     public static final String DEFAULT_JAXB_CONTEXT_ID = "**DEFAULT";
+
+    @Inject
+    private DeploymentInfoBean deploymentInfoBean;
     
     public void init(FilterConfig filterConfig) throws ServletException {
         // do nothing
@@ -29,6 +36,9 @@ public class DynamicJaxbContextFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String deploymentId = getDeploymentId(httpRequest);
+        // resolve in case a latest version is to be used
+        deploymentId = DeploymentIdResolver.matchAndReturnLatest(deploymentId, deploymentInfoBean.getDeploymentIds());
+
         DynamicJaxbContext.setDeploymentJaxbContext(deploymentId);
         logger.debug("JAXBContext retrieved and set for for '{}'", deploymentId);
         try { 

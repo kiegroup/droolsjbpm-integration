@@ -1,7 +1,5 @@
 package org.kie.remote.services.rest.jaxb;
 
-import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -27,6 +24,8 @@ import org.kie.remote.services.cdi.DeploymentProcessedEvent;
 import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.*;
 
 /**
  * <h3>READ THIS BEFORE WORKING ON THIS CLASS!</h3>
@@ -66,7 +65,7 @@ public class DynamicJaxbContext extends JAXBContext {
     DeploymentInfoBean deploymentInfoBean;
 
     private static AtomicInteger instanceCreated = new AtomicInteger(0);
-    
+
     public DynamicJaxbContext() {
         if( ! instanceCreated.compareAndSet(0, 1) ) {
             logger.debug("Instance {} of the {} created!", instanceCreated.incrementAndGet(), DynamicJaxbContext.class.getSimpleName() ); 
