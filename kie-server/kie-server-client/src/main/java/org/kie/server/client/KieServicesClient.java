@@ -9,6 +9,7 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,12 +148,12 @@ public class KieServicesClient {
         }
     }
 
-    public List<ServiceResponse<? extends Object>> executeScript(CommandScript script) {
+    public ServiceResponsesList executeScript(CommandScript script) {
         KieRemoteHttpRequest httpRequest = newRequest(baseURI).body(serializationProvider.serialize(script)).post();
         KieRemoteHttpResponse response = httpRequest.response();
         try {
             if (response.code() == Response.Status.OK.getStatusCode()) {
-                return (List<ServiceResponse<? extends Object>>) serializationProvider.deserialize(response.body(), List.class);
+                return serializationProvider.deserialize(response.body(), ServiceResponsesList.class);
             }
             // TODO print some useful info like response body here (e.g. when the server returns 500 with HTML content)
             throw new KieServicesClientException("Unexpected response code: " + response.code());

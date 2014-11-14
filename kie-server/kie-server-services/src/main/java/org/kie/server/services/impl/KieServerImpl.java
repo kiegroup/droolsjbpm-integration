@@ -39,6 +39,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,22 +58,22 @@ public class KieServerImpl {
         this.context = new KieContainersRegistryImpl();
     }
 
-    public List<ServiceResponse<? extends Object>> executeScript(CommandScript commands) {
-        List<ServiceResponse<? extends Object>> response = new ArrayList<ServiceResponse<? extends Object>>();
+    public ServiceResponsesList executeScript(CommandScript commands) {
+        List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
         if( commands != null ) {
             for (KieServerCommand command : commands.getCommands()) {
                 if (command instanceof CreateContainerCommand) {
-                    response.add(createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
+                    responses.add(createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
                 } else if (command instanceof ListContainersCommand) {
-                    response.add(listContainers());
+                    responses.add(listContainers());
                 } else if (command instanceof CallContainerCommand) {
-                    response.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
+                    responses.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
                 } else if (command instanceof DisposeContainerCommand) {
-                    response.add(disposeContainer(((DisposeContainerCommand) command).getContainerId()));
+                    responses.add(disposeContainer(((DisposeContainerCommand) command).getContainerId()));
                 }
             }
         }
-        return response;
+        return new ServiceResponsesList(responses);
     }
 
     public ServiceResponse<KieServerInfo> getInfo() {
