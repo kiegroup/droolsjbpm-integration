@@ -811,7 +811,7 @@ public class KieRemoteHttpRequest {
     }
 
     public KieRemoteHttpRequest followRedirects( final boolean followRedirects ) {
-        this.followRedirects = uncompress;
+        this.followRedirects = followRedirects;
         return this;
     }
 
