@@ -12,6 +12,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,7 +37,8 @@ public class JaxbSerializationProvider implements SerializationProvider {
                 KieContainerStatus.class,
                 KieServerInfo.class,
                 ReleaseId.class,
-                ServiceResponse.class
+                ServiceResponse.class,
+                ServiceResponsesList.class
         };
     }
 
