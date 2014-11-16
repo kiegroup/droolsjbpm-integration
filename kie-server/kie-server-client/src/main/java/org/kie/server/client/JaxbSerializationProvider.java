@@ -54,7 +54,7 @@ public class JaxbSerializationProvider implements SerializationProvider {
             this.marshaller = jaxbContext.createMarshaller();
             this.unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
-            throw new SerializationException("Error while create Jaxb context from default jaxb classes!", e);
+            throw new SerializationException("Error while creating JAXB context from default classes!", e);
         }
     }
 
