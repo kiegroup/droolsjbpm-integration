@@ -8,6 +8,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import javax.ws.rs.ext.ContextResolver;
 
+/**
+ * This class is needed when running the tests using TJWS as we need to specify the marshalling configuration for
+ * JSON. There is some RestEasy specific configuration that is required by the TJWS.
+ */
 public class JacksonRestEasyTestConfig implements ContextResolver<ObjectMapper> {
     private final ObjectMapper mapper;
 
