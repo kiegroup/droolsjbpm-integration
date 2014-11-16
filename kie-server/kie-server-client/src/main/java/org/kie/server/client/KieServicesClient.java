@@ -61,97 +61,124 @@ public class KieServicesClient {
     }
 
     public ServiceResponse<KieServerInfo> getServerInfo() {
-        return makeHttpGetRequestAndProcessResponse(baseURI, ServiceResponse.class);
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI, KieServerInfo.class);
     }
 
     public ServiceResponse<KieContainerResourceList> listContainers() {
-        return makeHttpGetRequestAndProcessResponse(baseURI + "/containers", ServiceResponse.class);
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers", KieContainerResourceList.class);
     }
 
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
-        return makeHttpPutRequestAndProcessResponse(baseURI + "/containers/" + id, resource, ServiceResponse.class);
+        return makeHttpPutRequestAndCreateServiceResponse(baseURI + "/containers/" + id, resource, KieContainerResource.class);
     }
 
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
-        return makeHttpGetRequestAndProcessResponse(baseURI + "/containers/" + id, ServiceResponse.class);
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id, KieContainerResource.class);
     }
 
     public ServiceResponse<Void> disposeContainer(String id) {
-        return makeHttpDeleteRequestAndProcessResponse(baseURI + "/containers/" + id, ServiceResponse.class);
+        return makeHttpDeleteRequestAndCreateServiceResponse(baseURI + "/containers/" + id, Void.class);
     }
 
     public ServiceResponse<String> executeCommands(String id, String payload) {
-        return makeHttpPostRequestAndProcessResponse(baseURI + "/containers/" + id, payload, ServiceResponse.class);
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id, payload, String.class);
     }
 
     public ServiceResponsesList executeScript(CommandScript script) {
-        return makeHttpPostRequestAndProcessResponse(baseURI, script, ServiceResponsesList.class);
+        return makeHttpPostRequestAndCreateCustomResult(baseURI, script, ServiceResponsesList.class);
     }
 
     public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
-        return makeHttpGetRequestAndProcessResponse(baseURI + "/containers/" + id + "/scanner", ServiceResponse.class);
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/scanner", KieScannerResource.class);
     }
 
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
-        return makeHttpPostRequestAndProcessResponse(baseURI + "/containers/" + id + "/scanner", resource,
-                ServiceResponse.class);
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/scanner", resource,
+                KieScannerResource.class);
     }
 
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
-        return makeHttpPostRequestAndProcessResponse(baseURI + "/containers/" + id + "/release-id", releaseId,
-                ServiceResponse.class);
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/release-id", releaseId,
+                ReleaseId.class);
     }
 
-    private <T> T makeHttpGetRequestAndProcessResponse(String uri, Class<T> type) {
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest(uri).get();
         KieRemoteHttpResponse response = request.response();
 
         if (response.code() == Response.Status.OK.getStatusCode()) {
-            return deserialize(response.body(), type);
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
         } else {
             throw createExceptionForUnexpectedResponseCode(request, response);
         }
     }
 
-    private <T> T makeHttpPostRequestAndProcessResponse(String uri, Object bodyObject, Class<T> type) {
-        return makeHttpPostRequestAndProcessResponse(uri, serialize(bodyObject), type);
+    private <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, Object bodyObject,
+            Class<T> resultType) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, serialize(bodyObject), resultType);
     }
 
-    private <T> T makeHttpPostRequestAndProcessResponse(String uri, String body, Class<T> type) {
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest(uri).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
         if (response.code() == Response.Status.OK.getStatusCode()) {
-            return deserialize(response.body(), type);
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
         } else {
             throw createExceptionForUnexpectedResponseCode(request, response);
         }
     }
 
-    private <T> T makeHttpPutRequestAndProcessResponse(String uri, Object bodyObject, Class<T> type) {
-        return makeHttpPutRequestAndProcessResponse(uri, serialize(bodyObject), type);
+    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, Object bodyObject, Class<T> resultType) {
+        return makeHttpPostRequestAndCreateCustomResult(uri, serialize(bodyObject), resultType);
     }
 
-    private <T> T makeHttpPutRequestAndProcessResponse(String uri, String body, Class<T> type) {
+    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, String body, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).body(body).post();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            return deserialize(response.body(), resultType);
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
+    private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, Object bodyObject,
+            Class<T> resultType) {
+        return makeHttpPutRequestAndCreateServiceResponse(uri, serialize(bodyObject), resultType);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest(uri).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
-        if (response.code() == Response.Status.CREATED.getStatusCode()) {
-            return deserialize(response.body(), type);
-        } else if (response.code() == Response.Status.BAD_REQUEST.getStatusCode()) {
-            return deserialize(response.body(), type);
+        if (response.code() == Response.Status.CREATED.getStatusCode() ||
+                response.code() == Response.Status.BAD_REQUEST.getStatusCode()) {
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
         } else {
             throw createExceptionForUnexpectedResponseCode(request, response);
         }
     }
 
-
-    private <T> T makeHttpDeleteRequestAndProcessResponse(String uri, Class<T> type) {
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest(uri).delete();
         KieRemoteHttpResponse response = request.response();
 
         if (response.code() == Response.Status.OK.getStatusCode()) {
-            return deserialize(response.body(), type);
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
         } else {
             throw createExceptionForUnexpectedResponseCode(request, response);
         }
@@ -180,6 +207,20 @@ public class KieServicesClient {
             return serializationProvider.deserialize(content, type);
         } catch (SerializationException e) {
             throw new KieServicesClientException("Error while deserializing data received from server!", e);
+        }
+    }
+
+    /**
+     * Checks whether the specified {@code ServiceResponse} contains the expected result type. In case the type is different,
+     * {@code KieServicesClientException} is thrown. This catches the errors early, before returning the result from the client.
+     * Without this check users could experience {@code ClassCastException} when retrieving the result that does not have
+     * the expected type.
+     */
+    private void checkResultType(ServiceResponse<?> serviceResponse, Class<?> expectedResultType) {
+        Object actualResult = serviceResponse.getResult();
+        if (actualResult != null && !expectedResultType.isInstance(actualResult)) {
+            throw new KieServicesClientException("Error while creating service response! The actual result type " +
+                    serviceResponse.getResult().getClass() + " does not match the expected type " + expectedResultType + "!");
         }
     }
 
