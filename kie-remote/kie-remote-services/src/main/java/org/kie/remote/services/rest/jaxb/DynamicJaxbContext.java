@@ -97,7 +97,8 @@ public class DynamicJaxbContext extends JAXBContext {
     private JAXBContext getRequestContext() { 
         JAXBContext requestJaxbContext = requestJaxbContextLocal.get();
         if( requestJaxbContext == null ) { 
-            throw new IllegalStateException("No jaxb context available for request!");
+            logger.error("No JAXB context could be found for request, using default!");
+            requestJaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
         }
         return requestJaxbContext;
     }
