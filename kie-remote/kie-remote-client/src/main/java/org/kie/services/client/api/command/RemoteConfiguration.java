@@ -11,10 +11,10 @@ import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.exception.RemoteCommunicationException;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
-import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 
 /**

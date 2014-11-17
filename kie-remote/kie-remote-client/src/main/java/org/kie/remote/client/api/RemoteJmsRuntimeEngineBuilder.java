@@ -1,4 +1,4 @@
-package org.kie.services.client.api.builder;
+package org.kie.remote.client.api;
 
 import java.net.URL;
 
@@ -10,9 +10,9 @@ import javax.naming.InitialContext;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.task.TaskService;
-import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
+import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineFactoryBuilder;
 
-public interface RemoteJmsRuntimeEngineBuilder extends RemoteRuntimeEngineBuilder<RemoteJmsRuntimeEngineBuilder, RemoteJmsRuntimeEngineFactory> {
+public interface RemoteJmsRuntimeEngineBuilder extends RemoteJmsRuntimeEngineFactoryBuilder {
 
     /**
      * Add a remote {@link InitialContext} instance to the configuration. This
@@ -23,18 +23,6 @@ public interface RemoteJmsRuntimeEngineBuilder extends RemoteRuntimeEngineBuilde
      * @return
      */
     RemoteJmsRuntimeEngineBuilder addRemoteInitialContext(InitialContext remoteInitialContext); 
-    
-    /**
-     * Use the given url to look up and retrieve a Remote {@link InitialContext} instance. The
-     * information in the remote {@link InitialContext} instance will be used to retrieve
-     * the {@link Queue} and {@link ConnectionFactory} instances. 
-     * </p>
-     * <i>This method has been deprecated in favor of the {@link #addJbossServerHostName(String)} method.</i> 
-     * @param serverUrl The url of the Jboss Server instance on which Console or BPMS is running.
-     * @return The current instance of this builder
-     */
-    @Deprecated
-    RemoteJmsRuntimeEngineBuilder addJbossServerUrl(URL serverUrl);
     
     /**
      * Use the given hostname to look up and retrieve a Remote {@link InitialContext} instance. The

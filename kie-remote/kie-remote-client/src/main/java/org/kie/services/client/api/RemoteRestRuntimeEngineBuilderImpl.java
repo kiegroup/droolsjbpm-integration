@@ -4,19 +4,19 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.kie.services.client.api.builder.RemoteRestRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
+import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
- * This is the internal implementation of the {@link RemoteRestRuntimeEngineBuilder} class.
+ * This is the internal implementation of the {@link RemoteRestRuntimeEngineBuilderImpl} class.
  * </p>
  * It takes care of implementing the methods specified as well as managing the 
  * state of the internal {@link RemoteConfiguration} instance.
  */
-public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngineBuilder {
+class RemoteRestRuntimeEngineBuilderImpl implements  org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder {
 
     private RemoteConfiguration config;
     
@@ -27,43 +27,43 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addDeploymentId(String deploymentId) {
+    public RemoteRestRuntimeEngineBuilderImpl addDeploymentId(String deploymentId) {
         this.config.setDeploymentId(deploymentId);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addProcessInstanceId(long processInstanceId) {
+    public RemoteRestRuntimeEngineBuilderImpl addProcessInstanceId(long processInstanceId) {
         this.config.setProcessInstanceId(processInstanceId);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addUserName(String userName) {
+    public RemoteRestRuntimeEngineBuilderImpl addUserName(String userName) {
         config.setUserName(userName);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addPassword(String password) {
+    public RemoteRestRuntimeEngineBuilderImpl addPassword(String password) {
         config.setPassword(password);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addUrl(URL url) {
+    public RemoteRestRuntimeEngineBuilderImpl addUrl(URL url) {
         config.setServerBaseRestUrl(url);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addTimeout(int timeoutInSeconds) {
+    public RemoteRestRuntimeEngineBuilderImpl addTimeout(int timeoutInSeconds) {
         config.setTimeout(timeoutInSeconds);
         return this;
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder addExtraJaxbClasses(Class... classes) {
+    public RemoteRestRuntimeEngineBuilderImpl addExtraJaxbClasses(Class... classes) {
         Set<Class<?>> classSet = new HashSet<Class<?>>();
         for( Class clazz : classes ) { 
             classSet.add(clazz);
@@ -73,14 +73,14 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
     }
 
     @Override
-    public RemoteRestRuntimeEngineBuilder clearJaxbClasses() {
+    public RemoteRestRuntimeEngineBuilderImpl clearJaxbClasses() {
         this.config.clearJaxbClasses();
         return this;
     }
     
     @Override
     @Deprecated
-    public RemoteRestRuntimeEngineBuilder useFormBasedAuth(boolean formBasedAuth) {
+    public RemoteRestRuntimeEngineBuilderImpl useFormBasedAuth(boolean formBasedAuth) {
         // TODO: delete me after 6.2.0.x
         return this;
     }
@@ -90,7 +90,7 @@ public class RemoteRestRuntimeEngineBuilderImpl implements RemoteRestRuntimeEngi
     }
     
     @Override
-    public RemoteRestRuntimeEngineFactory buildFactory() throws InsufficientInfoToBuildException {
+    public org.kie.remote.client.api.RemoteRestRuntimeEngineFactory buildFactory() throws InsufficientInfoToBuildException {
         checkAndFinalizeConfig();
         return new RemoteRestRuntimeEngineFactory(config.clone());
     }

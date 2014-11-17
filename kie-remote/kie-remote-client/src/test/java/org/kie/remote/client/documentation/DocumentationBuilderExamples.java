@@ -1,13 +1,13 @@
-package org.kie.services.client.documentation;
+package org.kie.remote.client.documentation;
 
 import java.net.URL;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
-import org.kie.services.client.api.RemoteRuntimeEngineFactory;
-import org.kie.services.client.api.builder.RemoteRestRuntimeEngineBuilder;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
+import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 
+//TODO: changed, add to documentation
 public class DocumentationBuilderExamples {
 
     public void minimumRestBuilderExample() throws Exception {
@@ -32,22 +32,26 @@ public class DocumentationBuilderExamples {
     private static final String JOHN_PASSWORD = "john123@";
 
     public void multipleDifferentRuntimeExamples(String deploymentId, URL deploymentUrl, boolean useFormBasedAuth) throws Exception {
-        RemoteRestRuntimeEngineBuilder runtimeEngineBuilder = RemoteRestRuntimeEngineFactory.newBuilder()
+        RemoteRestRuntimeEngineBuilder runtimeEngineBuilder = RemoteRuntimeEngineFactory.newRestBuilder()
                 .addDeploymentId(deploymentId)
-                .addUrl(deploymentUrl)
-                .useFormBasedAuth(useFormBasedAuth);
+                .addUrl(deploymentUrl);
 
-        RemoteRuntimeEngine krisRemoteEngine = runtimeEngineBuilder
+        RuntimeEngine krisRemoteEngine = runtimeEngineBuilder
                 .addUserName(KRIS_USER)
                 .addPassword(KRIS_PASSWORD)
                 .build();
-        RemoteRuntimeEngine maryRemoteEngine = runtimeEngineBuilder
+        RuntimeEngine maryRemoteEngine = runtimeEngineBuilder
                 .addUserName(MARY_USER)
                 .addPassword(MARY_PASSWORD)
                 .build();
-        RemoteRuntimeEngine johnRemoteEngine = runtimeEngineBuilder
+        RuntimeEngine johnRemoteEngine = runtimeEngineBuilder
                 .addUserName(JOHN_USER)
                 .addPassword(JOHN_PASSWORD)
                 .build();
+    }
+   
+    // TODO
+    public void jmsBuilderExamples() { 
+        
     }
 }

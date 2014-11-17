@@ -1,10 +1,11 @@
-package org.kie.services.client.documentation;
+package org.kie.remote.client.documentation;
 
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.kie.api.task.model.Task;
 
+//TODO: changed, add to documentation
 public class DocumentationRestCallExample {
 
     /*

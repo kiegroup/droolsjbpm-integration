@@ -28,17 +28,17 @@ import javax.naming.spi.NamingManager;
 
 import org.jbpm.bpmn2.objects.Person;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
-import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
-import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
-import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
-import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
+import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
+import org.kie.services.client.api.command.RemoteRuntimeEngine;
 import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.builder.objects.MyType;
@@ -50,9 +50,9 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InitialContext.class, NamingManager.class})
-public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.RemoteJmsRuntimeEngineFactory {
+public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends RemoteJmsRuntimeEngineFactory {
 
-    protected static Logger logger = LoggerFactory.getLogger(RemoteRuntimeEngineBuilderTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(BackwardsCompatibilityRemoteRuntimeEngineBuilderTest.class);
     
     private InitialContext remoteInitialContext = null;
     
@@ -61,10 +61,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
     private Queue taskQueue = null;
     private Queue responseQueue = null;
   
-    public RemoteRuntimeEngineBuilderTest() { 
+    public BackwardsCompatibilityRemoteRuntimeEngineBuilderTest() { 
         super();
     }
     
+    @BeforeClass
+    public static void beforeClass() { 
+    }
+  
     @Rule
     public TestName testName = new TestName();
 
@@ -98,7 +102,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
     
     @Test
     public void restRuntimeFactoryBuilderTest() throws MalformedURLException, InsufficientInfoToBuildException { 
-       org.kie.remote.client.api.RemoteRestRuntimeEngineFactory restRuntimeFactory = 
+       RemoteRestRuntimeEngineFactory restRuntimeFactory = 
                RemoteRestRuntimeEngineFactory.newBuilder()
                .addDeploymentId("deployment")
                .addProcessInstanceId(23l)
@@ -106,6 +110,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                .addPassword("koek")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
+               .useFormBasedAuth(true)
                .addExtraJaxbClasses(MyType.class, Person.class)
                .buildFactory();
        assertNotNull( restRuntimeFactory );
@@ -116,7 +121,8 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                .addPassword("poffertje")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .buildFactory();
+               .useFormBasedAuth(true)
+               .build();
            fail( "A user name should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
           // expected
@@ -128,7 +134,8 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                .addUserName("A")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .buildFactory();
+               .useFormBasedAuth(true)
+               .build();
            fail( "A password should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
           // expected 
@@ -140,7 +147,8 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                .addUserName("E")
                .addPassword("suiker")
                .addTimeout(3)
-               .buildFactory();
+               .useFormBasedAuth(true)
+               .build();
            fail( "A URL should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
           // expected 
@@ -151,14 +159,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                .addUserName("joke")
                .addPassword("stroop")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
-               .buildFactory();
+               .build();
     }
 
     @Test
     public void jmsRuntimeFactoryBuilderTest() throws InsufficientInfoToBuildException { 
         // url + all options
         RemoteJmsRuntimeEngineFactory jmsRuntimeFactory = 
-                RemoteRuntimeEngineFactory.newJmsBuilder()
+                RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addDeploymentId("deployment")
                 .addProcessInstanceId(46l)
                 .addUserName("C")
@@ -171,14 +179,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
        assertNotNull( jmsRuntimeFactory );
         
         // context, minimum
-        jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+        jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addRemoteInitialContext(remoteInitialContext)
                 .addUserName("E*")
                 .addPassword("koffie")
                 .buildFactory();
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addRemoteInitialContext(remoteInitialContext)
                     .addPassword("koffie")
                     .buildFactory();
@@ -188,7 +196,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
                 
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addRemoteInitialContext(remoteInitialContext)
                     .addUserName("E*")
                     .buildFactory();
@@ -198,7 +206,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addUserName("E*")
                     .addPassword("koffie")
                     .buildFactory();
@@ -208,7 +216,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
                 
         // queue collection, minimum
-        jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+        jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("M")
                 .addPassword("koekje")
                 .addKieSessionQueue(mock(Queue.class))
@@ -218,7 +226,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .buildFactory();
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addUserName("1")
                     .addPassword("ijs")
                     .addTaskServiceQueue(mock(Queue.class))
@@ -233,7 +241,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addUserName("1")
                     .addPassword("ijs")
                     .addKieSessionQueue(mock(Queue.class))
@@ -248,7 +256,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addUserName("1")
                     .addPassword("ijs")
                     .addKieSessionQueue(mock(Queue.class))
@@ -261,7 +269,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            jmsRuntimeFactory = RemoteRuntimeEngineFactory.newJmsBuilder()
+            jmsRuntimeFactory = RemoteJmsRuntimeEngineFactory.newBuilder()
                     .addUserName("1")
                     .addPassword("ijs")
                     .addKieSessionQueue(mock(Queue.class))
@@ -280,92 +288,8 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
 
         String hostName = "host-local";
         int port = 12345;
-        RemoteJmsRuntimeEngineBuilder builder = RemoteRuntimeEngineFactory.newJmsBuilder()
-        .addUserName("H")
-        .addPassword("gummy bears")
-        .addHostName(hostName)
-        .addJmsConnectorPort(port)
-        .addKieSessionQueue(ksessionQueue)
-        .addResponseQueue(responseQueue)
-        .useSsl(true);
-    
-        // this doesn't really test what I want.. but it's better than nothing? Maybe? 
-        {
-            Field hostNameField = 
-            Class.forName("org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl")
-            .getDeclaredField("hostName");
-            hostNameField.setAccessible(true);
-            assertEquals( hostName, hostNameField.get(builder) );
-        }
-        {
-            Field portField = 
-            Class.forName("org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl")
-            .getDeclaredField("jmsConnectorPort");
-            portField.setAccessible(true);
-            assertEquals( port, portField.get(builder) );
-        }
-       
-        try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
-            .addUserName("H")
-            .addPassword("gummy bears")
-            // .addHostName("localhost")
-            .addJmsConnectorPort(5446)
-            .addKieSessionQueue(ksessionQueue)
-            .addResponseQueue(responseQueue)
-            .buildFactory();
-            fail( "Should have thrown exception");
-        } catch( InsufficientInfoToBuildException iitbe ) {
-            assertTrue( iitbe.getMessage().contains( "JMS ConnectionFactory"));
-        }
         
-        try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
-            .addUserName("H")
-            .addPassword("gummy bears")
-            .addHostName("localhost")
-             // .addJmsConnectorPort(5446)
-            .addKieSessionQueue(ksessionQueue)
-            .addResponseQueue(responseQueue)
-            .buildFactory();
-            fail( "Should have thrown exception");
-        } catch( InsufficientInfoToBuildException iitbe ) {
-            assertTrue( iitbe.getMessage().contains( "JMS ConnectionFactory"));
-        }
-        
-        RemoteRuntimeEngineFactory.newJmsBuilder()
-            .addUserName("H")
-            .addPassword("gummy bears")
-            .addHostName("localhost")
-            .addJmsConnectorPort(5446)
-            .addKieSessionQueue(ksessionQueue)
-            .addResponseQueue(responseQueue)
-            .buildFactory();
-          
-        // SSL
-        try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
-            .useSsl(true)
-            .buildFactory();
-            fail( "Should have thrown exception");
-        } catch( InsufficientInfoToBuildException iitbe ) { 
-            // expected
-        }
-        
-        try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
-            .useSsl(true)
-            .addUserName("H")
-            .addPassword("gummy bears")
-            .addHostName("localhost")
-            .addJmsConnectorPort(5446)
-            .buildFactory();
-            fail( "Should have thrown exception");
-        } catch( InsufficientInfoToBuildException iitbe ) {
-            assertTrue( iitbe.getMessage().contains( "SSL"));
-        }
-        
-        RemoteRuntimeEngineFactory.newJmsBuilder()
+        RemoteJmsRuntimeEngineFactory.newBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
@@ -376,10 +300,10 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             .addTruststoreLocation("ssl/truststore.jts")
             .addKieSessionQueue(ksessionQueue)
             .addResponseQueue(responseQueue)
-            .buildFactory();
+            .build();
             
         try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
+            RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("H")
                 .addPassword("gummy bears")
                 .addHostName("localhost")
@@ -390,14 +314,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .addTruststoreLocation("ssl/truststore.jts")
                 .addKieSessionQueue(ksessionQueue)
                 .addResponseQueue(responseQueue)
-                .buildFactory();
+                .build();
             fail( "Should have thrown exception");
         } catch( InsufficientInfoToBuildException iitbe ) { 
             assertTrue( iitbe.getMessage().contains( "could be found on the classpath"));
         }
      
         try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
+            RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("H")
                 .addPassword("gummy bears")
                 .addHostName("localhost")
@@ -408,14 +332,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .addTruststoreLocation("/ssl/truststore.jts")
                 .addKieSessionQueue(ksessionQueue)
                 .addResponseQueue(responseQueue)
-                .buildFactory();
+                .build();
             fail( "Should have thrown exception");
         } catch( InsufficientInfoToBuildException iitbe ) { 
             assertTrue( iitbe.getMessage().contains( "could be found at"));
         }
         
         try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
+            RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("H")
                 .addPassword("gummy bears")
                 .addHostName("localhost")
@@ -426,14 +350,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .addTruststoreLocation("/ssl/truststore.jts")
                 .addKieSessionQueue(ksessionQueue)
                 .addResponseQueue(responseQueue)
-                .buildFactory();
+                .build();
             fail( "Should have thrown exception");
         } catch( InsufficientInfoToBuildException iitbe ) { 
             assertTrue( iitbe.getMessage().contains( "password is required"));
         }
         
         try { 
-            RemoteRuntimeEngineFactory.newJmsBuilder()
+            RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("H")
                 .addPassword("gummy bears")
                 .addHostName("localhost")
@@ -444,14 +368,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .addTruststoreLocation("/ssl/truststore.jts")
                 .addKieSessionQueue(ksessionQueue)
                 .addResponseQueue(responseQueue)
-                .buildFactory();
+                .build();
             fail( "Should have thrown exception");
         } catch( InsufficientInfoToBuildException iitbe ) { 
             assertTrue( iitbe.getMessage().contains( "password is required"));
         }
        
         // remote initial context
-        RemoteRuntimeEngineFactory.newJmsBuilder()
+        RemoteJmsRuntimeEngineFactory.newBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
@@ -461,10 +385,10 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             .addTruststorePassword("D")
             .addTruststoreLocation("ssl/truststore.jts")
             .addRemoteInitialContext(remoteInitialContext)
-            .buildFactory();
+            .build();
         
         // jboss server url
-        RemoteRuntimeEngineFactory.newJmsBuilder()
+        RemoteJmsRuntimeEngineFactory.newBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
@@ -474,10 +398,10 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             .addTruststorePassword("D")
             .addTruststoreLocation("ssl/truststore.jts")
             .addJbossServerUrl(new URL("http://localhost:8080/kie-wb"))
-            .buildFactory();
+            .build();
        
         // useKeystoreAsTruststore
-        builder = RemoteRuntimeEngineFactory.newJmsBuilder()
+        RemoteJmsRuntimeEngineBuilder builder = RemoteJmsRuntimeEngineFactory.newBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
@@ -488,81 +412,11 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             .addKieSessionQueue(ksessionQueue)
             .addResponseQueue(responseQueue);
            
-        builder.buildFactory();
+        builder.build();
     }
     
-    @Test
-    public void jmsRuntimeEngineNoSslTest() { 
-        // doNotUseSsl
-        RemoteRuntimeEngineFactory.newJmsBuilder()
-            .addUserName("H")
-            .addPassword("gummy bears")
-            .addHostName("localhost")
-            .addJmsConnectorPort(5446)
-            .addRemoteInitialContext(remoteInitialContext)
-            .doNotUseSsl()
-            .build();
-    }
-    
-    @Test
-    public void jmsRuntimeFactoryBuilderReuseTest() throws Exception { 
-        RemoteJmsRuntimeEngineBuilder runtimeEngineBuilder = RemoteRuntimeEngineFactory.newJmsBuilder()
-                .addDeploymentId("deploymentId")
-                .useSsl(true)
-                .addHostName("localhost")
-                .addJmsConnectorPort(5446)
-                .addKeystoreLocation("ssl/client_keystore.jks")
-                .addKeystorePassword("CLIENT_KEYSTORE_PASSWORD")
-                .useKeystoreAsTruststore();
-               
-        try { 
-            runtimeEngineBuilder
-            .addTaskServiceQueue((Queue) remoteInitialContext.lookup(TASK_QUEUE_NAME))
-            .addKieSessionQueue((Queue) remoteInitialContext.lookup(SESSION_QUEUE_NAME))
-            .addResponseQueue((Queue) remoteInitialContext.lookup(RESPONSE_QUEUE_NAME));
-        } catch( Exception e ) { 
-            String msg = "Unable to lookup queue instances: " + e.getMessage();
-            logger.error(msg, e);
-            fail(msg);
-        }
-
-        String krisUser = "kris";
-        String krisPassword = "kris123@";
-        RemoteJmsRuntimeEngineFactory krisRemoteEngineFactory = runtimeEngineBuilder
-                .addUserName(krisUser)
-                .addPassword(krisPassword)
-                .buildFactory();
-
-        String maryUser = "mary";
-        String maryPass = "mary123@";
-        RemoteJmsRuntimeEngineFactory maryRemoteEngineFactory = runtimeEngineBuilder
-                .addUserName(maryUser)
-                .addPassword(maryPass)
-                .buildFactory();
-
-        String johnUser = "john";
-        String johnPassword = "john123@";
-        RemoteJmsRuntimeEngineFactory johnRemoteEngineFactory = runtimeEngineBuilder
-                .addUserName(johnUser)
-                .addPassword(johnPassword)
-                .buildFactory();
-        
-        RemoteConfiguration maryConfig = getConfig((RemoteJmsRuntimeEngineFactory)maryRemoteEngineFactory);
-        assertEquals( maryUser, maryConfig.getUserName());
-        assertEquals( maryPass, maryConfig.getPassword());
-        
-        RemoteConfiguration krisConfig = getConfig((RemoteJmsRuntimeEngineFactory)krisRemoteEngineFactory);
-        assertEquals( krisUser, krisConfig.getUserName());
-        assertEquals( krisPassword, krisConfig.getPassword());
-        
-        RemoteConfiguration johnConfig = getConfig((RemoteJmsRuntimeEngineFactory)johnRemoteEngineFactory);
-        assertEquals( johnUser, johnConfig.getUserName());
-        assertEquals( johnPassword, johnConfig.getPassword());
-        
-    }
-    
-    private RemoteConfiguration getConfig(org.kie.services.client.api.RemoteJmsRuntimeEngineFactory factory) throws Exception { 
-        Field configField = org.kie.services.client.api.RemoteJmsRuntimeEngineFactory.class.getDeclaredField("config");
+    private RemoteConfiguration getConfig(RemoteJmsRuntimeEngineFactory factory) throws Exception { 
+        Field configField = RemoteJmsRuntimeEngineFactory.class.getDeclaredField("config");
         configField.setAccessible(true);
         Object configObj = configField.get(factory);
         assertNotNull("No config found.", configObj);
@@ -604,13 +458,14 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
     
     @Test
     public void missingDeploymentIdTest() throws Exception { 
-        RuntimeEngine runtimeEngine = 
+        RemoteRestRuntimeEngineFactory factory = 
                 RemoteRestRuntimeEngineFactory.newBuilder()
                 .addUserName("user")
                 .addPassword("pass")
                 .addUrl(new URL("http://localhost:8080/business-central"))
-                .build();
+                .buildFactory();
         
+        RemoteRuntimeEngine runtimeEngine = factory.newRuntimeEngine();
         try { 
             runtimeEngine.getTaskService().claim(23l, "user");
         } catch( RemoteCommunicationException rce ) { 
@@ -632,8 +487,8 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             // expected
         }
        
-        runtimeEngine = 
-                RemoteRuntimeEngineFactory.newJmsBuilder()
+        RemoteJmsRuntimeEngineFactory jmsFactory = 
+                RemoteJmsRuntimeEngineFactory.newBuilder()
                 .addUserName("user")
                 .addPassword("pass")
                 .addRemoteInitialContext(remoteInitialContext)
@@ -643,8 +498,9 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
                 .addKeystoreLocation("ssl/client_keystore.jks")
                 .useKeystoreAsTruststore()
                 .useSsl(true)
-                .build();
+                .buildFactory();
         
+        runtimeEngine = jmsFactory.newRuntimeEngine();
         try { 
             runtimeEngine.getTaskService().claim(23l, "user");
             fail( "This should have failed because there's no server running... ");

@@ -1,26 +1,20 @@
 package org.kie.services.client.api;
 
-import static org.kie.services.client.api.RemoteJmsRuntimeEngineFactory.getRemoteJbossInitialContext;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.ConnectionFactory;
 
 import org.hornetq.api.core.TransportConfiguration;
-import org.hornetq.api.core.client.ClientSessionFactory;
-import org.hornetq.api.core.client.HornetQClient;
-import org.hornetq.api.core.client.ServerLocator;
 import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.hornetq.jms.client.HornetQJMSConnectionFactory;
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.RemoteRestRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.RemoteRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
+import org.kie.remote.client.api.RemoteRuntimeEngineBuilder;
+import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
  * This factory class is the start point for building and configuring {@link RuntimeEngine} instances
@@ -34,23 +28,19 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  * An instance of this factory can be used to create client {@link RuntimeEngine} instances
  * using the {@link newRuntimeEngine()} method. 
  */
-public abstract class RemoteRuntimeEngineFactory {
+public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.api.RemoteRuntimeEngineFactory {
 
+    // The name of this class may not be changed until 7.x for backwards compatibility reasons!
+    
     protected RemoteConfiguration config;
     
-    /**
-     * @return a new (remote client) {@link RuntimeEngine} instance.
-     * @see {@link RemoteRuntimeEngineBuilder#buildRuntimeEngine()}
-     */
-    abstract public RemoteRuntimeEngine newRuntimeEngine();
-
     /**
      * Create a new {@link RemoteJmsRuntimeEngineBuilder} instance 
      * to configure and buid a remote API client {@link RuntimeEngine} instance.
      * @return A {@link RemoteJmsRuntimeEngineBuilder} instance
      */
     public static RemoteJmsRuntimeEngineBuilder newJmsBuilder() { 
-       return new RemoteJmsRuntimeEngineBuilderImpl(); 
+       return new org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl(); 
     }
     
     /**
@@ -59,12 +49,12 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
     public static RemoteRestRuntimeEngineBuilder newRestBuilder() { 
-       return new RemoteRestRuntimeEngineBuilderImpl(); 
+       return new org.kie.services.client.api.RemoteRestRuntimeEngineBuilderImpl(); 
     }
    
     static void checkAndFinalizeConfig(RemoteConfiguration config, RemoteRuntimeEngineBuilder builder ) {
-        if( builder instanceof RemoteJmsRuntimeEngineBuilderImpl ) { 
-            RemoteJmsRuntimeEngineBuilderImpl jmsBuilder = (RemoteJmsRuntimeEngineBuilderImpl) builder;
+        if( builder instanceof org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl ) { 
+            org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl jmsBuilder = (org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl) builder;
             // check
             if( config.getUserName() == null ) { 
                 throw new InsufficientInfoToBuildException("A user name is required to access the JMS queues!"); 
@@ -119,7 +109,7 @@ public abstract class RemoteRuntimeEngineFactory {
             } else { 
                 config.checkValidJmsValues();
             }
-        } else if( builder instanceof RemoteRestRuntimeEngineBuilderImpl ) { 
+        } else if( builder instanceof RemoteRestRuntimeEngineBuilder ) { 
             if( config.getServerBaseRestUrl() == null ) { 
                 throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
             }

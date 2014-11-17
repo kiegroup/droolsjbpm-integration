@@ -9,19 +9,19 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 
-import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineBuilder;
-import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
+import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
- * This is the internal implementation of the {@link RemoteJmsRuntimeEngineBuilder} class.
+ * This is the internal implementation of the {@link RemoteJmsRuntimeEngineBuilderImpl} class.
  * </p>
  * It takes care of implementing the methods specified as well as managing the 
  * state of the internal {@link RemoteConfiguration} instance.
  */
-class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder {
+class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder {
 
     private RemoteConfiguration config;
     
@@ -57,37 +57,37 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addDeploymentId(String deploymentId) {
+    public RemoteJmsRuntimeEngineBuilderImpl addDeploymentId(String deploymentId) {
         this.config.setDeploymentId(deploymentId);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addProcessInstanceId(long processInstanceId) {
+    public RemoteJmsRuntimeEngineBuilderImpl addProcessInstanceId(long processInstanceId) {
         this.config.setProcessInstanceId(processInstanceId);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addUserName(String userName) {
+    public RemoteJmsRuntimeEngineBuilderImpl addUserName(String userName) {
         this.config.setUserName(userName);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addPassword(String password) {
+    public RemoteJmsRuntimeEngineBuilderImpl addPassword(String password) {
         this.config.setPassword(password);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addTimeout(int timeoutInSeconds) {
+    public RemoteJmsRuntimeEngineBuilderImpl addTimeout(int timeoutInSeconds) {
         this.config.setTimeout((long) timeoutInSeconds);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addExtraJaxbClasses(Class... classes) {
+    public RemoteJmsRuntimeEngineBuilderImpl addExtraJaxbClasses(Class... classes) {
         Set<Class<?>> classSet = new HashSet<Class<?>>();
         for( Class clazz : classes ) { 
             classSet.add(clazz);
@@ -97,50 +97,50 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder clearJaxbClasses() {
+    public RemoteJmsRuntimeEngineBuilderImpl clearJaxbClasses() {
         this.config.clearJaxbClasses();
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addRemoteInitialContext(InitialContext remoteInitialContext) {
+    public RemoteJmsRuntimeEngineBuilderImpl addRemoteInitialContext(InitialContext remoteInitialContext) {
        this.remoteInitialContext = remoteInitialContext; 
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addJbossServerUrl(URL serverUrl) {
+    public RemoteJmsRuntimeEngineBuilderImpl addJbossServerUrl(URL serverUrl) {
         addJbossServerHostName(serverUrl.getHost());
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addJbossServerHostName(String hostname) {
+    public RemoteJmsRuntimeEngineBuilderImpl addJbossServerHostName(String hostname) {
         this.jbossServerHostName = hostname;
         addHostName(hostname);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addKieSessionQueue(Queue ksessionQueue) {
+    public RemoteJmsRuntimeEngineBuilderImpl addKieSessionQueue(Queue ksessionQueue) {
         this.config.setKsessionQueue(ksessionQueue); 
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addTaskServiceQueue(Queue taskServiceQueue) {
+    public RemoteJmsRuntimeEngineBuilderImpl addTaskServiceQueue(Queue taskServiceQueue) {
         this.config.setTaskQueue(taskServiceQueue);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addResponseQueue(Queue responseQueue) {
+    public RemoteJmsRuntimeEngineBuilderImpl addResponseQueue(Queue responseQueue) {
         this.config.setResponseQueue(responseQueue);
         return this;
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder addConnectionFactory(ConnectionFactory connectionFactory) {
+    public RemoteJmsRuntimeEngineBuilderImpl addConnectionFactory(ConnectionFactory connectionFactory) {
         this.config.setConnectionFactory(connectionFactory);
         return this;
     }
@@ -160,7 +160,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilder useSsl(boolean useSsl) {
+    public RemoteJmsRuntimeEngineBuilderImpl useSsl(boolean useSsl) {
         this.createOwnFactory = useSsl;
         this.config.setUseSsl(useSsl);
         return this;
@@ -201,7 +201,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
     }
   
     @Override
-    public RemoteJmsRuntimeEngineBuilder doNotUseSsl() {
+    public RemoteJmsRuntimeEngineBuilderImpl doNotUseSsl() {
         config.setDoNotUseSssl(true);
         return this;
     }
@@ -215,7 +215,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements RemoteJmsRuntimeEngineBuilder
      * @see org.kie.services.client.api.builder.RemoteRuntimeEngineFactoryBuilder#build()
      */
     @Override
-    public RemoteJmsRuntimeEngineFactory buildFactory() throws InsufficientInfoToBuildException {
+    public org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory buildFactory() throws InsufficientInfoToBuildException {
         checkAndFinalizeConfig();
         // return new instance
         return new RemoteJmsRuntimeEngineFactory(config.clone());

@@ -21,6 +21,10 @@ import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
+import org.kie.remote.client.jaxb.ConversionUtil;
+import org.kie.remote.client.jaxb.JaxbCommandsRequest;
+import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.StartProcessCommand;
 import org.kie.services.client.AbstractRemoteSerializationTest;
 import org.kie.services.client.builder.objects.MyType;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
@@ -290,5 +294,5 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
 
         ComparePair.compareObjectsViaFields(jaxbTaskSum, jaxbTaskSumCopy, "subTaskStrategy", "potentialOwners");
     }
-    
+
 }
