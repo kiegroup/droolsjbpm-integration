@@ -23,12 +23,12 @@ import javax.naming.NamingException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.remote.client.api.exception.RemoteCommunicationException;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
-import org.kie.services.client.api.command.exception.RemoteCommunicationException;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationConstants;
 import org.kie.services.client.serialization.SerializationException;
@@ -38,9 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO: changed, add to documentation
-public class DocumentationJmsExamples {
+public class DocumentationUnsupportedDirectJmsExamples {
 
-    protected static final Logger logger = LoggerFactory.getLogger(DocumentationJmsExamples.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DocumentationUnsupportedDirectJmsExamples.class);
 
     public void sendAndReceiveJmsMessage() {
 
@@ -237,8 +237,5 @@ public class DocumentationJmsExamples {
         }
     }
     
-   
-   public void jmsBuilderExamples() { 
-       
-   }
+
 }

@@ -29,6 +29,7 @@ import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
 import org.kie.api.time.SessionClock;
+import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
@@ -41,7 +42,6 @@ import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.SetGlobalCommand;
 import org.kie.remote.jaxb.gen.SignalEventCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
-import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession {
 

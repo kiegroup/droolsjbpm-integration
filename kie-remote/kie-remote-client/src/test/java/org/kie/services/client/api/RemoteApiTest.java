@@ -7,6 +7,7 @@ import org.jbpm.process.instance.impl.demo.DoNothingWorkItemHandler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.kie.api.runtime.process.WorkItemHandler;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
 
 public class RemoteApiTest extends Assert {
     
@@ -14,7 +15,7 @@ public class RemoteApiTest extends Assert {
     public void notAceptedMethodTest() throws Exception { 
         URL deploymentUrl = new URL( "http://localhost:8080/kie-wb/" );
         RemoteRestRuntimeEngineFactory restSessionFactory 
-            = RemoteRestRuntimeEngineFactory.newBuilder()
+            = RemoteRuntimeEngineFactory.newRestBuilder()
                 .addDeploymentId("deployment")
                 .addUrl(deploymentUrl)
                 .addUserName("mary")

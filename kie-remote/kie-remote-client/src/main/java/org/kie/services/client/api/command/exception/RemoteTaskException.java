@@ -2,10 +2,9 @@ package org.kie.services.client.api.command.exception;
 
 import org.kie.internal.task.exception.TaskException;
 
-public class RemoteTaskException extends TaskException {
 
-    /** Generated serial versio UID */
-    private static final long serialVersionUID = 2853230138916596256L;
+@Deprecated
+public class RemoteTaskException extends TaskException {
 
     public RemoteTaskException(String message) {
         super(message);

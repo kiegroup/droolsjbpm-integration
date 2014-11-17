@@ -1,4 +1,4 @@
-package org.kie.services.client.api.command.exception;
+package org.kie.remote.client.api.exception;
 
 
 /**
@@ -10,8 +10,10 @@ package org.kie.services.client.api.command.exception;
  * <li>But that the requested operation has failed due to problems on the server side</li>
  * </ul>
  */
-@Deprecated
-public class RemoteApiException extends RuntimeException {
+public class RemoteApiException extends org.kie.services.client.api.command.exception.RemoteApiException {
+
+    /** Generated serial version UID */
+    private static final long serialVersionUID = 9094450426921267633L;
 
     public RemoteApiException(String s) {
         super(s);

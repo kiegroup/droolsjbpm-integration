@@ -4,17 +4,18 @@ import java.net.URL;
 import java.util.List;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.api.RemoteRuntimeEngineFactory;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 
+//TODO: changed, add to documentation
 public class DocumentationRestExamples {
 
     public void javaRemoteApiRestExample(String deploymentId, URL baseUrl, String user, String password) {
         // Configure the RuntimeEngine instance with the necessarry information to communicate with the REST services, and build it
-        RemoteRuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
+        RuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
                 .addDeploymentId(deploymentId)
                 .addUrl(baseUrl)
                 .addUserName(user)

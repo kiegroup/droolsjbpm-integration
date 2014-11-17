@@ -10,27 +10,24 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.services.client.api.RemoteJmsRuntimeEngineFactory;
-import org.kie.services.client.api.RemoteRuntimeEngineFactory;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 import org.kie.services.client.builder.objects.MyType;
 
+//TODO: changed, add to documentation
 public class DocumentationApiExamples {
 
     public void startProcessAndTaskViaJmsRemoteJavaAPI(URL serverUrl, String deploymentId, String user, String password) {
         // the serverURL should contain a URL similar to "http://localhost:8080/jbpm-console"
         
         // Setup remote JMS runtime engine factory
-        RemoteJmsRuntimeEngineFactory remoteJmsFactory 
-            = RemoteRuntimeEngineFactory.newJmsBuilder()
+        RuntimeEngine engine = RemoteRuntimeEngineFactory.newJmsBuilder()
             .addDeploymentId(deploymentId)
             .addJbossServerHostName(serverUrl.getHost())
             .addUserName(user)
             .addPassword(password)
-            .buildFactory();
+            .build();
 
         // Interface with JMS api
-        RuntimeEngine engine = remoteJmsFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         
         Map<String, Object> params = new HashMap<String, Object>();
@@ -46,16 +43,14 @@ public class DocumentationApiExamples {
         // the serverRestUrl should contain a URL similar to "http://localhost:8080/jbpm-console/"
         
         // Setup the factory class with the necessarry information to communicate with the REST services
-        RemoteRuntimeEngineFactory restSessionFactory 
-            = RemoteRuntimeEngineFactory.newRestBuilder()
+        RuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
             .addUrl(instanceUrl)
             .addDeploymentId(deploymentId)
             .addUserName(user)
             .addPassword(password)
-            .buildFactory();
+            .build();
 
         // Create KieSession and TaskService instances and use them
-        RemoteRuntimeEngine engine = restSessionFactory.newRuntimeEngine();
         KieSession ksession = engine.getKieSession();
         TaskService taskService = engine.getTaskService();
 

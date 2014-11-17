@@ -22,6 +22,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
+import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
@@ -50,7 +51,6 @@ import org.kie.remote.jaxb.gen.StartTaskCommand;
 import org.kie.remote.jaxb.gen.StopTaskCommand;
 import org.kie.remote.jaxb.gen.SuspendTaskCommand;
 import org.kie.remote.jaxb.gen.Type;
-import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
 
 public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject implements TaskService {
 

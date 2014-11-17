@@ -1,17 +1,23 @@
 package org.kie.services.client.api;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.services.client.api.builder.RemoteRestRuntimeEngineBuilder;
+import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
  * A factory for creating REST remote API client instances of the {@link RuntimeEngine}.
- * @see {@link RemoteRuntimeEngineFactory}
+ *
+ * @see {@link org.kie.remote.client.api.RemoteRestRuntimeEngineFactory}
  */
-public class RemoteRestRuntimeEngineFactory extends RemoteRuntimeEngineFactory {
+@Deprecated
+public class RemoteRestRuntimeEngineFactory {
 
-    RemoteRestRuntimeEngineFactory(RemoteConfiguration config) { 
+    // The name of this class may not be changed until 7.x for backwards compatibility reasons!
+   
+    protected RemoteConfiguration config;
+    
+    protected RemoteRestRuntimeEngineFactory(RemoteConfiguration config) { 
         this.config = config;
     }
   
@@ -19,8 +25,12 @@ public class RemoteRestRuntimeEngineFactory extends RemoteRuntimeEngineFactory {
     	return new RemoteRuntimeEngine(config);
     }
 
+    /**
+     * @see {@link RemoteRuntimeEngineFactory#newRestBuilder()}
+     */
+    @Deprecated
     public static RemoteRestRuntimeEngineBuilder newBuilder() {
-        return newRestBuilder();
+        return RemoteRuntimeEngineFactory.newRestBuilder();
     }
 
 }

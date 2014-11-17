@@ -1,12 +1,18 @@
-package org.kie.services.client.api.builder;
+package org.kie.remote.client.api;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.services.client.api.RemoteRuntimeEngineFactory;
-import org.kie.services.client.api.builder.exception.InsufficientInfoToBuildException;
-import org.kie.services.client.api.command.RemoteRuntimeEngine;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
+import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 
 
-public interface RemoteRuntimeEngineBuilder<B, R> {
+/**
+ * This interface defines the fluent builder methods that can be used when either configuring a remote REST or remote JMS
+ * runtime engine instance. 
+ * 
+ * @param <B> The builder instance type
+ * @param <R> The factory instance type
+ */
+public interface RemoteRuntimeEngineBuilder<B, F> {
 
     /**
      * Adds the deployment id to the configuration.
@@ -74,7 +80,7 @@ public interface RemoteRuntimeEngineBuilder<B, R> {
      * is provided to build the {@link RemoteRuntimeEngineFactory}
      * @see {@link RemoteRuntimeEngineBuilder#build()}.
      */
-    R buildFactory() throws InsufficientInfoToBuildException;
+    F buildFactory() throws InsufficientInfoToBuildException;
    
     /**
      * Creates a {@link RuntimeEngine} instance, using the 
@@ -85,6 +91,6 @@ public interface RemoteRuntimeEngineBuilder<B, R> {
      * @throws @{link InsufficientInfoToBuildException} when insufficient information 
      * is provided to build the {@link RuntimeEngine}
      */
-    RemoteRuntimeEngine build();
+    RuntimeEngine build();
 
 }
