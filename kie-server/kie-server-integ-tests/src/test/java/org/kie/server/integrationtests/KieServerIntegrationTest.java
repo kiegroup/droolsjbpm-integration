@@ -189,4 +189,38 @@ public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
     }
 
+    @Test
+    public void testScannerStatusOnContainerInfo() throws Exception {
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        KieContainerResource kci = reply.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, kci.getScanner().getStatus() );
+
+        ServiceResponse<KieScannerResource> si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.STARTED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        KieScannerResource info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
+
+        kci = client.getContainerInfo( "kie1" ).getResult();
+        Assert.assertEquals( KieScannerStatus.STARTED, kci.getScanner().getStatus() );
+        Assert.assertEquals( 10000, kci.getScanner().getPollInterval().longValue() );
+
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.STOPPED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
+
+        kci = client.getContainerInfo( "kie1" ).getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, kci.getScanner().getStatus() );
+
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+
+        kci = client.getContainerInfo( "kie1" ).getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, kci.getScanner().getStatus() );
+    }
 }
