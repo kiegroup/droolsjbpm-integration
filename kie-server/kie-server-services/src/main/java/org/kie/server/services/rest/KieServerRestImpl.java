@@ -16,6 +16,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
 
@@ -50,7 +51,7 @@ public class KieServerRestImpl implements KieServer {
 
     @Override
     public Response execute(HttpHeaders headers, CommandScript command) {
-        return createCorrectVariant(new GenericEntity<List<ServiceResponse<? extends Object>>>(server.executeScript(command)) {
+        return createCorrectVariant(new GenericEntity<ServiceResponsesList>(server.executeScript(command)) {
         }, headers);
     }
 

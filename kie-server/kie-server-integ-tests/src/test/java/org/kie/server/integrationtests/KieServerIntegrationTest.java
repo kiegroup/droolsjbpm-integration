@@ -31,6 +31,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.ServiceResponsesList;
 
 public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -123,9 +124,9 @@ public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
         List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
         CommandScript script = new CommandScript(cmds);
 
-        List<ServiceResponse<? extends Object>> reply = client.executeScript(script);
+        ServiceResponsesList reply = client.executeScript(script);
 
-        for (ServiceResponse<? extends Object> r : reply) {
+        for (ServiceResponse<? extends Object> r : reply.getResponses()) {
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
         }
     }

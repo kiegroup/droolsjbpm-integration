@@ -1,26 +1,7 @@
 package org.kie.server.client;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
-
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.jboss.resteasy.util.GenericType;
+import org.kie.remote.common.rest.KieRemoteHttpRequest;
+import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -28,231 +9,227 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieServicesClient {
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServicesClient.class);
-    
+public class KieServicesClient {
+    private static Logger logger = LoggerFactory.getLogger(KieServicesClient.class);
+    public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 30000;
+
+
     private final String baseURI;
     private final String username;
     private final String password;
     private final MediaType mediaType;
+    private final long requestTimeoutMillis;
+    private final SerializationProvider serializationProvider;
 
     public KieServicesClient(String baseURI) {
-        this( baseURI, null, null, MediaType.APPLICATION_XML_TYPE );
+        this(baseURI, null, null, MediaType.APPLICATION_XML_TYPE);
     }
 
     public KieServicesClient(String baseURI, MediaType mediaType) {
-        this( baseURI, null, null, mediaType );
+        this(baseURI, null, null, mediaType);
     }
 
     public KieServicesClient(String baseURI, String username, String password) {
-        this( baseURI, username, password, MediaType.APPLICATION_XML_TYPE );
-    }
-
-    static {
-
-        try {
-            ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-            ContextResolver<ObjectMapper> contextResolver = new JacksonConfig();
-            factory.addContextResolver(contextResolver);
-        } catch (Throwable e) {
-            logger.warn("Unable to add context resolver due to {}", e.getMessage());
-        }
+        this(baseURI, username, password, MediaType.APPLICATION_XML_TYPE);
     }
 
     public KieServicesClient(String baseURI, String username, String password, MediaType mediaType) {
+        this(baseURI, username, password, mediaType, DEFAULT_REQUEST_TIMEOUT_MILLIS);
+    }
+
+    public KieServicesClient(String baseURI, String username, String password, MediaType mediaType, long requestTimeoutMillis) {
         this.baseURI = baseURI;
         this.username = username;
         this.password = password;
         this.mediaType = mediaType;
-    }
-
-    public ServiceResponse<KieServerInfo> getServerInfo() throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieServerInfo>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI);
-            response = clientRequest.get(new GenericType<ServiceResponse<KieServerInfo>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception retrieving server info.", e, response );
-        }
-    }
-
-    private ClientRequest newRequest(String uri) {
-        URI uriObject;
-        try {
-            uriObject = new URI(uri);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Malformed URI was specified: '" + uri + "'!", e);
-        }
-        if (username == null || password == null) {
-            return new ClientRequest(uri).accept(mediaType);
+        this.requestTimeoutMillis = requestTimeoutMillis;
+        if (MediaType.APPLICATION_XML_TYPE.equals(mediaType)) {
+            serializationProvider = new JaxbSerializationProvider();
+        } else if (MediaType.APPLICATION_JSON_TYPE.equals(mediaType)) {
+            serializationProvider = new JsonSerializationProvider();
         } else {
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(
-                    new AuthScope(uriObject.getHost(), uriObject.getPort()),
-                    new UsernamePasswordCredentials(username, password)
-            );
-
-            DefaultHttpClient client = new DefaultHttpClient();
-            client.setCredentialsProvider(credentialsProvider);
-            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-            return new ClientRequest(uri, executor).accept(mediaType);
+            throw new RuntimeException("Unsupported media type '" + mediaType + "' specified!");
         }
     }
 
-    public ServiceResponse<KieContainerResourceList> listContainers() throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerResourceList>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers");
-            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResourceList>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception retrieving list of containers.", e, response );
-        }
+    public ServiceResponse<KieServerInfo> getServerInfo() {
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI, KieServerInfo.class);
     }
 
-    public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.body(mediaType, resource).put(new GenericType<ServiceResponse<KieContainerResource>>(){});
-            if( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
-                return response.getEntity();
-            } else if( response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception creating container: "+id+" with release-id "+resource.getReleaseId(), e, response );
-        }
+    public ServiceResponse<KieContainerResourceList> listContainers() {
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers", KieContainerResourceList.class);
     }
 
-    public ServiceResponse<KieContainerResource> getContainerInfo(String id) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.get(new GenericType<ServiceResponse<KieContainerResource>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception retrieving container info.", e, response );
-        }
+    public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
+        return makeHttpPutRequestAndCreateServiceResponse(baseURI + "/containers/" + id, resource, KieContainerResource.class);
     }
 
-    public ServiceResponse<Void> disposeContainer(String id) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<Void>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.delete(new GenericType<ServiceResponse<Void>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception disposing container: "+id, e, response );
-        }
+    public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id, KieContainerResource.class);
     }
 
-    public ServiceResponse<String> executeCommands(String id, String payload) throws ClientResponseFailure {
-        ClientResponse<ServiceResponse<String>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id);
-            response = clientRequest.body(mediaType, payload).post(new GenericType<ServiceResponse<String>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception executing commands on container "+id, e, response );
-        }
+    public ServiceResponse<Void> disposeContainer(String id) {
+        return makeHttpDeleteRequestAndCreateServiceResponse(baseURI + "/containers/" + id, Void.class);
     }
 
-    public List<ServiceResponse<? extends Object>> executeScript(CommandScript script) throws ClientResponseFailure {
-        ClientResponse<List<ServiceResponse<? extends Object>>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI);
-            response = clientRequest.body(mediaType, script).post(new GenericType<List<ServiceResponse<? extends Object>>>() {});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception retrieving server info.", e, response );
-        }
+    public ServiceResponse<String> executeCommands(String id, String payload) {
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id, payload, String.class);
     }
-    
-    public ServiceResponse<KieScannerResource> getScannerInfo( String id ) {
-        ClientResponse<ServiceResponse<KieScannerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
-            response = clientRequest.get(new GenericType<ServiceResponse<KieScannerResource>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception retrieving scanner info for container '"+id+"'.", e, response );
-        }
+
+    public ServiceResponsesList executeScript(CommandScript script) {
+        return makeHttpPostRequestAndCreateCustomResult(baseURI, script, ServiceResponsesList.class);
     }
-    
-    public ServiceResponse<KieScannerResource> updateScanner( String id, KieScannerResource resource ) {
-        ClientResponse<ServiceResponse<KieScannerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/scanner");
-            response = clientRequest.body(mediaType, resource).post(new GenericType<ServiceResponse<KieScannerResource>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception scanner for container '"+id+"'.", e, response );
-        }
+
+    public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
+        return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/scanner", KieScannerResource.class);
+    }
+
+    public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/scanner", resource,
+                KieScannerResource.class);
     }
 
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
-        ClientResponse<ServiceResponse<ReleaseId>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(baseURI + "/containers/" + id + "/release-id");
-            response = clientRequest.body(mediaType, releaseId).post(new GenericType<ServiceResponse<ReleaseId>>(){});
-            if( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
-            }
-            throw new ClientResponseFailure("Unexpected response code: "+response.getStatus(), response );
-        } catch (ClientResponseFailure e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception updating releaseId for container '"+id+"'.", e, response );
+        return makeHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/release-id", releaseId,
+                ReleaseId.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).get();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
         }
     }
-    
+
+    private <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, Object bodyObject,
+            Class<T> resultType) {
+        return makeHttpPostRequestAndCreateServiceResponse(uri, serialize(bodyObject), resultType);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).body(body).post();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
+    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, Object bodyObject, Class<T> resultType) {
+        return makeHttpPostRequestAndCreateCustomResult(uri, serialize(bodyObject), resultType);
+    }
+
+    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, String body, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).body(body).post();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            return deserialize(response.body(), resultType);
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
+    private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, Object bodyObject,
+            Class<T> resultType) {
+        return makeHttpPutRequestAndCreateServiceResponse(uri, serialize(bodyObject), resultType);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).body(body).put();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.CREATED.getStatusCode() ||
+                response.code() == Response.Status.BAD_REQUEST.getStatusCode()) {
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest(uri).delete();
+        KieRemoteHttpResponse response = request.response();
+
+        if (response.code() == Response.Status.OK.getStatusCode()) {
+            ServiceResponse serviceResponse = deserialize(response.body(), ServiceResponse.class);
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode(request, response);
+        }
+    }
+
+    private KieRemoteHttpRequest newRequest(String uri) {
+        KieRemoteHttpRequest httpRequest =
+                KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(requestTimeoutMillis);
+        httpRequest.accept(mediaType.toString());
+        if (username != null && password != null) {
+            httpRequest.basicAuthorization(username, password);
+        }
+        return httpRequest;
+    }
+
+    private String serialize(Object object) {
+        try {
+            return serializationProvider.serialize(object);
+        } catch (SerializationException e) {
+            throw new KieServicesClientException("Error while serializing request data!", e);
+        }
+    }
+
+    private <T> T deserialize(String content, Class<T> type) {
+        try {
+            return serializationProvider.deserialize(content, type);
+        } catch (SerializationException e) {
+            throw new KieServicesClientException("Error while deserializing data received from server!", e);
+        }
+    }
+
+    /**
+     * Checks whether the specified {@code ServiceResponse} contains the expected result type. In case the type is different,
+     * {@code KieServicesClientException} is thrown. This catches the errors early, before returning the result from the client.
+     * Without this check users could experience {@code ClassCastException} when retrieving the result that does not have
+     * the expected type.
+     */
+    private void checkResultType(ServiceResponse<?> serviceResponse, Class<?> expectedResultType) {
+        Object actualResult = serviceResponse.getResult();
+        if (actualResult != null && !expectedResultType.isInstance(actualResult)) {
+            throw new KieServicesClientException("Error while creating service response! The actual result type " +
+                    serviceResponse.getResult().getClass() + " does not match the expected type " + expectedResultType + "!");
+        }
+    }
+
+    private RuntimeException createExceptionForUnexpectedResponseCode(KieRemoteHttpRequest request,
+            KieRemoteHttpResponse response) {
+        String summaryMessage = "Unexpected HTTP response code when requesting URI '" + request.getUri() + "'! Error code: " +
+                response.code() + ", message: " + response.message();
+        logger.debug(summaryMessage + ", response body: " + response.body());
+        return new KieServicesClientException(summaryMessage);
+    }
+
 }

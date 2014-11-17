@@ -36,7 +36,6 @@ public class KieRemoteHttpRequestException extends RuntimeException {
      * Create a new {@link KieRemoteHttpRequestException} with the given cause
      *
      * @param msg
-     * @param cause
      */
     public KieRemoteHttpRequestException(final String msg) {
         super(msg);
