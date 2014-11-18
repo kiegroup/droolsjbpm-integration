@@ -15,8 +15,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 
@@ -104,7 +102,7 @@ public class OsgiKieModule extends AbstractKieModule {
 
     private static String getPomProperties(Bundle bundle) {
         Enumeration<URL> e = bundle.findEntries("META-INF/maven", "pom.properties", true);
-        if (!e.hasMoreElements()) {
+        if (e == null || !e.hasMoreElements()) {
             throw new RuntimeException("Cannot find pom.properties file in bundle " + bundle);
         }
         return readUrlAsString(e.nextElement());
