@@ -154,14 +154,6 @@
             <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
         </feature>-->
 
-    <feature name="drools5-camel-example" version="${version.org.drools}" description="Drools5 Spring Camel Example">
-        <feature version="${version.org.drools}">drools-module</feature>
-        <feature version="${version.org.drools}">drools-decisiontable</feature>
-        <feature version="${version.org.drools}">drools5-spring</feature>
-        <feature version="${version.org.drools}">drools5-camel</feature>
-        <bundle>mvn:org.drools/drools-camel-example/${version.org.drools}</bundle>
-    </feature>
-
     <feature name="drools-decision-table-kie-spring-camel-example" version="${version.org.drools}" description="Drools Decision Table Kie Spring Camel Example">
         <feature version="${version.org.drools}">drools-module</feature>
         <feature version="${version.org.drools}">drools-decisiontable</feature>
