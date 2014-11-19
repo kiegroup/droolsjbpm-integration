@@ -50,8 +50,6 @@
 
   <modules>
     <module>drools-benchmark</module>
-    <!--module>drools-spring-legacy5</module-->
-    <!--module>drools-camel-legacy5</module-->
     <module>drools-camel-server-example</module>
     <module>drools-osgi</module>
     <module>drools-simulator</module>
