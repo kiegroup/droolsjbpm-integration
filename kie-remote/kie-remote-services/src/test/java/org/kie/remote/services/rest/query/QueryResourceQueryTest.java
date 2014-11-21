@@ -168,7 +168,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
 
         assertNotNull( "Null var Result!", varResult );
         assertFalse( "No var logs found.", varResult.isEmpty() );
-        assertEquals( "Num var logs found.", 1, varResult.size() );
+        assertEquals( "Num var logs found.", 3, varResult.size() );
         for( org.kie.api.runtime.manager.audit.VariableInstanceLog log : varResult ) { 
             assertTrue( "Incorrect var value: " + log.getValue(), log.getValue().endsWith("-" + procInstId) );
             assertTrue( "Incorrect var name: " + log.getVariableId(), log.getVariableId().startsWith("input") );
