@@ -48,11 +48,6 @@
       <scope>test</scope>
     </dependency>
 
-
-    <!-- dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-impl</artifactId>
-    </dependency -->
     <!-- Camel -->
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -122,12 +117,6 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
       <scope>test</scope>
     </dependency>
 
