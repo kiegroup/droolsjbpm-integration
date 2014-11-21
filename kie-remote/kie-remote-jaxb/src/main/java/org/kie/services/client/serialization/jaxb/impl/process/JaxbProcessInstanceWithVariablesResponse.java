@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
+import org.kie.internal.jaxb.StringKeyStringValueMapXmlAdapter;
 import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 
 @XmlRootElement(name="process-instance-with-vars-response")
@@ -21,7 +21,7 @@ import org.kie.services.client.serialization.jaxb.rest.AbstractJaxbResponse;
 public class JaxbProcessInstanceWithVariablesResponse extends AbstractJaxbResponse {
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=StringKeyObjectValueMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(value=StringKeyStringValueMapXmlAdapter.class)
     private Map<String, String> variables;
     
     @XmlElement
