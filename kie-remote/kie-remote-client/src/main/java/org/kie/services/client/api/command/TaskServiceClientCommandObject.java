@@ -40,6 +40,7 @@ import org.kie.remote.jaxb.gen.GetTaskCommand;
 import org.kie.remote.jaxb.gen.GetTaskContentCommand;
 import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
+import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
 import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.NominateTaskCommand;
@@ -464,6 +465,55 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskContentCommand cmd = new GetTaskContentCommand();
         cmd.setTaskId(taskId);
         return (Map<String, Object>) executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksByVariousFields( String userId, List<Long> workItemIds, List<Long> taskIds,
+            List<Long> procInstIds, List<String> busAdmins, List<String> potOwners, List<String> taskOwners, List<Status> status,
+            boolean union ) {
+        GetTasksByVariousFieldsCommand cmd = new GetTasksByVariousFieldsCommand();
+        cmd.setUserId(userId);
+        if( workItemIds != null ) { 
+            cmd.getWorkItemIds().addAll(workItemIds);
+        }
+        if( taskIds != null ) { 
+            cmd.getTaskIds().addAll(taskIds);
+        }
+        if( procInstIds != null ) { 
+            cmd.getProcessInstanceIds().addAll(procInstIds);
+        }
+        if( busAdmins != null ) { 
+            cmd.getBusinessAdmins().addAll(busAdmins);
+        }
+        if( potOwners != null ) { 
+            cmd.getPotentialOwners().addAll(potOwners);
+        }
+        if( taskOwners != null ) { 
+            cmd.getTaskOwners().addAll(taskOwners);
+        }
+        if( status != null ) { 
+            cmd.getStatuses().addAll(status);
+        }
+        cmd.setUnion(union);
+        return (List<TaskSummary>) executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksByVariousFields( String userId, Map<String, List<?>> parameters, boolean union ) {
+        throw new UnsupportedOperationException("The " + TaskService.class.getSimpleName() + ".getTasksByVariousFields(String, Map, boolean) method is not supported on the Remote Client instance.");
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, List<String> groupIds, int firstResult, int maxResults ) {
+        GetTaskAssignedAsPotentialOwnerCommand cmd 
+            = new GetTaskAssignedAsPotentialOwnerCommand();
+        cmd.setUserId(userId); 
+        cmd.getGroupIds().addAll(groupIds);
+        QueryFilter filter = new QueryFilter();
+        filter.setOffset(firstResult);
+        filter.setCount(maxResults);
+        cmd.setFilter(filter);
+        return (List<TaskSummary>) executeCommand(cmd);
     }
 
 }
