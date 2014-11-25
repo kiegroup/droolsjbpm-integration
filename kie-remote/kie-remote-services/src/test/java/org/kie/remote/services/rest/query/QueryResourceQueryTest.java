@@ -164,7 +164,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         .variableId("input*");
 
         List<org.kie.api.runtime.manager.audit.VariableInstanceLog> varResult 
-            = ((AuditLogService) engine.getAuditLogService()).queryVariableInstanceLogs(varLogQueryBuilder.getQueryData());
+            = ((AuditLogService) engine.getAuditService()).queryVariableInstanceLogs(varLogQueryBuilder.getQueryData());
 
         assertNotNull( "Null var Result!", varResult );
         assertFalse( "No var logs found.", varResult.isEmpty() );
@@ -199,7 +199,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         .variableId("input*");
         
         List<org.kie.api.runtime.manager.audit.ProcessInstanceLog> procResult 
-            = ((AuditLogService) engine.getAuditLogService()).queryProcessInstanceLogs(procLogQueryBuilder.getQueryData());
+            = ((AuditLogService) engine.getAuditService()).queryProcessInstanceLogs(procLogQueryBuilder.getQueryData());
         
         assertNotNull( "Null proc Result!", procResult );
         assertFalse( "No proc logs found.", procResult.isEmpty() );

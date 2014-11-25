@@ -618,7 +618,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            runtimeEngine.getAuditLogService().clear();
+            runtimeEngine.getAuditService().clear();
             fail( "This should have failed because there's no server running... ");
         } catch( RemoteCommunicationException rce ) { 
             // expected
@@ -654,7 +654,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
         }
         
         try { 
-            runtimeEngine.getAuditLogService().clear();
+            runtimeEngine.getAuditService().clear();
             fail( "This should have failed because there's no server running... ");
         } catch( RemoteCommunicationException rce ) { 
             logger.info("The " + NoSuchAlgorithmException.class.getSimpleName() + " above is expected, nothing is wrong.");

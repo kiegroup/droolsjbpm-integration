@@ -34,7 +34,7 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
     /**
      * @return a {@link AuditLogService} instance that acts as a client instance to the remote API
      */
-    public AuditService getAuditLogService() { 
+    public AuditService getAuditService() { 
         return new AuditServiceClientCommandObject(config);
     }
 
