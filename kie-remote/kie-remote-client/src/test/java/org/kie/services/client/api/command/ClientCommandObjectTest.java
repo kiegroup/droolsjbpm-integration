@@ -82,6 +82,8 @@ public class ClientCommandObjectTest {
                    params[i] = activateTaskCommand;
                    // TODO: reactivate when execute is enabled
                    continue;
+               } else if( int.class.isAssignableFrom(paramTypes[i]) ) { 
+                   params[i] = 42;
                } else { 
                    fail( taskMethod.getName() + ": param type " + paramTypes[i].getSimpleName() + " encountered!");
                }
@@ -184,6 +186,12 @@ public class ClientCommandObjectTest {
             }
             
             assertEquals( "Too many null values in " + methodCmd.getClass().getSimpleName(), params.length, paramsChecked );
+            
+            try { 
+                taskServiceClient.getTasksByVariousFields(null, null, false);
+            } catch( Exception e ) { 
+                e.printStackTrace();
+            }
         }
     }
 }
