@@ -61,6 +61,10 @@ public interface RuntimeResource {
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation);
 
+    /**
+     * WithVars methods
+     */
+    
     @POST
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
     public Response withVarsStartProcessInstance( @PathParam("processDefId")  String processId );

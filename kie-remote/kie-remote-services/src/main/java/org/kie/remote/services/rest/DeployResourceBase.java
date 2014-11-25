@@ -43,6 +43,12 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefini
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is extended by both the {@link DeploymentResourceImpl} and the
+ * {@link DeploymentsResourceImpl}. 
+ * </p>
+ * It contains methods and fields common to both REST resource implementations.
+ */
 @Singleton
 public class DeployResourceBase extends ResourceBase {
 

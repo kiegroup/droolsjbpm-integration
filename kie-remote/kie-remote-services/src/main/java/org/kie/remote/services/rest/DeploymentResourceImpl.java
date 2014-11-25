@@ -4,13 +4,17 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.kie.remote.services.rest.api.DeploymentResource;
+import org.jbpm.services.api.model.DeploymentUnit;
+import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
@@ -19,21 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * If a method in this class is annotated by a @Path annotation, 
- * then the name of the method should match the URL specified in the @Path, 
- * where "_" characters should be used for all "/" characters in the path. 
- * <p>
- * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
- * public void begin_varOne_middle_varTwo() { 
- * </pre>
- * 
- * If the method is annotated by the @Path anno, but is the "root", then
- * give it a name that explains it's funtion.
+ * This REST resource is responsible for retrieving information about and managing deployment units. 
  */
 @RequestScoped
-public class DeploymentResourceImpl extends ResourceBase implements DeploymentResource {
+@Path("/deployment/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
+public class DeploymentResourceImpl extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentResourceImpl.class);
     
@@ -48,18 +42,32 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
     /* Deployment operations */
    
     @Inject 
-    private DeployResourceBase deployBase;
+    private DeployResourceBase deployResourceBase;
    
     // REST operations -----------------------------------------------------------------------------------------------------------
 
-    @Override
+    /**
+     * Retrieve the status of the {@link DeploymentUnit} specified in the URL.
+     * 
+     * @return A {@link JaxbDeploymentUnit} instance
+     */
+    @GET
     public Response getConfig() { 
-        JaxbDeploymentUnit jaxbDepUnit = deployBase.determineStatus(deploymentId, true);
+        JaxbDeploymentUnit jaxbDepUnit = deployResourceBase.determineStatus(deploymentId, true);
         logger.debug("Returning deployment unit information for " + deploymentId);
         return createCorrectVariant(jaxbDepUnit, headers);
     }
 
-    @Override
+    /**
+     * Queues a request to deploy the given deployment unit. If the deployment already exist, this
+     * operation will fail.
+     * 
+     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
+     * the deployment unit should be deployed.
+     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+     */
+    @POST
+    @Path("/deploy")
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
         // parse request/options 
         Map<String, String []> params = getRequestParams();
@@ -68,17 +76,29 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         String mergeMode = getStringParam("mergemode", false, params, oper);
         
         // schedule deployment
-        JaxbDeploymentJobResult jobResult = deployBase.submitDeployJob(deploymentId, strategy, mergeMode, deployDescriptor);
+        JaxbDeploymentJobResult jobResult = deployResourceBase.submitDeployJob(deploymentId, strategy, mergeMode, deployDescriptor);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    @Override
+    /**
+     * Queues a request to undeploy the deployment unit specified in the URL
+     * 
+     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+     */
+    @POST
+    @Path("/undeploy")
     public Response undeploy() { 
-        JaxbDeploymentJobResult jobResult = deployBase.submitUndeployJob(deploymentId);
+        JaxbDeploymentJobResult jobResult = deployResourceBase.submitUndeployJob(deploymentId);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
     }
    
-    @Override
+
+    /**
+     * Returns a list of process definitions for the specified deployment.
+     * @return A {@link JaxbProcessDefinitionList} instance
+     */
+    @GET
+    @Path("/processes")
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
@@ -86,7 +106,7 @@ public class DeploymentResourceImpl extends ResourceBase implements DeploymentRe
         int maxNumResults = getMaxNumResultsNeeded(pageInfo); 
         
         JaxbProcessDefinitionList jaxbProcDefList  = new JaxbProcessDefinitionList();
-        deployBase.fillProcessDefinitionList(deploymentId, pageInfo, maxNumResults, jaxbProcDefList.getProcessDefinitionList());
+        deployResourceBase.fillProcessDefinitionList(deploymentId, pageInfo, maxNumResults, jaxbProcDefList.getProcessDefinitionList());
         JaxbProcessDefinitionList resultList 
             = paginateAndCreateResult(pageInfo, jaxbProcDefList.getProcessDefinitionList(), new JaxbProcessDefinitionList());
         return createCorrectVariant(resultList, headers);

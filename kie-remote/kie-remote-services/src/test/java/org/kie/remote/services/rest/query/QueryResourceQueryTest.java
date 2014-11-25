@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("null")
 public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeployResourceBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueryResourceQueryTest.class);
     
     private static final String PROCESS_FILE = "BPMN2-HumanTaskWithStringVariables.bpmn2";
     private static final String PROCESS_ID = "org.var.human.task.string";
