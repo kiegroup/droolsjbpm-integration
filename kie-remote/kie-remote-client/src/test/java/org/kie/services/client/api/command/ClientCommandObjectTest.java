@@ -1,6 +1,6 @@
 package org.kie.services.client.api.command;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,15 +38,21 @@ import org.mockito.ArgumentCaptor;
 
 public class ClientCommandObjectTest {
 
+    /**
+     * This test makes sure that the right command is called for the right method in the TaskService implementation
+     * @throws Exception
+     */
     @Test
     public void taskServiceClientTest() throws Exception { 
-      
+     
+        // mock setup
         RemoteConfiguration config = new RemoteConfiguration(RemoteConfiguration.Type.CONSTRUCTOR);
         TaskServiceClientCommandObject taskServiceClient = new TaskServiceClientCommandObject(config);
         TaskServiceClientCommandObject taskServiceClientSpy = spy(taskServiceClient);
         ArgumentCaptor<Command> cmdCaptor = ArgumentCaptor.forClass(Command.class);
         doReturn(new Object()).when(taskServiceClientSpy).executeCommand(cmdCaptor.capture());
-        
+      
+        // setup of arguments
         Map<String, Object> dataMap = new HashMap<String, Object>();
         dataMap.put("data", "value");
         dataMap = Collections.unmodifiableMap(dataMap);
@@ -55,8 +62,8 @@ public class ClientCommandObjectTest {
         ActivateTaskCommand activateTaskCommand = new ActivateTaskCommand();
         activateTaskCommand.setTaskId(23l);
         activateTaskCommand.setUserId("illuminati");
-        
-        Map<String, Object[]> methodArgsMap = new LinkedHashMap<String, Object[]>();
+       
+        // sort methods to test consistently
         List<Method> taskServiceMethods = Arrays.asList(TaskService.class.getMethods());
         Collections.sort(taskServiceMethods, new Comparator<Method>() {
             @Override
@@ -64,9 +71,19 @@ public class ClientCommandObjectTest {
                 return o1.getName().compareTo(o2.getName());
             }
         });
+        
+        // call each method in the TaskService
         for( Method taskMethod : taskServiceMethods ) { 
+            if( taskMethod.getName().equals("execute") ) { 
+                continue;
+            }
            Class<?> [] paramTypes = taskMethod.getParameterTypes(); 
            Object [] params = new Object[paramTypes.length];
+           if( taskMethod.getName().equals("getTasksByVariousFields")
+                   && paramTypes[1].equals(Map.class) ) { 
+               // not supported
+               continue;
+           }
            for( int i = 0; i < paramTypes.length; ++i ) { 
                if( long.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = 23l;
@@ -84,63 +101,22 @@ public class ClientCommandObjectTest {
                    continue;
                } else if( int.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = 42;
+               } else if( boolean.class.isAssignableFrom(paramTypes[i]) ) { 
+                   params[i] = false;
                } else { 
                    fail( taskMethod.getName() + ": param type " + paramTypes[i].getSimpleName() + " encountered!");
                }
            }
-           
-           String key = taskMethod.getName().toLowerCase();
-           Object [] prevVal = methodArgsMap.put(key, params);
-           assertNull( "Method " + key + " already tested!?!", prevVal);
-           
+          
+           // call the method
            try { 
                taskMethod.invoke(taskServiceClientSpy, params);
            } catch( Throwable t) { 
                // ignore this, we're just testing the method -> command mappings
            }
-        } 
         
-        List<Command> capturedCommands = cmdCaptor.getAllValues();
-        for( Command methodCmd : capturedCommands ) { 
-            String cmdName = methodCmd.getClass().getSimpleName();
-            int last = cmdName.indexOf("Command");
-            int lastTask = cmdName.indexOf("TaskCommand");
-            String cmdMethodName = cmdName.substring(
-                    0, 
-                    lastTask > 0 ? lastTask : last )
-                    .toLowerCase();
-            if( cmdMethodName.equals("add") ) { 
-                cmdMethodName = "addtask";
-            }
-            Object [] params = methodArgsMap.get(cmdMethodName);
-            if( params == null ) { 
-                if( cmdMethodName.length() < 4 ) { 
-                    cmdMethodName += "task";
-                } else if( cmdMethodName.length() < 20 ) {
-                   cmdMethodName += "byid"; 
-                }
-                if( "gettask".equals(cmdMethodName) ) { 
-                   cmdMethodName += "byid"; 
-                }
-                if( "gettaskassignedasbusinessadmin".equals(cmdMethodName) ) { 
-                    cmdMethodName = "gettasksassignedasbusinessadministrator";
-                }
-                if( "gettaskassignedaspotentialowner".equals(cmdMethodName) ) { 
-                    cmdMethodName = "gettasksassignedaspotentialowner";
-                }
-                params = methodArgsMap.get(cmdMethodName);
-            }
-            if( methodCmd instanceof GetTaskAssignedAsPotentialOwnerCommand
-                    || methodCmd instanceof GetTasksOwnedCommand ) { 
-                Field statusListField = methodCmd.getClass().getDeclaredField("statuses");
-                statusListField.setAccessible(true);
-                Object statusList = statusListField.get(methodCmd);
-                if( statusList != null ) { 
-                   params = methodArgsMap.get(cmdMethodName + "bystatus");
-                }
-            }
-            assertNotNull(cmdMethodName + ": no params found!", params);
-           
+           // Look at all the commands we've tested
+           Command methodCmd = cmdCaptor.getValue();
             int paramsChecked = 0;
             List<Field> cmdFields = new ArrayList<Field>(Arrays.asList(methodCmd.getClass().getDeclaredFields()));
             cmdFields.addAll(Arrays.asList(TaskCommand.class.getDeclaredFields()));
@@ -151,7 +127,12 @@ public class ClientCommandObjectTest {
                    continue;
                }
                if( fieldVal instanceof QueryFilter ) { 
-                   fieldVal = ((QueryFilter) fieldVal).getLanguage();
+                   QueryFilter filter = (QueryFilter) fieldVal; 
+                   fieldVal = filter.getLanguage();
+                   if( fieldVal == null ) { 
+                       fieldVal = filter.getOffset();
+                       ++paramsChecked;
+                   }
                }
                boolean found = false; 
                for( Object val : params ) { 
@@ -186,12 +167,25 @@ public class ClientCommandObjectTest {
             }
             
             assertEquals( "Too many null values in " + methodCmd.getClass().getSimpleName(), params.length, paramsChecked );
-            
-            try { 
-                taskServiceClient.getTasksByVariousFields(null, null, false);
-            } catch( Exception e ) { 
-                e.printStackTrace();
-            }
+        }
+    }
+  
+    private static class MethodNameParamsPair { 
+      
+        private String name;
+        private Object [] params;
+        
+        public MethodNameParamsPair(String name, Object[] params) { 
+            this.name = name;
+            this.params = params;
+        }
+       
+        public String getMethodName() { 
+            return name;
+        }
+        
+        public Object[] getParams() { 
+           return params; 
         }
     }
 }
