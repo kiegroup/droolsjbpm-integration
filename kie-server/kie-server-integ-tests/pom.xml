@@ -27,33 +27,6 @@
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
   </properties>
 
-  <!-- TODO move this into kie-p-w-d -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-distribution-wars</artifactId>
-        <type>war</type>
-        <classifier>webc</classifier>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-distribution-wars</artifactId>
-        <type>war</type>
-        <classifier>ee6</classifier>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-distribution-wars</artifactId>
-        <type>war</type>
-        <classifier>ee7</classifier>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- kie server dependencies -->
     <dependency>
