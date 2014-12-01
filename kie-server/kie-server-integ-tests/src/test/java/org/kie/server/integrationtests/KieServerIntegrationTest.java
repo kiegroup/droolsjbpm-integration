@@ -48,8 +48,13 @@ public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         KieServerInfo info = reply.getResult();
-        Assert.assertEquals(KieServerEnvironment.getVersion().toString(), info.getVersion());
+        Assert.assertEquals(getServerVersion(), info.getVersion());
         System.out.println(reply.getResult());
+    }
+
+    private String getServerVersion() {
+        // use the property if specified and fallback to KieServerEnvironment if no property set
+        return System.getProperty("kie.server.version", KieServerEnvironment.getVersion().toString());
     }
 
     @Test
