@@ -14,6 +14,9 @@
   <description>KIE Execution Server Integration Tests</description>
 
   <properties>
+    <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
+         SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
+    <kie.server.version>${project.version}</kie.server.version>
     <!-- Following properties are used only for testing -->
     <container.hostname>localhost</container.hostname>
     <!-- <container.port/> can't define the default port value, because the build-helper-maven-plugin:reserve-network-port
