@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -97,7 +98,7 @@ public class TaskResourceImpl extends ResourceBase {
    
     @GET
     @Path("/{taskId: [0-9-]+}")
-    public Response getTask(long taskId) { 
+    public Response getTask(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
         if( task == null ) { 
@@ -108,7 +109,7 @@ public class TaskResourceImpl extends ResourceBase {
 
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
-    public Response doTaskOperation(long taskId, String operation) { 
+    public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
         String oper = getRelativePath();
@@ -171,7 +172,7 @@ public class TaskResourceImpl extends ResourceBase {
     
     @GET
     @Path("/{taskId: [0-9-]+}/content")
-    public Response getTaskContentByTaskId(long taskId) { 
+    public Response getTaskContentByTaskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
         if( result == null ) {
@@ -192,7 +193,7 @@ public class TaskResourceImpl extends ResourceBase {
     
     @GET
     @Path("/{taskId: [0-9-]+}/showTaskForm")
-    public Response getTaskFormByTaskId(long taskId) {
+    public Response getTaskFormByTaskId(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
 
@@ -214,7 +215,7 @@ public class TaskResourceImpl extends ResourceBase {
     
     @GET
     @Path("/content/{contentId: [0-9-]+}")
-    public Response getTaskContentByContentId(long contentId) { 
+    public Response getTaskContentByContentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentCommand(contentId);
         cmd.setUserId(identityProvider.getName());
         JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
