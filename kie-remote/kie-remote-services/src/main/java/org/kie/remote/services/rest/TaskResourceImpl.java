@@ -38,7 +38,6 @@ import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Task;
 import org.kie.internal.identity.IdentityProvider;
-import org.kie.remote.services.rest.api.TaskResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
@@ -47,18 +46,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * If a method in this class is annotated by a @Path annotation, 
- * then the name of the method should match the URL specified in the @Path, 
- * where "_" characters should be used for all "/" characters in the path. 
- * <p>
- * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
- * public void begin_varOne_middle_varTwo() { 
- * </pre>
+ * This resource provides operations to manage (human) tasks.
  */
+@Path("/task")
 @RequestScoped
-public class TaskResourceImpl extends ResourceBase implements TaskResource {
+public class TaskResourceImpl extends ResourceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(RuntimeResourceImpl.class);
     
@@ -97,7 +89,8 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
     
     // Rest methods --------------------------------------------------------------------------------------------------------------
 
-    @Override
+    @GET
+    @Path("/query")
     @Deprecated
     public Response query() {
         return queryResource.taskSummaryQuery();
@@ -232,7 +225,8 @@ public class TaskResourceImpl extends ResourceBase implements TaskResource {
         return createCorrectVariant(new JaxbContent(content), headers);
     }
     
-    @Override
+    @POST
+    @Path("/history/bam/clear")
     public Response clearTaskBamHistory() { 
         doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);

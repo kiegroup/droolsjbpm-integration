@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -18,29 +19,20 @@ import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.services.rest.api.HistoryResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbProcessInstanceLog;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 /**
- * If a method in this class is annotated by a @Path annotation, 
- * then the name of the method should match the URL specified in the @Path, 
- * where "_" characters should be used for all "/" characters in the path. 
- * <p>
- * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
- * public void begin_varOne_middle_varTwo() { 
- * </pre>
+ * This resource is responsible for direct, simple access to the history information. 
  * 
- * If the method is annotated by the @Path anno, but is the "root", then
- * give it a name that explains it's funtion.
+ * For complex queries, see the {@link QueryResourceImpl}
  */
+@Path("/history")
 @RequestScoped
 @SuppressWarnings("unchecked")
-public class HistoryResourceImpl extends ResourceBase implements HistoryResource {
+public class HistoryResourceImpl extends ResourceBase {
 
     /* REST information */
     
@@ -48,14 +40,9 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
     private HttpHeaders headers;
    
     // Rest methods --------------------------------------------------------------------------------------------------------------
-   
-    @Override
-    public Response clear() {
-        getAuditLogService().clear();
-        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
-    }
 
-    @Override
+    @GET
+    @Path("/instances")
     public Response getProcessInstanceLogs() {
         String oper = getRelativePath();
         Map<String, String []> params = getRequestParams();
@@ -112,7 +99,7 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         
         return createCorrectVariant(resultList, headers);
     }
-
+    
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{type: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
     public Response getInstanceLogsByProcInstIdByLogId(@PathParam("procInstId") long procInstId, @PathParam("type") String operation, @PathParam("logId") String logId) {
@@ -244,6 +231,13 @@ public class HistoryResourceImpl extends ResourceBase implements HistoryResource
         List<Object> results = new ArrayList<Object>(procInstLogList);
         JaxbHistoryLogList resultList = paginateAndCreateResult(pageInfo, results, new JaxbHistoryLogList());
         return createCorrectVariant(resultList, headers);
+    }
+   
+    @POST
+    @Path("/clear")
+    public Response clear() {
+        getAuditLogService().clear();
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
     
     // Helper methods --------------------------------------------------------------------------------------------------------------

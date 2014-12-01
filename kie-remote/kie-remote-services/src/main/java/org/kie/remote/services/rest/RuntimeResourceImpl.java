@@ -38,7 +38,6 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.services.rest.api.RuntimeResource;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
@@ -50,21 +49,11 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemRespo
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 /**
- * If a method in this class is annotated by a @Path annotation, 
- * then the name of the method should match the URL specified in the @Path, 
- * where "_" characters should be used for all "/" characters in the path. 
- * <p>
- * For example: 
- * <pre>
- * @Path("/begin/{varOne: [_a-zA-Z0-9-:\\.]+}/midddle/{varTwo: [a-z]+}")
- * public void begin_varOne_middle_varTwo() { 
- * </pre>
- * 
- * If the method is annotated by the @Path anno, but is the "root", then
- * give it a name that explains it's function.
+ * This resource is responsible for providin operations to manage process instances. 
  */
+@Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
-public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource {
+public class RuntimeResourceImpl extends ResourceBase {
 
     /* REST information */
     
@@ -196,7 +185,8 @@ public class RuntimeResourceImpl extends ResourceBase implements RuntimeResource
         return createCorrectVariant(procVar, headers);
     }
   
-    @Override
+    @POST
+    @Path("/signal")
     public Response signalProcessInstances() {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
