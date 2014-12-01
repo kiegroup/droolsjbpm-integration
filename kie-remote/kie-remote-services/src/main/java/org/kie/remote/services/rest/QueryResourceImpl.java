@@ -1,5 +1,7 @@
 package org.kie.remote.services.rest;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.InternalProcInstQueryHelper;
 import org.kie.remote.services.rest.query.InternalTaskQueryHelper;
+import org.kie.remote.services.rest.query.QueryResourceData;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 
@@ -52,7 +55,9 @@ public class QueryResourceImpl extends ResourceBase {
     @Path("/runtime/task")
     public Response queryTasks() {
         String oper = getRelativePath();
-        Map<String, String[]> params = makeKeysLowerCase(getRequestParams());
+        Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
+        
         int[] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
@@ -68,7 +73,9 @@ public class QueryResourceImpl extends ResourceBase {
     @Path("/runtime/process")
     public Response queryProcessInstances() {
         String oper = getRelativePath();
-        Map<String, String[]> params = makeKeysLowerCase(getRequestParams());
+        Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
+        
         int[] pageInfo = getPageNumAndPageSize(params, oper);
         int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
@@ -99,19 +106,7 @@ public class QueryResourceImpl extends ResourceBase {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
 
-        for( String queryParam : params.keySet() ) {
-            boolean allowed = false;
-            for( String allowedParam : allowedQueryParams ) {
-                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam) ) {
-                    allowed = true;
-                    break;
-                }
-            }
-            if( !allowed ) {
-                throw KieRemoteRestOperationException.badRequest(queryParam
-                        + " is an unknown and unsupported query param for the task query operation.");
-            }
-        }
+        checkIfParametersAreAllowed(params, Arrays.asList(allowedQueryParams), "task query");
 
         List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
         List<Long> taskIds = getLongListParam(allowedQueryParams[1], false, params, "query", true);
@@ -141,8 +136,10 @@ public class QueryResourceImpl extends ResourceBase {
 
         return createCorrectVariant(resultList, headers);
     }
-    
-    private static Map<String, String[]> makeKeysLowerCase(Map<String, String[]> params) { 
+   
+    // helper methods -------------------------------------------------------------------------------------------------------------
+   
+    private static Map<String, String[]> makeQueryParametersLowerCase(Map<String, String[]> params) { 
         if( params == null || params.isEmpty() )  { 
             return params;
         }
@@ -152,4 +149,21 @@ public class QueryResourceImpl extends ResourceBase {
         }
         return lowerCaseParams;
     }
+    
+    private static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) { 
+        if( params == null || params.isEmpty() )  { 
+            return;
+        }
+       
+        EACHPARAM: for( String queryParam : params.keySet() ) {
+            for( String allowedParam : allowedParams ) {
+                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam) ) {
+                    continue EACHPARAM;
+                }
+            }
+            throw KieRemoteRestOperationException.badRequest(queryParam
+                        + " is an unknown and unsupported query param for the " + oper + " operation.");
+        }
+    }
+    
 }
