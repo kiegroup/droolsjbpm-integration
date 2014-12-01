@@ -3,7 +3,9 @@ package org.kie.remote.services.rest.query;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kie.api.task.model.Status;
@@ -13,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 public class QueryResourceData {
 
-    private static final Logger logger = LoggerFactory.getLogger(QueryResourceData.class);
-    
     // @formatter:off
     static final String [] generalQueryParams = { 
         "processinstanceid", "processid", "workitemid",
@@ -119,7 +119,31 @@ public class QueryResourceData {
         }
         return idGen;
     }
-   
+ 
+    private static Set<String> queryParameters = new HashSet<String>();
+    
+    public static Set<String> getQueryParameters() { 
+        synchronized(queryParameters) { 
+            if( queryParameters == null ) { 
+                String [][] queryParamArrs = { 
+                        generalQueryParams, generalQueryParamsShort,
+                        taskQueryParams, taskQueryParamsShort,
+                        procInstQueryParams, procInstQueryParamsShort,
+                        varInstQueryParams, varInstQueryParamsShort
+                      // metaRuntimeParams, metaRuntimeParamsShort
+                };
+                for( String [] paramArr : queryParamArrs ) { 
+                    for( String param : paramArr ) { 
+                       if( param != null ) { 
+                           queryParameters.add(param);
+                       }
+                    }
+                }
+            }
+        }
+        return queryParameters;
+    }
+    
     // "get" parser methods -------------------------------------------------------------------------------------------------------
     
     public static long [] getLongs(int action, String [] data) { 
