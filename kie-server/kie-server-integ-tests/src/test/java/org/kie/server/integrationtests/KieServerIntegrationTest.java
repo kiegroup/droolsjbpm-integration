@@ -49,7 +49,6 @@ public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         KieServerInfo info = reply.getResult();
         Assert.assertEquals(getServerVersion(), info.getVersion());
-        System.out.println(reply.getResult());
     }
 
     private String getServerVersion() {
