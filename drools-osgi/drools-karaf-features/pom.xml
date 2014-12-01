@@ -40,7 +40,6 @@
     <karaf.version.org.jboss.solder>3.2.0.Final</karaf.version.org.jboss.solder>
     <karaf.version.org.jboss.seam>3.1.0.Final</karaf.version.org.jboss.seam>
     <karaf.version.org.jboss.weld>1.1.13.Final</karaf.version.org.jboss.weld>
-    <karaf.version.org.mvel>2.2.2.Final</karaf.version.org.mvel>
     <!-- Overwrites with a different Maven version -->
     <karaf.version.commons-codec>1.7</karaf.version.commons-codec>
     <karaf.version.javax.enterprise.cdi>1.0-SP4</karaf.version.javax.enterprise.cdi>
