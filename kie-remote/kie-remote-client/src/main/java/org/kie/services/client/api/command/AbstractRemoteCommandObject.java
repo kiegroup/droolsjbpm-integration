@@ -397,6 +397,7 @@ public abstract class AbstractRemoteCommandObject {
         } 
 
         // Get response
+        boolean htmlException = false;
         JaxbExceptionResponse exceptionResponse = null;
         JaxbCommandsResponse commandResponse = null;
         int responseStatus = httpResponse.code();
@@ -409,6 +410,7 @@ public abstract class AbstractRemoteCommandObject {
                 if( contentType.equals(MediaType.APPLICATION_XML) ) { 
                     exceptionResponse = deserializeResponseContent(content, JaxbExceptionResponse.class);
                 } else if( contentType.startsWith(MediaType.TEXT_HTML) ) { 
+                    htmlException = true;
                     exceptionResponse = new JaxbExceptionResponse();
                     Document doc = Jsoup.parse(content);
                     String body = doc.body().text();
@@ -451,7 +453,11 @@ public abstract class AbstractRemoteCommandObject {
             throw new RemoteTaskException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
         default:
             if( exceptionResponse != null ) { 
-                throw new RemoteApiException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+                if( ! htmlException ) { 
+                    throw new RemoteApiException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+                } else { 
+                    throw new RemoteCommunicationException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+                } 
             } else { 
                 throw new RemoteCommunicationException("Unable to communicate with remote API via URL " 
                         + "'" + httpRequest.getUri().toString() + "'");
