@@ -24,7 +24,7 @@ public class ContainerIsolationIntegrationTest extends KieServerBaseIntegrationT
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
     }
 
-    @Test @Ignore
+    @Test 
     public void testUseClassWithSameFQNInDifferentContainers() {
         assertSuccess(client.createContainer("container-isolation-kjar1", new KieContainerResource("container-isolation-kjar1", kjar1)));
 
