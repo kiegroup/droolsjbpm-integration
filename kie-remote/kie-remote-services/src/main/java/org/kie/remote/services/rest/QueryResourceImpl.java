@@ -150,7 +150,7 @@ public class QueryResourceImpl extends ResourceBase {
         return lowerCaseParams;
     }
     
-    private static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) { 
+    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) { 
         if( params == null || params.isEmpty() )  { 
             return;
         }
