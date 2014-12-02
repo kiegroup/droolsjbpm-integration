@@ -185,7 +185,7 @@ public class InfPersistentStatefulSessionTest {
                       list.size() );
         
         // now load the ksession
-        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( ksession.getId(), kbase, null, env );
+        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( ksession.getIdentifier(), kbase, null, env );
         
         ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
         ut.begin();
@@ -209,7 +209,7 @@ public class InfPersistentStatefulSessionTest {
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         int origNumObjects = ksession.getObjects().size();
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         ProcessInstance processInstance = ksession.startProcess( "org.drools.test.TestProcess" );
         ksession.insert( "TestString" );
@@ -271,7 +271,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         UserTransaction ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
         ut.begin();
@@ -348,7 +348,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         ProcessInstance processInstance = ksession.startProcess( "org.drools.test.TestProcess" );
         logger.debug( "Started process instance " + processInstance.getId() );
@@ -376,7 +376,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         ksession.insert(new ArrayList<Object>());
 
@@ -402,7 +402,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         ProcessInstance processInstance = ksession.startProcess( "org.drools.test.TestProcess" );
         logger.debug( "Started process instance " + processInstance.getId() );
@@ -526,7 +526,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
         
         ProcessInstance processInstance = ksession.startProcess( "com.sample.SuperProcess" );
         logger.debug( "Started process instance " + processInstance.getId() );
@@ -573,7 +573,7 @@ public class InfPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", "John Doe");

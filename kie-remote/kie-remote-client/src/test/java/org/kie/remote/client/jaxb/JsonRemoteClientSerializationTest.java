@@ -61,7 +61,7 @@ public class JsonRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
        taskData.setProcessInstanceId(3l);
        taskData.setOutputContentId(3l);
        taskData.setParentId(3l);
-       taskData.setProcessSessionId(2);
+       taskData.setProcessSessionId(2l);
        
        String jsonTaskStr = objectMapper.writeValueAsString(serverTask);
        logger.debug( jsonTaskStr );

@@ -126,7 +126,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         log.info("---> create new SingleSessionCommandService");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.TestProcess");
@@ -216,7 +216,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
         ProcessInstance processInstance = service.startProcess("org.drools.test.TestProcess");
         log.info("Started process instance {}",
                 processInstance.getId());
@@ -397,7 +397,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     public void testPersistenceSubProcess() {
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
 
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess("org.drools.test.ProcessSubProcess");
         log.info("Started process instance {}",
@@ -551,7 +551,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         log.info("---> get bean jpaSingleSessionCommandService2");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.ProcessTimer");
@@ -652,7 +652,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     public void testPersistenceTimer2() throws Exception {
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.ProcessTimer2");
         log.info("Started process instance {}",

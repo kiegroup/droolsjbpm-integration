@@ -20,7 +20,7 @@ public class EntityHolder {
 	@Field
 	private String type;
 	@Field
-	private Integer sessionInfoId;
+	private Long sessionInfoId;
 	@Field
 	private Integer sessionInfoVersion;
 	@Field

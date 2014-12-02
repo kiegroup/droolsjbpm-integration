@@ -399,6 +399,11 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
     }
 
     @Override
+    public long getIdentifier() {
+        return unsupported(WorkItemManager.class, Long.class);
+    }
+
+    @Override
     public void dispose() {
         throw new UnsupportedOperationException("Dispose does not need to be called on the Remote Client  " + KieSession.class.getSimpleName() + " implementation.");
     }

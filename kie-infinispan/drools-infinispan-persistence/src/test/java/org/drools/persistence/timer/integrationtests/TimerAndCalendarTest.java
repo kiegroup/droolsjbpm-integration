@@ -277,7 +277,7 @@ public class TimerAndCalendarTest {
 
     private StatefulKnowledgeSession disposeAndReloadSession(StatefulKnowledgeSession ksession,
                                                              KieBase kbase) {
-        int ksessionId = ksession.getId();
+        long ksessionId = ksession.getIdentifier();
         ksession.dispose();
 
         final KieSessionConfiguration conf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();

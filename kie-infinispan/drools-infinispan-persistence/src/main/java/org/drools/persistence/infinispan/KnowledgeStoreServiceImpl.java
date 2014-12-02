@@ -102,7 +102,7 @@ public class KnowledgeStoreServiceImpl
             throw new IllegalArgumentException( "Environment cannot be null" );
         }
 
-        CommandService commandService = (CommandService) buildCommandService( id, kbase, mergeConfig( configuration ), environment );
+        CommandService commandService = (CommandService) buildCommandService( new Long(id), kbase, mergeConfig( configuration ), environment );
         if (commandService instanceof SingleSessionCommandService) {
         	((SingleSessionCommandService) commandService).
         		addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
@@ -122,7 +122,39 @@ public class KnowledgeStoreServiceImpl
         return new CommandBasedStatefulKnowledgeSession( commandService );
     }
 
-    private CommandExecutor buildCommandService(Integer sessionId,
+    public StatefulKnowledgeSession loadKieSession(Long id,
+            KieBase kbase,
+            KieSessionConfiguration configuration,
+            Environment environment) {
+        if ( configuration == null ) {
+            configuration = new SessionConfiguration();
+        }
+
+        if ( environment == null ) {
+            throw new IllegalArgumentException( "Environment cannot be null" );
+        }
+
+        CommandService commandService = (CommandService) buildCommandService( id, kbase, mergeConfig( configuration ), environment );
+        if (commandService instanceof SingleSessionCommandService) {
+            ((SingleSessionCommandService) commandService).
+                    addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
+            try {
+                Class<?> clazz = Class.forName("org.jbpm.persistence.ManualPersistProcessInterceptor");
+                Constructor<?> c = clazz.getConstructor(SingleSessionCommandService.class);
+                Interceptor interceptor = (Interceptor) c.newInstance(commandService);
+                ((SingleSessionCommandService) commandService).addInterceptor(interceptor);
+            } catch (ClassNotFoundException e) {
+                //Expected of non-jbpm based projects
+            } catch (Exception e) {
+                //something unexpected happened
+                throw new RuntimeException("Something wrong initializing manual process persistor interceptor", e);
+            }
+        }
+
+        return new CommandBasedStatefulKnowledgeSession( commandService );
+    }
+
+    private CommandExecutor buildCommandService(Long sessionId,
                                                 KieBase kbase,
                                                 KieSessionConfiguration conf,
                                                 Environment env) {
@@ -130,7 +162,7 @@ public class KnowledgeStoreServiceImpl
     	env = mergeEnvironment(env);
         try {
             Class< ? extends CommandExecutor> serviceClass = getCommandServiceClass();
-            Constructor< ? extends CommandExecutor> constructor = serviceClass.getConstructor( Integer.class,
+            Constructor< ? extends CommandExecutor> constructor = serviceClass.getConstructor( Long.class,
                                                                                               KieBase.class,
                                                                                               KieSessionConfiguration.class,
                                                                                               Environment.class );

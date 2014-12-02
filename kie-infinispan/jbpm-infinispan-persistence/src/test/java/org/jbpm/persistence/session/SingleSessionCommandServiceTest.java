@@ -125,7 +125,7 @@ public class SingleSessionCommandServiceTest {
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
                                                                                env );
-        int sessionId = service.getSessionId();
+        long sessionId = service.getSessionId();
 
         registerWorkItemHandlers(service);
         
@@ -256,7 +256,7 @@ public class SingleSessionCommandServiceTest {
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
                                                                                env );
-        int sessionId = service.getSessionId();
+        long sessionId = service.getSessionId();
 
         UserTransaction ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
         ut.begin();
@@ -458,7 +458,7 @@ public class SingleSessionCommandServiceTest {
         SingleSessionCommandService service = createSingleSessionCommandService( ruleBase,
                                                                                config,
                                                                                env );
-        int sessionId = service.getSessionId();
+        long sessionId = service.getSessionId();
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.execute( startProcessCommand );
@@ -647,7 +647,7 @@ public class SingleSessionCommandServiceTest {
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
                                                                                env );
-        int sessionId = service.getSessionId();
+        long sessionId = service.getSessionId();
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
@@ -751,7 +751,7 @@ public class SingleSessionCommandServiceTest {
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
                                                                                env );
-        int sessionId = service.getSessionId();
+        long sessionId = service.getSessionId();
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
         ProcessInstance processInstance = service.execute( startProcessCommand );
@@ -828,7 +828,7 @@ public class SingleSessionCommandServiceTest {
 		return service;
 	}
 
-	private SingleSessionCommandService createSingleSessionCommandService(int sessionId, KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
+	private SingleSessionCommandService createSingleSessionCommandService(long sessionId, KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
 		SingleSessionCommandService service = new SingleSessionCommandService(sessionId, kbase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));
@@ -844,7 +844,7 @@ public class SingleSessionCommandServiceTest {
 		return service;
 	}
 
-	private SingleSessionCommandService createSingleSessionCommandService(int sessionId, KieBase ruleBase, SessionConfiguration conf, Environment env) {
+	private SingleSessionCommandService createSingleSessionCommandService(long sessionId, KieBase ruleBase, SessionConfiguration conf, Environment env) {
 		SingleSessionCommandService service = new SingleSessionCommandService(sessionId, ruleBase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));

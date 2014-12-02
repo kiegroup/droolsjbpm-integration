@@ -59,12 +59,12 @@ public class SimulateProcessPathCommand implements GenericCommand<KieSession> {
             session.signalEvent(path.getSignalName(), null);
             if (!instances.isEmpty()) {
                 pi = instances.get(0);
-                instanceId = session.getId()+pi.getId();
+                instanceId = session.getIdentifier()+pi.getId();
             }
 
         } else {
             pi = session.startProcess(processId);
-            instanceId = session.getId()+pi.getId();
+            instanceId = session.getIdentifier()+pi.getId();
         }
 
         simContext.getRepository().storeEvent(new ProcessInstanceEndSimulationEvent(processId, instanceId,

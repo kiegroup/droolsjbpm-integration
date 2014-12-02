@@ -17,7 +17,7 @@ public class InfinispanKnowledgeService {
                 environment);
     }
 
-    public static StatefulKnowledgeSession loadStatefulKnowledgeSession(int id,
+    public static StatefulKnowledgeSession loadStatefulKnowledgeSession(long id,
                                                                         KieBase kbase,
                                                                         KieSessionConfiguration configuration,
                                                                         Environment environment) {
