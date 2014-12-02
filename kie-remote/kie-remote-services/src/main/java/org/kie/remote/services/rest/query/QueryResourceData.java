@@ -124,7 +124,7 @@ public class QueryResourceData {
     
     public static Set<String> getQueryParameters() { 
         synchronized(queryParameters) { 
-            if( queryParameters == null ) { 
+            if( queryParameters.isEmpty() ) { 
                 String [][] queryParamArrs = { 
                         generalQueryParams, generalQueryParamsShort,
                         taskQueryParams, taskQueryParamsShort,
