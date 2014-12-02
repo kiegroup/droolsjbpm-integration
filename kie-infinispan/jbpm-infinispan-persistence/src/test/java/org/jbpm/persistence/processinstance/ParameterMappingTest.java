@@ -44,7 +44,7 @@ public class ParameterMappingTest {
         Environment env = createEnvironment(context);
 
         ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession(createKnowledgeBase(), null, env);
-        assertTrue("Valid KnowledgeSession could not be created.", ksession != null && ksession.getId() > 0);
+        assertTrue("Valid KnowledgeSession could not be created.", ksession != null && ksession.getIdentifier() > 0);
 
         listener = new ProcessListener();
         ksession.addEventListener(listener);

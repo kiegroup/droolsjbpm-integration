@@ -79,7 +79,7 @@ public class InfinispanBasedPersistenceTest extends MapPersistenceTest {
     @Override
     protected StatefulKnowledgeSession disposeAndReloadSession(StatefulKnowledgeSession ksession,
                                                                KnowledgeBase kbase) {
-        int ksessionId = ksession.getId();
+        long ksessionId = ksession.getIdentifier();
         ksession.dispose();
         return InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksessionId, kbase, null, createEnvironment(context));
     }

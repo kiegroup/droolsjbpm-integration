@@ -33,7 +33,7 @@ import javax.persistence.EntityManagerFactory;
 public class MyDroolsBean {
 
     private static int timerTriggerCount;
-    private static int sessionId;
+    private static long sessionId;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -51,7 +51,7 @@ public class MyDroolsBean {
             KieSession ksession = kstore.newKieSession(kbase,
                     null,
                     getEnvironment());
-            sessionId = ksession.getId();
+            sessionId = ksession.getIdentifier();
 
             logger.info("\n\tSession id: " + sessionId + "\n");
 

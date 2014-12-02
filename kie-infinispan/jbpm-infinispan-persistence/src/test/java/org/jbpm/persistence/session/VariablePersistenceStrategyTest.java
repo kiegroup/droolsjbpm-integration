@@ -647,7 +647,7 @@ public class VariablePersistenceStrategyTest {
     }
     
     private StatefulKnowledgeSession reloadSession(StatefulKnowledgeSession ksession, KnowledgeBase kbase, Environment env){
-        int sessionId = ksession.getId();
+        long sessionId = ksession.getIdentifier();
         ksession.dispose();
         return InfinispanKnowledgeService.loadStatefulKnowledgeSession( sessionId, kbase, null, env);
     }

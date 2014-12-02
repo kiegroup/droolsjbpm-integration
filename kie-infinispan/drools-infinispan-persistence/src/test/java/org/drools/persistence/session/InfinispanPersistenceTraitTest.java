@@ -141,7 +141,7 @@ public class InfinispanPersistenceTraitTest {
 
         assertEquals( 2,
                 list.size() );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
 
 
         StatefulKnowledgeSession ksession2 = InfinispanKnowledgeService.loadStatefulKnowledgeSession( id, kbase, null, env );
@@ -247,7 +247,7 @@ public class InfinispanPersistenceTraitTest {
 
         assertEquals( 2,
                 list.size() );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
 
 
         StatefulKnowledgeSession ksession2 = InfinispanKnowledgeService.loadStatefulKnowledgeSession( id, kbase, null, env );
@@ -335,7 +335,7 @@ public class InfinispanPersistenceTraitTest {
 
         assertEquals( 1,
                 list.size() );
-        int id = ksession.getId();
+        long id = ksession.getIdentifier();
 
 
         Collection yOld = ksession.getObjects();

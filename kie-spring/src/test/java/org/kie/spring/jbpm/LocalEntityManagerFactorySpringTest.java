@@ -34,7 +34,7 @@ public class LocalEntityManagerFactorySpringTest extends AbstractJbpmSpringTest 
         KieSession ksession = engine.getKieSession();
         TaskService taskService = engine.getTaskService();
 
-        int ksessionId = ksession.getId();
+        long ksessionId = ksession.getIdentifier();
 
         ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
 
@@ -46,7 +46,7 @@ public class LocalEntityManagerFactorySpringTest extends AbstractJbpmSpringTest 
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
 
-        assertEquals(ksessionId, ksession.getId());
+        assertEquals(ksessionId, ksession.getIdentifier());
 
         AuditLogService logService = (AuditLogService) context.getBean("logService");
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();

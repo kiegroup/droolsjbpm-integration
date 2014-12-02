@@ -333,7 +333,7 @@ abstract class JaxbWrapper {
         }
     
         @Override
-        public int getProcessSessionId() {
+        public long getProcessSessionId() {
             return this.taskData.getProcessSessionId();
         }
     

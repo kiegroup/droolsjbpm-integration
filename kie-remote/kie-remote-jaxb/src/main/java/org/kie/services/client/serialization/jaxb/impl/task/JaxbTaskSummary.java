@@ -98,8 +98,8 @@ public class JaxbTaskSummary implements TaskSummary {
     private String processId;
     
     @XmlElement(name="process-session-id")
-    @XmlSchemaType(name="int")
-    private Integer processSessionId;
+    @XmlSchemaType(name="long")
+    private Long processSessionId;
     
     @XmlElement(name="deployment-id")
     @XmlSchemaType(name="string")
@@ -304,11 +304,11 @@ public class JaxbTaskSummary implements TaskSummary {
         this.processId = processId;
     }
 
-    public Integer getProcessSessionId() {
+    public Long getProcessSessionId() {
         return processSessionId;
     }
 
-    public void setProcessSessionId(int processSessionId) {
+    public void setProcessSessionId(long processSessionId) {
         this.processSessionId = processSessionId;
     }
 

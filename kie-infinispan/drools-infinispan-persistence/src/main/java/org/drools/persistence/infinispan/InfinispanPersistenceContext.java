@@ -8,7 +8,7 @@ import org.infinispan.Cache;
 
 public class InfinispanPersistenceContext implements PersistenceContext {
 	
-	private static int SESSIONINFO_KEY = 1;
+	private static long SESSIONINFO_KEY = 1;
 	private static long WORKITEMINFO_KEY = 1;
 	private static final Object syncObject = new Object();
 	
@@ -34,7 +34,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
         return entity;
     }
     
-    private Integer generateSessionInfoId() {
+    private Long generateSessionInfoId() {
     	synchronized (syncObject) {
     		while (cache.containsKey("sessionInfo" + SESSIONINFO_KEY)) {
     			SESSIONINFO_KEY++;
@@ -52,7 +52,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     	return WORKITEMINFO_KEY;
     }
 
-	private String createSessionKey(Integer id) {
+	private String createSessionKey(Long id) {
 		return "sessionInfo" + safeId(id);
 	}
 	
@@ -64,7 +64,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
 		return String.valueOf(id); //TODO
 	}
 
-    public SessionInfo findSessionInfo(Integer id) {
+    public SessionInfo findSessionInfo(Long id) {
     	EntityHolder holder = (EntityHolder) this.cache.get( createSessionKey(id) );
     	if (holder == null) {
     		return null;

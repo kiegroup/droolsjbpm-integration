@@ -61,7 +61,7 @@ public class ProcessInstanceResolverStrategyTest {
 
         // create session
         ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
-        Assert.assertTrue("Valid KnowledgeSession could not be created.", ksession != null && ksession.getId() > 0);
+        Assert.assertTrue("Valid KnowledgeSession could not be created.", ksession != null && ksession.getIdentifier() > 0);
     }
     
     private KnowledgeBase loadKnowledgeBase() { 

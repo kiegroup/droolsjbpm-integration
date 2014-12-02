@@ -38,7 +38,7 @@ public class GetProcessInstancesTest {
     
     private Environment env;
     private KnowledgeBase kbase;
-    private int sessionId;
+    private long sessionId;
 
     @Before
     public void setUp() throws Exception {
@@ -47,7 +47,7 @@ public class GetProcessInstancesTest {
 
         kbase = createBase();
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
-        sessionId = ksession.getId();
+        sessionId = ksession.getIdentifier();
         ksession.dispose();
     }
 

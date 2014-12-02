@@ -115,7 +115,7 @@ public class InfinispanPersistentStatefulSessionTest {
                 list.size() );
         String externalForm = atomicFH.toExternalForm();
         
-        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksession.getId(), kbase, null, env);
+        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksession.getIdentifier(), kbase, null, env);
         
         atomicFH = ksession.execute(CommandFactory.fromExternalFactHandleCommand(externalForm));
         
@@ -244,7 +244,7 @@ public class InfinispanPersistentStatefulSessionTest {
                       list.size() );
         
         // now load the ksession
-        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( ksession.getId(), kbase, null, env );
+        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( ksession.getIdentifier(), kbase, null, env );
         
         ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
         ut.begin();
@@ -349,7 +349,7 @@ public class InfinispanPersistentStatefulSessionTest {
         ksession.insert( test2 );
         ksession.fireAllRules();
 
-        KieSession ksession2 = InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksession.getId(), kbase, null, env);
+        KieSession ksession2 = InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksession.getIdentifier(), kbase, null, env);
 
         Iterator c = ksession2.getObjects().iterator();
         List ref1 = (List) c.next();

@@ -131,7 +131,7 @@ public class VariablePersistenceStrategyTest {
             }
         });
 
-        final int sessionId = ksession.getId();
+        final long sessionId = ksession.getIdentifier();
 
         txTemplate = new TransactionTemplate(txManager);
         txTemplate.execute(new TransactionCallback() {
@@ -243,7 +243,7 @@ public class VariablePersistenceStrategyTest {
         log.info("---> get bean jpaSingleSessionCommandService");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        int sessionId = service.getId();
+        long sessionId = service.getIdentifier();
         log.info("---> created SingleSessionCommandService id: " + sessionId);
 
         log.info("### Starting process ###");

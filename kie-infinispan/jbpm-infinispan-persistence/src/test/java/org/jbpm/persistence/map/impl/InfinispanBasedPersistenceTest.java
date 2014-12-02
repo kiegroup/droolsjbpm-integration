@@ -50,7 +50,7 @@ public class InfinispanBasedPersistenceTest extends MapPersistenceTest {
     }
 
     @Override
-    protected StatefulKnowledgeSession disposeAndReloadSession(StatefulKnowledgeSession ksession, int ksessionId,
+    protected StatefulKnowledgeSession disposeAndReloadSession(StatefulKnowledgeSession ksession, long ksessionId,
                                                                KieBase kbase) {
         ksession.dispose();
         return InfinispanKnowledgeService.loadStatefulKnowledgeSession( ksessionId, kbase, null, createEnvironment(context) );
