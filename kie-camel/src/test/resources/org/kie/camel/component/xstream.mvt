@@ -160,7 +160,7 @@
 @declare{"testGetObject.in.2"}
 
 <batch-execution>
-    <get-object fact-handle="0:1:19419730:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:19419730:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
@@ -181,14 +181,14 @@
 @declare{"testRetractObject.in.2"}
 
 <batch-execution>
-    <retract fact-handle="0:1:16031375:-1889973673:1:DEFAULT"/>
+    <retract fact-handle="0:1:16031375:-1889973673:1:pos:DEFAULT"/>
 </batch-execution>
 @end{}
 
 @declare{"testRetractObject.in.3"}
 
 <batch-execution>
-    <get-object fact-handle="0:1:16031375:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:16031375:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
@@ -223,7 +223,7 @@
 @declare{"testModifyObject.in.2"}
 
 <batch-execution>
-    <modify fact-handle="0:1:8501308:-1889973673:1:DEFAULT">
+    <modify fact-handle="0:1:8501308:-1889973673:1:pos:DEFAULT">
         <set accessor="oldPrice" value="42"/>
         <set accessor="price" value="50"/>
     </modify>
@@ -234,14 +234,14 @@
 @declare{"testModifyObject.in.3"}
 
 <batch-execution>
-    <get-object fact-handle="0:1:8501308:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:8501308:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
 @declare{"testModifyObject.in.4"}
 
 <batch-execution>
-    <modify fact-handle="0:1:8501308:-1889973673:1:DEFAULT">
+    <modify fact-handle="0:1:8501308:-1889973673:1:pos:DEFAULT">
         <set accessor="type" value="throwException()"/>
         <set accessor="price" value="100"/>
     </modify>
@@ -252,7 +252,7 @@
 @declare{"testModifyObject.in.5"}
 
 <batch-execution>
-    <get-object fact-handle="0:1:8501308:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:8501308:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 

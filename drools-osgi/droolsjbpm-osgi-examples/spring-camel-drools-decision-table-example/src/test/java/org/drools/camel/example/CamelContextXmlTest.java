@@ -16,22 +16,14 @@
 
 package org.drools.camel.example;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Collection;
-
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
-import org.kie.spring.InternalKieSpringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+import java.util.Collection;
 
 public class CamelContextXmlTest extends CamelSpringTestSupport {
 

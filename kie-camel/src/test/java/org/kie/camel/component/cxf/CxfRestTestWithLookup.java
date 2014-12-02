@@ -16,10 +16,8 @@
 
 package org.kie.camel.component.cxf;
 
-import org.apache.camel.test.junit4.CamelSpringTestSupport;
-import org.drools.compiler.kproject.ReleaseIdImpl;
+import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Test;
-import org.kie.spring.InternalKieSpringUtils;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
