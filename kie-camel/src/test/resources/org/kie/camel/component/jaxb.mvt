@@ -64,7 +64,7 @@
             <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:-1:20716393:20716393:3:null</value>
         </item>
         <item key="person">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:2:3112190:5463471:2:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:2:3112190:5463471:2:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -119,7 +119,7 @@
     </results>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:27806520:-1889973673:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:27806520:-1889973673:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -145,7 +145,7 @@
     <results/>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:30649454:-1889973673:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:30649454:-1889973673:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -164,7 +164,7 @@
     <results>
         <item key="out-list">
             <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper">
-                <element external-form="0:1:19458313:6714693:1:pos:DEFAULT" xsi:type="defaultFactHandle"/>
+                <element external-form="0:1:19458313:6714693:1:DEFAULT" xsi:type="defaultFactHandle"/>
             </value>
         </item>
     </results>
@@ -189,7 +189,7 @@
 @declare{"testGetObject.in.2"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <get-object fact-handle="0:1:25089808:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:25089808:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
@@ -210,14 +210,14 @@
 @declare{"testRetractObject.in.2"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <retract fact-handle="0:1:3751575:-1889973673:1:pos:DEFAULT"/>
+    <retract fact-handle="0:1:3751575:-1889973673:1:DEFAULT"/>
 </batch-execution>
 @end{}
 
 @declare{"testRetractObject.in.3"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <get-object fact-handle="0:1:3751575:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:3751575:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
@@ -249,7 +249,7 @@
     </results>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:2020896:-1889973673:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:2020896:-1889973673:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -258,7 +258,7 @@
 @declare{"testModifyObject.in.2"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <modify fact-handle="0:1:2020896:-1889973673:1:pos:DEFAULT">
+    <modify fact-handle="0:1:2020896:-1889973673:1:DEFAULT">
         <setters>
             <item accessor="oldPrice" value="42"/>
             <item accessor="price" value="50"/>
@@ -271,14 +271,14 @@
 @declare{"testModifyObject.in.3"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <get-object fact-handle="0:1:2020896:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:2020896:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
 @declare{"testModifyObject.in.4"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <modify fact-handle="0:1:2020896:-1889973673:1:pos:DEFAULT">
+    <modify fact-handle="0:1:2020896:-1889973673:1:DEFAULT">
         <setters>
             <item accessor="type" value="throwException()"/>
             <item accessor="price" value="100"/>
@@ -291,7 +291,7 @@
 @declare{"testModifyObject.in.5"}
 <?xml version="1.0" encoding="UTF-8"?>
 <batch-execution>
-    <get-object fact-handle="0:1:2020896:-1889973673:1:pos:DEFAULT" out-identifier="outStilton"/>
+    <get-object fact-handle="0:1:2020896:-1889973673:1:DEFAULT" out-identifier="outStilton"/>
 </batch-execution>
 @end{}
 
@@ -402,8 +402,8 @@
     <facts>
         <item key="myfacts">
             <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="jaxbListWrapper">
-                <element external-form="0:1:4329028:-1889973673:1:pos:DEFAULT" xsi:type="defaultFactHandle"/>
-                <element external-form="0:2:11970043:-1889973518:2:pos:DEFAULT" xsi:type="defaultFactHandle"/>
+                <element external-form="0:1:4329028:-1889973673:1:DEFAULT" xsi:type="defaultFactHandle"/>
+                <element external-form="0:2:11970043:-1889973518:2:DEFAULT" xsi:type="defaultFactHandle"/>
             </value>
         </item>
     </facts>
@@ -465,7 +465,7 @@
     </results>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:14649554:-1889974293:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:14649554:-1889974293:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -521,7 +521,7 @@
     </results>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:8855997:-1889973673:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:8855997:-1889973673:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -621,12 +621,12 @@
                 </results>
                 <fact-handles>
                     <item xmlns:ns3="http://jaxb.dev.java.net/array" xsi:type="ns3:anyTypeArray">
-                        <item external-form="0:3:29292935:742337872:3:pos:DEFAULT" xsi:type="defaultFactHandle"/>
-                        <item external-form="0:1:18538167:-1889974386:1:pos:DEFAULT" xsi:type="defaultFactHandle"/>
+                        <item external-form="0:3:29292935:742337872:3:DEFAULT" xsi:type="defaultFactHandle"/>
+                        <item external-form="0:1:18538167:-1889974386:1:DEFAULT" xsi:type="defaultFactHandle"/>
                     </item>
                     <item xmlns:ns3="http://jaxb.dev.java.net/array" xsi:type="ns3:anyTypeArray">
-                        <item external-form="0:2:2419450:742337841:2:pos:DEFAULT" xsi:type="defaultFactHandle"/>
-                        <item external-form="0:4:15736146:-1889974417:4:pos:DEFAULT" xsi:type="defaultFactHandle"/>
+                        <item external-form="0:2:2419450:742337841:2:DEFAULT" xsi:type="defaultFactHandle"/>
+                        <item external-form="0:4:15736146:-1889974417:4:DEFAULT" xsi:type="defaultFactHandle"/>
                     </item>
                 </fact-handles>
             </value>
@@ -695,7 +695,7 @@
     </results>
     <facts>
         <item key="outBrie">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:4:2742328:3033699:4:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:4:2742328:3033699:4:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
@@ -796,7 +796,7 @@
     </results>
     <facts>
         <item key="outStilton">
-            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:31196317:-1889973673:1:pos:DEFAULT</value>
+            <value xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">0:1:31196317:-1889973673:1:DEFAULT</value>
         </item>
     </facts>
 </execution-results>
