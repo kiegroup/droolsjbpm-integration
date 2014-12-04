@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
+import org.kie.internal.jaxb.StringKeyStringValueMapXmlAdapter;
 
 @XmlRootElement(name="process-definition")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -62,7 +63,7 @@ public class JaxbProcessDefinition implements Serializable {
     private Map<String, String> forms = new HashMap<String, String>();
 
     @XmlElement
-    @XmlJavaTypeAdapter(value=StringKeyObjectValueMapXmlAdapter.class)
+    @XmlJavaTypeAdapter(value=StringKeyStringValueMapXmlAdapter.class)
     private Map<String, String> variables = new HashMap<String, String>();
     
     public JaxbProcessDefinition() { 
