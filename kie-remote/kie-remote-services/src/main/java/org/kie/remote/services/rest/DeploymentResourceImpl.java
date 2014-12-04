@@ -19,6 +19,7 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDesc
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinitionList;
+import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,5 +111,21 @@ public class DeploymentResourceImpl extends ResourceBase {
         JaxbProcessDefinitionList resultList 
             = paginateAndCreateResult(pageInfo, jaxbProcDefList.getProcessDefinitionList(), new JaxbProcessDefinitionList());
         return createCorrectVariant(resultList, headers);
+    }
+
+    @POST
+    @Path("/activate")
+    public Response activate() {
+        deployResourceBase.activate(deploymentId);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
+
+    }
+
+    @POST
+    @Path("/deactivate")
+    public Response deactivate() {
+        deployResourceBase.deactivate(deploymentId);
+        return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
+
     }
 }

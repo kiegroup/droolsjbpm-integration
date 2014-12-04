@@ -404,4 +404,12 @@ public class DeployResourceBase extends ResourceBase {
             }
         }
     }
+
+    public void activate(String deploymentId) {
+        deploymentService.activate(deploymentId);
+    }
+
+    public void deactivate(String deploymentId) {
+        deploymentService.deactivate(deploymentId);
+    }
 }
