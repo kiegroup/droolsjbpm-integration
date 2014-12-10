@@ -54,10 +54,11 @@ public class KieSpringTaskJpaManager extends AbstractKieSpringJpaManager
                 cmdScopedEntityManager.clear();
             }
 
-            TransactionSynchronizationManager.unbindResource("cmdEM");
+
             if (this.env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER) != null) {
                 getPersistenceContext().close();
             }
+            TransactionSynchronizationManager.unbindResource("cmdEM");
         }
 
         if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
