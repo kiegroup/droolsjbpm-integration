@@ -16,6 +16,9 @@
 
 package org.kie.spring.persistence;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -93,7 +96,9 @@ public abstract class AbstractKieSpringJpaManager
             } else {
                 em = emHolder.getEntityManager();
             }
-            this.env.set(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, em);
+            cmdScopedEntityManager = em;
+            this.env.set(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                                                new Class[]{EntityManager.class}, new EmHolderDelegateInvocationHandler()));
         }
         return cmdScopedEntityManager;
     }
@@ -116,5 +121,32 @@ public abstract class AbstractKieSpringJpaManager
         }
     }
 
+    /**
+     * Invocation handler to allow proper (thread safe) usage of Spring entity managers
+     * that are taken from EntityManagerHolder which binds em instances to a thread.
+     * It is required as entity manager is stored in Environment that can be accessed by multiple
+     * threads working on same ksession so to mitigate that proxy with this handler is placed in environment
+     * instead of actual entity manager instance
+     */
+    private class EmHolderDelegateInvocationHandler implements InvocationHandler {
+
+        @Override
+        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+            EntityManagerHolder delegate = (EntityManagerHolder)TransactionSynchronizationManager.getResource("cmdEM");
+
+            if (delegate == null && method.getName().equals("isOpen")) {
+                return false;
+            }
+            try {
+                return method.invoke(delegate.getEntityManager(), objects);
+            } catch (Throwable e) {
+                if (e.getCause() != null) {
+                    throw e.getCause();
+                }
+
+                throw e;
+            }
+        }
+    }
 
 }
