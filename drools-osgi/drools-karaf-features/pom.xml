@@ -32,8 +32,11 @@
     <!--<karaf.version.org.jboss.weld>${version.org.jboss.weld}</karaf.version.org.jboss.weld>-->
     <!--<karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>-->
     <!-- TODO Instead of hard coding them and using maven filtering, we should use the karaf features-maven-plugin -->
-    <karaf.version.org.apache.camel>2.12.2</karaf.version.org.apache.camel>
+    <!--<karaf.version.org.apache.camel>2.12.2</karaf.version.org.apache.camel>
+    <karaf.version.org.apache.camel>2.14.0</karaf.version.org.apache.camel>
     <karaf.version.org.apache.cxf>2.6.6</karaf.version.org.apache.cxf>
+    <karaf.version.org.apache.cxf>2.7.11</karaf.version.org.apache.cxf>-->
+
     <karaf.version.org.apache.helix>0.6.1-incubating</karaf.version.org.apache.helix>
     <karaf.version.com.google.protobuf>2.5.0</karaf.version.com.google.protobuf>
     <karaf.version.joda-time>1.6.2</karaf.version.joda-time>
