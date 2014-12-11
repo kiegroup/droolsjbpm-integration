@@ -18,6 +18,7 @@ package org.drools.karaf.itest;
 
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.apache.karaf.features.FeaturesService;
 import org.drools.camel.example.Person;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
@@ -54,6 +56,7 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
 
     @Test
     public void testRuleOnCommand() throws Exception {
+
         Person person = new Person();
         person.setName("Young Scott");
         person.setAge(18);
@@ -107,10 +110,10 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Load Spring DM Karaf Feature
-                features(
+                /*features(
                         maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
                         "spring", "spring-dm"
-                ),
+                ),*/
 
                 // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),

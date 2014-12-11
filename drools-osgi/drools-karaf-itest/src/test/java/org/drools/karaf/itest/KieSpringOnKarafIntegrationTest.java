@@ -231,10 +231,10 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
 //                debugConfiguration("5005", true),
 
                 // Load Spring DM Karaf Feature
-                features(
+/*                features(
                         maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
                         "spring", "spring-dm"
-                        ),
+                        ),*/
 
                 // Load Kie-Spring
                 loadDroolsKieFeatures("jbpm-spring-persistent")
