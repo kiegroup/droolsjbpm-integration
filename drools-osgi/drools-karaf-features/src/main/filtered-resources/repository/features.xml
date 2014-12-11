@@ -4,8 +4,8 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <repository>mvn:org.apache.camel.karaf/apache-camel/${karaf.version.org.apache.camel}/xml/features</repository>
-    <repository>mvn:org.apache.cxf.karaf/apache-cxf/${karaf.version.org.apache.cxf}/xml/features</repository>
+    <repository>mvn:org.apache.camel.karaf/apache-camel/${version.org.apache.camel}/xml/features</repository>
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/${version.org.apache.cxf}/xml/features</repository>
 
     <feature name="drools-common" version="${version.org.drools}" description="Drools Commons">
         <feature version="[2.6,3.0)">cxf-specs</feature>
@@ -42,8 +42,8 @@
     <feature name="drools5-camel" version="${version.org.drools}" description="Drools5 Camel">
         <feature version="${version.org.drools}">drools-module</feature>
         <feature version="${version.org.drools}">drools5-spring</feature>
-        <feature version="${karaf.version.org.apache.camel}">camel</feature>
-        <feature version="${karaf.version.org.apache.camel}">camel-cxf</feature>
+        <feature version="${version.org.apache.camel}">camel</feature>
+        <feature version="${version.org.apache.camel}">camel-cxf</feature>
         <feature version="[2.6,3.0)">cxf-specs</feature>
         <feature version="[2.6,3.0)">cxf-core</feature>
         <feature version="[2.6,3.0)">cxf-jaxrs</feature>
@@ -79,6 +79,7 @@
         <feature version="${version.org.drools}">drools-jpa</feature>
         <feature version="${version.org.drools}">jbpm</feature>
         <feature version="${version.org.drools}">jbpm-human-task</feature>
+        <feature version="${version.org.springframework}}">spring</feature>
         <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
     </feature>
 
@@ -94,8 +95,8 @@
         <feature version="${version.org.drools}">kie</feature>
         <feature version="${version.org.drools}">kie-spring</feature>
         <feature version="${version.org.drools}">jbpm</feature>
-        <feature version="${karaf.version.org.apache.camel}">camel</feature>
-        <feature version="${karaf.version.org.apache.camel}">camel-cxf</feature>
+        <feature version="${version.org.apache.camel}">camel</feature>
+        <feature version="${version.org.apache.camel}">camel-cxf</feature>
         <feature version="[2.6,3.0)">cxf-specs</feature>
         <feature version="[2.6,3.0)">cxf-core</feature>
         <feature version="[2.6,3.0)">cxf-jaxrs</feature>
