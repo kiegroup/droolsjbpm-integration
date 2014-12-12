@@ -16,7 +16,6 @@
 
     <properties>
         <version.org.apache.karaf>2.4.0</version.org.apache.karaf>
-        <skipTests>true</skipTests>
     </properties>
 
     <repositories>
@@ -149,14 +148,6 @@
 
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <configuration>
-                    <skipTests>${skipTests}</skipTests>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <!--TODO - Version number should be moved to BOM, ... -->
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
@@ -209,13 +200,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>integration-tests</id>
-            <properties>
-                <skipTests>false</skipTests>
-            </properties>
-        </profile>
-    </profiles>
 </project>
