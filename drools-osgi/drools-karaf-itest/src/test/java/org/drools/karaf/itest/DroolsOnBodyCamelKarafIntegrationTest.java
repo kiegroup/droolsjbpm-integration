@@ -81,12 +81,6 @@ public class DroolsOnBodyCamelKarafIntegrationTest extends OSGiIntegrationSpring
                 // Option to be used to do remote debugging
                 //debugConfiguration("5005", true),
 
-                // Load Spring DM Karaf Feature
-                features(
-                        maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
-                        "spring", "spring-dm"
-                        ),
-
                 // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),
 

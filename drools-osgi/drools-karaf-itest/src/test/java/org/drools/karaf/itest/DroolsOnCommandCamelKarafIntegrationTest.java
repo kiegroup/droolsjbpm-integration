@@ -109,12 +109,6 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
                 keepRuntimeFolder(),
                 logLevel(LogLevelOption.LogLevel.INFO),
 
-                // Load Spring DM Karaf Feature
-                /*features(
-                        maven().groupId("org.apache.karaf.assemblies.features").artifactId("standard").type("xml").classifier("features").versionAsInProject(),
-                        "spring", "spring-dm"
-                ),*/
-
                 // Load camel-core, camel-spring, camel-test & camel-cxf Features
                 loadCamelFeatures("camel-cxf"),
 
