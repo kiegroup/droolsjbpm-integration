@@ -239,6 +239,7 @@
             <Import-Package>
               !org.kie.spring*,
               !org.drools.container.spring.beans.persistence,
+              =javax.persistence.criteria;resolution:=optional,
               *
             </Import-Package>
             <Export-Package>
