@@ -56,7 +56,9 @@ public class AuditServiceClientCommandObject extends AbstractRemoteCommandObject
 
     @Override
     public List<? extends NodeInstanceLog> findNodeInstances( long processInstanceId ) {
-        return (List<NodeInstanceLog>) executeCommand(new org.kie.remote.jaxb.gen.FindNodeInstancesCommand());
+        FindNodeInstancesCommand cmd = new FindNodeInstancesCommand();
+        cmd.setProcessInstanceId(processInstanceId);
+        return (List<NodeInstanceLog>) executeCommand(cmd);
     }
 
     @Override
