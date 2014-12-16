@@ -1,5 +1,8 @@
 package org.kie.remote.services.jms.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 
@@ -23,36 +26,62 @@ public class BackupIdentityProviderProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestMessageBean.class);
     
-    private RequestScopedBackupIdentityProvider backupIdentityProvider = null;
+    private IdentityProvider identityProvider = null;
     
-    public RequestScopedBackupIdentityProvider createBackupIdentityProvider(String commandUser) {
+    public IdentityProvider createBackupIdentityProvider(String commandUser, List<String> roles) {
         logger.debug( "Creating identity provider for user: {}", commandUser);
         if( commandUser == null ) { 
             commandUser = RequestScopedBackupIdentityProvider.UNKNOWN;
         }
         final String nameValue = commandUser;
-        this.backupIdentityProvider =  new RequestScopedBackupIdentityProvider() {
+        final List<String> rolesValue = new ArrayList<String>(roles);
+        this.identityProvider =  new IdentityProvider() {
+            
             private String name = nameValue;
+            private List<String> roles = rolesValue;
+            
             @Override
             public String getName() {
                 return name;
             }
+            
+            @Override
+            public List<String> getRoles() {
+                return roles;
+            }
+            
+            @Override
+            public boolean hasRole( String role ) {
+                return roles.contains(role);
+            }
         };
-        return this.backupIdentityProvider;
+        
+        return this.identityProvider;
     }
     
     @Produces
     @RequestScoped
-    public RequestScopedBackupIdentityProvider getJmsRequestScopeIdentityProvider() {
-        if (this.backupIdentityProvider != null) {
-            logger.debug( "Producing backup identity bean for user: {}" , this.backupIdentityProvider.getName() );
-            return this.backupIdentityProvider;
+    public IdentityProvider getJmsRequestScopeIdentityProvider() {
+        if (this.identityProvider != null) {
+            logger.debug( "Producing backup identity bean for user: {}" , this.identityProvider.getName() );
+            return this.identityProvider;
         } else {
+            logger.debug( "Unknown user during JMS request" );
             // in case there is none set return dummy one as @RequestScoped producers cannot return null
-            return new RequestScopedBackupIdentityProvider() {
+            return new IdentityProvider() {
                 @Override
                 public String getName() {
                     return RequestScopedBackupIdentityProvider.UNKNOWN;
+                }
+
+                @Override
+                public List<String> getRoles() {
+                    return new ArrayList<String>();
+                }
+
+                @Override
+                public boolean hasRole( String role ) {
+                    return false;
                 }
             };
         }
