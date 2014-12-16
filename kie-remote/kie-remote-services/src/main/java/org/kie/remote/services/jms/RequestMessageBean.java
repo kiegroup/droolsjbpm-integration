@@ -196,7 +196,6 @@ public class RequestMessageBean implements MessageListener {
         JaxbCommandsRequest cmdsRequest = deserializeRequest(message, msgCorrId, serializationProvider, serializationType);
 
         // 2. security/identity
-        backupIdentityProviderProducer.createBackupIdentityProvider(cmdsRequest.getUser());
         cmdsRequest.setUserPass(getUserPass(message));
 
         // 3. process request
@@ -330,10 +329,12 @@ public class RequestMessageBean implements MessageListener {
                         jaxbResponse.addException(uoe, i, cmd, FORBIDDEN);
                         continue;
                     }
-                    
+
+                    List<String> userRoles = new ArrayList<String>();
                     if( cmd instanceof TaskCommand && userGroupAdapter == null ) { 
-                        userGroupAdapter = getUserFromMessageAndLookupAndInjectGroups(request.getUserPass());
+                        userGroupAdapter = getUserFromMessageAndLookupAndInjectGroups(request.getUserPass(), userRoles);
                     }
+                    backupIdentityProviderProducer.createBackupIdentityProvider(request.getUser(), userRoles);
 
                     // if the JTA transaction (in HT or the KieSession) doesn't commit, that will cause message reception to be *NOT* acknowledged!
                     processRequestBean.processCommand(cmd, request, i, jaxbResponse);
@@ -360,7 +361,7 @@ public class RequestMessageBean implements MessageListener {
      * 
      * @param msg The JMS {@link Message} received.
      */
-    private UserGroupAdapter getUserFromMessageAndLookupAndInjectGroups(String [] userPass) {
+    private UserGroupAdapter getUserFromMessageAndLookupAndInjectGroups(String [] userPass, List<String> userRoles) {
         UserGroupAdapter jmsUserGroupAdapter = null;
         try {
             if( userPass == null ) { 
@@ -376,10 +377,11 @@ public class RequestMessageBean implements MessageListener {
             String [] rolesArr = new String[roles.size()];
             for( int i = 0; i < rolesArr.length; ++i ) { 
                 rolesArr[i] = roles.get(i).getName();
+                userRoles.add(rolesArr[i]);
             }
             UserGroupAdapter newUserGroupAdapter = new JmsUserGroupAdapter(userPass[0], rolesArr);
-            JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(newUserGroupAdapter);
             jmsUserGroupAdapter = newUserGroupAdapter;
+            JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(newUserGroupAdapter);
         } catch (Exception e) {
             logger.warn("Unable to retrieve group information for user in message: " + e.getMessage(), e);
         } 
