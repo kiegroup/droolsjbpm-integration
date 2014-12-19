@@ -12,7 +12,7 @@
   <artifactId>droolsjbpm-osgi-examples</artifactId>
   <packaging>pom</packaging>
 
-  <name>Drools jBPPM :: OSGI Examples</name>
+  <name>Drools jBPPM :: OSGi Examples</name>
 
   <modules>
     <module>spring-camel-drools-decision-table-example</module>

@@ -13,7 +13,7 @@
   <artifactId>drools-osgi</artifactId>
   <packaging>pom</packaging>
 
-  <name>Drools :: OSGI Parent project</name>
+  <name>Drools :: OSGi Parent project</name>
 
   <modules>
     <module>drools-karaf-features</module>
