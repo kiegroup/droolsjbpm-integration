@@ -163,8 +163,8 @@
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
     </feature>
 
-    <!-- Spring jBPM Persistent OSGI -->
-    <feature name="jbpm-spring-persistent" version="${version.org.drools}" description="jBPM Spring OSGI Example">
+    <!-- Spring jBPM Persistent OSGi -->
+    <feature name="jbpm-spring-persistent" version="${version.org.drools}" description="jBPM Spring OSGi Example">
         <feature version="${version.org.drools}">jbpm</feature>
         <feature version="${project.version}">lib</feature>
         <feature>spring-dm</feature>

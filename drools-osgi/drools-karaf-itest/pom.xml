@@ -163,7 +163,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>org.drools.test.osgi.kie-spring</Bundle-SymbolicName>
-            <Bundle-Name>Drools OSGI :: Test :: Kie Spring</Bundle-Name>
+            <Bundle-Name>Drools OSGi :: Test :: Kie Spring</Bundle-Name>
             <Import-Package>*</Import-Package>
           </instructions>
         </configuration>
