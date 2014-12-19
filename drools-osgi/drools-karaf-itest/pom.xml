@@ -169,29 +169,6 @@
         </configuration>
       </plugin>
 
-      <!-- this keeps the droolsjbpm-integration build from breaking.. @#$@#$@#.. -->
-      <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <executions>
-          <execution>
-            <id>fix-broken-junit-reports</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>replace</goal>
-            </goals>
-            <configuration>
-              <ignoreErrors>true</ignoreErrors>
-              <basedir>${project.build.directory}/failsafe-reports</basedir>
-              <includes>
-                <include>TEST*xml</include>
-              </includes>
-              <unescape>true</unescape>
-              <tokenValueMap>${basedir}/replace-tokenFile.txt</tokenValueMap>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 </project>
