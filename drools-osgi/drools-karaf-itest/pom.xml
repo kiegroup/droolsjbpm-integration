@@ -13,14 +13,6 @@
 
   <name>Drools :: Karaf iTest</name>
 
-  <repositories>
-    <repository>
-      <id>apache</id>
-      <!-- <url>http://repo1.maven.org/maven2/</url> -->
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
