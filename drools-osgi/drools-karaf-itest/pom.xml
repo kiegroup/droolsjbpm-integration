@@ -14,10 +14,6 @@
     <name>Drools :: Karaf iTest</name>
     <!-- <packaging>bundle</packaging> -->
 
-    <properties>
-        <version.org.apache.karaf>2.4.0</version.org.apache.karaf>
-    </properties>
-
     <repositories>
         <repository>
             <id>apache</id>
