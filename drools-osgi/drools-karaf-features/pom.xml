@@ -20,23 +20,17 @@
       - If a property relates to a version property in kie-parent-with-dependencies or jboss-integration-platform-bom,
         then it must follow the pattern "karaf.[servicemix.]{relatedVersionPropertyName}".
     -->
+    <!-- TODO we should use the karaf features-maven-plugin -->
     <!-- Normal reuses -->
-    <!-- TODO Because these properties moved into the jboss-integration-platform-bom, we can't use them directly: -->
-    <!--<karaf.version.org.apache.helix>${version.org.apache.helix}</karaf.version.org.apache.helix>-->
-    <!--<karaf.version.com.google.protobuf>${version.com.google.protobuf}</karaf.version.com.google.protobuf>-->
-    <!--<karaf.version.joda-time>${version.joda-time}</karaf.version.joda-time>-->
-    <!--<karaf.version.org.jboss.solder>${version.org.jboss.solder}</karaf.version.org.jboss.solder>-->
-    <!--<karaf.version.org.jboss.seam>${version.org.jboss.seam}</karaf.version.org.jboss.seam>-->
-    <!--<karaf.version.org.jboss.weld>${version.org.jboss.weld}</karaf.version.org.jboss.weld>-->
-    <!--<karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>-->
-
-    <!-- TODO Instead of hard coding them and using maven filtering, we should use the karaf features-maven-plugin -->
-    <karaf.version.org.apache.helix>0.6.1-incubating</karaf.version.org.apache.helix>
-    <karaf.version.com.google.protobuf>2.5.0</karaf.version.com.google.protobuf>
-    <karaf.version.joda-time>1.6.2</karaf.version.joda-time>
-    <karaf.version.org.jboss.solder>3.2.0.Final</karaf.version.org.jboss.solder>
-    <karaf.version.org.jboss.seam>3.1.0.Final</karaf.version.org.jboss.seam>
-    <karaf.version.org.jboss.weld>1.1.13.Final</karaf.version.org.jboss.weld>
+    <karaf.version.org.apache.camel>${version.org.apache.camel}</karaf.version.org.apache.camel>
+    <karaf.version.org.apache.cxf>${version.org.apache.cxf}</karaf.version.org.apache.cxf>
+    <karaf.version.org.apache.helix>${version.org.apache.helix}</karaf.version.org.apache.helix>
+    <karaf.version.com.google.protobuf>${version.com.google.protobuf}</karaf.version.com.google.protobuf>
+    <karaf.version.joda-time>${version.joda-time}</karaf.version.joda-time>
+    <karaf.version.org.jboss.solder>${version.org.jboss.solder}</karaf.version.org.jboss.solder>
+    <karaf.version.org.jboss.seam>${version.org.jboss.seam}</karaf.version.org.jboss.seam>
+    <karaf.version.org.jboss.weld>${version.org.jboss.weld.weld}</karaf.version.org.jboss.weld>
+    <karaf.version.org.mvel>${version.org.mvel}</karaf.version.org.mvel>
     <!-- Overwrites with a different Maven version -->
     <karaf.version.commons-codec>1.7</karaf.version.commons-codec>
     <karaf.version.javax.enterprise.cdi>1.0-SP4</karaf.version.javax.enterprise.cdi>
