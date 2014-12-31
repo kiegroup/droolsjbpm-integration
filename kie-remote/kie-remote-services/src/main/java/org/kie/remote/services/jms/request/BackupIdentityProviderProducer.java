@@ -1,6 +1,5 @@
 package org.kie.remote.services.jms.request;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -26,33 +25,22 @@ public class BackupIdentityProviderProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestMessageBean.class);
     
-    private IdentityProvider identityProvider = null;
+    private RequestScopedBackupIdentityProvider identityProvider = null;
     
-    public IdentityProvider createBackupIdentityProvider(String commandUser, List<String> roles) {
+    public RequestScopedBackupIdentityProvider createBackupIdentityProvider(String commandUser, List<String> roles) {
         logger.debug( "Creating identity provider for user: {}", commandUser);
         if( commandUser == null ) { 
             commandUser = RequestScopedBackupIdentityProvider.UNKNOWN;
         }
         final String nameValue = commandUser;
-        final List<String> rolesValue = new ArrayList<String>(roles);
-        this.identityProvider =  new IdentityProvider() {
+        
+        this.identityProvider =  new RequestScopedBackupIdentityProvider() {
             
             private String name = nameValue;
-            private List<String> roles = rolesValue;
             
             @Override
             public String getName() {
                 return name;
-            }
-            
-            @Override
-            public List<String> getRoles() {
-                return roles;
-            }
-            
-            @Override
-            public boolean hasRole( String role ) {
-                return roles.contains(role);
             }
         };
         
@@ -61,28 +49,20 @@ public class BackupIdentityProviderProducer {
     
     @Produces
     @RequestScoped
-    public IdentityProvider getJmsRequestScopeIdentityProvider() {
+    public RequestScopedBackupIdentityProvider getJmsRequestScopeIdentityProvider() {
         if (this.identityProvider != null) {
             logger.debug( "Producing backup identity bean for user: {}" , this.identityProvider.getName() );
             return this.identityProvider;
         } else {
             logger.debug( "Unknown user during JMS request" );
             // in case there is none set return dummy one as @RequestScoped producers cannot return null
-            return new IdentityProvider() {
+            return new RequestScopedBackupIdentityProvider() {
+                
                 @Override
                 public String getName() {
                     return RequestScopedBackupIdentityProvider.UNKNOWN;
                 }
 
-                @Override
-                public List<String> getRoles() {
-                    return new ArrayList<String>();
-                }
-
-                @Override
-                public boolean hasRole( String role ) {
-                    return false;
-                }
             };
         }
     }
