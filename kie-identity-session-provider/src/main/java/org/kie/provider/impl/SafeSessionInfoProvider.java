@@ -16,9 +16,10 @@ import org.jboss.errai.security.shared.api.identity.UserImpl;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.provider.SessionInfoProvider;
 import org.uberfire.rpc.SessionInfo;
+import java.io.Serializable;
 
 @SessionScoped
-public class SafeSessionInfoProvider implements SessionInfoProvider {
+public class SafeSessionInfoProvider implements SessionInfoProvider, Serializable  {
 
     @Inject
     private Instance<SessionInfo> delegate;
