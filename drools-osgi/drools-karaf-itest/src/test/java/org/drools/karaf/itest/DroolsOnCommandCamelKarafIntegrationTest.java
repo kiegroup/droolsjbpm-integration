@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.slf4j.Logger;
@@ -103,7 +104,8 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
 
     @Configuration
     public static Option[] configure() {
-        return new Option[]{
+        return OptionUtils.combine(
+                CommonKarafOptions.get(),
                 getKarafDistributionOption(),
 
                 keepRuntimeFolder(),
@@ -113,10 +115,8 @@ public class DroolsOnCommandCamelKarafIntegrationTest extends OSGiIntegrationSpr
                 loadCamelFeatures("camel-cxf"),
 
                 // Load drools-module (= core + compiler + knowledge), kie-camel & kie-spring
-                loadDroolsFeatures("kie-spring","kie-camel")
-
-        };
-
+                loadDroolsFeatures("kie-spring", "kie-camel")
+        );
     }
 
 }
