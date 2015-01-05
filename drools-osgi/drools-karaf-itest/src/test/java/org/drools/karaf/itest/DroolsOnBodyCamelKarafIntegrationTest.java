@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import static org.drools.osgi.spring.OsgiApplicationContextFactory.getOsgiSpringContext;
-import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 @RunWith(PaxExam.class)
@@ -43,7 +43,7 @@ public class DroolsOnBodyCamelKarafIntegrationTest extends OSGiIntegrationSpring
     @Produce(ref = "ruleOnBodyEndpoint")
     protected ProducerTemplate ruleOnBodyEndpoint;
 
-    //@Override
+    @Override
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
         return getOsgiSpringContext(new ReleaseIdImpl("dummyGroup", "dummyArtifact", "dummyVersion"),
                                     DroolsOnBodyCamelKarafIntegrationTest.class.getResource("/org/drools/karaf/itest/camel-context.xml"));
@@ -72,7 +72,8 @@ public class DroolsOnBodyCamelKarafIntegrationTest extends OSGiIntegrationSpring
 
     @Configuration
     public static Option[] configure() {
-        return new Option[] {
+        return OptionUtils.combine(
+                CommonKarafOptions.get(),
                 getKarafDistributionOption(),
 
                 keepRuntimeFolder(),
@@ -85,9 +86,7 @@ public class DroolsOnBodyCamelKarafIntegrationTest extends OSGiIntegrationSpring
                 loadCamelFeatures("camel-cxf"),
 
                 // Load drools-module (= core + compiler + knowledge), kie-camel & kie-spring
-                loadDroolsFeatures("kie-spring","kie-camel")
-        };
-
+                loadDroolsFeatures("kie-spring", "kie-camel")
+        );
     }
-
 }

@@ -35,6 +35,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -105,8 +106,8 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
     
     @Configuration
     public static Option[] configure() {
-        return new Option[]{
-
+        return OptionUtils.combine(
+                CommonKarafOptions.get(),
                 // Install Karaf Container
                 getKarafDistributionOption(),
 
@@ -119,16 +120,14 @@ public class KieSpringOnKarafIntegrationTest extends KieSpringIntegrationTestSup
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-//                debugConfiguration("5005", true),
+                //  debugConfiguration("5005", true),
 
                 // Load camel-test as it is required by pax-exam
                 loadCamelFeatures(),
 
                 // Load Kie-Spring
                 loadDroolsKieFeatures("kie-spring")
-
-        };
-
+        );
     }
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
