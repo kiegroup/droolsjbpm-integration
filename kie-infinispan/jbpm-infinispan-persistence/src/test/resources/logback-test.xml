@@ -9,15 +9,15 @@
     </encoder>
   </appender>
 
-    <!-- bitronix -->   
-    <logger name="bitronix.tm" level="warn"/ >
-    
-    <logger name="org.hibernate.tool.hbm2ddl" level="warn">
-    <logger name="org.hibernate.hql.internal" level="warn" />
-    <logger name="org.hibernate.engine.jdbc.internal" level="warn" />
-    
+  <!-- bitronix -->
+  <logger name="bitronix.tm" level="warn"/>
+
+  <logger name="org.hibernate.tool.hbm2ddl" level="warn"/>
+  <logger name="org.hibernate.hql.internal" level="warn"/>
+  <logger name="org.hibernate.engine.jdbc.internal" level="warn"/>
+
   <root level="info">
-    <appender-ref ref="consoleAppender" />
+    <appender-ref ref="consoleAppender"/>
   </root>
 
 </configuration>
