@@ -65,6 +65,7 @@
     <module>drools-osgi-integration</module>
     <module>kie-server</module>
     <module>kie-examples-api</module>
+    <module>kie-identity-session-provider</module>
   </modules>
 
   <profiles>
