@@ -99,7 +99,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
     public void testJmsAuditCommandWithoutDeploymentId() {
         setupTaskMocks(this, FOR_PROCESS_TASKS);
 
-        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        // run cmd (no deploymentId set on JaxbCommandsRequest object
         JaxbCommandsRequest 
         cmdsRequest = new JaxbCommandsRequest(new FindProcessInstancesCommand());
         JaxbCommandsResponse 
@@ -111,7 +111,7 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         responseObj = response.getResponses().get(0);
         assertFalse( "Command did not complete successfully", responseObj instanceof JaxbExceptionResponse );
         
-        // run cmd (no deploymentId set on JaxbConmandsRequest object
+        // run cmd (no deploymentId set on JaxbCommandsRequest object
         cmdsRequest = new JaxbCommandsRequest(new ClearHistoryLogsCommand());
         cmdsRequest.setVersion(ServicesVersion.VERSION);
         response = this.jmsProcessJaxbCommandsRequest(cmdsRequest);

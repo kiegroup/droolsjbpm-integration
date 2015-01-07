@@ -75,7 +75,7 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
     }
 
     @Test
-    public void startProcessAndDoStuffPerProcessStartegyTest() throws Exception {
+    public void startProcessAndDoStuffPerProcessStrategyTest() throws Exception {
         // This method does some static mock magic to make sure 
         // - that EmptyContext.get() throws an exception if it is called here (since a ProcessInstanceIdContext should be used instead)
         // - that a process instance id *is* used in the second call in the constructor of the ProcessInstanceIdContext
