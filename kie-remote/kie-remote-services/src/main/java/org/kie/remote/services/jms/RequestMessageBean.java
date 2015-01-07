@@ -89,7 +89,7 @@ public class RequestMessageBean implements MessageListener {
     protected ProcessRequestBean processRequestBean;
 
     @Inject
-    private BackupIdentityProviderProducer backupIdentityProviderProducer;
+    protected BackupIdentityProviderProducer backupIdentityProviderProducer;
 
     @Inject
     private DynamicJaxbContext dynamicJaxbContext;
