@@ -28,10 +28,12 @@ import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.shared.ServicesVersion;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -68,6 +70,8 @@ public class JmsStartProcessEveryStrategyTest extends RequestMessageBean impleme
         this.processRequestBean = new ProcessRequestBean();
         this.processRequestBean.setProcessService(processServiceMock);
         this.processRequestBean.setUserTaskService(userTaskServiceMock);
+
+        this.backupIdentityProviderProducer = Mockito.mock(BackupIdentityProviderProducer.class);
     }
 
     @Test

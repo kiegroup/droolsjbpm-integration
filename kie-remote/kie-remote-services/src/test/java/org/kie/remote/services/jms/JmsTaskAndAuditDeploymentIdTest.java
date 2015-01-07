@@ -30,9 +30,11 @@ import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.shared.ServicesVersion;
+import org.mockito.Mockito;
 
 @SuppressWarnings("unchecked")
 public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implements TaskDeploymentIdTest {
@@ -61,6 +63,8 @@ public class JmsTaskAndAuditDeploymentIdTest extends RequestMessageBean implemen
         doReturn(new ArrayList<ProcessInstanceLog>()).when(auditLogService).findProcessInstances();
         doNothing().when(auditLogService).clear();
         this.processRequestBean.setAuditLogService(auditLogService);
+
+        this.backupIdentityProviderProducer = Mockito.mock(BackupIdentityProviderProducer.class);
     }
 
     @Test
