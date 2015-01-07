@@ -449,7 +449,7 @@ public class KieServerImpl {
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ". ReleaseId is null. ");
         }
         try {
-            KieContainerInstance kci = (KieContainerInstance) context.getContainer(id);
+            KieContainerInstance kci = context.getContainer(id);
             // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it
             // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent 
             // call do dispose() is executed.
