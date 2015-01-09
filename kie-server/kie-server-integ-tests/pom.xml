@@ -269,9 +269,9 @@
       </build>
     </profile>
     <profile>
-      <id>wildfly8x</id>
+      <id>wildfly81x</id>
       <properties>
-        <wildfly8x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly8x.download.url>
+        <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
       </properties>
       <build>
         <plugins>
@@ -283,7 +283,35 @@
                 <containerId>wildfly8x</containerId>
                 <type>installed</type>
                 <zipUrlInstaller>
-                  <url>${wildfly8x.download.url}</url>
+                  <url>${wildfly81x.download.url}</url>
+                </zipUrlInstaller>
+              </container>
+              <deployables>
+                <deployable>
+                  <classifier>ee7</classifier>
+                </deployable>
+              </deployables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>wildfly82x</id>
+      <properties>
+        <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration combine.self="append">
+              <container>
+                <containerId>wildfly8x</containerId>
+                <type>installed</type>
+                <zipUrlInstaller>
+                  <url>${wildfly82x.download.url}</url>
                 </zipUrlInstaller>
               </container>
               <deployables>
