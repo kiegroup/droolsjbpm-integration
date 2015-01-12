@@ -1,5 +1,6 @@
 package org.kie.remote.services.ws.command;
 
+import javax.jws.WebParam;
 import javax.jws.WebService;
 
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
@@ -19,7 +20,7 @@ public class CommandWebServiceImpl extends ResourceBase implements CommandWebSer
     static final String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
     
     @Override
-    public JaxbCommandsResponse execute( JaxbCommandsRequest request ) throws CommandWebServiceException {
+    public JaxbCommandsResponse execute( @WebParam(name = "request") JaxbCommandsRequest request ) throws CommandWebServiceException {
         return restProcessJaxbCommandsRequest(request);
     } 
 
