@@ -156,7 +156,12 @@ public class RuntimeResource extends ResourceBase {
     public Response process_instance_procInstId_variable_varName(@PathParam("procInstId") Long procInstId,
             @PathParam("varName") String varName) {
         Object procVar =  processRequestBean.getVariableObjectInstanceFromRuntime(deploymentId, procInstId, varName);
-     
+        
+        // If this is a primitive type, there's no need to serialize
+        if(procVar instanceof String || procVar instanceof Boolean || procVar instanceof Float || procVar instanceof Integer) {
+        	return createCorrectVariant(procVar, headers);
+        }
+        
         // serialize
         QName rootElementName = getRootElementName(procVar); 
         @SuppressWarnings("rawtypes") // unknown at compile time, dynamic from deployment
