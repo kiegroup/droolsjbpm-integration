@@ -65,11 +65,12 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     // helper methods -------------------------------------------------------------------------------------------------------------
     
     private QueryFilter addLanguageFilter( String language ) {
-        QueryFilter filter = null;
+        QueryFilter filter = new QueryFilter();
         if( language != null ) {
-            filter = new QueryFilter();
             filter.setLanguage(language);
         }
+        // since we do not have hint bout number of results to return return all
+        filter.setCount(-1);
         return filter;
     }
 
