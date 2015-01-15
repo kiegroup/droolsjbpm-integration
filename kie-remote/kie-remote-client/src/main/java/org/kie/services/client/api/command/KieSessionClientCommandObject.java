@@ -272,6 +272,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         SignalEventCommand cmd = new SignalEventCommand();
         cmd.setEvent(event);
         cmd.setEventType(type);
+        cmd.setProcessInstanceId(-1);
         executeCommand(cmd);
     }
 
