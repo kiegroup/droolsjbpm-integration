@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.namespace.QName;
 
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.w3c.dom.Element;
 
 @XmlRootElement(name="variable-info")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -34,9 +35,9 @@ public class JaxbVariableInfo {
     
     public JaxbVariableInfo(String name, Object value) { 
         this.name = name;
-        if( value instanceof String ) { 
+        if( value instanceof String ) {
             this.value = getStringJaxbElement((String) value);
-        } else { 
+        } else {
             this.value = value;
         }
     }
@@ -65,12 +66,16 @@ public class JaxbVariableInfo {
         if( value instanceof JAXBElement ) { 
             return ((JAXBElement) value).getValue();
         }
+        // name of the dom element ('string') must match the one defined in QName of getStringJaxbElement method
+        if( value instanceof Element && "string".equals(((Element) value).getNodeName())) {
+            return ((Element) value).getTextContent();
+        }
         return value;
     }
 
     public void setValue( Object value ) {
-        if( value instanceof String ) { 
-           this.value = getStringJaxbElement((String) value); 
+        if( value instanceof String ) {
+           this.value = getStringJaxbElement((String) value);
         }
         this.value = value;
     }
