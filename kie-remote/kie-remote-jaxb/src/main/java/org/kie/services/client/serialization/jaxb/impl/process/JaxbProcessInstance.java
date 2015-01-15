@@ -37,6 +37,10 @@ public class JaxbProcessInstance implements ProcessInstance {
 
     @XmlElement(name="event-types")
     private List<String> eventTypes = new ArrayList<String>();
+
+    @XmlElement
+    @XmlSchemaType(name="long")
+    private long parentProcessInstanceId;
     
     public JaxbProcessInstance() { 
         // Default Constructor
@@ -51,6 +55,9 @@ public class JaxbProcessInstance implements ProcessInstance {
             this.id = processInstanceLog.getProcessInstanceId();
             this.processId = processInstanceLog.getProcessId();
             this.state = processInstanceLog.getStatus();
+            if ( processInstanceLog.getParentProcessInstanceId() != null ) {
+                this.parentProcessInstanceId = processInstanceLog.getParentProcessInstanceId();
+            }
         }
     }
 
@@ -89,6 +96,14 @@ public class JaxbProcessInstance implements ProcessInstance {
 
     public void setEventTypes(List<String> eventTypes) {
         this.eventTypes = eventTypes;
+    }
+
+    public long getParentProcessInstanceId() {
+        return this.parentProcessInstanceId;
+    }
+
+    public void setParentProcessInstanceId(long parentProcessInstanceId) {
+        this.parentProcessInstanceId = parentProcessInstanceId;
     }
 
     @Override
