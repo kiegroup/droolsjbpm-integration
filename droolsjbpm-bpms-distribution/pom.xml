@@ -178,6 +178,14 @@
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz-oracle</artifactId>
+    </dependency>
 
     <!-- Javadocs and documentation -->
     <dependency><!-- Workaround for http://jira.codehaus.org/browse/MJAVADOC-340 -->
