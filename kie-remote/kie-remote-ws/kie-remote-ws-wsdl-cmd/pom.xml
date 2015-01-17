@@ -10,7 +10,7 @@
 
   <packaging>jar</packaging>
   <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
-  <name>KIE Remote Webservices :: WSDL for the Command service</name>
+  <name>KIE Remote Webservices :: Client-side WSDL for the Command service</name>
 
   <dependencies>
     <!-- generated code -->
@@ -18,9 +18,68 @@
       <groupId>org.kie.remote.ws</groupId>
       <artifactId>kie-remote-ws-common</artifactId>
     </dependency>
+    <!-- for JaxbCommandsRe* classes -->
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-client</artifactId>
+    </dependency>
+     
+    <!-- test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+  
+    <!-- api's --> 
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.bind</groupId>
+      <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.ws</groupId>
+      <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+      
+    <!-- classes --> 
+    <dependency>
+      <groupId>org.jboss.ws</groupId>
+      <artifactId>jbossws-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ws.security</groupId>
+      <artifactId>wss4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-ws-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- jetty --> 
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -84,7 +143,7 @@
           </execution>
         </executions>
         <configuration>
-          <basedir>${project.build.directory}/classes/META-INF/wsdl</basedir>
+          <basedir>${project.build.directory}/classes/wsdl</basedir>
           <includes>
             <include>CommandService.wsdl</include>
           </includes>
@@ -115,7 +174,7 @@
               <packageName>org.kie.remote.services.ws.command.generated</packageName>
               <target>2.1</target>
               <wsdlLocation>file:///wsdl/*</wsdlLocation>
-              <wsdlDirectory>${project.build.directory}/classes/META-INF/wsdl</wsdlDirectory>
+              <wsdlDirectory>${project.build.directory}/classes/wsdl</wsdlDirectory>
               <wsdlFiles>
                 <wsdlFile>CommandService.wsdl</wsdlFile>              
               </wsdlFiles>

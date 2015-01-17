@@ -89,9 +89,9 @@
           </xs:appinfo>
         </xs:annotation>
        </xs:complexType> 
-
     </xs:schema>
   </types>
+  
   <message name="execute">
     <part name="parameters" element="tns:execute"/>
   </message>
@@ -101,7 +101,7 @@
   <message name="CommandServiceException">
     <part name="fault" element="tns:CommandServiceException"/>
   </message>
-  <portType name="CommandService">
+  <portType name="CommandServicePortType">
     <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
       <jaxws:class name="CommandWebService"/>
     </jaxws:bindings>
@@ -115,7 +115,10 @@
       </fault>
     </operation>
   </portType>
-  <binding name="CommandServicePortBinding" type="tns:CommandService">
+ 
+  <!-- Binding: Plain text -->
+  
+  <binding name="CommandServiceBasicAuthBinding" type="tns:CommandServicePortType">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
     <operation name="execute">
       <soap:operation soapAction=""/>
@@ -130,12 +133,14 @@
       </fault>
     </operation>
   </binding>
-  <service name="CommandServiceClient">
+  
+  <service name="CommandServiceBasicAuth">
     <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
-      <jaxws:class name="CommandWebServiceClient"/>
+      <jaxws:class name="CommandServiceBasicAuthClient"/>
     </jaxws:bindings>
-    <port name="CommandServicePort" binding="tns:CommandServicePortBinding">
+    <port name="CommandServiceBasicAuthPort" binding="tns:CommandServiceBasicAuthBinding">
       <soap:address location="REPLACE_WITH_ACTUAL_URL"/>
     </port>
   </service>
+  
 </definitions>

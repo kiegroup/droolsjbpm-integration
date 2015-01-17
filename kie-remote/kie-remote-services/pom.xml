@@ -325,7 +325,7 @@
           </execution>
         </executions>
         <configuration>
-          <basedir>${project.build.directory}/classes/META-INF/wsdl</basedir>
+          <basedir>${project.build.directory}/classes/wsdl</basedir>
           <includes>
             <include>CommandService.wsdl</include>
           </includes>
@@ -357,7 +357,7 @@
               <target>2.1</target>
               <!-- Following configuration will invoke wsimport once for each wsdl. -->
               <wsdlLocation>file:///wsdl/*</wsdlLocation>
-              <wsdlDirectory>${project.build.directory}/classes/META-INF/wsdl</wsdlDirectory>
+              <wsdlDirectory>${project.build.directory}/classes/wsdl</wsdlDirectory>
               <wsdlFiles>
                 <wsdlFile>CommandService.wsdl</wsdlFile>              
               </wsdlFiles>
