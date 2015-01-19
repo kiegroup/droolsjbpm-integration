@@ -62,6 +62,12 @@
 
     <!-- REST:       covered via java classes: see KieRemoteHttpRequest  -->
     <!-- jaxb/json:  covered via imports from kie-remote-jaxb -->
+   
+    <!-- Webservices --> 
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
+    </dependency>
     
     <!-- logging -->
     <dependency>

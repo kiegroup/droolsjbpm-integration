@@ -40,7 +40,7 @@ public final class RemoteConfiguration {
     
     private String userName;
     private String password;
-    private URL serverBaseRestUrl;
+    private URL serverBaseUrl;
 
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     private JaxbSerializationProvider jaxbSerializationProvider;
@@ -109,13 +109,35 @@ public final class RemoteConfiguration {
     }
 
     /**
-     * Initializes the URL that will be used for the request factory
+     * Initializes the URL that will be used for REST service access
      * 
      * @param deploymentId Deployment ID
      * @param url URL of the server instance
-     * @return An URL that can be used for the REST request factory
+     * @return An URL that can be used to access the REST services
      */
     URL initializeRestServicesUrl(URL url) {
+       return initializeServicesUrl(url, "rest");
+    }
+    
+    /**
+     * Initializes the URL that will be used for web service access
+     * 
+     * @param deploymentId Deployment ID
+     * @param url URL of the server instance
+     * @return An URL that can be used for the web services
+     */
+    URL initializeWebServicesUrl(URL url) {
+       return initializeServicesUrl(url, "ws");
+    }
+    
+    /**
+     * Initializes the URL that will be used for web service access
+     * 
+     * @param deploymentId Deployment ID
+     * @param url URL of the server instance
+     * @return An URL that can be used for the web services
+     */
+    private URL initializeServicesUrl(URL url, String servicePrefix) {
         if (url == null) {
             throw new IllegalArgumentException("The url may not be empty or null.");
         }
@@ -130,21 +152,21 @@ public final class RemoteConfiguration {
         if (!urlString.endsWith("/")) {
             urlString += "/";
         }
-        urlString += "rest";
+        urlString += servicePrefix;
 
-        URL serverPlusRestUrl;
+        URL serverPlusServicePrefixUrl;
         try {
-            serverPlusRestUrl = new URL(urlString);
+            serverPlusServicePrefixUrl = new URL(urlString);
         } catch (MalformedURLException murle) {
             throw new IllegalArgumentException(
                     "URL (" + url.toExternalForm() + ") is incorrectly formatted: " + murle.getMessage(), murle);
         }
 
-        return serverPlusRestUrl;
+        return serverPlusServicePrefixUrl;
     }
-
+    
     KieRemoteHttpRequest createHttpRequest() { 
-        return KieRemoteHttpRequest.newRequest(serverBaseRestUrl, userName, password).timeout(timeoutInMillisecs);
+        return KieRemoteHttpRequest.newRequest(serverBaseUrl, userName, password).timeout(timeoutInMillisecs);
     }
     
     // JMS ----------------------------------------------------------------------------------------------------------------------
@@ -245,11 +267,11 @@ public final class RemoteConfiguration {
     }
 
     public enum Type {
-        REST, JMS, CONSTRUCTOR;
+        REST, JMS, WS, CONSTRUCTOR;
     }
 
-    public URL getServerBaseRestUrl() { 
-        return serverBaseRestUrl;
+    public URL getServerBaseUrl() { 
+        return serverBaseUrl;
     }
     
     public String getUserName() {
@@ -334,9 +356,14 @@ public final class RemoteConfiguration {
 
     public void setServerBaseRestUrl(URL url) {
         URL checkedModifiedUrl = initializeRestServicesUrl(url);
-        this.serverBaseRestUrl = checkedModifiedUrl;
+        this.serverBaseUrl = checkedModifiedUrl;
     }
 
+    public void setServerBaseWsUrl(URL url) {
+        URL checkedModifiedUrl = initializeWebServicesUrl(url);
+        this.serverBaseUrl = checkedModifiedUrl;
+    }
+    
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -385,7 +412,7 @@ public final class RemoteConfiguration {
        this.password = config.password;
        this.processInstanceId = config.processInstanceId;
        this.responseQueue = config.responseQueue;
-       this.serverBaseRestUrl = config.serverBaseRestUrl;
+       this.serverBaseUrl = config.serverBaseUrl;
        this.taskQueue = config.taskQueue;
        this.timeoutInMillisecs = config.timeoutInMillisecs;
        this.type = config.type;
