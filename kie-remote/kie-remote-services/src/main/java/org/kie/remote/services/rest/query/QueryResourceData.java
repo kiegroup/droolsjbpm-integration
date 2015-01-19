@@ -10,8 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kie.api.task.model.Status;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class QueryResourceData {
 
@@ -60,6 +58,18 @@ public class QueryResourceData {
        "vid", "vv", 
        null, "vr",
        null
+    };
+   
+    private static final String [] nameValueParams = {
+        varInstQueryParams[2], // "var" 
+        varInstQueryParams[3], varInstQueryParamsShort[3], // "varregex"
+    };
+    
+    private static final String [] minMaxParams = {
+        generalQueryParams[0], generalQueryParamsShort[0], // process instance id
+        taskQueryParams[0], taskQueryParamsShort[0], // task id
+        procInstQueryParams[2], procInstQueryParamsShort[2], // start date
+        procInstQueryParams[3], procInstQueryParamsShort[3], // start date
     };
     
     public static final String [] metaRuntimeParams = { 
@@ -253,5 +263,23 @@ public class QueryResourceData {
           }
        }
        return result;
+    }
+   
+    public static boolean isSpecialParameter(String queryParam) { 
+        for( String allowedParam : nameValueParams ) {
+            if( queryParam.toLowerCase().startsWith(allowedParam + "_")) {
+                return true;
+            }
+        }
+        for( String allowedParam : minMaxParams ) {
+            String start = allowedParam + "_";
+            if( queryParam.toLowerCase().startsWith(start) ) { 
+                String end = queryParam.substring(start.length());
+                if( end.equals("min") || end.equals("max") ) { 
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

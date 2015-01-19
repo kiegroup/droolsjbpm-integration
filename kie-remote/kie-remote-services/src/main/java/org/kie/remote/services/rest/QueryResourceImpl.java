@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest;
 
+import static org.kie.remote.services.rest.query.QueryResourceData.isSpecialParameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -151,6 +152,10 @@ public class QueryResourceImpl extends ResourceBase {
     }
     
     public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) { 
+        checkIfParametersAreAllowed(params, allowedParams, false, oper);
+    }
+    
+    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, boolean checkSpecial, String oper ) { 
         if( params == null || params.isEmpty() )  { 
             return;
         }
@@ -160,10 +165,14 @@ public class QueryResourceImpl extends ResourceBase {
                 if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam) ) {
                     continue EACHPARAM;
                 }
+                if( checkSpecial && isSpecialParameter(queryParam) ) { 
+                    continue EACHPARAM;
+                }
             }
             throw KieRemoteRestOperationException.badRequest(queryParam
                         + " is an unknown and unsupported query param for the " + oper + " operation.");
         }
     }
     
+
 }
