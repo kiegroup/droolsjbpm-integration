@@ -59,7 +59,7 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
      * to configure and buid a remote API client {@link RuntimeEngine} instance.
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
-    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandServiceClientBuilder() { 
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandWebServiceClientBuilder() { 
        return new RemoteCommandWebserviceClientBuilderImpl();
     }
     
