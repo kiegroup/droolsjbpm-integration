@@ -19,7 +19,6 @@
     <module>kie-remote-ws-common</module>
     <module>kie-remote-ws-wsdl</module>
     <module>kie-remote-ws-impl</module>
-    <module>kie-remote-ws-wsdl-cmd</module>
   </modules>
 
   <!-- add to bom.xml -->

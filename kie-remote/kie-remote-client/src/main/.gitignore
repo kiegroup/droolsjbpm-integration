@@ -1,2 +1,3 @@
 # ignore source unpacked from the kie-remote-jaxb-gen jar
 /unpacked/
+/generated/
