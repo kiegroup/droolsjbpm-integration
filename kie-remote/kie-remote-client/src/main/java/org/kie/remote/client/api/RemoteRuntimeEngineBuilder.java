@@ -12,7 +12,7 @@ import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
  * @param <B> The builder instance type
  * @param <R> The factory instance type
  */
-public interface RemoteRuntimeEngineBuilder<B, F> {
+public interface RemoteRuntimeEngineBuilder<B, F> extends RemoteClientBuilder<B> {
 
     /**
      * Adds the deployment id to the configuration.
@@ -28,31 +28,6 @@ public interface RemoteRuntimeEngineBuilder<B, F> {
      * @return The builder instance
      */
     B addProcessInstanceId(long processInstanceId);
-    
-    /**
-     * Adds the user name used. If no other user name is specified, the user id
-     * specified is used for all purposes.
-     * 
-     * @param userName The user name
-     * @return The builder instance
-     */
-    B addUserName(String userName);
-    
-    /**
-     * Adds the password used. If no other password is specified, the password 
-     * specified is used for all purposes.
-     * 
-     * @param userName The password
-     * @return The builder instance
-     */
-    B addPassword(String password);
-    
-    /**
-     * The timeout (or otherwise the quality-of-service threshold when sending JMS msgs).
-     * @param timeoutInSeconds The timeout in seconds
-     * @return The builder instance
-     */
-    B addTimeout(int timeoutInSeconds);
     
     /**
      * When sending non-primitive class instances, it's necessary to add the class instances

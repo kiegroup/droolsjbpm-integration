@@ -50,9 +50,9 @@ import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InitialContext.class, NamingManager.class})
-public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.RemoteJmsRuntimeEngineFactory {
+public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJmsRuntimeEngineFactory {
 
-    protected static Logger logger = LoggerFactory.getLogger(RemoteRuntimeEngineBuilderTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(RemoteClientBuilderTest.class);
     
     private InitialContext remoteInitialContext = null;
     
@@ -61,7 +61,7 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
     private Queue taskQueue = null;
     private Queue responseQueue = null;
   
-    public RemoteRuntimeEngineBuilderTest() { 
+    public RemoteClientBuilderTest() { 
         super();
     }
     
@@ -666,6 +666,28 @@ public class RemoteRuntimeEngineBuilderTest extends org.kie.services.client.api.
             runtimeEngine.getKieSession().startProcess("org.test.process"); 
         } catch( MissingRequiredInfoException mrie ) { 
             // expected
+        }
+    }
+    
+    @Test
+    public void commandWebServiceClientInterfaceInheritanceTest() { 
+        try { 
+        RemoteRuntimeEngineFactory.newCommandServiceClientBuilder()
+            .addPassword("test")
+            .addUserName("tester")
+            .addServerUrl("http://test.server.com/test-app/")
+            .addServerUrl(new URL("http://test.server.com/test-app/"))
+            .addPassword("test")
+            .addUserName("tester")
+            .addServerUrl("http://test.server.com/test-app/")
+            .addServerUrl(new URL("http://test.server.com/test-app/"))
+            .addPassword("test")
+            .addUserName("tester")
+            .addServerUrl("http://test.server.com/test-app/")
+            .addServerUrl(new URL("http://test.server.com/test-app/"))
+            .buildBasicAuthClient();
+        } catch( Exception e ) { 
+            // the above just needs to compile..
         }
     }
 }

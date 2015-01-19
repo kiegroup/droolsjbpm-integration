@@ -10,10 +10,14 @@ import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.hornetq.jms.client.HornetQJMSConnectionFactory;
 import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.remote.client.api.RemoteClientBuilder;
 import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteRuntimeEngineBuilder;
+import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClient;
+import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.services.client.api.command.RemoteConfiguration;
 
 /**
@@ -51,8 +55,17 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
     public static RemoteRestRuntimeEngineBuilder newRestBuilder() { 
        return new org.kie.services.client.api.RemoteRestRuntimeEngineBuilderImpl(); 
     }
-   
-    static void checkAndFinalizeConfig(RemoteConfiguration config, RemoteRuntimeEngineBuilder builder ) {
+
+    /**
+     * Create a new {@link RemoteRestRuntimeEngineBuilder} instance 
+     * to configure and buid a remote API client {@link RuntimeEngine} instance.
+     * @return A {@link RemoteRestRuntimeEngineBuilder} instance
+     */
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandWebServiceClientBuilder() { 
+       return new RemoteCommandWebserviceClientBuilderImpl();
+    }
+    
+    static void checkAndFinalizeConfig(RemoteConfiguration config, RemoteClientBuilder builder ) {
         if( builder instanceof org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl ) { 
             org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl jmsBuilder = (org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl) builder;
             // check
@@ -110,14 +123,24 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
                 config.checkValidJmsValues();
             }
         } else if( builder instanceof RemoteRestRuntimeEngineBuilder ) { 
-            if( config.getServerBaseRestUrl() == null ) { 
-                throw new InsufficientInfoToBuildException("A URL is required to build the factory.");
+            if( config.getServerBaseUrl() == null ) { 
+                throw new InsufficientInfoToBuildException("A URL is required to access the REST services.");
             }
             if( config.getUserName() == null ) { 
-                throw new InsufficientInfoToBuildException("A user name is required to build the factory.");
+                throw new InsufficientInfoToBuildException("A user name is required to access the REST services.");
             }
             if( config.getPassword() == null ) { 
-                throw new InsufficientInfoToBuildException("A password is required to build the factory.");
+                throw new InsufficientInfoToBuildException("A password is required to access the REST services.");
+            }
+        } else if(builder instanceof RemoteWebserviceClientBuilder ) { 
+            if( config.getServerBaseUrl() == null ) { 
+                throw new InsufficientInfoToBuildException("A URL is required to access the web services.");
+            }
+            if( config.getUserName() == null ) { 
+                throw new InsufficientInfoToBuildException("A user name is required to access the web services.");
+            }
+            if( config.getPassword() == null ) { 
+                throw new InsufficientInfoToBuildException("A password is required to access the web services.");
             }
         }
         if( config.getExtraJaxbClasses() != null && ! config.getExtraJaxbClasses().isEmpty() ) { 
