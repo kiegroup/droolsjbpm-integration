@@ -672,7 +672,7 @@ public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJ
     @Test
     public void commandWebServiceClientInterfaceInheritanceTest() { 
         try { 
-        RemoteRuntimeEngineFactory.newCommandServiceClientBuilder()
+        RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("test")
             .addUserName("tester")
             .addServerUrl("http://test.server.com/test-app/")

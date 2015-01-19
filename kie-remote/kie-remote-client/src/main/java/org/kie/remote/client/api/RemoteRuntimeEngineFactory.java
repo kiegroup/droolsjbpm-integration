@@ -46,8 +46,8 @@ public abstract class RemoteRuntimeEngineFactory {
      * to configure and buid a remote client for the {@link CommandWebService}.
      * @return A {@link RemoteWebserviceClientBuilder} instance
      */
-    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandServiceClientBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newCommandServiceClientBuilder();
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandWebServiceClientBuilder() { 
+       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
     }
     
     /**
