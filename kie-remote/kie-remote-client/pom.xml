@@ -62,13 +62,13 @@
 
     <!-- REST:       covered via java classes: see KieRemoteHttpRequest  -->
     <!-- jaxb/json:  covered via imports from kie-remote-jaxb -->
-   
-    <!-- Webservices --> 
+ 
+    <!-- webservices -->
     <dependency>
       <groupId>org.kie.remote.ws</groupId>
-      <artifactId>kie-remote-ws-wsdl-cmd</artifactId>
+      <artifactId>kie-remote-ws-common</artifactId>
     </dependency>
-    
+   
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -167,7 +167,6 @@
       <artifactId>powermock-api-mockito</artifactId>
       <scope>test</scope>
     </dependency>
-    
   
     <!-- for the live server test -->
     <dependency>
@@ -178,6 +177,52 @@
     <dependency>
       <groupId>org.jboss.xnio</groupId>
       <artifactId>xnio-nio</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- web services: api's --> 
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.bind</groupId>
+      <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.xml.ws</groupId>
+      <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+      
+    <!-- web services: classes --> 
+    <dependency>
+      <groupId>org.jboss.ws</groupId>
+      <artifactId>jbossws-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ws.security</groupId>
+      <artifactId>wss4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-ws-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-frontend-jaxws</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- web services: jetty --> 
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-rt-transports-http-jetty</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -194,8 +239,10 @@
           </filesets>
         </configuration>
       </plugin>
-      
-      <!-- 0. add src/main/unpacked so that unpacked classes are added to jar -->
+     
+      <!-- Importing generated classes -->
+            
+      <!-- 1. add src/main/unpacked so that unpacked classes are added to jar -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -212,9 +259,22 @@
               </sources>
             </configuration>
           </execution>
+          <execution>
+            <!-- for webservices/wsdl generated code -->
+            <id>add-generated-sources</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+             <configuration>
+              <sources>
+                <source>src/main/generated</source>
+              </sources>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
-      <!-- 1. unpack flat command class sourc from kie-remote-jaxb-gen -->
+      <!-- 2. unpack flat command class sourc from kie-remote-jaxb-gen -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -241,7 +301,146 @@
           </execution>
         </executions>
       </plugin>
+    
+      <!-- Web Services -->
+     
+      <!--  0. delete all generated files because only the WSDL determines code, no code in VCS -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>src/main/generated</directory>
+              <includes>
+                <include>**/*.java</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin> 
+      <!-- 1. add src/main/generated so that generated classes are added to jar -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-generated-sources</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+             <configuration>
+              <sources>
+                <source>src/main/generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 2. copy wsdl file to target/classes so that "VERSION" in wsdl file can be replaced with appropriate value, before compile -->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-wsdl-to-target</id>
+            <!-- here the phase you need -->
+            <phase>process-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/</directory>
+                    </resource>
+                </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 3. replace "VERSION" in WSDL file with project version + bugfix version -->
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>                    
+          </execution>
+        </executions>
+        <configuration>
+          <basedir>${project.build.directory}/classes/wsdl</basedir>
+          <includes>
+            <include>CommandService.wsdl</include>
+          </includes>
+          <regex>true</regex>
+          <replacements>
+            <replacement>
+              <token>VERSION</token>
+              <value>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${bugfix.version}</value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
+      <!-- 4. generate classes based on WSDL to be included in jar -->
+      <plugin>
+        <groupId>org.jvnet.jax-ws-commons</groupId>
+        <artifactId>jaxws-maven-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <id>wsimport-from-jdk</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>wsimport</goal>
+            </goals>
+            <configuration>
+              <executable>${tool.wsimport}</executable>
+              <sourceDestDir>${project.basedir}/src/main/generated</sourceDestDir>
+              <packageName>org.kie.remote.services.ws.command.generated</packageName>
+              <target>2.1</target>
+              <wsdlLocation>file:///wsdl/*</wsdlLocation>
+              <wsdlDirectory>${project.build.directory}/classes/wsdl</wsdlDirectory>
+              <wsdlFiles>
+                <wsdlFile>CommandService.wsdl</wsdlFile>              
+              </wsdlFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
+  <!-- setup corresponding executables on win/*nix -->
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen.exe</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport.exe</tool.wsimport>
+      </properties>
+    </profile>
+    <profile>
+      <id>nix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <properties>
+        <tool.wsgen>${java.home}/../bin/wsgen</tool.wsgen>
+        <tool.wsimport>${java.home}/../bin/wsimport</tool.wsimport>
+      </properties>
+    </profile>
+  </profiles>
 </project>
 
