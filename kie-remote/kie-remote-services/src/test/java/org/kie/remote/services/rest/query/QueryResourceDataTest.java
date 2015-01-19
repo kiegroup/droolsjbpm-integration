@@ -33,6 +33,10 @@ public class QueryResourceDataTest extends QueryResourceData {
         List<String[]> allParams = new ArrayList<String[]>(paramFields.size());
         while( iter.hasNext() ) { 
            Field field = iter.next();
+           if( field.getName().equals("minMaxParams")
+               || field.getName().equals("nameValueParams") ) { 
+               continue;
+           }
            if( ! Modifier.isStatic(field.getModifiers()) ) { 
               iter.remove();
               continue;
