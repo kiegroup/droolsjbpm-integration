@@ -7,7 +7,66 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <dependencySets>
     <dependencySet>
+      <includes>
+        <include>org.jbpm:jbpm-flow</include>
+        <include>org.jbpm:jbpm-flow-builder</include>
+        <include>org.jbpm:jbpm-persistence-jpa</include>
+        <include>org.jbpm:jbpm-bpmn2</include>
+        <include>org.kie:kie-api</include>
+        <include>org.kie:kie-aries-blueprint</include>
+        <include>org.kie:kie-internal</include>
+        <include>org.kie:kie-maven-plugin</include>
+        <include>org.kie:kie-ci</include>
+        <include>org.kie:kie-ci-osgi</include>
+        <include>org.kie:kie-camel</include>
+        <include>org.kie:kie-spring</include>
+        <include>org.drools:drools-core</include>
+        <include>org.drools:drools-compiler</include>
+        <include>org.drools:drools-decisiontables</include>
+        <include>org.drools:drools-jsr94</include>
+        <include>org.drools:drools-karaf-features</include>
+        <include>org.drools:drools-osgi-integration</include>
+        <include>org.drools:drools-persistence-jpa</include>
+        <include>org.drools:drools-pmml</include>
+        <include>org.drools:drools-reteoo</include>
+        <include>org.drools:drools-rhq-plugin</include>
+        <include>org.drools:drools-scorecards</include>
+        <include>org.drools:drools-templates</include>
+        <include>org.drools:drools-verifier</include>
+        <include>org.drools:knowledge-api</include>
+      </includes>
       <outputDirectory></outputDirectory>
+    </dependencySet>
+    <dependencySet>
+      <excludes>
+        <exclude>org.jbpm:jbpm-flow</exclude>
+        <exclude>org.jbpm:jbpm-flow-builder</exclude>
+        <exclude>org.jbpm:jbpm-persistence-jpa</exclude>
+        <exclude>org.jbpm:jbpm-bpmn2</exclude>
+        <exclude>org.kie:kie-api</exclude>
+        <exclude>org.kie:kie-aries-blueprint</exclude>
+        <exclude>org.kie:kie-internal</exclude>
+        <exclude>org.kie:kie-maven-plugin</exclude>
+        <exclude>org.kie:kie-ci</exclude>
+        <exclude>org.kie:kie-ci-osgi</exclude>
+        <exclude>org.kie:kie-camel</exclude>
+        <exclude>org.kie:kie-spring</exclude>
+        <exclude>org.drools:drools-core</exclude>
+        <exclude>org.drools:drools-compiler</exclude>
+        <exclude>org.drools:drools-decisiontables</exclude>
+        <exclude>org.drools:drools-jsr94</exclude>
+        <exclude>org.drools:drools-karaf-features</exclude>
+        <exclude>org.drools:drools-osgi-integration</exclude>
+        <exclude>org.drools:drools-persistence-jpa</exclude>
+        <exclude>org.drools:drools-pmml</exclude>
+        <exclude>org.drools:drools-reteoo</exclude>
+        <exclude>org.drools:drools-rhq-plugin</exclude>
+        <exclude>org.drools:drools-scorecards</exclude>
+        <exclude>org.drools:drools-templates</exclude>
+        <exclude>org.drools:drools-verifier</exclude>
+        <exclude>org.drools:knowledge-api</exclude>
+      </excludes>
+      <outputDirectory>lib</outputDirectory>
     </dependencySet>
   </dependencySets>
 </assembly>
