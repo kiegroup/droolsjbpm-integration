@@ -399,6 +399,11 @@ public class ResourceBase {
         if( s < 0 ) { 
             s = 0;
         }
+      
+        // if the page size is 0, we ignore the page number
+        if( s == 0 ) { 
+            p = 0;
+        }
         
         pageInfo[PAGE_NUM] = p;
         pageInfo[PAGE_SIZE] = s;
@@ -409,7 +414,7 @@ public class ResourceBase {
     protected static <T> List<T> paginate(int[] pageInfo, List<T> results) { 
         List<T> pagedResults = new ArrayList<T>();
         assert pageInfo[0] >= 0;
-        if( pageInfo[1] > 0 && pageInfo[0] == 0 ) { 
+        if( pageInfo[0] == 0 && pageInfo[1] > 0 ) { 
             pageInfo[0] = 1;
         }
         if( pageInfo[0] == 0 && pageInfo[1] == 0) { 
@@ -423,7 +428,7 @@ public class ResourceBase {
         return pagedResults;
     }
     
-    protected static int getMaxNumResultsNeeded(int [] pageInfo) { 
+    public static int getMaxNumResultsNeeded(int [] pageInfo) { 
         int numResults = pageInfo[PAGE_NUM]*pageInfo[PAGE_SIZE];
         if( numResults == 0 ) { 
             numResults = 1000;

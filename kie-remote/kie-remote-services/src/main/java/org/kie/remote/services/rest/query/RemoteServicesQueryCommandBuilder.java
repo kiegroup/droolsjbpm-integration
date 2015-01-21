@@ -29,6 +29,11 @@ import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.kie.api.task.model.Status;
 import org.kie.internal.query.AbstractQueryBuilderImpl;
 import org.kie.internal.query.data.QueryData;
+import org.kie.internal.runtime.manager.audit.query.NodeInstanceLogQueryBuilder;
+import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
+import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
+import org.kie.internal.runtime.manager.audit.query.NodeInstanceLogQueryBuilder.OrderBy;
+import org.kie.internal.task.query.TaskQueryBuilder;
 
 /**
  * This is the {@link AbstractQueryBuilderImpl} implementation used by the REST query operations
@@ -277,6 +282,39 @@ class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteS
         return this;
     }
 
+    public RemoteServicesQueryCommandBuilder orderBy( Object orderByField ) {
+        if( orderByField == null ) { 
+            throw new IllegalArgumentException( "A null order by criteria is invalid." );
+        }
+        String orderByString = null;
+        if( orderByField instanceof TaskQueryBuilder.OrderBy ) { 
+            switch( (TaskQueryBuilder.OrderBy) orderByField ) {
+            case processInstanceId:
+                orderByString = "t.taskData.processInstanceId";
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
+            }
+        } else if( orderByField instanceof VariableInstanceLogQueryBuilder.OrderBy ) {
+            switch( (VariableInstanceLogQueryBuilder.OrderBy) orderByField ) { 
+            case processInstanceId:
+                orderByString = "processInstanceId";
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
+            }
+        } else if( orderByField instanceof ProcessInstanceLogQueryBuilder.OrderBy ) {
+            switch( (ProcessInstanceLogQueryBuilder.OrderBy) orderByField ) { 
+            case processInstanceId:
+                orderByString = "processInstanceId";
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
+            }
+        }
+        this.queryData.getQueryContext().setOrderBy(orderByString);
+        return this;
+    }
         
     // command generation
     
@@ -299,4 +337,5 @@ class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteS
       intersect();
       return this;
     }
+    
 }

@@ -60,11 +60,10 @@ public class QueryResourceImpl extends ResourceBase {
         checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
         
         int[] pageInfo = getPageNumAndPageSize(params, oper);
-        int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
         InternalTaskQueryHelper queryHelper = new InternalTaskQueryHelper(this);
         JaxbQueryTaskResult result 
-            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityProvider.getName(), params, pageInfo, maxNumResults);
+            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityProvider.getName(), params, pageInfo);
         queryHelper.dispose();
         
         return createCorrectVariant(result, headers);
@@ -78,12 +77,11 @@ public class QueryResourceImpl extends ResourceBase {
         checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
         
         int[] pageInfo = getPageNumAndPageSize(params, oper);
-        int maxNumResults = getMaxNumResultsNeeded(pageInfo);
 
         String identityNotNeeded = null;
         InternalProcInstQueryHelper queryHelper = new InternalProcInstQueryHelper(this);
         JaxbQueryProcessInstanceResult result 
-            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityNotNeeded, params, pageInfo, maxNumResults);
+            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityNotNeeded, params, pageInfo);
         queryHelper.dispose();
 
         return createCorrectVariant(result, headers);

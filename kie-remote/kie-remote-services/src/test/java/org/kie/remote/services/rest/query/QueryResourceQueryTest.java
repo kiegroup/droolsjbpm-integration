@@ -5,46 +5,22 @@ import static org.kie.remote.services.rest.query.QueryResourceData.QUERY_PARAM_D
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
-import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
-import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.ParametrizedQuery;
-import org.kie.remote.services.rest.DeployResourceBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("null")
-public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueryResourceQueryTest.class);
-    
-    private static final String PROCESS_FILE = "BPMN2-HumanTaskWithStringVariables.bpmn2";
-    private static final String PROCESS_ID = "org.var.human.task.string";
-    private static final String USER_ID = "john";
-
-    private KieSession ksession;
-    private TaskService taskService;
-    private RuntimeManager runtimeManager;
-    private RuntimeEngine engine;
-    
+public class QueryResourceQueryTest extends AbstractQueryResourceTest {
 
     public QueryResourceQueryTest() {
         super(true, true, "org.jbpm.domain");
@@ -52,7 +28,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
 
     @Before
     public void init() {
-        runtimeManager = createRuntimeManager(PROCESS_FILE);
+        runtimeManager = createRuntimeManager(PROCESS_STRING_VAR_FILE);
         engine = getRuntimeEngine();
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
@@ -73,38 +49,12 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
     private void setupTestData() { 
         if( ! testDataInitialized ) { 
             for( int i = 0; i < 5; ++i ) { 
-                runProcess(ksession);
+                runStringProcess(ksession);
             }
             testDataInitialized = true;
         }
     }
     
-    private void runProcess(KieSession ksession) { 
-        Map<String, Object> params = new HashMap<String, Object>();
-        String initValue = UUID.randomUUID().toString();
-        params.put("inputStr", initValue );
-        params.put("otherStr", initValue ); 
-        ProcessInstance processInstance = ksession.startProcess(PROCESS_ID, params);
-        assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
-        long procInstId = processInstance.getId();
-        
-        List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
-        assertFalse( "No tasks found!", taskIds.isEmpty() );
-        long taskId = taskIds.get(0); 
-        taskService.start(taskId, USER_ID);
-        
-        Map<String, Object> taskResults = new HashMap<String, Object>();
-        taskResults.put("taskOutputStr", "task-" + procInstId);
-        taskService.complete(taskId, USER_ID, taskResults);
-    
-        assertNull("Process instance has not been finished.", ksession.getProcessInstance(procInstId) );
-        
-        AuditLogService logService = new JPAAuditLogService(getEmf());
-        List<VariableInstanceLog> vils = logService.findVariableInstances(procInstId);
-        assertTrue( "No variable instance logs found", vils != null && ! vils.isEmpty() );
-        assertTrue( "Too few variable instance logs found", vils.size() > 3 );
-    }
-
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
     @Test
@@ -137,7 +87,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         .endDateMax(tomorrow)
         .processInstanceId(procInstId)
         .processInstanceStatus(ProcessInstance.STATE_COMPLETED)
-        .processId(PROCESS_ID)
+        .processId(PROCESS_STRING_VAR_ID)
         .taskId(taskSum.getId())
         .taskStatus(Status.Completed)
         .value("check-" + procInstId)
@@ -157,7 +107,7 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
         .endDateMax(tomorrow)
         .processInstanceId(procInstId)
         .processInstanceStatus(ProcessInstance.STATE_COMPLETED)
-        .processId(PROCESS_ID)
+        .processId(PROCESS_STRING_VAR_ID)
         .taskId(taskSum.getId())
         .taskStatus(Status.Completed)
         .like().value("*-" + procInstId)
@@ -168,10 +118,15 @@ public class QueryResourceQueryTest extends JbpmJUnitBaseTestCase {
 
         assertNotNull( "Null var Result!", varResult );
         assertFalse( "No var logs found.", varResult.isEmpty() );
-        assertEquals( "Num var logs found.", 3, varResult.size() );
+
         for( org.kie.api.runtime.manager.audit.VariableInstanceLog log : varResult ) { 
-            assertTrue( "Incorrect var value: " + log.getValue(), log.getValue().endsWith("-" + procInstId) );
+            assertEquals( "deployment id", deploymentId, log.getExternalId() );
+            assertTrue( "incorrect start date", log.getDate().after(yesterday) );
+            assertTrue( "incorrect end date", log.getDate().before(tomorrow) );
+            assertEquals( "process instance id", procInstId, log.getProcessInstanceId().longValue() );
+            assertEquals( "process id", PROCESS_STRING_VAR_ID, log.getProcessId() );
             assertTrue( "Incorrect var name: " + log.getVariableId(), log.getVariableId().startsWith("input") );
+            assertTrue( "Incorrect var value: " + log.getValue(), log.getValue().endsWith("-" + procInstId) );
         }
         
         RemoteServicesQueryCommandBuilder procLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
