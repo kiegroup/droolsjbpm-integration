@@ -201,6 +201,8 @@
 
     <feature name="h2" version="${h2.version}" description="h2 database">
         <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
+        <bundle start-level="100">mvn:commons-dbcp/commons-dbcp/${version.commons-dbcp}</bundle>
+        <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
     </feature>
 
 </features>
