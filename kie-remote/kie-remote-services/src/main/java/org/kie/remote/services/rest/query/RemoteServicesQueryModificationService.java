@@ -20,7 +20,7 @@ import org.kie.internal.query.data.QueryData;
 
 /**
  * This is the {@link QueryModificationService} implementation for the REST remote services, 
- * which allows us to do complicated queries that join<ul>
+ * which allows us to do complicated queries that join the following:<ul>
  * <li>The process instance tables to the variable instance log tables</li>
  * <li>Or the task tables to the variable instance log tables</li>
  * </ul>
@@ -78,7 +78,8 @@ public class RemoteServicesQueryModificationService implements QueryModification
         procInstLogNeededWithVarInstLogCriterias.add(PROCESS_INSTANCE_STATUS_LIST);
         procInstLogNeededWithVarInstLogCriterias.add(PROCESS_VERSION_LIST);
     }
-    
+   
+    // query types
     private static final int TASK_SUMMARY_QUERY_TYPE;
     private static final int VARIABLE_INSTANCE_LOG_QUERY_TYPE;
     private static final int PROCESS_INSTANCE_LOG_QUERY_TYPE;
@@ -92,6 +93,11 @@ public class RemoteServicesQueryModificationService implements QueryModification
        OTHER_QUERY_TYPE = idGen++;
     }
 
+    /**
+     * This looks at the query string built and determines what type of query it is. 
+     * @param queryBuilder The query string(Builder)
+     * @return an int showing which type it is (see "query types" above)
+     */
     private int determineQueryType(StringBuilder queryBuilder) { 
         String taskSumQueryBegin = TaskQueryServiceImpl.TASKSUMMARY_SELECT;
         String varInstLogQueryBegin = JPAAuditLogService.VARIABLE_INSTANCE_LOG_QUERY;

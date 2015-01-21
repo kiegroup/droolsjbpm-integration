@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest.query;
 
+import static org.kie.remote.services.rest.ResourceBase.*;
 import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VALUE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
@@ -51,7 +52,23 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * @param identity The identity of the user doing the REST call, needed when querying Tasks
      */
     protected abstract void createAndSetQueryBuilders(String identity);
-
+  
+    /**
+     * Calculates and returns the offset and max results information to be used in the query.
+     * @param pageInfo Pagination information ([0] is page number, [1] is page size)
+     * @return a int array with the calculated offset and maximum number of results
+     */
+    protected static int getOffset(int [] pageInfo) { 
+        int offset = 0;
+        if( pageInfo[0] == 0 && pageInfo[1] > 0 ) { 
+            pageInfo[0] = 1;
+        } 
+        if( pageInfo[0] > 1 && pageInfo[1] > 0 ) {
+            offset = (pageInfo[0]-1)*pageInfo[1];
+        } 
+        return offset;
+    }
+    
     /**
      * <ol>
      * <li>Use the created {@link RemoteServicesQueryCommandBuilder} instances to execute the query via the backend.</li>
@@ -61,9 +78,10 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * @param onlyRetrieveLastVarLogs Whether to 
      * @param workFlowInstanceVariables (UNFINISHED FEATURE) whether to use the information from variable instance logs 
      *        or from the process instance variables themselves.
+     * @param pageInfo pagination information 
      * @return
      */
-    protected abstract R doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables);
+    protected abstract R doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo);
 
     /**
      * This method is the internal logic that
@@ -86,10 +104,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * @return A {@link JaxbQueryTaskResult} or {@link JaxbQueryProcessInstanceResult} containing a list of entities containing task 
      *         and process variable information
      */
-    public R queryTaskOrProcInstAndAssociatedVariables( String identity, Map<String, String[]> queryParams, int[] pageInfo, int maxResults ) {
-    
-        Map<String, String> varValueMap = new HashMap<String, String>();
-        Map<String, String> varRegexMap = new HashMap<String, String>();
+    public R queryTaskOrProcInstAndAssociatedVariables( String identity, Map<String, String[]> queryParams, int[] pageInfo) {
     
         // UNFINISHED FEATURE: use in-memory/process instance variables
         // 1. meta (in-memory or history variable values?) 
@@ -107,6 +122,10 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
         if( paramVals != null ) { 
            onlyRetrieveLastVarLogs = false;
         }
+
+        // Hold the information for parameters like "var_myVar=myVal" or "varregex_myVar=my*"
+        Map<String, String> varValueMap = new HashMap<String, String>();
+        Map<String, String> varRegexMap = new HashMap<String, String>();
     
         // 1. Create the query action queue, that is then processed to fill the query
         Queue<QueryAction> queryActionQueue = fillQueryActionQueueFromQueryParams(queryParams, varValueMap, varRegexMap);
@@ -118,12 +137,13 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
         processQueryActionQueue(queryActionQueue, varValueMap, varRegexMap, workFlowInstanceVariables);
     
         // 4. execute the query via the backend, which uses the creatd {@link QueryData} instance
-        return doQueryAndCreateResultObjects(onlyRetrieveLastVarLogs, workFlowInstanceVariables);
+        return doQueryAndCreateResultObjects(onlyRetrieveLastVarLogs, workFlowInstanceVariables, pageInfo);
     }
 
-    public R queryTasksOrProcInstsAndVariables( Map<String, String[]> queryParams, int[] pageInfo, int maxResults ) {
-       return queryTaskOrProcInstAndAssociatedVariables(null, queryParams, pageInfo, maxResults);
+    public R queryTasksOrProcInstsAndVariables( Map<String, String[]> queryParams, int[] pageInfo) {
+       return queryTaskOrProcInstAndAssociatedVariables(null, queryParams, pageInfo);
     }
+    
     /**
      * Figure out whether or not we're getting audit variable logs or workflow instance variables.
      * 
@@ -163,8 +183,10 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * @param varRegexMap a {@link Map} that maps query variable names to the passed regexs for the specified variable
      * @return A {@link Queue} of {@link QueryAction} instances
      */
-    protected Queue<QueryAction> fillQueryActionQueueFromQueryParams( Map<String, String[]> queryParams,
-            Map<String, String> varValueMap, Map<String, String> varRegexMap) { 
+    protected Queue<QueryAction> fillQueryActionQueueFromQueryParams( 
+            Map<String, String[]> queryParams,
+            Map<String, String> varValueMap, 
+            Map<String, String> varRegexMap) { 
         
         ArrayDeque<QueryAction> queryActionQueue = new ArrayDeque<QueryAction>();
         

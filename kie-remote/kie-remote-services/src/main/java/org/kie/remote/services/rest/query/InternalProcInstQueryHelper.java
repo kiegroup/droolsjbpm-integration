@@ -1,8 +1,14 @@
 package org.kie.remote.services.rest.query;
 
+import static org.kie.remote.services.rest.ResourceBase.getMaxNumResultsNeeded;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.drools.core.util.StringUtils;
@@ -11,6 +17,8 @@ import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.task.model.Status;
 import org.kie.internal.query.data.QueryData;
+import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
+import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstance;
@@ -35,16 +43,17 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
         setQueryBuilders(procInstLogQueryBuilder, varInstLogQueryBuilder);
     }
-   
+    
     /*
      * (non-Javadoc)
      * @see org.kie.remote.services.rest.query.AbstractInternalQueryHelper#doQueryAndCreateResultObjects(boolean, boolean)
      */
     @Override
-    public JaxbQueryProcessInstanceResult doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables) { 
+    public JaxbQueryProcessInstanceResult doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo) { 
 
         // setup
         RemoteServicesQueryCommandBuilder procInstLogQueryBuilder = getQueryBuilders()[0];
+        setPaginationParameters(pageInfo, procInstLogQueryBuilder);
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = getQueryBuilders()[1];
         AuditLogService auditLogService = resourceBase.getAuditLogService();
       
@@ -56,7 +65,17 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         }
        
         // process instance queries
+        procInstLogQueryBuilder.orderBy(ProcessInstanceLogQueryBuilder.OrderBy.processInstanceId);
         List<ProcessInstanceLog> procLogs = auditLogService.queryProcessInstanceLogs(procInstLogQueryBuilder.getQueryData());
+
+        // variable instance log queries
+        // - limit variable logs retrieved to the process instance ids in the proc logs (since only proc logs have been limited by pagination)
+        long [] procLogProcInstIds = new long[procLogs.size()];
+        for( int i = 0; i < procLogProcInstIds.length; ++i ) { 
+            procLogProcInstIds[i] = procLogs.get(i).getProcessInstanceId();
+        }
+        varInstLogQueryBuilder.processInstanceId(procLogProcInstIds);
+        varInstLogQueryBuilder.orderBy(VariableInstanceLogQueryBuilder.OrderBy.processInstanceId);
         List<VariableInstanceLog> varLogs = auditLogService.queryVariableInstanceLogs(varInstLogQueryBuilder.getQueryData());
         
         // UNFINISHED FEATURE: using in-memory/proces instance variabels instead of audit/history logs
@@ -72,6 +91,20 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         return result;
     }
 
+    /**
+     * Set the pagination parameters on the query builder that determines the number of results (the task query builder, in this case)
+     * @param pageInfo Pagination information
+     * @param determiningQueryBuilder The query builder that determines the number of results
+     */
+    protected static void setPaginationParameters(int [] pageInfo, RemoteServicesQueryCommandBuilder determiningQueryBuilder) {
+        int offset = getOffset(pageInfo);
+        if( offset > 0 ) { 
+            determiningQueryBuilder.offset(offset);
+        } 
+        if( pageInfo[1] > 0 ) { 
+            determiningQueryBuilder.maxResults(pageInfo[1]); // page size
+        }
+    }
 
     private JaxbQueryProcessInstanceResult createProcessInstanceResult( 
             List<ProcessInstanceLog> procLogs,
@@ -79,25 +112,28 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
             List<JaxbVariableInfo> processVariables ) {
         JaxbQueryProcessInstanceResult result = new JaxbQueryProcessInstanceResult();
 
-        Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap = new HashMap<Long, JaxbQueryProcessInstanceInfo>();
+        Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap = new LinkedHashMap<Long, JaxbQueryProcessInstanceInfo>();
+        long procInstId = -1;
         for( ProcessInstanceLog procLog : procLogs ) {
-            long procInstId = procLog.getProcessInstanceId();
+            assert procInstId <= procLog.getProcessInstanceId() : procInstId + " not <= " + procLog.getProcessInstanceId();
+            procInstId = procLog.getProcessInstanceId();
             JaxbQueryProcessInstanceInfo procInfo = getQueryProcessInstanceInfo(procInstId, procInstIdProcInstInfoMap);
             procInfo.setProcessInstance(new JaxbProcessInstance(procLog));
         }
         for( VariableInstanceLog varLog : varLogs ) {
-            long procInstId = varLog.getProcessInstanceId();
+            procInstId = varLog.getProcessInstanceId();
+            // The reasoning here is that the number of process logs may be constrained by pagination
             JaxbQueryProcessInstanceInfo procInfo = procInstIdProcInstInfoMap.get(procInstId);
-            if( procInfo == null ) { 
-                throwDebugExceptionWithQueryInformation();
+            if( procInfo != null ) { 
+                procInfo.getVariables().add(new JaxbVariableInfo(varLog));
             }
-            procInfo.getVariables().add(new JaxbVariableInfo(varLog));
         }
 
         result.getProcessInstanceInfoList().addAll(procInstIdProcInstInfoMap.values());
         return result;
     }
 
+    // TODO: delete? add elsewhare? was for createProcessInstanceResult
     private void throwDebugExceptionWithQueryInformation() { 
         StringBuilder message = new StringBuilder("Please contact the developers: the following query retrieved variable instance logs without retrieving the associated process instance logs:\n");
         QueryData queryData = getQueryBuilders()[0].getQueryData();
