@@ -1,7 +1,6 @@
 package org.kie.provider.impl;
 
-import static org.kie.provider.impl.SafeIdentityProvider.UNKNOWN_USER_IDENTITY;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +14,18 @@ import org.jboss.errai.security.shared.api.identity.User;
 import org.jboss.errai.security.shared.api.identity.UserImpl;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.provider.SessionInfoProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uberfire.rpc.SessionInfo;
-import java.io.Serializable;
 
 @SessionScoped
 public class SafeSessionInfoProvider implements SessionInfoProvider, Serializable  {
 
+    /** Generated serial version UID */
+    private static final long serialVersionUID = 8510219062936244657L;
+
+    private static final Logger logger = LoggerFactory.getLogger( SafeIdentityProvider.class );
+            
     @Inject
     private Instance<SessionInfo> delegate;
 
@@ -46,19 +51,24 @@ public class SafeSessionInfoProvider implements SessionInfoProvider, Serializabl
     @Override
     public User getIdentity() {
         if( delegate.isUnsatisfied() ) { 
-            List<String> roleStrList = identityProvider.getRoles();
-            List<Role> roles = new ArrayList<Role>(roleStrList.size());
-            for( String roleStr : roleStrList ) { 
-                roles.add( new RoleImpl(roleStr));
-            }
-            return new UserImpl( identityProvider.getName(), roles );
+           return getUserFromIdentityProvider(); 
         } 
        
         // default
         try {
             return delegate.get().getIdentity(); 
         } catch ( Exception e ) {
-            return new UserImpl( UNKNOWN_USER_IDENTITY );
+            logger.debug("SessionInfo bean was available but could not return identity: " + e.getMessage(), e );
+            return getUserFromIdentityProvider();
         }
+    }
+    
+    private User getUserFromIdentityProvider() { 
+        List<String> roleStrList = identityProvider.getRoles();
+        List<Role> roles = new ArrayList<Role>(roleStrList.size());
+        for( String roleStr : roleStrList ) { 
+            roles.add( new RoleImpl(roleStr));
+        }
+        return new UserImpl( identityProvider.getName(), roles ); 
     }
 }
