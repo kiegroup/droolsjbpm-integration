@@ -115,7 +115,7 @@ public class RequestMessageBean implements MessageListener {
             throw new KieRemoteServicesRuntimeException(errMsg, jmse);
         }
     }
-
+    
     @PreDestroy
     public void cleanup() {
         try {
@@ -226,9 +226,10 @@ public class RequestMessageBean implements MessageListener {
         }
 
         // 3c. send response message
+        MessageProducer producer = null;
         try {
             Queue responseQueue = (Queue) (new InitialContext()).lookup(RESPONSE_QUEUE_NAME);
-            MessageProducer producer = session.createProducer(responseQueue);
+            producer = session.createProducer(responseQueue);
             producer.send(msg);
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId 
@@ -237,6 +238,14 @@ public class RequestMessageBean implements MessageListener {
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
             logger.error(errMsg, jmse);
+        } finally { 
+            if( producer != null ) { 
+                try {
+                    producer.close();
+                } catch( JMSException e ) {
+                    logger.debug("Closing the producer resulted in an exception: "  + e.getMessage(), e);
+                }
+            }
         }
     }
 
