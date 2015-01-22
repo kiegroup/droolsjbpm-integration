@@ -1,10 +1,7 @@
 package org.kie.provider;
 
-import org.jboss.errai.security.shared.api.identity.User;
+import org.uberfire.rpc.SessionInfo;
 
-public interface SessionInfoProvider {
+public interface SessionInfoProvider extends SessionInfo {
 
-    String getId();
-
-    User getIdentity();
 }
