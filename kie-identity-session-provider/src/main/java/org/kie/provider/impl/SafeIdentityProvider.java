@@ -32,8 +32,6 @@ public class SafeIdentityProvider implements IdentityProvider, Serializable {
     @Inject
     @RequestScoped
     private Instance<HttpServletRequest> request;
-
-    static final String UNKNOWN_USER_IDENTITY = "unknown";
     
     @Override
     public String getName() {
