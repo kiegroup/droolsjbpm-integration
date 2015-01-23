@@ -17,6 +17,7 @@ import org.kie.provider.SessionInfoProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.rpc.SessionInfo;
+import org.uberfire.rpc.impl.SessionInfoImpl;
 
 @SessionScoped
 public class SafeSessionInfoProvider implements SessionInfoProvider, Serializable {
@@ -31,8 +32,6 @@ public class SafeSessionInfoProvider implements SessionInfoProvider, Serializabl
 
     @Inject 
     private IdentityProvider identityProvider; 
-  
-    private static String UNKNOWN_SESSION_ID = "--";
     
     @Override
     public String getId() {
@@ -70,5 +69,27 @@ public class SafeSessionInfoProvider implements SessionInfoProvider, Serializabl
             roles.add( new RoleImpl(roleStr));
         }
         return new UserImpl( identityProvider.getName(), roles ); 
+    }
+
+    @Override
+    public SessionInfo getSessionInfo() {
+        if( delegate.isUnsatisfied() ) { 
+            return createSessionInfo();
+        }
+        
+        try { 
+            SessionInfo sessionInfo = delegate.get();
+            sessionInfo.getId();
+            return sessionInfo;
+        } catch( Exception e ) { 
+            logger.debug("SessionInfo bean was available but could not be retrieved: " + e.getMessage(), e );
+            return createSessionInfo();
+        }
+    }
+        
+    private SessionInfo createSessionInfo() { 
+        String id = getId();
+        User identity = getUserFromIdentityProvider();
+        return new SessionInfoImpl(id, identity);
     }
 }
