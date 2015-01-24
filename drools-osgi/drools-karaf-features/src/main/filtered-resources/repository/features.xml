@@ -20,6 +20,7 @@
         <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
         <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
         <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
+        <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
     </feature>
 
     <feature name="drools-module" version="${version.org.drools}" description="Drools core">
