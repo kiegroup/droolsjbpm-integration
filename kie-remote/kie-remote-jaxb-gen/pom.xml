@@ -271,29 +271,52 @@
         <artifactId>replacer</artifactId>
         <executions>
           <execution>
+            <id>OnlyCmdImpl</id>
             <phase>process-resources</phase>
             <goals>
               <goal>replace</goal>
             </goals>
+            <configuration>
+              <basedir>${basedir}/src/main/generated/org/kie/remote/jaxb/gen/</basedir>
+              <includes>
+                <include>*.java</include>
+              </includes>
+              <excludes>
+                <exclude>*Command.java</exclude>
+              </excludes>
+              <unescape>true</unescape>
+              <replacements>
+                <replacement>
+                  <token>implements Command</token>
+                  <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
+                  <value>extends Object</value>
+                </replacement>
+              </replacements>
+            </configuration>
+          </execution>
+          <execution>
+            <id>DefaultProcessInstanceId</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <basedir>${basedir}/src/main/generated/org/kie/remote/jaxb/gen/</basedir>
+              <includes>
+                <include>*SignalEventCommand.java</include>
+              </includes>
+              <unescape>true</unescape>
+              <replacements>
+                <replacement>
+                  <token>protected long processInstanceId;</token>
+                  <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
+                  <value>protected long processInstanceId = -1;</value>
+                </replacement>
+              </replacements>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <basedir>${basedir}/src/main/generated/org/kie/remote/jaxb/gen/</basedir>
-          <includes>
-            <include>*.java</include>
-          </includes>
-          <excludes>
-            <exclude>*Command.java</exclude>
-          </excludes>
-          <unescape>true</unescape>
-          <replacements>
-            <replacement>
-              <token>implements Command</token>
-              <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
-              <value>extends Object</value>
-            </replacement>
-          </replacements>
-        </configuration>
+
       </plugin>
 
       <!-- 6. exclude unpacked command sources from jar/sources -->
