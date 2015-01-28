@@ -47,6 +47,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbVarElement;
 
 /**
  * This resource is responsible for providin operations to manage process instances. 
@@ -180,7 +181,11 @@ public class RuntimeResourceImpl extends ResourceBase {
         } catch( DeploymentNotFoundException dnfe ) { 
             throw new org.kie.remote.services.exception.DeploymentNotFoundException(dnfe.getMessage());
         }
-     
+        // handle primitives and their wrappers as JAXBElement
+        if (procVar != null && isPrimitiveOrWrapper(procVar.getClass())) {
+            procVar = new JaxbVarElement(new QName("value"), procVar.getClass(), procVar);
+        }
+
         // return
         return createCorrectVariant(procVar, headers);
     }

@@ -40,6 +40,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbVarElement;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
@@ -106,7 +107,10 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
                 JaxbQueryProcessInstanceResult.class,
                 
                 // exception
-                JaxbRestRequestException.class
+                JaxbRestRequestException.class,
+
+                // vairable wrapper element for primitives and their wrappers
+                JaxbVarElement.class
         };
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     }

@@ -96,6 +96,21 @@ public class ResourceBase {
         paginationParams.add(SIZE_LONG_PARAM);
         paginationParams.add(SIZE_SHORT_PARAM);
     };
+
+    protected static Set<Class> wrapperPrimitives = new HashSet<Class>();
+    static {
+        wrapperPrimitives.add(Boolean.class);
+        wrapperPrimitives.add(Byte.class);
+        wrapperPrimitives.add(Character.class);
+        wrapperPrimitives.add(Short.class);
+        wrapperPrimitives.add(Integer.class);
+        wrapperPrimitives.add(Long.class);
+        wrapperPrimitives.add(Double.class);
+        wrapperPrimitives.add(Float.class);
+        if (Boolean.getBoolean("org.kie.remote.wrap.string")) {
+            wrapperPrimitives.add(String.class);
+        }
+    }
     
     public static final String PROC_INST_ID_PARAM_NAME = "runtimeProcInstId";
     
@@ -516,5 +531,12 @@ public class ResourceBase {
     
     protected <T> T doRestTaskOperationWithDeploymentId(String deploymentId, TaskCommand<T> cmd) { 
         return processRequestBean.doRestTaskOperation(null, deploymentId, null, null, cmd);
+    }
+
+    public static boolean isPrimitiveOrWrapper(final Class<?> type) {
+        if (type == null) {
+            return false;
+        }
+        return type.isPrimitive() || wrapperPrimitives.contains(type);
     }
 }
