@@ -99,7 +99,7 @@ public class LiveServerTest {
                 .addJbossServerHostName("localhost")
                 .addUserName(userId)
                 .addPassword(password)
-                .doNotUseSsl()
+                .disableTaskSecurity()
                 .build();
 
         // create JMS request

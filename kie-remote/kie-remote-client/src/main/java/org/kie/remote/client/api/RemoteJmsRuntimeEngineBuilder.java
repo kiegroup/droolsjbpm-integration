@@ -74,7 +74,7 @@ public interface RemoteJmsRuntimeEngineBuilder extends RemoteJmsRuntimeEngineFac
      * {@link KieSession}, but required[*] when doing operations that concern the {@link TaskService}. 
      * </p>
      * [*] If you are sure you do <i>not</i> want to use SSL when communicating with Console or BPMS while
-     * doing {@link TaskService} related operations, then use the {@link RemoteJmsRuntimeEngineBuilder#doNotUseSsl()}
+     * doing {@link TaskService} related operations, then use the {@link RemoteJmsRuntimeEngineBuilder#disableTaskSecurity()}
      * method to turn off SSL usage. Doing this will expose the password used in JMS {@link Message} instances to
      * a man-in-the-middle attack, since no encryption will be used when sending the message (which will contain the 
      * password). 
@@ -94,7 +94,7 @@ public interface RemoteJmsRuntimeEngineBuilder extends RemoteJmsRuntimeEngineFac
      * will be used when sending the message (which will contain the password). 
      * @return An instnace of this builder
      */
-    RemoteJmsRuntimeEngineBuilder doNotUseSsl();
+    RemoteJmsRuntimeEngineBuilder disableTaskSecurity();
    
     /**
      * Add the host name of the server on which Console or BPMS is running. 

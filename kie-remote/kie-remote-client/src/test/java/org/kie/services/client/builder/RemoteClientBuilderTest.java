@@ -493,14 +493,14 @@ public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJ
     
     @Test
     public void jmsRuntimeEngineNoSslTest() { 
-        // doNotUseSsl
+        // disableTaskSecurity
         RemoteRuntimeEngineFactory.newJmsBuilder()
             .addUserName("H")
             .addPassword("gummy bears")
             .addHostName("localhost")
             .addJmsConnectorPort(5446)
             .addRemoteInitialContext(remoteInitialContext)
-            .doNotUseSsl()
+            .disableTaskSecurity()
             .build();
     }
     
