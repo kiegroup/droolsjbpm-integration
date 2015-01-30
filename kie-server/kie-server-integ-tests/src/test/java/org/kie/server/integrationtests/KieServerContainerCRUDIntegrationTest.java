@@ -129,8 +129,6 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
     }
 
     @Test
-    @Ignore("InternalKieContainer no longer updates the original releaseId after calling updateToVersion(). " +
-            "Needs to be decided if it should do that or if the kie-server needs to be fixed.")
     public void testUpdateReleaseIdForExistingContainer() throws Exception {
         client.createContainer("update-releaseId", new KieContainerResource("update-releaseId", releaseId1));
 
