@@ -201,8 +201,8 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
     }
   
     @Override
-    public RemoteJmsRuntimeEngineBuilderImpl doNotUseSsl() {
-        config.setDoNotUseSssl(true);
+    public RemoteJmsRuntimeEngineBuilderImpl disableTaskSecurity() {
+        config.setDisableTaskSecurity(true);
         return this;
     }
 

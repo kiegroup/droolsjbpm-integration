@@ -47,7 +47,7 @@ public final class RemoteConfiguration {
 
     // JMS
     private boolean useSsl = false;
-    private boolean doNotUseSsl = false;
+    private boolean disableTaskSecurity = false;
     private ConnectionFactory connectionFactory;
     private Queue ksessionQueue;
     private Queue taskQueue;
@@ -332,8 +332,8 @@ public final class RemoteConfiguration {
         return useSsl;
     } 
     
-    public boolean getDoNotUseSsl() { 
-        return doNotUseSsl;
+    public boolean getDisableTaskSecurity() {
+        return disableTaskSecurity;
     } 
     
     Long getProcessInstanceId() {
@@ -396,8 +396,8 @@ public final class RemoteConfiguration {
         this.useSsl = useSsl;
     }
    
-    public void setDoNotUseSssl(boolean doNotUseSsl) {
-        this.doNotUseSsl = doNotUseSsl;
+    public void setDisableTaskSecurity(boolean disableTaskSecurity) {
+        this.disableTaskSecurity = disableTaskSecurity;
     }
    
     // Clone --- 
@@ -418,7 +418,7 @@ public final class RemoteConfiguration {
        this.type = config.type;
        this.userName = config.userName;
        this.useSsl = config.useSsl;
-       this.doNotUseSsl = config.doNotUseSsl;
+       this.disableTaskSecurity = config.disableTaskSecurity;
     }
     
     public RemoteConfiguration clone() {
