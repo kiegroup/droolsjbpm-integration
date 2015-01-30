@@ -19,6 +19,7 @@
     <module>drools-karaf-features</module>
     <module>droolsjbpm-osgi-examples</module>
     <module>drools-karaf-itest</module>
+    <module>drools-osgi-environment-tests</module>
   </modules>
 
 </project>
