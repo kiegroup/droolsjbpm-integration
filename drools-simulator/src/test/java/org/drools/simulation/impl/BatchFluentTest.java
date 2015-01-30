@@ -15,24 +15,26 @@
  */
 package org.drools.simulation.impl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.io.impl.ByteArrayResource;
 import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.batch.impl.FluentBatchExecutionImpl;
-import org.drools.core.io.impl.ByteArrayResource;
 import org.junit.Test;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.api.command.BatchExecutionCommand;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.ExecutionResults;
 import org.kie.internal.runtime.StatelessKnowledgeSession;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class BatchFluentTest {
 
@@ -56,8 +58,7 @@ public class BatchFluentTest {
         ExecutionResults results = createStatelessSession().execute(cmd);
 
         assertEquals(2, results.getIdentifiers().size());
-        assertEquals("y", (String) results.getIdentifiers().toArray()[0]);
-        assertEquals("x", (String) results.getIdentifiers().toArray()[1]);
+        assertTrue(results.getIdentifiers().containsAll(asList("x", "y")));
     }
 
     @Test
@@ -80,9 +81,7 @@ public class BatchFluentTest {
         ExecutionResults results = createStatelessSession().execute(cmd);
 
         assertEquals(3, results.getIdentifiers().size());
-        assertEquals("myGlobal", (String) results.getIdentifiers().toArray()[0]);
-        assertEquals("y", (String) results.getIdentifiers().toArray()[1]);
-        assertEquals("x", (String) results.getIdentifiers().toArray()[2]);
+        assertTrue(results.getIdentifiers().containsAll(asList("myGlobal", "x", "y")));
     }
 
     private StatelessKnowledgeSession createStatelessSession() {
