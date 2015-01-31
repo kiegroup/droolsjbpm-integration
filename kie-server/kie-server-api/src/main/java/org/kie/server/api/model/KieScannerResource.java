@@ -1,12 +1,17 @@
 package org.kie.server.api.model;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "kie-scanner")
+@XStreamAlias( "kie-scanner" )
 public class KieScannerResource {
 
+    @XStreamAlias( "status" )
     private KieScannerStatus status;
+    @XStreamAlias( "poll-interval" )
     private Long             pollInterval;
 
     public KieScannerResource() {

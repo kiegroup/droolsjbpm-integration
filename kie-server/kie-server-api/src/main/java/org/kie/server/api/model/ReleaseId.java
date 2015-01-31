@@ -3,6 +3,7 @@ package org.kie.server.api.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
@@ -10,11 +11,17 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
  * used for JAXB marshalling/unmarshalling only 
  */
 @XmlRootElement(name="release-id")
+@XStreamAlias( "release-id" )
 @JsonIgnoreProperties({"snapshot"})
 public class ReleaseId implements org.kie.api.builder.ReleaseId {
 
+    @XStreamAlias( "group-id" )
     private String groupId;
+
+    @XStreamAlias( "artifact-id" )
     private String artifactId;
+
+    @XStreamAlias( "version" )
     private String version;
 
     public ReleaseId() {

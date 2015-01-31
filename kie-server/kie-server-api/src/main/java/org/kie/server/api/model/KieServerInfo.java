@@ -1,9 +1,12 @@
 package org.kie.server.api.model;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="kie-server-info")
+@XStreamAlias( "kie-server-info" )
 public class KieServerInfo {
     private String version;
     
