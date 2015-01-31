@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.api.task.TaskService;
@@ -42,7 +43,7 @@ public class ClientCommandObjectTest {
      * This test makes sure that the right command is called for the right method in the TaskService implementation
      * @throws Exception
      */
-    @Test
+    @Test  @Ignore
     public void taskServiceClientTest() throws Exception { 
      
         // mock setup

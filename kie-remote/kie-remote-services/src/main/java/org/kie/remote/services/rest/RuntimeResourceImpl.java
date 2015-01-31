@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -47,7 +46,6 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbVarElement;
 
 /**
  * This resource is responsible for providin operations to manage process instances. 
@@ -182,9 +180,9 @@ public class RuntimeResourceImpl extends ResourceBase {
         } catch( DeploymentNotFoundException dnfe ) { 
             throw new org.kie.remote.services.exception.DeploymentNotFoundException(dnfe.getMessage());
         }
-        // handle primitives and their wrappers as JAXBElement
+        // handle primitives and their wrappers
         if (procVar != null && isPrimitiveOrWrapper(procVar.getClass())) {
-            procVar = new JaxbVarElement(new QName("value"), procVar.getClass(), procVar);
+            procVar = wrapPrimitive(procVar);
         }
 
         // return

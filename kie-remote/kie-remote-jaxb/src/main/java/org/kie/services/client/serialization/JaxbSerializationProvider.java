@@ -40,13 +40,21 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbVarElement;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbBoolean;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbByte;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbCharacter;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbDouble;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbFloat;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbInteger;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbLong;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbShort;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
@@ -110,7 +118,15 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
                 JaxbRestRequestException.class,
 
                 // vairable wrapper element for primitives and their wrappers
-                JaxbVarElement.class
+                JaxbBoolean.class,
+                JaxbByte.class,
+                JaxbCharacter.class,
+                JaxbDouble.class,
+                JaxbFloat.class,
+                JaxbInteger.class,
+                JaxbLong.class,
+                JaxbShort.class,
+                JaxbString.class
         };
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     }
