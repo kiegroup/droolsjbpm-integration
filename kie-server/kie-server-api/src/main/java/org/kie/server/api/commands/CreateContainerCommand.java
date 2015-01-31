@@ -17,6 +17,7 @@ public class CreateContainerCommand implements KieServerCommand {
     private static final long    serialVersionUID = -1803374525440238478L;
 
     @XmlElement
+    @XStreamAlias( "kie-container" )
     private KieContainerResource container;
 
     public CreateContainerCommand() {

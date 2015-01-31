@@ -35,13 +35,10 @@ import org.kie.server.api.model.KieServerCommand;
 @XmlRootElement(name = "script")
 @XStreamAlias( "script" )
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "script", propOrder = {"lookup", "commands"})
+@XmlType(name = "script")
 public class CommandScript implements Serializable {
 
     private static final long serialVersionUID = 510l;
-
-    @XmlAttribute
-    private String lookup;
 
     @XmlElements({
                          @XmlElement(name = "create-container", type = CreateContainerCommand.class),
@@ -59,11 +56,6 @@ public class CommandScript implements Serializable {
         this.commands = commands;
     }
 
-    public CommandScript(List<KieServerCommand> commands, String lookup) {
-        this.commands = commands;
-        this.lookup = lookup;
-    }
-
     public List<KieServerCommand> getCommands() {
         if (commands == null) {
             commands = new ArrayList<KieServerCommand>();
@@ -71,18 +63,8 @@ public class CommandScript implements Serializable {
         return this.commands;
     }
 
-    public void setLookup(String lookup) {
-        this.lookup = lookup;
-    }
-
-    public String getLookup() {
-        return lookup;
-    }
-
     public String toString() {
-        return "CommandScriptImpl{" +
-                "lookup='" + lookup + '\'' +
-                ", commands=" + commands +
+        return "CommandScriptImpl{ commands=" + commands +
                 '}';
     }
 }

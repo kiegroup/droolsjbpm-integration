@@ -3,6 +3,7 @@ package org.kie.server.services.marshalling.xstream;
 import com.thoughtworks.xstream.XStream;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.*;
+import org.kie.server.api.model.*;
 import org.kie.server.services.marshalling.Marshaller;
 
 public class XStreamMarshaller
@@ -19,6 +20,14 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( CreateContainerCommand.class );
         this.xstream.processAnnotations( DisposeContainerCommand.class );
         this.xstream.processAnnotations( ListContainersCommand.class );
+        this.xstream.processAnnotations( ServiceResponsesList.class );
+        this.xstream.processAnnotations( ServiceResponse.class );
+        this.xstream.processAnnotations( KieContainerResourceList.class );
+        this.xstream.processAnnotations( KieContainerResource.class );
+        this.xstream.processAnnotations( ReleaseId.class );
+        this.xstream.processAnnotations( KieContainerStatus.class );
+        this.xstream.processAnnotations( KieScannerResource.class );
+        this.xstream.processAnnotations( KieServerInfo.class );
     }
 
     @Override

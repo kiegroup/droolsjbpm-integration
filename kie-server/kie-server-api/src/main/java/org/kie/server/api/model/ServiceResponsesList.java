@@ -1,5 +1,8 @@
 package org.kie.server.api.model;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -8,10 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name="responses")
+@XStreamAlias( "responses" )
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ServiceResponsesList {
 
-    @XmlElement(name="response")
+    @XmlElement(name = "response")
+    @XStreamImplicit(itemFieldName = "response")
     private List<ServiceResponse<? extends Object>> responses;
 
     public ServiceResponsesList() {

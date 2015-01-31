@@ -1,16 +1,28 @@
 package org.kie.server.api.model;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "kie-container")
+@XStreamAlias( "kie-container" )
 public class KieContainerResource {
 
+    @XStreamAlias( "container-id" )
     private String             containerId;
+
+    @XStreamAlias( "release-id" )
     private ReleaseId          releaseId;
+
+    @XStreamAlias( "resolved-release-id" )
     private ReleaseId          resolvedReleaseId;
+
+    @XStreamAlias( "status" )
     private KieContainerStatus status;
+
+    @XStreamAlias( "scanner" )
     private KieScannerResource scanner;
 
     public KieContainerResource() {
