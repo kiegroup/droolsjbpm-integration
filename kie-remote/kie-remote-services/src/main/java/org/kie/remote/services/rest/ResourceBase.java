@@ -3,6 +3,7 @@ package org.kie.remote.services.rest;
 import static org.kie.remote.common.rest.RestEasy960Util.defaultVariant;
 import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +43,15 @@ import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbBoolean;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbByte;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbCharacter;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbDouble;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbFloat;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbInteger;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbLong;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbShort;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,18 +107,18 @@ public class ResourceBase {
         paginationParams.add(SIZE_SHORT_PARAM);
     };
 
-    protected static Set<Class> wrapperPrimitives = new HashSet<Class>();
+    protected static Map<Class, Class> wrapperPrimitives = new HashMap<Class, Class>();
     static {
-        wrapperPrimitives.add(Boolean.class);
-        wrapperPrimitives.add(Byte.class);
-        wrapperPrimitives.add(Character.class);
-        wrapperPrimitives.add(Short.class);
-        wrapperPrimitives.add(Integer.class);
-        wrapperPrimitives.add(Long.class);
-        wrapperPrimitives.add(Double.class);
-        wrapperPrimitives.add(Float.class);
+        wrapperPrimitives.put(Boolean.class, JaxbBoolean.class);
+        wrapperPrimitives.put(Byte.class, JaxbByte.class);
+        wrapperPrimitives.put(Character.class, JaxbCharacter.class);
+        wrapperPrimitives.put(Short.class, JaxbShort.class);
+        wrapperPrimitives.put(Integer.class, JaxbInteger.class);
+        wrapperPrimitives.put(Long.class, JaxbLong.class);
+        wrapperPrimitives.put(Double.class, JaxbDouble.class);
+        wrapperPrimitives.put(Float.class, JaxbFloat.class);
         if (Boolean.getBoolean("org.kie.remote.wrap.string")) {
-            wrapperPrimitives.add(String.class);
+            wrapperPrimitives.put(String.class, JaxbString.class);
         }
     }
     
@@ -537,6 +547,16 @@ public class ResourceBase {
         if (type == null) {
             return false;
         }
-        return type.isPrimitive() || wrapperPrimitives.contains(type);
+        return type.isPrimitive() || wrapperPrimitives.containsKey(type);
+    }
+
+    public static Object wrapPrimitive(final Object value) {
+        try {
+            Class<?> wrapperClass = wrapperPrimitives.get(value.getClass());
+            Constructor c = wrapperClass.getConstructor(value.getClass());
+            return c.newInstance(value);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create wrapper for type " + value.getClass() + " with value " + value);
+        }
     }
 }
