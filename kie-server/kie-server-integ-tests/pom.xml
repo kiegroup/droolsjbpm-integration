@@ -47,6 +47,11 @@
       <artifactId>kie-server-services</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-jms</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- logging -->
     <dependency>
@@ -59,6 +64,34 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- JMS -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_1.1_spec</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hornetq</groupId>
+      <artifactId>hornetq-jms-client</artifactId>
+    </dependency>
+
+    <!-- dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-jms-client-bom</artifactId>
+      <type>pom</type>
+    </dependency -->
+
+    <!-- dependency>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-remote-naming</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-nio</artifactId>
+      <scope>test</scope>
+    </dependency -->
 
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>

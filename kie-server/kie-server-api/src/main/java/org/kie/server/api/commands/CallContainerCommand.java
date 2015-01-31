@@ -6,15 +6,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "call-container")
+@XStreamAlias( "call-container" )
 @XmlAccessorType(XmlAccessType.NONE)
 public class CallContainerCommand implements KieServerCommand {
 
     private static final long   serialVersionUID = -1803374525440238478L;
 
     @XmlAttribute(name = "container-id")
+    @XStreamAlias( "container-id" )
     private String              containerId;
 
     @XmlElement(name = "payload")

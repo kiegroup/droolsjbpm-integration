@@ -42,6 +42,7 @@
     <dependencySet>
       <includes>
         <include>org.kie:kie-server-services</include>
+        <include>org.kie:kie-server-jms</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
