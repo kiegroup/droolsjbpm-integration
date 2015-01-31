@@ -5,21 +5,30 @@ import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.services.marshalling.Marshaller;
+import org.kie.server.services.marshalling.MarshallerFactory;
+import org.kie.server.services.marshalling.MarshallingFormat;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class KieContainerInstance {
 
-    private KieContainerResource resource;
-    private InternalKieContainer kieContainer;
-    private InternalKieScanner   scanner;
+    private KieContainerResource               resource;
+    private InternalKieContainer               kieContainer;
+    private InternalKieScanner                 scanner;
+    private Map<MarshallingFormat, Marshaller> marshallers;
 
     public KieContainerInstance(String containerId, KieContainerStatus status) {
-        this(containerId, status, null);
+        this( containerId, status, null );
     }
 
     public KieContainerInstance(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
         super();
-        this.resource = new KieContainerResource(containerId, kieContainer != null ? new ReleaseId(kieContainer.getContainerReleaseId()) : null, status);
         this.kieContainer = kieContainer;
+        this.resource = new KieContainerResource( containerId, null, status );
+        this.marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>();
+        updateReleaseId();
     }
 
     public String getContainerId() {
@@ -27,7 +36,7 @@ public class KieContainerInstance {
     }
 
     public void setContainerId(String containerId) {
-        this.resource.setContainerId(containerId);
+        this.resource.setContainerId( containerId );
     }
 
     public InternalKieContainer getKieContainer() {
@@ -36,7 +45,7 @@ public class KieContainerInstance {
 
     public void setKieContainer(InternalKieContainer kieContainer) {
         this.kieContainer = kieContainer;
-        updateReleaseId(kieContainer);
+        updateReleaseId();
     }
 
     public KieContainerStatus getStatus() {
@@ -44,11 +53,11 @@ public class KieContainerInstance {
     }
 
     public void setStatus(KieContainerStatus status) {
-        this.resource.setStatus(status);
+        this.resource.setStatus( status );
     }
 
     public KieContainerResource getResource() {
-        updateReleaseId(kieContainer);
+        updateReleaseId();
         return resource;
     }
 
@@ -64,10 +73,31 @@ public class KieContainerInstance {
         return this.scanner;
     }
 
-    private void updateReleaseId(InternalKieContainer kieContainer) {
-        if (kieContainer != null) {
-            this.resource.setReleaseId(new ReleaseId(kieContainer.getContainerReleaseId()));
-            this.resource.setResolvedReleaseId(new ReleaseId(kieContainer.getReleaseId()));
+    private void updateReleaseId() {
+        if ( kieContainer != null ) {
+            this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
+            this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
+        }
+        disposeMarshallers();
+    }
+
+    public Marshaller getMarshaller(MarshallingFormat format) {
+        synchronized ( marshallers ) {
+            Marshaller marshaller = marshallers.get( format );
+            if ( marshaller == null ) {
+                marshaller = MarshallerFactory.getMarshaller( format, this.kieContainer.getClassLoader() );
+                this.marshallers.put( format, marshaller );
+            }
+            return marshaller;
+        }
+    }
+
+    public void disposeMarshallers() {
+        synchronized ( marshallers ) {
+            for ( Marshaller marshaller : this.marshallers.values() ) {
+                marshaller.dispose();
+            }
+            this.marshallers.clear();
         }
     }
 

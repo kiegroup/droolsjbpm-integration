@@ -5,10 +5,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "create-container")
+@XStreamAlias( "create-container" )
 @XmlAccessorType(XmlAccessType.NONE)
 public class CreateContainerCommand implements KieServerCommand {
 

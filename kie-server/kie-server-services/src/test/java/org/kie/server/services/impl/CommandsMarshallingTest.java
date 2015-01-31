@@ -1,6 +1,5 @@
 package org.kie.server.services.impl;
 
-import com.thoughtworks.xstream.XStream;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -15,52 +14,55 @@ import org.drools.core.command.runtime.rule.ModifyCommand;
 import org.drools.core.command.runtime.rule.QueryCommand;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.server.services.marshalling.Marshaller;
+import org.kie.server.services.marshalling.MarshallerFactory;
+import org.kie.server.services.marshalling.MarshallingFormat;
 
 import static org.junit.Assert.assertEquals;
 
 public class CommandsMarshallingTest {
-    private XStream marshaller = XStreamXml.newXStreamMarshaller(Thread.currentThread().getContextClassLoader());
+    private Marshaller marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.XSTREAM, Thread.currentThread().getContextClassLoader() );
 
     @Test
     public void testMarshallInsertObjectCommand() {
         String xmlCommand = "<insert>\n" +
-                "  <string>String value</string>\n" +
-                "</insert>";
-        InsertObjectCommand command = (InsertObjectCommand) marshaller.fromXML(xmlCommand);
-        assertEquals("String value", command.getObject().toString());
+                            "  <string>String value</string>\n" +
+                            "</insert>";
+        InsertObjectCommand command = (InsertObjectCommand) marshaller.unmarshall( xmlCommand );
+        assertEquals( "String value", command.getObject().toString() );
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals( xmlCommand, marshaller.marshall( command ) );
     }
 
     @Test
     public void testMarshallRetractCommand() {
         String xmlCommand = "<retract fact-handle=\"0:234:345:456:567:789\"/>";
-        DeleteCommand command = (DeleteCommand) marshaller.fromXML(xmlCommand);
-        assertEquals("0:234:345:456:567:789:NON_TRAIT", command.getFactHandle().toExternalForm());
+        DeleteCommand command = (DeleteCommand) marshaller.unmarshall( xmlCommand );
+        assertEquals( "0:234:345:456:567:789:NON_TRAIT", command.getFactHandle().toExternalForm() );
 
-        assertEquals("<retract fact-handle=\"0:234:345:456:567:789:NON_TRAIT\"/>", marshaller.toXML(command));
+        assertEquals( "<retract fact-handle=\"0:234:345:456:567:789:NON_TRAIT\"/>", marshaller.marshall( command ) );
     }
 
     @Test
     public void testMarshallModifyCommand() {
         String xmlCommand = "<modify fact-handle=\"0:234:345:456:567:789\">\n" +
-                "  <set accessor=\"age\" value=\"30\"/>\n" +
-                "</modify>";
-        ModifyCommand command = (ModifyCommand) marshaller.fromXML(xmlCommand);
+                            "  <set accessor=\"age\" value=\"30\"/>\n" +
+                            "</modify>";
+        ModifyCommand command = (ModifyCommand) marshaller.unmarshall(xmlCommand);
         assertEquals(1, command.getSetters().size());
 
         assertEquals("<modify fact-handle=\"0:234:345:456:567:789:NON_TRAIT\">\n" +
                 "  <set accessor=\"age\" value=\"30\"/>\n" +
-                "</modify>", marshaller.toXML(command));
+                "</modify>", marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallGetObjectCommand() {
         String xmlCommand = "<get-object fact-handle=\"0:234:345:456:567:789\" out-identifier=\"test\"/>";
-        GetObjectCommand command = (GetObjectCommand) marshaller.fromXML(xmlCommand);
+        GetObjectCommand command = (GetObjectCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("test", command.getOutIdentifier());
 
-        assertEquals("<get-object fact-handle=\"0:234:345:456:567:789:NON_TRAIT\" out-identifier=\"test\"/>", marshaller.toXML(command));
+        assertEquals("<get-object fact-handle=\"0:234:345:456:567:789:NON_TRAIT\" out-identifier=\"test\"/>", marshaller.marshall(command));
     }
 
     @Test
@@ -69,37 +71,37 @@ public class CommandsMarshallingTest {
                 "  <string>test1</string>\n" +
                 "  <string>test2</string>\n" +
                 "</insert-elements>";
-        InsertElementsCommand command = (InsertElementsCommand) marshaller.fromXML(xmlCommand);
+        InsertElementsCommand command = (InsertElementsCommand) marshaller.unmarshall(xmlCommand);
         assertEquals(2, command.getObjects().size());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallFireAllRulesCommand() {
         String xmlCommand = "<fire-all-rules max=\"10\" out-identifier=\"result\"/>";
-        FireAllRulesCommand command = (FireAllRulesCommand) marshaller.fromXML(xmlCommand);
+        FireAllRulesCommand command = (FireAllRulesCommand) marshaller.unmarshall(xmlCommand);
         assertEquals(10, command.getMax());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallStartProcessCommand() {
         String xmlCommand = "<start-process processId=\"org.drools.task.processOne\" out-identifier=\"id\"/>";
-        StartProcessCommand command = (StartProcessCommand) marshaller.fromXML(xmlCommand);
+        StartProcessCommand command = (StartProcessCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("org.drools.task.processOne", command.getProcessId());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallQueryCommand() {
         String xmlCommand = "<query out-identifier=\"persons-out\" name=\"persons\"/>";
-        QueryCommand command = (QueryCommand) marshaller.fromXML(xmlCommand);
+        QueryCommand command = (QueryCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("persons", command.getName());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
@@ -107,38 +109,38 @@ public class CommandsMarshallingTest {
         String xmlCommand = "<set-global identifier=\"helper\" out-identifier=\"output\">\n" +
                 "  <list/>\n" +
                 "</set-global>";
-        SetGlobalCommand command = (SetGlobalCommand) marshaller.fromXML(xmlCommand);
+        SetGlobalCommand command = (SetGlobalCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("helper", command.getIdentifier());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallGetGlobalCommand() {
         String xmlCommand = "<get-global identifier=\"helper\" out-identifier=\"helperOutput\"/>";
-        GetGlobalCommand command = (GetGlobalCommand) marshaller.fromXML(xmlCommand);
+        GetGlobalCommand command = (GetGlobalCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("helper", command.getIdentifier());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     public void testMarshallGetObjectsCommand() {
         String xmlCommand = "<get-objects out-identifier=\"objects\"/>";
-        GetObjectsCommand command = (GetObjectsCommand) marshaller.fromXML(xmlCommand);
+        GetObjectsCommand command = (GetObjectsCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("objects", command.getOutIdentifier());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     @Test
     @Ignore("Set focus command not yet supported")
     public void testMarshallAgendaGroupSetFocusCommand() {
         String xmlCommand = "<agenda-group-set-focus name=\"my-agenda-group\"/>";
-        AgendaGroupSetFocusCommand command = (AgendaGroupSetFocusCommand) marshaller.fromXML(xmlCommand);
+        AgendaGroupSetFocusCommand command = (AgendaGroupSetFocusCommand) marshaller.unmarshall(xmlCommand);
         assertEquals("my-agenda-group", command.getName());
 
-        assertEquals(xmlCommand, marshaller.toXML(command));
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     // TODO determine what other commands are supported and add tests for them

@@ -37,6 +37,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.services.marshalling.MarshallingFormat;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -193,9 +194,7 @@ public class KieServerImpl {
                     ks = kci.getKieContainer().getKieSession();
                 }
                 if (ks != null) {
-                    ClassLoader moduleClassLoader = kci.getKieContainer().getClassLoader();
-                    XStream xs = XStreamXml.newXStreamMarshaller(moduleClassLoader);
-                    Command<?> cmd = (Command<?>) xs.fromXML(payload);
+                    Command<?> cmd = (Command<?>) kci.getMarshaller( MarshallingFormat.XSTREAM ).unmarshall(payload);
 
                     if (cmd == null) {
                         return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
@@ -205,7 +204,7 @@ public class KieServerImpl {
                     }
 
                     ExecutionResults results = ks.execute((BatchExecutionCommandImpl) cmd);
-                    String result = xs.toXML(results);
+                    String result = kci.getMarshaller( MarshallingFormat.XSTREAM ).marshall(results);
                     return new ServiceResponse<String>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
                 } else {
                     return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");

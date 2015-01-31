@@ -19,6 +19,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
 
 import static org.kie.remote.common.rest.RestEasy960Util.*;
 
@@ -29,7 +30,7 @@ public class KieServerRestImpl implements KieServer {
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
-        this.server = new KieServerImpl();
+        this.server = KieServerLocator.getInstance();
     }
 
     public KieServerRestImpl(KieServerImpl server) {

@@ -28,10 +28,12 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.kie.server.api.model.KieServerCommand;
 
 @XmlRootElement(name = "script")
+@XStreamAlias( "script" )
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "script", propOrder = {"lookup", "commands"})
 public class CommandScript implements Serializable {
