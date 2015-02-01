@@ -319,6 +319,11 @@
                   <url>${wildfly81x.download.url}</url>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                </properties>
+              </configuration>
               <deployables>
                 <deployable>
                   <classifier>ee7</classifier>
@@ -347,6 +352,11 @@
                   <url>${wildfly82x.download.url}</url>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                </properties>
+              </configuration>
               <deployables>
                 <deployable>
                   <classifier>ee7</classifier>
@@ -375,6 +385,11 @@
                   <url>${jbossas71x.download.url}</url>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                </properties>
+              </configuration>
               <deployables>
                 <deployable>
                   <classifier>ee6</classifier>
@@ -407,6 +422,11 @@
                   <url>${eap63x.download.url}</url>
                 </zipUrlInstaller>
               </container>
+              <configuration>
+                <properties>
+                  <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                </properties>
+              </configuration>
               <deployables>
                 <deployable>
                   <classifier>ee6</classifier>
