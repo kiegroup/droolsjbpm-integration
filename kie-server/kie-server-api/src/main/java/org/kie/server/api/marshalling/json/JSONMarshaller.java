@@ -1,17 +1,21 @@
-package org.kie.server.client;
+package org.kie.server.api.marshalling.json;
+
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallingException;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
+
 import java.io.IOException;
 
-public class JsonSerializationProvider implements SerializationProvider {
+public class JSONMarshaller implements Marshaller {
 
     private final ObjectMapper objectMapper;
 
-    public JsonSerializationProvider() {
+    public JSONMarshaller() {
         objectMapper = new ObjectMapper();
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
         // one we move to Jackson 2.x, the config below should not be needed
@@ -23,27 +27,26 @@ public class JsonSerializationProvider implements SerializationProvider {
     }
 
     @Override
-    public String serialize(Object objectInput) {
+    public String marshall(Object objectInput) {
         try {
             return objectMapper.writeValueAsString(objectInput);
         } catch (IOException e) {
-            throw new SerializationException("Can't serialize the provided object!", e);
+            throw new MarshallingException("Error marshalling input", e);
         }
     }
 
     @Override
-    public Object deserialize(String serializedInput) {
-        Class<?> type = null;
-        return deserialize(serializedInput, type);
-    }
-
-    @Override
-    public <T> T deserialize(String serializedInput, Class<T> type) {
+    public <T> T unmarshall(String serializedInput, Class<T> type) {
         try {
             return objectMapper.readValue(serializedInput, type);
         } catch (IOException e) {
-            throw new SerializationException("Can't deserialize provided string!", e);
+            throw new MarshallingException("Error unmarshalling input", e);
         }
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
 }

@@ -1,10 +1,10 @@
-package org.kie.server.services.marshalling.xstream;
+package org.kie.server.api.marshalling.xstream;
 
 import com.thoughtworks.xstream.XStream;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.*;
 import org.kie.server.api.model.*;
-import org.kie.server.services.marshalling.Marshaller;
+import org.kie.server.api.marshalling.Marshaller;
 
 public class XStreamMarshaller
         implements Marshaller {
@@ -36,8 +36,8 @@ public class XStreamMarshaller
     }
 
     @Override
-    public Object unmarshall(String serializedInput) {
-        return xstream.fromXML( serializedInput );
+    public <T> T unmarshall(String input, Class<T> type) {
+        return (T) xstream.fromXML( input );
     }
 
     @Override
