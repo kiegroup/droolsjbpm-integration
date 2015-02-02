@@ -5,6 +5,7 @@ import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.kie.server.api.marshalling.MarshallingException;
 
 import javax.ws.rs.core.MediaType;
 
@@ -16,16 +17,16 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTest {
 
-    private static BaseMatcher<SerializationException> serializationExceptionMatcher =
-            new BaseMatcher<SerializationException>() {
+    private static BaseMatcher<MarshallingException> serializationExceptionMatcher =
+            new BaseMatcher<MarshallingException>() {
                 @Override
                 public boolean matches(Object o) {
-                    return o instanceof SerializationException;
+                    return o instanceof MarshallingException;
                 }
 
                 @Override
                 public void describeTo(Description description) {
-                    description.appendText("SerializationException");
+                    description.appendText( "SerializationException" );
                 }
             };
 
@@ -34,22 +35,24 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
 
     @Test
     public void testError404Handling() {
-        expectedEx.expect(KieServicesClientException.class);
-        expectedEx.expectMessage("Error code: 404");
-        stubFor(get(urlEqualTo("/containers"))
-                .withHeader("Accept", equalTo("application/xml"))
-                .willReturn(aResponse()
-                                .withStatus(404)
-                                .withBody("Resource not found!")
-                ));
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        expectedEx.expect( KieServicesClientException.class );
+        expectedEx.expectMessage( "Error code: 404" );
+        stubFor(
+                get( urlEqualTo( "/containers" ) )
+                        .withHeader( "Accept", equalTo( "application/xml" ) )
+                        .willReturn(
+                                aResponse()
+                                        .withStatus( 404 )
+                                        .withBody( "Resource not found!" )
+                        ) );
+        KieServicesClient client = new KieServicesClient( mockServerBaseUri );
         client.listContainers();
     }
 
     @Test
     public void testError500Handling() {
-        expectedEx.expect(KieServicesClientException.class);
-        expectedEx.expectMessage("Error code: 500");
+        expectedEx.expect( KieServicesClientException.class );
+        expectedEx.expectMessage( "Error code: 500");
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()

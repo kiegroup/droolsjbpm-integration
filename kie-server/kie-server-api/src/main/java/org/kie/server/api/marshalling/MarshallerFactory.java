@@ -1,8 +1,8 @@
-package org.kie.server.services.marshalling;
+package org.kie.server.api.marshalling;
 
-import org.kie.server.services.marshalling.jaxb.JaxbMarshaller;
-import org.kie.server.services.marshalling.json.JSONMarshaller;
-import org.kie.server.services.marshalling.xstream.XStreamMarshaller;
+import org.kie.server.api.marshalling.jaxb.JaxbMarshaller;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

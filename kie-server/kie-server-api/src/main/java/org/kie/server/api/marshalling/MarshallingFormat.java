@@ -1,4 +1,4 @@
-package org.kie.server.services.marshalling;
+package org.kie.server.api.marshalling;
 
 public enum MarshallingFormat {
     XSTREAM(0), JAXB(1), JSON(2);

@@ -5,9 +5,9 @@ import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.services.marshalling.Marshaller;
-import org.kie.server.services.marshalling.MarshallerFactory;
-import org.kie.server.services.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

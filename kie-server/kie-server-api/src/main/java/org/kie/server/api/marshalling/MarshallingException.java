@@ -1,4 +1,4 @@
-package org.kie.server.services.marshalling;
+package org.kie.server.api.marshalling;
 
 public class MarshallingException
         extends RuntimeException {

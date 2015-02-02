@@ -37,12 +37,10 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.services.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.thoughtworks.xstream.XStream;
 
 public class KieServerImpl {
 
@@ -194,7 +192,7 @@ public class KieServerImpl {
                     ks = kci.getKieContainer().getKieSession();
                 }
                 if (ks != null) {
-                    Command<?> cmd = (Command<?>) kci.getMarshaller( MarshallingFormat.XSTREAM ).unmarshall(payload);
+                    Command<?> cmd = kci.getMarshaller( MarshallingFormat.XSTREAM ).unmarshall(payload, Command.class);
 
                     if (cmd == null) {
                         return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");

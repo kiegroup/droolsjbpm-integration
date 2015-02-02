@@ -2,11 +2,11 @@ package org.kie.server.jms;
 
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.services.marshalling.Marshaller;
+import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
-import org.kie.server.services.marshalling.MarshallerFactory;
-import org.kie.server.services.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,7 +191,7 @@ public class KieServerMDB
         CommandScript cmdMsg = null;
         try {
             String msgStrContent = ((TextMessage) message).getText();
-            cmdMsg = (CommandScript) serializationProvider.unmarshall( msgStrContent );
+            cmdMsg = serializationProvider.unmarshall( msgStrContent, CommandScript.class );
         } catch (JMSException jmse) {
             String errMsg = "Unable to read information from message " + msgId + ".";
             throw new JMSRuntimeException(errMsg, jmse);

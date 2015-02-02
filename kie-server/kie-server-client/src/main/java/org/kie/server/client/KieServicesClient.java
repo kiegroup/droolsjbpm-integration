@@ -3,6 +3,10 @@ package org.kie.server.client;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingException;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
@@ -15,34 +19,32 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 public class KieServicesClient {
-    private static Logger logger = LoggerFactory.getLogger(KieServicesClient.class);
-    public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 30000;
+    private static      Logger logger                         = LoggerFactory.getLogger( KieServicesClient.class );
+    public static final long   DEFAULT_REQUEST_TIMEOUT_MILLIS = 30000;
 
-
-    private final String baseURI;
-    private final String username;
-    private final String password;
-    private final MediaType mediaType;
-    private final long requestTimeoutMillis;
-    private final SerializationProvider serializationProvider;
+    private final String     baseURI;
+    private final String     username;
+    private final String     password;
+    private final MediaType  mediaType;
+    private final long       requestTimeoutMillis;
+    private final Marshaller marshaller;
 
     public KieServicesClient(String baseURI) {
-        this(baseURI, null, null, MediaType.APPLICATION_XML_TYPE);
+        this( baseURI, null, null, MediaType.APPLICATION_XML_TYPE );
     }
 
     public KieServicesClient(String baseURI, MediaType mediaType) {
-        this(baseURI, null, null, mediaType);
+        this( baseURI, null, null, mediaType );
     }
 
     public KieServicesClient(String baseURI, String username, String password) {
-        this(baseURI, username, password, MediaType.APPLICATION_XML_TYPE);
+        this( baseURI, username, password, MediaType.APPLICATION_XML_TYPE );
     }
 
     public KieServicesClient(String baseURI, String username, String password, MediaType mediaType) {
-        this(baseURI, username, password, mediaType, DEFAULT_REQUEST_TIMEOUT_MILLIS);
+        this( baseURI, username, password, mediaType, DEFAULT_REQUEST_TIMEOUT_MILLIS );
     }
 
     public KieServicesClient(String baseURI, String username, String password, MediaType mediaType, long requestTimeoutMillis) {
@@ -52,9 +54,9 @@ public class KieServicesClient {
         this.mediaType = mediaType;
         this.requestTimeoutMillis = requestTimeoutMillis;
         if (MediaType.APPLICATION_XML_TYPE.equals(mediaType)) {
-            serializationProvider = new JaxbSerializationProvider();
+            marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JAXB, getClass().getClassLoader() );
         } else if (MediaType.APPLICATION_JSON_TYPE.equals(mediaType)) {
-            serializationProvider = new JsonSerializationProvider();
+            marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, getClass().getClassLoader() );
         } else {
             throw new RuntimeException("Unsupported media type '" + mediaType + "' specified!");
         }
@@ -196,16 +198,16 @@ public class KieServicesClient {
 
     private String serialize(Object object) {
         try {
-            return serializationProvider.serialize(object);
-        } catch (SerializationException e) {
+            return marshaller.marshall( object );
+        } catch (MarshallingException e) {
             throw new KieServicesClientException("Error while serializing request data!", e);
         }
     }
 
     private <T> T deserialize(String content, Class<T> type) {
         try {
-            return serializationProvider.deserialize(content, type);
-        } catch (SerializationException e) {
+            return marshaller.unmarshall(content, type);
+        } catch (MarshallingException e) {
             throw new KieServicesClientException("Error while deserializing data received from server!", e);
         }
     }
