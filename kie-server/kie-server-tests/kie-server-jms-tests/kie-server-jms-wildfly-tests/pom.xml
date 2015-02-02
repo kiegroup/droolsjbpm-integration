@@ -13,11 +13,11 @@
   <name>KIE :: Execution Server :: JMS Tests on WildFly</name>
 
   <properties>
-    <!-- default version, can be overriden in profiles below -->
+    <!-- Default version, can be overriden in profiles below. This version decides what dependencies will be used -->
     <version.org.wildfly>8.1.0.Final</version.org.wildfly>
-
-    <kie.server.base.uri>http://localhost:8080/kie-server/services/rest/server</kie.server.base.uri>
+    <wildfly.http.remoting.uri>http-remoting://${container.hostname}:${container.port}</wildfly.http.remoting.uri>
   </properties>
+
   <!-- We need to align with WildFly versions to make the JMS client work -->
   <dependencyManagement>
     <dependencies>
@@ -40,6 +40,7 @@
       <artifactId>kie-server-distribution-wars</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
+      <scope>test</scope>
     </dependency>
 
     <!-- logging -->
@@ -58,6 +59,7 @@
       <groupId>org.wildfly</groupId>
       <artifactId>wildfly-jms-client-bom</artifactId>
       <type>pom</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -65,115 +67,43 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
-          <configuration>
-            <container>
-              <containerId>wildfly8x</containerId>
-              <type>installed</type>
-            </container>
-            <configuration>
-              <properties>
-                <cargo.servlet.port>8080</cargo.servlet.port>
-                <cargo.servlet.users>yoda:usetheforce123@:kie-server,guest</cargo.servlet.users>
-                <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-              </properties>
-            </configuration>
-            <deployables>
-              <deployable>
-                <groupId>org.kie</groupId>
-                <artifactId>kie-server-distribution-wars</artifactId>
-                <classifier>ee7</classifier>
-                <type>war</type>
-                <properties>
-                  <context>kie-server</context>
-                </properties>
-                <pingURL>${kie.server.base.uri}</pingURL>
-                <pingTimeout>30000</pingTimeout>
-              </deployable>
-            </deployables>
-          </configuration>
-          <executions>
-            <execution>
-              <id>start-container</id>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>start</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>stop-container</id>
-              <phase>post-integration-test</phase>
-              <goals>
-                <goal>stop</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <!-- Skip the tests by default, they are executed when one of container profiles is used -->
-        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
-            <skipTests>true</skipTests>
+            <systemPropertyVariables>
+              <wildfly.http.remoting.uri>${wildfly.http.remoting.uri}</wildfly.http.remoting.uri>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
-
   <profiles>
     <profile>
       <id>wildfly81x</id>
       <properties>
         <version.org.wildfly>8.1.0.Final</version.org.wildfly>
-        <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
       </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration>
-              <container>
-                <zipUrlInstaller>
-                  <url>${wildfly81x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skipTests>false</skipTests>
-            </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>wildfly82x</id>
       <properties>
         <version.org.wildfly>8.2.0.Final</version.org.wildfly>
-        <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
       </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <configuration>
-              <container>
-                <zipUrlInstaller>
-                  <url>${wildfly82x.download.url}</url>
-                </zipUrlInstaller>
-              </container>
-            </configuration>
-          </plugin>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skipTests>false</skipTests>
-            </configuration>
           </plugin>
         </plugins>
       </build>

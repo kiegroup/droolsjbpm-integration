@@ -1,6 +1,7 @@
 package org.kie.server.integrationtests.jms;
 
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,12 @@ public class DummyJMSIntegrationTest {
     private static final String DEFAULT_USERNAME = "yoda";
     private static final String DEFAULT_PASSWORD = "usetheforce123@";
     private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
-    private static final String PROVIDER_URL = "http-remoting://localhost:8080";
+    private static final String PROVIDER_URL = System.getProperty("wildfly.http.remoting.uri", "http-remoting://localhost:8080");
+
+    @BeforeClass
+    public static void logConfig() {
+        log.info("Remoting provider URI='" + PROVIDER_URL + "'");
+    }
 
     @Test
     public void testSendBasicJMSMessage() throws Exception {
