@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>kie-server</artifactId>
+    <groupId>org.kie</groupId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-jms-wildfly-tests</artifactId>
+  <name>KIE :: Execution Server :: JMS Tests on WildFly</name>
+
+  <properties>
+    <!-- default version, can be overriden in profiles below -->
+    <version.org.wildfly>8.1.0.Final</version.org.wildfly>
+
+    <kie.server.base.uri>http://localhost:8080/kie-server/services/rest/server</kie.server.base.uri>
+  </properties>
+  <!-- We need to align with WildFly versions to make the JMS client work -->
+  <dependencyManagement>
+    <dependencies>
+      <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
+           so this is the closest thing.
+           Note: this replaces lot's of the versions defined in ip-bom -->
+      <dependency>
+        <groupId>org.wildfly</groupId>
+        <artifactId>wildfly-parent</artifactId>
+        <version>${version.org.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-distribution-wars</artifactId>
+      <classifier>ee7</classifier>
+      <type>war</type>
+    </dependency>
+
+    <!-- logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-jms-client-bom</artifactId>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-maven2-plugin</artifactId>
+          <configuration>
+            <container>
+              <containerId>wildfly8x</containerId>
+              <type>installed</type>
+            </container>
+            <configuration>
+              <properties>
+                <cargo.servlet.port>8080</cargo.servlet.port>
+                <cargo.servlet.users>yoda:usetheforce123@:kie-server,guest</cargo.servlet.users>
+                <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+              </properties>
+            </configuration>
+            <deployables>
+              <deployable>
+                <groupId>org.kie</groupId>
+                <artifactId>kie-server-distribution-wars</artifactId>
+                <classifier>ee7</classifier>
+                <type>war</type>
+                <properties>
+                  <context>kie-server</context>
+                </properties>
+                <pingURL>${kie.server.base.uri}</pingURL>
+                <pingTimeout>30000</pingTimeout>
+              </deployable>
+            </deployables>
+          </configuration>
+          <executions>
+            <execution>
+              <id>start-container</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>start</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>stop-container</id>
+              <phase>post-integration-test</phase>
+              <goals>
+                <goal>stop</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Skip the tests by default, they are executed when one of container profiles is used -->
+        <plugin>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <skipTests>true</skipTests>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>wildfly81x</id>
+      <properties>
+        <version.org.wildfly>8.1.0.Final</version.org.wildfly>
+        <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+              <container>
+                <zipUrlInstaller>
+                  <url>${wildfly81x.download.url}</url>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skipTests>false</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>wildfly82x</id>
+      <properties>
+        <version.org.wildfly>8.2.0.Final</version.org.wildfly>
+        <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <configuration>
+              <container>
+                <zipUrlInstaller>
+                  <url>${wildfly82x.download.url}</url>
+                </zipUrlInstaller>
+              </container>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skipTests>false</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+</project>
