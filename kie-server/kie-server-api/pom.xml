@@ -14,6 +14,10 @@
   <description>KIE Execution Server API</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
     <!-- core dependencies -->
     <dependency>
       <groupId>org.kie</groupId>
