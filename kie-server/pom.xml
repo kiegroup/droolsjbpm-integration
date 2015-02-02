@@ -21,7 +21,7 @@
     <module>kie-server-services</module>
     <module>kie-server-jms</module>
     <module>kie-server-distribution-wars</module>
-    <module>kie-server-integ-tests</module>
+    <module>kie-server-tests</module>
   </modules>
 
   <!-- move to droolsjbpm-buildbootstrap! -->
@@ -50,13 +50,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <profiles>
-    <!-- The JMS WildFly tests do not even compile on JDK6, so they are excluded from default build. -->
-    <profile>
-      <id>jms-tests</id>
-      <modules>
-        <module>kie-server-jms-wildfly-tests</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
