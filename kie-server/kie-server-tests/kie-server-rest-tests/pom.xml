@@ -3,15 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie</groupId>
-    <artifactId>kie-server</artifactId>
+    <artifactId>kie-server-tests</artifactId>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-server-integ-tests</artifactId>
-  <packaging>jar</packaging>
+  <artifactId>kie-server-rest-tests</artifactId>
 
-  <name>KIE :: Execution Server :: Integration Tests</name>
-  <description>KIE Execution Server Integration Tests</description>
+  <name>KIE :: Execution Server :: REST Tests</name>
+  <description>KIE Execution Server REST Tests</description>
 
   <properties>
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running

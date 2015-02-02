@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-server-tests</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-server-jms-tests</artifactId>
+  <packaging>pom</packaging>
+
+  <name>KIE :: Execution Server :: JMS Tests Parent</name>
+  <description>KIE Execution Server JMS Tests Parent</description>
+
+  <profiles>
+    <!-- The JMS WildFly tests do not even compile on JDK6, so they are excluded from default build. -->
+    <profile>
+      <id>jms-tests</id>
+      <modules>
+        <module>kie-server-jms-wildfly-tests</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>
