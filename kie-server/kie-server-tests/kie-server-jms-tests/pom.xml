@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: JMS Tests Parent</name>
   <description>KIE Execution Server JMS Tests Parent</description>
 
+  <modules>
+    <module>kie-server-jms-eap6-tests</module>
+  </modules>
+
   <profiles>
     <!-- The JMS WildFly tests do not even compile on JDK6, so they are excluded from default build. -->
     <profile>
