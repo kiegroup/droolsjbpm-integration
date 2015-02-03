@@ -62,10 +62,6 @@
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-camel</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
       <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
@@ -78,19 +74,11 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-features</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
       <artifactId>drools-rhq-plugin</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-aries-blueprint</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-osgi-integration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

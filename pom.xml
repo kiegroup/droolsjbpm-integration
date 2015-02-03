@@ -50,19 +50,15 @@
 
   <modules>
     <module>drools-benchmark</module>
-    <module>drools-camel-server-example</module>
-    <module>drools-osgi</module>
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
     <module>kie-remote</module>
     <module>kie-spring</module>
-    <module>kie-camel</module>
     <module>kie-aries-blueprint</module>
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
-    <module>drools-osgi-integration</module>
     <module>kie-server</module>
     <module>kie-examples-api</module>
     <module>kie-identity-session-provider</module>
