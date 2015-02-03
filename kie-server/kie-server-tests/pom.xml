@@ -35,11 +35,11 @@
     <jbossas71x.download.url>http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip</jbossas71x.download.url>
     <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
     <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
-    <!-- The EAP 6.3.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
+    <!-- The EAP 6.4.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
-    <eap63x.download.url>valid-url-for-eap-6.3.x-needs-to-be-specified-here-or-via-cmd-line</eap63x.download.url>
+    <eap64x.download.url>valid-url-for-eap-6.4.x-needs-to-be-specified-here-or-via-cmd-line</eap64x.download.url>
   </properties>
 
   <modules>
@@ -305,7 +305,7 @@
       </build>
     </profile>
     <profile>
-      <id>eap63x</id>
+      <id>eap64x</id>
       <build>
         <pluginManagement>
           <plugins>
@@ -314,10 +314,11 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
+                  <!-- jboss74x works for now, but should be updated to jboss75x once Cargo supports EAP 6.4 -->
                   <containerId>jboss74x</containerId>
                   <type>installed</type>
                   <zipUrlInstaller>
-                    <url>${eap63x.download.url}</url>
+                    <url>${eap64x.download.url}</url>
                   </zipUrlInstaller>
                 </container>
                 <configuration>
