@@ -6,8 +6,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.kie.server.api.marshalling.MarshallingException;
-
-import javax.ws.rs.core.MediaType;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.impl.KieServicesClientImpl;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -35,7 +35,7 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
 
     @Test
     public void testError404Handling() {
-        expectedEx.expect( KieServicesClientException.class );
+        expectedEx.expect( KieServicesException.class );
         expectedEx.expectMessage( "Error code: 404" );
         stubFor(
                 get( urlEqualTo( "/containers" ) )
@@ -45,13 +45,13 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
                                         .withStatus( 404 )
                                         .withBody( "Resource not found!" )
                         ) );
-        KieServicesClient client = new KieServicesClient( mockServerBaseUri );
+        KieServicesClient client = new KieServicesClientImpl( config );
         client.listContainers();
     }
 
     @Test
     public void testError500Handling() {
-        expectedEx.expect( KieServicesClientException.class );
+        expectedEx.expect( KieServicesException.class );
         expectedEx.expectMessage( "Error code: 500");
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -59,13 +59,13 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
                                 .withStatus(500)
                                 .withBody("Internal server error!")
                 ));
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        KieServicesClient client = new KieServicesClientImpl(config);
         client.listContainers();
     }
 
     @Test
     public void testXmlDeserializationErrorHandling() {
-        expectedEx.expect(KieServicesClientException.class);
+        expectedEx.expect(KieServicesException.class);
         expectedEx.expectCause(serializationExceptionMatcher);
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -74,13 +74,13 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
                                 .withHeader("Content-Type", "application/xml")
                                 .withBody("Some gibberish that can't be parsed by client!")
                 ));
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        KieServicesClient client = new KieServicesClientImpl(config);
         client.listContainers();
     }
 
     @Test
     public void testJsonDeserializationErrorHandling() {
-        expectedEx.expect(KieServicesClientException.class);
+        expectedEx.expect(KieServicesException.class);
         expectedEx.expectCause(serializationExceptionMatcher);
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/json"))
@@ -89,7 +89,9 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
                                 .withHeader("Content-Type", "application/json")
                                 .withBody("Some gibberish that can't be parsed by client!")
                 ));
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri, MediaType.APPLICATION_JSON_TYPE);
+        KieServicesConfiguration configJSON = config.clone();
+        configJSON.setMarshallingFormat( MarshallingFormat.JSON );
+        KieServicesClient client = new KieServicesClientImpl(configJSON);
         client.listContainers();
     }
 

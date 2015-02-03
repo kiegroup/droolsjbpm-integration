@@ -1,13 +1,12 @@
 package org.kie.server.client;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.impl.KieServicesClientImpl;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -32,7 +31,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                         "  </kie-server-info>\n" +
                                         "</response>")));
 
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
@@ -52,7 +51,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                         "  </kie-containers>" +
                                         "</response>")));
 
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         assertSuccess(response);
         assertEquals("Number of listed containers", 2, response.getResult().getContainers().size());
@@ -80,7 +79,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                 "  </kie-container>\n" +
                                 "</response>")));
 
-        KieServicesClient client = new KieServicesClient(mockServerBaseUri);
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar2", "1.0-SNAPSHOT");
         KieContainerResource resource = new KieContainerResource("kie1", releaseId);
         ServiceResponse<KieContainerResource> response = client.createContainer("kie1", resource);

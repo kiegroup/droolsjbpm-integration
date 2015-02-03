@@ -149,7 +149,7 @@ public class KieServerMDB
         MarshallingFormat format = null;
         try {
             if ( !message.propertyExists( SERIALIZATION_TYPE_PROPERTY_NAME ) ) {
-                format = MarshallingFormat.XSTREAM;
+                format = MarshallingFormat.JAXB;
             } else {
                 int intFormat = message.getIntProperty( SERIALIZATION_TYPE_PROPERTY_NAME );
                 format = MarshallingFormat.fromId( intFormat );
@@ -166,18 +166,16 @@ public class KieServerMDB
         // 2. get marshaller
         Marshaller marshaller = marshallers.get( format );
 
-        System.out.println("Marshaller = "+marshaller);
-
-        // 2. deserialize request
+        // 3. deserialize request
         CommandScript script = unmarshallRequest( message, msgCorrId, marshaller, format );
 
-        // 3. process request
+        // 4. process request
         ServiceResponsesList response = kieServer.executeScript( script );
 
-        // 4. serialize response
+        // 5. serialize response
         Message msg = marshallResponse( session, msgCorrId, format, marshaller, response );
 
-        // 5. send response
+        // 6. send response
         sendResponse( msgCorrId, format, msg );
 
 //
@@ -206,7 +204,6 @@ public class KieServerMDB
         TextMessage textMsg = null;
         try {
             String msgStr = marshaller.marshall( response );
-            logger.info(">>>>>>>>>>>> Sending response = ["+msgStr+"]");
             textMsg = session.createTextMessage(msgStr);
             textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, format.getId());
         } catch (JMSException jmse) {
