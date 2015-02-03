@@ -32,6 +32,10 @@
       <directory>${project.basedir}/src/main/shared-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/main/ee6-container</directory>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
@@ -40,7 +44,8 @@
         <exclude>org.jboss.resteasy:*</exclude>
       </excludes>
       <includes>
-        <include>org.kie:kie-server-services:jar</include>
+        <include>org.kie:kie-server-services</include>
+        <include>org.kie:kie-server-jms</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
