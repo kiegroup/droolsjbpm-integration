@@ -35,6 +35,28 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- kie server dependencies -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-services</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-jms</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-server-distribution-wars</artifactId>

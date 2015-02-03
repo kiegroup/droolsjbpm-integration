@@ -51,6 +51,13 @@
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
 
+    <!-- JMS -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.jms</groupId>
+      <artifactId>jboss-jms-api_1.1_spec</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
