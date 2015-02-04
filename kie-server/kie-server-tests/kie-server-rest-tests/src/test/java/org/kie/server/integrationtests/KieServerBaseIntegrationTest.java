@@ -7,12 +7,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +41,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -131,10 +128,14 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private void startClient() throws Exception {
+        client = createDefaultClient();
+    }
+
+    protected KieServicesClient createDefaultClient() {
         if (LOCAL_SERVER) {
-            client = new KieServicesClient(BASE_URI, MEDIA_TYPE);
+            return new KieServicesClient(BASE_URI, MEDIA_TYPE);
         } else {
-            client = new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, MEDIA_TYPE);
+            return new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, MEDIA_TYPE);
         }
     }
 
