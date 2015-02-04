@@ -1304,7 +1304,7 @@ public class KieRemoteHttpRequest {
             closeOutput();
             return getConnection().getResponseCode();
         } catch( IOException ioe ) {
-            throw new KieRemoteHttpRequestException("Error occured when trying to retrieve response code", ioe);
+            throw new KieRemoteHttpRequestException("Error occurred when trying to retrieve response code", ioe);
         }
     }
 
