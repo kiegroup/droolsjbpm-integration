@@ -41,9 +41,14 @@ public class CommandScript implements Serializable {
     private static final long serialVersionUID = 510l;
 
     @XmlElements({
+                         @XmlElement(name = "get-server-info", type = GetServerInfoCommand.class),
                          @XmlElement(name = "create-container", type = CreateContainerCommand.class),
+                         @XmlElement(name = "get-container-info", type = GetContainerInfoCommand.class),
                          @XmlElement(name = "list-containers", type = ListContainersCommand.class),
                          @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
+                         @XmlElement(name = "get-scanner-info", type = GetScannerInfoCommand.class),
+                         @XmlElement(name = "update-scanner", type = UpdateScannerCommand.class),
+                         @XmlElement(name = "update-release-id", type = UpdateReleaseIdCommand.class),
                          @XmlElement(name = "call-container", type = CallContainerCommand.class)
                  })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")

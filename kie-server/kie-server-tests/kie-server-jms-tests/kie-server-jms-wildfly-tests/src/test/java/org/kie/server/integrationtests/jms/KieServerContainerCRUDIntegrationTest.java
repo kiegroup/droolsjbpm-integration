@@ -14,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Ignore
 public class KieServerContainerCRUDIntegrationTest
         extends KieServerBaseIntegrationTest {
 
@@ -108,6 +107,7 @@ public class KieServerContainerCRUDIntegrationTest
     }
 
     @Test
+    @Ignore
     public void testGetContainerInfoNonExisting() throws Exception {
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("non-existing-container");
         System.out.println(reply.getMsg());

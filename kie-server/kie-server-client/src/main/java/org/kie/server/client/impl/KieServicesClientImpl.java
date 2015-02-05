@@ -1,8 +1,10 @@
 package org.kie.server.client.impl;
 
+import org.kie.api.command.Command;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
-import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.*;
+import org.kie.server.api.jms.JMSConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
@@ -14,11 +16,16 @@ import org.kie.server.client.KieServicesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jms.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class KieServicesClientImpl
         implements KieServicesClient {
@@ -72,56 +79,105 @@ public class KieServicesClientImpl
 
     @Override
     public ServiceResponse<KieServerInfo> getServerInfo() {
-        return makeHttpGetRequestAndCreateServiceResponse( baseURI, KieServerInfo.class );
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateServiceResponse( baseURI, KieServerInfo.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetServerInfoCommand() ) );
+            return (ServiceResponse<KieServerInfo>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<KieContainerResourceList> listContainers() {
-        return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers", KieContainerResourceList.class );
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers", KieContainerResourceList.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new ListContainersCommand() ) );
+            return (ServiceResponse<KieContainerResourceList>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
-        return makeHttpPutRequestAndCreateServiceResponse( baseURI + "/containers/" + id, resource, KieContainerResource.class );
+        if( config.isRest() ) {
+            return makeHttpPutRequestAndCreateServiceResponse( baseURI + "/containers/" + id, resource, KieContainerResource.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateContainerCommand( resource ) ) );
+            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
-        return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id, KieContainerResource.class );
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id, KieContainerResource.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetContainerInfoCommand( id ) ) );
+            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<Void> disposeContainer(String id) {
-        return makeHttpDeleteRequestAndCreateServiceResponse( baseURI + "/containers/" + id, Void.class );
+        if( config.isRest() ) {
+            return makeHttpDeleteRequestAndCreateServiceResponse( baseURI + "/containers/" + id, Void.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DisposeContainerCommand( id ) ) );
+            return (ServiceResponse<Void>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<String> executeCommands(String id, String payload) {
-        return makeHttpPostRequestAndCreateServiceResponse( baseURI + "/containers/" + id, payload, String.class );
+        if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateServiceResponse( baseURI + "/containers/" + id, payload, String.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, payload ) ) );
+            return (ServiceResponse<String>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponsesList executeScript(CommandScript script) {
-        return makeHttpPostRequestAndCreateCustomResult( baseURI, script, ServiceResponsesList.class );
+        if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateCustomResult( baseURI, script, ServiceResponsesList.class );
+        } else {
+            return executeJmsCommand( script );
+        }
     }
 
     @Override
     public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
-        return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id + "/scanner", KieScannerResource.class );
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id + "/scanner", KieScannerResource.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetScannerInfoCommand( id ) ) );
+            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
-        return makeHttpPostRequestAndCreateServiceResponse(
-                baseURI + "/containers/" + id + "/scanner", resource,
-                KieScannerResource.class );
+        if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateServiceResponse(
+                    baseURI + "/containers/" + id + "/scanner", resource,
+                    KieScannerResource.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateScannerCommand( id, resource ) ) );
+            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
-        return makeHttpPostRequestAndCreateServiceResponse(
-                baseURI + "/containers/" + id + "/release-id", releaseId,
-                ReleaseId.class );
+        if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateServiceResponse(
+                    baseURI + "/containers/" + id + "/release-id", releaseId,
+                    ReleaseId.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateReleaseIdCommand( id, releaseId ) ) );
+            return (ServiceResponse<ReleaseId>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -217,6 +273,100 @@ public class KieServicesClientImpl
         }
         return httpRequest;
     }
+
+    /**
+     * Method to communicate with the backend via JMS.
+     *
+     * @param command The {@link org.kie.api.command.Command} object to be executed.
+     * @return The result of the {@link org.kie.api.command.Command} object execution.
+     */
+    private ServiceResponsesList executeJmsCommand( CommandScript command ) {
+        ConnectionFactory factory = config.getConnectionFactory();
+        Queue sendQueue = config.getRequestQueue();
+        Queue responseQueue = config.getResponseQueue();
+
+        Connection connection = null;
+        Session session = null;
+        ServiceResponsesList cmdResponse = null;
+        String corrId = UUID.randomUUID().toString();
+        String selector = "JMSCorrelationID = '" + corrId + "'";
+        try {
+            // setup
+            MessageProducer producer;
+            MessageConsumer consumer;
+            try {
+                if( config.getPassword() != null ) {
+                    connection = factory.createConnection(config.getUserName(), config.getPassword());
+                } else {
+                    connection = factory.createConnection();
+                }
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                producer = session.createProducer(sendQueue);
+                consumer = session.createConsumer(responseQueue, selector);
+
+                connection.start();
+            } catch( JMSException jmse ) {
+                throw new KieServicesException("Unable to setup a JMS connection.", jmse);
+            }
+
+            // Create msg
+            TextMessage textMsg;
+            Marshaller marshaller;
+            try {
+
+                // serialize request
+                marshaller = MarshallerFactory.getMarshaller( config.getMarshallingFormat(), CommandScript.class.getClassLoader() );
+                String xmlStr = marshaller.marshall( command );
+                textMsg = session.createTextMessage(xmlStr);
+
+                // set properties
+                // 1. corr id
+                textMsg.setJMSCorrelationID(corrId);
+                // 2. serialization info
+                textMsg.setIntProperty( JMSConstants.SERIALIZATION_FORMAT_PROPERTY_NAME, config.getMarshallingFormat().getId() );
+                // send
+                producer.send(textMsg);
+            } catch( JMSException jmse ) {
+                throw new KieServicesException("Unable to send a JMS message.", jmse);
+            }
+
+            // receive
+            Message response;
+            try {
+                response = consumer.receive( config.getTimeout() );
+            } catch( JMSException jmse ) {
+                jmse.printStackTrace();
+                throw new KieServicesException("Unable to receive or retrieve the JMS response.", jmse);
+            }
+
+            if( response == null ) {
+                logger.warn("Response is empty");
+                return null;
+            }
+            // extract response
+            assert response != null: "Response is empty.";
+            try {
+                String responseStr = ((TextMessage) response).getText();
+                cmdResponse = marshaller.unmarshall(responseStr, ServiceResponsesList.class);
+                return cmdResponse;
+            } catch( JMSException jmse ) {
+                throw new KieServicesException("Unable to extract " + ServiceResponsesList.class.getSimpleName()
+                                                       + " instance from JMS response.", jmse);
+            }
+        } finally {
+            if( connection != null ) {
+                try {
+                    connection.close();
+                    if( session != null ) {
+                        session.close();
+                    }
+                } catch( JMSException jmse ) {
+                    logger.warn("Unable to close connection or session!", jmse);
+                }
+            }
+        }
+    }
+
 
     private String getMediaType( MarshallingFormat format ) {
         switch ( format ) {

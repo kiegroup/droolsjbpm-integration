@@ -25,8 +25,7 @@ public final class KieServicesConfigurationImpl
     public static final String REQUEST_QUEUE_NAME          = "jms/queue/KIE.SERVER.REQUEST";
     public static final String RESPONSE_QUEUE_NAME         = "jms/queue/KIE.SERVER.RESPONSE";
 
-    public static final int  DEFAULT_TIMEOUT_IN_SECS = 5;
-    private             long timeoutInMillisecs      = DEFAULT_TIMEOUT_IN_SECS * 1000; // in seconds
+    private             long timeoutInMillisecs      = 5000; // in milliseconds
 
     // REST or JMS
     private final Transport transport;
@@ -56,7 +55,7 @@ public final class KieServicesConfigurationImpl
      * @param password
      */
     public KieServicesConfigurationImpl(String url, String username, String password) {
-        this( url, username, password, DEFAULT_TIMEOUT_IN_SECS );
+        this( url, username, password, 5000 );
     }
 
     /**
@@ -66,13 +65,13 @@ public final class KieServicesConfigurationImpl
      * @param password
      * @param timeoutInSecs
      */
-    public KieServicesConfigurationImpl(String url, String username, String password, int timeoutInSecs) {
+    public KieServicesConfigurationImpl(String url, String username, String password, long timeout) {
         this.transport = Transport.REST;
 
         this.serverUrl = url;
         this.userName = username;
         this.password = password;
-        this.timeoutInMillisecs = timeoutInSecs * 1000;
+        this.timeoutInMillisecs = timeout;
     }
 
     @Override
@@ -253,7 +252,7 @@ public final class KieServicesConfigurationImpl
 
     @Override
     public KieServicesConfiguration setTimeout(long timeout) {
-        this.timeoutInMillisecs = timeout * 1000;
+        this.timeoutInMillisecs = timeout;
         return this;
     }
 

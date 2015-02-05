@@ -19,6 +19,11 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( CallContainerCommand.class );
         this.xstream.processAnnotations( CreateContainerCommand.class );
         this.xstream.processAnnotations( DisposeContainerCommand.class );
+        this.xstream.processAnnotations( GetContainerInfoCommand.class );
+        this.xstream.processAnnotations( GetScannerInfoCommand.class );
+        this.xstream.processAnnotations( UpdateScannerCommand.class );
+        this.xstream.processAnnotations( UpdateReleaseIdCommand.class );
+        this.xstream.processAnnotations( GetServerInfoCommand.class );
         this.xstream.processAnnotations( ListContainersCommand.class );
         this.xstream.processAnnotations( ServiceResponsesList.class );
         this.xstream.processAnnotations( ServiceResponse.class );
@@ -44,12 +49,6 @@ public class XStreamMarshaller
     public void dispose() {
         // nothing to do
     }
-
-    private void registerKieServerAliases() {
-        xstream.alias( "script", CommandScript.class );
-        xstream.alias( "list-containers", ListContainersCommand.class );
-    }
-
 
     @Override
     public String toString() {

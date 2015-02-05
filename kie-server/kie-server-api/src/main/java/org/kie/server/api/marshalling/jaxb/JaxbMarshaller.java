@@ -21,6 +21,11 @@ public class JaxbMarshaller implements Marshaller {
                 CreateContainerCommand.class,
                 DisposeContainerCommand.class,
                 ListContainersCommand.class,
+                GetContainerInfoCommand.class,
+                GetScannerInfoCommand.class,
+                GetServerInfoCommand.class,
+                UpdateScannerCommand.class,
+                UpdateReleaseIdCommand.class,
 
                 KieContainerResource.class,
                 KieContainerResourceList.class,
