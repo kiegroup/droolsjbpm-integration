@@ -9,7 +9,6 @@ import javax.naming.NamingException;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.remote.client.api.exception.RemoteCommunicationException;
-import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClient;
 import org.kie.remote.services.ws.command.generated.CommandWebService;
 
 /**
@@ -46,7 +45,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * to configure and buid a remote client for the {@link CommandWebService}.
      * @return A {@link RemoteWebserviceClientBuilder} instance
      */
-    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandWebServiceClientBuilder() { 
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newCommandWebServiceClientBuilder() { 
        return org.kie.services.client.api.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
     }
     

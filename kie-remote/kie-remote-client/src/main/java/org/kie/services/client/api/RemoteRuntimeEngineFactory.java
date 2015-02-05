@@ -15,7 +15,7 @@ import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
-import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClient;
+import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.services.client.api.command.RemoteConfiguration;
 
 /**
@@ -59,7 +59,7 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
      * to configure and buid a remote API client {@link RuntimeEngine} instance.
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
-    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandServiceBasicAuthClient> newCommandWebServiceClientBuilder() { 
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newCommandWebServiceClientBuilder() { 
        return new RemoteCommandWebserviceClientBuilderImpl();
     }
     

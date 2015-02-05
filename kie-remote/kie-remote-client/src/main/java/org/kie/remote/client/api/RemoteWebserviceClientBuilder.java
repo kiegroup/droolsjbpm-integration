@@ -3,7 +3,7 @@ package org.kie.remote.client.api;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClient;
+import org.kie.remote.services.ws.command.generated.CommandWebService;
 
 
 /**
@@ -50,13 +50,13 @@ public interface RemoteWebserviceClientBuilder<B, S> extends RemoteClientBuilder
     RemoteWebserviceClientBuilder<B, S> addServerUrl(String instanceUrlString) throws MalformedURLException;
     
     /**
-     * Creates a {@link CommandServiceBasicAuthClient} instance, using the 
+     * Creates a {@link CommandWebService} instance, using the 
      * configuration built up to this point. 
      * </p>
      * 
-     * @return The {@link CommandServiceBasicAuthClient} instance
+     * @return The {@link CommandWebService} instance
      * @throws @{link InsufficientInfoToBuildException} when insufficient information 
-     * is provided to build the {@link CommandServiceBasicAuthClient}
+     * is provided to build the {@link CommandWebService}
      */
     S buildBasicAuthClient();
 

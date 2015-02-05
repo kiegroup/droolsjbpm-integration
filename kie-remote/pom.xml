@@ -41,8 +41,7 @@
     <version.org.jboss.ws.cxf>4.3.0.Final</version.org.jboss.ws.cxf>
 
     <!-- apache -->
-    <version.org.apache.cxf>2.7.10</version.org.apache.cxf>
-    <version.org.apache.ws.security.wss4j>1.6.15</version.org.apache.ws.security.wss4j>
+    <version.org.apache.ws.security.wss4j>1.6.17</version.org.apache.ws.security.wss4j>
   </properties> 
  
   <dependencyManagement>
@@ -51,6 +50,11 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-api</artifactId>
+        <version>${version.org.apache.cxf}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-simple</artifactId>
         <version>${version.org.apache.cxf}</version>
       </dependency>
       <dependency>

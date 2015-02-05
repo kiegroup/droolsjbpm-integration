@@ -2,6 +2,8 @@ package org.kie.services.client.api;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.services.client.api.command.RemoteConfiguration;
@@ -43,7 +45,7 @@ abstract class RemoteWebserviceClientBuilderImpl<S> implements RemoteWebserviceC
     public RemoteWebserviceClientBuilder addServerUrl( String instanceUrlString ) throws MalformedURLException {
         URL serverUrl = new URL(instanceUrlString);
         config.setServerBaseWsUrl(serverUrl);
-        return null;
+        return this;
     }
     
     @Override
@@ -51,7 +53,23 @@ abstract class RemoteWebserviceClientBuilderImpl<S> implements RemoteWebserviceC
         config.setTimeout(timeoutInSeconds);
         return this;
     }
+    
+    @Override
+    public RemoteWebserviceClientBuilder addDeploymentId(String deploymentId) {
+        config.setDeploymentId(deploymentId);
+        return this;
+    }
 
+    @Override
+    public RemoteWebserviceClientBuilder addExtraJaxbClasses( Class... classes ) {
+        Set<Class<?>> classSet = new HashSet<Class<?>>();
+        for( Class clazz : classes ) { 
+            classSet.add(clazz);
+        }
+        config.addJaxbClasses(classSet);
+        return this;
+    }
+    
     protected void checkAndFinalizeConfig() { 
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
