@@ -26,6 +26,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
@@ -133,9 +134,9 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected KieServicesClient createDefaultClient() {
         if (LOCAL_SERVER) {
-            return new KieServicesClient(BASE_URI, MEDIA_TYPE);
+            return KieServicesFactory.newKieServicesRestClient( BASE_URI, null, null );
         } else {
-            return new KieServicesClient(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, MEDIA_TYPE);
+            return KieServicesFactory.newKieServicesRestClient( BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD );
         }
     }
 
