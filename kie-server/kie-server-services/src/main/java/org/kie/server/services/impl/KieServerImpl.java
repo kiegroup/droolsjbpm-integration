@@ -21,11 +21,7 @@ import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
-import org.kie.server.api.commands.CallContainerCommand;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.CreateContainerCommand;
-import org.kie.server.api.commands.DisposeContainerCommand;
-import org.kie.server.api.commands.ListContainersCommand;
+import org.kie.server.api.commands.*;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -60,12 +56,22 @@ public class KieServerImpl {
             for (KieServerCommand command : commands.getCommands()) {
                 if (command instanceof CreateContainerCommand) {
                     responses.add(createContainer(((CreateContainerCommand) command).getContainer().getContainerId(), ((CreateContainerCommand) command).getContainer()));
+                } else if (command instanceof GetServerInfoCommand) {
+                    responses.add(getInfo());
                 } else if (command instanceof ListContainersCommand) {
                     responses.add(listContainers());
                 } else if (command instanceof CallContainerCommand) {
                     responses.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
                 } else if (command instanceof DisposeContainerCommand) {
                     responses.add(disposeContainer(((DisposeContainerCommand) command).getContainerId()));
+                } else if (command instanceof GetContainerInfoCommand ) {
+                    responses.add(getContainerInfo(((GetContainerInfoCommand) command).getContainerId()));
+                } else if (command instanceof GetScannerInfoCommand ) {
+                    responses.add(getScannerInfo(((GetScannerInfoCommand) command).getContainerId()));
+                } else if (command instanceof UpdateScannerCommand ) {
+                    responses.add(updateScanner(((UpdateScannerCommand) command).getContainerId(), ((UpdateScannerCommand) command).getScanner()));
+                } else if (command instanceof UpdateReleaseIdCommand ) {
+                    responses.add(updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
                 }
             }
         }

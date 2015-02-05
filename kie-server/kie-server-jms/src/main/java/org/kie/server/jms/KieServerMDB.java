@@ -24,7 +24,7 @@ import javax.naming.NamingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.kie.server.jms.JMSConstants.*;
+import static org.kie.server.api.jms.JMSConstants.*;
 
 @MessageDriven(name = "KieServerMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/KIE.SERVER.REQUEST"),
@@ -101,20 +101,6 @@ public class KieServerMDB
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void onMessage(Message message) {
-        // ---------------------------------------
-        //     REMOVE THIS:
-        try {
-            if ( message instanceof TextMessage ) {
-                logger.info( "Received Message from queue: " + ((TextMessage) message).getText() );
-            } else {
-                logger.warn( "Message of wrong type: " + message.getClass().getName() );
-            }
-        } catch ( JMSException e ) {
-            throw new RuntimeException( e );
-        }
-//        logger.info( ">>>>>>>>>>>> retry tracker = "+retryTracker );
-        // -----------------------------------------
-
 //        String msgId = null;
 //        boolean redelivered = false;
 //        try {
@@ -148,10 +134,10 @@ public class KieServerMDB
         // 1. get marshalling info
         MarshallingFormat format = null;
         try {
-            if ( !message.propertyExists( SERIALIZATION_TYPE_PROPERTY_NAME ) ) {
+            if ( !message.propertyExists( SERIALIZATION_FORMAT_PROPERTY_NAME ) ) {
                 format = MarshallingFormat.JAXB;
             } else {
-                int intFormat = message.getIntProperty( SERIALIZATION_TYPE_PROPERTY_NAME );
+                int intFormat = message.getIntProperty( SERIALIZATION_FORMAT_PROPERTY_NAME );
                 format = MarshallingFormat.fromId( intFormat );
                 if( format == null ) {
                     String errMsg = "Unsupported marshalling format '"+ intFormat +"' from message " + msgCorrId + ".";
@@ -159,7 +145,7 @@ public class KieServerMDB
                 }
             }
         } catch ( JMSException jmse ) {
-            String errMsg = "Unable to retrieve property '"+SERIALIZATION_TYPE_PROPERTY_NAME+"' from message " + msgCorrId + ".";
+            String errMsg = "Unable to retrieve property '"+ SERIALIZATION_FORMAT_PROPERTY_NAME +"' from message " + msgCorrId + ".";
             throw new JMSRuntimeException( errMsg, jmse );
         }
 
@@ -178,7 +164,6 @@ public class KieServerMDB
         // 6. send response
         sendResponse( msgCorrId, format, msg );
 
-//
 //        if ( redelivered ) {
 //            retryTracker.clearRetries( msgId );
 //        }
@@ -205,7 +190,7 @@ public class KieServerMDB
         try {
             String msgStr = marshaller.marshall( response );
             textMsg = session.createTextMessage(msgStr);
-            textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, format.getId());
+            textMsg.setIntProperty( SERIALIZATION_FORMAT_PROPERTY_NAME, format.getId());
         } catch (JMSException jmse) {
             String errMsg = "Unable to create response message or write to it [msg id: " + msgId + "].";
             throw new JMSRuntimeException(errMsg, jmse);
@@ -233,6 +218,7 @@ public class KieServerMDB
             Queue responseQueue = (Queue) (new InitialContext()).lookup(RESPONSE_QUEUE_NAME);
             producer = session.createProducer(responseQueue);
             producer.send(msg);
+            session.commit();
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId
                             + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
