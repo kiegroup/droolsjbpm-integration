@@ -1,8 +1,5 @@
 package org.kie.remote.client.api;
 
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 
 
 /**
@@ -39,5 +36,21 @@ public interface RemoteClientBuilder<B> {
      * @return The builder instance
      */
     B addTimeout(int timeoutInSeconds);
+    
+    /**
+     * Adds the deployment id to the configuration.
+     * @param deploymentId The deployment id
+     * @return The builder instance
+     */
+    B addDeploymentId(String deploymentId);
+    
+    /**
+     * When sending non-primitive class instances, it's necessary to add the class instances
+     * beforehand to the configuration so that the class instances can be serialized correctly
+     * in requests
+     * @param classes One or more class instances
+     * @return The builder instance
+     */
+    B addExtraJaxbClasses(Class... classes);
 
 }

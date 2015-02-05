@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <definitions 
 	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
 	xmlns:tns="http://services.remote.kie.org/VERSION/command" 
-	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+  
+    xmlns:wsp="http://www.w3.org/ns/ws-policy"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
 	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
 	name="CommandService" 
 	targetNamespace="http://services.remote.kie.org/VERSION/command" 
 	>
   <!-- JAX-WS Customizations: Wrapper styles, async. -->
-  <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+  <jaxws:bindings>
     <jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
     <jaxws:enableAsyncMapping>false</jaxws:enableAsyncMapping>
   </jaxws:bindings>
@@ -102,14 +106,14 @@
     <part name="fault" element="tns:CommandServiceException"/>
   </message>
   <portType name="CommandServicePortType">
-    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+    <jaxws:bindings>
       <jaxws:class name="CommandWebService"/>
     </jaxws:bindings>
     <operation name="execute">
       <input wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/executeRequest" message="tns:execute"/>
       <output wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/executeResponse" message="tns:executeResponse"/>
       <fault message="tns:CommandServiceException" name="CommandServiceException" wsam:Action="http://services.remote.kie.org/VERSION/command/CommandService/execute/Fault/CommandServiceException">
-        <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+        <jaxws:bindings>
           <jaxws:class name="CommandWebServiceException"/>
         </jaxws:bindings>
       </fault>
@@ -135,7 +139,7 @@
   </binding>
   
   <service name="CommandServiceBasicAuth">
-    <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
+    <jaxws:bindings> 
       <jaxws:class name="CommandServiceBasicAuthClient"/>
     </jaxws:bindings>
     <port name="CommandServiceBasicAuthPort" binding="tns:CommandServiceBasicAuthBinding">

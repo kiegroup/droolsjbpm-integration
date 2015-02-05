@@ -197,7 +197,8 @@ public class DynamicJaxbContext extends JAXBContext {
         // retrieve deployment classes
         Collection<Class<?>> depClasses = deploymentInfoBean.getDeploymentClasses(deploymentId);
 
-        // While we have no guarantees that JAXBContext instances are thread-safe, 
+        // We are sharing the default jaxb context among different requests here: 
+        // while we have no guarantees that JAXBContext instances are thread-safe, 
         // the REST framework using the JAXBContext instance is responsible for that thread-safety
         // since it is caching the JAXBContext in any case.. 
         if( depClasses.size() == 0 ) { 

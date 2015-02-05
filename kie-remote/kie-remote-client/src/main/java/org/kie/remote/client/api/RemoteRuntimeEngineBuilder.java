@@ -15,13 +15,6 @@ import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 public interface RemoteRuntimeEngineBuilder<B, F> extends RemoteClientBuilder<B> {
 
     /**
-     * Adds the deployment id to the configuration.
-     * @param deploymentId The deployment id
-     * @return The builder instance
-     */
-    B addDeploymentId(String deploymentId);
-    
-    /**
      * Adds the process instance id, which may be necessary when interacting
      * with deployments that employ the {@link RuntimeStrategy#PER_PROCESS_INSTANCE}.
      * @param processInstanceId The process instance id
@@ -29,15 +22,6 @@ public interface RemoteRuntimeEngineBuilder<B, F> extends RemoteClientBuilder<B>
      */
     B addProcessInstanceId(long processInstanceId);
     
-    /**
-     * When sending non-primitive class instances, it's necessary to add the class instances
-     * beforehand to the configuration so that the class instances can be serialized correctly
-     * in requests
-     * @param classes One or more class instances
-     * @return The builder instance
-     */
-    B addExtraJaxbClasses(Class... classes);
-   
     /**
      * If the {@link RemoteRuntimeEngineBuilder} is being reused (in order to build
      * multiple {@link RemoteRuntimeEngineFactory}'s, then this method can be called between 
