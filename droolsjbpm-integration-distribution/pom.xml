@@ -43,16 +43,6 @@
   <dependencies>
     <!-- Binaries and sources -->
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-server-example</artifactId>
-      <type>war</type>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-camel-server-example</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-spring</artifactId>
     </dependency>
