@@ -124,7 +124,6 @@
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency> 
-    
 
     <!-- general -->
     <dependency>
@@ -138,6 +137,11 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
+    </dependency>
+    <dependency>
+	  <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- persistence -->

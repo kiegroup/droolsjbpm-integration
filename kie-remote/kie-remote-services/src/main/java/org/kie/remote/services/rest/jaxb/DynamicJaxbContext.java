@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest.jaxb;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -7,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -21,9 +25,16 @@ import org.jbpm.services.cdi.Deploy;
 import org.jbpm.services.cdi.Undeploy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.DeploymentProcessedEvent;
+import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
+import org.kie.remote.services.exception.KieRemoteServicesInternalError;
+import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xml.bind.v2.runtime.IllegalAnnotationException;
+import com.sun.xml.bind.v2.runtime.IllegalAnnotationsException;
+import com.sun.xml.bind.v2.runtime.Location;
 
 import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.*;
 
@@ -113,7 +124,7 @@ public class DynamicJaxbContext extends JAXBContext {
         if (context != null) {
             return context.createUnmarshaller();
         }
-        throw new IllegalStateException("No Unmarshaller available: JAXBContext instance could be found for this request!");
+        throw new KieRemoteServicesInternalError("No Unmarshaller available: JAXBContext instance could be found for this request!");
     }
 
     /*
@@ -126,7 +137,7 @@ public class DynamicJaxbContext extends JAXBContext {
         if (context != null) {
             return context.createMarshaller();
         }
-        throw new IllegalStateException("No Marshaller available: JAXBContext instance could be found for this request!");
+        throw new KieRemoteServicesInternalError("No Marshaller available: JAXBContext instance could be found for this request!");
     }
 
     /*
@@ -140,7 +151,7 @@ public class DynamicJaxbContext extends JAXBContext {
         if (context != null) {
             return context.createValidator();
         }
-        throw new IllegalStateException("No Validator available: JAXBContext instance could be found for this request!");
+        throw new KieRemoteServicesInternalError("No Validator available: JAXBContext instance could be found for this request!");
     }
     
     // Deployment jaxbContext management and creation logic -----------------------------------------------------------------------
@@ -184,6 +195,15 @@ public class DynamicJaxbContext extends JAXBContext {
         }
     }
 
+    public JAXBContext getDeploymentJaxbContext(String deploymentId) {
+        JAXBContext jaxbContext = contextsCache.get(deploymentId);
+        if( jaxbContext == null ) { 
+            logger.debug("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance."); 
+            jaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
+        }
+        return jaxbContext;
+    }
+
     /**
      * Creates the {@link JAXBContext} instance for the given deployment at deployment time
      * @param deploymentId The deployment identifier.
@@ -216,23 +236,84 @@ public class DynamicJaxbContext extends JAXBContext {
         // create and cache jaxb context 
         JAXBContext jaxbContext = null;
         try { 
-            jaxbContext = JAXBContext.newInstance(allClassesArr);
+            if( smartJaxbContextInitialization ) { 
+                jaxbContext = smartJaxbContextInitialization(allClassesArr);
+            } else { 
+                jaxbContext = JAXBContext.newInstance(allClassesArr);
+            }
             contextsCache.put(deploymentId, jaxbContext);
         } catch( JAXBException jaxbe ) { 
             String errMsg = "Unable to instantiate JAXBContext for deployment '" + deploymentId + "'.";
-            throw new IllegalStateException( errMsg, jaxbe );
+            throw new KieRemoteServicesDeploymentException( errMsg, jaxbe );
             // This is a serious problem if it goes wrong here. 
         }
     }
+  
+    private final static String SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME = "org.kie.remote.jaxb.smart.init";
+    private final static boolean smartJaxbContextInitialization;
+    private final static String EXPECTED_JAXB_CONTEXT_IMPL_CLASS = "com.sun.xml.bind.v2.runtime.JAXBContextImpl";
     
-    public JAXBContext getDeploymentJaxbContext(String deploymentId) {
-        JAXBContext jaxbContext = contextsCache.get(deploymentId);
-        if( jaxbContext == null ) { 
-           logger.debug("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance."); 
-           jaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
+    // only use smart initialization if we're using the (default) JAXB RI 
+    static { 
+         boolean smartJaxbContextInitProperty = Boolean.parseBoolean(System.getProperty(SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME, "true"));
+         if( smartJaxbContextInitProperty ) { 
+            try {
+                smartJaxbContextInitProperty = false;
+                smartJaxbContextInitProperty = EXPECTED_JAXB_CONTEXT_IMPL_CLASS.equals(JAXBContext.newInstance(new Class[0]).getClass().getName());
+            } catch( JAXBException jaxbe ) {
+                logger.error("Unable to initialize empty JAXB Context: something is VERY wrong!", jaxbe);
+            }
+         }
+         smartJaxbContextInitialization = smartJaxbContextInitProperty;
+    }
+ 
+    private JAXBContext smartJaxbContextInitialization(Class [] jaxbContextClasses) throws JAXBException { 
+        
+        List<Class> classList = new ArrayList<Class>(Arrays.asList(jaxbContextClasses));
+        
+        JAXBContext jaxbContext = null;
+        boolean retryJaxbContextCreation = true;
+        while( retryJaxbContextCreation ) { 
+            try {
+                jaxbContext = JAXBContext.newInstance(classList.toArray(new Class[classList.size()]));
+                retryJaxbContextCreation = false;
+            } catch( IllegalAnnotationsException iae ) {
+                // throws any exception it can not process
+                removeClassFromJaxbContextClassList(classList, iae);
+            } 
         }
+        
         return jaxbContext;
     }
-    
+
+    private void removeClassFromJaxbContextClassList( List<Class> classList, IllegalAnnotationsException iae)
+        throws IllegalAnnotationException {
+        Set<Class> removedClasses = new HashSet<Class>();
+        for( IllegalAnnotationException error : iae.getErrors() ) {
+            List<Location> classLocs = error.getSourcePos().get(0);
+            
+            if( classLocs != null && ! classLocs.isEmpty() ) { 
+               String className = classLocs.listIterator(classLocs.size()).previous().toString();
+               Class removeClass = null;
+               try {
+                   removeClass = Class.forName(className);
+                   if( ! removedClasses.add(removeClass) ) { 
+                       // we've already determined that this class was bad
+                       continue;
+                   }
+               } catch( ClassNotFoundException cnfe ) {
+                   // this should not be possible, after the class object instance has already been found
+                   //  and added to the list of classes needed for the JAXB context
+                   throw new KieRemoteServicesInternalError("Class [" + className + "] could not be found when creating JAXB context: "  + cnfe.getMessage(), cnfe);
+               }
+               if( classList.remove(removeClass) ) { 
+                   // next error
+                   continue;
+               }
+            } 
+            // We could not figure out which class caused this error (this error is wrapped later)
+            throw error;
+        }
+    }
     
 }
