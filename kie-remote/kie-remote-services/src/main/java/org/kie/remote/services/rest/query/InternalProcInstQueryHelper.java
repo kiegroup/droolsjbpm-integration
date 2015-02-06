@@ -132,22 +132,6 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         result.getProcessInstanceInfoList().addAll(procInstIdProcInstInfoMap.values());
         return result;
     }
-
-    // TODO: delete? add elsewhare? was for createProcessInstanceResult
-    private void throwDebugExceptionWithQueryInformation() { 
-        StringBuilder message = new StringBuilder("Please contact the developers: the following query retrieved variable instance logs without retrieving the associated process instance logs:\n");
-        QueryData queryData = getQueryBuilders()[0].getQueryData();
-        for( Entry<String,  List<? extends Object>> entry : queryData.getIntersectParameters().entrySet() ) { 
-           message.append( "[" + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
-        }
-        for( Entry<String,  List<? extends Object>> entry : queryData.getIntersectRangeParameters().entrySet() ) { 
-           message.append( "[ (m/m) " + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
-        }
-        for( Entry<String,  List<String>> entry : queryData.getIntersectRegexParameters().entrySet() ) { 
-           message.append( "[ (re) " + entry.getKey() + ":" + StringUtils.collectionToDelimitedString(entry.getValue(), ",") + "], " );
-        }
-        throw KieRemoteRestOperationException.internalServerError(message.toString()); 
-    }
     
     private static JaxbQueryProcessInstanceInfo getQueryProcessInstanceInfo( long procInstId,
             Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap ) {
@@ -158,7 +142,6 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         }
         return procInstInfo;
     }
-
 
     @Override
     public void taskId(long[] longData) { 

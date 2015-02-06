@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -37,6 +38,7 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
@@ -147,7 +149,7 @@ public class RuntimeResourceImpl extends ResourceBase {
             if( iae.getMessage().startsWith("Could not find process instance") ) {
                 throw KieRemoteRestOperationException.notFound("Process instance " + procInstId + " is not available.");
             }
-            throw iae;
+            throw KieRemoteRestOperationException.internalServerError("Unable to abort process instance '"  + procInstId + "'", iae );
         }
                 
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
@@ -177,7 +179,7 @@ public class RuntimeResourceImpl extends ResourceBase {
         } catch( ProcessInstanceNotFoundException pinfe ) { 
             throw KieRemoteRestOperationException.notFound(pinfe.getMessage(), pinfe);
         } catch( DeploymentNotFoundException dnfe ) { 
-            throw new org.kie.remote.services.exception.DeploymentNotFoundException(dnfe.getMessage());
+            throw new DeploymentNotFoundException(dnfe.getMessage());
         }
         // handle primitives and their wrappers
         if (procVar != null && isPrimitiveOrWrapper(procVar.getClass())) {
@@ -355,7 +357,7 @@ public class RuntimeResourceImpl extends ResourceBase {
             if( iae.getMessage().startsWith("Unknown process ID")) { 
                 throw KieRemoteRestOperationException.notFound("Process '" + processId + "' is not known to this deployment.");
             }
-            throw iae;
+            throw KieRemoteRestOperationException.internalServerError("Unable to start process instance '" + processId + "'", iae);
         }
         return (ProcessInstance) result;
     }

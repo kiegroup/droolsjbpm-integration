@@ -31,6 +31,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.remote.services.AcceptedServerCommands;
+import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
 import org.kie.services.client.serialization.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class ProcessRequestBeanTest {
         try { 
             procReqBean.checkThatUserDefinedClassesWereUnmarshalled(copyCmd.getParameters()); 
         } catch( Exception e ) { 
-           assertTrue( "Expected an " + IllegalStateException.class.getSimpleName() + " instance", e instanceof IllegalStateException );
+           assertTrue( "Did not expect an " + e.getClass().getSimpleName() + " instance", e instanceof KieRemoteServicesDeploymentException );
            msg = e.getMessage();
         }
         assertNotNull( "Expected exception to be thrown", msg );

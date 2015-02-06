@@ -42,6 +42,7 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
+import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.RuntimeResourceImpl;
@@ -216,7 +217,7 @@ public class ProcessRequestBean {
     private void verifyObjectHasBeenUnmarshalled(Object obj) { 
         if( Element.class.isAssignableFrom(obj.getClass()) ) { 
             String typeName = ((Element) obj).getAttribute("xsi:type");
-            throw new IllegalStateException("Could not unmarshall user-defined class instance parameter of type '" + typeName + "'");
+            throw new KieRemoteServicesDeploymentException("Could not unmarshall user-defined class instance parameter of type '" + typeName + "'");
         }
     }
     
@@ -314,9 +315,7 @@ public class ProcessRequestBean {
             return doTaskOperation(taskId, deploymentId, processInstanceId, task, cmd);
         } catch (PermissionDeniedException pde) {
             throw KieRemoteRestOperationException.conflict(pde.getMessage(), pde);
-        } catch (RuntimeException re) {
-            throw re;
-        }
+        } 
     }
 
 }

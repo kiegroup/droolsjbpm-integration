@@ -1,21 +1,17 @@
 package org.kie.remote.services.rest.query;
 
-import static org.kie.remote.services.rest.ResourceBase.*;
+import static org.kie.remote.services.rest.ResourceBase.getMaxNumResultsNeeded;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import org.drools.core.rule.builder.dialect.asm.GeneratorHelper.GetMethodBytecodeMethod;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.query.data.QueryData;
 import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
 import org.kie.internal.task.query.TaskQueryBuilder;
 import org.kie.remote.services.rest.ResourceBase;

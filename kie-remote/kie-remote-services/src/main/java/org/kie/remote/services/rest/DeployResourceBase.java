@@ -29,6 +29,7 @@ import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
+import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
 import org.kie.remote.services.rest.async.JobResultManager;
 import org.kie.remote.services.rest.async.cmd.DeploymentCmd;
 import org.kie.remote.services.rest.async.cmd.JobType;
@@ -311,7 +312,7 @@ public class DeployResourceBase extends ResourceBase {
                        logger.debug("Stack trace:", new Throwable()); 
                 break;
             default: 
-                throw new IllegalStateException("Unknown deployment unit status: " + depUnit.getStatus());
+                throw new KieRemoteServicesDeploymentException("Unknown deployment unit status: " + depUnit.getStatus());
             }
             jobResult = new JaxbDeploymentJobResult(null, explanation, depUnit, JobType.UNDEPLOY.toString() );
             jobResult.setSuccess(false);

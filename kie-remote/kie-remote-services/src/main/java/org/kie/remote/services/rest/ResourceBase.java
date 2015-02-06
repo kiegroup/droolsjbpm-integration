@@ -38,6 +38,7 @@ import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
@@ -514,7 +515,7 @@ public class ResourceBase {
            if( value.equalsIgnoreCase("inprogress") )  { 
                return Status.InProgress;
            }
-           throw iae;
+           throw new KieRemoteServicesInternalError("Unable to determine Status for value '"  + value + "'", iae);
         }
     }
   

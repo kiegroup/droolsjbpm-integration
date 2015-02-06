@@ -1,14 +1,9 @@
 package org.kie.remote.services.exception;
 
-import javax.jms.Connection;
-import javax.jms.Session;
 
 
 /**
- * This exception is primarily used by the JMS code to indicate that an operation
- * that we expect to succeed has failed. In most of the cases, when this exception
- * is thrown, it is due to a failure by the underlying JMS framework ({@link Session}, 
- * {@link Connection}).
+ * This exception should be thrown when an operation by infrastructure code, such as JMS or REST code, that we expect to succeed has failed. 
  */
 public class KieRemoteServicesRuntimeException extends RuntimeException {
 

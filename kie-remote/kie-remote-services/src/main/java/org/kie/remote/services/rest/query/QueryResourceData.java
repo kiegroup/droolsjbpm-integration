@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kie.api.task.model.Status;
+import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 
 public class QueryResourceData {
@@ -95,29 +96,29 @@ public class QueryResourceData {
         int idGen = 0;
         idGen = addParamsToActionMap(idGen, generalQueryParams, generalQueryParamsShort);
         if( idGen != GENERAL_END ) { 
-            throw new IllegalStateException("General query parameters [" + idGen + "]");
+            throw new KieRemoteServicesInternalError("General query parameters [" + idGen + "]");
         }
         idGen = addParamsToActionMap(idGen, taskQueryParams, taskQueryParamsShort);
         if( idGen != TASK_END ) { 
-            throw new IllegalStateException("Task query parameters [" + idGen + "]" );
+            throw new KieRemoteServicesInternalError("Task query parameters [" + idGen + "]" );
         }
         idGen = addParamsToActionMap(idGen, procInstQueryParams, procInstQueryParamsShort);
         if( idGen != PROCESS_END ) { 
-            throw new IllegalStateException("Process instance query parameters [" + idGen + "]" );
+            throw new KieRemoteServicesInternalError("Process instance query parameters [" + idGen + "]" );
         }
         idGen = addParamsToActionMap(idGen, varInstQueryParams, varInstQueryParamsShort);
         if( idGen != VARIABLE_END ) { 
-            throw new IllegalStateException("Variable instance query parameters [" + idGen + "]" );
+            throw new KieRemoteServicesInternalError("Variable instance query parameters [" + idGen + "]" );
         }
         idGen = addParamsToActionMap(idGen, metaRuntimeParams, metaRuntimeParamsShort);
         if( idGen != META_END ) { 
-            throw new IllegalStateException("Meta parameters [" + idGen + "]" );
+            throw new KieRemoteServicesInternalError("Meta parameters [" + idGen + "]" );
         }
     }
     
     private static int addParamsToActionMap(int idGen, String [] params, String [] paramsShort ) { 
         if( params.length != paramsShort.length ) { 
-            throw new IllegalStateException( params.length + " params but " + paramsShort.length + " abbreviated params!");
+            throw new KieRemoteServicesInternalError( params.length + " params but " + paramsShort.length + " abbreviated params!");
         }
         for( int i = 0; i < params.length; ++i ) { 
             int id = idGen++;
@@ -240,7 +241,8 @@ public class QueryResourceData {
             return QUERY_PARAM_DATE_FORMAT.parse(parseDateStr);
         } catch( ParseException pe ) {
             badDateString(parseDateStr);
-            throw new RuntimeException("This should never be thrown", pe);
+            // this should never be thrown
+            throw new KieRemoteServicesInternalError("Unable to parse date string '"  + parseDateStr + "'", pe);
         }
     }
    

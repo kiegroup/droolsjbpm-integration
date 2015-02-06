@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.rest.async.cmd.JobType;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
@@ -54,7 +55,7 @@ public class JobResultManager {
     @PostConstruct
     public void start() {
         if (!created.compareAndSet(0, 1)) {
-            throw new IllegalStateException("Only 1 JobResultManager instance is allowed per container!");
+            throw new KieRemoteServicesInternalError("Only 1 JobResultManager instance is allowed per container!");
         }
         Cache<JaxbDeploymentJobResult> cache = new Cache<JaxbDeploymentJobResult>(maxCacheSize);
         jobs = Collections.synchronizedMap(cache);

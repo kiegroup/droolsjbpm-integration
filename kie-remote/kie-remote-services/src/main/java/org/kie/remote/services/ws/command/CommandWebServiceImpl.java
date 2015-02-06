@@ -55,25 +55,24 @@ public class CommandWebServiceImpl extends ResourceBase implements Provider<Sour
             unmarshaller = dynamicJaxbContext.createUnmarshaller();
         } catch( JAXBException e ) {
             // DBG Auto-generated catch block
-            throw new RuntimeException("Could not create unmarshaller: " + e.getMessage(), e);
+            throw new KieRemoteWebServiceException("Could not create unmarshaller: " + e.getMessage(), e);
         }
       
         JAXBElement<Execute> jaxbWrappedRequest;
         try {
             jaxbWrappedRequest = unmarshaller.unmarshal(requestSource, Execute.class);
         } catch( JAXBException e ) {
-            // DBG Auto-generated catch block
-            throw new RuntimeException("Could not unmarshall source: " + e.getMessage(), e);
+            throw new KieRemoteWebServiceException("Could not unmarshall request source: " + e.getMessage(), e);
         }
       
         Execute wrappedRquest = jaxbWrappedRequest.getValue();
         if( wrappedRquest == null ) { 
-            throw new RuntimeException("Execute request instance is null!");
+            throw new KieRemoteWebServiceException("Execute request instance is null!");
         }
         
         JaxbCommandsRequest request = wrappedRquest.getRequest();
         if( request == null ) { 
-            throw new RuntimeException("JaxbCommandsRequest instance is null!");
+            throw new KieRemoteWebServiceException("JaxbCommandsRequest instance is null!");
         }
         return request;
     }
@@ -88,7 +87,7 @@ public class CommandWebServiceImpl extends ResourceBase implements Provider<Sour
         try { 
             responseSource = new JAXBSource(dynamicJaxbContext.createMarshaller(), jaxbWrappedResponse);
         } catch( JAXBException e ) { 
-            throw new RuntimeException("Could not serialize response to JAXBSource: "  + e.getMessage(), e);
+            throw new KieRemoteWebServiceException("Could not serialize response to JAXBSource: "  + e.getMessage(), e);
         }
         
         return responseSource;
