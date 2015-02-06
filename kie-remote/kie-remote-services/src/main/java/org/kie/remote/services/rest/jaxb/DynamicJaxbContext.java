@@ -237,7 +237,7 @@ public class DynamicJaxbContext extends JAXBContext {
         JAXBContext jaxbContext = null;
         try { 
             if( smartJaxbContextInitialization ) { 
-                jaxbContext = smartJaxbContextInitialization(allClassesArr);
+                jaxbContext = smartJaxbContextInitialization(allClassesArr, deploymentId);
             } else { 
                 jaxbContext = JAXBContext.newInstance(allClassesArr);
             }
@@ -267,7 +267,7 @@ public class DynamicJaxbContext extends JAXBContext {
          smartJaxbContextInitialization = smartJaxbContextInitProperty;
     }
  
-    private JAXBContext smartJaxbContextInitialization(Class [] jaxbContextClasses) throws JAXBException { 
+    private JAXBContext smartJaxbContextInitialization(Class [] jaxbContextClasses, String deploymentId) throws JAXBException { 
         
         List<Class> classList = new ArrayList<Class>(Arrays.asList(jaxbContextClasses));
         
@@ -279,15 +279,16 @@ public class DynamicJaxbContext extends JAXBContext {
                 retryJaxbContextCreation = false;
             } catch( IllegalAnnotationsException iae ) {
                 // throws any exception it can not process
-                removeClassFromJaxbContextClassList(classList, iae);
+                removeClassFromJaxbContextClassList(classList, iae, deploymentId);
             } 
         }
         
         return jaxbContext;
     }
 
-    private void removeClassFromJaxbContextClassList( List<Class> classList, IllegalAnnotationsException iae)
+    private void removeClassFromJaxbContextClassList( List<Class> classList, IllegalAnnotationsException iae, String deploymentId)
         throws IllegalAnnotationException {
+        
         Set<Class> removedClasses = new HashSet<Class>();
         for( IllegalAnnotationException error : iae.getErrors() ) {
             List<Location> classLocs = error.getSourcePos().get(0);
@@ -300,13 +301,14 @@ public class DynamicJaxbContext extends JAXBContext {
                    if( ! removedClasses.add(removeClass) ) { 
                        // we've already determined that this class was bad
                        continue;
-                   }
+                   } 
                } catch( ClassNotFoundException cnfe ) {
                    // this should not be possible, after the class object instance has already been found
                    //  and added to the list of classes needed for the JAXB context
                    throw new KieRemoteServicesInternalError("Class [" + className + "] could not be found when creating JAXB context: "  + cnfe.getMessage(), cnfe);
                }
                if( classList.remove(removeClass) ) { 
+                   logger.warn("Removing class '{}' from serialization context for deployment '{}'", className, deploymentId);
                    // next error
                    continue;
                }
