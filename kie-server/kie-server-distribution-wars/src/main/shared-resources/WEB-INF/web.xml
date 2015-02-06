@@ -19,6 +19,7 @@
       <url-pattern>/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
+      <role-name>admin</role-name>
       <role-name>kie-server</role-name>
     </auth-constraint>
   </security-constraint>
@@ -27,6 +28,10 @@
     <realm-name>KIE Server</realm-name>
   </login-config>
   <security-role>
+      <role-name>admin</role-name>
+    </security-role>
+  <security-role>
+    <role-name>admin</role-name>
     <role-name>kie-server</role-name>
   </security-role>
 
