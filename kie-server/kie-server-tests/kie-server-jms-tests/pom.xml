@@ -13,14 +13,22 @@
   <name>KIE :: Execution Server :: JMS Tests Parent</name>
   <description>KIE Execution Server JMS Tests Parent</description>
 
-  <modules>
-    <module>kie-server-jms-eap6-tests</module>
-  </modules>
-
+  <!-- The modules are in specific profiles to ensure they get executed only when running with particular container -->
   <profiles>
-    <!-- The JMS WildFly tests do not even compile on JDK6, so they are excluded from default build. -->
     <profile>
-      <id>jms-tests</id>
+      <id>eap64x</id>
+      <modules>
+        <module>kie-server-jms-eap6-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wildfly81x</id>
+      <modules>
+        <module>kie-server-jms-wildfly-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wildfly82x</id>
       <modules>
         <module>kie-server-jms-wildfly-tests</module>
       </modules>
