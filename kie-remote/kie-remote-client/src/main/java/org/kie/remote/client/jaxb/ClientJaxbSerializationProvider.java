@@ -11,6 +11,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.kie.remote.jaxb.gen.util.JaxbListWrapper;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 
@@ -23,7 +24,10 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
                 JaxbCommandsResponse.class,
                 JaxbContentResponse.class,
                 JaxbTaskResponse.class,
-                JaxbTaskSummaryListResponse.class
+                JaxbTaskSummaryListResponse.class,
+                
+                // used with gnerated classes
+                JaxbListWrapper.class
         };
         List<Class<?>> serverSideJaxbClassList = new ArrayList<Class<?>>();
         for( Class clazz : serviceSideClasses ) { 

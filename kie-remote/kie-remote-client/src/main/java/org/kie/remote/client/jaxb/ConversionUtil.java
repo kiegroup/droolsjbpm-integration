@@ -10,10 +10,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.kie.internal.jaxb.StringKeyObjectValueEntry;
-import org.kie.internal.jaxb.StringKeyObjectValueMap;
-import org.kie.remote.jaxb.gen.JaxbStringObjectPair;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 
 public class ConversionUtil {
 

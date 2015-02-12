@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.kie.api.command.Command;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;

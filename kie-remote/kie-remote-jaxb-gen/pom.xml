@@ -229,7 +229,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <!-- 2. generate xsd's based on unpacked sources -->
           <execution>
@@ -288,7 +287,7 @@
               <replacements>
                 <replacement>
                   <token>implements Command</token>
-                  <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
+                  <!-- the replacer plugin won't take a blank value. -->
                   <value>extends Object</value>
                 </replacement>
               </replacements>
@@ -309,7 +308,6 @@
               <replacements>
                 <replacement>
                   <token>protected long processInstanceId;</token>
-                  <!-- @#$@#$!!! : the replacer plugin won't take a blank value. WTF! -->
                   <value>protected long processInstanceId = -1;</value>
                 </replacement>
               </replacements>

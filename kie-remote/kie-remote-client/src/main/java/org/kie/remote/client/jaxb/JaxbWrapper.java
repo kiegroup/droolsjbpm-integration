@@ -21,12 +21,10 @@ import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
 import org.kie.api.task.model.User;
-import org.kie.internal.task.api.model.Deadline;
 import org.kie.internal.task.api.model.Deadlines;
 import org.kie.internal.task.api.model.Delegation;
 import org.kie.internal.task.api.model.InternalPeopleAssignments;
 import org.kie.internal.task.api.model.InternalTask;
-import org.kie.internal.task.api.model.InternalTaskData;
 import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.jaxb.gen.Type;
 
