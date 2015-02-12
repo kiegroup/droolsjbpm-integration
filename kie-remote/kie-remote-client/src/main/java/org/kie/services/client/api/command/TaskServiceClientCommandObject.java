@@ -31,6 +31,7 @@ import org.kie.remote.jaxb.gen.CompleteTaskCommand;
 import org.kie.remote.jaxb.gen.DelegateTaskCommand;
 import org.kie.remote.jaxb.gen.ExitTaskCommand;
 import org.kie.remote.jaxb.gen.FailTaskCommand;
+import org.kie.remote.jaxb.gen.ForwardTaskCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
 import org.kie.remote.jaxb.gen.GetContentCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
@@ -292,7 +293,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public void forward( long taskId, String userId, String targetEntityId ) {
-        DelegateTaskCommand cmd = new DelegateTaskCommand();
+        ForwardTaskCommand cmd = new ForwardTaskCommand();
         cmd.setTaskId(taskId);
         cmd.setUserId(userId);
         cmd.setTargetEntityId(targetEntityId);
