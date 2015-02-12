@@ -57,26 +57,22 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
     }
 
     static String stringToBase64String(String in) { 
-        System.out.println("Encoding : [" + in + "]");
         if( ! ENCODE_STRINGS ) { 
             return in;
         }
         logger.debug("Encoding string to base64 [{}]", in);
         byte[] bytes = stringToBytes(in);
         String out = DatatypeConverter.printBase64Binary(bytes);
-        System.out.println( "["  + in + "] -> [" + out +"]");
         return out;
     }
 
     static String base64StringToString(String in) { 
-        System.out.println("Decoding : [" + in + "]");
         if( ! ENCODE_STRINGS ) { 
             return in;
         }
         logger.debug("Decoding string from base64 [{}]", in);
         byte [] bytes = DatatypeConverter.parseBase64Binary(in);
         String out = bytesToString(bytes);
-        System.out.println( "["  + in + "] -> [" + out +"]");
         return out;
     }
     
