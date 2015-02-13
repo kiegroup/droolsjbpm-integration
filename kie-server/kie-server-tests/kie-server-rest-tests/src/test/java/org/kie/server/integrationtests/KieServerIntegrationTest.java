@@ -194,6 +194,38 @@ public class KieServerIntegrationTest extends KieServerBaseIntegrationTest {
     }
 
     @Test
+    public void testScannerScanNow() throws Exception {
+        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ServiceResponse<KieScannerResource> si = client.getScannerInfo("kie1");
+        Assert.assertEquals( ResponseType.SUCCESS, si.getType() );
+        KieScannerResource info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.SCANNING, 0l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
+
+        si = client.getScannerInfo("kie1");
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
+
+        si = client.updateScanner("kie1", new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+
+        si = client.getScannerInfo("kie1");
+        Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
+        info = si.getResult();
+        Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
+    }
+
+    @Test
     public void testScannerStatusOnContainerInfo() throws Exception {
         client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("kie1");

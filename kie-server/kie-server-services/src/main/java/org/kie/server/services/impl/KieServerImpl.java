@@ -382,18 +382,17 @@ public class KieServerImpl {
 
     private ServiceResponse<KieScannerResource> scanNow(String id, KieScannerResource resource, KieContainerInstance kci) {
         if (kci.getScanner() == null) {
-            return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid call. Scanner is not instantiated. ",
-                    getScannerResource(kci));
+            createScanner( id, kci );
         }
-        if (KieScannerStatus.STOPPED.equals(mapStatus(kci.getScanner().getStatus()))) {
+        KieScannerStatus kss = mapStatus( kci.getScanner().getStatus() );
+        if (KieScannerStatus.STOPPED.equals( kss ) || KieScannerStatus.CREATED.equals( kss ) || KieScannerStatus.STARTED.equals( kss )) {
             kci.getScanner().scanNow();
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
                     "Scan successfully executed.",
                     getScannerResource(kci));
         } else {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid kie scanner status: " + mapStatus(kci.getScanner().getStatus()),
+                    "Invalid kie scanner status: " + kss,
                     getScannerResource(kci));
         }
     }
