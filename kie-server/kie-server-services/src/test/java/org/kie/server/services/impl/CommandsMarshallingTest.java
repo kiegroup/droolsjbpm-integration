@@ -38,9 +38,9 @@ public class CommandsMarshallingTest {
     public void testMarshallRetractCommand() {
         String xmlCommand = "<retract fact-handle=\"0:234:345:456:567:789\"/>";
         DeleteCommand command = marshaller.unmarshall( xmlCommand, DeleteCommand.class );
-        assertEquals( "0:234:345:456:567:789:NON_TRAIT", command.getFactHandle().toExternalForm() );
+        assertEquals( "0:234:345:456:567:789:NON_TRAIT:null", command.getFactHandle().toExternalForm() );
 
-        assertEquals( "<retract fact-handle=\"0:234:345:456:567:789:NON_TRAIT\"/>", marshaller.marshall( command ) );
+        assertEquals( "<retract fact-handle=\"0:234:345:456:567:789:NON_TRAIT:null\"/>", marshaller.marshall( command ) );
     }
 
     @Test
@@ -51,7 +51,7 @@ public class CommandsMarshallingTest {
         ModifyCommand command = marshaller.unmarshall(xmlCommand, ModifyCommand.class);
         assertEquals(1, command.getSetters().size());
 
-        assertEquals("<modify fact-handle=\"0:234:345:456:567:789:NON_TRAIT\">\n" +
+        assertEquals("<modify fact-handle=\"0:234:345:456:567:789:NON_TRAIT:null\">\n" +
                 "  <set accessor=\"age\" value=\"30\"/>\n" +
                 "</modify>", marshaller.marshall(command));
     }
@@ -62,7 +62,7 @@ public class CommandsMarshallingTest {
         GetObjectCommand command = marshaller.unmarshall(xmlCommand, GetObjectCommand.class);
         assertEquals("test", command.getOutIdentifier());
 
-        assertEquals("<get-object fact-handle=\"0:234:345:456:567:789:NON_TRAIT\" out-identifier=\"test\"/>", marshaller.marshall(command));
+        assertEquals("<get-object fact-handle=\"0:234:345:456:567:789:NON_TRAIT:null\" out-identifier=\"test\"/>", marshaller.marshall(command));
     }
 
     @Test
