@@ -8,7 +8,9 @@
     </encoder>
   </appender>
 
-  <root level="debug">
+  <logger name="org.kie.server" level="DEBUG" />
+
+  <root level="WARN">
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>

@@ -2,13 +2,14 @@ package org.kie.server.client;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
-import org.kie.server.client.impl.KieServicesConfigurationImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.URL;
 
 public abstract class BaseKieServicesClientTest {
+    private static Logger logger = LoggerFactory.getLogger(BaseKieServicesClientTest.class);
 
     private final   int    port              = findFreePort();
     protected final String mockServerBaseUri = "http://localhost:" + port;
@@ -39,7 +40,7 @@ public abstract class BaseKieServicesClientTest {
             // failed to dynamically allocate port, try to use hard coded one
             port = 9789;
         }
-        System.out.println( "Allocating port: " + port );
+        logger.debug("Allocating port: " + port);
         return port;
     }
 }
