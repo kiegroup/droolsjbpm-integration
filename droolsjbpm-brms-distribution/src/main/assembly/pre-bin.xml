@@ -18,14 +18,11 @@
         <include>org.kie:kie-maven-plugin</include>
         <include>org.kie:kie-ci</include>
         <include>org.kie:kie-ci-osgi</include>
-        <include>org.kie:kie-camel</include>
         <include>org.kie:kie-spring</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
-        <include>org.drools:drools-karaf-features</include>
-        <include>org.drools:drools-osgi-integration</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-pmml</include>
         <include>org.drools:drools-reteoo</include>
@@ -49,14 +46,11 @@
         <exclude>org.kie:kie-maven-plugin</exclude>
         <exclude>org.kie:kie-ci</exclude>
         <exclude>org.kie:kie-ci-osgi</exclude>
-        <exclude>org.kie:kie-camel</exclude>
         <exclude>org.kie:kie-spring</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
-        <exclude>org.drools:drools-karaf-features</exclude>
-        <exclude>org.drools:drools-osgi-integration</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-pmml</exclude>
         <exclude>org.drools:drools-reteoo</exclude>
