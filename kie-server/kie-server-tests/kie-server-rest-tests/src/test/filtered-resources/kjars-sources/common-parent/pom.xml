@@ -43,6 +43,14 @@
     </repository>
   </repositories>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <!-- Needed to download the kie-maven-plugin SNAPSHOT during build -->
+      <id>jboss-public-repo</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <distributionManagement>
     <repository>
       <id>remote-testing-repo</id>
