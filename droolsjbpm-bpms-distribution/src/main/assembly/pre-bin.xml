@@ -47,14 +47,11 @@
         <include>org.kie.remote:kie-remote-client</include>
         <include>org.kie.remote:kie-remote-jaxb</include>
         <include>org.kie.remote:kie-remote-common</include>
-        <include>org.kie:kie-camel</include>
         <include>org.kie:kie-spring</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
-        <include>org.drools:drools-karaf-features</include>
-        <include>org.drools:drools-osgi-integration</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-reteoo</include>
         <include>org.drools:drools-rhq-plugin</include>
@@ -97,14 +94,11 @@
         <exclude>org.kie.remote:kie-remote-client</exclude>
         <exclude>org.kie.remote:kie-remote-jaxb</exclude>
         <exclude>org.kie.remote:kie-remote-common</exclude>
-        <exclude>org.kie:kie-camel</exclude>
         <exclude>org.kie:kie-spring</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
-        <exclude>org.drools:drools-karaf-features</exclude>
-        <exclude>org.drools:drools-osgi-integration</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-reteoo</exclude>
         <exclude>org.drools:drools-rhq-plugin</exclude>
