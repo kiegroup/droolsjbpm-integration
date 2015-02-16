@@ -57,11 +57,17 @@ import org.kie.services.client.serialization.jaxb.impl.type.JaxbShort;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.xml.bind.marshaller.CharacterEscapeHandler;
 
 public abstract class JaxbSerializationProvider implements SerializationProvider {
 
+    protected static final Logger logger = LoggerFactory.getLogger(JaxbSerializationProvider.class);
+    
+    // Classes -------------------------------------------------------------------------------------------------------------------
+    
     public final static int JMS_SERIALIZATION_TYPE = 0;
     
     public final static String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
@@ -130,7 +136,7 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
         };
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     }
-   
+    
     public static Set<Class<?>> PRIMITIVE_ARRAY_CLASS_SET;
     static { 
         Class<?> [] primitiveClasses = { 
@@ -187,11 +193,7 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
         }
         
         try {
-            marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
-                public void escape(char[] ac, int i, int j, boolean flag, Writer writer) throws IOException {
-                    writer.write( ac, i, j ); 
-                }
-            });
+            marshaller.setProperty(CharacterEscapeHandler.class.getName(), XmlCharacterHandler.getInstance());
         } catch (PropertyException e) {
             throw new SerializationException("Unable to set CharacterEscapeHandler", e);
         }

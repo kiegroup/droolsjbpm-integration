@@ -34,9 +34,7 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
     
     @Override
     public Object marshal(Object o) throws Exception {
-        if ( o instanceof String ) {
-            return stringToBase64String((String) o);
-        } else if ( o instanceof List ) {
+        if ( o instanceof List ) {
             List v = ( List ) o;
             return new JaxbListWrapper( v.toArray( new Object[v.size()]) );
         } else {
@@ -46,9 +44,7 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
 
     @Override
     public Object unmarshal(Object o) throws Exception {
-        if ( o instanceof String ) {
-            return base64StringToString((String) o);
-        } else if ( o instanceof JaxbListWrapper ) {
+        if ( o instanceof JaxbListWrapper ) {
             JaxbListWrapper v = ( JaxbListWrapper ) o;
             return Arrays.asList( v.getElements() );
         } else {
@@ -56,46 +52,4 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
         }
     }
 
-    static String stringToBase64String(String in) { 
-        if( ! ENCODE_STRINGS ) { 
-            return in;
-        }
-        logger.debug("Encoding string to base64 [{}]", in);
-        byte[] bytes = stringToBytes(in);
-        String out = DatatypeConverter.printBase64Binary(bytes);
-        return out;
-    }
-
-    static String base64StringToString(String in) { 
-        if( ! ENCODE_STRINGS ) { 
-            return in;
-        }
-        logger.debug("Decoding string from base64 [{}]", in);
-        byte [] bytes = DatatypeConverter.parseBase64Binary(in);
-        String out = bytesToString(bytes);
-        return out;
-    }
-    
-    // The following methods bypass issues with string encoding
-    
-    private static byte[] stringToBytes( String str ) {
-        char[] chars = str.toCharArray();
-        byte[] b = new byte[chars.length << 1];
-        for( int ic = 0; ic < chars.length; ic++ ) {
-            int ib = ic << 1;
-            b[ib] = (byte) ((chars[ic] & 0xFF00) >> 8);
-            b[ib + 1] = (byte) (chars[ic] & 0x00FF);
-        }
-        return b;
-    }
-
-    private static String bytesToString( byte[] bytes ) {
-        char[] chars = new char[bytes.length >> 1];
-        for( int ic = 0; ic < chars.length; ic++ ) {
-            int ib = ic << 1;
-            char c = (char) (((bytes[ib] & 0x00FF) << 8) + (bytes[ib + 1] & 0x00FF));
-            chars[ic] = c;
-        }
-        return new String(chars);
-    }
 }

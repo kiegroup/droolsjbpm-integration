@@ -45,7 +45,7 @@ public class JsonRemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
        text.setText("Doei!");
        names.add(text);
        JaxbTaskData taskData = new JaxbTaskData();
-       serverTask.setJaxbTaskData(taskData);
+       serverTask.setTaskData(taskData);
        taskData.setActualOwnerId("me");
        taskData.setCreatedById("you");
        taskData.setCreatedOn(new Date());
