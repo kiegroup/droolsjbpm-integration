@@ -68,6 +68,7 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.reflections.Reflections;
@@ -509,5 +510,14 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         }
         return namedObjectModelList;
     }
-    
+   
+
+    @Test
+    public void funnyCharactersTest() throws Exception {
+        String testStr = "test &<>\"\' test";
+        JaxbString jaxbStr = new JaxbString(testStr);
+
+        JaxbString copy = testRoundTrip(jaxbStr);
+        assertEquals("Funny characters not correctly encoded", testStr, copy.getValue());
+    }
 }

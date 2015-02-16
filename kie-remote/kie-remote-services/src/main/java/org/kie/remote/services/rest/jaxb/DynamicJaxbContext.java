@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest.jaxb;
 
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -124,7 +125,7 @@ public class DynamicJaxbContext extends JAXBContext {
     public Marshaller createMarshaller() throws JAXBException {
         JAXBContext context = getRequestContext();
         if (context != null) {
-            return context.createMarshaller();
+            return configureMarshaller(context, false);
         }
         throw new IllegalStateException("No Marshaller available: JAXBContext instance could be found for this request!");
     }

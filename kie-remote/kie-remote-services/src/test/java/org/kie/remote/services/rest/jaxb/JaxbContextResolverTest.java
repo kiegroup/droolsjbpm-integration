@@ -166,7 +166,7 @@ public class JaxbContextResolverTest {
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
         
         Constructor<?> myTypeCstr = myTypeClass.getConstructor(String.class, int.class);
-        Object myTypeObj = myTypeCstr.newInstance("og", 23);
+        Object myTypeObj = myTypeCstr.newInstance("og & \"<>", 23);
         
         String xmlStr = serialize(jaxbContext, myTypeObj);
         Object roundTripTypeObj = deserialize(jaxbContext, xmlStr, myTypeClass);

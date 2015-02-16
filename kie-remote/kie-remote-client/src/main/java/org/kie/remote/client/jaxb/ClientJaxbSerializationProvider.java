@@ -121,7 +121,7 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
     }
   
     //  Functional methods -------------------------------------------------------------------------------------------------------
- 
+
     /* (non-Javadoc)
      * @see org.kie.services.client.serialization.JaxbSerializationProvider#addJaxbClasses(java.lang.Class)
      */
