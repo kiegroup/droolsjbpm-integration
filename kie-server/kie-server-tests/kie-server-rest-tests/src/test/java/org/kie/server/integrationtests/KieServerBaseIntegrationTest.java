@@ -180,6 +180,7 @@ public abstract class KieServerBaseIntegrationTest {
         // magic which then results in CNFE in RestEasy client
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
         // remote repo
+        logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
         ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
         MavenCli cli = new MavenCli();
         String[] mvnArgs;
@@ -196,6 +197,7 @@ public abstract class KieServerBaseIntegrationTest {
                     ". Return code=" + mvnRunResult);
         }
         Thread.currentThread().setContextClassLoader(classLoaderBak);
+        logger.debug("Maven project successfully built and deployed!");
     }
 
     protected static void buildAndDeployCommonMavenParent() {
