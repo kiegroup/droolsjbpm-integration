@@ -67,9 +67,9 @@ public class ConcurrentRequestsIntegrationTest extends KieServerBaseIntegrationT
             long threadId = Thread.currentThread().getId();
             ServiceResponse<String> reply;
             for (int i = 0; i < NR_OF_REQUESTS_PER_THREAD; i++) {
-                logger.debug("Container call #{}, thread-id={}", i, threadId);
+                logger.trace("Container call #{}, thread-id={}", i, threadId);
                 reply = client.executeCommands(CONTAINER_ID, payload);
-                logger.debug("Container reply for request #{}: {}, thread-id={}", i, reply, threadId);
+                logger.trace("Container reply for request #{}: {}, thread-id={}", i, reply, threadId);
                 assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
             }
             return "SUCCESS";
