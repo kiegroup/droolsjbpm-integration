@@ -26,6 +26,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.services.rest.KieServerRestImpl;
@@ -90,17 +91,43 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
-    @BeforeClass
-    public static void logSettings() {
-        logger.debug("Kie Server base URI: " + BASE_URI);
-    }
 
     @BeforeClass
-    public static void setupCustomSettingsXml() {
+    public static void setupClass() {
+        setupCustomSettingsXml();
+        logSettings();
+        warmUpServer();
+    }
+
+    private static void setupCustomSettingsXml() {
         if (!LOCAL_SERVER) {
             String clientDeploymentSettingsXml = ClassLoader.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
             System.setProperty("kie.maven.settings.custom", clientDeploymentSettingsXml);
         }
+    }
+
+    /*
+    * The first call to the server takes usually much longer because the JVM needs to load all the classes, JAXRS subsystem gets
+    * initialized, etc. The first test sometimes fails, more frequently on slow machines.
+    *
+    * This method creates dummy container and then immediately destroys it. This should warm-up the server enough
+    * so that the subsequent calls are faster.
+    */
+    private static void warmUpServer() {
+        logger.info("Warming-up the server by creating dummy container and then immediately destroying it...");
+        // specify higher timeout, the default is too small
+        KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(BASE_URI, DEFAULT_USERNAME, DEFAULT_PASSWORD, 30000);
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ReleaseId warmUpReleaseId = new ReleaseId("org.kie.server.testing", "server-warm-up", "42");
+        createAndDeployKJar(warmUpReleaseId);
+        assertSuccess(client.createContainer("warm-up-kjar", new KieContainerResource("warm-up-kjar", warmUpReleaseId)));
+        assertSuccess(client.disposeContainer("warm-up-kjar"));
+        logger.info("Server warm-up done.");
+    }
+
+
+    private static void logSettings() {
+        logger.debug("Kie Server base URI: " + BASE_URI);
     }
 
     @Before
@@ -240,16 +267,16 @@ public abstract class KieServerBaseIntegrationTest {
         return port;
     }
 
-    protected void assertSuccess(ServiceResponse<?> response) {
+    protected static void assertSuccess(ServiceResponse<?> response) {
         ServiceResponse.ResponseType type = response.getType();
         assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS, type);
     }
 
-    protected void assertResultContainsString(String result, String expectedString) {
+    protected static void assertResultContainsString(String result, String expectedString) {
         assertTrue("Expecting string '" + expectedString + "' in result, but got: " + result, result.contains(expectedString));
     }
 
-    protected void assertResultContainsStringRegex(String result, String regex) {
+    protected static void assertResultContainsStringRegex(String result, String regex) {
         assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!" ,
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
     }
