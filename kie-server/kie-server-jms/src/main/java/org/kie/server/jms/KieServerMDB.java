@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.kie.server.api.jms.JMSConstants.*;
 
 @MessageDriven(name = "KieServerMDB", activationConfig = {
+        @ActivationConfigProperty(propertyName = "destinationJndiName", propertyValue = "queue/KIE.SERVER.REQUEST"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/KIE.SERVER.REQUEST"),
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")})
