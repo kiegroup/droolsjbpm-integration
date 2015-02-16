@@ -1,5 +1,8 @@
 package org.kie.remote.services.rest.jaxb;
 
+import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.DEFAULT_JAXB_CONTEXT_ID;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.configureMarshaller;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,8 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -27,7 +28,6 @@ import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.remote.services.cdi.DeploymentProcessedEvent;
 import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
-import org.kie.remote.services.exception.KieRemoteServicesRuntimeException;
 import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
 import com.sun.xml.bind.v2.runtime.IllegalAnnotationException;
 import com.sun.xml.bind.v2.runtime.IllegalAnnotationsException;
 import com.sun.xml.bind.v2.runtime.Location;
-
-import static org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter.*;
 
 /**
  * <h3>READ THIS BEFORE WORKING ON THIS CLASS!</h3>
@@ -135,7 +133,7 @@ public class DynamicJaxbContext extends JAXBContext {
     public Marshaller createMarshaller() throws JAXBException {
         JAXBContext context = getRequestContext();
         if (context != null) {
-            return context.createMarshaller();
+            return configureMarshaller(context, false);
         }
         throw new KieRemoteServicesInternalError("No Marshaller available: JAXBContext instance could be found for this request!");
     }

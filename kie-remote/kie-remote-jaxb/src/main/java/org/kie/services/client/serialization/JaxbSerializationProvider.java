@@ -182,8 +182,21 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
     }
     
     public static String serialize(JAXBContext jaxbContext, boolean prettyPrint, Object object) {
+        Marshaller marshaller = configureMarshaller(jaxbContext, prettyPrint);
+        
+        StringWriter stringWriter = new StringWriter();
+        try {
+            marshaller.marshal(object, stringWriter);
+        } catch( JAXBException jaxbe ) { 
+            throw new SerializationException("Unable to marshall " + object.getClass().getSimpleName() + " instance.", jaxbe);
+        }
+
+        return stringWriter.toString();
+    }
+
+    public static Marshaller configureMarshaller(JAXBContext jaxbContext, boolean prettyPrint) { 
         Marshaller marshaller = null;
-        try { 
+        try {
             marshaller = jaxbContext.createMarshaller();
             if( prettyPrint ) { 
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -197,19 +210,9 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
         } catch (PropertyException e) {
             throw new SerializationException("Unable to set CharacterEscapeHandler", e);
         }
-        
-        StringWriter stringWriter = new StringWriter();
-
-        try {
-            marshaller.marshal(object, stringWriter);
-        } catch( JAXBException jaxbe ) { 
-            throw new SerializationException("Unable to marshall " + object.getClass().getSimpleName() + " instance.", jaxbe);
-        }
-        String output = stringWriter.toString();
-
-        return output;
+        return marshaller;
     }
-
+    
     /* (non-Javadoc)
      * @see org.kie.services.client.serialization.JaxbSerializationProvider#deserialize(java.lang.String)
      */
