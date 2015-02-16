@@ -8,6 +8,16 @@
   <dependencySets>
     <dependencySet>
       <includes>
+        <!-- Following artifacts are _not_ included on purpose, do not add them to the assembly unless absolutely sure! -->
+
+        <!-- Not yet in use, work towards certain features -->
+        <!--<include>org.kie.remote:kie-remote-rest-api</include>-->
+        <!--<include>org.kie.remote.ws:kie-remote-ws-impl</include>-->
+        <!--<include>org.kie.remote.ws:kie-remote-ws-wsdl</include>-->
+
+        <!-- Just a helper module, the generated contents of this one are included in another jar -->
+        <!--<include>org.kie.remote:kie-remote-jaxb-gen</include>-->
+
         <include>org.jbpm:jbpm-flow</include>
         <include>org.jbpm:jbpm-flow-builder</include>
         <include>org.jbpm:jbpm-persistence-jpa</include>
