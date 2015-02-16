@@ -34,6 +34,10 @@
         <include>org.jbpm:jbpm-shared-services</include>
         <include>org.jbpm:jbpm-test</include>
         <include>org.jbpm:jbpm-runtime-manager</include>
+        <include>org.jbpm:jbpm-services-ejb-api</include>
+        <include>org.jbpm:jbpm-services-ejb-client</include>
+        <include>org.jbpm:jbpm-services-ejb-impl</include>
+        <include>org.jbpm:jbpm-services-ejb-timer</include>
         <include>org.kie:kie-api</include>
         <include>org.kie:kie-aries-blueprint</include>
         <include>org.kie:kie-internal</include>
@@ -80,6 +84,10 @@
         <exclude>org.jbpm:jbpm-shared-services</exclude>
         <exclude>org.jbpm:jbpm-test</exclude>
         <exclude>org.jbpm:jbpm-runtime-manager</exclude>
+        <exclude>org.jbpm:jbpm-services-ejb-api</exclude>
+        <exclude>org.jbpm:jbpm-services-ejb-client</exclude>
+        <exclude>org.jbpm:jbpm-services-ejb-impl</exclude>
+        <exclude>org.jbpm:jbpm-services-ejb-timer</exclude>
         <exclude>org.kie:kie-api</exclude>
         <exclude>org.kie:kie-aries-blueprint</exclude>
         <exclude>org.kie:kie-internal</exclude>
