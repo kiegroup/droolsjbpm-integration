@@ -12,6 +12,7 @@
 
     <!-- 1. delete generated classes -->
     <xsl:template match="//xs:schema/xs:simpleType[@name='status']" />
+    <xsl:template match="//xs:schema/xs:simpleType[@name='subTasksStrategy']" />
     <xsl:template match="//xs:schema/xs:complexType[@name='stringKeyObjectValueMap']" />
     <xsl:template match="//xs:schema/xs:complexType[@name='stringKeyObjectValueEntry']" />
     <xsl:template match="//xs:schema/xs:complexType[@name='jaxbStringObjectPair']" />
@@ -30,6 +31,13 @@
           <xs:annotation>
             <xs:appinfo>
               <jxb:class ref="org.kie.api.task.model.Status" />
+            </xs:appinfo>
+          </xs:annotation>
+        </xs:complexType>
+        <xs:complexType name="subTasksStrategy">
+          <xs:annotation>
+            <xs:appinfo>
+              <jxb:class ref="org.kie.internal.task.api.model.SubTasksStrategy" />
             </xs:appinfo>
           </xs:annotation>
         </xs:complexType>
