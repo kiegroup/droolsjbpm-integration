@@ -18,7 +18,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.ReleaseId;
 
-@Path("/server")
 public interface KieServer {
     
     @GET

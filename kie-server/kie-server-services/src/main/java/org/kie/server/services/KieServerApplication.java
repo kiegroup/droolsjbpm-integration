@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
@@ -14,6 +15,7 @@ import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.kie.server.services.rest.KieServerRestImpl;
 
+@ApplicationPath("/")
 public class KieServerApplication extends Application {
 
     private final Set<Object> instances = new CopyOnWriteArraySet<Object>() {
