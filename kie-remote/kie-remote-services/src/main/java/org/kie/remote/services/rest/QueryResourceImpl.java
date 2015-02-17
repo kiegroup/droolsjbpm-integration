@@ -57,7 +57,7 @@ public class QueryResourceImpl extends ResourceBase {
     public Response queryTasks() {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
-        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), true, oper);
         
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
@@ -74,7 +74,7 @@ public class QueryResourceImpl extends ResourceBase {
     public Response queryProcessInstances() {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
-        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), oper);
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(), true, oper);
         
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
