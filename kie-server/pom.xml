@@ -22,6 +22,7 @@
     <module>kie-server-jms</module>
     <module>kie-server-distribution-wars</module>
     <module>kie-server-tests</module>
+    <module>kie-server-distribution</module>
   </modules>
 
   <!-- move to droolsjbpm-buildbootstrap! -->
