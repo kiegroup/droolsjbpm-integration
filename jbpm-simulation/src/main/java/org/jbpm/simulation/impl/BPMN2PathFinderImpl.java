@@ -18,6 +18,7 @@ import org.eclipse.bpmn2.CompensateEventDefinition;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
+import org.eclipse.bpmn2.EventSubprocess;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowElementsContainer;
 import org.eclipse.bpmn2.IntermediateCatchEvent;
@@ -27,6 +28,7 @@ import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.RootElement;
 import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
+import org.eclipse.bpmn2.SubProcess;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathContextManager;
 import org.jbpm.simulation.PathFinder;
@@ -138,6 +140,9 @@ public class BPMN2PathFinderImpl implements PathFinder {
         for (FlowElement fElement : flowElements) {
             if (fElement instanceof StartEvent) {
                 triggerElements.add(0, fElement);
+
+                List<EventDefinition> eventDefinitions = ((StartEvent) fElement).getEventDefinitions();
+                processEventDefinitions(fElement, eventDefinitions, catchingEvents);
             } else if((fElement instanceof Activity) && BPMN2Utils.isContainerAdHoc(container)) {
                 Activity act = (Activity) fElement;
                 if(act.getIncoming() == null || act.getIncoming().size() == 0) {
@@ -159,6 +164,8 @@ public class BPMN2PathFinderImpl implements PathFinder {
                 List<EventDefinition> eventDefinitions = ((BoundaryEvent) fElement).getEventDefinitions();
                 
                 processEventDefinitions(fElement, eventDefinitions, catchingEvents);
+            } else if (fElement instanceof EventSubprocess || ((fElement instanceof SubProcess) && ((SubProcess) fElement).isTriggeredByEvent())) {
+                readFlowElements((FlowElementsContainer)fElement, catchingEvents);
             }
         }
     }

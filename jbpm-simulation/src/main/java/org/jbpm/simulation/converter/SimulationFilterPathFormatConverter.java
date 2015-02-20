@@ -22,6 +22,7 @@ import org.eclipse.bpmn2.MessageEventDefinition;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.SignalEventDefinition;
 import org.eclipse.bpmn2.StartEvent;
+import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.ThrowEvent;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.PathFormatConverter;
@@ -76,7 +77,7 @@ public class SimulationFilterPathFormatConverter implements
                   simPath.addBoundaryEventId(fe.getId());  
                 } else if (fe instanceof CatchEvent) {
                     CatchEvent act = (CatchEvent) fe;
-                    if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                    if(act.getIncoming() == null || act.getIncoming().size() == 0 && !isParentEventSubprocess(fe)) {
                         String ref = processEventDefinitions(((CatchEvent) fe).getEventDefinitions());
                         simPath.setSignalName(ref);
                     }
@@ -91,7 +92,7 @@ public class SimulationFilterPathFormatConverter implements
                     }
                 }
                 // ensure that only processes that have start nodes will be considered
-                if (fe instanceof StartEvent) {
+                if (fe instanceof StartEvent && !isParentEventSubprocess(fe)) {
                     simPath.setStartable(true);
                 }
             }
@@ -117,6 +118,14 @@ public class SimulationFilterPathFormatConverter implements
         });
         
         return allPaths;
+    }
+
+    private boolean isParentEventSubprocess(FlowElement fe) {
+        if (fe.eContainer() instanceof SubProcess && ((SubProcess) fe.eContainer()).isTriggeredByEvent()){
+            return true;
+        }
+
+        return false;
     }
 
     protected String processEventDefinitions(List<EventDefinition> eventDefinitions) {
