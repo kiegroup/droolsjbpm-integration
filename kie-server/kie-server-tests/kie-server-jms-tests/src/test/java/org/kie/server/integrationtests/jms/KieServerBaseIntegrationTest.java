@@ -50,7 +50,7 @@ public abstract class KieServerBaseIntegrationTest {
     private static final String DEFAULT_USERNAME        = "yoda";
     private static final String DEFAULT_PASSWORD        = "usetheforce123@";
     private static final String INITIAL_CONTEXT_FACTORY = "org.jboss.naming.remote.client.InitialContextFactory";
-    private static final String PROVIDER_URL            = System.getProperty( "wildfly.http.remoting.uri", "http-remoting://localhost:8080" );
+    private static final String PROVIDER_URL            = System.getProperty( "remoting.uri", "remote://localhost:4447" );
 
     protected static String BASE_URI = System.getProperty( "kie.server.base.uri" );
 
