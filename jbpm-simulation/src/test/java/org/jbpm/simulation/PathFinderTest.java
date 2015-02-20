@@ -1620,4 +1620,58 @@ public class PathFinderTest {
         TestUtils.printOutPaths(paths, jsonPaths, "testSinglePath");
 
     }
+
+    @Test
+    public void testEventSubProcessPath() throws IOException {
+        List<String> expectedIds = new ArrayList<String>();
+        expectedIds.add("_4CA767F7-AA98-4863-B97D-A1318F049D2F");
+        expectedIds.add("_82AA298E-A340-4A2C-9359-C37DB4F91401");
+        expectedIds.add("_585F6E81-E445-4E5E-944A-394A5042D89B");
+        expectedIds.add("_8B6B7AB4-61F3-44B9-BFCC-DCEA77F6A73C");
+        expectedIds.add("_A0E1BE5F-C53A-462A-9022-C9779890BE63");
+
+        List<String> expectedIds2 = new ArrayList<String>();
+        expectedIds2.add("_BE6FF397-EFCC-4714-A52E-D7D25096D817");
+        expectedIds2.add("_E794FA5E-BA65-43D3-858A-525A4F164295");
+        expectedIds2.add("_A76F0AF1-A98F-465B-B4A9-DD149B5B8047");
+        expectedIds2.add("_1B5B5427-41E3-4CFC-994F-04D35B18DCAE");
+        expectedIds2.add("_F1D4055A-39FE-4097-B4B6-EDE2086FCD0A");
+        expectedIds2.add("_CB924F3A-7F0B-4876-84D5-045D9CBC18B8");
+        expectedIds2.add("_0C870F9F-0DF9-4595-B046-55C316768521");
+
+        List<String> expectedIds3 = new ArrayList<String>();
+        expectedIds3.add("_BE6FF397-EFCC-4714-A52E-D7D25096D817");
+        expectedIds3.add("_E794FA5E-BA65-43D3-858A-525A4F164295");
+        expectedIds3.add("_A76F0AF1-A98F-465B-B4A9-DD149B5B8047");
+        expectedIds3.add("_1B5B5427-41E3-4CFC-994F-04D35B18DCAE");
+        expectedIds3.add("_F1D4055A-39FE-4097-B4B6-EDE2086FCD0A");
+        expectedIds3.add("_EAD98873-E74D-4F08-9569-D9F839DECE36");
+        expectedIds3.add("_07794FB1-8A36-438A-9FB7-9D0CE6556D15");
+        expectedIds3.add("_EF284208-A361-4057-9E2E-61D5846D33BC");
+        expectedIds3.add("_52884953-6BC7-42B9-899F-232BA2641AE5");
+        expectedIds3.add("_4CA767F7-AA98-4863-B97D-A1318F049D2F");
+        expectedIds3.add("_82AA298E-A340-4A2C-9359-C37DB4F91401");
+        expectedIds3.add("_585F6E81-E445-4E5E-944A-394A5042D89B");
+        expectedIds3.add("_8B6B7AB4-61F3-44B9-BFCC-DCEA77F6A73C");
+        expectedIds3.add("_A0E1BE5F-C53A-462A-9022-C9779890BE63");
+
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-EventSubProcess.bpmn2"));
+
+        List<PathContext> paths = finder.findPaths();
+
+        assertNotNull(paths);
+        assertEquals(3, paths.size());
+        assertTrue(TestUtils.matchExpected(paths, expectedIds, expectedIds2, expectedIds3));
+
+        JSONObject jsonPaths = new JSONPathFormatConverter().convert(paths);
+        assertNotNull(jsonPaths);
+        try {
+            assertEquals(3, ((JSONObject)jsonPaths.get("paths")).length());
+        } catch (JSONException e) {
+            fail(e.getMessage());
+        }
+
+        TestUtils.printOutPaths(paths, jsonPaths, "testEventSubProcessPath");
+
+    }
 }
