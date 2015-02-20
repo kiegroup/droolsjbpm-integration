@@ -9,7 +9,7 @@
   </parent>
 
   <groupId>org.kie</groupId>
-  <artifactId>kie-server</artifactId>
+  <artifactId>kie-server-parent</artifactId>
   <packaging>pom</packaging>
 
   <name>KIE :: Execution Server</name>

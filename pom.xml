@@ -60,7 +60,7 @@
     <module>kie-aries-blueprint</module>
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
-    <module>kie-server</module>
+    <module>kie-server-parent</module>
     <module>kie-examples-api</module>
   </modules>
 
