@@ -62,7 +62,7 @@
             <deployables>
               <deployable>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>kie-server-distribution-wars</artifactId>
+                <artifactId>kie-server</artifactId>
                 <!-- default, may be overriden in container specific profiles -->
                 <classifier>ee6</classifier>
                 <type>war</type>
