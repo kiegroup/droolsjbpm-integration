@@ -20,7 +20,7 @@
     <module>kie-server-client</module>
     <module>kie-server-services</module>
     <module>kie-server-jms</module>
-    <module>kie-server-distribution-wars</module>
+    <module>kie-server</module>
     <module>kie-server-tests</module>
     <module>kie-server-distribution</module>
   </modules>
