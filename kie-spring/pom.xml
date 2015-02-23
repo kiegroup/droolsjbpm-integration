@@ -248,6 +248,36 @@
           </instructions>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <basedir>${basedir}/src/test</basedir>
+          <includes>
+            <include>java/org/kie/spring/CodeVersion.java</include>
+            <include>resources/org/kie/spring/kie-import-releaseid.xml</include>
+          </includes>
+          <regex>true</regex>
+          <replacements>
+            <replacement>
+              <token>public final static String VERSION = ".*</token>
+              <value>public final static String VERSION = "${project.version}";</value>
+            </replacement>
+            <replacement>
+              <token>artifactId="named-kiesession" version=".*</token>
+              <value>artifactId="named-kiesession" version="${project.version}"/></value>
+            </replacement>
+          </replacements>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
