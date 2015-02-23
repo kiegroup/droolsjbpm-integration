@@ -25,30 +25,4 @@
     <module>kie-server-distribution</module>
   </modules>
 
-  <!-- move to droolsjbpm-buildbootstrap! -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-server-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-        <dependency>
-          <groupId>org.kie</groupId>
-          <artifactId>kie-server-services</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.kie</groupId>
-          <artifactId>kie-server-jms</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-  </dependencyManagement>
-
 </project>
