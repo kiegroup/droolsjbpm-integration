@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<weblogic-ejb-jar xmlns="http://xmlns.oracle.com/weblogic/weblogic-ejb-jar" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://xmlns.oracle.com/weblogic/weblogic-ejb-jar http://xmlns.oracle.com/weblogic/weblogic-ejb-jar/1.5/weblogic-ejb-jar.xsd">
+
+  <weblogic-enterprise-bean>
+    <ejb-name>KieServerMDB</ejb-name>
+    <message-driven-descriptor>
+      <destination-jndi-name>jms/KIE.SERVER.REQUEST</destination-jndi-name>
+      <connection-factory-jndi-name>jms/cf/KIE.SERVER.REQUEST</connection-factory-jndi-name>
+    </message-driven-descriptor>
+    <resource-description>
+      <res-ref-name>org.kie.server.jms.KieServerMDB/factory</res-ref-name>
+      <jndi-name>jms/cf/KIE.SERVER.RESPONSE</jndi-name>
+    </resource-description>
+  </weblogic-enterprise-bean>
+
+</weblogic-ejb-jar>
