@@ -17,6 +17,8 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -26,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.kie.server.api.jms.JMSConstants.*;
 
+@TransactionManagement(TransactionManagementType.BEAN)
 @MessageDriven(name = "KieServerMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationJndiName", propertyValue = "queue/KIE.SERVER.REQUEST"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "queue/KIE.SERVER.REQUEST"),
@@ -203,7 +206,7 @@ public class KieServerMDB
     }
 
     private void sendResponse(String msgCorrId, MarshallingFormat format, Message msg) {
-        // set correlation id in response messgae
+        // set correlation id in response message
         try {
             msg.setJMSCorrelationID(msgCorrId);
         } catch (JMSException jmse) {
@@ -219,7 +222,6 @@ public class KieServerMDB
             Queue responseQueue = (Queue) (new InitialContext()).lookup(RESPONSE_QUEUE_NAME);
             producer = session.createProducer(responseQueue);
             producer.send(msg);
-            session.commit();
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId
                             + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
