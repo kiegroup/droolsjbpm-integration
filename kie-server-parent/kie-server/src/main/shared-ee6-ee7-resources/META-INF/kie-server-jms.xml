@@ -15,7 +15,6 @@
         <entry name="java:jboss/exported/jms/queue/KIE.SERVER.RESPONSE" />
       </jms-queue>
 
-
     </jms-destinations>
   </hornetq-server>
 </messaging-deployment>

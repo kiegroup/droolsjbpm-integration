@@ -29,11 +29,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/src/main/shared-resources</directory>
-      <outputDirectory>.</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/src/main/ee6-container</directory>
+      <directory>${project.basedir}/src/main/shared-ee6-ee7-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
   </fileSets>
