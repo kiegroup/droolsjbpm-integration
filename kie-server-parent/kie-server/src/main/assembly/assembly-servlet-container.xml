@@ -29,14 +29,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/src/main/shared-resources</directory>
-      <outputDirectory>.</outputDirectory>
-      <excludes>
-        <exclude>WEB-INF/web.xml</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/src/main/servlet-container</directory>
+      <directory>${project.basedir}/src/main/webc-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
   </fileSets>
