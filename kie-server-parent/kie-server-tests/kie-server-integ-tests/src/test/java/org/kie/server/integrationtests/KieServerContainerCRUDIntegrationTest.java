@@ -1,15 +1,25 @@
-package org.kie.server.integrationtests.jms;
+package org.kie.server.integrationtests;
 
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+//import org.jboss.resteasy.client.ClientRequest;
+//import org.jboss.resteasy.client.ClientResponse;
+//import org.jboss.resteasy.client.ClientResponseFailure;
+//import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.server.api.model.*;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 
-import java.util.List;
-
-public class KieServerContainerCRUDIntegrationTest
-        extends KieServerBaseIntegrationTest {
+public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
@@ -45,7 +55,7 @@ public class KieServerContainerCRUDIntegrationTest
 //
 //        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
 //        try {
-//            ClientRequest clientRequest = newRequest(BASE_URI + "/containers/" + resource.getContainerId());
+//            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/" + resource.getContainerId());
 //            response = clientRequest.body(
 //                    MediaType.APPLICATION_XML_TYPE, resource).put(
 //                    new GenericType<ServiceResponse<KieContainerResource>>() {
@@ -58,12 +68,12 @@ public class KieServerContainerCRUDIntegrationTest
 //                    e, response);
 //        }
 //    }
-//
+
 //    @Test
 //    public void testCreateContainerEmptyBody() throws Exception {
 //        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
 //        try {
-//            ClientRequest clientRequest = newRequest(BASE_URI + "/containers/empty-body-container");
+//            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/empty-body-container");
 //            response = clientRequest.body(
 //                    MediaType.APPLICATION_XML_TYPE, "").put(
 //                    new GenericType<ServiceResponse<KieContainerResource>>() {
@@ -73,7 +83,7 @@ public class KieServerContainerCRUDIntegrationTest
 //            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
 //        }
 //    }
-//
+
     @Test
     public void testCreateContainerAfterFailure() throws Exception {
         // non-existing ID to simulate failure
@@ -101,7 +111,6 @@ public class KieServerContainerCRUDIntegrationTest
     }
 
     @Test
-    @Ignore
     public void testGetContainerInfoNonExisting() throws Exception {
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("non-existing-container");
         System.out.println(reply.getMsg());

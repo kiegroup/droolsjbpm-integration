@@ -24,7 +24,7 @@
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->
     <kie.server.context>kie-server-services</kie.server.context>
-    <kie.server.base.uri>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.uri>
+    <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
     <!-- This property can be overriden when some other remote repo location should be used -->
@@ -42,8 +42,7 @@
   </properties>
 
   <modules>
-    <module>kie-server-rest-tests</module>
-    <module>kie-server-jms-tests</module>
+    <module>kie-server-integ-tests</module>
   </modules>
 
   <build>
@@ -68,7 +67,7 @@
                 <properties>
                   <context>${kie.server.context}</context>
                 </properties>
-                <pingURL>${kie.server.base.uri}</pingURL>
+                <pingURL>${kie.server.base.http.url}</pingURL>
                 <pingTimeout>30000</pingTimeout>
               </deployable>
             </deployables>
