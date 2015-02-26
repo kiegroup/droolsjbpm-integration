@@ -8,7 +8,7 @@ import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
 
-public class ContainerIsolationIntegrationTest extends KieServerBaseIntegrationTest {
+public class ContainerIsolationIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
             "1.0.0.Final");
     private static final ReleaseId kjar2 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar2",

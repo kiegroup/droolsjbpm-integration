@@ -6,7 +6,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
-public class RuleFlowIntegrationTest extends KieServerBaseIntegrationTest {
+public class RuleFlowIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "ruleflow-group",
             "1.0.0.Final");

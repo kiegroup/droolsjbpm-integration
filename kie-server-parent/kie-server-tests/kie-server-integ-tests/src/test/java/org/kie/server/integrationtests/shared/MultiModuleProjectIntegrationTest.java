@@ -8,7 +8,7 @@ import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.assertTrue;
 
-public class MultiModuleProjectIntegrationTest extends KieServerBaseIntegrationTest {
+public class MultiModuleProjectIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseIdRules1 = new ReleaseId("org.kie.server.testing", "multimodule-project-rules1",
             "2.0.0.Final");

@@ -2,10 +2,6 @@ package org.kie.server.integrationtests.shared;
 
 import java.util.List;
 
-//import org.jboss.resteasy.client.ClientRequest;
-//import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.client.ClientResponseFailure;
-//import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +11,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
-public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrationTest {
+public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
@@ -43,42 +39,6 @@ public class KieServerContainerCRUDIntegrationTest extends KieServerBaseIntegrat
                                                                                                               "0.0.0")));
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
-
-//    @Test
-//    public void testCreateContainerNonExistingGAV2() throws Exception {
-//        KieContainerResource resource = new KieContainerResource("no-gav2-container",
-//                                                                 new ReleaseId("foo", "bar", "0.0.0"));
-//
-//        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-//        try {
-//            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/" + resource.getContainerId());
-//            response = clientRequest.body(
-//                    MediaType.APPLICATION_XML_TYPE, resource).put(
-//                    new GenericType<ServiceResponse<KieContainerResource>>() {
-//                    });
-//            Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-//            Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, response.getEntity().getType());
-//        } catch (Exception e) {
-//            throw new ClientResponseFailure(
-//                    "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
-//                    e, response);
-//        }
-//    }
-
-//    @Test
-//    public void testCreateContainerEmptyBody() throws Exception {
-//        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-//        try {
-//            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/empty-body-container");
-//            response = clientRequest.body(
-//                    MediaType.APPLICATION_XML_TYPE, "").put(
-//                    new GenericType<ServiceResponse<KieContainerResource>>() {
-//                    });
-//            Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-//        } catch (Exception e) {
-//            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
-//        }
-//    }
 
     @Test
     public void testCreateContainerAfterFailure() throws Exception {

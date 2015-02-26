@@ -1,22 +1,4 @@
-package org.kie.server.integrationtests.shared;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.Queue;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.ws.rs.core.MediaType;
+package org.kie.server.integrationtests;
 
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -25,8 +7,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -43,64 +23,41 @@ import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RunWith(Parameterized.class)
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public abstract class KieServerBaseIntegrationTest {
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
-    public static Collection<Object[]> data() throws Exception {
-        KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
-
-        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][]
-                        {
-                                {MediaType.APPLICATION_XML_TYPE, restConfiguration},
-                                {MediaType.APPLICATION_JSON_TYPE, restConfiguration},
-                        }
-        ));
-                
-
-        if (PROVIDER_URL != null) {
-            KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
-            parameterData.addAll(Arrays.asList(new Object[][]
-                            {
-                                    {MediaType.APPLICATION_XML_TYPE, jmsConfiguration},
-                                    {MediaType.APPLICATION_JSON_TYPE, jmsConfiguration}
-                            })
-            );
-        }
-
-        return parameterData;
-    }
-
-    @Parameterized.Parameter(0)
-    public MediaType MEDIA_TYPE;
-
-    private static final Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
-
+    private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
+    
     protected static final String DEFAULT_USERNAME = "yoda";
     protected static final String DEFAULT_PASSWORD = "usetheforce123@";
-
     // REST
     protected static String BASE_HTTP_URL = System.getProperty("kie.server.base.http.url");
     // JMS
-    private static final String INITIAL_CONTEXT_FACTORY = System.getProperty( "context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
-    private static final String CONNECTION_FACTORY = System.getProperty( "connection.factory", "jms/RemoteConnectionFactory");
-    private static final String PROVIDER_URL = System.getProperty( "remoting.uri" );
-    private static final String REQUEST_QUEUE_JNDI = System.getProperty( "jndi.kie.request.queue", "jms/queue/KIE.SERVER.REQUEST" );
-    private static final String RESPONSE_QUEUE_JNDI = System.getProperty( "jndi.kie.response.queue", "jms/queue/KIE.SERVER.RESPONSE" );
-
-    protected static boolean LOCAL_SERVER = false;
-
-    protected static int PORT;
-
-    private static MavenRepository repository;
-
+    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty( "context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
+    protected static final String CONNECTION_FACTORY = System.getProperty( "connection.factory", "jms/RemoteConnectionFactory");
+    protected static final String PROVIDER_URL = System.getProperty( "remoting.uri" );
+    protected static final String REQUEST_QUEUE_JNDI = System.getProperty( "jndi.kie.request.queue", "jms/queue/KIE.SERVER.REQUEST" );
+    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty( "jndi.kie.response.queue", "jms/queue/KIE.SERVER.RESPONSE" );
+    
     protected static TJWSEmbeddedJaxrsServer server;
-
-    @Parameterized.Parameter(1)
-    public KieServicesConfiguration configuration;
+    protected static boolean LOCAL_SERVER = false;
+    protected static int PORT;
+    
+    protected static MavenRepository repository;
 
     protected KieServicesClient client;
-
     /*
        Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
        kjars depend on that parent, but it is not necessary to deploy it multiple times. This flag is set the first time
@@ -111,7 +68,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     static {
         if (BASE_HTTP_URL == null && PROVIDER_URL == null) {
-            // falls back to local, in memory, server -> serving just for REST
+            // falls back to local, in memory, server -> serving only over REST
             LOCAL_SERVER = true;
             PORT = findFreePort();
             BASE_HTTP_URL = "http://localhost:" + PORT + "/server";
@@ -131,7 +88,8 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static void setupCustomSettingsXml() {
         if (!LOCAL_SERVER) {
-            String clientDeploymentSettingsXml = ClassLoader.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
+            String clientDeploymentSettingsXml = ClassLoader.class.getResource(
+                    "/kie-server-testing-client-deployment-settings.xml").getFile();
             System.setProperty("kie.maven.settings.custom", clientDeploymentSettingsXml);
         }
     }
@@ -145,7 +103,7 @@ public abstract class KieServerBaseIntegrationTest {
     */
     private static void warmUpServer() throws Exception {
         logger.info("Warming-up the server by creating dummy container and then immediately destroying it...");
-        KieServicesConfiguration config  = createKieServicesRestConfiguration();
+        KieServicesConfiguration config = createKieServicesRestConfiguration();
         // specify higher timeout, the default is too small
         config.setTimeout(30000);
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
@@ -187,13 +145,7 @@ public abstract class KieServerBaseIntegrationTest {
         client = createDefaultClient();
     }
 
-    protected KieServicesClient createDefaultClient() throws Exception {
-        if (LOCAL_SERVER) {
-            return KieServicesFactory.newKieServicesRestClient(BASE_HTTP_URL, null, null);
-        } else {
-            return KieServicesFactory.newKieServicesClient(configuration);
-        }
-    }
+    protected abstract KieServicesClient createDefaultClient() throws Exception;
 
     private static void startServer() throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
@@ -214,7 +166,7 @@ public abstract class KieServerBaseIntegrationTest {
         String[] mvnArgs;
         if (LOCAL_SERVER) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
-            // if the repo does not exists.
+            // if the repo does not exist.
             mvnArgs = new String[]{"-B", "clean", "install"};
         } else {
             mvnArgs = new String[]{"-B", "clean", "deploy"};
@@ -233,7 +185,7 @@ public abstract class KieServerBaseIntegrationTest {
         if (!commonParentDeployed) {
             buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
         } else {
-            logger.info("Common parent project already deployed!");
+            logger.debug("Common parent project already deployed, nothing to do here.");
         }
     }
 
@@ -262,8 +214,8 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     private static void createAndDeployJar(KieServices ks,
-                                    ReleaseId releaseId,
-                                    String... drls) {
+            ReleaseId releaseId,
+            String... drls) {
         KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(
                 releaseId);
         for (int i = 0; i < drls.length; i++) {
@@ -299,7 +251,8 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected static void assertSuccess(ServiceResponse<?> response) {
         ServiceResponse.ResponseType type = response.getType();
-        assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS, type);
+        assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS,
+                type);
     }
 
     protected static void assertResultContainsString(String result, String expectedString) {
@@ -307,32 +260,11 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     protected static void assertResultContainsStringRegex(String result, String regex) {
-        assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!" ,
+        assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!",
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
     }
 
-//    protected ClientRequest newRequest(String uriString) {
-//        URI uri;
-//        try {
-//            uri = new URI(uriString);
-//        } catch (URISyntaxException e) {
-//            throw new RuntimeException("Malformed URI was specified: '" + uriString + "'!", e);
-//        }
-//        if (LOCAL_SERVER) {
-//            return new ClientRequest(uriString);
-//        } else {
-//            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//            credentialsProvider.setCredentials(
-//                    new AuthScope(uri.getHost(), uri.getPort()),
-//                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
-//            );
-//            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
-//            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-//            return new ClientRequest(uriString, executor);
-//        }
-//    }
-
-    private static KieServicesConfiguration createKieServicesJmsConfiguration() throws Exception {
+    protected static KieServicesConfiguration createKieServicesJmsConfiguration() throws Exception {
         final Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
         env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
@@ -357,7 +289,7 @@ public abstract class KieServerBaseIntegrationTest {
         return jmsConfiguration;
     }
 
-    private static KieServicesConfiguration createKieServicesRestConfiguration() throws Exception {
+    protected static KieServicesConfiguration createKieServicesRestConfiguration() throws Exception {
         return KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
     }
     
