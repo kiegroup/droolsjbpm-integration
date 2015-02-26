@@ -45,11 +45,11 @@ public abstract class KieServerBaseIntegrationTest {
     // REST
     protected static String BASE_HTTP_URL = System.getProperty("kie.server.base.http.url");
     // JMS
-    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty( "context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
-    protected static final String CONNECTION_FACTORY = System.getProperty( "connection.factory", "jms/RemoteConnectionFactory");
-    protected static final String PROVIDER_URL = System.getProperty( "remoting.uri" );
-    protected static final String REQUEST_QUEUE_JNDI = System.getProperty( "jndi.kie.request.queue", "jms/queue/KIE.SERVER.REQUEST" );
-    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty( "jndi.kie.response.queue", "jms/queue/KIE.SERVER.RESPONSE" );
+    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
+    protected static final String CONNECTION_FACTORY = System.getProperty("kie.server.connection.factory", "jms/RemoteConnectionFactory");
+    protected static final String PROVIDER_URL = System.getProperty("kie.server.remoting.url");
+    protected static final String REQUEST_QUEUE_JNDI = System.getProperty("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
+    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
     
     protected static TJWSEmbeddedJaxrsServer server;
     protected static boolean LOCAL_SERVER = false;
@@ -264,32 +264,36 @@ public abstract class KieServerBaseIntegrationTest {
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
     }
 
-    protected static KieServicesConfiguration createKieServicesJmsConfiguration() throws Exception {
-        final Properties env = new Properties();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
-        env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
-        env.put(Context.SECURITY_PRINCIPAL, System.getProperty("username", DEFAULT_USERNAME));
-        env.put(Context.SECURITY_CREDENTIALS, System.getProperty("password", DEFAULT_PASSWORD));
-        InitialContext context = new InitialContext(env);
+    protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
+        try {
+            final Properties env = new Properties();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
+            env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
+            env.put(Context.SECURITY_PRINCIPAL, System.getProperty("username", DEFAULT_USERNAME));
+            env.put(Context.SECURITY_CREDENTIALS, System.getProperty("password", DEFAULT_PASSWORD));
+            InitialContext context = new InitialContext(env);
 
-        logger.debug("JMS provider URL: {}", PROVIDER_URL);
-        logger.debug("Initial context factory: {}", INITIAL_CONTEXT_FACTORY);
-        logger.debug("Connection factory: {}", CONNECTION_FACTORY);
-        logger.debug("JMS request queue JNDI: {}", REQUEST_QUEUE_JNDI);
-        logger.debug("JMS response queue JNDI: {}", RESPONSE_QUEUE_JNDI);
+            logger.debug("JMS provider URL: {}", PROVIDER_URL);
+            logger.debug("Initial context factory: {}", INITIAL_CONTEXT_FACTORY);
+            logger.debug("Connection factory: {}", CONNECTION_FACTORY);
+            logger.debug("JMS request queue JNDI: {}", REQUEST_QUEUE_JNDI);
+            logger.debug("JMS response queue JNDI: {}", RESPONSE_QUEUE_JNDI);
 
-        Queue requestQueue = (Queue) context.lookup(REQUEST_QUEUE_JNDI);
-        Queue responseQueue = (Queue) context.lookup(RESPONSE_QUEUE_JNDI);
-        ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(CONNECTION_FACTORY);
+            Queue requestQueue = (Queue) context.lookup(REQUEST_QUEUE_JNDI);
+            Queue responseQueue = (Queue) context.lookup(RESPONSE_QUEUE_JNDI);
+            ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(CONNECTION_FACTORY);
 
-        KieServicesConfiguration jmsConfiguration = KieServicesFactory.newJMSConfiguration(
-                connectionFactory, requestQueue, responseQueue, System.getProperty("username", DEFAULT_USERNAME),
-                System.getProperty("password", DEFAULT_PASSWORD));
+            KieServicesConfiguration jmsConfiguration = KieServicesFactory.newJMSConfiguration(
+                    connectionFactory, requestQueue, responseQueue, System.getProperty("username", DEFAULT_USERNAME),
+                    System.getProperty("password", DEFAULT_PASSWORD));
 
-        return jmsConfiguration;
+            return jmsConfiguration;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create JMS client configuration!", e);
+        }
     }
 
-    protected static KieServicesConfiguration createKieServicesRestConfiguration() throws Exception {
+    protected static KieServicesConfiguration createKieServicesRestConfiguration() {
         return KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
     }
     

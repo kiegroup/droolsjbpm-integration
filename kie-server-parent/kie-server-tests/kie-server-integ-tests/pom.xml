@@ -99,13 +99,13 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <systemPropertyVariables>
-              <!-- Value is supplied by specific profiles -->
-              <remoting.uri>${remoting.uri}</remoting.uri>
+              <!-- Values are supplied by specific profiles -->
+              <kie.server.remoting.url>${kie.server.remoting.url}</kie.server.remoting.url>
               <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
-              <context.factory>${context.factory}</context.factory>
-              <jndi.kie.request.queue>${jndi.kie.request.queue}</jndi.kie.request.queue>
-              <jndi.kie.response.queue>${jndi.kie.response.queue}</jndi.kie.response.queue>
-              <connection.factory>${connection.factory}</connection.factory>
+              <kie.server.context.factory>${kie.server.context.factory}</kie.server.context.factory>
+              <kie.server.connection.factory>${kie.server.connection.factory}</kie.server.connection.factory>
+              <kie.server.jndi.request.queue>${kie.server.jndi.request.queue}</kie.server.jndi.request.queue>
+              <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -148,7 +148,7 @@
     <profile>
       <id>jbossas71x</id>
       <properties>
-        <remoting.uri>remote://${container.hostname}:4447</remoting.uri>
+        <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -172,7 +172,7 @@
     <profile>
       <id>eap64x</id>
       <properties>
-        <remoting.uri>remote://${container.hostname}:4447</remoting.uri>
+        <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -198,7 +198,7 @@
     <profile>
       <id>wildfly82x</id>
       <properties>
-        <remoting.uri>http-remoting://${container.hostname}:${container.port}</remoting.uri>
+        <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
       </properties>
       <dependencyManagement>
         <dependencies>
