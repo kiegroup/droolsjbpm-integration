@@ -444,7 +444,8 @@ public class RequestMessageBean implements MessageListener {
     private Subject tryLogin(String[] userPass) throws LoginException {
         try { 
             CallbackHandler handler = new UserPassCallbackHandler(userPass);
-            LoginContext lc = new LoginContext("kie-jms-login-context", handler);
+            final String domain = System.getProperty( "org.uberfire.domain", "kie-jms-login-context");
+            LoginContext lc = new LoginContext( domain, handler);
             lc.login();
             return lc.getSubject();
         } catch( Exception e ) { 
