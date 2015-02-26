@@ -16,7 +16,7 @@ import java.util.Collection;
 public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseIntegrationTest {
 
     @Parameterized.Parameters(name = "{index}: {0} {1}")
-    public static Collection<Object[]> data() throws Exception {
+    public static Collection<Object[]> data() {
         KieServicesConfiguration restConfiguration = createKieServicesRestConfiguration();
 
         Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][]
@@ -46,7 +46,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     @Parameterized.Parameter(1)
     public KieServicesConfiguration configuration;
 
-    protected KieServicesClient createDefaultClient() throws Exception {
+    protected KieServicesClient createDefaultClient() {
         if (LOCAL_SERVER) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, null, null).setMarshallingFormat(marshallingFormat);
