@@ -25,9 +25,6 @@
     <module>kie-remote-rest-api</module>
     <module>kie-remote-services</module>
     <module>kie-remote-ws</module>
-    <!-- finish me.. :/ 
-    <module>kie-remote-osgi</module>
-    -->
   </modules>
 
   <properties>
