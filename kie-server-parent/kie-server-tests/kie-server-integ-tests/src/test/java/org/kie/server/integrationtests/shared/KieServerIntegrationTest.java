@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests;
+package org.kie.server.integrationtests.shared;
 
 import java.io.File;
 import java.lang.reflect.Method;

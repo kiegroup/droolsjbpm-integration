@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.kie.server.integrationtests;
+package org.kie.server.integrationtests.shared;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
