@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests;
+package org.kie.server.integrationtests.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

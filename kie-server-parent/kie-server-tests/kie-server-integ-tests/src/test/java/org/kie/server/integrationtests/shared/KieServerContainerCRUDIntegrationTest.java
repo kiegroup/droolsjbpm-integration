@@ -1,9 +1,6 @@
-package org.kie.server.integrationtests;
+package org.kie.server.integrationtests.shared;
 
 import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 //import org.jboss.resteasy.client.ClientRequest;
 //import org.jboss.resteasy.client.ClientResponse;
@@ -11,7 +8,6 @@ import javax.ws.rs.core.Response;
 //import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
