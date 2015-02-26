@@ -26,7 +26,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         try {
             ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/" + resource.getContainerId());
             response = clientRequest.body(
-                    MEDIA_TYPE, resource).put(
+                    getMediaType(), resource).put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -43,7 +43,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         try {
             ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/empty-body-container");
             response = clientRequest.body(
-                    MEDIA_TYPE, "").put(
+                    getMediaType(), "").put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
