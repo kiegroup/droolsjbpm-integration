@@ -131,6 +131,21 @@
 
   <profiles>
     <profile>
+      <id>tomcat7x</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <id>jbossas71x</id>
       <properties>
         <remoting.uri>remote://${container.hostname}:4447</remoting.uri>
@@ -206,6 +221,31 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.org.apache.httpcomponents.httpclient}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${version.org.apache.httpcomponents.httpcore}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>

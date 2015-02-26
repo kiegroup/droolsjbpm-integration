@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConcurrentRequestsIntegrationTest extends KieServerBaseIntegrationTest {
+public class ConcurrentRequestsIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestsIntegrationTest.class);
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");

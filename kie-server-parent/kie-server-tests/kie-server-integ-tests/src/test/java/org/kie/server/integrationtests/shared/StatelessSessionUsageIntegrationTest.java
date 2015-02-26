@@ -24,7 +24,7 @@ import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
 
-public class StatelessSessionUsageIntegrationTest extends KieServerBaseIntegrationTest {
+public class StatelessSessionUsageIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar",
             "1.0.0-SNAPSHOT");

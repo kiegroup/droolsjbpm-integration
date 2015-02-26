@@ -9,7 +9,7 @@ import org.kie.server.api.model.ServiceResponse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class StatefulSessionUsageIntegrationTest extends KieServerBaseIntegrationTest {
+public class StatefulSessionUsageIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "state-is-kept-for-stateful-session",
             "1.0.0-SNAPSHOT");
