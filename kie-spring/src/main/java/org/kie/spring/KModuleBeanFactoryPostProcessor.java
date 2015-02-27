@@ -314,12 +314,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         try {
-            configFileURL = applicationContext.getResource("classpath:/").getURL();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        if (configFileURL.toString().endsWith("service-loader-resources/")) {
-            try {
+            if (isEapContext(applicationContext)) {
                 Enumeration<URL> urls = getClass().getClassLoader().getResources("/");
                 while (urls.hasMoreElements()) {
                     URL url = urls.nextElement();
@@ -328,10 +323,32 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                         break;
                     }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } else {
+                configFileURL = applicationContext.getResource("classpath:/").getURL();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        log.info("classpath root URL: " + configFileURL);
+    }
+
+    private boolean isEapContext(ApplicationContext applicationContext) throws IOException {
+        URL url = applicationContext.getResource("classpath:/").getURL();
+        if (isEapUrl(url)) {
+            return true;
+        } else {
+            Enumeration<URL> urls = getClass().getClassLoader().getResources("/");
+            while (urls.hasMoreElements()) {
+                if (isEapUrl(urls.nextElement())) {
+                    return true;
+                }
             }
         }
-        log.info("classpath root URL: " + configFileURL);
+        return false;
+    }
+
+    private boolean isEapUrl(URL url) {
+        return url.toString().endsWith("service-loader-resources/");
     }
 }
