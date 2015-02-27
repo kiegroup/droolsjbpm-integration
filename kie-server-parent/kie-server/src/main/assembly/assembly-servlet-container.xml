@@ -38,6 +38,7 @@
     <dependencySet>
       <includes>
         <include>org.kie:kie-server-services</include>
+        <include>org.slf4j:slf4j-jdk14</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
