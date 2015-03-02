@@ -15,6 +15,8 @@ import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.order.OrderedRemoteJmsRuntimeEngineBuilder;
+import org.kie.remote.client.api.order.OrderedRemoteRestRuntimeEngineBuilder;
 import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.services.client.api.command.RemoteConfiguration;
 
@@ -60,6 +62,33 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
     public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newCommandWebServiceClientBuilder() { 
+       return new RemoteCommandWebserviceClientBuilderImpl();
+    }
+   
+    /**
+     * Create a new {@link RemoteJmsRuntimeEngineBuilder} instance 
+     * to configure and buid a remote API client {@link RuntimeEngine} instance.
+     * @return A {@link RemoteJmsRuntimeEngineBuilder} instance
+     */
+    public static OrderedRemoteJmsRuntimeEngineBuilder newOrderedJmsBuilder() { 
+       return new org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl(); 
+    }
+    
+    /**
+     * Create a new {@link RemoteRestRuntimeEngineBuilder} instance 
+     * to configure and buid a remote API client {@link RuntimeEngine} instance.
+     * @return A {@link RemoteRestRuntimeEngineBuilder} instance
+     */
+    public static OrderedRemoteRestRuntimeEngineBuilder newOrderedRestBuilder() { 
+       return new org.kie.services.client.api.RemoteRestRuntimeEngineBuilderImpl(); 
+    }
+
+    /**
+     * Create a new {@link RemoteRestRuntimeEngineBuilder} instance 
+     * to configure and buid a remote API client {@link RuntimeEngine} instance.
+     * @return A {@link RemoteRestRuntimeEngineBuilder} instance
+     */
+    public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newOrderedCommandWebServiceClientBuilder() { 
        return new RemoteCommandWebserviceClientBuilderImpl();
     }
     

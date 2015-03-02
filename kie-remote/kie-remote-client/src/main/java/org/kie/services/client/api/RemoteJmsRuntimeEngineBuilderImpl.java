@@ -11,6 +11,7 @@ import javax.naming.InitialContext;
 
 import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.order.OrderedRemoteJmsRuntimeEngineBuilder;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
@@ -21,7 +22,7 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  * It takes care of implementing the methods specified as well as managing the 
  * state of the internal {@link RemoteConfiguration} instance.
  */
-class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder {
+class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder, OrderedRemoteJmsRuntimeEngineBuilder.OrderedRemoteJmsRuntimeEngineBuilderAll {
 
     private RemoteConfiguration config;
     
@@ -167,6 +168,13 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
     }
 
     @Override
+    public RemoteJmsRuntimeEngineBuilderImpl useSsl() {
+        this.createOwnFactory = true;
+        this.config.setUseSsl(true);
+        return this;
+    }
+
+    @Override
     public RemoteJmsRuntimeEngineBuilderImpl addKeystorePassword(String keystorePassword) {
         this.keystorePassword = keystorePassword;
         this.useSsl(true);
@@ -202,10 +210,35 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
   
     @Override
     public RemoteJmsRuntimeEngineBuilderImpl disableTaskSecurity() {
+        this.createOwnFactory = false;
         config.setDisableTaskSecurity(true);
         return this;
     }
 
+    @Override
+    public RemoteJmsRuntimeEngineBuilderImpl setConnectionFactoryJNDIName( String connectionFactoryJNDIName ) {
+        config.setConnectionFactoryJndiName(connectionFactoryJNDIName); 
+        return this;
+    }
+
+    @Override
+    public RemoteJmsRuntimeEngineBuilderImpl setSessionQueueJNDIName( String sessionQueueJNDIName ) {
+        config.setSessionQueueJndiName(sessionQueueJNDIName);
+        return this;
+    }
+
+    @Override
+    public RemoteJmsRuntimeEngineBuilderImpl setTaskQueueJNDIName( String taskQueueJNDIName ) {
+        config.setTaskQueueJndiName(taskQueueJNDIName);
+        return this;
+    }
+
+    @Override
+    public RemoteJmsRuntimeEngineBuilderImpl setResponseQueueJNDIName( String responseQueueJNDIName ) {
+        config.setResponseQueueJndiName(responseQueueJNDIName);
+        return this;
+    }
+    
     private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
@@ -272,5 +305,7 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
     public static RemoteJmsRuntimeEngineBuilderImpl newBuilder() { 
         return new RemoteJmsRuntimeEngineBuilderImpl();
     }
+
+
 
 }

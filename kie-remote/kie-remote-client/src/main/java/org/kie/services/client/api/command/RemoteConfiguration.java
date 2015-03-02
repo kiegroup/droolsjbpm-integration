@@ -54,6 +54,11 @@ public final class RemoteConfiguration {
     private Queue responseQueue;
     private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 
+    private String connectionFactoryJndiName = CONNECTION_FACTORY_NAME;
+    private String sessionQueueJndiName = SESSION_QUEUE_NAME;
+    private String taskQueueJndiName = TASK_QUEUE_NAME;
+    private String responseQueueJndiName = RESPONSE_QUEUE_NAME;
+            
     /**
      * Public constructors and setters
      */
@@ -216,7 +221,7 @@ public final class RemoteConfiguration {
     }
     
     public void setRemoteInitialContext(InitialContext context) { 
-        String prop = CONNECTION_FACTORY_NAME;
+        String prop = this.connectionFactoryJndiName;
         try {
             if( this.connectionFactory == null ) { 
                 this.connectionFactory = (ConnectionFactory) context.lookup(prop);
@@ -400,6 +405,22 @@ public final class RemoteConfiguration {
         this.disableTaskSecurity = disableTaskSecurity;
     }
    
+    public void setConnectionFactoryJndiName( String connectionFactoryJndiName ) {
+        this.connectionFactoryJndiName = connectionFactoryJndiName;
+    }
+
+    public void setSessionQueueJndiName( String sessionQueueJndiName ) {
+        this.sessionQueueJndiName = sessionQueueJndiName;
+    }
+
+    public void setTaskQueueJndiName( String taskQueueJndiName ) {
+        this.taskQueueJndiName = taskQueueJndiName;
+    }
+
+    public void setResponseQueueJndiName( String responseQueueJndiName ) {
+        this.responseQueueJndiName = responseQueueJndiName;
+    }
+
     // Clone --- 
    
     private RemoteConfiguration(RemoteConfiguration config) { 

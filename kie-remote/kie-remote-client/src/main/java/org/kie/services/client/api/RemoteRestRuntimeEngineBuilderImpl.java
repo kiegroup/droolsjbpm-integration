@@ -1,11 +1,13 @@
 package org.kie.services.client.api;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
+import org.kie.remote.client.api.order.OrderedRemoteRestRuntimeEngineBuilder;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
@@ -16,7 +18,7 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  * It takes care of implementing the methods specified as well as managing the 
  * state of the internal {@link RemoteConfiguration} instance.
  */
-class RemoteRestRuntimeEngineBuilderImpl implements  org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder {
+class RemoteRestRuntimeEngineBuilderImpl implements org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder, OrderedRemoteRestRuntimeEngineBuilder.OrderedRemoteRestRuntimeEngineBuilderAll {
 
     private RemoteConfiguration config;
     
@@ -56,6 +58,13 @@ class RemoteRestRuntimeEngineBuilderImpl implements  org.kie.remote.client.api.R
         return this;
     }
 
+    @Override
+    public RemoteRestRuntimeEngineBuilderImpl addUrl(String urlString) throws MalformedURLException {
+        URL realUrl = new URL(urlString);
+        config.setServerBaseRestUrl(realUrl);
+        return this;
+    }
+    
     @Override
     public RemoteRestRuntimeEngineBuilderImpl addTimeout(int timeoutInSeconds) {
         config.setTimeout(timeoutInSeconds);
