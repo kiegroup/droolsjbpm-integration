@@ -518,6 +518,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         QueryFilter filter = new QueryFilter();
         filter.setOffset(firstResult);
         filter.setCount(maxResults);
+        filter.setLanguage(language);
         cmd.setFilter(filter);
         return (List<TaskSummary>) executeCommand(cmd);
     }

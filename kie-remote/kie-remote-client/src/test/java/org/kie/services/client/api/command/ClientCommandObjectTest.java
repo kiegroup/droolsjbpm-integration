@@ -1,8 +1,6 @@
 package org.kie.services.client.api.command;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
@@ -15,11 +13,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
+import org.jbpm.services.task.impl.model.GroupImpl;
+import org.jbpm.services.task.impl.model.OrganizationalEntityImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,19 +31,22 @@ import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
-import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.OrganizationalEntity;
 import org.kie.remote.jaxb.gen.QueryFilter;
 import org.kie.remote.jaxb.gen.TaskCommand;
+import org.kie.remote.jaxb.gen.Type;
 import org.mockito.ArgumentCaptor;
 
 public class ClientCommandObjectTest {
 
+    private static final Random random = new Random();
+    
     /**
      * This test makes sure that the right command is called for the right method in the TaskService implementation
      * @throws Exception
      */
-    @Test  @Ignore
+    @Test  
     public void taskServiceClientTest() throws Exception { 
      
         // mock setup
@@ -87,13 +90,19 @@ public class ClientCommandObjectTest {
            }
            for( int i = 0; i < paramTypes.length; ++i ) { 
                if( long.class.isAssignableFrom(paramTypes[i]) ) { 
-                   params[i] = 23l;
+                   params[i] = random.nextLong();
                } else if( String.class.isAssignableFrom(paramTypes[i]) ) { 
-                   params[i] = "user";
+                   params[i] = UUID.randomUUID().toString();
                } else if( Map.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = dataMap;
                } else if( List.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = list;
+                   if( taskMethod.getName().equals("nominate") ) {
+                      List<org.kie.api.task.model.OrganizationalEntity> orgEntList = new ArrayList<org.kie.api.task.model.OrganizationalEntity>();
+                      OrganizationalEntityImpl orgEnt = new GroupImpl(UUID.randomUUID().toString());
+                      orgEntList.add(orgEnt);
+                      params[i] = orgEntList;
+                   }
                } else if( Task.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = task;
                } else if( Command.class.isAssignableFrom(paramTypes[i]) ) { 
@@ -101,7 +110,7 @@ public class ClientCommandObjectTest {
                    // TODO: reactivate when execute is enabled
                    continue;
                } else if( int.class.isAssignableFrom(paramTypes[i]) ) { 
-                   params[i] = 42;
+                   params[i] = random.nextInt(Integer.MAX_VALUE);
                } else if( boolean.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = false;
                } else { 
@@ -130,28 +139,29 @@ public class ClientCommandObjectTest {
                if( fieldVal instanceof QueryFilter ) { 
                    QueryFilter filter = (QueryFilter) fieldVal; 
                    fieldVal = filter.getLanguage();
-                   if( fieldVal == null ) { 
-                       fieldVal = filter.getOffset();
-                       ++paramsChecked;
-                   }
+                   if( fieldVal != null ) { 
+                      boolean langFound = matchFieldValue(fieldVal, params);
+                      assertTrue( methodCmd.getClass().getSimpleName() + "." + cmdField.getName() + " [language] not filled!", langFound);
+                      ++paramsChecked;
+                   } 
+                   
+                   fieldVal = filter.getOffset();
+                   if( fieldVal != null ) { 
+                      boolean offsetFound = matchFieldValue(fieldVal, params);
+                      assertTrue( methodCmd.getClass().getSimpleName() + "." + cmdField.getName() + " [offset] not filled!", offsetFound);
+                      ++paramsChecked;
+                   } 
+                   
+                   fieldVal = filter.getCount();
+                   if( fieldVal != null && ((Integer) fieldVal) != -1 ) {
+                      boolean countFound = matchFieldValue(fieldVal, params);
+                      assertTrue( methodCmd.getClass().getSimpleName() + "." + cmdField.getName() + " [count] not filled!", countFound);
+                      ++paramsChecked;
+                   } 
+                   continue;
                }
-               boolean found = false; 
-               for( Object val : params ) { 
-                  if( val.equals(fieldVal) ) { 
-                      found = true;
-                      break;
-                  } else if( fieldVal instanceof org.kie.remote.jaxb.gen.Task ) { 
-                     if( val instanceof Task ) { 
-                         found = true;
-                         break;
-                     }
-                  } else if( fieldVal instanceof JaxbStringObjectPairArray ) { 
-                     if( val instanceof Map ) { 
-                         found = true;
-                         break;
-                     }
-                  }
-               }
+               boolean found = matchFieldValue(fieldVal, params);
+
                assertTrue( methodCmd.getClass().getSimpleName() + "." + cmdField.getName() + " not filled!", found);
                ++paramsChecked;
             }
@@ -170,23 +180,35 @@ public class ClientCommandObjectTest {
             assertEquals( "Too many null values in " + methodCmd.getClass().getSimpleName(), params.length, paramsChecked );
         }
     }
-  
-    private static class MethodNameParamsPair { 
-      
-        private String name;
-        private Object [] params;
-        
-        public MethodNameParamsPair(String name, Object[] params) { 
-            this.name = name;
-            this.params = params;
-        }
-       
-        public String getMethodName() { 
-            return name;
-        }
-        
-        public Object[] getParams() { 
-           return params; 
-        }
+
+    private boolean matchFieldValue(Object fieldVal, Object [] inputValues ) { 
+        boolean found = false;
+        for( Object val : inputValues ) { 
+            if( val.equals(fieldVal) ) { 
+                found = true;
+                break;
+            } else if( fieldVal instanceof org.kie.remote.jaxb.gen.Task ) { 
+                if( val instanceof Task ) { 
+                    found = true;
+                    break;
+                }
+            } else if( fieldVal instanceof JaxbStringObjectPairArray ) { 
+                if( val instanceof Map ) { 
+                    found = true;
+                    break;
+                }
+            } else if( fieldVal instanceof List && val instanceof List ) { 
+               for( Object elem : (List) fieldVal ) { 
+                  if( elem instanceof OrganizationalEntity ) { 
+                      OrganizationalEntity orgEnt = (OrganizationalEntity) elem;
+                      if( ((List) val).contains(new GroupImpl(orgEnt.getId()))) { 
+                         found = true; 
+                         break;
+                      }
+                  }
+               }
+            }
+        } 
+        return found;
     }
 }
