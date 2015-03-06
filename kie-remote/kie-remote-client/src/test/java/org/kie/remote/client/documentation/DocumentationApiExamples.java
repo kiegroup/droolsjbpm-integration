@@ -8,8 +8,6 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
-import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
 import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 
 //TODO: changed, add to documentation

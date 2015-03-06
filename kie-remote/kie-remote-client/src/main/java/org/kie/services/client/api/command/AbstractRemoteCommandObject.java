@@ -266,7 +266,7 @@ public abstract class AbstractRemoteCommandObject {
                 textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
                 Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses();
                 if( !extraJaxbClasses.isEmpty() ) {
-                    if( deploymentId == null ) {
+                    if( emptyDeploymentId(deploymentId) ) { 
                         throw new MissingRequiredInfoException(
                                 "Deserialization of parameter classes requires a deployment id, which has not been configured.");
                     }
@@ -373,7 +373,10 @@ public abstract class AbstractRemoteCommandObject {
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
         
         // necessary for deserialization
-        httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, config.getDeploymentId());
+        String deploymentId = config.getDeploymentId();
+        if( ! emptyDeploymentId(deploymentId) ) { 
+            httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, deploymentId);
+        }
 
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
         if( logger.isTraceEnabled() ) {
@@ -388,7 +391,9 @@ public abstract class AbstractRemoteCommandObject {
         KieRemoteHttpResponse httpResponse = null;
         try {
             logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + httpRequest.getUri());
-            httpRequest.contentType(MediaType.APPLICATION_XML).body(jaxbRequestString);
+            httpRequest.contentType(MediaType.APPLICATION_XML);
+            httpRequest.accept(MediaType.APPLICATION_XML);
+            httpRequest.body(jaxbRequestString);
             httpRequest.post();
             httpResponse = httpRequest.response();
         } catch( Exception e ) {
@@ -520,4 +525,7 @@ public abstract class AbstractRemoteCommandObject {
         throw new UnsupportedOperationException("The " + realClass.getSimpleName() + "." + methodName + "(..) method is not supported on the Remote Client instance.");
     }
 
+    public static boolean emptyDeploymentId(String deploymentId) { 
+        return deploymentId == null || deploymentId.trim().isEmpty();
+    }
 }
