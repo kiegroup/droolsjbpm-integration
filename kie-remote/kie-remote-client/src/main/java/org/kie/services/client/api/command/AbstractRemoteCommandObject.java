@@ -1,9 +1,7 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
-import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
+import static org.kie.services.client.api.command.InternalJmsCommandHelper.internalExecuteJmsCommand;
 import static org.kie.services.shared.ServicesVersion.VERSION;
-import static org.kie.services.client.api.command.InternalJmsCommandHelper.*;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -13,17 +11,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
 import javax.jms.Queue;
-import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -226,6 +215,7 @@ public abstract class AbstractRemoteCommandObject {
                 config.getConnectionFactory(), sendQueue, config.getResponseQueue(),
                 (SerializationProvider) config.getJaxbSerializationProvider(), config.getExtraJaxbClasses(),
                 config.getSerializationType(), config.getTimeout());
+
     }
    
     /**
@@ -240,8 +230,8 @@ public abstract class AbstractRemoteCommandObject {
         
         // necessary for deserialization
         String deploymentId = config.getDeploymentId();
-        if( deploymentId != null && ! deploymentId.trim().isEmpty() ) { 
-            httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, config.getDeploymentId());
+        if( ! emptyDeploymentId(deploymentId) ) { 
+            httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, deploymentId);
         }
 
         String jaxbRequestString = config.getJaxbSerializationProvider().serialize(jaxbRequest);
@@ -257,7 +247,9 @@ public abstract class AbstractRemoteCommandObject {
         KieRemoteHttpResponse httpResponse = null;
         try {
             logger.debug("Sending POST request with " + command.getClass().getSimpleName() + " to " + httpRequest.getUri());
-            httpRequest.contentType(MediaType.APPLICATION_XML).body(jaxbRequestString);
+            httpRequest.contentType(MediaType.APPLICATION_XML);
+            httpRequest.accept(MediaType.APPLICATION_XML);
+            httpRequest.body(jaxbRequestString);
             httpRequest.post();
             httpResponse = httpRequest.response();
         } catch( Exception e ) {
@@ -399,4 +391,7 @@ public abstract class AbstractRemoteCommandObject {
         throw new UnsupportedOperationException("The " + realClass.getSimpleName() + "." + methodName + "(..) method is not supported on the Remote Client instance.");
     }
 
+    public static boolean emptyDeploymentId(String deploymentId) { 
+        return deploymentId == null || deploymentId.trim().isEmpty();
+    }
 }

@@ -1,5 +1,6 @@
 package org.kie.services.client.api;
 
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -142,7 +143,7 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
             }
         }
         if( config.getExtraJaxbClasses() != null && ! config.getExtraJaxbClasses().isEmpty() ) { 
-           if( config.getDeploymentId() == null ) { 
+           if( emptyDeploymentId(config.getDeploymentId()) ) { 
                 throw new InsufficientInfoToBuildException("A deployment id is required if user-defined class instances are being sent.");
            }
         }

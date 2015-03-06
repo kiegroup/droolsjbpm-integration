@@ -131,7 +131,7 @@ public class DeploymentInfoBean {
      * @return A Collection of Classes that are in the deployment unit
      */
     public Collection<Class<?>> getDeploymentClasses(String deploymentId) { 
-        if( deploymentId == null ) { 
+        if( emptyDeploymentId(deploymentId) ) { 
             return Collections.emptySet();
         }
         Collection<Class<?>> classes = deploymentClassesMap.get(deploymentId);
@@ -144,5 +144,8 @@ public class DeploymentInfoBean {
      public Collection<String> getDeploymentIds() { 
          return deploymentClassesMap.keySet();
      }
-     
+
+     public static boolean emptyDeploymentId(String deploymentId) { 
+         return deploymentId == null || deploymentId.trim().isEmpty();
+     }
 }
