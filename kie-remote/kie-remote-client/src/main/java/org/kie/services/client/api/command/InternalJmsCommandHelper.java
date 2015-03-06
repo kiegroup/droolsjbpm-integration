@@ -1,5 +1,6 @@
 package org.kie.services.client.api.command;
 
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.*;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 import static org.kie.services.shared.ServicesVersion.VERSION;
@@ -81,7 +82,7 @@ public class InternalJmsCommandHelper {
                 // 2. serialization info
                 textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, serializationType);
                 if( extraJaxbClasses != null && !extraJaxbClasses.isEmpty() ) {
-                    if( deploymentId == null ) {
+                    if( emptyDeploymentId(deploymentId) ) {
                         throw new MissingRequiredInfoException(
                                 "Deserialization of parameter classes requires a deployment id, which has not been configured.");
                     }

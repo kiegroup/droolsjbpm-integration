@@ -1,5 +1,7 @@
 package org.kie.services.client.api;
 
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.emptyDeploymentId;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.mail.internet.NewsAddress;
 import javax.ws.rs.core.HttpHeaders;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -112,10 +113,10 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
         httpClientPolicy.setAutoRedirect(config.getHttpRedirect());
         
         // if present, add deployment id for JAXB context
-        String depId = config.getDeploymentId();
-        if( depId != null && ! depId.trim().isEmpty() ) {
+        String deploymentId = config.getDeploymentId();
+        if( ! emptyDeploymentId(deploymentId) ) { 
             Map<String, List<String>> headers = new HashMap<String, List<String>>(1);
-            String [] depIdHeader = { depId };
+            String [] depIdHeader = { deploymentId };
             headers.put(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, Arrays.asList(depIdHeader));
             proxyClient.getRequestContext().put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }

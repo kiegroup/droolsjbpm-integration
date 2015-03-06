@@ -1,5 +1,6 @@
 package org.kie.remote.services.cdi;
 
+import static org.kie.remote.services.cdi.DeploymentInfoBean.*;
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FAILURE;
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
@@ -234,7 +235,7 @@ public class ProcessRequestBean {
      * @return The result of the {@link Command}.
      */
     public <T> T doKieSessionOperation(Command<T> cmd, String deploymentId, Long processInstanceId) {
-        if( deploymentId == null ) {
+        if( emptyDeploymentId(deploymentId) ) {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
 
@@ -307,7 +308,7 @@ public class ProcessRequestBean {
            cmd = new ExecuteAndSerializeCommand(cmd); 
         }
 
-        if( deploymentId == null && taskDeploymentIdCommands.contains(cmd.getClass()) ) {
+        if( emptyDeploymentId(deploymentId) && taskDeploymentIdCommands.contains(cmd.getClass()) ) {
             deploymentId = getDeploymentId(task,taskId, cmd);
         }
 
