@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-server-parent</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-distribution</artifactId>
