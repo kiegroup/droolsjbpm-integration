@@ -30,6 +30,7 @@ import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
+import org.jbpm.services.task.impl.factories.TaskFactory;
 import org.jbpm.services.task.impl.model.TaskDataImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.kie.api.runtime.KieSession;
@@ -79,6 +80,7 @@ public class MockSetupTestHelper {
         InternalTask task = new TaskImpl();
         task.setId(TASK_ID);
         task.setTaskData(new TaskDataImpl());
+        doReturn(task).when(userTaskServiceMock).getTask(TASK_ID);
 
         doThrow(new IllegalStateException("Use the getTaskById() method, which should already have been called!"))
             .when(injectedTaskServiceMock).execute(any(GetTaskCommand.class));
