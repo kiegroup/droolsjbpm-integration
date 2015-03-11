@@ -4,8 +4,10 @@ import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -33,6 +35,7 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
+import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
@@ -271,6 +274,13 @@ public class ProcessRequestBean {
     }
 
     // task operations ------------------------------------------------------------------------------------------------------------
+
+    private static Set<Class<? extends TaskCommand>> taskDeploymentIdCommands = new HashSet<Class<? extends TaskCommand>>();
+    static {
+        taskDeploymentIdCommands.add(CompleteTaskCommand.class);
+        taskDeploymentIdCommands.add(FailTaskCommand.class);
+        taskDeploymentIdCommands.add(SkipTaskCommand.class);
+    }
     
     /**
      * There are 3 possibilities here: <ol>
@@ -295,6 +305,11 @@ public class ProcessRequestBean {
                 || cmd instanceof GetTaskContentCommand ) { 
            cmd = new ExecuteAndSerializeCommand(cmd); 
         }
+
+        if( deploymentId == null && taskDeploymentIdCommands.contains(cmd.getClass()) ) {
+            deploymentId = getDeploymentId(task,taskId, cmd);
+        }
+
         try {
             return userTaskService.execute(deploymentId, cmd);
         } catch (TaskNotFoundException e) {
@@ -319,4 +334,17 @@ public class ProcessRequestBean {
         }
     }
 
+    private String getDeploymentId(Task task, Long taskId, TaskCommand cmd) {
+        if( task == null ) {
+            if( taskId == null ) {
+                taskId = cmd.getTaskId();
+            }
+            task = userTaskService.getTask(taskId);
+        }
+        String deploymentId = null;
+        if( task != null && task.getTaskData() != null ) { 
+            deploymentId = task.getTaskData().getDeploymentId();
+        }
+        return deploymentId;
+    }
 }
