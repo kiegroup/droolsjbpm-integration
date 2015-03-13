@@ -23,6 +23,8 @@
     <module>kie-server</module>
     <module>kie-server-tests</module>
     <module>kie-server-distribution</module>
+    <module>kie-server-services-jbpm</module>
+    <module>kie-server-services-drools</module>
   </modules>
 
 </project>

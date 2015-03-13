@@ -111,6 +111,8 @@
               <kie.server.connection.factory>${kie.server.connection.factory}</kie.server.connection.factory>
               <kie.server.jndi.request.queue>${kie.server.jndi.request.queue}</kie.server.jndi.request.queue>
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
+              <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
+              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -139,6 +141,14 @@
       <plugin>
         <groupId>org.codehaus.cargo</groupId>
         <artifactId>cargo-maven2-plugin</artifactId>
+        <configuration>
+          <container>
+            <systemProperties>
+              <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
+              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
+            </systemProperties>
+          </container>
+        </configuration>
       </plugin>
     </plugins>
   </build>
