@@ -1,5 +1,6 @@
 package org.kie.server.api.marshalling.json;
 
+import org.codehaus.jackson.map.JsonMappingException;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 
@@ -15,6 +16,8 @@ public class JSONMarshaller implements Marshaller {
 
     private final ObjectMapper objectMapper;
 
+    private final ObjectMapper fallbackObjectMapper;
+
     public JSONMarshaller() {
         objectMapper = new ObjectMapper();
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
@@ -24,6 +27,8 @@ public class JSONMarshaller implements Marshaller {
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
         objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
         objectMapper.setSerializationConfig(objectMapper.getSerializationConfig().withAnnotationIntrospector(introspectorPair));
+
+        fallbackObjectMapper = new ObjectMapper();
     }
 
     @Override
@@ -39,7 +44,17 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
         try {
             return objectMapper.readValue(serializedInput, type);
+        } catch (JsonMappingException e){
+
+            // in case of mapping exception try with object mapper without annotation introspection
+            try {
+                return fallbackObjectMapper.readValue(serializedInput, type);
+            } catch (IOException ex) {
+
+            }
+            throw new MarshallingException("Error unmarshalling input", e);
         } catch (IOException e) {
+
             throw new MarshallingException("Error unmarshalling input", e);
         }
     }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PUT;
@@ -13,7 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.jbpm.services.api.ProcessService;
 import org.kie.api.command.Command;
@@ -37,9 +37,9 @@ public class ProcessServiceResource  {
     @Path("containers/{id}/process/{pId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @javax.ws.rs.core.Context UriInfo uriInfo) {
+    public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @javax.ws.rs.core.Context HttpServletRequest request) {
         try {
-            Long processInstanceId = delegate.startProcess(containerId, processId, new HashMap<String, Object>(uriInfo.getQueryParameters()));
+            Long processInstanceId = delegate.startProcess(containerId, processId, extractMapFromParams(request.getParameterMap()));
 
             return createCorrectVariant(new JaxbLong(processInstanceId), headers, Response.Status.CREATED);
         } catch (Exception e) {
@@ -138,6 +138,23 @@ public class ProcessServiceResource  {
 
     public <T> T execute(String s, Context<?> context, Command<T> command) {
         return null;
+    }
+
+    protected static Map<String, Object> extractMapFromParams(Map<String, String[]> params) {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        for (Map.Entry<String, String[]> entry : params.entrySet()) {
+
+            String key = entry.getKey();
+            String[] paramValues = entry.getValue();
+
+            String mapKey = key;
+            String mapVal = paramValues[0].trim();
+
+            map.put(mapKey, mapVal);
+
+        }
+        return map;
     }
 
 }

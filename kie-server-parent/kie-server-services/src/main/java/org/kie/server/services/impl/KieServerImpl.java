@@ -2,22 +2,31 @@ package org.kie.server.services.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.regex.Pattern;
+import java.util.Set;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
+import org.kie.remote.common.rest.KieRemoteHttpRequest;
+import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingException;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -25,22 +34,29 @@ import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
+import org.kie.server.services.impl.storage.KieServerState;
+import org.kie.server.services.impl.storage.KieServerStateRepository;
+import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KieServerImpl {
 
-    private static final String             CONTAINER_STATE_FILE = "container.xml";
-    private static final Pattern            LOOKUP               = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
     private static final Logger             logger               = LoggerFactory.getLogger(KieServerImpl.class);
 
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
     private final KieServerRegistry context;
 
+    private final KieServerStateRepository repository;
+
+
     public KieServerImpl() {
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
+        repository = new KieServerStateFileRepository();
+
+        KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
         for (KieServerExtension extension : serverExtensions) {
             if (!extension.isActive()) {
@@ -57,6 +73,78 @@ public class KieServerImpl {
             }
         }
 
+        // once all extensions are loaded connect and sync with controller if exists
+        Set<String> controllers = currentState.getControllers();
+        boolean controllerSynced = false;
+        for (String controllerUrl : controllers ) {
+
+            if (controllerUrl != null && !controllerUrl.isEmpty()) {
+                String connectAndSyncUrl = controllerUrl + "/controller/server/" + KieServerEnvironment.getServerId();
+
+                try {
+                    KieContainerResourceList containerResourceList = makeHttpGetRequestAndCreateServiceResponse(connectAndSyncUrl, KieContainerResourceList.class);
+
+                    if (containerResourceList != null) {
+
+                        for (KieContainerResource containerResource : containerResourceList.getContainers()) {
+//                            if (containerResource.getStatus() != KieContainerStatus.STARTED) {
+//                                continue;
+//                            }
+
+                            createContainer(containerResource.getContainerId(), containerResource);
+                        }
+                    }
+                    controllerSynced = true;
+                    break;
+                } catch (IllegalStateException e) {
+                    // let's check all other controllers in case of running in cluster of controllers
+                }
+
+            }
+        }
+
+        if ( !controllerSynced ) {
+            // no controller or no controller available proceed with local info only
+
+            for (KieContainerResource containerResource : currentState.getContainers()) {
+//                if (containerResource.getStatus() != KieContainerStatus.STARTED) {
+//                    continue;
+//                }
+                createContainer(containerResource.getContainerId(), containerResource);
+            }
+
+            repository.store(KieServerEnvironment.getServerId(), currentState);
+        }
+    }
+
+    public ServiceResponse<KieServerInfo> registerController(String controller, KieServerConfig kieServerConfig) {
+        if (controller != null && !controller.isEmpty()) {
+            this.context.registerController(controller);
+
+            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+            currentState.setControllers(this.context.getControllers());
+            currentState.setConfiguration(kieServerConfig);
+
+            repository.store(KieServerEnvironment.getServerId(), currentState);
+        }
+
+        return getInfo();
+    }
+
+    public void destroy() {
+        for (KieServerExtension extension : context.getServerExtensions()) {
+
+            try {
+                extension.destroy(this, this.context);
+
+                this.context.unregisterServerExtension(extension);
+
+                logger.info("{} has been successfully unregistered as server extension", extension);
+            } catch (Exception e) {
+                logger.error("Error when destroying server extension of type {}", extension, e);
+            }
+        }
+
     }
 
 
@@ -69,8 +157,9 @@ public class KieServerImpl {
     public ServiceResponse<KieServerInfo> getInfo() {
         try {
             Version version = KieServerEnvironment.getVersion();
+            String serverId = KieServerEnvironment.getServerId();
             String versionStr = version != null ? version.toString() : "Unknown-Version";
-            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(versionStr));
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(serverId, versionStr));
         } catch (Exception e) {
             logger.error("Error retrieving server info:", e);
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: " +
@@ -106,6 +195,15 @@ public class KieServerImpl {
 
                             ci.getResource().setStatus(KieContainerStatus.STARTED);
                             logger.info("Container {} (for release id {}) successfully started", containerId, releaseId);
+
+
+                            // store the current state of the server
+                            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+                            container.setStatus(KieContainerStatus.STARTED);
+                            currentState.getContainers().add(container);
+
+                            repository.store(KieServerEnvironment.getServerId(), currentState);
+
                             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                         } else {
                             ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -185,6 +283,20 @@ public class KieServerImpl {
                                     " disposed, but exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
                         }
                         logger.info("Container {} (for release id {}) successfully stopped", containerId, kci.getResource().getReleaseId());
+
+                        // store the current state of the server
+                        KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+
+                        List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
+                        for (KieContainerResource containerResource : currentState.getContainers()) {
+                            if ( !containerId.equals(containerResource.getContainerId()) ) {
+                                containers.add(containerResource);
+                            }
+                        }
+                        currentState.setContainers(new HashSet<KieContainerResource>(containers));
+
+                        repository.store(KieServerEnvironment.getServerId(), currentState);
+
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " was not instantiated.");
@@ -436,5 +548,34 @@ public class KieServerImpl {
         }
     }
 
+    private <T> T makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+            KieContainerResourceList serviceResponse = deserialize( response.body(), KieContainerResourceList.class );
+
+            return (T)serviceResponse;
+        } else {
+            throw new IllegalStateException("No response from controller server");
+        }
+    }
+
+    private KieRemoteHttpRequest newRequest(String uri) {
+        KieRemoteHttpRequest httpRequest =
+                KieRemoteHttpRequest.newRequest( uri ).followRedirects( true ).timeout( 5000 );
+        httpRequest.accept(MediaType.APPLICATION_JSON);
+        httpRequest.basicAuthorization( KieServerEnvironment.getUsername(), KieServerEnvironment.getPassword() );
+
+        return httpRequest;
+    }
+
+    private <T> T deserialize(String content, Class<T> type) {
+        try {
+            return MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader()).unmarshall(content, type);
+        } catch ( MarshallingException e ) {
+            throw new IllegalStateException( "Error while deserializing data received from server!", e );
+        }
+    }
 
 }

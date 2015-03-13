@@ -76,6 +76,15 @@ public class KieServicesClientImpl
         return urlString;
     }
 
+    @Override
+    public ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig) {
+        if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateServiceResponse( baseURI+"/controller/"+controllerEndpoint, kieServerConfig, KieServerInfo.class );
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new RegisterServerControllerCommand( controllerEndpoint, kieServerConfig ) ) );
+            return (ServiceResponse<KieServerInfo>) executeJmsCommand( script ).getResponses().get( 0 );
+        }
+    }
 
     @Override
     public ServiceResponse<KieServerInfo> getServerInfo() {

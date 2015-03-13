@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
 
 @XmlRootElement(name = "script")
 @XStreamAlias( "script" )
@@ -41,6 +43,7 @@ public class CommandScript implements Serializable {
     private static final long serialVersionUID = 510l;
 
     @XmlElements({
+                         @XmlElement(name = "register-server-controller", type = RegisterServerControllerCommand.class),
                          @XmlElement(name = "get-server-info", type = GetServerInfoCommand.class),
                          @XmlElement(name = "create-container", type = CreateContainerCommand.class),
                          @XmlElement(name = "get-container-info", type = GetContainerInfoCommand.class),
@@ -49,7 +52,11 @@ public class CommandScript implements Serializable {
                          @XmlElement(name = "get-scanner-info", type = GetScannerInfoCommand.class),
                          @XmlElement(name = "update-scanner", type = UpdateScannerCommand.class),
                          @XmlElement(name = "update-release-id", type = UpdateReleaseIdCommand.class),
-                         @XmlElement(name = "call-container", type = CallContainerCommand.class)
+                         @XmlElement(name = "call-container", type = CallContainerCommand.class),
+
+            // TODO can this be added somewhere else? if not here JAXRS cannot deserialize content
+            @XmlElement(name = "kie-server-config", type = KieServerConfig.class),
+            @XmlElement(name = "kie-server-config-item", type = KieServerConfigItem.class)
                  })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     protected List<KieServerCommand> commands;

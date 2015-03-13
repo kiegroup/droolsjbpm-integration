@@ -33,7 +33,10 @@ public class JaxbMarshaller implements Marshaller {
                 KieServerInfo.class,
                 ReleaseId.class,
                 ServiceResponse.class,
-                ServiceResponsesList.class
+                ServiceResponsesList.class,
+
+                KieServerConfig.class,
+                KieServerConfigItem.class
         };
     }
 

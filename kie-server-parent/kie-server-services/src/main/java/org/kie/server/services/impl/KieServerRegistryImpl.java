@@ -1,6 +1,7 @@
 package org.kie.server.services.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,8 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     private final ConcurrentMap<String, KieContainerInstanceImpl> containers = new ConcurrentHashMap<String, KieContainerInstanceImpl>();
     private IdentityProvider identityProvider;
     private Set<KieServerExtension> serverExtensions = new CopyOnWriteArraySet<KieServerExtension>();
+
+    private Set<String> controllers = new CopyOnWriteArraySet<String>();
 
     @Override
     public KieContainerInstanceImpl registerContainer(String id, KieContainerInstanceImpl kieContainerInstance) {
@@ -77,5 +80,19 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     @Override
     public List<KieServerExtension> getServerExtensions() {
         return new ArrayList<KieServerExtension>(serverExtensions);
+    }
+
+    @Override
+    public void registerController(String controllerUrl) {
+        this.controllers.add(controllerUrl);
+    }
+
+    @Override
+    public Set<String> getControllers() {
+        if (controllers.isEmpty()) {
+            controllers.add("http://localhost:8080/kie-wb/rest");
+        }
+
+        return new HashSet<String>(controllers);
     }
 }
