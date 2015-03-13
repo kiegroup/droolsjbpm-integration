@@ -20,6 +20,7 @@ import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
+import org.kie.server.api.commands.RegisterServerControllerCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -131,6 +132,8 @@ public class RuleServiceImpl implements RuleService, KieContainerExecutor {
                     responses.add(this.kieServer.updateScanner(((UpdateScannerCommand) command).getContainerId(), ((UpdateScannerCommand) command).getScanner()));
                 } else if (command instanceof UpdateReleaseIdCommand) {
                     responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
+                } else if (command instanceof RegisterServerControllerCommand) {
+                    responses.add(this.kieServer.registerController(((RegisterServerControllerCommand) command).getControllerUrl(), ((RegisterServerControllerCommand) command).getKieServerConfig()));
                 }
             }
         }

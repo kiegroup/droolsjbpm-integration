@@ -4,6 +4,8 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.*;
 
 public interface KieServicesClient {
+    ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig);
+
     ServiceResponse<KieServerInfo> getServerInfo();
 
     ServiceResponse<KieContainerResourceList> listContainers();

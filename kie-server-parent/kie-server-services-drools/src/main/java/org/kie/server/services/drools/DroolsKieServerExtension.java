@@ -33,6 +33,11 @@ public class DroolsKieServerExtension implements KieServerExtension {
     }
 
     @Override
+    public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
+
+    }
+
+    @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // do any other bootstrapping rule service requires
 

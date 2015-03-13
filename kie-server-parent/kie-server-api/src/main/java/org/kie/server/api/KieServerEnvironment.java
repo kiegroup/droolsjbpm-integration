@@ -3,6 +3,7 @@ package org.kie.server.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +12,9 @@ public class KieServerEnvironment {
     
     private static final Pattern VERSION_PAT = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)([\\.-].*)?");
     private static Version version;
+    private static String serverId;
+    private static String username = System.getProperty("org.kie.server.user", "kieserver");
+    private static String password = System.getProperty("org.kie.server.pwd", "kieserver1!");
 
     static {
         String kieServerString = KieServerEnvironment.class.getPackage().getImplementationVersion();
@@ -21,6 +25,7 @@ public class KieServerEnvironment {
                 Properties properties = new Properties();
                 properties.load(is);
                 kieServerString = properties.get("kie.server.version").toString();
+
                 is.close();
             } catch ( IOException e ) {
                 throw new RuntimeException(e);
@@ -46,10 +51,26 @@ public class KieServerEnvironment {
                 version = new Version(0,0,0,null);
             }
         }
+
     }
 
     public static Version getVersion() {
         return version;
     }
 
+    public static String getServerId() {
+        return serverId;
+    }
+
+    public static void setServerId(String serverIdIn) {
+        serverId = serverIdIn;
+    }
+
+    public static String getUsername() {
+        return username;
+    }
+
+    public static String getPassword() {
+        return password;
+    }
 }

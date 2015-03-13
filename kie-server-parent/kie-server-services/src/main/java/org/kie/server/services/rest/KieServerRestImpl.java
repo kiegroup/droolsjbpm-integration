@@ -1,5 +1,7 @@
 package org.kie.server.services.rest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -7,6 +9,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.api.KieServer;
@@ -38,7 +41,23 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
+    public Response register(HttpHeaders headers, String controllerEndpoint, KieServerConfig kieServerConfig) {
+
+        if (controllerEndpoint != null) {
+            try {
+                controllerEndpoint = URLDecoder.decode(controllerEndpoint, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+
+            }
+            server.registerController(controllerEndpoint, kieServerConfig);
+        }
+
+        return createCorrectVariant(server.getInfo(), headers);
+    }
+
+    @Override
     public Response getInfo(HttpHeaders headers) {
+
         return createCorrectVariant(server.getInfo(), headers);
     }
 

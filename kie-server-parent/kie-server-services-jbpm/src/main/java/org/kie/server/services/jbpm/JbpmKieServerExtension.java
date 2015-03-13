@@ -2,12 +2,13 @@ package org.kie.server.services.jbpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.jbpm.executor.ExecutorServiceFactory;
+import org.jbpm.kie.services.impl.AbstractDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.ProcessServiceImpl;
@@ -15,6 +16,7 @@ import org.jbpm.kie.services.impl.RuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
@@ -26,7 +28,9 @@ import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
-import org.kie.api.runtime.KieContainer;
+import org.kie.internal.executor.api.ExecutorService;
+import org.kie.internal.runtime.conf.DeploymentDescriptor;
+import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
@@ -43,6 +47,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.jbpm.server.ext.disabled", "false"));
 
+    private boolean isExecutorAvailable = false;
+
+    private String persistenceUnitName = "org.jbpm.domain";
+
     private KieServerImpl kieServer;
 
     private DeploymentService deploymentService;
@@ -51,6 +59,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private UserTaskService userTaskService;
     private RuntimeDataService runtimeDataService;
 
+    private ExecutorService executorService;
+
     @Override
     public boolean isActive() {
         return disabled == false;
@@ -58,8 +68,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+        this.isExecutorAvailable = isExecutorOnClasspath();
         this.kieServer = kieServer;
-        EntityManagerFactory emf = EntityManagerFactoryManager.get().getOrCreate("org.jbpm.domain");
+
+        EntityManagerFactory emf = EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName);
 
         // build definition service
         definitionService = new BPMN2DataServiceImpl();
@@ -94,6 +106,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
         userTaskService = new UserTaskServiceImpl();
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
+
+        // build executor service
+        executorService = ExecutorServiceFactory.newExecutorService(emf);
+        executorService.init();
+    }
+
+    @Override
+    public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
+        ((AbstractDeploymentService)deploymentService).shutdown();
+
+        executorService.destroy();
     }
 
     @Override
@@ -132,6 +155,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setKsessionName(ksessionNames.iterator().next());
             }
 
+            addAsyncHandler(unit);
+
             deploymentService.deploy(unit);
 
             kieContainerInstance.addService(deploymentService);
@@ -139,6 +164,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             kieContainerInstance.addService(processService);
             kieContainerInstance.addService(userTaskService);
             kieContainerInstance.addService(runtimeDataService);
+            kieContainerInstance.addService(executorService);
 
             logger.info("Container {} created successfully", id);
         } catch (Exception e) {
@@ -189,6 +215,31 @@ public class JbpmKieServerExtension implements KieServerExtension {
         @Override
         public String getIdentifier() {
             return this.id;
+        }
+    }
+
+    protected void addAsyncHandler(KModuleDeploymentUnit unit) {
+        // add async only when the executor component is not disabled
+        if (isExecutorAvailable) {
+            DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
+            if (descriptor == null) {
+                descriptor = new DeploymentDescriptorImpl(persistenceUnitName);
+            }
+            descriptor.getBuilder()
+                    .addWorkItemHandler(new NamedObjectModel("mvel", "async",
+                            "new org.jbpm.executor.impl.wih.AsyncWorkItemHandler(org.jbpm.executor.ExecutorServiceFactory.newExecutorService(),\"org.jbpm.executor.commands.PrintOutCommand\")"));
+
+            unit.setDeploymentDescriptor(descriptor);
+        }
+    }
+
+    protected boolean isExecutorOnClasspath() {
+        try {
+            Class.forName("org.jbpm.executor.impl.wih.AsyncWorkItemHandler");
+
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 }
