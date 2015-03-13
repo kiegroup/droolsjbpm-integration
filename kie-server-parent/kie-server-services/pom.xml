@@ -25,6 +25,10 @@
       <artifactId>kie-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
@@ -46,6 +50,12 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- security -->
+    <dependency>
+      <groupId>javax.security.jacc</groupId>
+      <artifactId>javax.security.jacc-api</artifactId>
     </dependency>
 
     <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->

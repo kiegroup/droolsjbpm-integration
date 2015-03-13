@@ -1,27 +1,19 @@
 package org.kie.server.services.rest;
 
-import java.util.List;
-
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Variant;
 
-import org.kie.remote.common.rest.RestEasy960Util;
-import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 
-import static org.kie.remote.common.rest.RestEasy960Util.*;
+import static org.kie.server.services.rest.RestUtils.*;
 
 @Path("/server")
 public class KieServerRestImpl implements KieServer {
@@ -51,12 +43,6 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
-    public Response execute(HttpHeaders headers, CommandScript command) {
-        return createCorrectVariant(new GenericEntity<ServiceResponsesList>(server.executeScript(command)) {
-        }, headers);
-    }
-
-    @Override
     public Response listContainers(HttpHeaders headers) {
         return createCorrectVariant(server.listContainers(), headers);
     }
@@ -81,11 +67,6 @@ public class KieServerRestImpl implements KieServer {
     }
 
     @Override
-    public Response execute(HttpHeaders headers, String id, String cmdPayload) {
-        return createCorrectVariant(server.callContainer(id, cmdPayload), headers);
-    }
-
-    @Override
     public Response getScannerInfo(HttpHeaders headers, String id) {
         return createCorrectVariant(server.getScannerInfo(id), headers);
     }
@@ -105,22 +86,6 @@ public class KieServerRestImpl implements KieServer {
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers);
     }
 
-    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) {
-        return createCorrectVariant(responseObj, headers, null);
-    }
 
-    protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
-        Response.ResponseBuilder responseBuilder = null;
-        Variant v = getVariant(headers);
-        if( v == null ) {
-            v = defaultVariant;
-        }
-        if( status != null ) {
-            responseBuilder = Response.status(status).entity(responseObj).variant(v);
-        } else {
-            responseBuilder = Response.ok(responseObj, v);
-        }
-        return responseBuilder.build();
-    }
 
 }

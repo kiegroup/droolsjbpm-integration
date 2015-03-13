@@ -1,6 +1,7 @@
 package org.kie.server.services;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -13,6 +14,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.kie.server.services.api.KieServer;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.rest.KieServerRestImpl;
 
 @ApplicationPath("/")
@@ -21,7 +27,17 @@ public class KieServerApplication extends Application {
     private final Set<Object> instances = new CopyOnWriteArraySet<Object>() {
         private static final long serialVersionUID = 1763183096852523317L;
         {
-            add(new KieServerRestImpl());
+            KieServerImpl server = KieServerLocator.getInstance();
+
+            add(new KieServerRestImpl(server));
+
+            // next add any resources from server extensions
+            List<KieServerExtension> extensions = server.getServerExtensions();
+
+            for (KieServerExtension extension : extensions) {
+                addAll(extension.getAppComponents(SupportedTransports.REST));
+            }
+
             // Register the Jackson provider for JSON
             // Make (de)serializer use a subset of JAXB and (afterwards) Jackson annotations
             // See http://wiki.fasterxml.com/JacksonJAXBAnnotations for more information

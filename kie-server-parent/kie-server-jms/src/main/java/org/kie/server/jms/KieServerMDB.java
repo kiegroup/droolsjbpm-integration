@@ -3,6 +3,9 @@ package org.kie.server.jms;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.services.api.KieContainerExecutor;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -23,6 +26,8 @@ import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import java.lang.IllegalStateException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -126,6 +131,20 @@ public class KieServerMDB
 //            }
 //        }
 //
+
+        KieContainerExecutor executor = null;
+
+        // TODO temp lookup as currently this MDB does support rule operations only
+        for (KieServerExtension extension : kieServer.getServerExtensions()) {
+            executor = extension.getAppComponents(KieContainerExecutor.class);
+            if (executor != null) {
+                break;
+            }
+        }
+        if (executor == null) {
+            throw new IllegalStateException("No executor found for script execution");
+        }
+
         // 0. Get msg correlation id (for response)
         String msgCorrId = null;
         try {
@@ -160,7 +179,7 @@ public class KieServerMDB
         CommandScript script = unmarshallRequest( message, msgCorrId, marshaller, format );
 
         // 4. process request
-        ServiceResponsesList response = kieServer.executeScript( script );
+        ServiceResponsesList response = executor.executeScript( script );
 
         // 5. serialize response
         Message msg = marshallResponse( session, msgCorrId, format, marshaller, response );

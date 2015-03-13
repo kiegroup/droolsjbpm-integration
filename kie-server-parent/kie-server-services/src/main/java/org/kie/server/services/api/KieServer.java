@@ -24,11 +24,6 @@ public interface KieServer {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getInfo(@Context HttpHeaders headers);
     
-    @POST
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute(@Context HttpHeaders headers, CommandScript command );
-    
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -49,13 +44,7 @@ public interface KieServer {
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id );
-    
-    @POST
-    @Path("containers/{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response execute( @Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload );
-    
+
     @GET
     @Path("containers/{id}/release-id")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

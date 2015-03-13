@@ -8,26 +8,30 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.services.api.KieContainerInstance;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class KieContainerInstance {
+public class KieContainerInstanceImpl implements KieContainerInstance {
 
     private KieContainerResource               resource;
     private InternalKieContainer               kieContainer;
     private InternalKieScanner                 scanner;
     private Map<MarshallingFormat, Marshaller> marshallers;
 
-    public KieContainerInstance(String containerId, KieContainerStatus status) {
+    private Map<String, Object> serviceContainer;
+
+    public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
         this( containerId, status, null );
     }
 
-    public KieContainerInstance(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
+    public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
         super();
         this.kieContainer = kieContainer;
         this.resource = new KieContainerResource( containerId, null, status );
         this.marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>();
+        this.serviceContainer = new ConcurrentHashMap<String, Object>();
         updateReleaseId();
     }
 
@@ -99,6 +103,27 @@ public class KieContainerInstance {
             }
             this.marshallers.clear();
         }
+    }
+
+    @Override
+    public void addService(Object service) {
+        if (service == null) {
+            return;
+        }
+        if (serviceContainer.containsKey(service.getClass().getName())) {
+            throw new IllegalStateException("Service " + service.getClass().getName() + " already exists");
+        }
+        serviceContainer.put(service.getClass().getName(), service);
+    }
+
+    @Override
+    public <T> T getService(Class<T> serviceType) {
+        return (T) this.serviceContainer.get(serviceType.getName());
+    }
+
+    @Override
+    public <T> T removeService(Class<T> serviceType) {
+        return (T) this.serviceContainer.remove(serviceType.getName());
     }
 
     @Override
