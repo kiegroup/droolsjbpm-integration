@@ -18,6 +18,7 @@
   <!-- query output -->
   <logger name="org.jbpm.services.task.persistence" level="info" />
   <logger name="org.jbpm.process.audit" level="info" />
+  <logger name="org.jbpm.query.jpa.impl" level="info" />
 
   <!-- test output -->
   <logger name="org.kie.remote.services.rest.query" level="info" />

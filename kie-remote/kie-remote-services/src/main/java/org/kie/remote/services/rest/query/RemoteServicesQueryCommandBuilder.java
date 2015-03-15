@@ -25,9 +25,9 @@ import static org.kie.internal.query.QueryParameterIdentifiers.WORK_ITEM_ID_LIST
 import java.util.Date;
 
 import org.jbpm.process.audit.command.AuditVariableInstanceLogQueryCommand;
+import org.jbpm.query.jpa.builder.impl.AbstractQueryBuilderImpl;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
 import org.kie.api.task.model.Status;
-import org.kie.internal.query.AbstractQueryBuilderImpl;
 import org.kie.internal.query.data.QueryData;
 import org.kie.internal.runtime.manager.audit.query.NodeInstanceLogQueryBuilder;
 import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;

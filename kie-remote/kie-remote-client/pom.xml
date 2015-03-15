@@ -11,6 +11,10 @@
   <artifactId>kie-remote-client</artifactId>
   <name>KIE Remote Services :: Client</name>
 
+  <properties>
+    <maven.jdbc.url>jdbc:h2:file:test;MVCC=true</maven.jdbc.url>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>

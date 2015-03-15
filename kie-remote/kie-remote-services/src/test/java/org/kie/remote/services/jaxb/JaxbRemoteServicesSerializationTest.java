@@ -20,6 +20,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.HaltCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.common.DisconnectedFactHandle;
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
@@ -27,6 +28,8 @@ import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
@@ -48,6 +51,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 @SuppressWarnings("unchecked")
 public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase {
@@ -75,7 +80,6 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         return (T) jaxbProvider.deserialize(xmlObject);
     }
 
-    
     /**
      * If you think this test is a mistake: beware, this test is smarter than you.
      */
