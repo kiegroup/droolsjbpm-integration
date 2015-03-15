@@ -35,4 +35,16 @@ class QueryAction {
         this.action = action;
         this.paramData = data;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder("[" + action + "] " + paramName + ": (");
+        if( paramData.length > 0 ) { 
+            out.append(paramData[0]);
+            for( int i = 1; i < paramData.length; ++i ) { 
+                out.append(", ").append(paramData[i]);
+            }
+        } 
+        return out.append(")").toString();
+    }
 }

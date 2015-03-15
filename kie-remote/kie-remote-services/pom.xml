@@ -173,6 +173,12 @@
       <artifactId>deltaspike-core-api</artifactId>
     </dependency>
 
+    <!-- query -->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-query-jpa</artifactId>
+    </dependency>
+
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>
@@ -194,7 +200,6 @@
       <artifactId>kie-remote-client</artifactId>
       <scope>test</scope>
     </dependency>
-
 
     <!-- TEST: persistence -->
     <dependency>

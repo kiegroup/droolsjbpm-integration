@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.query.jpa.impl.QueryAndParameterAppender;
+import org.jbpm.query.jpa.service.QueryModificationService;
 import org.jbpm.services.task.impl.TaskQueryServiceImpl;
-import org.kie.internal.query.QueryAndParameterAppender;
-import org.kie.internal.query.QueryModificationService;
 import org.kie.internal.query.data.QueryData;
 
 /**
