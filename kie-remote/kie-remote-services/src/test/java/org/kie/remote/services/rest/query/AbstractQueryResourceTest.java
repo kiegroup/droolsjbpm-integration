@@ -1,7 +1,5 @@
 package org.kie.remote.services.rest.query;
 
-import static org.junit.Assert.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +7,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.VariableInstanceLog;
@@ -25,6 +24,8 @@ import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.test.MyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
 
@@ -44,10 +45,14 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
     protected TaskService taskService;
     protected RuntimeManager runtimeManager;
     protected RuntimeEngine engine;
-   
 
-    public AbstractQueryResourceTest(boolean setupDataSource, boolean sessionPersistence, String persistenceUnitName) {
+    public AbstractQueryResourceTest() {
         super(true, true, "org.jbpm.domain");
+        
+        Logger logger = LoggerFactory.getLogger(DatabaseMetadata.class);
+        if( logger instanceof ch.qos.logback.classic.Logger ) { 
+            ((ch.qos.logback.classic.Logger) logger).setLevel(Level.OFF);
+        }
     }
     
     protected <T> T roundTripJson(T in) throws Exception { 
@@ -61,12 +66,30 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
         logger.debug("\n" + xmlStr);
         return (T) jaxbClientMapper.deserialize(xmlStr);
     }
+  
+    // must be at least 5
+    protected static int numTestProcesses = 10;
+    protected boolean testDataInitialized = false;
+    protected boolean addObjectProcessInstances = true;
     
-    protected void runStringProcess(KieSession ksession) { 
+    protected void setupTestData() { 
+        if( ! testDataInitialized ) { 
+            for( int i = 0; i < numTestProcesses; ++i ) { 
+                runStringProcess(ksession, i);
+                if( addObjectProcessInstances ) { 
+                    runObjectProcess(ksession, i);
+                }
+            }
+            testDataInitialized = true;
+        }
+    } 
+        
+    protected void runStringProcess(KieSession ksession, int i) { 
         Map<String, Object> params = new HashMap<String, Object>();
         String initValue = UUID.randomUUID().toString();
-        params.put("inputStr", initValue );
-        params.put("otherStr", initValue ); 
+        params.put("inputStr", "proc-" + i + "-" + initValue );
+        params.put("otherStr", "proc-" + i + "-" + initValue ); 
+        params.put("secondStr", i + "-second-" + random.nextInt(Integer.MAX_VALUE));
         ProcessInstance processInstance = ksession.startProcess(PROCESS_STRING_VAR_ID, params);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
@@ -141,4 +164,7 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
                 lastVil.getValue().contains("check") || lastVil.getVariableId().equals("otherStr") );
     }
 
+    protected static void addParams(Map<String, String[]> params, String name, String... values ) { 
+       params.put(name,  values);
+    }
 }

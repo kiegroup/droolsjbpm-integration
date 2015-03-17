@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.services.task.commands.TaskQueryDataCommand;
@@ -18,13 +19,10 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.ParametrizedQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("null")
 public class QueryResourceQueryTest extends AbstractQueryResourceTest {
-
-    public QueryResourceQueryTest() {
-        super(true, true, "org.jbpm.domain");
-    }
 
     @Before
     public void init() {
@@ -32,7 +30,8 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         engine = getRuntimeEngine();
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
-        
+       
+        addObjectProcessInstances = false;
         setupTestData();
     }
     
@@ -44,17 +43,6 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         }
     }
 
-    private static boolean testDataInitialized = false;
-    
-    private void setupTestData() { 
-        if( ! testDataInitialized ) { 
-            for( int i = 0; i < 5; ++i ) { 
-                runStringProcess(ksession);
-            }
-            testDataInitialized = true;
-        }
-    }
-    
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
     @Test

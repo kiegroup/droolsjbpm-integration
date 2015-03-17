@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<query-process-instance-result>
+  <processInstanceInfoList>
+    <process-instance>
+      <process-id>org.jboss.qa.bpms.ObjectVariableProcess</process-id>
+      <id>145</id>
+      <state>2</state>
+      <parentProcessInstanceId>0</parentProcessInstanceId>
+    </process-instance>
+  </processInstanceInfoList>
+  <processInstanceInfoList>
+    <process-instance>
+      <process-id>org.jboss.qa.bpms.ObjectVariableProcess</process-id>
+      <id>146</id>
+      <state>2</state>
+      <parentProcessInstanceId>0</parentProcessInstanceId>
+    </process-instance>
+    <variables>
+      <name>myobject</name>
+      <string>2</string>
+      <lastModificationDate>2015-03-09T13:32:59.965+01:00</lastModificationDate>
+    </variables>
+  </processInstanceInfoList>
+</query-process-instance-result>
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<query-process-instance-result>
+  <processInstanceInfoList>
+    <process-instance>
+      <process-id>org.jboss.qa.bpms.ObjectVariableProcess</process-id>
+      <id>106</id>
+      <state>2</state>
+      <parentProcessInstanceId>0</parentProcessInstanceId>
+    </process-instance>
+    <variables>
+      <name>myobject</name>
+      <string>Hello World!</string>
+      <lastModificationDate>2015-03-09T13:25:01.976+01:00</lastModificationDate>
+    </variables>
+  </processInstanceInfoList>
+  <processInstanceInfoList>
+    <process-instance>
+      <process-id>org.jboss.qa.bpms.ObjectVariableProcess</process-id>
+      <id>107</id>
+      <state>2</state>
+      <parentProcessInstanceId>0</parentProcessInstanceId>
+    </process-instance>
+    <variables>
+      <name>myobject</name>
+      <string>Hello Ivo!</string>
+      <lastModificationDate>2015-03-09T13:25:02+01:00</lastModificationDate>
+    </variables>
+  </processInstanceInfoList>
+  <processInstanceInfoList>
+    <process-instance>
+      <process-id>org.jboss.qa.bpms.ObjectVariableProcess</process-id>
+      <id>108</id>
+      <state>2</state>
+      <parentProcessInstanceId>0</parentProcessInstanceId>
+    </process-instance>
+  </processInstanceInfoList>
+</query-process-instance-result>

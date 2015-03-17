@@ -135,7 +135,7 @@ public class RemoteServicesQueryModificationService implements QueryModification
         if( ! queryData.intersectRegexParametersAreEmpty() ) { 
            parameterListIdsUsed.addAll(queryData.getIntersectRegexParameters().keySet()); 
         }
-       
+     
         // go through parameter list ids to see which tables need to be added
         for( String listId : parameterListIdsUsed ) { 
             if( type == TASK_SUMMARY_QUERY_TYPE ) { 
@@ -278,6 +278,11 @@ public class RemoteServicesQueryModificationService implements QueryModification
                }
            }
        }
+       
+       int end = "SELECT".length();
+       if( type == VARIABLE_INSTANCE_LOG_QUERY_TYPE || type == PROCESS_INSTANCE_LOG_QUERY_TYPE ) { 
+           queryBuilder.replace(0, end, "SELECT DISTINCT");
+       }
     } 
 
     private static void internalAddCriteriaToQuery(StringBuilder queryBuilder, QueryData queryData, QueryAndParameterAppender queryAppender,
@@ -298,6 +303,11 @@ public class RemoteServicesQueryModificationService implements QueryModification
             for( Entry<String, List<? extends Object>> entry : queryData.getIntersectParameters().entrySet() ) { 
                 String listId = entry.getKey();
                 if( VAR_VALUE_ID_LIST.equals(listId) ) { 
+                    if( firstNeededCriterias.contains(listId) ) {
+                        addFirstTableJoinClause = true;
+                    } else if ( otherNeededCriterias.contains(listId) ) { 
+                        addOtherTableJoinClause = true;
+                    }
                     continue;
                 }
                 if( firstNeededCriterias.contains(listId) )   { 
@@ -359,6 +369,11 @@ public class RemoteServicesQueryModificationService implements QueryModification
             for( Entry<String, List<String>> entry : queryData.getIntersectRegexParameters().entrySet() ) { 
                 String listId = entry.getKey();
                 if( VAR_VALUE_ID_LIST.equals(listId) ) { 
+                    if( firstNeededCriterias.contains(listId) ) {
+                        addFirstTableJoinClause = true;
+                    } else if ( otherNeededCriterias.contains(listId) ) { 
+                        addOtherTableJoinClause = true;
+                    }
                     continue;
                 }
                 if( firstNeededCriterias.contains(listId) )   { 
@@ -384,12 +399,18 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 queryData.getIntersectRegexParameters().remove(processedListId);
             }
         }
-        
+       
+        String jpqlOp = "AND";
+        if( ! queryAppender.hasBeenUsed() ) { 
+           jpqlOp = "WHERE"; 
+        }
         if( addFirstTableJoinClause ) { 
-           queryBuilder.append("\nAND " + firstTableId + firstTableIdJoinClause );
+            queryAppender.markAsUsed();
+            queryBuilder.append("\n").append(jpqlOp).append(" ").append(firstTableId).append(firstTableIdJoinClause);
         }
         if( addOtherTableJoinClause ) { 
-           queryBuilder.append("\nAND " + otherTableId + otherTableJoinClause );
+            queryAppender.markAsUsed();
+            queryBuilder.append("\n").append(jpqlOp).append(" ").append(otherTableId).append(otherTableJoinClause);
         }
     }
     
