@@ -113,17 +113,13 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         JaxbQueryProcessInstanceResult result = new JaxbQueryProcessInstanceResult();
 
         Map<Long, JaxbQueryProcessInstanceInfo> procInstIdProcInstInfoMap = new LinkedHashMap<Long, JaxbQueryProcessInstanceInfo>();
-        long procInstId = -1;
         for( ProcessInstanceLog procLog : procLogs ) {
-            assert procInstId <= procLog.getProcessInstanceId() : procInstId + " not <= " + procLog.getProcessInstanceId();
-            procInstId = procLog.getProcessInstanceId();
-            JaxbQueryProcessInstanceInfo procInfo = getQueryProcessInstanceInfo(procInstId, procInstIdProcInstInfoMap);
+            JaxbQueryProcessInstanceInfo procInfo = getQueryProcessInstanceInfo(procLog.getProcessInstanceId(), procInstIdProcInstInfoMap);
             procInfo.setProcessInstance(new JaxbProcessInstance(procLog));
         }
         for( VariableInstanceLog varLog : varLogs ) {
-            procInstId = varLog.getProcessInstanceId();
             // The reasoning here is that the number of process logs may be constrained by pagination
-            JaxbQueryProcessInstanceInfo procInfo = procInstIdProcInstInfoMap.get(procInstId);
+            JaxbQueryProcessInstanceInfo procInfo = procInstIdProcInstInfoMap.get(varLog.getProcessInstanceId());
             if( procInfo != null ) { 
                 procInfo.getVariables().add(new JaxbVariableInfo(varLog));
             }
