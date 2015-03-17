@@ -15,14 +15,12 @@ import java.util.Set;
 import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.process.instance.ProcessInstance;
 import org.jbpm.services.api.DeploymentService;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
-import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
@@ -43,12 +41,14 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
 
    
     public QueryResourceTest() {
-        super(true, true, "org.jbpm.domain");
+        super();
         jsonMapper.enable(Feature.INDENT_OUTPUT);
         jaxbClientMapper.setPrettyPrint(true);
         jaxbServerMapper.setPrettyPrint(true);
     }
 
+    private int numProcesses = 6;
+    
     @Before
     public void init() {
         runtimeManager = createRuntimeManager(PROCESS_STRING_VAR_FILE, PROCESS_OBJ_VAR_FILE);
@@ -56,7 +56,6 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
         
-        setupTestData();
         
         queryResource = new QueryResourceImpl();
         
@@ -77,6 +76,8 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         
         queryTaskHelper = new InternalTaskQueryHelper(queryResource);
         queryProcInstHelper = new InternalProcInstQueryHelper(queryResource);
+        
+        setupTestData();
     }
     
     @After
@@ -89,19 +90,6 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
 
     private static boolean testDataInitialized = false;
    
-    // must be at least 5
-    private static int numTestProcesses = 10;
-    
-    private void setupTestData() { 
-        if( ! testDataInitialized ) { 
-            for( int i = 0; i < numTestProcesses; ++i ) { 
-                runStringProcess(ksession);
-                runObjectProcess(ksession, i);
-            }
-            testDataInitialized = true;
-        }
-    }
-
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
     @Test
@@ -185,18 +173,9 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         roundTripJson(result);
         roundTripXml(result);
     }
-
-    private static void addParams(Map<String, String[]> params, String name, String... values ) { 
-       params.put(name,  values);
-    }
    
     @Test
     public void queryProcessRestCallTest() throws Exception  { 
-        int numProcesses = 6;
-        for( int i = 0; i < numProcesses; ++i ) { 
-            runObjectProcess(ksession, i);
-        }
-      
         int pageSize = 5;
         assertTrue( numProcesses > pageSize );
         int [] pageInfo = { 0, pageSize };
@@ -338,4 +317,43 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         assertNotNull( "null result", result );
         assertTrue( "Expected empty result: " + result.getProcessInstanceInfoList().size(), result.getProcessInstanceInfoList().isEmpty() );
     }
+    
+    @Test
+    @Ignore("BZ-1199993 - No results from Process Query API when I query process instances with 2 or more variables")
+    public void moreQueryProcessRestCallTest() throws Exception  { 
+        int pageSize = 5;
+        assertTrue( numProcesses > pageSize );
+        int [] pageInfo = { 0, pageSize };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "processinstancestatus", "" + ProcessInstance.STATE_COMPLETED );
+        
+        // simple (everything) 
+        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertTrue( "Empty result (status complete)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
+        int origNumResults = result.getProcessInstanceInfoList().size();
+       
+        JaxbQueryProcessInstanceInfo foundProcInfo = null;
+        FIND: for( JaxbQueryProcessInstanceInfo queryProcInfo : result.getProcessInstanceInfoList() ) { 
+            assertEquals( "Incorrect process instance state!", ProcessInstance.STATE_COMPLETED, queryProcInfo.getProcessInstance().getState() );
+            for( JaxbVariableInfo varInfo : queryProcInfo.getVariables() ) { 
+                if( varInfo.getName().equals("secondStr") ) { 
+                   foundProcInfo = queryProcInfo;
+                   break FIND;
+                }
+            }
+        }
+        assertNotNull( "Could not find process instance!" , foundProcInfo );
+    
+        int i = 0;
+        for( JaxbVariableInfo varInfo : foundProcInfo.getVariables() ) { 
+            if( i++ > 1 ) break;
+            addParams(queryParams, "var_" + varInfo.getName(), varInfo.getValue().toString() );
+        }
+       
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertTrue( "Empty result ('COMPLETE' + var1 + var2)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
+        assertEquals( "Incorrect num results", 1, result.getProcessInstanceInfoList().size() );
+        
+    }
+   
 }

@@ -17,6 +17,7 @@
   <bpmn2:process id="org.var.human.task.string" name="boolean" isExecutable="true">
 
     <bpmn2:property id="inputStr" itemSubjectRef="_inputStrItem"/>
+    <bpmn2:property id="secondStr" itemSubjectRef="_inputStrItem"/>
 
     <bpmn2:startEvent id="_start" name="start"/>
     <bpmn2:sequenceFlow id="_start-_script_init" sourceRef="_start" targetRef="_script_init"/>

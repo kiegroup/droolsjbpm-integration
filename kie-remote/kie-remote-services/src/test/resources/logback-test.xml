@@ -15,12 +15,13 @@
 
   <logger name="org.kie.remote.services" level="info" />
 
-  <!-- see queries -->
+  <!-- query output -->
   <logger name="org.jbpm.services.task.persistence" level="info" />
   <logger name="org.jbpm.process.audit" level="info" />
 
   <!-- test output -->
   <logger name="org.kie.remote.services.rest.query" level="info" />
+  <logger name="org.kie.internal" level="info" />
 
   <root level="info">
     <appender-ref ref="consoleAppender" />
