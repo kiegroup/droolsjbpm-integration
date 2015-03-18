@@ -603,5 +603,5 @@ This behaviour should be analyzed with EAP team.
 Limitations
 ===========
 * The plugin only supports the generation of a single static layer.
-* Maven 3.0.X - Aether API from Maven 3.0.X to Maven 3.1.X has been changed. This plugin version only supports Maven 3.0.X
+* Maven versions major than > 3.1.X - Aether API from Maven 3.0.X to Maven 3.1.X has been changed. This plugin version only supports Maven versions major than 3.1.X
 * The current plugin graph implementation type (currently only FLAT) generates the static modules by NOT exporting the dependencies (see <code>export</code> attribute for JBoss module descriptors).
