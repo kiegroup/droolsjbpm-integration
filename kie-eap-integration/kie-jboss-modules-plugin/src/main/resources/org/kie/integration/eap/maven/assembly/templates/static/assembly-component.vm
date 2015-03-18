@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+#set( $D = '$' )
+<component>
+
+    <files>
+        <file>
+          <source>$moduleDescriptorPath</source>
+          <outputDirectory>$outputDir</outputDirectory>
+          <filtered>false</filtered>
+        </file>
+    </files>
+
+    #if (!$node.resources.empty)
+    <dependencySets>
+        <dependencySet>
+        <outputFileNameMapping>${D}{artifact.artifactId}-${D}{artifact.baseVersion}${D}{dashClassifier?}.${D}{artifact.extension}</outputFileNameMapping>
+            <includes>
+                #foreach($resource in $node.resources)
+                    #if ($resource.addAsResource)
+                    <include>$resource.name</include>
+                    #end
+                #end
+            </includes>
+            <outputDirectory>$outputDir</outputDirectory>
+            <unpack>false</unpack>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useStrictFiltering>true</useStrictFiltering>
+        </dependencySet>
+    </dependencySets>
+    #end
+
+</component>

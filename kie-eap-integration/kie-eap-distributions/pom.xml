@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>kie-eap-integration</artifactId>
+    <groupId>org.kie</groupId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kie-eap-distributions</artifactId>
+  <name>KIE EAP - Distributions</name>
+  <packaging>pom</packaging>
+
+  <profiles>
+
+    <!-- Profile for BPMS layer. -->
+    <profile>
+      <id>bpms-layer</id>
+      <activation>
+        <property>
+          <name>bpms-layer</name>
+        </property>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>kie-eap-distributions-bpms-layer</module>
+      </modules>
+    </profile>
+
+    <!-- Profile for BPMS webapp. -->
+    <profile>
+      <id>bpms-webapp</id>
+      <activation>
+        <property>
+          <name>bpms-webapp</name>
+        </property>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>kie-eap-distributions-bpms-webapp</module>
+      </modules>
+    </profile>
+
+    <!-- Profile for BRMS layer. -->
+    <profile>
+      <id>brms-layer</id>
+      <activation>
+        <property>
+          <name>brms-layer</name>
+        </property>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>kie-eap-distributions-brms-layer</module>
+      </modules>
+    </profile>
+
+    <!-- Profile for BRMS webapp. -->
+    <profile>
+      <id>brms-webapp</id>
+      <activation>
+        <property>
+          <name>brms-webapp</name>
+        </property>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>kie-eap-distributions-brms-webapp</module>
+      </modules>
+    </profile>
+
+  </profiles>
+
+</project>

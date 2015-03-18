@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>kie-eap-distributions</artifactId>
+    <groupId>org.kie</groupId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kie-eap-distributions-brms-layer</artifactId>
+  <name>KIE EAP - BRMS layer distribution</name>
+
+  <properties>
+    <modules.tmp.path>${project.build.directory}/generated</modules.tmp.path>
+    <modules.distribution.name>brms</modules.distribution.name>
+  </properties>
+
+  <!-- The BRMS distributions dependencies. -->
+  <dependencies>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-kie</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-kie-remote</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-drools</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-jbpm</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-compress</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-exec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.freemarker</groupId>
+          <artifactId>freemarker</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-eclipse-emf</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-eclipse-aether</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-ant</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-codehouse-plexus</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-maven</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-mvel</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-poi</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>com-google-protobuf</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-eclipse-sisu</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-sonatype-sisu</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-sonatype-plexus</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-maven-wagon</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>com-opensymphony-quartz</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-junit</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-xmlbeans</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>com-thoughtworks-xstream</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org.antlr</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-hamcrest</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-osgi</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>xmlpull</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>xpp3</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-jsoup</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- Create the module templates and assembly files. -->
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>jboss-modules</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+
+          <!-- The name of the JBoss EAP layer distrubtion to geneate. -->
+          <distributionName>${modules.distribution.name}</distributionName>
+
+          <!-- The maven module that contains all base EAP/AS modules for a given version.-->
+          <baseModule>
+            <groupId>org.kie.modules</groupId>
+            <artifactId>jboss-eap-6.3</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <exclusions>
+              <!-- Do not use these base modules as they resources are provided by the BRMS static layer (using newer resource versions). -->
+              <exclusion>
+                <groupId>org.kie.modules</groupId>
+                <artifactId>org-antlr-main</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+              </exclusion>
+            </exclusions>
+          </baseModule>
+
+          <!-- The static dependencies for this distribution modules. -->
+          <staticDependencies>
+            <!-- Add a dependency to javax.api:main module for all static modules in this layer. -->
+            <staticDependency>
+              <name>ALL</name>
+              <slot>ALL</slot>
+              <dependencies>javax.api:main</dependencies>
+            </staticDependency>
+            <!-- Protobuf depedencies on org.jbpm-minimal -->
+            <staticDependency>
+              <name>com.google.protobuf</name>
+              <slot>main</slot>
+              <dependencies>org.jbpm-minimal:main</dependencies>
+            </staticDependency>
+            <!-- Protobuf depedencies on org.jbpm-minimal, org.drools and org.kie -->
+            <staticDependency>
+              <name>com.opensymphony.quartz</name>
+              <slot>main</slot>
+              <dependencies>org.jbpm:main,org.drools:main,org.kie:main</dependencies>
+            </staticDependency>
+          </staticDependencies>
+          
+          <!-- The output path for the genrated module descriptor and assembly files. The resulting global assembly.xml file will be created in this path. -->
+          <outputPath>${modules.tmp.path}</outputPath>
+
+          <!-- The flag that indicates if the build must fail when a dependency is not satisfied. -->
+          <failOnMissingDependency>true</failOnMissingDependency>
+
+          <!-- Do not fail when a version for a resource is not resolvable in current project dependencies. -->
+          <failOnVersionMismatchedResource>false</failOnVersionMismatchedResource>
+          
+          <!-- Print the generated modules graph to a file. -->
+          <!--<graphOutputFile>${project.basedir}/../../doc/brms-graph.txt</graphOutputFile>-->
+
+          <!-- Do not include the dependencies marked as optional. -->
+          <includeOptionalDependencies>false</includeOptionalDependencies>
+
+        </configuration>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>build-static-layer</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Assembly the distribution. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>${modules.tmp.path}/static-modules/${modules.distribution.name}/${modules.distribution.name}-assembly.xml</descriptor>
+          </descriptors>
+          <appendAssemblyId>false</appendAssemblyId>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

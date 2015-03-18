@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.kie</groupId>
+  <artifactId>org-apache-commons-io-main</artifactId>
+  <name>EAP Base Module org.apache.commons.io:main</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <module.type>base</module.type>
+    <module.slot>main</module.slot>
+    <module.name>org.apache.commons.io</module.name>
+  </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.1</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+
+
+</project>

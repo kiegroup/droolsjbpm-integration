@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.modules</groupId>
+    <artifactId>kie-eap-static-modules</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.modules</groupId>
+  <artifactId>ch-qos-logback</artifactId>
+  <name>KIE EAP - ch-qos-logback static module</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <module.name>ch.qos.logback</module.name>
+    <module.type>static</module.type>
+    <module.location>ch/qos/logback</module.location>
+    <module.slot>main</module.slot>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <type>jar</type>
+    </dependency>
+
+  </dependencies>
+</project>

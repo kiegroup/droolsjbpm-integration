@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>kie-eap-modules</artifactId>
+    <groupId>org.kie.modules</groupId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kie-eap-static-modules</artifactId>
+  <packaging>pom</packaging>
+  <name>KIE EAP - Static module definitions</name>
+
+  <modules>
+    <module>org-kie</module>
+    <module>org-kie-remote</module>
+    <module>org-drools</module>
+    <module>org-jbpm</module>
+    <module>org-jbpm-minimal</module>
+    <module>org-eclipse-aether</module>
+    <module>org-apache-ant</module>
+    <module>org-codehouse-plexus</module>
+    <module>org-apache-commons-math</module>
+    <module>org-apache-commons-compress</module>
+    <module>org-apache-commons-exec</module>
+    <module>org-apache-helix</module>
+    <module>org-eclipse-jgit</module>
+    <module>org-apache-lucene</module>
+    <module>org-apache-maven</module>
+    <module>org-mvel</module>
+    <module>org-apache-commons-net</module>
+    <module>org-apache-poi</module>
+    <module>com-google-protobuf</module>
+    <module>org-eclipse-sisu</module>
+    <module>org-sonatype-sisu</module>
+    <module>org-tukaani</module>
+    <module>org-sonatype-maven</module>
+    <module>org-sonatype-plexus</module>
+    <module>org-apache-commons-vfs</module>
+    <module>org-apache-maven-wagon</module>
+    <module>org-apache-mina</module>
+    <module>org-apache-commons-fileupload</module>
+    <module>org-apache-commons-jxpath</module>
+    <module>com-opensymphony-quartz</module>
+    <module>org-junit</module>
+    <module>org-apache-xmlbeans</module>
+    <module>org-apache-commons-lang3</module>
+
+    <module>aopalliance</module>
+    <module>asm</module>
+    <module>ch-qos-logback</module>
+    <module>com-jcraft</module>
+    <module>com-thoughtworks-xstream</module>
+    <module>jakarta-regexp</module>
+    <module>javax-ws-rs</module>
+    <module>jivesoftware</module>
+    <module>net-sf-opencsv</module>
+    <module>org.antlr</module>
+    <module>org-apache-abdera</module>
+    <module>org-apache-camel</module>
+    <module>org-apache-xmlgraphics</module>
+    <module>org-beanshell</module>
+    <module>org-eclipse-emf</module>
+    <module>org-eclipse</module>
+    <module>org-freemarker</module>
+    <module>org-hamcrest</module>
+    <module>org-jboss-netty</module>
+    <module>org-jboss-seam-transaction</module>
+    <module>org-json</module>
+    <module>org-jsoup</module>
+    <module>org-osgi</module>
+    <module>rhino</module>
+    <module>rome</module>
+    <module>xmlpull</module>
+    <module>xpp3</module>
+    <module>com-google-code-gson</module>
+  </modules>
+
+</project>

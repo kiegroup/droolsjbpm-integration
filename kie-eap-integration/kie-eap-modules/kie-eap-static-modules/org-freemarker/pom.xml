@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.modules</groupId>
+    <artifactId>kie-eap-static-modules</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.modules</groupId>
+  <artifactId>org-freemarker</artifactId>
+  <name>KIE EAP - org-freemarker static module</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <module.name>org.freemarker</module.name>
+    <module.type>static</module.type>
+    <module.location>org/freemarker</module.location>
+    <module.slot>main</module.slot>
+    <!-- Added log4j due to runtime dependency -->
+    <module.dependencies>org.apache.log4j:main</module.dependencies>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <type>jar</type>
+    </dependency>
+
+  </dependencies>
+</project>

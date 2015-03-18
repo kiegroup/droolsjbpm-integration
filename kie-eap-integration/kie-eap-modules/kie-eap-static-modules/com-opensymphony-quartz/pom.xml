@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.modules</groupId>
+    <artifactId>kie-eap-static-modules</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.modules</groupId>
+  <artifactId>com-opensymphony-quartz</artifactId>
+  <name>KIE EAP - com-opensymphony-quartz static module</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <module.name>com.opensymphony.quartz</module.name>
+    <module.type>static</module.type>
+    <module.location>com/opensymphony/quartz</module.location>
+    <module.dependencies>javax.api:main</module.dependencies>
+    <module.slot>main</module.slot>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+      <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.openejb</groupId>
+          <artifactId>javaee-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.transaction</groupId>
+          <artifactId>jta</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+
+  </dependencies>
+</project>

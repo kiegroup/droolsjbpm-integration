@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.modules</groupId>
+    <artifactId>kie-eap-static-modules</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.kie.modules</groupId>
+  <artifactId>org-apache-maven</artifactId>
+  <name>KIE EAP - org-apache-maven static module</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <module.name>org.apache.maven</module.name>
+    <module.type>static</module.type>
+    <module.location>org/apache/maven</module.location>
+    <module.slot>main</module.slot>
+    <module.dependencies>com.google.guava:main,org.sonatype.sisu:main,org.eclipse.sisu:main:true,javax.inject.api:main</module.dependencies>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model-builder</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-aether-provider</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-settings-builder</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <type>jar</type>
+    </dependency>
+
+
+  </dependencies>
+</project>

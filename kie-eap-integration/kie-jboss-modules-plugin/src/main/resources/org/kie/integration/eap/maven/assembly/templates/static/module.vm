@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="$node.name" slot="$node.slot">
+
+  #if (!$node.resources.isEmpty)
+  <resources>
+    #foreach($resource in $sorter.sort($node.resources))
+        #if ($resource.addAsResource)
+        <resource-root path="$resource.fileName"/>
+        #end
+    #end
+  </resources>
+  #end
+
+  #if (!$node.dependencies.empty)
+  <dependencies>
+    #foreach($dependency in $sorter.sort($node.dependencies))
+        #if (!$dependency.missing)
+        <module name="$dependency.name" export="$dependency.export" slot="$dependency.slot" services="$dependency.services" optional="$dependency.optional"/>
+        #end
+    #end
+  </dependencies>
+  #end
+</module>
