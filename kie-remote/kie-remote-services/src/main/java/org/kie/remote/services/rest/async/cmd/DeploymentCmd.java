@@ -1,10 +1,13 @@
 package org.kie.remote.services.rest.async.cmd;
 
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.util.AnnotationLiteral;
 
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
-import org.jbpm.executor.cdi.CDIUtils;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.cdi.Kjar;
@@ -20,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This command is executed by the jbpm-executor asynchronously.
  * </p>
- * It contains the logic to deploy or undeploy a deployment 
+ * It contains the logic to deploy or undeploy a deployment
  */
 public class DeploymentCmd implements Command {
 
@@ -29,11 +32,11 @@ public class DeploymentCmd implements Command {
     public static final String DEPLOYMENT_UNIT = "DeploymentUnit";
     public static final String JOB_TYPE = "JobType";
     public static final String JOB_ID = "JobId";
-    
+
     @Override
     public ExecutionResults execute(CommandContext ctx) throws Exception {
         DeploymentService deploymentService = getDeploymentService(ctx);
-        
+
         KModuleDeploymentUnit deploymentUnit = (KModuleDeploymentUnit) ctx.getData(DEPLOYMENT_UNIT);
         JobType jobType = (JobType) ctx.getData(JOB_TYPE);
         String deploymentId = deploymentUnit.getIdentifier();
@@ -78,20 +81,34 @@ public class DeploymentCmd implements Command {
         results.setData("Result", success);
         return results;
     }
-    
+
     @SuppressWarnings("serial")
     private DeploymentService getDeploymentService(CommandContext ctx) throws Exception {
         BeanManager beanManager = getBeanManager();
-        return CDIUtils.createBean(DeploymentService.class, beanManager, new AnnotationLiteral<Kjar>(){});
+        return createBean(DeploymentService.class, beanManager, new AnnotationLiteral<Kjar>(){});
     }
-   
+
     private JobResultManager getJobManager(CommandContext ctx) throws Exception {
         BeanManager beanManager = getBeanManager();
-        return CDIUtils.createBean(JobResultManager.class, beanManager);
+        return createBean(JobResultManager.class, beanManager);
     }
-   
-    private BeanManager getBeanManager() { 
+
+    private BeanManager getBeanManager() {
         return BeanManagerProvider.getInstance().getBeanManager();
-    } 
-        
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T createBean(Class<T> beanType, BeanManager beanManager, Annotation... bindings) throws Exception {
+
+      Set<Bean<?>> beans = beanManager.getBeans( beanType, bindings );
+
+      if (beans != null && !beans.isEmpty()) {
+        Bean<T> bean = (Bean<T>) beans.iterator().next();
+
+        return (T) beanManager.getReference(bean, beanType, beanManager.createCreationalContext(bean));
+      }
+
+      return null;
+  }
+
 }

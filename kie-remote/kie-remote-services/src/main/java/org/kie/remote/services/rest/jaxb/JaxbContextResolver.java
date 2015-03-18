@@ -10,13 +10,12 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
 
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
-import org.jbpm.executor.cdi.CDIUtils;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * We use this class in order to use (user) classes from Kjar deployments in serialization. 
+ * We use this class in order to use (user) classes from Kjar deployments in serialization.
  * </p>
  * Users may send inputs to the REST API that contain instances of these classes as parameters to {@link KieSession} operations.
  */
