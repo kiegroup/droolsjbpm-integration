@@ -14,6 +14,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.lang.reflect.Field;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -677,16 +678,20 @@ public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJ
             .addUserName("tester")
             .addServerUrl("http://test.server.com/test-app/")
             .addServerUrl(new URL("http://test.server.com/test-app/"))
+            .setWsdlLocationRelativePath("random/path/to/CommandWebservice.wsdl")
             .addPassword("test")
             .addUserName("tester")
             .addServerUrl("http://test.server.com/test-app/")
             .addServerUrl(new URL("http://test.server.com/test-app/"))
+            .setWsdlLocationRelativePath("random/path/to/CommandWebservice.wsdl")
+            .useHttpRedirect()
             .addPassword("test")
             .addUserName("tester")
             .addServerUrl("http://test.server.com/test-app/")
             .addServerUrl(new URL("http://test.server.com/test-app/"))
             .buildBasicAuthClient();
         } catch( Exception e ) { 
+            logger.info("The " + ConnectException.class.getSimpleName() + " above is expected, nothing is wrong.");
             // the above just needs to compile..
         }
     }

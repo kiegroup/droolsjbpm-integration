@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
+import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
 
@@ -67,6 +68,18 @@ abstract class RemoteWebserviceClientBuilderImpl<S> implements RemoteWebserviceC
             classSet.add(clazz);
         }
         config.addJaxbClasses(classSet);
+        return this;
+    }
+   
+    @Override
+    public RemoteWebserviceClientBuilder setWsdlLocationRelativePath( String wsdlLocationRelativePath ) {
+        config.setWsdlLocationRelativePath(wsdlLocationRelativePath);
+        return this;
+    }
+    
+    @Override
+    public RemoteWebserviceClientBuilder useHttpRedirect() {
+        config.setHttpRedirect(true);
         return this;
     }
     
