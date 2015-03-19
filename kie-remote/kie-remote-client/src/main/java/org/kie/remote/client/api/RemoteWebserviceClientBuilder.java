@@ -48,6 +48,33 @@ public interface RemoteWebserviceClientBuilder<B, S> extends RemoteClientBuilder
      * @throws MalformedURLException If the url is malformed
      */
     RemoteWebserviceClientBuilder<B, S> addServerUrl(String instanceUrlString) throws MalformedURLException;
+  
+    /**
+     * The string parameter here represents the URL path of the webserivce WSDL, not including
+     * the hostname, port or application.
+     * </p>
+     * For example, if the WSDL was available at 
+     *   <pre>http://localhost:8080/business-central/random/path/to/wsdl/Webservice.wsdl</pre>
+     * Then the submitted string should be 
+     *   <pre>random/path/to/wsdl/Webservice.wsdl</pre>
+     * </p>
+     * If this method is not used, the default value  for this location is 
+     *   <pre>http://localhost:8080/business-central/ws/Webservice?wsdl</pre>
+     * 
+     * @param wsdlLocationRelativePath The relative path of the WSDL
+     * @return The builder instance
+     */
+    RemoteWebserviceClientBuilder<B, S> setWsdlLocationRelativePath(String wsdlLocationRelativePath);
+   
+    /**
+     * When initializing the webservice or doing webservice operation, make sure
+     * that HTTP redirect responses are accepted and used. 
+     * </p>
+     * The default is to ignore HTTP redirect responses.
+     * 
+     * @return The builder instance
+     */
+    RemoteWebserviceClientBuilder<B, S> useHttpRedirect();
     
     /**
      * Creates a {@link CommandWebService} instance, using the 
