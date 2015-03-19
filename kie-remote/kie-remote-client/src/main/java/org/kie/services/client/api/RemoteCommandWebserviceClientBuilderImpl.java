@@ -1,5 +1,6 @@
 package org.kie.services.client.api;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -9,9 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.internet.NewsAddress;
+import javax.ws.rs.core.HttpHeaders;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -20,6 +24,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.remote.client.api.exception.RemoteApiException;
+import org.kie.remote.client.api.exception.RemoteCommunicationException;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.client.ws.KieRemoteWsAuthenticator;
@@ -50,15 +55,17 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
         KieRemoteWsAuthenticator auth = new KieRemoteWsAuthenticator();
         auth.setUserAndPassword(config.getUserName(), config.getPassword()); 
    
-        // wsdl URL
-        String wsdlLocationSuffix = "ws/CommandService?wsdl";
+        String wsdlLocationRelativePath = config.getWsdlLocationRelativePath();
+
         URL wsdlUrl;
         try { 
-            wsdlUrl = new URL(config.getServerBaseUrl(), wsdlLocationSuffix);
+            wsdlUrl = new URL(config.getServerBaseUrl(), wsdlLocationRelativePath);
         } catch( MalformedURLException murle ) { 
-            throw new IllegalStateException("Checked URL is not correct: [" + config.getServerBaseUrl().toExternalForm() + wsdlLocationSuffix + "]", murle);
+            throw new IllegalStateException("WSDL URL is not correct: [" + config.getServerBaseUrl().toExternalForm() + wsdlLocationRelativePath + "]", murle);
         }
-       
+  
+        wsdlUrl = verifyURLWithRedirect(wsdlUrl);
+        
         // initial client proxy setup
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(CommandWebService.class);
@@ -102,6 +109,7 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
         HTTPClientPolicy httpClientPolicy = conduit.getClient();
         httpClientPolicy.setConnectionTimeout(config.getTimeout());
         httpClientPolicy.setReceiveTimeout(config.getTimeout());
+        httpClientPolicy.setAutoRedirect(config.getHttpRedirect());
         
         // if present, add deployment id for JAXB context
         String depId = config.getDeploymentId();
@@ -115,4 +123,73 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
         return commandService;
     }
 
+    /**
+     * Verify that the given URL points to a valid URL by connecting to the URL and checking the response status. 
+     * </p> 
+     * If HTTP redirect has been enabled, return the 
+     * 
+     * @param wsdlUrl
+     * @return
+     */
+    private URL verifyURLWithRedirect(URL wsdlUrl) { 
+        int redirectTries = 0;
+        URL newWsdlUrl = wsdlUrl;
+        int connStatus = -1;
+        do { 
+            wsdlUrl = newWsdlUrl;
+
+            HttpURLConnection conn;
+            try { 
+                conn = (HttpURLConnection) wsdlUrl.openConnection();
+                conn.setInstanceFollowRedirects(false);
+                String encoded = Base64Utility.encode((config.getUserName() + ":" + config.getPassword()).getBytes("UTF-8"));
+                conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Basic "+encoded);
+                connStatus = conn.getResponseCode();
+            } catch (Exception e) {
+                throw new IllegalStateException("Could not verify WSDL URL: [" + wsdlUrl.toExternalForm() + "]", e);
+            }
+
+            switch( connStatus ) { 
+            case HttpURLConnection.HTTP_OK:
+                break;
+            case HttpURLConnection.HTTP_MOVED_TEMP:
+            case HttpURLConnection.HTTP_MOVED_PERM:
+            case HttpURLConnection.HTTP_SEE_OTHER:
+                String newWsdlLoc = conn.getHeaderField(HttpHeaders.LOCATION);
+                if( config.getHttpRedirect() ) { 
+                    if( newWsdlLoc.startsWith("/") ) { 
+                        URL baseUrl = config.getServerBaseUrl();
+                        newWsdlLoc = baseUrl.getProtocol() + "://" + baseUrl.getAuthority() + newWsdlLoc;
+                    } else if( ! newWsdlLoc.startsWith("http") ) { 
+                        throw new RemoteCommunicationException("Could not parse redirect URL: [" + newWsdlLoc + "]");
+                    }
+                    try {
+                        newWsdlUrl = new URL(newWsdlLoc);
+                    } catch( MalformedURLException murle ) {
+                        throw new RemoteCommunicationException("Redirect URL returned by server is invalid: [" + newWsdlLoc + "]", murle);
+                    }
+                } else { 
+                    throw new RemoteCommunicationException("HTTP Redirect is not set but server redirected client to [" + newWsdlLoc + "]" );
+                }
+                break;
+            default:
+                throw new RemoteCommunicationException("Status " + connStatus + " received when verifying WSDL URL: [" + wsdlUrl.toExternalForm() + "]");
+            } 
+            ++redirectTries;
+        } while( redirectTries < 3 && ! wsdlUrl.equals(newWsdlUrl) && connStatus != 200 );
+
+        if( connStatus != 200 ) { 
+            if( newWsdlUrl.equals(wsdlUrl) && connStatus >= 300 && connStatus < 400 ) { 
+                throw new RemoteCommunicationException("Unable to verify WSDL URL: request returned a redirect to the same URL [" + newWsdlUrl + "]");
+            } else { 
+                throw new RemoteCommunicationException("Unable to verify WSDL URL: request returned status " + connStatus + " after " + redirectTries + " redirects [" + newWsdlUrl + "]");
+            }
+        }
+        
+        if( ! wsdlUrl.equals(newWsdlUrl) ) {
+            throw new RemoteCommunicationException("Server redirected (WSDL) request 3 times in a row. The last request URL was [" + newWsdlUrl + "]");
+        }
+        
+        return wsdlUrl;
+    }
 }

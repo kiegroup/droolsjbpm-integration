@@ -53,6 +53,11 @@ public final class RemoteConfiguration {
     private Queue taskQueue;
     private Queue responseQueue;
     private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
+    
+    // WS
+    private String webserviceName =  "CommandService";
+    private String wsdlLocRelativePath = "ws/" + webserviceName + "?wsdl";
+    private boolean httpRedirect = false;
 
     /**
      * Public constructors and setters
@@ -340,6 +345,14 @@ public final class RemoteConfiguration {
         return processInstanceId;
     }
 
+    public String getWsdlLocationRelativePath() {
+        return wsdlLocRelativePath;
+    }
+
+    public boolean getHttpRedirect() {
+        return httpRedirect;
+    }
+
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setTimeout(long timeout) {
@@ -399,7 +412,15 @@ public final class RemoteConfiguration {
     public void setDisableTaskSecurity(boolean disableTaskSecurity) {
         this.disableTaskSecurity = disableTaskSecurity;
     }
-   
+    
+    public void setWsdlLocationRelativePath(String wsdlLocationRelativePath) {
+        this.wsdlLocRelativePath = wsdlLocationRelativePath;
+    }
+  
+    public void setHttpRedirect(boolean httpRedirect) {
+        this.httpRedirect = httpRedirect;
+    }
+    
     // Clone --- 
    
     private RemoteConfiguration(RemoteConfiguration config) { 

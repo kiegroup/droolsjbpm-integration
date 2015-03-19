@@ -236,8 +236,45 @@
       <artifactId>cxf-rt-transports-http-jetty</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <!--  redirect test -->
+    <dependency>
+      <groupId>org.simpleframework</groupId>
+      <artifactId>simple-http</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.simpleframework</groupId>
+      <artifactId>simple-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.simpleframework</groupId>
+      <artifactId>simple-transport</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.simpleframework</groupId>
+        <artifactId>simple-http</artifactId>
+        <version>6.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.simpleframework</groupId>
+        <artifactId>simple-common</artifactId>
+        <version>6.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.simpleframework</groupId>
+        <artifactId>simple-transport</artifactId>
+        <version>6.0.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <build>
     <plugins>
       <!--  generated: 0. delete all generated unpacked files because they are generated code and could change -->
