@@ -243,16 +243,6 @@
       <artifactId>simple-http</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.simpleframework</groupId>
-      <artifactId>simple-common</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.simpleframework</groupId>
-      <artifactId>simple-transport</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -260,16 +250,6 @@
       <dependency>
         <groupId>org.simpleframework</groupId>
         <artifactId>simple-http</artifactId>
-        <version>6.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.simpleframework</groupId>
-        <artifactId>simple-common</artifactId>
-        <version>6.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.simpleframework</groupId>
-        <artifactId>simple-transport</artifactId>
         <version>6.0.1</version>
       </dependency>
     </dependencies>
