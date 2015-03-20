@@ -245,16 +245,6 @@
     </dependency>
   </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.simpleframework</groupId>
-        <artifactId>simple-http</artifactId>
-        <version>6.0.1</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  
   <build>
     <plugins>
       <!--  generated: 0. delete all generated unpacked files because they are generated code and could change -->
