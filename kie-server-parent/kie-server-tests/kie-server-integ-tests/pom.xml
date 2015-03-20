@@ -58,6 +58,11 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-test-tjws</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
       <scope>test</scope>
     </dependency>
