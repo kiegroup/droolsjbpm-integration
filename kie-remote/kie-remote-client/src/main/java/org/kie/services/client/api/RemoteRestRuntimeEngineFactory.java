@@ -6,6 +6,8 @@ import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
+ * This class will be deleted as of 7.x
+ * </p>
  * A factory for creating REST remote API client instances of the {@link RuntimeEngine}.
  *
  * @see {@link org.kie.remote.client.api.RemoteRestRuntimeEngineFactory}

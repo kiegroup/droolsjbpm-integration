@@ -3,6 +3,7 @@ package org.kie.services.client.api.command;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 import static org.kie.services.shared.ServicesVersion.VERSION;
+import static org.kie.services.client.api.command.InternalJmsCommandHelper.*;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -56,6 +57,7 @@ import org.kie.remote.jaxb.gen.UpdateCommand;
 import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
+import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.slf4j.Logger;
@@ -71,7 +73,7 @@ public abstract class AbstractRemoteCommandObject {
     protected final RemoteConfiguration config;
     protected boolean isTaskService = false;
 
-    AbstractRemoteCommandObject(RemoteConfiguration config) {
+    protected AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
         if( config.isJms() && config.getResponseQueue() == null ) { 
             throw new MissingRequiredInfoException("A Response queue is necessary in order to create a Remote JMS Client instance.");
@@ -177,23 +179,23 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    private JaxbCommandsRequest prepareCommandRequest( Command command ) {
-        if( config.getDeploymentId() == null && !(command instanceof TaskCommand || command instanceof AuditCommand) ) {
+    static JaxbCommandsRequest prepareCommandRequest( Command command, String userName, String deploymentId, Long processInstanceId ) {
+        if( deploymentId == null && !(command instanceof TaskCommand || command instanceof AuditCommand) ) {
             throw new MissingRequiredInfoException("A deployment id is required when sending commands involving the KieSession.");
         }
         JaxbCommandsRequest req;
         if( command instanceof AuditCommand ) {
             req = new JaxbCommandsRequest(command);
         } else {
-            req = new JaxbCommandsRequest(config.getDeploymentId(), command);
+            req = new JaxbCommandsRequest(deploymentId, command);
         }
 
-        Long processInstanceId = findProcessInstanceId(command);
-        if( processInstanceId == null ) {
-            processInstanceId = config.getProcessInstanceId();
+        if( processInstanceId != null ) { 
+            processInstanceId = findProcessInstanceId(command);
         }
+        
         req.setProcessInstanceId(processInstanceId);
-        req.setUser(config.getUserName());
+        req.setUser(userName);
         req.setVersion(VERSION);
 
         return req;
@@ -206,12 +208,8 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private Object executeJmsCommand( Command command ) {
-        JaxbCommandsRequest req = prepareCommandRequest(command);
-        String deploymentId = config.getDeploymentId();
-
-        ConnectionFactory factory = config.getConnectionFactory();
+       
         Queue sendQueue;
-
         boolean isTaskCommand = (command instanceof TaskCommand);
         if( isTaskCommand ) {
             sendQueue = config.getTaskQueue();
@@ -221,147 +219,15 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             sendQueue = config.getKsessionQueue();
         }
-        Queue responseQueue = config.getResponseQueue();
-
-        Connection connection = null;
-        Session session = null;
-        JaxbCommandsResponse cmdResponse = null;
-        String corrId = UUID.randomUUID().toString();
-        String selector = "JMSCorrelationID = '" + corrId + "'";
-        try {
-
-            // setup
-            MessageProducer producer;
-            MessageConsumer consumer;
-            try {
-                if( config.getPassword() != null ) {
-                    connection = factory.createConnection(config.getUserName(), config.getPassword());
-                } else {
-                    connection = factory.createConnection();
-                }
-                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-                producer = session.createProducer(sendQueue);
-                consumer = session.createConsumer(responseQueue, selector);
-
-                connection.start();
-            } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
-            }
-
-            // Create msg
-            TextMessage textMsg;
-            JaxbSerializationProvider serializationProvider;
-            try {
-
-                // serialize request
-                serializationProvider = config.getJaxbSerializationProvider();
-                String xmlStr = serializationProvider.serialize(req);
-                textMsg = session.createTextMessage(xmlStr);
-                
-                // set properties
-                // 1. corr id
-                textMsg.setJMSCorrelationID(corrId);
-                // 2. serialization info
-                textMsg.setIntProperty(SERIALIZATION_TYPE_PROPERTY_NAME, config.getSerializationType());
-                Set<Class<?>> extraJaxbClasses = config.getExtraJaxbClasses();
-                if( !extraJaxbClasses.isEmpty() ) {
-                    if( deploymentId == null ) {
-                        throw new MissingRequiredInfoException(
-                                "Deserialization of parameter classes requires a deployment id, which has not been configured.");
-                    }
-                    textMsg.setStringProperty(DEPLOYMENT_ID_PROPERTY_NAME, deploymentId);
-                }
-                // 3. user/pass for task operations
-                String userName = config.getUserName();
-                String password = config.getPassword();
-                if( isTaskCommand ) {
-                    if( userName == null ) {
-                        throw new RemoteCommunicationException(
-                                "A user name is required when sending task operation requests via JMS");
-                    }
-                    if( password == null ) {
-                        throw new RemoteCommunicationException(
-                                "A password is required when sending task operation requests via JMS");
-                    }
-                    textMsg.setStringProperty("username", userName);
-                    textMsg.setStringProperty("password", password);
-                }
-                // 4. process instance id
-            } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to create and fill a JMS message.", jmse);
-            } catch( SerializationException se ) {
-                throw new RemoteCommunicationException("Unable to deserialze JMS message.", se.getCause());
-            }
-
-            // send
-            try {
-                producer.send(textMsg);
-            } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to send a JMS message.", jmse);
-            }
-
-            // receive
-            Message response;
-            try {
-                response = consumer.receive(config.getTimeout() * 1000);
-            } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to receive or retrieve the JMS response.", jmse);
-            }
-
-            if( response == null ) {
-                logger.warn("Response is empty");
-                return null;
-            }
-            // extract response
-            assert response != null: "Response is empty.";
-            try {
-                String xmlStr = ((TextMessage) response).getText();
-                cmdResponse = (JaxbCommandsResponse) serializationProvider.deserialize(xmlStr);
-            } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
-                        + " instance from JMS response.", jmse);
-            } catch( SerializationException se ) {
-                throw new RemoteCommunicationException("Unable to extract " + JaxbCommandsResponse.class.getSimpleName()
-                        + " instance from JMS response.", se.getCause());
-            }
-            assert cmdResponse != null: "Jaxb Cmd Response was null!";
-        } finally {
-            if( connection != null ) {
-                try {
-                    connection.close();
-                    if( session != null ) {
-                        session.close();
-                    }
-                } catch( JMSException jmse ) {
-                    logger.warn("Unable to close connection or session!", jmse);
-                }
-            }
-        }
-        String version = cmdResponse.getVersion();
-        if( version == null ) {
-            version = "pre-6.0.3";
-        }
-        if( !version.equals(VERSION) ) {
-            logger.info("Response received from server version [{}] while client is version [{}]! This may cause problems.",
-                    version, VERSION);
-        }
-        List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
-        if( responses.size() > 0 ) {
-            JaxbCommandResponse<?> response = responses.get(0);
-            if( response instanceof JaxbExceptionResponse ) {
-                JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
-                throw new RemoteApiException(exceptionResponse.getMessage());
-            } else {
-                return response.getResult();
-            }
-        } else {
-            assert responses.size() == 0: "There should only be 1 response, " + "not " + responses.size()
-                    + ", returned by a command!";
-            return null;
-        }
+        
+        return internalExecuteJmsCommand(command,
+                config.getConnectionUserName(), config.getConnectionPassword(), 
+                config.getUserName(), config.getPassword(), config.getDeploymentId(), config.getProcessInstanceId(),
+                config.getConnectionFactory(), sendQueue, config.getResponseQueue(),
+                (SerializationProvider) config.getJaxbSerializationProvider(), config.getExtraJaxbClasses(),
+                config.getSerializationType(), config.getTimeout());
     }
-
+   
     /**
      * Method to communicate with the backend via REST.
      * 
@@ -369,7 +235,7 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeRestCommand( Command command ) {
-        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command);
+        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command, config.getUserName(), config.getDeploymentId(), config.getProcessInstanceId());
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
         
         // necessary for deserialization
@@ -398,16 +264,26 @@ public abstract class AbstractRemoteCommandObject {
             httpRequest.disconnect();
             throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
         } 
-
+        
         // Get response
         boolean htmlException = false;
         JaxbExceptionResponse exceptionResponse = null;
-        JaxbCommandsResponse commandResponse = null;
+        JaxbCommandsResponse cmdResponse = null;
         int responseStatus = httpResponse.code();
         try {
             String content = httpResponse.body();
             if( responseStatus < 300 ) {
-                commandResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
+                cmdResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
+
+                // check version
+                String version = cmdResponse.getVersion();
+                if( version == null ) {
+                    version = "pre-6.0.3";
+                }
+                if( !version.equals(VERSION) ) {
+                    logger.info("Response received from server version [{}] while client is version [{}]! This may cause problems.",
+                            version, VERSION);
+                }
             } else {
                 String contentType = httpResponse.contentType();
                 if( contentType.equals(MediaType.APPLICATION_XML) ) { 
@@ -432,8 +308,8 @@ public abstract class AbstractRemoteCommandObject {
             httpRequest.disconnect();
         }
         
-        if( commandResponse != null ) {
-            List<JaxbCommandResponse<?>> responses = commandResponse.getResponses();
+        if( cmdResponse != null ) {
+            List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
             if( responses.size() == 0 ) {
                 return null;
             } else if( responses.size() == 1 ) {
@@ -480,7 +356,7 @@ public abstract class AbstractRemoteCommandObject {
     }
 
     // TODO: https://issues.jboss.org/browse/JBPM-4296
-    private Long findProcessInstanceId( Object command ) {
+    private static Long findProcessInstanceId( Object command ) {
         if( command instanceof AuditCommand ) {
             return null;
         }

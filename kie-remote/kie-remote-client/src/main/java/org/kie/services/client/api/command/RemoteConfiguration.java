@@ -48,6 +48,8 @@ public final class RemoteConfiguration {
     // JMS
     private boolean useSsl = false;
     private boolean disableTaskSecurity = false;
+    private String connectionUserName = null;
+    private String connectionPassword = null;
     private ConnectionFactory connectionFactory;
     private Queue ksessionQueue;
     private Queue taskQueue;
@@ -280,15 +282,27 @@ public final class RemoteConfiguration {
     }
     
     public String getUserName() {
-        // assert userName != null : "username value should not be null!"; // disabled for tests
         return userName;
     }
 
     public String getPassword() {
-        // assert password != null : "password value should not be null!"; // disabled for tests
         return password;
     }
 
+    public String getConnectionUserName() {
+        if( connectionUserName == null ) { 
+            return userName;
+        } 
+        return connectionUserName;
+    }
+
+    public String getConnectionPassword() {
+        if( this.connectionPassword == null ) { 
+           return password;
+        }
+        return connectionPassword;
+    }
+    
     ConnectionFactory getConnectionFactory() {
         assert connectionFactory != null : "connectionFactory value should not be null!";
         return connectionFactory;

@@ -109,12 +109,6 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
     }
 
     @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addJbossServerUrl(URL serverUrl) {
-        addJbossServerHostName(serverUrl.getHost());
-        return this;
-    }
-
-    @Override
     public RemoteJmsRuntimeEngineBuilderImpl addJbossServerHostName(String hostname) {
         this.jbossServerHostName = hostname;
         addHostName(hostname);

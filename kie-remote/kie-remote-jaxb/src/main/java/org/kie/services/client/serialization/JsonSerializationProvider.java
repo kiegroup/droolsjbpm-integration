@@ -3,10 +3,8 @@ package org.kie.services.client.serialization;
 import java.io.IOException;
 
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 
 public class JsonSerializationProvider implements SerializationProvider {
 
@@ -19,6 +17,11 @@ public class JsonSerializationProvider implements SerializationProvider {
     public JsonSerializationProvider() {
     }
 
+    @Override
+    public int getSerializationType() { 
+        return JMS_SERIALIZATION_TYPE;
+    }
+    
     @Override
     public String serialize(Object object) {
         try {

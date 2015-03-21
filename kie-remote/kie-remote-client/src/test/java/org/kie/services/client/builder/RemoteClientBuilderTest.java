@@ -474,7 +474,7 @@ public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJ
             .addKeystoreLocation("ssl/client_keystore.jks")
             .addTruststorePassword("D")
             .addTruststoreLocation("ssl/truststore.jts")
-            .addJbossServerUrl(new URL("http://localhost:8080/kie-wb"))
+            .addJbossServerHostName("localhost")
             .buildFactory();
        
         // useKeystoreAsTruststore
