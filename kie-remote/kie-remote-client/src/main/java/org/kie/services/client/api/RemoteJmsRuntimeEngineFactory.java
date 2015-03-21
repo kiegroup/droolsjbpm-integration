@@ -12,6 +12,8 @@ import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
+ * This class will be deleted as of 7.
+ * </p>
  * A factory for creating JMS remote API client instances of the {@link RuntimeEngine}.
  * @see {@link RemoteRuntimeEngineFactory}
  */

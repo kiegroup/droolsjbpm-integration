@@ -78,13 +78,6 @@ class RemoteRestRuntimeEngineBuilderImpl implements  org.kie.remote.client.api.R
         return this;
     }
     
-    @Override
-    @Deprecated
-    public RemoteRestRuntimeEngineBuilderImpl useFormBasedAuth(boolean formBasedAuth) {
-        // TODO: delete me after 6.2.0.x
-        return this;
-    }
-
     private void checkAndFinalizeConfig() { 
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }

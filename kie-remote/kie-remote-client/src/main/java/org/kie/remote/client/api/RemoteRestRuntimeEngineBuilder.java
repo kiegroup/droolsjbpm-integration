@@ -3,14 +3,13 @@ package org.kie.remote.client.api;
 import java.net.URL;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.services.client.api.builder.RemoteRestRuntimeEngineFactoryBuilder;
 
 
 /**
  * This is fluent API builder class for creating a remote {@link RuntimeEngine} instance 
  * or a {@link RemoteRestRuntimeEngineFactory}.
  */
-public interface RemoteRestRuntimeEngineBuilder extends RemoteRestRuntimeEngineFactoryBuilder {
+public interface RemoteRestRuntimeEngineBuilder extends  RemoteRuntimeEngineBuilder<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> {
 
     /**
      * The URL used here should be in the following form:

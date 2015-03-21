@@ -110,7 +110,6 @@ public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends Remote
                .addPassword("koek")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .addExtraJaxbClasses(MyType.class, Person.class)
                .buildFactory();
        assertNotNull( restRuntimeFactory );
@@ -121,7 +120,6 @@ public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends Remote
                .addPassword("poffertje")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .build();
            fail( "A user name should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
@@ -134,7 +132,6 @@ public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends Remote
                .addUserName("A")
                .addUrl(new URL("http://localhost:8080/kie-wb"))
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .build();
            fail( "A password should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
@@ -147,7 +144,6 @@ public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends Remote
                .addUserName("E")
                .addPassword("suiker")
                .addTimeout(3)
-               .useFormBasedAuth(true)
                .build();
            fail( "A URL should always be required!");
        } catch(InsufficientInfoToBuildException e) { 
@@ -397,7 +393,7 @@ public class BackwardsCompatibilityRemoteRuntimeEngineBuilderTest extends Remote
             .addKeystoreLocation("ssl/client_keystore.jks")
             .addTruststorePassword("D")
             .addTruststoreLocation("ssl/truststore.jts")
-            .addJbossServerUrl(new URL("http://localhost:8080/kie-wb"))
+            .addJbossServerHostName("localhost")
             .build();
        
         // useKeystoreAsTruststore

@@ -1,7 +1,5 @@
 package org.kie.remote.client.api;
 
-import java.net.URL;
-
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
@@ -10,9 +8,8 @@ import javax.naming.InitialContext;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.task.TaskService;
-import org.kie.services.client.api.builder.RemoteJmsRuntimeEngineFactoryBuilder;
 
-public interface RemoteJmsRuntimeEngineBuilder extends RemoteJmsRuntimeEngineFactoryBuilder {
+public interface RemoteJmsRuntimeEngineBuilder extends RemoteRuntimeEngineBuilder<RemoteJmsRuntimeEngineBuilder, RemoteJmsRuntimeEngineFactory> {
 
     /**
      * Add a remote {@link InitialContext} instance to the configuration. This

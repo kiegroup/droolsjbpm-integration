@@ -1,9 +1,7 @@
 package org.kie.services.client.serialization;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,10 +66,6 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
     
     // Classes -------------------------------------------------------------------------------------------------------------------
     
-    public final static int JMS_SERIALIZATION_TYPE = 0;
-    
-    public final static String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
-  
     public static Set<Class<?>> KIE_JAXB_CLASS_SET;
     static { 
         Class<?> [] kieJaxbClasses = { 
@@ -155,6 +149,17 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
         PRIMITIVE_ARRAY_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(primitiveClasses));
     };
 
+    // Other fields, methods, etc -------------------------------------------------------------------------------------------------
+    
+    public final static int JMS_SERIALIZATION_TYPE = 0;
+   
+    @Override
+    public int getSerializationType() { 
+       return JMS_SERIALIZATION_TYPE; 
+    }
+    
+    public final static String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
+  
     private boolean prettyPrint = false;
     
     public void setPrettyPrint( boolean prettyPrint ) { 
