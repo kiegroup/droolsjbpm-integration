@@ -8,11 +8,11 @@
     <version>6.3.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.kie.server</groupId>
+  <groupId>org.kie</groupId>
   <artifactId>kie-server-remote</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Execution Server :: Remote</name>
+  <name>KIE :: Execution Server Remote</name>
   <description>KIE Execution Server Remote Services</description>
 
   <modules>
@@ -22,6 +22,7 @@
     <module>kie-server-ws</module>
   </modules>
 
+<<<<<<< HEAD
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -37,4 +38,6 @@
     </dependencies>
   </dependencyManagement>
   
+=======
+>>>>>>> Moving remote modules (-api, -client, -jms) to kie-server-remote parent module
 </project>
