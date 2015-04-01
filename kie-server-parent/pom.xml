@@ -16,11 +16,10 @@
   <description>KIE Execution Server</description>
 
   <modules>
-    <module>kie-server-api</module>
-    <module>kie-server-client</module>
+    <module>kie-server-remote</module>
     <module>kie-server-services</module>
-    <module>kie-server-jms</module>
     <module>kie-server</module>
+    <module>kie-server-api</module>
     <module>kie-server-tests</module>
     <module>kie-server-distribution</module>
     <module>kie-server-services-jbpm</module>
