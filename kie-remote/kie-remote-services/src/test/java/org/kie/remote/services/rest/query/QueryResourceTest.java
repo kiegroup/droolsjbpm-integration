@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +57,6 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
         
-        
         queryResource = new QueryResourceImpl();
         
         IdentityProvider mockIdProvider = mock(IdentityProvider.class);
@@ -92,6 +92,51 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
    
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
+    @Test
+    public void simpleQueryTaskRestCallTest() throws Exception  {
+        int [] pageInfo = { 0, 0 };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        
+        // simple (everything) 
+        JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+        assertNotNull( "null result", result );
+        assertFalse( "empty result", result.getTaskInfoList().isEmpty() );
+        assertTrue( "empty result", result.getTaskInfoList().size() > 2 );
+        assertTrue( "pagination should not have happened: " + result.getTaskInfoList().size(), result.getTaskInfoList().size() >= 20 );
+        
+        for( JaxbQueryTaskInfo taskInfo : result.getTaskInfoList() ) { 
+           long procInstId = taskInfo.getProcessInstanceId();
+           assertEquals( procInstId, taskInfo.getTaskSummaries().get(0).getProcessInstanceId().longValue() );
+        }
+      
+        roundTripJson(result);
+        roundTripXml(result);
+      
+        // complicated 
+        String varVal = null;
+        String varName = null;
+        Date varDate = null;
+        for( JaxbVariableInfo varInfo : result.getTaskInfoList().get(0).getVariables() ) { 
+           if( varDate == null ) { 
+              varVal = varInfo.getValue().toString();
+              varName = varInfo.getName();
+              varDate = varInfo.getModificationDate();
+           } else if( varInfo.getModificationDate().after(varDate) && varInfo.getName().equals(varName) ) { 
+               varVal = varInfo.getValue().toString();
+           }
+        }
+        addParams(queryParams, "var_" + varName, varVal);
+       
+        result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+       
+        // typo test
+        queryParams.clear();
+        addParams(queryParams, "potentialowner" , "anton");
+        
+        result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+    }
+   
+    
     @Test
     public void queryTaskRestCallTest() throws Exception  {
         int [] pageInfo = { 0, 0 };
@@ -154,9 +199,9 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         addParams(queryParams, "edt_max", tomorowStr);
         String yesterdayStr = "00:00:01";
         addParams(queryParams, "startdate_min", yesterdayStr);
-        addParams(queryParams, "vid", "inputStr");
+        addParams(queryParams, "var_inputStr", "check-1");
         addParams(queryParams, "vv_re", "check*");
-        
+       
         result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getTaskInfoList().isEmpty() );
