@@ -62,6 +62,7 @@
     <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
     <module>kie-examples-api</module>
+    <module>jbpm-process-svg</module>
   </modules>
 
   <profiles>
