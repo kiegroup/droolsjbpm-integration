@@ -30,13 +30,13 @@ public abstract class AbstractRemoteClientSerializationTest extends JbpmJUnitBas
     protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteClientSerializationTest.class); 
 
     public abstract <T> T testRoundTrip(T in) throws Exception;
+   
+    public AbstractRemoteClientSerializationTest() { 
+        super(true, true, "org.jbpm.persistence.jpa");
+    }
     
     @Test
     public void taskSummaryListTest() throws Exception {
-        this.setupDataSource = true;
-        this.sessionPersistence = true;
-        super.setUp();
-        
         RuntimeManager runtimeManager = createRuntimeManager(Strategy.SINGLETON, "test", "BPMN2-HumanTaskWithTaskContent.bpmn2");
         RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(null);
         KieSession ksession = runtimeEngine.getKieSession();
@@ -80,9 +80,6 @@ public abstract class AbstractRemoteClientSerializationTest extends JbpmJUnitBas
                 "createdOn", "activationTime", "expirationTime",
                 "subTaskStrategy"); // dates
         
-        super.tearDown();
-        this.setupDataSource = false;
-        this.sessionPersistence = false;
     }
    
 }
