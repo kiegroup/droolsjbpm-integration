@@ -25,6 +25,12 @@
 
     <dependency>
       <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-query-jpa</artifactId>
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
       <artifactId>jbpm-executor</artifactId>
       <type>jar</type>
     </dependency>
