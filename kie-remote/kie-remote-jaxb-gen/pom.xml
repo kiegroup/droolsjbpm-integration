@@ -270,7 +270,7 @@
         <artifactId>replacer</artifactId>
         <executions>
           <execution>
-            <id>OnlyCmdImpl</id>
+            <id>only-command-impl</id>
             <phase>process-resources</phase>
             <goals>
               <goal>replace</goal>
@@ -294,7 +294,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>DefaultProcessInstanceId</id>
+            <id>default-process-instance-id</id>
             <phase>process-resources</phase>
             <goals>
               <goal>replace</goal>
@@ -309,6 +309,34 @@
                 <replacement>
                   <token>protected long processInstanceId;</token>
                   <value>protected long processInstanceId = -1;</value>
+                </replacement>
+              </replacements>
+            </configuration>
+          </execution>
+          <execution>
+            <id>fix-task-access-type</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>replace</goal>
+            </goals>
+            <configuration>
+              <basedir>${basedir}/src/main/generated/org/kie/remote/jaxb/gen/</basedir>
+              <includes>
+                <include>AccessType.java</include>
+              </includes>
+              <unescape>true</unescape>
+              <replacements>
+                <replacement>
+                  <token>INLINE</token>
+                  <value>Inline</value>
+                </replacement>
+                <replacement>
+                  <token>URL</token>
+                  <value>Url</value>
+                </replacement>
+                <replacement>
+                  <token>UNKNOWN</token>
+                  <value>Unknown</value>
                 </replacement>
               </replacements>
             </configuration>
