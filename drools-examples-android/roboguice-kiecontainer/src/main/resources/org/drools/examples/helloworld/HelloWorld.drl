@@ -1,0 +1,45 @@
+/*
+ * Copyright 2015 JBoss by Red Hat
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *//
+
+package org.drools.examples.helloworld
+ 
+import org.drools.examples.helloworld.Message;
+
+dialect "mvel"
+
+declare TestType
+    @propertyReactive
+    name : String @key
+    id : long @key
+end
+
+rule "Hello World"
+    dialect "mvel"
+    when
+        m : Message( status == Message.HELLO, message : message )
+    then
+        channels["log"].send(message);
+    modify ( m ) { message = "Goodbye cruel world",
+                   status = Message.GOODBYE };
+end
+
+rule "Java Good Bye"
+    dialect "java"
+    when
+        Message( status == Message.GOODBYE, message : message )
+    then
+        drools.getChannel("log").send(message);
+end

@@ -61,6 +61,9 @@
     <module>jbpm-process-svg</module>
     <module>drools-osgi</module>
     <module>kie-performance-kit</module>
+    <module>drools-android</module>
+    <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
+    <!-- <module>drools-examples-android</module> -->
   </modules>
 
   <profiles>
@@ -77,6 +80,14 @@
         <module>droolsjbpm-brms-distribution</module>
       </modules>
     </profile>
+    <profile>
+      <id>android</id>
+      <activation>
+        <file><exists>${env.ANDROID_HOME}</exists></file>
+      </activation>
+      <modules>
+        <module>drools-examples-android</module>
+      </modules>
+    </profile>
   </profiles>
-
 </project>
