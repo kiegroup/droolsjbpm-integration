@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (C) 2014 CNH Industrial NV. All rights reserved.
+  ~
+  ~ This software contains proprietary information of CNH Industrial NV. Neither
+  ~ receipt nor possession thereof confers any right to reproduce, use, or
+  ~ disclose in whole or in part any such information without written
+  ~ authorization from CNH Industrial NV.
+  -->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke
+            android:color="#ff9c9c00"
+            android:dashWidth="4dp"
+            android:dashGap="2dp"
+            android:width="2dp"/>
+    <solid android:color="#28ffff00"/>
+    <corners android:radius="4dp" />
+</shape>
