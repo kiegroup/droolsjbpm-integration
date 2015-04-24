@@ -12,6 +12,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.dom.svg.SVGOMTSpanElement;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.jbpm.process.svg.model.NodeSummary;
 import org.jbpm.process.svg.model.SVGSummary;
@@ -28,8 +29,14 @@ public class SVGImageProcessor {
 
     private Document svgDocument;
     private SVGSummary summary = new SVGSummary();
+    private boolean mapById = true;
 
     public SVGImageProcessor(InputStream svg) {
+        this(svg, true);
+    }
+    
+    public SVGImageProcessor(InputStream svg, boolean mapById) {
+        this.mapById = mapById;
         try {
             String parser = XMLResourceDescriptor.getXMLParserClassName();
             SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
@@ -43,6 +50,19 @@ public class SVGImageProcessor {
 
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
         SVGImageProcessor processor = new SVGImageProcessor(svg);
+        for (String nodeId : completed) {
+            processor.defaultCompletedTransformation(nodeId);
+        }
+        for (String nodeId : active) {
+            if (!completed.contains(nodeId)) {
+                processor.defaultActiveTransformation(nodeId);
+            }
+        }
+        return processor.getSVG();
+    }
+
+    public static String transformByName(InputStream svg, List<String> completed, List<String> active) {
+        SVGImageProcessor processor = new SVGImageProcessor(svg, false);
         for (String nodeId : completed) {
             processor.defaultCompletedTransformation(nodeId);
         }
@@ -88,15 +108,36 @@ public class SVGImageProcessor {
                 Node svgIdNode = attributes.getNamedItem("id");
                 if (svgIdNode != null) {
                     String svgId = svgIdNode.getNodeValue();
-                    Node nodeIdNode = attributes.getNamedItem("bpmn2nodeid");
-                    if (nodeIdNode != null) {
-                        String nodeId = nodeIdNode.getNodeValue();
-                        Element border = null;
-                        Element background = null;
-                        if (nodeId != null) {
-                            background = svgDocument.getElementById(svgId + "fill_el");
-                            border = svgDocument.getElementById(svgId + "bg_frame");
-                            summary.addNode(new NodeSummary(nodeId, border, background));
+                    if (mapById) {
+                        Node nodeIdNode = attributes.getNamedItem("bpmn2nodeid");
+                        if (nodeIdNode != null) {
+                            String nodeId = nodeIdNode.getNodeValue();
+                            Element border = null;
+                            Element background = null;
+                            if (nodeId != null) {
+                                background = svgDocument.getElementById(svgId + "fill_el");
+                                border = svgDocument.getElementById(svgId + "bg_frame");
+                                summary.addNode(new NodeSummary(nodeId, border, background));
+                            }
+                        }
+                    } else {
+                        // map by name
+                        if (svgId.endsWith("text_name")) {
+                            svgId = svgId.substring(0, svgId.length() - 9);
+                            StringBuilder taskLabel = new StringBuilder();
+                            for (int j = 0; j < node.getChildNodes().getLength(); j++) {
+                                if (node.getChildNodes().item(j) instanceof SVGOMTSpanElement) {
+                                    SVGOMTSpanElement spanElement = (SVGOMTSpanElement)node.getChildNodes().item(j);
+                                    taskLabel.append(spanElement.getFirstChild().getNodeValue());
+                                }
+                            }
+                            String name = taskLabel.toString();
+                            // filtering out nodes with no name
+                            if (!name.trim().isEmpty()) {
+                                Element background = svgDocument.getElementById(svgId + "fill_el");
+                                Element border = svgDocument.getElementById(svgId + "bg_frame");
+                                summary.addNode(new NodeSummary(name, border, background));
+                            }
                         }
                     }
                 }
@@ -104,5 +145,5 @@ public class SVGImageProcessor {
             processNodes(node.getChildNodes());
         }
     }
-
+    
 }
