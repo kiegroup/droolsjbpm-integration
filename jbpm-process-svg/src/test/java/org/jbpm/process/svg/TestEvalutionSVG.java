@@ -20,4 +20,17 @@ public class TestEvalutionSVG {
         // out.close();
     }
 
+    @Test
+    public void testByName() throws Exception {
+        List<String> completed = new ArrayList<String>();
+        completed.add("Self Evaluation");
+        List<String> active = new ArrayList<String>();
+        active.add("PM Evaluation");
+        String svg = SVGImageProcessor.transformByName(
+            TestEvalutionSVG.class.getResourceAsStream("/evaluation-svg.svg"), completed, active);
+        // PrintWriter out = new PrintWriter("output.svg");
+        // out.print(svg);
+        // out.close();
+    }
+
 }
