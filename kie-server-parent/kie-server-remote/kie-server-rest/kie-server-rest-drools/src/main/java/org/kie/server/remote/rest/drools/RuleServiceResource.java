@@ -1,4 +1,4 @@
-package org.kie.server.services.drools.rest;
+package org.kie.server.remote.rest.drools;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -15,7 +15,7 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.drools.RuleService;
 
-import static org.kie.server.services.rest.RestUtils.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 @Path("/server")
 public class RuleServiceResource {

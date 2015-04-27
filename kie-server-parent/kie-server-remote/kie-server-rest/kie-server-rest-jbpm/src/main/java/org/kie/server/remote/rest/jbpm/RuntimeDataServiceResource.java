@@ -1,9 +1,10 @@
-package org.kie.server.services.jbpm.rest;
+package org.kie.server.remote.rest.jbpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -27,15 +28,15 @@ import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 
-import static org.kie.server.services.rest.RestUtils.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 @Path("/server")
 public class RuntimeDataServiceResource {
 
-    private RuntimeDataService delegate;
+    private RuntimeDataService runtimeDataService;
 
     public RuntimeDataServiceResource(RuntimeDataService delegate) {
-        this.delegate = delegate;
+        this.runtimeDataService = delegate;
     }
 
     public Collection<ProcessInstanceDesc> getProcessInstances(QueryContext queryContext) {
@@ -64,7 +65,7 @@ public class RuntimeDataServiceResource {
             status.add(ProcessInstance.STATE_ACTIVE);
         }
 
-        Collection<ProcessInstanceDesc> instances = delegate.getProcessInstancesByDeploymentId(containerId, status , new QueryContext(0, 20));
+        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByDeploymentId(containerId, status , new QueryContext(0, 20));
 
         return createCorrectVariant(instances, headers, Response.Status.OK);
     }
@@ -74,7 +75,7 @@ public class RuntimeDataServiceResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceById(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId) {
 
-        ProcessInstanceDesc processInstanceDesc = delegate.getProcessInstanceById(processInstanceId);
+        ProcessInstanceDesc processInstanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
         if (processInstanceDesc == null) {
 
             return createCorrectVariant("Not found", headers, Response.Status.NOT_FOUND);

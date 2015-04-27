@@ -1,9 +1,13 @@
-package org.kie.server.services.jbpm.rest;
+package org.kie.server.remote.rest.jbpm;
+
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,42 +18,72 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
+import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.server.api.model.type.JaxbLong;
-
-import static org.kie.server.services.rest.RestUtils.*;
+import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
+import org.kie.server.remote.rest.common.util.QueryParameterUtil;
 
 @Path("/server")
 public class ProcessServiceResource  {
 
-    private ProcessService delegate;
+    private ProcessService processService;
+    private DefinitionService definitionService;
 
-    public ProcessServiceResource(ProcessService delegate) {
-        this.delegate = delegate;
+    public ProcessServiceResource(ProcessService processService, DefinitionService definitionService) {
+        this.processService = processService;
+        this.definitionService = definitionService;
     }
 
+    protected static String getRelativePath(HttpServletRequest httpRequest) { 
+        String url =  httpRequest.getRequestURI();
+        url.replaceAll( ".*/rest", "");
+        return url;
+    }
+    
     @PUT
     @Path("containers/{id}/process/{pId}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @javax.ws.rs.core.Context HttpServletRequest request) {
-        try {
-            Long processInstanceId = delegate.startProcess(containerId, processId, extractMapFromParams(request.getParameterMap()));
 
-            return createCorrectVariant(new JaxbLong(processInstanceId), headers, Response.Status.CREATED);
+        Variant v = getVariant(headers);
+        // Check for presence of process id
+        try { 
+            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
+            if( procDef == null ) { 
+                throw ExecutionServerRestOperationException.notFound(
+                        "Could not find process definition '" + processId + "' in deployment '" + containerId + "'", v);
+            }
+        } catch( Exception e ) { 
+                throw ExecutionServerRestOperationException.internalServerError(
+                        "Error when retrieving process definition '" + processId + "' in deployment '" + containerId + "': " + e.getMessage(), 
+                        v);
+        }
+
+        Map<String, Object> params = QueryParameterUtil.extractMapFromParams(request.getParameterMap(), getRelativePath(request), v);
+        Long processInstanceId = processService.startProcess(containerId, processId, params);
+
+        // return response
+        try {
+            return createResponse(new JaxbLong(processInstanceId), v, Response.Status.CREATED);
         } catch (Exception e) {
-            return createCorrectVariant(e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+            throw ExecutionServerRestOperationException.internalServerError(
+                    "Unable to create response: " + e.getMessage(),
+                    v);
         }
     }
 
 
     public Long startProcess(String containerId, String processId, Map<String, Object> parameters) {
-        return delegate.startProcess(containerId, processId, parameters);
+        return processService.startProcess(containerId, processId, parameters);
     }
 
     @DELETE
@@ -57,7 +91,7 @@ public class ProcessServiceResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("pInstanceId") Long processInstanceId) {
         try {
-            delegate.abortProcessInstance(processInstanceId);
+            processService.abortProcessInstance(processInstanceId);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (Exception e) {
@@ -66,7 +100,10 @@ public class ProcessServiceResource  {
     }
 
 
-    public void abortProcessInstances(List<Long> list) {
+    @DELETE
+    @Path("containers/{id}/process/instance")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public void abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @javax.ws.rs.core.Context HttpServletRequest request) {
 
     }
 
@@ -140,21 +177,5 @@ public class ProcessServiceResource  {
         return null;
     }
 
-    protected static Map<String, Object> extractMapFromParams(Map<String, String[]> params) {
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        for (Map.Entry<String, String[]> entry : params.entrySet()) {
-
-            String key = entry.getKey();
-            String[] paramValues = entry.getValue();
-
-            String mapKey = key;
-            String mapVal = paramValues[0].trim();
-
-            map.put(mapKey, mapVal);
-
-        }
-        return map;
-    }
 
 }
