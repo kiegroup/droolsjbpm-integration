@@ -7,7 +7,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import org.kie.server.api.KieServerEnvironment;
-import org.kie.server.services.api.KieServer;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;

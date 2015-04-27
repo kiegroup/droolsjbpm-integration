@@ -1,5 +1,19 @@
 package org.kie.server.integrationtests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.List;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
@@ -19,22 +33,9 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
-import org.kie.server.services.rest.KieServerRestImpl;
+import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.Queue;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public abstract class KieServerBaseIntegrationTest {
 

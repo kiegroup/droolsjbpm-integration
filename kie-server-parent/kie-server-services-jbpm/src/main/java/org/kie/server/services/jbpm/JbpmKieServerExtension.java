@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
+
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
@@ -31,13 +33,13 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
+import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.services.api.KieContainerInstance;
+import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.jbpm.rest.ProcessServiceResource;
-import org.kie.server.services.jbpm.rest.RuntimeDataServiceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -185,12 +187,21 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public List<Object> getAppComponents(SupportedTransports type) {
-        List<Object> applicationComponents = new ArrayList<Object>();
-        if (type.equals(SupportedTransports.REST)) {
-            applicationComponents.add(new ProcessServiceResource(processService));
-            applicationComponents.add(new RuntimeDataServiceResource(runtimeDataService));
+        ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
+            = ServiceLoader.load(KieServerApplicationComponentsService.class);
+        List<Object> appComponentsList = new ArrayList<Object>();
+        Object [] services = { 
+                deploymentService, 
+                definitionService, 
+                processService, 
+                userTaskService, 
+                runtimeDataService, 
+                executorService
+        };
+        for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) { 
+           appComponentsList.addAll(appComponentsService.getAppComponents(type, services));
         }
-        return applicationComponents;
+        return appComponentsList;
     }
 
     @Override

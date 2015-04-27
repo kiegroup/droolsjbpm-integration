@@ -29,6 +29,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-compiler</artifactId>
       <scope>test</scope>
