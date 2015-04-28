@@ -29,6 +29,12 @@
               <artifactId>jbpm-bpmn2</artifactId>
               <version>${version.org.kie}</version>
             </dependency>
+            <!-- needed to compile spreadsheet decision tables -->
+            <dependency>
+              <groupId>org.drools</groupId>
+              <artifactId>drools-decisiontables</artifactId>
+              <version>${version.org.kie}</version>
+            </dependency>
           </dependencies>
         </plugin>
       </plugins>
