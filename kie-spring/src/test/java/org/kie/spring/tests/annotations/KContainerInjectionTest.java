@@ -25,6 +25,9 @@ import org.kie.spring.beans.annotations.KContainerBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -46,10 +49,11 @@ public class KContainerInjectionTest {
     public void testKContainer() throws Exception {
         KContainerBean sampleBean = (KContainerBean) context.getBean("sampleBean");
         assertNotNull(sampleBean);
-        assertNotNull(sampleBean.getKieContainer() );
-        ReleaseId releaseId = sampleBean.getKieContainer().getReleaseId();
-        assertNotNull("ReleaseId returned by the bean should not be null!", releaseId);
-        assertTrue("kie-spring".equalsIgnoreCase(releaseId.getArtifactId()));
+        assertNotNull(sampleBean.getKieContainer());
+        Collection<String> kieBaseNames = sampleBean.getKieContainer().getKieBaseNames();
+        assertEquals("Expecting different number of KieBases!", 2, kieBaseNames.size());
+        assertTrue("Expecting KieBase 'drl_kiesample'!", kieBaseNames.contains("drl_kiesample"));
+        assertTrue("Expecting KieBase 'drl_kiesample3'!", kieBaseNames.contains("drl_kiesample3"));
     }
 
     @Test
@@ -57,9 +61,10 @@ public class KContainerInjectionTest {
         KContainerBean sampleBean = (KContainerBean) context.getBean("sampleBean");
         assertNotNull(sampleBean);
         assertNotNull(sampleBean.getKieContainer2());
-        ReleaseId releaseId = sampleBean.getKieContainer2().getReleaseId();
-        assertNotNull("ReleaseId returned by the bean should not be null!", releaseId);
-        assertTrue("kie-spring".equalsIgnoreCase(releaseId.getArtifactId()));
+        Collection<String> kieBaseNames = sampleBean.getKieContainer2().getKieBaseNames();
+        assertEquals("Expecting different number of KieBases!", 2, kieBaseNames.size());
+        assertTrue("Expecting KieBase 'drl_kiesample'!", kieBaseNames.contains("drl_kiesample"));
+        assertTrue("Expecting KieBase 'drl_kiesample3'!", kieBaseNames.contains("drl_kiesample3"));
     }
 
 
