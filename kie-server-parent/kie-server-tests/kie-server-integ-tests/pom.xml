@@ -114,6 +114,15 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <nonFilteredFileExtensions>
+              <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+            </nonFilteredFileExtensions>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <testResources>
