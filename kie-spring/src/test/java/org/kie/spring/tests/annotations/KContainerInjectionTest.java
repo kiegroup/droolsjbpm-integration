@@ -47,8 +47,8 @@ public class KContainerInjectionTest {
         KContainerBean sampleBean = (KContainerBean) context.getBean("sampleBean");
         assertNotNull(sampleBean);
         assertNotNull(sampleBean.getKieContainer() );
-        assertTrue(sampleBean.getKieContainer() instanceof KieContainer );
         ReleaseId releaseId = sampleBean.getKieContainer().getReleaseId();
+        assertNotNull("ReleaseId returned by the bean should not be null!", releaseId);
         assertTrue("kie-spring".equalsIgnoreCase(releaseId.getArtifactId()));
     }
 
@@ -57,8 +57,8 @@ public class KContainerInjectionTest {
         KContainerBean sampleBean = (KContainerBean) context.getBean("sampleBean");
         assertNotNull(sampleBean);
         assertNotNull(sampleBean.getKieContainer2());
-        assertTrue(sampleBean.getKieContainer2() instanceof KieContainer);
         ReleaseId releaseId = sampleBean.getKieContainer2().getReleaseId();
+        assertNotNull("ReleaseId returned by the bean should not be null!", releaseId);
         assertTrue("kie-spring".equalsIgnoreCase(releaseId.getArtifactId()));
     }
 
