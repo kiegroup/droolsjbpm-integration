@@ -1,6 +1,5 @@
 package org.kie.server.remote.rest.common.exception;
 
-import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
  * for the client.
  */
 @Provider
-@RequestScoped
 public class ExecutionServerRestExceptionHandler implements ExceptionMapper<ExecutionServerRestOperationException> {
 
     protected static Logger logger = LoggerFactory.getLogger(ExecutionServerRestExceptionHandler.class);

@@ -7,6 +7,6 @@ import java.util.Collection;
  */
 public interface KieServerApplicationComponentsService {
 
-    Collection<Object> getAppComponents( SupportedTransports type, Object... services );
+    Collection<Object> getAppComponents( String extension, SupportedTransports type, Object... services );
 
 }

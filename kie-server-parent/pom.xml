@@ -40,42 +40,42 @@
       </dependency>
     
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-remote</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-client</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-jms</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-rest-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-rest-drools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-rest-jbpm</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie.server</groupId>
+        <groupId>org.kie</groupId>
         <artifactId>kie-server-ws</artifactId>
         <version>${project.version}</version>
       </dependency>

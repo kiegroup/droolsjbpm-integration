@@ -5,11 +5,11 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
   <servlet>
-    <servlet-name>org.kie.server.services.KieServerApplication</servlet-name>
+    <servlet-name>org.kie.server.remote.rest.common.KieServerApplication</servlet-name>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>org.kie.server.services.KieServerApplication</servlet-name>
+    <servlet-name>org.kie.server.remote.rest.common.KieServerApplication</servlet-name>
     <url-pattern>/services/rest/*</url-pattern>
   </servlet-mapping>
 

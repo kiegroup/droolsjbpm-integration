@@ -15,6 +15,8 @@ import org.kie.server.services.impl.KieServerImpl;
 
 public class DroolsKieServerExtension implements KieServerExtension {
 
+    public static final String EXTENSION_NAME = "Drools";
+
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.drools.server.ext.disabled", "false"));
 
     private RuleService ruleService;
@@ -55,7 +57,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
                 ruleService
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) { 
-            appComponentsList.addAll(appComponentsService.getAppComponents(type, services));
+            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;
     }
