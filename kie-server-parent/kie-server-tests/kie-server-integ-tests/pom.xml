@@ -29,7 +29,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie.server</groupId>
+      <groupId>org.kie</groupId>
       <artifactId>kie-server-rest-common</artifactId>
       <scope>test</scope>
     </dependency>

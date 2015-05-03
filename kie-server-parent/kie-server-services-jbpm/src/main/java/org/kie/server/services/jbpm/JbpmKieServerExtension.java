@@ -11,6 +11,7 @@ import javax.persistence.EntityManagerFactory;
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.kie.services.impl.AbstractDeploymentService;
+import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.ProcessServiceImpl;
@@ -45,9 +46,12 @@ import org.slf4j.LoggerFactory;
 
 public class JbpmKieServerExtension implements KieServerExtension {
 
+    public static final String EXTENSION_NAME = "jBPM";
+
     private static final Logger logger = LoggerFactory.getLogger(JbpmKieServerExtension.class);
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.jbpm.server.ext.disabled", "false"));
+
 
     private boolean isExecutorAvailable = false;
 
@@ -84,6 +88,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((KModuleDeploymentService)deploymentService).setEmf(emf);
         ((KModuleDeploymentService)deploymentService).setIdentityProvider(registry.getIdentityProvider());
         ((KModuleDeploymentService)deploymentService).setManagerFactory(new RuntimeManagerFactoryImpl());
+        ((KModuleDeploymentService)deploymentService).setFormManagerService(new FormManagerServiceImpl());
 
         // build runtime data service
         runtimeDataService = new RuntimeDataServiceImpl();
@@ -156,6 +161,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setKbaseName(kbaseNames.iterator().next());
                 unit.setKsessionName(ksessionNames.iterator().next());
             }
+            // reuse kieContainer to avoid unneeded bootstrap
+            unit.setKieContainer(kieContainer);
 
             addAsyncHandler(unit);
 
@@ -199,7 +206,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 executorService
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) { 
-           appComponentsList.addAll(appComponentsService.getAppComponents(type, services));
+           appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;
     }

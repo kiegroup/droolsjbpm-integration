@@ -549,25 +549,33 @@ public class KieServerImpl {
     }
 
     private <T> T makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
-        KieRemoteHttpRequest request = newRequest( uri ).get();
-        KieRemoteHttpResponse response = request.response();
+        try {
+            KieRemoteHttpRequest request = newRequest( uri ).get();
+            KieRemoteHttpResponse response = request.response();
 
-        if ( response.code() == Response.Status.OK.getStatusCode() ) {
-            KieContainerResourceList serviceResponse = deserialize( response.body(), KieContainerResourceList.class );
+            if ( response.code() == Response.Status.OK.getStatusCode() ) {
+                KieContainerResourceList serviceResponse = deserialize( response.body(), KieContainerResourceList.class );
 
-            return (T)serviceResponse;
-        } else {
-            throw new IllegalStateException("No response from controller server");
+                return (T)serviceResponse;
+            } else {
+                throw new IllegalStateException("No response from controller server at " + uri);
+            }
+
+        } catch (IllegalStateException e){
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalStateException("No response from controller server at " + uri);
         }
     }
 
     private KieRemoteHttpRequest newRequest(String uri) {
-        KieRemoteHttpRequest httpRequest =
-                KieRemoteHttpRequest.newRequest( uri ).followRedirects( true ).timeout( 5000 );
+
+        KieRemoteHttpRequest httpRequest = KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
         httpRequest.accept(MediaType.APPLICATION_JSON);
-        httpRequest.basicAuthorization( KieServerEnvironment.getUsername(), KieServerEnvironment.getPassword() );
+        httpRequest.basicAuthorization(KieServerEnvironment.getUsername(), KieServerEnvironment.getPassword());
 
         return httpRequest;
+
     }
 
     private <T> T deserialize(String content, Class<T> type) {
