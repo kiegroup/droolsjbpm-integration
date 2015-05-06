@@ -6,8 +6,6 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.integrationtests.KieServerBaseIntegrationTest;
-import org.kie.server.integrationtests.config.TestConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;

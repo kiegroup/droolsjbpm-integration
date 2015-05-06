@@ -171,6 +171,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -203,6 +204,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -232,6 +234,11 @@
                     <url>${tomcat7x.download.url}</url>
                   </zipUrlInstaller>
                 </container>
+                <configuration>
+                  <properties>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                  </properties>
+                </configuration>
                 <deployables>
                   <deployable>
                     <classifier>webc</classifier>
@@ -259,6 +266,11 @@
                     <url>${tomcat8x.download.url}</url>
                   </zipUrlInstaller>
                 </container>
+                <configuration>
+                  <properties>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                  </properties>
+                </configuration>
                 <deployables>
                   <deployable>
                     <classifier>webc</classifier>
@@ -290,6 +302,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>

@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests.rest;
+package org.kie.server.integrationtests.drools.rest;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -14,8 +14,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.integrationtests.KieServerBaseIntegrationTest;
-import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
 import javax.ws.rs.core.MediaType;
 

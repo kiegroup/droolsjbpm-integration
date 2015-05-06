@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests.rest;
+package org.kie.server.integrationtests.drools.rest;
 
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;

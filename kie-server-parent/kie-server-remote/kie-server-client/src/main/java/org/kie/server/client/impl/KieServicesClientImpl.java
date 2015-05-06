@@ -10,6 +10,16 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ServiceTasksDefinition;
+import org.kie.server.api.model.definition.SubProcessesDefinition;
+import org.kie.server.api.model.definition.TaskInputsDefinition;
+import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinitionList;
+import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
@@ -22,8 +32,10 @@ import javax.ws.rs.core.Response;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -189,6 +201,142 @@ public class KieServicesClientImpl
         }
     }
 
+    /*
+     * jBPM part START
+     * Process definition related operations
+     */
+
+    @Override
+    public ProcessDefinition getProcessDefinition(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId,
+                    ProcessDefinition.class);
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public SubProcessesDefinition getReusableSubProcessDefinitions(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/subprocesses",
+                    SubProcessesDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public VariablesDefinition getProcessVariableDefinitions(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/variables",
+                    VariablesDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public ServiceTasksDefinition getServiceTaskDefinitions(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/service",
+                    ServiceTasksDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public AssociatedEntitiesDefinition getAssociatedEntityDefinitions(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/entities",
+                    AssociatedEntitiesDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public UserTaskDefinitionList getUserTaskDefinitions(String containerId, String processId) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user",
+                    UserTaskDefinitionList.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskInputsDefinition getUserTaskInputDefinitions(String containerId, String processId, String taskName) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user/" + taskName + "/inputs",
+                    TaskInputsDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskOutputsDefinition getUserTaskOutputDefinitions(String containerId, String processId, String taskName) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user/" + taskName + "/outputs",
+                    TaskOutputsDefinition.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Long startProcess(String containerId, String processId, Map<String, Object> variables) {
+        if( config.isRest() ) {
+            JaxbLong result = makeHttpPutRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/" + processId, variables,
+                    JaxbLong.class);
+
+            if (result == null) {
+                return null;
+            }
+
+            return result.getValue();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void abortProcessInstance(String containerId, Long processInstanceId) {
+        if( config.isRest() ) {
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId,
+                    null);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+
+    /*
+     * jBPM part END
+     *
+     */
+
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest( uri ).get();
@@ -198,6 +346,17 @@ public class KieServicesClientImpl
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
             return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
+    private <T> T makeHttpGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+            return deserialize( response.body(), resultType );
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }
@@ -259,6 +418,27 @@ public class KieServicesClientImpl
         }
     }
 
+    private <T> T makeHttpPutRequestAndCreateCustomResponse(
+            String uri, Object bodyObject,
+            Class<T> resultType) {
+        return makeHttpPutRequestAndCreateCustomResponse(uri, serialize(bodyObject), resultType);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest( uri ).body( body ).put();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.CREATED.getStatusCode() ||
+                response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
+            T serviceResponse = deserialize( response.body(), resultType );
+
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         KieRemoteHttpRequest request = newRequest( uri ).delete();
@@ -268,6 +448,23 @@ public class KieServicesClientImpl
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
             return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
+        KieRemoteHttpRequest request = newRequest( uri ).delete();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ||
+                response.code() == Response.Status.NO_CONTENT.getStatusCode()) {
+            if (resultType == null) {
+                return null;
+            }
+
+            return deserialize( response.body(), resultType );
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }
@@ -386,6 +583,10 @@ public class KieServicesClientImpl
     }
 
     private String serialize(Object object) {
+        if (object == null) {
+            return null;
+        }
+
         try {
             return marshaller.marshall( object );
         } catch ( MarshallingException e ) {

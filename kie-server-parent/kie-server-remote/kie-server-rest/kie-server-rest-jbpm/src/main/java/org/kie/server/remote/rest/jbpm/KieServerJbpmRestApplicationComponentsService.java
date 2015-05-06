@@ -40,9 +40,10 @@ public class KieServerJbpmRestApplicationComponentsService implements KieServerA
             }
         }
         
-        List<Object> components = new ArrayList<Object>(2);
+        List<Object> components = new ArrayList<Object>(3);
         components.add(new ProcessServiceResource(processService, definitionService));
         components.add(new RuntimeDataServiceResource(runtimeDataService));
+        components.add(new DefinitionServiceResource(definitionService));
         
         return components;
     }

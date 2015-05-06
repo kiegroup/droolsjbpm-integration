@@ -1,5 +1,6 @@
 package org.kie.server.remote.rest.jbpm;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -13,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
@@ -27,8 +29,10 @@ import org.kie.internal.query.QueryContext;
 import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
+import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
 @Path("/server")
 public class RuntimeDataServiceResource {
@@ -71,14 +75,14 @@ public class RuntimeDataServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/instances/{pInstanceId}")
+    @Path("process/instances/{pInstanceId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceById(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId) {
-
+        Variant v = getVariant(headers);
         ProcessInstanceDesc processInstanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
         if (processInstanceDesc == null) {
 
-            return createCorrectVariant("Not found", headers, Response.Status.NOT_FOUND);
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         }
         return createCorrectVariant(processInstanceDesc, headers, Response.Status.OK);
     }
