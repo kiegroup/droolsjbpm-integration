@@ -1,10 +1,11 @@
-package org.kie.server.integrationtests.shared;
+package org.kie.server.integrationtests.drools;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public class RuleFlowIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 

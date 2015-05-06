@@ -1,7 +1,26 @@
 package org.kie.server.client;
 
+import java.util.List;
+import java.util.Map;
+
 import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.model.*;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ServiceTasksDefinition;
+import org.kie.server.api.model.definition.SubProcessesDefinition;
+import org.kie.server.api.model.definition.TaskInputsDefinition;
+import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinition;
+import org.kie.server.api.model.definition.UserTaskDefinitionList;
+import org.kie.server.api.model.definition.VariablesDefinition;
 
 public interface KieServicesClient {
     ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig);
@@ -25,4 +44,26 @@ public interface KieServicesClient {
     ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource);
 
     ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId);
+
+    // process definition
+    ProcessDefinition getProcessDefinition(String containerId, String processId);
+
+    SubProcessesDefinition getReusableSubProcessDefinitions(String containerId, String processId);
+
+    VariablesDefinition getProcessVariableDefinitions(String containerId, String processId);
+
+    ServiceTasksDefinition getServiceTaskDefinitions(String containerId, String processId);
+
+    AssociatedEntitiesDefinition getAssociatedEntityDefinitions(String containerId, String processId);
+
+    UserTaskDefinitionList getUserTaskDefinitions(String containerId, String processId);
+
+    TaskInputsDefinition getUserTaskInputDefinitions(String containerId, String processId, String taskName);
+
+    TaskOutputsDefinition getUserTaskOutputDefinitions(String containerId, String processId, String taskName);
+
+    // process operations
+    Long startProcess(String containerId, String processId, Map<String, Object> variables);
+
+    void abortProcessInstance(String containerId, Long processInstanceId);
 }

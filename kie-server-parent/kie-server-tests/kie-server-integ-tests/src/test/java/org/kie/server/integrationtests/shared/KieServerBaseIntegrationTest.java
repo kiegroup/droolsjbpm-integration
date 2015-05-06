@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests;
+package org.kie.server.integrationtests.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.jms.ConnectionFactory;
@@ -25,6 +26,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.scanner.MavenRepository;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
@@ -34,6 +36,10 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +79,9 @@ public abstract class KieServerBaseIntegrationTest {
             LOCAL_SERVER = true;
             PORT = findFreePort();
             BASE_HTTP_URL = "http://localhost:" + PORT + "/server";
+            // needed only for local tests to configure server properly
+            KieServerEnvironment.setServerId(UUID.randomUUID().toString());
+            System.setProperty("org.kie.server.repo", "target");
         }
     }
 
@@ -153,6 +162,18 @@ public abstract class KieServerBaseIntegrationTest {
         server.setPort(PORT);
         server.start();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
+
+        KieServerImpl kieServer = KieServerLocator.getInstance();
+        List<KieServerExtension> extensions = kieServer.getServerExtensions();
+
+        for (KieServerExtension extension : extensions) {
+            List<Object> components = extension.getAppComponents(SupportedTransports.REST);
+            for (Object component : components) {
+                server.getDeployment().getRegistry().addSingletonResource(component);
+            }
+
+        }
+
         server.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
     }
 

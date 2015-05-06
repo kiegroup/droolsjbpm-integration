@@ -3,7 +3,9 @@ package org.kie.server.remote.rest.jbpm;
 import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
 import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
@@ -59,13 +63,11 @@ public class ProcessServiceResource  {
         try { 
             ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
             if( procDef == null ) { 
-                throw ExecutionServerRestOperationException.notFound(
-                        "Could not find process definition '" + processId + "' in deployment '" + containerId + "'", v);
+                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
             }
         } catch( Exception e ) { 
                 throw ExecutionServerRestOperationException.internalServerError(
-                        "Error when retrieving process definition '" + processId + "' in deployment '" + containerId + "': " + e.getMessage(), 
-                        v);
+                        MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
         }
 
         Map<String, Object> params = QueryParameterUtil.extractMapFromParams(request.getParameterMap(), getRelativePath(request), v);
@@ -76,8 +78,7 @@ public class ProcessServiceResource  {
             return createResponse(new JaxbLong(processInstanceId), v, Response.Status.CREATED);
         } catch (Exception e) {
             throw ExecutionServerRestOperationException.internalServerError(
-                    "Unable to create response: " + e.getMessage(),
-                    v);
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
 
@@ -89,13 +90,20 @@ public class ProcessServiceResource  {
     @DELETE
     @Path("containers/{id}/process/instance/{pInstanceId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("pInstanceId") Long processInstanceId) {
+    public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") Long processInstanceId) {
+        Variant v = getVariant(headers);
         try {
             processService.abortProcessInstance(processInstanceId);
             // return null to produce 204 NO_CONTENT response code
             return null;
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
-            return createCorrectVariant(e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 

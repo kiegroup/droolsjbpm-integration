@@ -1,4 +1,4 @@
-package org.kie.server.integrationtests.shared;
+package org.kie.server.integrationtests.drools;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -32,6 +32,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
