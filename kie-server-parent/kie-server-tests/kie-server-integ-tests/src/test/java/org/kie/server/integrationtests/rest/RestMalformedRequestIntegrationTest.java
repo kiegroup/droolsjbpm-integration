@@ -11,6 +11,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.RESTOnly;
+import org.kie.server.integrationtests.config.TestConfig;
 
 import javax.ws.rs.core.Response;
 
@@ -24,7 +25,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/" + resource.getContainerId());
+            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId());
             response = clientRequest.body(
                     getMediaType(), resource).put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
@@ -41,7 +42,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     public void testCreateContainerEmptyBody() throws Exception {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/empty-body-container");
+            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/empty-body-container");
             response = clientRequest.body(
                     getMediaType(), "").put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {

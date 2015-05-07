@@ -19,18 +19,16 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.services.rest.KieServerRestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
-import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.io.IOException;
-import java.net.ServerSocket;
+
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
@@ -40,21 +38,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
     
-    protected static final String DEFAULT_USERNAME = "yoda";
-    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
-    // REST
-    protected static String BASE_HTTP_URL = System.getProperty("kie.server.base.http.url");
-    // JMS
-    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
-    protected static final String CONNECTION_FACTORY = System.getProperty("kie.server.connection.factory", "jms/RemoteConnectionFactory");
-    protected static final String PROVIDER_URL = System.getProperty("kie.server.remoting.url");
-    protected static final String REQUEST_QUEUE_JNDI = System.getProperty("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
-    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
-    
     protected static TJWSEmbeddedJaxrsServer server;
-    protected static boolean LOCAL_SERVER = false;
-    protected static int PORT;
-    
     protected static MavenRepository repository;
 
     protected KieServicesClient client;
@@ -66,28 +50,17 @@ public abstract class KieServerBaseIntegrationTest {
      */
     private static boolean commonParentDeployed = false;
 
-    static {
-        if (BASE_HTTP_URL == null && PROVIDER_URL == null) {
-            // falls back to local, in memory, server -> serving only over REST
-            LOCAL_SERVER = true;
-            PORT = findFreePort();
-            BASE_HTTP_URL = "http://localhost:" + PORT + "/server";
-        }
-    }
-
-
     @BeforeClass
     public static void setupClass() throws Exception {
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             startServer();
         }
         setupCustomSettingsXml();
-        logSettings();
         warmUpServer();
     }
 
     private static void setupCustomSettingsXml() {
-        if (!LOCAL_SERVER) {
+        if (!TestConfig.isLocalServer()) {
             String clientDeploymentSettingsXml = ClassLoader.class.getResource(
                     "/kie-server-testing-client-deployment-settings.xml").getFile();
             System.setProperty("kie.maven.settings.custom", clientDeploymentSettingsXml);
@@ -115,10 +88,6 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
 
-    private static void logSettings() {
-        logger.debug("KIE Server base URI: " + BASE_HTTP_URL);
-    }
-
     @Before
     public void setup() throws Exception {
         startClient();
@@ -127,7 +96,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     @AfterClass
     public static void tearDown() {
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             server.stop();
         }
     }
@@ -149,7 +118,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static void startServer() throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(PORT);
+        server.setPort(TestConfig.getAllocatedPort());
         server.start();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
         server.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
@@ -164,7 +133,7 @@ public abstract class KieServerBaseIntegrationTest {
         ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
         MavenCli cli = new MavenCli();
         String[] mvnArgs;
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exist.
             mvnArgs = new String[]{"-B", "clean", "install"};
@@ -234,21 +203,6 @@ public abstract class KieServerBaseIntegrationTest {
         repository.deployArtifact(releaseId, jar, pom);
     }
 
-    public static int findFreePort() {
-        int port = 0;
-        try {
-            ServerSocket server =
-                    new ServerSocket(0);
-            port = server.getLocalPort();
-            server.close();
-        } catch (IOException e) {
-            // failed to dynamically allocate port, try to use hard coded one
-            port = 9789;
-        }
-        logger.debug("Allocating port {}.", +port);
-        return port;
-    }
-
     protected static void assertSuccess(ServiceResponse<?> response) {
         ServiceResponse.ResponseType type = response.getType();
         assertEquals("Expected SUCCESS, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.SUCCESS,
@@ -266,26 +220,15 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
         try {
-            final Properties env = new Properties();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
-            env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
-            env.put(Context.SECURITY_PRINCIPAL, System.getProperty("username", DEFAULT_USERNAME));
-            env.put(Context.SECURITY_CREDENTIALS, System.getProperty("password", DEFAULT_PASSWORD));
-            InitialContext context = new InitialContext(env);
+            InitialContext context = TestConfig.getInitialRemoteContext();
 
-            logger.debug("JMS provider URL: {}", PROVIDER_URL);
-            logger.debug("Initial context factory: {}", INITIAL_CONTEXT_FACTORY);
-            logger.debug("Connection factory: {}", CONNECTION_FACTORY);
-            logger.debug("JMS request queue JNDI: {}", REQUEST_QUEUE_JNDI);
-            logger.debug("JMS response queue JNDI: {}", RESPONSE_QUEUE_JNDI);
-
-            Queue requestQueue = (Queue) context.lookup(REQUEST_QUEUE_JNDI);
-            Queue responseQueue = (Queue) context.lookup(RESPONSE_QUEUE_JNDI);
-            ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(CONNECTION_FACTORY);
+            Queue requestQueue = (Queue) context.lookup(TestConfig.getRequestQueueJndi());
+            Queue responseQueue = (Queue) context.lookup(TestConfig.getResponseQueueJndi());
+            ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(TestConfig.getConnectionFactory());
 
             KieServicesConfiguration jmsConfiguration = KieServicesFactory.newJMSConfiguration(
-                    connectionFactory, requestQueue, responseQueue, System.getProperty("username", DEFAULT_USERNAME),
-                    System.getProperty("password", DEFAULT_PASSWORD));
+                    connectionFactory, requestQueue, responseQueue, TestConfig.getUsername(),
+                    TestConfig.getPassword());
 
             return jmsConfiguration;
         } catch (Exception e) {
@@ -294,7 +237,7 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     protected static KieServicesConfiguration createKieServicesRestConfiguration() {
-        return KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+        return KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
     }
     
 }

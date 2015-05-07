@@ -15,8 +15,10 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.KieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.config.TestConfig;
 
 import javax.ws.rs.core.MediaType;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -40,13 +42,13 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
         } catch (URISyntaxException e) {
             throw new RuntimeException("Malformed request URI was specified: '" + uriString + "'!", e);
         }
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             return new ClientRequest(uriString);
         } else {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
                     new AuthScope(uri.getHost(), uri.getPort()),
-                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+                    new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
             );
             HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
@@ -57,10 +59,10 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
     @Override
     protected KieServicesClient createDefaultClient() {
         KieServicesConfiguration config;
-        if (LOCAL_SERVER) {
-            config = KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, null, null);
+        if (TestConfig.isLocalServer()) {
+            config = KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null);
         } else {
-            config = KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+            config = KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
         }
         config.setMarshallingFormat(marshallingFormat);
         return KieServicesFactory.newKieServicesClient(config);
