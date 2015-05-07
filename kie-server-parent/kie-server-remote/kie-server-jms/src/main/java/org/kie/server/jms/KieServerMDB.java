@@ -1,17 +1,9 @@
 package org.kie.server.jms;
 
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.services.api.KieContainerExecutor;
-import org.kie.server.services.api.KieServerExtension;
-import org.kie.server.services.api.SupportedTransports;
-import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.kie.server.api.jms.JMSConstants.SERIALIZATION_FORMAT_PROPERTY_NAME;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,16 +14,29 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import java.lang.IllegalStateException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.kie.server.api.jms.JMSConstants.*;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.services.api.KieContainerCommandService;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @TransactionManagement(TransactionManagementType.BEAN)
 @MessageDriven(name = "KieServerMDB", activationConfig = {
@@ -132,11 +137,11 @@ public class KieServerMDB
 //        }
 //
 
-        KieContainerExecutor executor = null;
+        KieContainerCommandService executor = null;
 
         // TODO temp lookup as currently this MDB does support rule operations only
         for (KieServerExtension extension : kieServer.getServerExtensions()) {
-            executor = extension.getAppComponents(KieContainerExecutor.class);
+            executor = extension.getAppComponents(KieContainerCommandService.class);
             if (executor != null) {
                 break;
             }

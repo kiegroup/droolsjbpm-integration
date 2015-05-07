@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
-import org.kie.server.services.drools.impl.RuleServiceImpl;
+import org.kie.server.services.impl.KieContainerCommandServiceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 
 public class DroolsKieServerExtension implements KieServerExtension {
@@ -19,7 +20,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.drools.server.ext.disabled", "false"));
 
-    private RuleService ruleService;
+    private KieContainerCommandService batchCommandService;
 
     @Override
     public boolean isActive() {
@@ -28,7 +29,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
-        this.ruleService = new RuleServiceImpl(kieServer, registry);
+        this.batchCommandService = new KieContainerCommandServiceImpl(kieServer, registry);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // do any other bootstrapping rule service requires
 
-        kieContainerInstance.addService(ruleService);
+        kieContainerInstance.addService(batchCommandService);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
             = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList =  new ArrayList<Object>();
         Object [] services = { 
-                ruleService
+                batchCommandService
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) { 
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
@@ -64,8 +65,8 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
-        if (serviceType.isAssignableFrom(ruleService.getClass())) {
-            return (T) ruleService;
+        if (serviceType.isAssignableFrom(batchCommandService.getClass())) {
+            return (T) batchCommandService;
         }
 
         return null;
@@ -73,6 +74,6 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public String toString() {
-        return "Drools KIE Server extension";
+        return EXTENSION_NAME + " KIE Server extension";
     }
 }

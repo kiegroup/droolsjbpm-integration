@@ -5,6 +5,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -15,8 +19,16 @@ import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -157,10 +169,13 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected abstract KieServicesClient createDefaultClient() throws Exception;
 
+    private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
+    
     private static void startServer() throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(PORT);
         server.start();
+        KieServerEnvironment.setServerId("target/" + KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
 
         KieServerImpl kieServer = KieServerLocator.getInstance();
@@ -318,5 +333,25 @@ public abstract class KieServerBaseIntegrationTest {
     protected static KieServicesConfiguration createKieServicesRestConfiguration() {
         return KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
     }
-    
+   
+    protected ClientRequest newRequest(String uriString) {
+        URI uri;
+        try {
+            uri = new URI(uriString);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Malformed request URI was specified: '" + uriString + "'!", e);
+        }
+        if (LOCAL_SERVER) {
+            return new ClientRequest(uriString);
+        } else {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(
+                    new AuthScope(uri.getHost(), uri.getPort()),
+                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+            );
+            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
+            return new ClientRequest(uriString, executor);
+        }
+    }
 }

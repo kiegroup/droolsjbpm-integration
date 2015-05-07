@@ -117,6 +117,10 @@ public class KieServerImpl {
         }
     }
 
+    public KieServerRegistry getServerRegistry() { 
+        return context;
+    }
+    
     public ServiceResponse<KieServerInfo> registerController(String controller, KieServerConfig kieServerConfig) {
         if (controller != null && !controller.isEmpty()) {
             this.context.registerController(controller);

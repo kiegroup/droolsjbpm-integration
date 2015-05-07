@@ -1,4 +1,4 @@
-package org.kie.server.services.drools.impl;
+package org.kie.server.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,23 +27,20 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.services.api.KieContainerExecutor;
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.drools.RuleService;
-import org.kie.server.services.impl.KieContainerInstanceImpl;
-import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RuleServiceImpl implements RuleService, KieContainerExecutor {
+public class KieContainerCommandServiceImpl implements KieContainerCommandService {
 
-    private static final Pattern LOOKUP               = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
-    private static final Logger logger               = LoggerFactory.getLogger(RuleServiceImpl.class);
+    private static final Pattern LOOKUP            = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
+    private static final Logger logger             = LoggerFactory.getLogger(KieContainerCommandServiceImpl.class);
 
     private KieServerImpl kieServer;
     private final KieServerRegistry context;
 
-    public RuleServiceImpl(KieServerImpl kieServer, KieServerRegistry context) {
+    public KieContainerCommandServiceImpl(KieServerImpl kieServer, KieServerRegistry context) {
         this.kieServer = kieServer;
         this.context = context;
     }
