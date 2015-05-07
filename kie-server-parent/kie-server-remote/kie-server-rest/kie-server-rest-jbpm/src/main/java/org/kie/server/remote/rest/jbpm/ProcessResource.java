@@ -26,6 +26,7 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.ProcessService;
+import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.manager.Context;
@@ -36,14 +37,16 @@ import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationE
 import org.kie.server.remote.rest.common.util.QueryParameterUtil;
 
 @Path("/server")
-public class ProcessServiceResource  {
+public class ProcessResource  {
 
     private ProcessService processService;
     private DefinitionService definitionService;
+    private RuntimeDataService runtimeDataService;
 
-    public ProcessServiceResource(ProcessService processService, DefinitionService definitionService) {
+    public ProcessResource(ProcessService processService, DefinitionService definitionService, RuntimeDataService runtimeDataService) {
         this.processService = processService;
         this.definitionService = definitionService;
+        this.runtimeDataService = runtimeDataService;
     }
 
     protected static String getRelativePath(HttpServletRequest httpRequest) { 
@@ -58,6 +61,8 @@ public class ProcessServiceResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @javax.ws.rs.core.Context HttpServletRequest request) {
 
+        System.out.println( " RECEVEID: [" + processId + "]");
+        
         Variant v = getVariant(headers);
         // Check for presence of process id
         try { 

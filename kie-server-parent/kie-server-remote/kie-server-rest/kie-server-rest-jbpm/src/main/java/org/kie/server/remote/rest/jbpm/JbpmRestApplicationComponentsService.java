@@ -12,7 +12,7 @@ import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 
-public class KieServerJbpmRestApplicationComponentsService implements KieServerApplicationComponentsService {
+public class JbpmRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
     private static final String OWNER_EXTENSION = JbpmKieServerExtension.EXTENSION_NAME;
 
@@ -39,11 +39,13 @@ public class KieServerJbpmRestApplicationComponentsService implements KieServerA
                continue;
             }
         }
+       
+        System.out.println( " CREATING A PROCESS RESOURCE!" );
         
         List<Object> components = new ArrayList<Object>(3);
-        components.add(new ProcessServiceResource(processService, definitionService));
+        components.add(new ProcessResource(processService, definitionService, runtimeDataService));
         components.add(new RuntimeDataServiceResource(runtimeDataService));
-        components.add(new DefinitionServiceResource(definitionService));
+//        components.add(new DefinitionServiceResource(definitionService));
         
         return components;
     }

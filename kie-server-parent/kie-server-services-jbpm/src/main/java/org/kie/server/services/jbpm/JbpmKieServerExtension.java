@@ -34,7 +34,6 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
-import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -57,8 +56,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private String persistenceUnitName = "org.jbpm.domain";
 
-    private KieServerImpl kieServer;
-
     private DeploymentService deploymentService;
     private DefinitionService definitionService;
     private ProcessService processService;
@@ -75,7 +72,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.isExecutorAvailable = isExecutorOnClasspath();
-        this.kieServer = kieServer;
 
         EntityManagerFactory emf = EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName);
 
@@ -218,7 +214,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public String toString() {
-        return "jBPM KIE Server extension";
+        return EXTENSION_NAME + " KIE Server extension";
     }
 
     private static class CustomIdKmoduleDeploymentUnit extends KModuleDeploymentUnit {
