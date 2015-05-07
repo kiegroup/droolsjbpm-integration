@@ -60,17 +60,6 @@
         <artifactId>kie-aries-blueprint</artifactId>
         <classifier>sources</classifier>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-grid-impl</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-simulator</artifactId>
@@ -91,18 +80,6 @@
       <artifactId>droolsjbpm-integration-examples</artifactId>
       <classifier>sources</classifier>
     </dependency>
-
-    <!-- Javadocs and documentation -->
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-docs</artifactId>
-      <type>jdocbook</type>
-    </dependency>
-<!--    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-docs</artifactId>
-      <type>jdocbook</type>
-    </dependency>-->
   </dependencies>
 
 </project>
