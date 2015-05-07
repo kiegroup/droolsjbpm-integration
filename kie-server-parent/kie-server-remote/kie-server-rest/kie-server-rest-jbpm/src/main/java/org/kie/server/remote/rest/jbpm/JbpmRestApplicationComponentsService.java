@@ -40,12 +40,10 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             }
         }
        
-        System.out.println( " CREATING A PROCESS RESOURCE!" );
-        
         List<Object> components = new ArrayList<Object>(3);
         components.add(new ProcessResource(processService, definitionService, runtimeDataService));
         components.add(new RuntimeDataServiceResource(runtimeDataService));
-//        components.add(new DefinitionServiceResource(definitionService));
+        components.add(new DefinitionServiceResource(definitionService));
         
         return components;
     }

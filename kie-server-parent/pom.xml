@@ -8,7 +8,7 @@
     <version>6.3.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.kie</groupId>
+  <groupId>org.kie.server</groupId>
   <artifactId>kie-server-parent</artifactId>
   <packaging>pom</packaging>
 
@@ -29,57 +29,103 @@
  <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-drools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-services-jbpm</artifactId>
         <version>${project.version}</version>
       </dependency>
-    
+
+      <!-- kie server remote --> 
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-remote</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-client</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- jms -->
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-jms</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- rest -->
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-rest-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-rest-drools</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-rest-jbpm</artifactId>
         <version>${project.version}</version>
       </dependency>
+
+      <!-- ws -->
       <dependency>
-        <groupId>org.kie</groupId>
+        <groupId>org.kie.server</groupId>
         <artifactId>kie-server-ws</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+
+      <!-- wars -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>${project.version}</version>
+        <classifier>webc</classifier>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>${project.version}</version>
+        <classifier>ee6</classifier>
+        <type>war</type>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server</artifactId>
+        <version>${project.version}</version>
+        <classifier>ee7</classifier>
+        <type>war</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
   

@@ -40,11 +40,14 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 2;
+        int numComponents = 3;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
-                    appComponent instanceof ProcessResource || appComponent instanceof RuntimeDataServiceResource);
+                    appComponent instanceof ProcessResource 
+                    || appComponent instanceof RuntimeDataServiceResource
+                    || appComponent instanceof DefinitionServiceResource
+                    );
         }
     }
 

@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class KieServerBaseIntegrationTest {
 
-    private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
     
     protected static final String DEFAULT_USERNAME = "yoda";
     protected static final String DEFAULT_PASSWORD = "usetheforce123@";

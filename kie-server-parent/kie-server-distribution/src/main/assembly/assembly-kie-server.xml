@@ -14,7 +14,7 @@
     <!-- Web application -->
     <dependencySet>
       <includes>
-        <include>org.kie:kie-server:war</include>
+        <include>org.kie.server:kie-server:war</include>
       </includes>
       <outputDirectory/>
       <useStrictFiltering>true</useStrictFiltering>

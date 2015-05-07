@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.kie</groupId>
+    <groupId>org.kie.server</groupId>
     <artifactId>kie-server-tests</artifactId>
     <version>6.3.0-SNAPSHOT</version>
   </parent>
@@ -27,42 +27,43 @@
     
     <!-- kie server deps -->
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-server-client</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-drools</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-jbpm</artifactId>
       <scope>test</scope>
     </dependency>
+
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-client</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-common</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-drools</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm</artifactId>
       <scope>test</scope>
     </dependency>
@@ -142,21 +143,21 @@
     </dependency>
 
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>webc</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
