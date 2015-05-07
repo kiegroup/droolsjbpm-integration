@@ -61,8 +61,6 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @javax.ws.rs.core.Context HttpServletRequest request) {
 
-        System.out.println( " RECEVEID: [" + processId + "]");
-        
         Variant v = getVariant(headers);
         // Check for presence of process id
         try { 

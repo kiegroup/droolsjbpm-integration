@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.kie</groupId>
+    <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
     <version>6.3.0-SNAPSHOT</version>
   </parent>
@@ -15,7 +15,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services</artifactId>
       <exclusions>
         <exclusion>
@@ -29,11 +29,11 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-drools</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-jbpm</artifactId>
       <exclusions>
         <exclusion>
@@ -43,19 +43,19 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-jms</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-drools</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm</artifactId>
     </dependency>
     <dependency>

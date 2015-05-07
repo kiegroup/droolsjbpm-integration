@@ -69,7 +69,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     @Test
     public void testGetContainerInfoNonExisting() throws Exception {
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("non-existing-container");
-        System.out.println(reply.getMsg());
+        logger.info(reply.getMsg());
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 

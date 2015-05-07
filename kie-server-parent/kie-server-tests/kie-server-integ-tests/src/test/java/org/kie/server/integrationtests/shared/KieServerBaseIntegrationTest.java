@@ -57,8 +57,19 @@ import org.slf4j.LoggerFactory;
 
 public abstract class KieServerBaseIntegrationTest {
 
-    private static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
+    protected static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
+    protected static final String DEFAULT_USERNAME = "yoda";
+    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
+    // REST
+    protected static String BASE_HTTP_URL = System.getProperty("kie.server.base.http.url");
+    // JMS
+    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
+    protected static final String CONNECTION_FACTORY = System.getProperty("kie.server.connection.factory", "jms/RemoteConnectionFactory");
+    protected static final String PROVIDER_URL = System.getProperty("kie.server.remoting.url");
+    protected static final String REQUEST_QUEUE_JNDI = System.getProperty("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
+    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
+    
     protected static TJWSEmbeddedJaxrsServer server;
     protected static MavenRepository repository;
 
