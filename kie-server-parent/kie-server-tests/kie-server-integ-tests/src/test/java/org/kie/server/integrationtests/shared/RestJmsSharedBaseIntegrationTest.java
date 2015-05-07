@@ -7,6 +7,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.KieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.config.TestConfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +28,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         ));
 
 
-        if (PROVIDER_URL != null) {
+        if (TestConfig.getRemotingUrl() != null) {
             KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
             parameterData.addAll(Arrays.asList(new Object[][]
                             {
@@ -47,9 +48,9 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     public KieServicesConfiguration configuration;
 
     protected KieServicesClient createDefaultClient() {
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, null, null).setMarshallingFormat(marshallingFormat);
+                    KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             return KieServicesFactory.newKieServicesClient(localServerConfig);
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
