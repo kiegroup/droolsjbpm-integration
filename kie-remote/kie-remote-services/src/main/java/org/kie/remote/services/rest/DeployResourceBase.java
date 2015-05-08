@@ -365,7 +365,10 @@ public class DeployResourceBase extends ResourceBase {
     public void fillProcessDefinitionList(String deploymentId, int [] pageInfo, int maxNumResults, List<JaxbProcessDefinition> procDefList) { 
         List<String> processIdList = Collections.EMPTY_LIST;
         try { 
-            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, new QueryContext(pageInfo[0], pageInfo[1])));
+            int offset = ( pageInfo[PAGE_NUM] > 0 ? pageInfo[PAGE_NUM]-1 : 0 ) * pageInfo[PAGE_SIZE];
+            int count = ( pageInfo[PAGE_SIZE] > 0 ? pageInfo[PAGE_SIZE] : 10 );
+            QueryContext queryContext = new QueryContext(offset, count);
+            processIdList = new ArrayList<String>(runtimeDataService.getProcessIds(deploymentId, queryContext));
             Collections.sort(processIdList);
         } catch( Exception e) { 
             // possibly because the deployment is being modified and not fully un/deployed.. (un/deploy*ing*) 
