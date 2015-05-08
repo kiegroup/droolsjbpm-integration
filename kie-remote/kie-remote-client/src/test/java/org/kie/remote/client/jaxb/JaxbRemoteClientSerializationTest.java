@@ -1,9 +1,11 @@
 package org.kie.remote.client.jaxb;
 
+import org.junit.Ignore;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class JaxbRemoteClientSerializationTest extends AbstractRemoteClientSerializationTest {
 
     protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteClientSerializationTest.class); 
