@@ -102,6 +102,12 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.kie.server</groupId>

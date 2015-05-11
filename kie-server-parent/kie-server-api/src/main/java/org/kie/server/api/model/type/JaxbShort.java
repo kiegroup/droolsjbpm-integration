@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "short-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbShort {
+public class JaxbShort implements Wrapped<Short> {
 
     @XmlElement
     @XmlSchemaType(name = "short")
@@ -31,5 +33,10 @@ public class JaxbShort {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Short unwrap() {
+        return value;
     }
 }

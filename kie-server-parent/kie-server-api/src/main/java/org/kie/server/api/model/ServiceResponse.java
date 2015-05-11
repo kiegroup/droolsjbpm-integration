@@ -22,7 +22,9 @@ import org.kie.server.api.model.type.JaxbCharacter;
 import org.kie.server.api.model.type.JaxbDouble;
 import org.kie.server.api.model.type.JaxbFloat;
 import org.kie.server.api.model.type.JaxbInteger;
+import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbLong;
+import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbShort;
 import org.kie.server.api.model.type.JaxbString;
 
@@ -49,6 +51,8 @@ public class ServiceResponse<T> {
         @XmlElement(name = "long-type", type = JaxbLong.class),
         @XmlElement(name = "short-type", type = JaxbShort.class),
         @XmlElement(name = "string-type", type = JaxbString.class),
+        @XmlElement(name = "map-type", type = JaxbMap.class),
+        @XmlElement(name = "list-type", type = JaxbList.class),
         //kie server model
         @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
         @XmlElement(name = "kie-container", type = KieContainerResource.class),

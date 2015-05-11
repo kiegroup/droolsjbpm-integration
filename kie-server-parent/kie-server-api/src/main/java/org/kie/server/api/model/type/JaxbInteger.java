@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "int-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbInteger {
+public class JaxbInteger implements Wrapped<Integer> {
 
 
     @XmlElement
@@ -32,5 +34,10 @@ public class JaxbInteger {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Integer unwrap() {
+        return value;
     }
 }

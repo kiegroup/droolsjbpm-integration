@@ -66,4 +66,10 @@ public interface KieServicesClient {
     Long startProcess(String containerId, String processId, Map<String, Object> variables);
 
     void abortProcessInstance(String containerId, Long processInstanceId);
+
+    Object getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName);
+
+    <T> T getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName, Class<T> type);
+
+    Map<String, Object> getProcessInstanceVariables(String containerId, Long processInstanceId);
 }

@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "byte-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbByte {
+public class JaxbByte implements Wrapped<Byte> {
 
     @XmlElement
     @XmlSchemaType(name = "byte")
@@ -32,5 +34,10 @@ public class JaxbByte {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Byte unwrap() {
+        return value;
     }
 }

@@ -2,10 +2,10 @@ package org.kie.server.services.jbpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
@@ -26,6 +26,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
@@ -56,6 +57,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private String persistenceUnitName = "org.jbpm.domain";
 
+    private KieServerImpl kieServer;
+    private KieServerRegistry context;
+
     private DeploymentService deploymentService;
     private DefinitionService definitionService;
     private ProcessService processService;
@@ -72,6 +76,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.isExecutorAvailable = isExecutorOnClasspath();
+
+        this.kieServer = kieServer;
+        this.context = registry;
 
         EntityManagerFactory emf = EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName);
 
@@ -163,6 +170,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
             addAsyncHandler(unit);
 
             deploymentService.deploy(unit);
+            // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
+            DeployedUnit deployedUnit = deploymentService.getDeployedUnit(unit.getIdentifier());
+            kieContainerInstance.addJaxbClasses(new HashSet<Class<?>>(deployedUnit.getDeployedClasses()));
 
             kieContainerInstance.addService(deploymentService);
             kieContainerInstance.addService(definitionService);
@@ -193,15 +203,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
             = ServiceLoader.load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<Object>();
-        Object [] services = { 
-                deploymentService, 
-                definitionService, 
-                processService, 
-                userTaskService, 
-                runtimeDataService, 
-                executorService
+        Object [] services = {
+                deploymentService,
+                definitionService,
+                processService,
+                userTaskService,
+                runtimeDataService,
+                executorService,
+                context
         };
-        for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) { 
+        for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
            appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
         }
         return appComponentsList;

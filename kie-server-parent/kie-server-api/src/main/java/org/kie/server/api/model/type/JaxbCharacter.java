@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "char-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbCharacter {
+public class JaxbCharacter implements Wrapped<Character> {
 
     @XmlElement
     @XmlSchemaType(name = "string")
@@ -31,5 +33,10 @@ public class JaxbCharacter {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Character unwrap() {
+        return value;
     }
 }

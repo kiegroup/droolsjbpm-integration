@@ -4,12 +4,17 @@ import org.kie.server.api.commands.*;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.type.JaxbList;
+import org.kie.server.api.model.type.JaxbMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class JaxbMarshaller implements Marshaller {
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
@@ -36,7 +41,10 @@ public class JaxbMarshaller implements Marshaller {
                 ServiceResponsesList.class,
 
                 KieServerConfig.class,
-                KieServerConfigItem.class
+                KieServerConfigItem.class,
+
+                JaxbList.class,
+                JaxbMap.class
         };
     }
 
@@ -45,9 +53,16 @@ public class JaxbMarshaller implements Marshaller {
     private final javax.xml.bind.Marshaller marshaller;
     private final Unmarshaller              unmarshaller;
 
-    public JaxbMarshaller() {
+    public JaxbMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         try {
-            this.jaxbContext = JAXBContext.newInstance( KIE_SERVER_JAXB_CLASSES );
+            Set<Class<?>> allClasses = new HashSet<Class<?>>();
+
+            allClasses.addAll(Arrays.asList(KIE_SERVER_JAXB_CLASSES));
+            if (classes != null) {
+                allClasses.addAll(classes);
+            }
+
+            this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
             this.marshaller = jaxbContext.createMarshaller();
             this.unmarshaller = jaxbContext.createUnmarshaller();
         } catch ( JAXBException e ) {

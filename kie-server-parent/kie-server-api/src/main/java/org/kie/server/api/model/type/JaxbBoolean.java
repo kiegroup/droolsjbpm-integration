@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "boolean-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbBoolean {
+public class JaxbBoolean implements Wrapped<Boolean> {
 
     @XmlElement
     @XmlSchemaType(name = "boolean")
@@ -32,5 +34,10 @@ public class JaxbBoolean {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Boolean unwrap() {
+        return value;
     }
 }

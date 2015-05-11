@@ -23,16 +23,16 @@ public class JbpmApplicationComponentsServiceTest {
 
     @Test
     public void createResources() {
-        ServiceLoader<KieServerApplicationComponentsService> appComponentsServices 
+        ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
             = ServiceLoader .load(KieServerApplicationComponentsService.class);
         List<Object> appComponentsList = new ArrayList<Object>();
-        Object[] services = { 
-                mock(DeploymentService.class), 
-                mock(DefinitionService.class), 
+        Object[] services = {
+                mock(DeploymentService.class),
+                mock(DefinitionService.class),
                 mock(ProcessService.class),
-                mock(UserTaskService.class), 
-                mock(RuntimeDataService.class), 
-                mock(ExecutorService.class) 
+                mock(UserTaskService.class),
+                mock(RuntimeDataService.class),
+                mock(ExecutorService.class)
                 };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll(appComponentsService.getAppComponents(
@@ -44,7 +44,7 @@ public class JbpmApplicationComponentsServiceTest {
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
-                    appComponent instanceof ProcessResource 
+                    appComponent instanceof ProcessResource
                     || appComponent instanceof RuntimeDataServiceResource
                     || appComponent instanceof DefinitionServiceResource
                     );

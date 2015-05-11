@@ -1,43 +1,65 @@
 package org.kie.server.client.impl;
 
-import org.kie.api.command.Command;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
-import org.kie.server.api.commands.*;
+import org.kie.server.api.commands.CallContainerCommand;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetScannerInfoCommand;
+import org.kie.server.api.commands.GetServerInfoCommand;
+import org.kie.server.api.commands.ListContainersCommand;
+import org.kie.server.api.commands.RegisterServerControllerCommand;
+import org.kie.server.api.commands.UpdateReleaseIdCommand;
+import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.jms.JMSConstants;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.*;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
-import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.type.JaxbLong;
+import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.jms.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public class KieServicesClientImpl
         implements KieServicesClient {
@@ -51,7 +73,7 @@ public class KieServicesClientImpl
         this.config = config.clone();
         this.baseURI = config.getServerUrl();
         ClassLoader cl = Thread.currentThread().getContextClassLoader() != null ? Thread.currentThread().getContextClassLoader() : CommandScript.class.getClassLoader();
-        this.marshaller = MarshallerFactory.getMarshaller( config.getMarshallingFormat(), cl );
+        this.marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), cl );
     }
 
     /**
@@ -305,7 +327,7 @@ public class KieServicesClientImpl
     public Long startProcess(String containerId, String processId, Map<String, Object> variables) {
         if( config.isRest() ) {
             JaxbLong result = makeHttpPutRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/" + processId, variables,
+                    baseURI + "/containers/" + containerId + "/process/" + processId, new JaxbMap(variables),
                     JaxbLong.class);
 
             if (result == null) {
@@ -331,6 +353,41 @@ public class KieServicesClientImpl
         }
     }
 
+    @Override
+    public Object getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName) {
+        return getProcessInstanceVariable(containerId, processInstanceId, variableName, Object.class);
+    }
+
+    @Override
+    public <T> T getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName, Class<T> type) {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variable/" + variableName,
+                    type);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Map<String, Object> getProcessInstanceVariables(String containerId, Long processInstanceId) {
+        if( config.isRest() ) {
+            JaxbMap variables = makeHttpGetRequestAndCreateCustomResponse(
+                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variables",
+                    JaxbMap.class);
+
+            if (variables != null && variables.getEntries() != null) {
+                return variables.unwrap();
+            }
+
+            return Collections.emptyMap();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
 
     /*
      * jBPM part END
@@ -339,6 +396,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+        logger.debug("About to send GET request to '{}'", uri);
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
@@ -352,6 +410,7 @@ public class KieServicesClientImpl
     }
 
     private <T> T makeHttpGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
+        logger.debug("About to send GET request to '{}'", uri);
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
@@ -370,6 +429,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
+        logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
         KieRemoteHttpResponse response = request.response();
 
@@ -387,6 +447,7 @@ public class KieServicesClientImpl
     }
 
     private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, String body, Class<T> resultType) {
+        logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
         KieRemoteHttpResponse response = request.response();
 
@@ -405,6 +466,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
+        logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).put();
         KieRemoteHttpResponse response = request.response();
 
@@ -426,6 +488,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType) {
+        logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).put();
         KieRemoteHttpResponse response = request.response();
 
@@ -441,6 +504,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+        logger.debug("About to send DELETE request to '{}' ", uri);
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
 
@@ -455,6 +519,7 @@ public class KieServicesClientImpl
 
     @SuppressWarnings("unchecked")
     private <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
+        logger.debug("About to send DELETE request to '{}' ", uri);
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
 
@@ -521,7 +586,7 @@ public class KieServicesClientImpl
             try {
 
                 // serialize request
-                marshaller = MarshallerFactory.getMarshaller( config.getMarshallingFormat(), CommandScript.class.getClassLoader() );
+                marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), CommandScript.class.getClassLoader() );
                 String xmlStr = marshaller.marshall( command );
                 textMsg = session.createTextMessage(xmlStr);
 

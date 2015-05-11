@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "double-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbDouble {
+public class JaxbDouble implements Wrapped<Double> {
 
     @XmlElement
     @XmlSchemaType(name = "double")
@@ -31,5 +33,10 @@ public class JaxbDouble {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Double unwrap() {
+        return value;
     }
 }
