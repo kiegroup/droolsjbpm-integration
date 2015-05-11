@@ -15,10 +15,7 @@
   <description>KIE jBPM Execution Server Extension</description>
 
   <dependencies>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-jaxb</artifactId>
-    </dependency>
+    <!-- core/kie -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
@@ -27,7 +24,12 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+    </dependency>
 
+    <!-- kie-server -->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
@@ -37,54 +39,22 @@
       <artifactId>kie-server-services</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-compiler</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-runtime-manager</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-shared-services</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-services-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-executor</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-workitems</artifactId>
-    </dependency>
-
+    <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     
+    <!-- REST -->
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-jaxb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+    </dependency>
+
     <!-- jackson (JSON support) --> 
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
