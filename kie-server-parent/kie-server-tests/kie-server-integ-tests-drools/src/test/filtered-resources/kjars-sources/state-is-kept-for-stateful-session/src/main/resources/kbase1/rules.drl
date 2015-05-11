@@ -1,0 +1,28 @@
+import org.kie.server.testing.Person;
+
+rule "Set lastname for Darth"
+    no-loop true
+when
+    $person : Person(firstname == "Darth")
+then
+    modify($person) {
+        setSurname("Vader")
+    }
+end
+
+rule "Mark duplicated Vaders"
+   no-loop true
+when
+    $vader1 : Person(firstname == "Darth", surname == "Vader", duplicated == false)
+    $vader2 : Person(firstname == "Darth", surname == "Vader", duplicated == false, this != $vader1)
+then
+   modify($vader1) {
+       setDuplicated(true)
+   }
+   modify($vader2) {
+       setDuplicated(true)
+   }
+end
+
+
+
