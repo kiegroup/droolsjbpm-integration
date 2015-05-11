@@ -126,6 +126,11 @@
         <type>war</type>
       </dependency>
 
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   

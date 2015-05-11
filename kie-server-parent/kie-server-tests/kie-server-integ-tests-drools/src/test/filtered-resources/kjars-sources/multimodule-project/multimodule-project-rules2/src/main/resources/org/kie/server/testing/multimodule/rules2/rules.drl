@@ -1,0 +1,10 @@
+package org.kie.server.testing.multimodule.rules2;
+
+import org.kie.server.testing.multimodule.domain.Bus;
+
+rule "Drive the bus"
+when
+    $bus : Bus()
+then
+    $bus.drive();
+end
