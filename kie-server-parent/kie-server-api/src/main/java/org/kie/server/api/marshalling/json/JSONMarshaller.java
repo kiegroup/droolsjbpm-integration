@@ -1,16 +1,19 @@
 package org.kie.server.api.marshalling.json;
 
-import org.codehaus.jackson.map.JsonMappingException;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallingException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
+import org.codehaus.jackson.map.jsontype.NamedType;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-
-
-import java.io.IOException;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallingException;
 
 public class JSONMarshaller implements Marshaller {
 
@@ -18,17 +21,34 @@ public class JSONMarshaller implements Marshaller {
 
     private final ObjectMapper fallbackObjectMapper;
 
-    public JSONMarshaller() {
+    public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
+
         objectMapper = new ObjectMapper();
+
+        List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
         // one we move to Jackson 2.x, the config below should not be needed
-        AnnotationIntrospector primary = new JaxbAnnotationIntrospector();
+        // and to pass custom class types so they can be easily deserialized - need to be checked with Jackson 2.x how to achieve that
+        AnnotationIntrospector primary = new ExtendedJaxbAnnotationIntrospector(customClasses);
         AnnotationIntrospector secondary = new JacksonAnnotationIntrospector();
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
         objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
         objectMapper.setSerializationConfig(objectMapper.getSerializationConfig().withAnnotationIntrospector(introspectorPair));
 
         fallbackObjectMapper = new ObjectMapper();
+
+    }
+
+    protected List<NamedType> prepareCustomClasses(Set<Class<?>> classes) {
+        List<NamedType> customClasses = new ArrayList<NamedType>();
+        if (classes != null) {
+            for (Class<?> clazz : classes) {
+                customClasses.add(new NamedType(clazz, clazz.getSimpleName()));
+                customClasses.add(new NamedType(clazz, clazz.getName()));
+            }
+        }
+
+        return customClasses;
     }
 
     @Override
@@ -43,6 +63,7 @@ public class JSONMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String serializedInput, Class<T> type) {
         try {
+
             return objectMapper.readValue(serializedInput, type);
         } catch (JsonMappingException e){
 
@@ -64,4 +85,26 @@ public class JSONMarshaller implements Marshaller {
 
     }
 
+    class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
+
+        private List<NamedType> customClasses;
+
+        public ExtendedJaxbAnnotationIntrospector(List<NamedType> customClasses) {
+            this.customClasses = customClasses;
+        }
+
+        @Override
+        public List<NamedType> findSubtypes(Annotated a) {
+            List<NamedType> base = super.findSubtypes(a);
+
+            List<NamedType> complete = new ArrayList<NamedType>();
+            if (base != null) {
+                complete.addAll(base);
+            }
+            if (customClasses != null) {
+                complete.addAll(customClasses);
+            }
+            return complete;
+        }
+    }
 }

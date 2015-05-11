@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "long-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbLong {
+public class JaxbLong implements Wrapped<Long> {
 
     @XmlElement
     @XmlSchemaType(name="long")
@@ -32,5 +34,10 @@ public class JaxbLong {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Long unwrap() {
+        return value;
     }
 }

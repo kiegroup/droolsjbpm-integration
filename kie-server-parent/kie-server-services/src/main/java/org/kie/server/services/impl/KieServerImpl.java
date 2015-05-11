@@ -3,6 +3,7 @@ package org.kie.server.services.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -16,6 +17,7 @@ import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
+import org.kie.server.api.KieController;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -46,6 +48,8 @@ public class KieServerImpl {
 
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
+    private static final ServiceLoader<KieController> kieControllers = ServiceLoader.load(KieController.class);
+
     private final KieServerRegistry context;
 
     private final KieServerStateRepository repository;
@@ -75,46 +79,23 @@ public class KieServerImpl {
 
         // once all extensions are loaded connect and sync with controller if exists
         Set<String> controllers = currentState.getControllers();
-        boolean controllerSynced = false;
-        for (String controllerUrl : controllers ) {
 
-            if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                String connectAndSyncUrl = controllerUrl + "/controller/server/" + KieServerEnvironment.getServerId();
-
-                try {
-                    KieContainerResourceList containerResourceList = makeHttpGetRequestAndCreateServiceResponse(connectAndSyncUrl, KieContainerResourceList.class);
-
-                    if (containerResourceList != null) {
-
-                        for (KieContainerResource containerResource : containerResourceList.getContainers()) {
-//                            if (containerResource.getStatus() != KieContainerStatus.STARTED) {
-//                                continue;
-//                            }
-
-                            createContainer(containerResource.getContainerId(), containerResource);
-                        }
-                    }
-                    controllerSynced = true;
-                    break;
-                } catch (IllegalStateException e) {
-                    // let's check all other controllers in case of running in cluster of controllers
-                }
-
-            }
+        KieController kieController = getController();
+        // try to load container information from available controllers if any...
+        Set<KieContainerResource> containers = kieController.getContainers(controllers, KieServerEnvironment.getServerId());
+        if (containers == null || containers.isEmpty()) {
+            // if no containers from controller use local storage
+            containers = currentState.getContainers();
         }
-
-        if ( !controllerSynced ) {
-            // no controller or no controller available proceed with local info only
-
-            for (KieContainerResource containerResource : currentState.getContainers()) {
+        for (KieContainerResource containerResource : containers) {
 //                if (containerResource.getStatus() != KieContainerStatus.STARTED) {
 //                    continue;
 //                }
-                createContainer(containerResource.getContainerId(), containerResource);
-            }
-
-            repository.store(KieServerEnvironment.getServerId(), currentState);
+            createContainer(containerResource.getContainerId(), containerResource);
         }
+
+        repository.store(KieServerEnvironment.getServerId(), currentState);
+
     }
 
     public KieServerRegistry getServerRegistry() { 
@@ -552,42 +533,14 @@ public class KieServerImpl {
         }
     }
 
-    private <T> T makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
-        try {
-            KieRemoteHttpRequest request = newRequest( uri ).get();
-            KieRemoteHttpResponse response = request.response();
-
-            if ( response.code() == Response.Status.OK.getStatusCode() ) {
-                KieContainerResourceList serviceResponse = deserialize( response.body(), KieContainerResourceList.class );
-
-                return (T)serviceResponse;
-            } else {
-                throw new IllegalStateException("No response from controller server at " + uri);
-            }
-
-        } catch (IllegalStateException e){
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalStateException("No response from controller server at " + uri);
+    protected KieController getController() {
+        KieController controller = new DefaultRestControllerImpl();
+        Iterator<KieController> it = kieControllers.iterator();
+        if (it != null && it.hasNext()) {
+            controller = it.next();
         }
-    }
 
-    private KieRemoteHttpRequest newRequest(String uri) {
-
-        KieRemoteHttpRequest httpRequest = KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
-        httpRequest.accept(MediaType.APPLICATION_JSON);
-        httpRequest.basicAuthorization(KieServerEnvironment.getUsername(), KieServerEnvironment.getPassword());
-
-        return httpRequest;
-
-    }
-
-    private <T> T deserialize(String content, Class<T> type) {
-        try {
-            return MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader()).unmarshall(content, type);
-        } catch ( MarshallingException e ) {
-            throw new IllegalStateException( "Error while deserializing data received from server!", e );
-        }
+        return controller;
     }
 
 }

@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlRootElement(name = "float-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbFloat {
+public class JaxbFloat implements Wrapped<Float> {
 
     @XmlElement
     @XmlSchemaType(name = "float")
@@ -31,5 +33,10 @@ public class JaxbFloat {
         if (value != null) {
             this.value = value;
         }
+    }
+
+    @Override
+    public Float unwrap() {
+        return value;
     }
 }

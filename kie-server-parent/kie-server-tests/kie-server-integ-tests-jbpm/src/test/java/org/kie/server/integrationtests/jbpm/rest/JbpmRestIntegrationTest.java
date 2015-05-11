@@ -1,13 +1,19 @@
 package org.kie.server.integrationtests.jbpm.rest;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import javax.ws.rs.core.Response;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -20,12 +26,21 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "rest-processes", "1.0.0.Final");
    
     private static Logger logger = LoggerFactory.getLogger(JbpmRestIntegrationTest.class);
-    
+
+
+    @ClassRule
+    public static ExternalResource StaticResource = new DBExternalResource();
     
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         buildAndDeployCommonMavenParent();
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rest-processes").getFile());
+    }
+
+
+    @Before
+    public void cleanup() {
+        cleanupSingletonSessionId();
     }
 
     /**
@@ -65,5 +80,35 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         }
         
     }
+
+
+
+
+    static class DBExternalResource extends ExternalResource {
+        PoolingDataSource pds;
+
+        @Override
+        protected void after() {
+            if (pds != null) {
+                pds.close();
+            }
+        };
+
+        @Override
+        protected void before() throws Throwable {
+            cleanupSingletonSessionId();
+
+            pds = new PoolingDataSource();
+            pds.setUniqueName("jdbc/jbpm-ds");
+            pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
+            pds.setMaxPoolSize(50);
+            pds.setAllowLocalTransactions(true);
+            pds.getDriverProperties().put("user", "sa");
+            pds.getDriverProperties().put("password", "");
+            pds.getDriverProperties().put("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
+            pds.getDriverProperties().put("driverClassName", "org.h2.Driver");
+            pds.init();
+        };
+    };
     
 }

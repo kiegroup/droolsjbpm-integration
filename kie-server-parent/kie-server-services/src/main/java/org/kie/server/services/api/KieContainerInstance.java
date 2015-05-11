@@ -1,5 +1,7 @@
 package org.kie.server.services.api;
 
+import java.util.Set;
+
 import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.marshalling.Marshaller;
@@ -24,6 +26,12 @@ public interface KieContainerInstance {
     void disposeMarshallers();
 
     void addService(Object service);
+
+    boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList);
+
+    void clearJaxbClasses();
+
+    Set<Class<?>> getExtraJaxbClasses();
 
     <T> T getService(Class<T> serviceType);
 

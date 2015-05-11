@@ -10,7 +10,9 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.services.api.KieContainerInstance;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class KieContainerInstanceImpl implements KieContainerInstance {
@@ -21,6 +23,8 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     private Map<MarshallingFormat, Marshaller> marshallers;
 
     private Map<String, Object> serviceContainer;
+
+    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
         this( containerId, status, null );
@@ -89,7 +93,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         synchronized ( marshallers ) {
             Marshaller marshaller = marshallers.get( format );
             if ( marshaller == null ) {
-                marshaller = MarshallerFactory.getMarshaller( format, this.kieContainer.getClassLoader() );
+                marshaller = MarshallerFactory.getMarshaller( getExtraJaxbClasses(), format, this.kieContainer.getClassLoader() );
                 this.marshallers.put( format, marshaller );
             }
             return marshaller;
@@ -114,6 +118,21 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
             throw new IllegalStateException("Service " + service.getClass().getName() + " already exists");
         }
         serviceContainer.put(service.getClass().getName(), service);
+    }
+
+    @Override
+    public boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
+        return this.extraJaxbClasses.addAll( extraJaxbClassList );
+    }
+
+    @Override
+    public void clearJaxbClasses() {
+        this.extraJaxbClasses.clear();
+    }
+
+    @Override
+    public Set<Class<?>> getExtraJaxbClasses() {
+        return this.extraJaxbClasses;
     }
 
     @Override

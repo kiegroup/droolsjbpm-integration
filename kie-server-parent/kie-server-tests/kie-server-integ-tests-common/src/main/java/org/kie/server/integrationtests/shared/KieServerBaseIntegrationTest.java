@@ -3,6 +3,8 @@ package org.kie.server.integrationtests.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URI;
@@ -352,6 +354,25 @@ public abstract class KieServerBaseIntegrationTest {
             HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
             return new ClientRequest(uriString, executor);
+        }
+    }
+
+    public static void cleanupSingletonSessionId() {
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        if (tempDir.exists()) {
+
+            String[] jbpmSerFiles = tempDir.list(new FilenameFilter() {
+
+                @Override
+                public boolean accept(File dir, String name) {
+
+                    return name.endsWith("-jbpmSessionId.ser");
+                }
+            });
+            for (String file : jbpmSerFiles) {
+
+                new File(tempDir, file).delete();
+            }
         }
     }
 }
