@@ -59,6 +59,7 @@
     <module>kie-server-parent</module>
     <module>kie-examples-api</module>
     <module>jbpm-process-svg</module>
+    <module>drools-osgi</module>
   </modules>
 
   <profiles>
