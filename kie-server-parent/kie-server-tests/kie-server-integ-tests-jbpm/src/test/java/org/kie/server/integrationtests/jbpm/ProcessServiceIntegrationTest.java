@@ -19,6 +19,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
@@ -45,9 +46,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(BASE_HTTP_URL, null, null).setMarshallingFormat(marshallingFormat);
+                    KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
 
             localServerConfig.addJaxbClasses(extraClasses);
             return KieServicesFactory.newKieServicesClient(localServerConfig);

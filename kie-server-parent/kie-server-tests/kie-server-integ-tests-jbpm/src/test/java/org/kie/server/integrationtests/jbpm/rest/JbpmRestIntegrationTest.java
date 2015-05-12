@@ -14,9 +14,13 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.type.JaxbLong;
+import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,48 +71,23 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
         assertSuccess(client.createContainer("rest-processes", resource));
         
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        ClientResponse<JaxbLong> response = null;
         try {
-            ClientRequest clientRequest = newRequest(BASE_HTTP_URL + "/containers/" + resource.getContainerId()
-                    + "/process/" + HUMAN_TASK_OWN_TYPE_ID );
+            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId()
+                    + "/process/" + HUMAN_TASK_OWN_TYPE_ID ).header("Content-Type", getMediaType().toString());
             logger.info( "[PUT] " + clientRequest.getUri());
             response = clientRequest.put();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId()
+                    + "/process/instance/" + response.getEntity(JaxbLong.class).getValue() ).header("Content-Type", getMediaType().toString());
+            logger.info( "[DELETE] " + clientRequest.getUri());
+            response = clientRequest.delete();
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
         } catch (Exception e) {
-            throw new ClientResponseFailure(
-                    e, response);
+            throw new ClientResponseFailure(e, response);
         }
         
     }
-
-
-
-
-    static class DBExternalResource extends ExternalResource {
-        PoolingDataSource pds;
-
-        @Override
-        protected void after() {
-            if (pds != null) {
-                pds.close();
-            }
-        };
-
-        @Override
-        protected void before() throws Throwable {
-            cleanupSingletonSessionId();
-
-            pds = new PoolingDataSource();
-            pds.setUniqueName("jdbc/jbpm-ds");
-            pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
-            pds.setMaxPoolSize(50);
-            pds.setAllowLocalTransactions(true);
-            pds.getDriverProperties().put("user", "sa");
-            pds.getDriverProperties().put("password", "");
-            pds.getDriverProperties().put("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
-            pds.getDriverProperties().put("driverClassName", "org.h2.Driver");
-            pds.init();
-        };
-    };
     
 }

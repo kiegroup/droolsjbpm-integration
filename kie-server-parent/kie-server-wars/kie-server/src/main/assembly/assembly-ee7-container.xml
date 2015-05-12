@@ -42,6 +42,8 @@
     <dependencySet>
       <includes>
         <include>org.kie.server:kie-server-services-common</include>
+        <include>org.kie.server:kie-server-services-drools</include>
+        <include>org.kie.server:kie-server-services-jbpm</include>
         <include>org.kie.server:kie-server-jms</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>

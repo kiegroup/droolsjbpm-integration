@@ -11,6 +11,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.integrationtests.config.TestConfig;
 
 @RunWith(Parameterized.class)
 public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrationTest {

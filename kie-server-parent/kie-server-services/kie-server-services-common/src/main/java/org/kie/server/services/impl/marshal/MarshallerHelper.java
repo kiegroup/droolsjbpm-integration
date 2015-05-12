@@ -32,7 +32,9 @@ public class MarshallerHelper {
     }
 
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<?> unmarshalType, Class<T> returnType) {
-
+        if (data == null || data.isEmpty()) {
+            return null;
+        }
         MarshallingFormat format = MarshallingFormat.fromType(marshallingFormat);
         KieContainerInstance containerInstance = registry.getContainer(containerId);
 

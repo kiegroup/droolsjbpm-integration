@@ -1,24 +1,15 @@
 package org.kie.server.integrationtests.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
 import java.util.regex.Pattern;
-
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.apache.http.auth.AuthScope;
@@ -49,6 +40,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
@@ -57,21 +49,12 @@ import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.*;
+
 public abstract class KieServerBaseIntegrationTest {
 
     protected static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
-    protected static final String DEFAULT_USERNAME = "yoda";
-    protected static final String DEFAULT_PASSWORD = "usetheforce123@";
-    // REST
-    protected static String BASE_HTTP_URL = System.getProperty("kie.server.base.http.url");
-    // JMS
-    protected static final String INITIAL_CONTEXT_FACTORY = System.getProperty("kie.server.context.factory", "org.jboss.naming.remote.client.InitialContextFactory");
-    protected static final String CONNECTION_FACTORY = System.getProperty("kie.server.connection.factory", "jms/RemoteConnectionFactory");
-    protected static final String PROVIDER_URL = System.getProperty("kie.server.remoting.url");
-    protected static final String REQUEST_QUEUE_JNDI = System.getProperty("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
-    protected static final String RESPONSE_QUEUE_JNDI = System.getProperty("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
-    
     protected static TJWSEmbeddedJaxrsServer server;
     protected static MavenRepository repository;
 
@@ -84,22 +67,12 @@ public abstract class KieServerBaseIntegrationTest {
      */
     private static boolean commonParentDeployed = false;
 
-    static {
-        if (BASE_HTTP_URL == null && PROVIDER_URL == null) {
-            // falls back to local, in memory, server -> serving only over REST
-            LOCAL_SERVER = true;
-            PORT = findFreePort();
-            BASE_HTTP_URL = "http://localhost:" + PORT + "/server";
-            // needed only for local tests to configure server properly
-            KieServerEnvironment.setServerId(UUID.randomUUID().toString());
-            System.setProperty("org.kie.server.repo", "target");
-        }
-    }
 
 
     @BeforeClass
     public static void setupClass() throws Exception {
         if (TestConfig.isLocalServer()) {
+
             startServer();
         }
         setupCustomSettingsXml();
@@ -145,6 +118,7 @@ public abstract class KieServerBaseIntegrationTest {
     public static void tearDown() {
         if (TestConfig.isLocalServer()) {
             server.stop();
+            System.clearProperty("java.naming.factory.initial");
         }
     }
 
@@ -166,6 +140,7 @@ public abstract class KieServerBaseIntegrationTest {
     private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
 
     private static void startServer() throws Exception {
+        System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(TestConfig.getAllocatedPort());
         server.start();
@@ -309,13 +284,13 @@ public abstract class KieServerBaseIntegrationTest {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Malformed request URI was specified: '" + uriString + "'!", e);
         }
-        if (LOCAL_SERVER) {
+        if (TestConfig.isLocalServer()) {
             return new ClientRequest(uriString);
         } else {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
                     new AuthScope(uri.getHost(), uri.getPort()),
-                    new UsernamePasswordCredentials(DEFAULT_USERNAME, DEFAULT_PASSWORD)
+                    new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
             );
             HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
             ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);

@@ -16,6 +16,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>compile</scope>
     </dependency>
     
     <!-- core deps -->
@@ -102,12 +103,6 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>compile</scope>
-    </dependency>
     
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -182,6 +177,7 @@
             <systemProperties>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>
           </container>
         </configuration>

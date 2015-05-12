@@ -9,6 +9,7 @@ public class DBExternalResource extends ExternalResource {
 
     @Override
     protected void after() {
+
         if (pds != null) {
             pds.close();
         }
@@ -16,6 +17,7 @@ public class DBExternalResource extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
+
         KieServerBaseIntegrationTest.cleanupSingletonSessionId();
 
         pds = new PoolingDataSource();

@@ -21,6 +21,10 @@ import static org.junit.Assert.*;
 
 public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
+    static {
+        System.out.print("");
+    }
+
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 

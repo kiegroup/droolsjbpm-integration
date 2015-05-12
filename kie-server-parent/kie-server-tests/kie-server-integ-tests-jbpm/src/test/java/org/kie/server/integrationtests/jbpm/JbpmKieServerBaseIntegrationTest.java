@@ -5,7 +5,7 @@ import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
-public class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
 
     @ClassRule

@@ -11,6 +11,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.RESTOnly;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 
 import javax.ws.rs.core.Response;

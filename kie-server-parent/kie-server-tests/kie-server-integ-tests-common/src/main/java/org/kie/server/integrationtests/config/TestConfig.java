@@ -55,7 +55,7 @@ public class TestConfig {
             // If HTTP URL is not provided by system property then we run tests locally on embedded server and URL is generated.
             httpUrl = "http://localhost:" + getAllocatedPort() + "/server";
         }
-        
+
         return httpUrl;
     }
 
@@ -81,6 +81,18 @@ public class TestConfig {
     }
 
     /**
+     * Allows to skip JMS tests by placing on the classpath empty file 'jms.skip'
+     * @return
+     */
+    public static boolean skipJMS() {
+        if (TestConfig.class.getResource("/jms.skip") != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Used for detecting if we run test with local embedded server.
      *
      * @return True if local embedded server is used.
@@ -92,7 +104,7 @@ public class TestConfig {
         if(PROVIDED_HTTP_URL.isParameterConfigured() || REMOTING_URL.isParameterConfigured()) {
             isLocalServer = false;
         }
-        
+
         return isLocalServer;
     }
 
@@ -104,79 +116,79 @@ public class TestConfig {
     public static String getUsername() {
         return TestConfig.USERNAME.getParameterValue();
     }
-    
-   /**
-    * Get password of user registered in container.
-    *
-    * @return password.
-    */
-   public static String getPassword() {
-       return TestConfig.PASSWORD.getParameterValue();
-   }
 
-   /**
-    * Get initial context factory class name for creating context factory used in JMS.
-    *
-    * @return Initial context factory class name.
-    */
-   public static String getInitialContextFactory() {
-       return TestConfig.INITIAL_CONTEXT_FACTORY.getParameterValue();
-   }
+    /**
+     * Get password of user registered in container.
+     *
+     * @return password.
+     */
+    public static String getPassword() {
+        return TestConfig.PASSWORD.getParameterValue();
+    }
 
-   /**
-    * Get connection factory JNDI name defined in container to create JMS messages.
-    *
-    * @return Connection factory JNDI name.
-    */
-   public static String getConnectionFactory() {
-       return TestConfig.CONNECTION_FACTORY.getParameterValue();
-   }
+    /**
+     * Get initial context factory class name for creating context factory used in JMS.
+     *
+     * @return Initial context factory class name.
+     */
+    public static String getInitialContextFactory() {
+        return TestConfig.INITIAL_CONTEXT_FACTORY.getParameterValue();
+    }
 
-   /**
-    * Get URL which is used for remoting services like JMS.
-    *
-    * @return URL for remoting service.
-    */
-   public static String getRemotingUrl() {
-       return TestConfig.REMOTING_URL.getParameterValue();
-   }
+    /**
+     * Get connection factory JNDI name defined in container to create JMS messages.
+     *
+     * @return Connection factory JNDI name.
+     */
+    public static String getConnectionFactory() {
+        return TestConfig.CONNECTION_FACTORY.getParameterValue();
+    }
 
-   /**
-    * Get JNDI name of request queue for kie server.
-    *
-    * @return Request queue JNDI name.
-    */
-   public static String getRequestQueueJndi() {
-       return TestConfig.REQUEST_QUEUE_JNDI.getParameterValue();
-   }
+    /**
+     * Get URL which is used for remoting services like JMS.
+     *
+     * @return URL for remoting service.
+     */
+    public static String getRemotingUrl() {
+        return TestConfig.REMOTING_URL.getParameterValue();
+    }
 
-   /**
-    * Get JNDI name of response queue for kie server.
-    *
-    * @return Response queue JNDI name.
-    */
-   public static String getResponseQueueJndi() {
-       return TestConfig.RESPONSE_QUEUE_JNDI.getParameterValue();
-   }
+    /**
+     * Get JNDI name of request queue for kie server.
+     *
+     * @return Request queue JNDI name.
+     */
+    public static String getRequestQueueJndi() {
+        return TestConfig.REQUEST_QUEUE_JNDI.getParameterValue();
+    }
+
+    /**
+     * Get JNDI name of response queue for kie server.
+     *
+     * @return Response queue JNDI name.
+     */
+    public static String getResponseQueueJndi() {
+        return TestConfig.RESPONSE_QUEUE_JNDI.getParameterValue();
+    }
 
     /**
      * @return Initial context for connecting to remote server.
      */
     public static InitialContext getInitialRemoteContext() {
-       InitialContext context = null;
-       try {
-           final Properties env = new Properties();
-           env.put(Context.INITIAL_CONTEXT_FACTORY, getInitialContextFactory());
-           env.put(Context.PROVIDER_URL, getRemotingUrl());
-           env.put(Context.SECURITY_PRINCIPAL, getUsername());
-           env.put(Context.SECURITY_CREDENTIALS, getPassword());
-           context = new InitialContext(env);
-       } catch (NamingException e) {
-           throw new RuntimeException("Failed to create initial context!", e);
-       }
-       return context;
-   }
-   
+        InitialContext context = null;
+        try {
+            final Properties env = new Properties();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, getInitialContextFactory());
+            env.put(Context.PROVIDER_URL, getRemotingUrl());
+            env.put(Context.SECURITY_PRINCIPAL, getUsername());
+            env.put(Context.SECURITY_CREDENTIALS, getPassword());
+            context = new InitialContext(env);
+        } catch (NamingException e) {
+            throw new RuntimeException("Failed to create initial context!", e);
+        }
+        return context;
+    }
+
     // Used for printing all configuration values at the beginning of first test run.
     static {
         TreeMap<String, String> params = new TreeMap<String, String>();
@@ -205,7 +217,7 @@ public class TestConfig {
             );
         }
     }
-   
+
     private static abstract class TestParameter<T> {
 
         private String key;
@@ -215,7 +227,7 @@ public class TestConfig {
             this.key = key;
             this.defaultValue = defaultValue;
         }
-        
+
         /**
          * @return Parameter value.
          */
@@ -223,7 +235,7 @@ public class TestConfig {
             T parameterValue = convert(key);
             return parameterValue != null ? parameterValue : defaultValue;
         }
-        
+
         /**
          * @return True if parameter is configured.
          */
@@ -231,7 +243,7 @@ public class TestConfig {
             T parameterValue = convert(key);
             return parameterValue != null ? true : false;
         }
-        
+
         /**
          * Convert provided key to value object.
          *
@@ -240,7 +252,7 @@ public class TestConfig {
          */
         protected abstract T convert(String key);
     }
-    
+
     private static class StringTestParameter extends TestParameter<String> {
 
         private StringTestParameter(String key) {
