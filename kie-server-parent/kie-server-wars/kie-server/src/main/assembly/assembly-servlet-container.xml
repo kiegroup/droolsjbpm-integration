@@ -37,7 +37,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>org.kie.server:kie-server-services</include>
+        <include>org.kie.server:kie-server-services-common</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>

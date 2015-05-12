@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.kie.server</groupId>
-    <artifactId>kie-server-parent</artifactId>
+    <artifactId>kie-server-services</artifactId>
     <version>6.3.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>kie-server-services-drools</artifactId>
 
-  <name>KIE :: Execution Server :: Drools Extension</name>
+  <name>KIE :: Execution Server :: Services :: Drools Extension</name>
   <description>KIE Drools Execution Server Extension</description>
 
 
@@ -31,7 +31,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services</artifactId>
+      <artifactId>kie-server-services-common</artifactId>
     </dependency>
 
     <dependency>

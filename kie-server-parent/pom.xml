@@ -20,8 +20,6 @@
     <module>kie-server-services</module>
     <module>kie-server-api</module>
     <module>kie-server-tests</module>
-    <module>kie-server-services-jbpm</module>
-    <module>kie-server-services-drools</module>
     <module>kie-server-wars</module>
   </modules>
 
@@ -35,7 +33,7 @@
 
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-services</artifactId>
+        <artifactId>kie-server-services-common</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
