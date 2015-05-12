@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>kie-server-distribution</artifactId>
-  <name>KIE :: Execution Server :: Distribution</name>
+  <name>KIE :: Execution Server :: Wars :: Distribution</name>
   <description>KIE Execution Server Distribution. Bundles the different WARs into single downloadable zip.</description>
 
   <dependencies>

@@ -10,7 +10,7 @@
   <artifactId>kie-server-tests</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Execution Server :: Tests Parent</name>
+  <name>KIE :: Execution Server :: Tests</name>
   <description>KIE Execution Server Tests Parent</description>
 
   <!-- Properties shared between the different test modules -->

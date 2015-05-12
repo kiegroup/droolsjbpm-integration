@@ -10,7 +10,7 @@
   <artifactId>kie-server-client</artifactId>
   <packaging>jar</packaging>
 
-  <name>KIE :: Execution Server :: Remote Client</name>
+  <name>KIE :: Execution Server :: Remote :: Client</name>
   <description>KIE Execution Server Client</description>
 
   <dependencies>

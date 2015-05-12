@@ -10,7 +10,7 @@
   <artifactId>kie-server</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Execution Server :: Distribution Wars</name>
+  <name>KIE :: Execution Server :: Wars :: Distribution Wars</name>
   <description>KIE Execution Server Distribution Wars. Name of the module is just 'kie-server' so that the final WARs have nicer names.</description>
 
   <dependencies>
