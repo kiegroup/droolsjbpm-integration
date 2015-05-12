@@ -11,7 +11,7 @@
   <artifactId>kie-server-remote</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE :: Execution Server Remote</name>
+  <name>KIE :: Execution Server :: Remote</name>
   <description>KIE Execution Server Remote Services</description>
 
   <modules>

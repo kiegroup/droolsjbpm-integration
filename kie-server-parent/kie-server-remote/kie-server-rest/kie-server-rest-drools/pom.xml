@@ -11,7 +11,7 @@
 
   <artifactId>kie-server-rest-drools</artifactId>
 
-  <name>KIE :: Execution Server :: Remote :: REST Drools</name>
+  <name>KIE :: Execution Server :: Remote :: REST :: Drools</name>
   <description>KIE Drools Execution Server Extension</description>
 
   <dependencies>

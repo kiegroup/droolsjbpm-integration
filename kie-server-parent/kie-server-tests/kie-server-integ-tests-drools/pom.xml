@@ -9,7 +9,7 @@
 
   <artifactId>kie-server-integ-tests-drools</artifactId>
 
-  <name>KIE :: Execution Server :: Drools Integration Tests</name>
+  <name>KIE :: Execution Server :: Tests :: Drools Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration options to run on different containers.</description>
 
   <dependencies>
@@ -176,7 +176,7 @@
               <kie.server.connection.factory>${kie.server.connection.factory}</kie.server.connection.factory>
               <kie.server.jndi.request.queue>${kie.server.jndi.request.queue}</kie.server.jndi.request.queue>
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
-              <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
+              <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
@@ -209,7 +209,7 @@
         <configuration>
           <container>
             <systemProperties>
-              <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
+              <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
             </systemProperties>
           </container>
