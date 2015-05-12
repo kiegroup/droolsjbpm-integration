@@ -5,13 +5,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.kie.server</groupId>
-    <artifactId>kie-server-parent</artifactId>
+    <artifactId>kie-server-services</artifactId>
     <version>6.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services-jbpm</artifactId>
 
-  <name>KIE :: Execution Server :: jBPM Extension</name>
+  <name>KIE :: Execution Server :: Services :: jBPM Extension</name>
   <description>KIE jBPM Execution Server Extension</description>
 
   <dependencies>
@@ -30,7 +30,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services</artifactId>
+      <artifactId>kie-server-services-common</artifactId>
     </dependency>
 
     <dependency>

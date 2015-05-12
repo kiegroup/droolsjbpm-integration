@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services</artifactId>
+      <artifactId>kie-server-services-common</artifactId>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>

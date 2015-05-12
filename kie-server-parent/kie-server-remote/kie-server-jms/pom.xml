@@ -29,7 +29,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services</artifactId>
+      <artifactId>kie-server-services-common</artifactId>
     </dependency>
 
     <!-- JMS -->
