@@ -5,47 +5,37 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
+  <import resource="classpath:jbpm/configuration-template/assets.xml" />
+
   <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="persistenceUnitName" value="org.jbpm.persistence.spring.jta"/>
-    <property name="persistenceXmlLocation" value="classpath:jbpm/jta-emf/persistence-jta.xml"/>
+    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-jta.xml"/>
   </bean>
 
-  <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices">
+  <bean id="jbpmEM" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
   </bean>
+
+  <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices"/>
 
   <bean id="BitronixTransactionManager" factory-method="getTransactionManager"
         class="bitronix.tm.TransactionManagerServices" depends-on="btmConfig" destroy-method="shutdown" />
-  
+
   <bean id="jbpmTxManager" class="org.springframework.transaction.jta.JtaTransactionManager">
     <property name="transactionManager" ref="BitronixTransactionManager" />
     <property name="userTransaction" ref="BitronixTransactionManager" />
   </bean>
-  
-  <bean id="process" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
-  	<constructor-arg>
-  		<value>jbpm/processes/sample.bpmn</value>
-	  </constructor-arg>
-  </bean>
-  
+
   <bean id="runtimeEnvironment" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean">
-  	<property name="type" value="DEFAULT"/>
-  	<property name="entityManagerFactory" ref="jbpmEMF"/>
-  	<property name="transactionManager" ref="jbpmTxManager"/>
-  	<property name="assets">
-  		<map>
-  			<entry key-ref="process"><util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/></entry>
-  		</map>
-  	</property>
+    <property name="type" value="DEFAULT"/>
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
+    <property name="entityManager" ref="jbpmEM" />
+    <property name="transactionManager" ref="jbpmTxManager"/>
+    <property name="assets" ref="assets"/>
   </bean>
-  
-  <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
-  	<property name="identifier" value="spring-rm"/>
-  	<property name="runtimeEnvironment" ref="runtimeEnvironment"/>
-  </bean>
-  
-  <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService">
-  	<constructor-arg>
-  		<ref bean="jbpmEMF"/>
-	  </constructor-arg>
+
+  <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService" depends-on="runtimeEnvironment">
+    <constructor-arg value="#{runtimeEnvironment.environment}" />
+    <constructor-arg value="STANDALONE_JTA_SPRING_SHARED_EM" />
   </bean>
 </beans>

@@ -17,7 +17,7 @@ public class LocalEntityManagerLocalAuditSpringTest extends AbstractJbpmSpringTe
     @Test
     public void testAuditLogTxLocal() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-em/local-em-spring-audit-em.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/local-em/per-process-instance.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
         AuditLogService auditLogService = (AuditLogService) context.getBean("logService");
@@ -42,7 +42,7 @@ public class LocalEntityManagerLocalAuditSpringTest extends AbstractJbpmSpringTe
     @Test
     public void testAuditLogTxJTA() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-em/jta-em-spring-audit-em.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-em/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
         AuditLogService auditLogService = (AuditLogService) context.getBean("logService");

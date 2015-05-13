@@ -38,7 +38,7 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
     @Test
     public void testSpringWithJTAAndEMF() throws Exception{
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/jta-emf-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
@@ -78,7 +78,7 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
     @Test
     public void testSpringWithJTAAndEMFwithRollback() throws Exception{
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/jta-emf-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
@@ -114,7 +114,7 @@ public class JTAEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
     @Test
     public void testSpringWithJTAAndEMFwithUserTransaction() throws Exception{
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/tx-jta-emf-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
