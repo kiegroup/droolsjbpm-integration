@@ -7,7 +7,7 @@
 
   <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="persistenceUnitName" value="org.jbpm.persistence.spring.jta"/>
-    <property name="persistenceXmlLocation" value="classpath:jbpm/jta-em/persistence-jta.xml"/>
+    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-jta.xml"/>
   </bean>
 
   <bean id="jbpmEM" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">

@@ -26,7 +26,7 @@
 
   <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="poolingDataSource">
     <property name="persistenceUnitName" value="org.jbpm.persistence.spring.local" />
-    <property name="persistenceXmlLocation" value="classpath:jbpm/pessimistic-lock/persistence-local.xml" />
+    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-local.xml" />
     <property name="dataSource" ref="poolingDataSource" />
   </bean>
 

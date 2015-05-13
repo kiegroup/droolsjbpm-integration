@@ -6,8 +6,8 @@
                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
   <bean id="entityManagerFactoryBpmn" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-    <property name="persistenceUnitName" value="org.jbpm.persistence.spring.jpa"/>
-    <property name="persistenceXmlLocation" value="classpath:jbpm/jpa/persistence-jpa.xml"/>
+    <property name="persistenceUnitName" value="org.jbpm.persistence.spring.local"/>
+    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-local.xml"/>
   </bean>
 
   <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
