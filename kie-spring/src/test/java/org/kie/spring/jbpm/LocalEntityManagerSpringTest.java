@@ -30,7 +30,7 @@ public class LocalEntityManagerSpringTest extends AbstractJbpmSpringTest {
     public void testSpringWithJTAAndEM() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-em/local-em-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/local-em/per-process-instance.xml");
         EntityManager em = (EntityManager) context.getBean("jbpmEM");
         // check that there is no sessions in db
         List<?> sessions = em.createQuery("from SessionInfo").getResultList();
@@ -85,7 +85,7 @@ public class LocalEntityManagerSpringTest extends AbstractJbpmSpringTest {
     public void testSpringWithJTAAndEMwithRollback() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-em/local-em-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/local-em/per-process-instance.xml");
 
         AbstractPlatformTransactionManager aptm = (AbstractPlatformTransactionManager) context.getBean( "jbpmTxManager" );
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");

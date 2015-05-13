@@ -25,7 +25,7 @@ public class LocalEntityManagerFactorySpringTest extends AbstractJbpmSpringTest 
     public void testSpringWithJTAAndEMF() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-emf/local-emf-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/local-emf/per-process-instance.xml");
 
         AbstractPlatformTransactionManager aptm = (AbstractPlatformTransactionManager) context.getBean( "jbpmTxManager" );
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
@@ -80,7 +80,7 @@ public class LocalEntityManagerFactorySpringTest extends AbstractJbpmSpringTest 
     public void testSpringWithJTAAndEMFwithRollback() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-emf/local-emf-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/local-emf/per-process-instance.xml");
 
         AbstractPlatformTransactionManager aptm = (AbstractPlatformTransactionManager) context.getBean( "jbpmTxManager" );
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
