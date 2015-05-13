@@ -2,6 +2,7 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -9,10 +10,12 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,13 +27,13 @@ import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
-import org.kie.api.command.Command;
-import org.kie.api.runtime.manager.Context;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.ModelWrapper;
-import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
+import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -90,7 +93,7 @@ public class ProcessResource  {
         // return response
         try {
             String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(processInstanceId));
-            logger.debug("Returning OK response with content '{}'", response);
+            logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -99,10 +102,6 @@ public class ProcessResource  {
         }
     }
 
-
-    public Long startProcess(String containerId, String processId, Map<String, Object> parameters) {
-        return processService.startProcess(containerId, processId, parameters);
-    }
 
     @DELETE
     @Path("containers/{id}/process/instance/{pInstanceId}")
@@ -127,35 +126,175 @@ public class ProcessResource  {
 
 
     @DELETE
-    @Path("containers/{id}/process/instance")
+    @Path("containers/{id}/process/instances")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @javax.ws.rs.core.Context HttpServletRequest request) {
+    public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("instanceId") List<Long> processInstanceIds) {
+        Variant v = getVariant(headers);
+        try {
+            processService.abortProcessInstances(processInstanceIds);
+            // return null to produce 204 NO_CONTENT response code
+            return null;
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
 
+    @POST
+    @Path("containers/{id}/process/instance/{pInstanceId}/signal/{sName}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response signalProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, @PathParam("sName") String signalName, String eventPayload) {
+
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            String classType = getClassType(headers);
+            logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
+            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, classType, Object.class);
+
+            logger.debug("Calling signal '{}' process instance with id {} on container {} and event {}", signalName, processInstanceId, containerId, event);
+            processService.signalProcessInstance(processInstanceId, signalName, event);
+
+            return createResponse(null, v, Response.Status.OK);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
     }
 
 
-    public void signalProcessInstance(Long aLong, String s, Object o) {
+    @POST
+    @Path("containers/{id}/process/instances/signal/{sName}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @QueryParam("instanceId") List<Long> processInstanceIds, @PathParam("sName") String signalName, String eventPayload) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            String classType = getClassType(headers);
+            logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
+            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, classType, Object.class);
 
+            logger.debug("Calling signal '{}' process instances with id {} on container {} and event {}", signalName, processInstanceIds, containerId, event);
+            processService.signalProcessInstances(processInstanceIds, signalName, event);
+
+            return createResponse("", v, Response.Status.OK);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
+
+    @GET
+    @Path("containers/{id}/process/instance/{pInstanceId}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+
+            ProcessInstanceDesc instanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
+            if (instanceDesc == null) {
+                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            }
+
+            org.kie.server.api.model.instance.ProcessInstance processInstance = org.kie.server.api.model.instance.ProcessInstance.builder()
+                    .id(instanceDesc.getId())
+                    .processId(instanceDesc.getProcessId())
+                    .processName(instanceDesc.getProcessName())
+                    .processVersion(instanceDesc.getProcessVersion())
+                    .state(instanceDesc.getState())
+                    .containerId(instanceDesc.getDeploymentId())
+                    .date(instanceDesc.getDataTimeStamp())
+                    .initiator(instanceDesc.getInitiator())
+                    .processInstanceDescription(instanceDesc.getProcessInstanceDescription())
+                    .parentInstanceId(instanceDesc.getParentId())
+                    .build();
+
+            logger.debug("About to marshal process instance with id '{}' {}", processInstanceId, processInstance);
+            String response = marshallerHelper.marshal(containerId, type, processInstance);
+
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
     }
 
 
-    public void signalProcessInstances(List<Long> list, String s, Object o) {
+    @POST
+    @Path("containers/{id}/process/instance/{pInstanceId}/variable/{varName}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response setProcessVariable(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName, String variablePayload) {
 
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            String classType = getClassType(headers);
+            logger.debug("About to unmarshal variable from payload: '{}'", variablePayload);
+            Object variable = marshallerHelper.unmarshal(containerId, variablePayload, type, classType, Object.class);
+
+            logger.debug("Setting variable '{}' on process instance with id {} with value {}", varName, processInstanceId, variable);
+            processService.setProcessVariable(processInstanceId, varName, variable);
+
+            return createResponse("", v, Response.Status.OK);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
     }
 
+    @POST
+    @Path("containers/{id}/process/instance/{pInstanceId}/variables")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, String variablePayload) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            String classType = getClassType(headers);
+            logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
+            Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, type, JaxbMap.class, Map.class);
 
-    public ProcessInstance getProcessInstance(Long aLong) {
-        return null;
-    }
+            logger.debug("Setting variables '{}' on process instance with id {} with value {}", variables.keySet(), processInstanceId, variables.values());
+            processService.setProcessVariables(processInstanceId, variables);
 
+            return createResponse("", v, Response.Status.OK);
 
-    public void setProcessVariable(Long aLong, String s, Object o) {
-
-    }
-
-
-    public void setProcessVariables(Long aLong, Map<String, Object> map) {
-
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
     }
 
     @GET
@@ -175,10 +314,11 @@ public class ProcessResource  {
             }
 
             logger.debug("About to marshal process variable with name '{}' {}", varName, variable);
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(variable));
+            Object wrappedObject = ModelWrapper.wrap(variable);
+            String response = marshallerHelper.marshal(containerId, type, wrappedObject);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, Collections.singletonMap(KieServerConstants.CLASS_TYPE_HEADER, wrappedObject.getClass().getName()), v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
             throw ExecutionServerRestOperationException.notFound(
@@ -222,8 +362,30 @@ public class ProcessResource  {
     }
 
 
-    public Collection<String> getAvailableSignals(Long aLong) {
-        return null;
+    @GET
+    @Path("containers/{id}/process/instance/{pInstanceId}/signals")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getAvailableSignals(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            Collection<String> signals = processService.getAvailableSignals(processInstanceId);
+
+            logger.debug("About to marshal available signals {}", signals);
+            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(signals));
+
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+        }  catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+
     }
 
 
@@ -243,16 +405,6 @@ public class ProcessResource  {
 
 
     public List<WorkItem> getWorkItemByProcessInstance(Long aLong) {
-        return null;
-    }
-
-
-    public <T> T execute(String s, Command<T> command) {
-        return null;
-    }
-
-
-    public <T> T execute(String s, Context<?> context, Command<T> command) {
         return null;
     }
 

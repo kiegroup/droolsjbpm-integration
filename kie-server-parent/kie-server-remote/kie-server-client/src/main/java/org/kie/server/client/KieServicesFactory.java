@@ -78,6 +78,10 @@ public class KieServicesFactory {
         return new KieServicesClientImpl( conf );
     }
 
+    public static KieServicesClient newKieServicesClient( KieServicesConfiguration conf, ClassLoader classLoader ) {
+        return new KieServicesClientImpl( conf, classLoader );
+    }
+
     public static KieServicesClient newKieServicesRestClient( String serverUrl, String login, String password ) {
         return new KieServicesClientImpl( newRestConfiguration( serverUrl, login, password ) );
     }

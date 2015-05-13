@@ -29,9 +29,8 @@ public class ModelWrapper {
         wrapperPrimitives.put(Long.class, JaxbLong.class);
         wrapperPrimitives.put(Double.class, JaxbDouble.class);
         wrapperPrimitives.put(Float.class, JaxbFloat.class);
-        if (Boolean.getBoolean("org.kie.remote.wrap.string")) {
-            wrapperPrimitives.put(String.class, JaxbString.class);
-        }
+        wrapperPrimitives.put(String.class, JaxbString.class);
+
     }
 
     public static Object wrap(Object object) {

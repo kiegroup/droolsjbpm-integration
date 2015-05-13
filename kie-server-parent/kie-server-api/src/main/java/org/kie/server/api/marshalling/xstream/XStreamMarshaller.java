@@ -3,6 +3,7 @@ package org.kie.server.api.marshalling.xstream;
 import com.thoughtworks.xstream.XStream;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.*;
+import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.model.*;
 import org.kie.server.api.marshalling.Marshaller;
 
@@ -10,8 +11,10 @@ public class XStreamMarshaller
         implements Marshaller {
 
     private XStream xstream;
+    private final ClassLoader classLoader;
 
     public XStreamMarshaller( final ClassLoader classLoader ) {
+        this.classLoader = classLoader;
         this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) );
         this.xstream.setClassLoader( classLoader );
 
@@ -43,6 +46,17 @@ public class XStreamMarshaller
     @Override
     public <T> T unmarshall(String input, Class<T> type) {
         return (T) xstream.fromXML( input );
+    }
+
+    @Override
+    public <T> T unmarshall(String input, String type) {
+        try {
+            Class<?> clazz = Class.forName(type, true, this.classLoader);
+
+            return (T) unmarshall(input, clazz);
+        } catch (Exception e) {
+            throw new MarshallingException("Error unmarshalling input", e);
+        }
     }
 
     @Override

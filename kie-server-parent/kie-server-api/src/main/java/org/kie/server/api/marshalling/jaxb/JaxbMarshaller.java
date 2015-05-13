@@ -4,6 +4,7 @@ import org.kie.server.api.commands.*;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 
@@ -44,16 +45,21 @@ public class JaxbMarshaller implements Marshaller {
                 KieServerConfigItem.class,
 
                 JaxbList.class,
-                JaxbMap.class
+                JaxbMap.class,
+
+                ProcessInstance.class
         };
     }
 
     private final JAXBContext jaxbContext;
 
+    private final ClassLoader classLoader;
+
     private final javax.xml.bind.Marshaller marshaller;
     private final Unmarshaller              unmarshaller;
 
     public JaxbMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
+        this.classLoader = classLoader;
         try {
             Set<Class<?>> allClasses = new HashSet<Class<?>>();
 
@@ -87,6 +93,17 @@ public class JaxbMarshaller implements Marshaller {
             return (T) unmarshaller.unmarshal( new StringReader( input ) );
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Can't unmarshall input string: "+input, e );
+        }
+    }
+
+    @Override
+    public <T> T unmarshall(String input, String type) {
+        try {
+            Class<?> clazz = Class.forName(type, true, this.classLoader);
+
+            return (T) unmarshall(input, clazz);
+        } catch (Exception e) {
+            throw new MarshallingException("Error unmarshalling input", e);
         }
     }
 

@@ -31,6 +31,20 @@ public class MarshallerHelper {
 
     }
 
+    public <T> T unmarshal(String containerId, String data, String marshallingFormat, String unmarshalType, Class<T> returnType) {
+
+        KieContainerInstance containerInstance = registry.getContainer(containerId);
+        Class<?> actualUnfarshalType = null;
+        try {
+            actualUnfarshalType = Class.forName(unmarshalType, true, containerInstance.getKieContainer().getClassLoader());
+            return unmarshal(containerId, data, marshallingFormat, actualUnfarshalType, returnType);
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<?> unmarshalType, Class<T> returnType) {
         if (data == null || data.isEmpty()) {
             return null;

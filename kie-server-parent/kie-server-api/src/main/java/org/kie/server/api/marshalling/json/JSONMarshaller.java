@@ -17,12 +17,13 @@ import org.kie.server.api.marshalling.MarshallingException;
 
 public class JSONMarshaller implements Marshaller {
 
+    private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
     private final ObjectMapper fallbackObjectMapper;
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
-
+        this.classLoader = classLoader;
         objectMapper = new ObjectMapper();
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
@@ -76,6 +77,17 @@ public class JSONMarshaller implements Marshaller {
             throw new MarshallingException("Error unmarshalling input", e);
         } catch (IOException e) {
 
+            throw new MarshallingException("Error unmarshalling input", e);
+        }
+    }
+
+    @Override
+    public <T> T unmarshall(String input, String type) {
+        try {
+            Class<?> clazz = Class.forName(type, true, this.classLoader);
+
+            return (T) unmarshall(input, clazz);
+        } catch (Exception e) {
             throw new MarshallingException("Error unmarshalling input", e);
         }
     }

@@ -8,6 +8,8 @@ public interface Marshaller {
     public String marshall(Object input);
 
     public <T> T unmarshall(String input, Class<T> type);
+
+    public <T> T unmarshall(String input, String type);
    
     public void dispose();
 

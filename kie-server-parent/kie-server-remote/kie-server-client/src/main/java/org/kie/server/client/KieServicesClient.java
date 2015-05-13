@@ -18,9 +18,9 @@ import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
-import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.ProcessInstance;
 
 public interface KieServicesClient {
     ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig);
@@ -63,13 +63,29 @@ public interface KieServicesClient {
     TaskOutputsDefinition getUserTaskOutputDefinitions(String containerId, String processId, String taskName);
 
     // process operations
+    Long startProcess(String containerId, String processId);
+
     Long startProcess(String containerId, String processId, Map<String, Object> variables);
 
     void abortProcessInstance(String containerId, Long processInstanceId);
+
+    void abortProcessInstances(String containerId, List<Long> processInstanceIds);
 
     Object getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName);
 
     <T> T getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName, Class<T> type);
 
     Map<String, Object> getProcessInstanceVariables(String containerId, Long processInstanceId);
+
+    void signalProcessInstance(String containerId, Long processInstanceId, String signalName, Object event);
+
+    void signalProcessInstances(String containerId, List<Long> processInstanceId, String signalName, Object event);
+
+    List<String> getAvailableSignals(String containerId, Long processInstanceId);
+
+    void setProcessVariable(String containerId, Long processInstanceId, String variableId, Object value);
+
+    void setProcessVariables(String containerId, Long processInstanceId, Map<String, Object> variables);
+
+    ProcessInstance getProcessInstance(String containerId, Long processInstanceId);
 }
