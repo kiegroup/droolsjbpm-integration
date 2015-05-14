@@ -24,7 +24,7 @@ public class EntityManagerFactorySpringJpaTxManagerTest extends AbstractJbpmSpri
 
     @Test
     public void testSpringWithJpa() throws Exception{
-        context = new ClassPathXmlApplicationContext("jbpm/jpa/jpa-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/pessimistic-lock/pessimistic-locking-local-em-per-request.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 

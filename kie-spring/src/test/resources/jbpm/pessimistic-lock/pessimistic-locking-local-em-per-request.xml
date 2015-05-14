@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+  <import resource="classpath:jbpm/configuration-template/local-em-spring.xml" />
+
+  <bean id="pessimisticLockingRuntimeEnvironment" parent="runtimeEnvironment">
+    <property name="pessimisticLocking" value="true" />
+    <property name="environmentEntries">
+      <map>
+        <entry key="TRANSACTION_LOCK_ENABLED">
+          <value type="java.lang.Boolean">false</value>
+        </entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+    <property name="identifier" value="spring-rm"/>
+    <property name="runtimeEnvironment" ref="pessimisticLockingRuntimeEnvironment"/>
+    <property name="type" value="PER_REQUEST"/>
+  </bean>
+</beans>

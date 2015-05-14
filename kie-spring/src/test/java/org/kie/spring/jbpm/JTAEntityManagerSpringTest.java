@@ -26,7 +26,7 @@ public class JTAEntityManagerSpringTest extends AbstractJbpmSpringTest {
     public void testSpringWithJTAAndEM() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-em/jta-em-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-em/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
@@ -67,7 +67,7 @@ public class JTAEntityManagerSpringTest extends AbstractJbpmSpringTest {
     public void testSpringWithJTAAndEMwithRollback() throws Exception{
 
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-em/jta-em-spring.xml");
+        context = new ClassPathXmlApplicationContext("jbpm/jta-em/singleton.xml");
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
