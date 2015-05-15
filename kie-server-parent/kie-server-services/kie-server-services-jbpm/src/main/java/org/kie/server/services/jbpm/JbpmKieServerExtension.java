@@ -20,6 +20,7 @@ import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
+import org.jbpm.runtime.manager.impl.identity.UserDataServiceProvider;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
@@ -32,6 +33,7 @@ import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
@@ -75,6 +77,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+        // if no other callback set, use jaas by default
+        if (System.getProperty("org.jbpm.ht.callback") == null) {
+            System.setProperty("org.jbpm.ht.callback", "jaas");
+        }
         this.isExecutorAvailable = isExecutorOnClasspath();
 
         this.kieServer = kieServer;
@@ -93,13 +99,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((KModuleDeploymentService)deploymentService).setManagerFactory(new RuntimeManagerFactoryImpl());
         ((KModuleDeploymentService)deploymentService).setFormManagerService(new FormManagerServiceImpl());
 
+        // configure user group callback
+        UserGroupCallback userGroupCallback = UserDataServiceProvider.getUserGroupCallback();
+
         // build runtime data service
         runtimeDataService = new RuntimeDataServiceImpl();
         ((RuntimeDataServiceImpl) runtimeDataService).setCommandService(new TransactionalCommandService(emf));
         ((RuntimeDataServiceImpl) runtimeDataService).setIdentityProvider(registry.getIdentityProvider());
         ((RuntimeDataServiceImpl) runtimeDataService).setTaskService(HumanTaskServiceFactory.newTaskServiceConfigurator()
                 .entityManagerFactory(emf)
-                .userGroupCallback(new JAASUserGroupCallbackImpl(true))
+                .userGroupCallback(userGroupCallback)
                 .getTaskService());
         ((KModuleDeploymentService)deploymentService).setRuntimeDataService(runtimeDataService);
 

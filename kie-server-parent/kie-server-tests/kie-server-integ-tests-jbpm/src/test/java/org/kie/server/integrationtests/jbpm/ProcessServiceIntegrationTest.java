@@ -15,6 +15,8 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -375,6 +377,54 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     public void testGetNonExistingProcessInstance() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
         client.getProcessInstance("definition-project", 9999l);
+    }
+
+    @Test
+    public void testProcessWithUserTasks() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            assertNotNull(taskList);
+            assertNotNull(taskList.getTasks());
+
+            TaskSummary[] tasks = taskList.getTasks();
+            assertEquals(1, tasks.length);
+            TaskSummary taskSummary = tasks[0];
+            assertEquals("First task", taskSummary.getName());
+
+            // startTask and completeTask task
+            client.startTask("definition-project", taskSummary.getId(), "yoda");
+
+            Map<String, Object> taskOutcome = new HashMap<String, Object>();
+            taskOutcome.put("string_", "my custom data");
+            taskOutcome.put("person_", createPersonInstance("mary"));
+
+            client.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
+
+            // check if task outcomes are properly set as process variables
+            Object personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            assertNotNull(personVar);
+            assertEquals("mary", valueOf(personVar, "name"));
+
+            String stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            assertNotNull(personVar);
+            assertEquals("my custom data", stringVar);
+
+            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            assertNotNull(taskList);
+            assertNotNull(taskList.getTasks());
+
+            tasks = taskList.getTasks();
+            assertEquals(1, tasks.length);
+            taskSummary = tasks[0];
+            assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+        }
     }
 
     private Object createPersonInstance(String name) {

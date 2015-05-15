@@ -141,6 +141,9 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static void startServer() throws Exception {
         System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
+        System.setProperty("org.kie.server.bypass.auth.user", "true");
+        System.setProperty("org.jbpm.ht.callback", "custom");
+        System.setProperty("org.jbpm.ht.custom.callback", "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(TestConfig.getAllocatedPort());
         server.start();

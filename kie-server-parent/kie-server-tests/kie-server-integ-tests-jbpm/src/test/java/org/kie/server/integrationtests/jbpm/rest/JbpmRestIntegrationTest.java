@@ -1,10 +1,11 @@
 package org.kie.server.integrationtests.jbpm.rest;
 
-import java.io.File;
-import java.io.FilenameFilter;
+import static org.kie.server.api.rest.RestURI.*;
+
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.core.Response;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
@@ -14,10 +15,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
@@ -70,17 +69,20 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     public void testBasicJbpmRequest() throws Exception {
         KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
         assertSuccess(client.createContainer("rest-processes", resource));
-        
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
+
         ClientResponse<JaxbLong> response = null;
         try {
-            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId()
-                    + "/process/" + HUMAN_TASK_OWN_TYPE_ID ).header("Content-Type", getMediaType().toString());
-            logger.info( "[PUT] " + clientRequest.getUri());
-            response = clientRequest.put();
+            ClientRequest clientRequest = newRequest(build(TestConfig.getHttpUrl(), START_PROCESS_POST_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            logger.info( "[POST] " + clientRequest.getUri());
+            response = clientRequest.post();
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
-            clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId()
-                    + "/process/instance/" + response.getEntity(JaxbLong.class).getValue() ).header("Content-Type", getMediaType().toString());
+            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
+            clientRequest = newRequest(build(TestConfig.getHttpUrl(), ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info( "[DELETE] " + clientRequest.getUri());
             response = clientRequest.delete();
             Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());

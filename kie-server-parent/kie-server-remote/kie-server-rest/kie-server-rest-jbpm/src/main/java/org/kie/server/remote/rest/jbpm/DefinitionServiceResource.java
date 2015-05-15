@@ -27,6 +27,7 @@ import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationE
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
+import static org.kie.server.api.rest.RestURI.*;
 
 @Path("/server")
 public class DefinitionServiceResource {
@@ -39,7 +40,7 @@ public class DefinitionServiceResource {
 
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}")
+    @Path(PROCESS_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessDefinition(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -65,7 +66,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/subprocesses")
+    @Path(PROCESS_DEF_SUBPROCESS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getReusableSubProcesses(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -82,7 +83,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/variables")
+    @Path(PROCESS_DEF_VARIABLES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessVariables(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -99,7 +100,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/tasks/service")
+    @Path(PROCESS_DEF_SERVICE_TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getServiceTasks(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -116,7 +117,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/entities")
+    @Path(PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getAssociatedEntities(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -133,7 +134,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/tasks/user")
+    @Path(PROCESS_DEF_USER_TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksDefinitions(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
@@ -150,7 +151,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/tasks/user/{taskName}/inputs")
+    @Path(PROCESS_DEF_USER_TASK_INPUT_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskInputMappings(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);
@@ -167,7 +168,7 @@ public class DefinitionServiceResource {
     }
 
     @GET
-    @Path("containers/{id}/process/definition/{pId}/tasks/user/{taskName}/outputs")
+    @Path(PROCESS_DEF_USER_TASK_OUTPUT_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskOutputMappings(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);

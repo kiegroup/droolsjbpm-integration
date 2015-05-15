@@ -28,18 +28,17 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.type.JaxbMap;
-import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
@@ -66,8 +65,8 @@ public class ProcessResource  {
         return url;
     }
 
-    @PUT
-    @Path("containers/{id}/process/{pId}")
+    @POST
+    @Path(START_PROCESS_POST_URI)
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @DefaultValue("") String payload) {
@@ -104,7 +103,7 @@ public class ProcessResource  {
 
 
     @DELETE
-    @Path("containers/{id}/process/instance/{pInstanceId}")
+    @Path(ABORT_PROCESS_INST_DEL_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
@@ -126,7 +125,7 @@ public class ProcessResource  {
 
 
     @DELETE
-    @Path("containers/{id}/process/instances")
+    @Path(ABORT_PROCESS_INSTANCES_DEL_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("instanceId") List<Long> processInstanceIds) {
         Variant v = getVariant(headers);
@@ -147,7 +146,7 @@ public class ProcessResource  {
     }
 
     @POST
-    @Path("containers/{id}/process/instance/{pInstanceId}/signal/{sName}")
+    @Path(SIGNAL_PROCESS_INST_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response signalProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("sName") String signalName, String eventPayload) {
@@ -176,7 +175,7 @@ public class ProcessResource  {
 
 
     @POST
-    @Path("containers/{id}/process/instances/signal/{sName}")
+    @Path(SIGNAL_PROCESS_INSTANCES_PORT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @QueryParam("instanceId") List<Long> processInstanceIds, @PathParam("sName") String signalName, String eventPayload) {
@@ -203,7 +202,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path("containers/{id}/process/instance/{pInstanceId}")
+    @Path(PROCESS_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {
@@ -242,8 +241,8 @@ public class ProcessResource  {
     }
 
 
-    @POST
-    @Path("containers/{id}/process/instance/{pInstanceId}/variable/{varName}")
+    @PUT
+    @Path(PROCESS_INSTANCE_VAR_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setProcessVariable(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName, String variablePayload) {
@@ -258,7 +257,7 @@ public class ProcessResource  {
             logger.debug("Setting variable '{}' on process instance with id {} with value {}", varName, processInstanceId, variable);
             processService.setProcessVariable(processInstanceId, varName, variable);
 
-            return createResponse("", v, Response.Status.OK);
+            return createResponse("", v, Response.Status.CREATED);
 
         } catch (ProcessInstanceNotFoundException e) {
             throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
@@ -271,14 +270,14 @@ public class ProcessResource  {
     }
 
     @POST
-    @Path("containers/{id}/process/instance/{pInstanceId}/variables")
+    @Path(PROCESS_INSTANCE_VARS_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, String variablePayload) {
         Variant v = getVariant(headers);
         String type = v.getMediaType().getSubtype();
         try {
-            String classType = getClassType(headers);
+
             logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
             Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, type, JaxbMap.class, Map.class);
 
@@ -298,7 +297,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path("containers/{id}/process/instance/{pInstanceId}/variable/{varName}")
+    @Path(PROCESS_INSTANCE_VAR_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Object getProcessInstanceVariable(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
                                              @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName) {
@@ -333,7 +332,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path("containers/{id}/process/instance/{pInstanceId}/variables")
+    @Path(PROCESS_INSTANCE_VARS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {
@@ -363,7 +362,7 @@ public class ProcessResource  {
 
 
     @GET
-    @Path("containers/{id}/process/instance/{pInstanceId}/signals")
+    @Path(PROCESS_INSTANCE_SIGNALS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getAvailableSignals(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {

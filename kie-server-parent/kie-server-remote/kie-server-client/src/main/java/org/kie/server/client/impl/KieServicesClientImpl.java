@@ -59,6 +59,7 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
@@ -68,9 +69,13 @@ import org.kie.server.client.KieServicesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.kie.server.api.rest.RestURI.*;
+
 public class KieServicesClientImpl
         implements KieServicesClient {
     private static Logger logger = LoggerFactory.getLogger( KieServicesClientImpl.class );
+
+    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty("org.kie.server.bypass.auth.user", "false"));
 
     private       String                   baseURI;
     private final KieServicesConfiguration config;
@@ -196,7 +201,7 @@ public class KieServicesClientImpl
     @Override
     public ServiceResponsesList executeScript(CommandScript script) {
         if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateCustomResult( baseURI, script, ServiceResponsesList.class );
+            return makeHttpPostRequestAndCreateCustomResponse( baseURI, script, ServiceResponsesList.class );
         } else {
             return executeJmsCommand( script );
         }
@@ -244,8 +249,12 @@ public class KieServicesClientImpl
     @Override
     public ProcessDefinition getProcessDefinition(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId,
+                    build(baseURI, PROCESS_DEF_GET_URI, valuesMap),
                     ProcessDefinition.class);
         } else {
             throw new UnsupportedOperationException("Not yet supported");
@@ -255,8 +264,12 @@ public class KieServicesClientImpl
     @Override
     public SubProcessesDefinition getReusableSubProcessDefinitions(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/subprocesses",
+                    build(baseURI, PROCESS_DEF_SUBPROCESS_GET_URI, valuesMap),
                     SubProcessesDefinition.class);
 
         } else {
@@ -267,8 +280,12 @@ public class KieServicesClientImpl
     @Override
     public VariablesDefinition getProcessVariableDefinitions(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/variables",
+                    build(baseURI, PROCESS_DEF_VARIABLES_GET_URI, valuesMap),
                     VariablesDefinition.class);
 
         } else {
@@ -279,8 +296,12 @@ public class KieServicesClientImpl
     @Override
     public ServiceTasksDefinition getServiceTaskDefinitions(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/service",
+                    build(baseURI, PROCESS_DEF_SERVICE_TASKS_GET_URI, valuesMap),
                     ServiceTasksDefinition.class);
 
         } else {
@@ -291,8 +312,12 @@ public class KieServicesClientImpl
     @Override
     public AssociatedEntitiesDefinition getAssociatedEntityDefinitions(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/entities",
+                    build(baseURI, PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI, valuesMap),
                     AssociatedEntitiesDefinition.class);
 
         } else {
@@ -303,8 +328,12 @@ public class KieServicesClientImpl
     @Override
     public UserTaskDefinitionList getUserTaskDefinitions(String containerId, String processId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user",
+                    build(baseURI, PROCESS_DEF_USER_TASKS_GET_URI, valuesMap),
                     UserTaskDefinitionList.class);
 
         } else {
@@ -315,8 +344,13 @@ public class KieServicesClientImpl
     @Override
     public TaskInputsDefinition getUserTaskInputDefinitions(String containerId, String processId, String taskName) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+            valuesMap.put(TASK_NAME, taskName);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user/" + taskName + "/inputs",
+                    build(baseURI, PROCESS_DEF_USER_TASK_INPUT_GET_URI, valuesMap),
                     TaskInputsDefinition.class);
 
         } else {
@@ -327,8 +361,13 @@ public class KieServicesClientImpl
     @Override
     public TaskOutputsDefinition getUserTaskOutputDefinitions(String containerId, String processId, String taskName) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+            valuesMap.put(TASK_NAME, taskName);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/definition/" + processId + "/tasks/user/" + taskName + "/outputs",
+                    build(baseURI, PROCESS_DEF_USER_TASK_OUTPUT_GET_URI, valuesMap),
                     TaskOutputsDefinition.class);
 
         } else {
@@ -344,9 +383,14 @@ public class KieServicesClientImpl
     @Override
     public Long startProcess(String containerId, String processId, Map<String, Object> variables) {
         if( config.isRest() ) {
-            JaxbLong result = makeHttpPutRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/" + processId, (variables == null?null:new JaxbMap(variables)),
-                    JaxbLong.class);
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
+            JaxbLong result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, START_PROCESS_POST_URI, valuesMap), (variables == null ? null : new JaxbMap(variables)),
+                            JaxbLong.class);
 
             if (result == null) {
                 return null;
@@ -362,8 +406,12 @@ public class KieServicesClientImpl
     @Override
     public void abortProcessInstance(String containerId, Long processInstanceId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId,
+                    build(baseURI, ABORT_PROCESS_INST_DEL_URI, valuesMap),
                     null);
 
         } else {
@@ -374,14 +422,13 @@ public class KieServicesClientImpl
     @Override
     public void abortProcessInstances(String containerId, List<Long> processInstanceIds) {
         if( config.isRest() ) {
-            StringBuilder builder = new StringBuilder();
-            for (Long pid : processInstanceIds) {
-                builder.append("instanceId=").append(pid).append("&");
-            }
-            builder.deleteCharAt(builder.length()-1);
+            String queryStr = buildQueryString("instanceId", processInstanceIds);
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instances?" + builder.toString(),
+                    build(baseURI, ABORT_PROCESS_INSTANCES_DEL_URI, valuesMap) + queryStr,
                     null);
 
         } else {
@@ -397,9 +444,13 @@ public class KieServicesClientImpl
     @Override
     public <T> T getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName, Class<T> type) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(VAR_NAME, variableName);
+
             Object result = makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variable/" + variableName,
-                    type);
+                    build(baseURI, PROCESS_INSTANCE_VAR_GET_URI, valuesMap), type);
 
             if (result instanceof Wrapped) {
                 return (T) ((Wrapped) result).unwrap();
@@ -415,8 +466,13 @@ public class KieServicesClientImpl
     @Override
     public Map<String, Object> getProcessInstanceVariables(String containerId, Long processInstanceId) {
         if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
             JaxbMap variables = makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variables",
+                    build(baseURI, PROCESS_INSTANCE_VARS_GET_URI, valuesMap),
                     JaxbMap.class);
 
             if (variables != null && variables.getEntries() != null) {
@@ -434,14 +490,18 @@ public class KieServicesClientImpl
     public void signalProcessInstance(String containerId, Long processInstanceId, String signalName, Object event) {
 
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(SIGNAL_NAME, signalName);
+
             Object evenWrapped = ModelWrapper.wrap(event);
             Map<String, String> headers = new HashMap<String, String>();
             if (event != null) {
                 headers.put(KieServerConstants.CLASS_TYPE_HEADER, evenWrapped.getClass().getName());
             }
-            makeHttpPostRequestAndCreateCustomResult(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/signal/" + signalName
-                    ,  evenWrapped, String.class, headers);
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, SIGNAL_PROCESS_INST_POST_URI, valuesMap), evenWrapped, String.class, headers);
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -451,19 +511,19 @@ public class KieServicesClientImpl
     public void signalProcessInstances(String containerId, List<Long> processInstanceIds, String signalName, Object event) {
 
         if( config.isRest() ) {
-            StringBuilder builder = new StringBuilder();
-            for (Long pid : processInstanceIds) {
-                builder.append("instanceId=").append(pid).append("&");
-            }
-            builder.deleteCharAt(builder.length()-1);
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(SIGNAL_NAME, signalName);
+
+            String queryStr = buildQueryString("instanceId", processInstanceIds);
 
             Object eventWrapped = ModelWrapper.wrap(event);
             Map<String, String> headers = new HashMap<String, String>();
             if (event != null) {
                 headers.put(KieServerConstants.CLASS_TYPE_HEADER, eventWrapped.getClass().getName());
             }
-            makeHttpPostRequestAndCreateCustomResult(
-                    baseURI + "/containers/" + containerId + "/process/instances/signal/" + signalName +"?" + builder.toString()
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap) + queryStr
                     , eventWrapped, String.class, headers);
         } else {
             throw new UnsupportedOperationException("Not yet supported");
@@ -473,8 +533,12 @@ public class KieServicesClientImpl
     @Override
     public List<String> getAvailableSignals(String containerId, Long processInstanceId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
             JaxbList signals = makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/signals", JaxbList.class);
+                    build(baseURI, PROCESS_INSTANCE_SIGNALS_GET_URI, valuesMap), JaxbList.class);
 
             if (signals != null) {
                 return (List<String>) signals.unwrap();
@@ -490,14 +554,15 @@ public class KieServicesClientImpl
     @Override
     public void setProcessVariable(String containerId, Long processInstanceId, String variableId, Object value) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(VAR_NAME, variableId);
+
             Object varWrapped = ModelWrapper.wrap(value);
-            Map<String, String> headers = new HashMap<String, String>();
-            if (varWrapped != null) {
-                headers.put(KieServerConstants.CLASS_TYPE_HEADER, varWrapped.getClass().getName());
-            }
-            makeHttpPostRequestAndCreateCustomResult(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variable/" + variableId
-                    ,  varWrapped, String.class, headers);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_VAR_PUT_URI, valuesMap), varWrapped, String.class, getHeaders(varWrapped));
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -506,8 +571,12 @@ public class KieServicesClientImpl
     @Override
     public void setProcessVariables(String containerId, Long processInstanceId, Map<String, Object> variables) {
         if( config.isRest() ) {
-            makeHttpPostRequestAndCreateCustomResult(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId + "/variables", new JaxbMap(variables),
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_VARS_POST_URI, valuesMap), new JaxbMap(variables),
                     String.class);
 
         } else {
@@ -518,8 +587,99 @@ public class KieServicesClientImpl
     @Override
     public ProcessInstance getProcessInstance(String containerId, Long processInstanceId) {
         if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
             return makeHttpGetRequestAndCreateCustomResponse(
-                    baseURI + "/containers/" + containerId + "/process/instance/" + processInstanceId , ProcessInstance.class);
+                    build(baseURI, PROCESS_INSTANCE_GET_URI, valuesMap) , ProcessInstance.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void activateTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ACTIVATE_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void claimTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_CLAIM_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                    (params == null ? null : new JaxbMap(params)), String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void startTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_START_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void stopTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_STOP_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskSummaryList getTasksAssignedAsPotentialOwner(String containerId, String userId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
         } else {
             throw new UnsupportedOperationException("Not yet supported");
@@ -587,20 +747,21 @@ public class KieServicesClientImpl
     }
 
 
-    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, Object bodyObject, Class<T> resultType, Map<String, String> headers) {
-        return makeHttpPostRequestAndCreateCustomResult( uri, serialize( bodyObject ), resultType, headers );
+    private <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType, Map<String, String> headers) {
+        return makeHttpPostRequestAndCreateCustomResponse(uri, serialize(bodyObject), resultType, headers);
     }
 
-    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, Object bodyObject, Class<T> resultType) {
-        return makeHttpPostRequestAndCreateCustomResult( uri, serialize( bodyObject ), resultType, new HashMap<String, String>() );
+    private <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
+        return makeHttpPostRequestAndCreateCustomResponse(uri, serialize(bodyObject), resultType, new HashMap<String, String>() );
     }
 
-    private <T> T makeHttpPostRequestAndCreateCustomResult(String uri, String body, Class<T> resultType, Map<String, String> headers) {
+    private <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
-        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+        if ( response.code() == Response.Status.OK.getStatusCode()
+                || response.code() == Response.Status.CREATED.getStatusCode()) {
             return deserialize( response.body(), resultType );
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
@@ -616,7 +777,7 @@ public class KieServicesClientImpl
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).body( body ).put();
+        KieRemoteHttpRequest request = newRequest(uri).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
@@ -631,14 +792,14 @@ public class KieServicesClientImpl
 
     private <T> T makeHttpPutRequestAndCreateCustomResponse(
             String uri, Object bodyObject,
-            Class<T> resultType) {
-        return makeHttpPutRequestAndCreateCustomResponse(uri, serialize(bodyObject), resultType);
+            Class<T> resultType, Map<String, String> headers) {
+        return makeHttpPutRequestAndCreateCustomResponse(uri, serialize(bodyObject), resultType, headers);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType) {
+    private <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).body( body ).put();
+        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
@@ -852,6 +1013,45 @@ public class KieServicesClientImpl
                                 response.code() + ", message: " + response.message();
         logger.debug( summaryMessage + ", response body: " + response.body() );
         return new KieServicesException( summaryMessage );
+    }
+
+    private String buildQueryString(String paramName, List<?> items) {
+        StringBuilder builder = new StringBuilder("?");
+        for (Object o : items) {
+            builder.append(paramName).append("=").append(o).append("&");
+        }
+        builder.deleteCharAt(builder.length()-1);
+
+        return builder.toString();
+    }
+
+    private Map<String, String> getHeaders(Object object) {
+        Map<String, String> headers = new HashMap<String, String>();
+        if (object != null) {
+            headers.put(KieServerConstants.CLASS_TYPE_HEADER, object.getClass().getName());
+        }
+
+        return headers;
+    }
+
+    private String getUserQueryStr(String userId) {
+        if (BYPASS_AUTH_USER) {
+            return "?user=" + userId;
+        }
+
+        return "";
+    }
+
+    private String getUserAndPagingQueryString(String userId, Integer page, Integer pageSize) {
+        StringBuilder queryString = new StringBuilder(getUserQueryStr(userId));
+        if (queryString.length() == 0) {
+            queryString.append("?");
+        } else {
+            queryString.append("&");
+        }
+        queryString.append("page=" + page).append("&pageSize=" + pageSize);
+
+        return queryString.toString();
     }
 
 }

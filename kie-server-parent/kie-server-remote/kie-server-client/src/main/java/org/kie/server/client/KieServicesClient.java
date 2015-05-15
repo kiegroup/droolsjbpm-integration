@@ -21,6 +21,7 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummaryList;
 
 public interface KieServicesClient {
     ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig);
@@ -88,4 +89,19 @@ public interface KieServicesClient {
     void setProcessVariables(String containerId, Long processInstanceId, Map<String, Object> variables);
 
     ProcessInstance getProcessInstance(String containerId, Long processInstanceId);
+
+
+    // task operations
+    void activateTask(String containerId, Long taskId, String userId);
+
+    void claimTask(String containerId, Long taskId, String userId);
+
+    void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params);
+
+    void startTask(String containerId, Long taskId, String userId);
+
+    void stopTask(String containerId, Long taskId, String userId);
+
+    // task searches
+    TaskSummaryList getTasksAssignedAsPotentialOwner(String containerId, String userId, Integer page, Integer pageSize);
 }

@@ -5,6 +5,8 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 
@@ -47,7 +49,10 @@ public class JaxbMarshaller implements Marshaller {
                 JaxbList.class,
                 JaxbMap.class,
 
-                ProcessInstance.class
+                ProcessInstance.class,
+
+                TaskSummary.class,
+                TaskSummaryList.class
         };
     }
 

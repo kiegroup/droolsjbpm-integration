@@ -6,6 +6,7 @@ public class Messages {
     public static final String PROCESS_DEFINITION_FETCH_ERROR = "Error when retrieving process definition \"{0}\" in deployment \"{1}\":: Cause: {2}";
 
     public static final String PROCESS_INSTANCE_NOT_FOUND = "Could not find process instance with id \"{0}\"";
+    public static final String TASK_INSTANCE_NOT_FOUND = "Could not find task instance with id \"{0}\"";
 
     public static final String VARIABLE_INSTANCE_NOT_FOUND = "Could not find variable \"{0}\" in process instance with id \"{1}\"";
 

@@ -8,6 +8,7 @@ import java.util.List;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.UserTaskService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
@@ -27,6 +28,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         ProcessService  processService = null;
         RuntimeDataService runtimeDataService = null;
         DefinitionService definitionService = null;
+        UserTaskService userTaskService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -39,15 +41,19 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( DefinitionService.class.isAssignableFrom(object.getClass()) ) {
                definitionService = (DefinitionService) object;
                continue;
+            } else if( UserTaskService.class.isAssignableFrom(object.getClass()) ) {
+                userTaskService = (UserTaskService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
             }
         }
-        List<Object> components = new ArrayList<Object>(3);
+        List<Object> components = new ArrayList<Object>(4);
         components.add(new ProcessResource(processService, definitionService, runtimeDataService, context));
-        components.add(new RuntimeDataServiceResource(runtimeDataService));
+        components.add(new RuntimeDataServiceResource(runtimeDataService, context));
         components.add(new DefinitionServiceResource(definitionService));
+        components.add(new UserTaskResource(userTaskService, context));
 
         return components;
     }
