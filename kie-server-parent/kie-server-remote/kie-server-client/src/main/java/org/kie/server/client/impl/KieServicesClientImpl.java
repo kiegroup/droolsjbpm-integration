@@ -3,7 +3,9 @@ package org.kie.server.client.impl;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +61,18 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskAttachment;
+import org.kie.server.api.model.instance.TaskAttachmentList;
+import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.type.JaxbBoolean;
+import org.kie.server.api.model.type.JaxbDate;
+import org.kie.server.api.model.type.JaxbInteger;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
+import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
@@ -602,12 +612,8 @@ public class KieServicesClientImpl
     @Override
     public void activateTask(String containerId, Long taskId, String userId) {
         if( config.isRest() ) {
-            Map<String, Object> valuesMap = new HashMap<String, Object>();
-            valuesMap.put(CONTAINER_ID, containerId);
-            valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_INSTANCE_ACTIVATE_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_ACTIVATE_PUT_URI, getUserQueryStr(userId));
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -616,12 +622,8 @@ public class KieServicesClientImpl
     @Override
     public void claimTask(String containerId, Long taskId, String userId) {
         if( config.isRest() ) {
-            Map<String, Object> valuesMap = new HashMap<String, Object>();
-            valuesMap.put(CONTAINER_ID, containerId);
-            valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_INSTANCE_CLAIM_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_CLAIM_PUT_URI, getUserQueryStr(userId));
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -643,14 +645,87 @@ public class KieServicesClientImpl
     }
 
     @Override
-    public void startTask(String containerId, Long taskId, String userId) {
+    public void delegateTask(String containerId, Long taskId, String userId, String targetUserId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_DELEGATE_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetUserId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void exitTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_EXIT_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void failTask(String containerId, Long taskId, String userId, Map<String, Object> params) {
+
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_INSTANCE_START_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+                    build(baseURI, TASK_INSTANCE_FAIL_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                    (params == null ? null : new JaxbMap(params)), String.class, getHeaders(null));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void forwardTask(String containerId, Long taskId, String userId, String targetEntityId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_FORWARD_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetEntityId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void releaseTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_RELEASE_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void resumeTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_RESUME_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void skipTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_SKIP_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void startTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_START_PUT_URI, getUserQueryStr(userId));
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -659,12 +734,368 @@ public class KieServicesClientImpl
     @Override
     public void stopTask(String containerId, Long taskId, String userId) {
         if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_STOP_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void suspendTask(String containerId, Long taskId, String userId) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_SUSPEND_PUT_URI, getUserQueryStr(userId));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void nominateTask(String containerId, Long taskId, String userId, List<String> potentialOwners) {
+        if( config.isRest() ) {
+
+            sendTaskOperation(containerId, taskId, TASK_INSTANCE_NOMINATE_PUT_URI, getUserAndAdditionalParams(userId, "potOwner", potentialOwners));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void setTaskPriority(String containerId, Long taskId, int priority) {
+        if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
+            Object content = new JaxbInteger(priority);
+
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_INSTANCE_STOP_PUT_URI, valuesMap) + getUserQueryStr(userId), null, String.class, getHeaders(null));
+                    build(baseURI, TASK_INSTANCE_PRIORITY_PUT_URI, valuesMap),
+                    content, String.class, getHeaders(content));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void setTaskExpirationDate(String containerId, Long taskId, Date date) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            Object content = new JaxbDate(date);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_EXPIRATION_DATE_PUT_URI, valuesMap),
+                    content, String.class, getHeaders(content));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void setTaskSkipable(String containerId, Long taskId, boolean skipable) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            Object content = new JaxbBoolean(skipable);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_SKIPABLE_PUT_URI, valuesMap),
+                    content, String.class, getHeaders(content));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void setTaskName(String containerId, Long taskId, String name) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            Object content = new JaxbString(name);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_NAME_PUT_URI, valuesMap),
+                    content, String.class, getHeaders(content));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void setTaskDescription(String containerId, Long taskId, String description) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            Object content = new JaxbString(description);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_DESCRIPTION_PUT_URI, valuesMap),
+                    content, String.class, getHeaders(content));
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            JaxbLong contentId = makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap),
+                    (values == null ? null : new JaxbMap(values)), JaxbLong.class, getHeaders(null));
+
+            return contentId.unwrap();
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Map<String, Object> getTaskOutputContentByTaskId(String containerId, Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            JaxbMap variables = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_OUTPUT_DATA_GET_URI, valuesMap), JaxbMap.class);
+
+            if (variables != null) {
+                return variables.unwrap();
+            }
+
+            return Collections.emptyMap();
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Map<String, Object> getTaskInputContentByTaskId(String containerId, Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            JaxbMap variables = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_INPUT_DATA_GET_URI, valuesMap), JaxbMap.class);
+
+            if (variables != null) {
+                return variables.unwrap();
+            }
+
+            return Collections.emptyMap();
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void deleteTaskContent(String containerId, Long taskId, Long contentId) {
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(CONTENT_ID, contentId);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_CONTENT_DATA_DELETE_URI, valuesMap),
+                    null);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Long addTaskComment(String containerId, Long taskId, String text, String addedBy, Date addedOn) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            TaskComment taskComment = TaskComment.builder()
+                    .text(text)
+                    .addedBy(addedBy)
+                    .addedAt(addedOn)
+                    .build();
+
+            JaxbLong commentId = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_COMMENT_ADD_POST_URI, valuesMap), taskComment, JaxbLong.class, getHeaders(taskComment));
+
+            return commentId.unwrap();
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void deleteTaskComment(String containerId, Long taskId, Long commentId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(COMMENT_ID, commentId);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_COMMENT_DELETE_URI, valuesMap),
+                    null);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskComment> getTaskCommentsByTaskId(String containerId, Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            TaskCommentList commentList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_COMMENTS_GET_URI, valuesMap), TaskCommentList.class);
+
+            if (commentList.getTasks() != null) {
+                return Arrays.asList(commentList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskComment getTaskCommentById(String containerId, Long taskId, Long commentId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(COMMENT_ID, commentId);
+
+            TaskComment taskComment = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_COMMENT_GET_URI, valuesMap), TaskComment.class);
+
+            return taskComment;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Long addTaskAttachment(String containerId, Long taskId, String userId, Object attachment) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            Object attachmentWrapped = ModelWrapper.wrap(attachment);
+
+            JaxbLong commentId = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserQueryStr(userId),
+                    attachmentWrapped, JaxbLong.class, getHeaders(attachmentWrapped));
+
+            return commentId.unwrap();
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void deleteTaskAttachment(String containerId, Long taskId, Long attachmentId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(ATTACHMENT_ID, attachmentId);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ATTACHMENT_DELETE_URI, valuesMap),
+                    null);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskAttachment getTaskAttachmentById(String containerId, Long taskId, Long attachmentId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(ATTACHMENT_ID, attachmentId);
+
+            TaskAttachment attachment = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ATTACHMENT_GET_URI, valuesMap), TaskAttachment.class);
+
+            return attachment;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+            valuesMap.put(ATTACHMENT_ID, attachmentId);
+
+            Object result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap), Object.class);
+
+            if (result instanceof Wrapped) {
+                return ((Wrapped) result).unwrap();
+            }
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskAttachment> getTaskAttachmentsByTaskId(String containerId, Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            TaskAttachmentList attachmentList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_ATTACHMENTS_GET_URI, valuesMap), TaskAttachmentList.class);
+
+            if (attachmentList.getTasks() != null) {
+                return Arrays.asList(attachmentList.getTasks());
+            }
+
+            return Collections.emptyList();
+
         } else {
             throw new UnsupportedOperationException("Not yet supported");
         }
@@ -691,6 +1122,15 @@ public class KieServicesClientImpl
      * jBPM part END
      *
      */
+
+    private void sendTaskOperation(String containerId, Long taskId, String operation, String queryString) {
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(CONTAINER_ID, containerId);
+        valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+        makeHttpPutRequestAndCreateCustomResponse(
+                build(baseURI, operation, valuesMap) + queryString, null, String.class, getHeaders(null));
+    }
 
     @SuppressWarnings("unchecked")
     private <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
@@ -1051,6 +1491,32 @@ public class KieServicesClientImpl
         }
         queryString.append("page=" + page).append("&pageSize=" + pageSize);
 
+        return queryString.toString();
+    }
+
+    private String getUserAndAdditionalParam(String userId, String name, String value) {
+        StringBuilder queryString = new StringBuilder(getUserQueryStr(userId));
+        if (queryString.length() == 0) {
+            queryString.append("?");
+        } else {
+            queryString.append("&");
+        }
+        queryString.append(name).append("=").append(value);
+
+        return queryString.toString();
+    }
+
+    private String getUserAndAdditionalParams(String userId, String name, List<?> values) {
+        StringBuilder queryString = new StringBuilder(getUserQueryStr(userId));
+        if (queryString.length() == 0) {
+            queryString.append("?");
+        } else {
+            queryString.append("&");
+        }
+        for (Object value : values) {
+            queryString.append(name).append("=").append(value).append("&");
+        }
+        queryString.deleteCharAt(queryString.length() - 1);
         return queryString.toString();
     }
 

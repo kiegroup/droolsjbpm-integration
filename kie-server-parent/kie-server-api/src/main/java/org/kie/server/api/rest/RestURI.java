@@ -14,6 +14,9 @@ public class RestURI {
     public static final String VAR_NAME = "varName";
     public static final String TASK_NAME = "taskName";
     public static final String TASK_INSTANCE_ID = "tInstanceId";
+    public static final String CONTENT_ID = "contentId";
+    public static final String COMMENT_ID = "commentId";
+    public static final String ATTACHMENT_ID = "attachmentId";
 
     // uris
     // process related
@@ -45,6 +48,39 @@ public class RestURI {
     public static final String TASK_INSTANCE_START_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/started";
     public static final String TASK_INSTANCE_STOP_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/stopped";
     public static final String TASK_INSTANCE_COMPLETE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/completed";
+    public static final String TASK_INSTANCE_DELEGATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/delegated";
+    public static final String TASK_INSTANCE_EXIT_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/exited";
+    public static final String TASK_INSTANCE_FAIL_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/failed";
+    public static final String TASK_INSTANCE_FORWARD_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/forwarded";
+    public static final String TASK_INSTANCE_RELEASE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/released";
+    public static final String TASK_INSTANCE_RESUME_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/resumed";
+    public static final String TASK_INSTANCE_SKIP_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/skipped";
+    public static final String TASK_INSTANCE_SUSPEND_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/suspended";
+    public static final String TASK_INSTANCE_NOMINATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/nominated";
+
+    public static final String TASK_INSTANCE_PRIORITY_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/priority";
+    public static final String TASK_INSTANCE_DESCRIPTION_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/description";
+    public static final String TASK_INSTANCE_NAME_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/name";
+    public static final String TASK_INSTANCE_EXPIRATION_DATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/expiration";
+    public static final String TASK_INSTANCE_SKIPABLE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/skipable";
+
+    public static final String TASK_INSTANCE_OUTPUT_DATA_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/output";
+    public static final String TASK_INSTANCE_OUTPUT_DATA_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/output";
+    public static final String TASK_INSTANCE_INPUT_DATA_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/input";
+
+    public static final String TASK_INSTANCE_CONTENT_DATA_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/{" + CONTENT_ID +"}";
+
+    public static final String TASK_INSTANCE_COMMENT_ADD_POST_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments";
+    public static final String TASK_INSTANCE_COMMENTS_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments";
+    public static final String TASK_INSTANCE_COMMENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
+    public static final String TASK_INSTANCE_COMMENT_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
+
+    public static final String TASK_INSTANCE_ATTACHMENT_ADD_POST_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments";
+    public static final String TASK_INSTANCE_ATTACHMENTS_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments";
+    public static final String TASK_INSTANCE_ATTACHMENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
+    public static final String TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}/content";
+    public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
+
 
     // task search related
     public static final String TASKS_ASSIGN_POT_OWNERS_GET_URI = "containers/{" + CONTAINER_ID + "}/task/instances";

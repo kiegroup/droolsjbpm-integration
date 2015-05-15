@@ -1,8 +1,10 @@
 package org.kie.server.client;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.api.task.model.Task;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -21,6 +23,8 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskAttachment;
+import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskSummaryList;
 
 public interface KieServicesClient {
@@ -98,9 +102,63 @@ public interface KieServicesClient {
 
     void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params);
 
+    void delegateTask(String containerId, Long taskId, String userId, String targetUserId);
+
+    void exitTask(String containerId, Long taskId, String userId);
+
+    void failTask(String containerId, Long taskId, String userId, Map<String, Object> params);
+
+    void forwardTask(String containerId, Long taskId, String userId, String targetEntityId);
+
+    void releaseTask(String containerId, Long taskId, String userId);
+
+    void resumeTask(String containerId, Long taskId, String userId);
+
+    void skipTask(String containerId, Long taskId, String userId);
+
     void startTask(String containerId, Long taskId, String userId);
 
     void stopTask(String containerId, Long taskId, String userId);
+
+    void suspendTask(String containerId, Long taskId, String userId);
+
+    void nominateTask(String containerId, Long taskId, String userId, List<String> potentialOwners);
+
+    void setTaskPriority(String containerId, Long taskId, int priority);
+
+    void setTaskExpirationDate(String containerId, Long taskId, Date date);
+
+    void setTaskSkipable(String containerId, Long taskId, boolean skipable);
+
+    void setTaskName(String containerId, Long taskId, String name);
+
+    void setTaskDescription(String containerId, Long taskId, String description);
+
+    Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values);
+
+    Map<String, Object> getTaskOutputContentByTaskId(String containerId, Long taskId);
+
+    Map<String, Object> getTaskInputContentByTaskId(String containerId, Long taskId);
+
+    void deleteTaskContent(String containerId, Long taskId, Long contentId);
+
+    Long addTaskComment(String containerId, Long taskId, String text, String addedBy, Date addedOn);
+
+    void deleteTaskComment(String containerId, Long taskId, Long commentId);
+
+    List<TaskComment> getTaskCommentsByTaskId(String containerId, Long taskId);
+
+    TaskComment getTaskCommentById(String containerId, Long taskId, Long commentId);
+
+    Long addTaskAttachment(String containerId, Long taskId, String userId, Object attachment);
+
+    void deleteTaskAttachment(String containerId, Long taskId, Long attachmentId);
+
+    TaskAttachment getTaskAttachmentById(String containerId, Long taskId, Long attachmentId);
+
+    Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId);
+
+    List<TaskAttachment> getTaskAttachmentsByTaskId(String containerId, Long taskId);
 
     // task searches
     TaskSummaryList getTasksAssignedAsPotentialOwner(String containerId, String userId, Integer page, Integer pageSize);
