@@ -16,30 +16,52 @@
 
 package org.kie.spring.tests;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
 
-public class KieSpringImportReleaseIdTest extends KieSpringImportKieTest {
+public class KieSpringImportReleaseIdTest extends AbstractKieSpringDynamicModuleTest {
 
-    @BeforeClass
-    public static void setup() {
-        context = new ClassPathXmlApplicationContext("org/kie/spring/kie-import-releaseid.xml");
-    }
+    static ApplicationContext context = null;
+    protected final int FIRST_VALUE = 5;
 
     @Test
-    public void testReleaseId() throws Exception {
-        ReleaseId releaseId = context.getBean("namedKieSession", ReleaseId.class);
+    public void testSpringKieImportReleaseId() throws Exception {
+
+        KieServices ks = KieServices.Factory.get();
+
+        //step 1: deploy the test module to MAVEN Repo
+        createAndDeployModule(ks, FIRST_VALUE);
+
+        //step 2: load the spring context
+        createSpringContext();
+
+        //step 3: check the basic spring objects
+        lookupReleaseId();
+        lookupNamedKieBase();
+
+        //step 4: cleanup. Remove the module
+        ks.getRepository().removeKieModule(releaseId);
+    }
+
+    protected void lookupNamedKieBase() throws Exception {
+        KieBase kieBase = context.getBean("KBase1", KieBase.class);
+        assertNotNull(kieBase);
+    }
+
+    protected void lookupReleaseId() throws Exception {
+        ReleaseId releaseId = context.getBean("spring-import-releaseId", ReleaseId.class);
         assertNotNull(releaseId);
     }
 
-    @AfterClass
-    public static void tearDown() {
-
+    protected void createSpringContext() throws Exception {
+        context = new ClassPathXmlApplicationContext("org/kie/spring/kie-import-releaseid.xml");
+        assertNotNull(context);
     }
 
 }

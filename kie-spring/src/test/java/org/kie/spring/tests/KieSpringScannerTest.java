@@ -46,14 +46,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.kie.scanner.MavenRepository.getMavenRepository;
 
-public class KieSpringScannerTest {
+public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
 
     static ApplicationContext context = null;
-    private File kPom;
-    private ReleaseId releaseId;
-    private FileManager fileManager;
-    private final int FIRST_VALUE = 5;
     private final int SECOND_VALUE = 10;
+    protected final int FIRST_VALUE = 5;
 
     @Test
     public void testSpringKieScanner() throws Exception {
@@ -61,7 +58,7 @@ public class KieSpringScannerTest {
         KieServices ks = KieServices.Factory.get();
 
         //step 1: deploy the test module to MAVEN Repo
-        MavenRepository repository = createAndDeployModule(ks);
+        MavenRepository repository = createAndDeployModule(ks, FIRST_VALUE);
 
         //step 2: load the spring context
         createSpringContext();
@@ -86,19 +83,6 @@ public class KieSpringScannerTest {
 
         //step 8: cleanup. Remove the module
         ks.getRepository().removeKieModule(releaseId);
-    }
-
-    protected MavenRepository createAndDeployModule(KieServices ks) throws IOException {
-        this.fileManager = new FileManager();
-        this.fileManager.setUp();
-        releaseId = KieServices.Factory.get().newReleaseId("org.kie.spring", "spring-scanner-test", "1.0-SNAPSHOT");
-        kPom = createKPom(releaseId);
-
-        MavenRepository repository = getMavenRepository();
-
-        InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
-        repository.deployArtifact(releaseId, kJar1, kPom);
-        return repository;
     }
 
     protected void createSpringContext() throws Exception {
@@ -137,73 +121,4 @@ public class KieSpringScannerTest {
         assertTrue("Expected:<" + value + "> but was:<" + list.get(0)  + ">", list.get(0) == value);
     }
 
-    protected InternalKieModule createKieJarWithClass(KieServices ks, ReleaseId releaseId, int value) throws IOException {
-        KieFileSystem kfs = createKieFileSystemWithKProject(ks, false);
-        kfs.writePomXML(getPom(releaseId));
-
-
-        kfs.write("src/main/resources/KBase1/rule1.drl", createDRL(value));
-
-        KieBuilder kieBuilder = ks.newKieBuilder(kfs);
-        assertTrue("", kieBuilder.buildAll().getResults().getMessages().isEmpty());
-        return (InternalKieModule) kieBuilder.getKieModule();
-    }
-
-    protected KieFileSystem createKieFileSystemWithKProject(KieServices ks, boolean isdefault) {
-        KieModuleModel kproj = ks.newKieModuleModel();
-
-        KieBaseModel kieBaseModel1 = kproj.newKieBaseModel("KBase1").setDefault(isdefault)
-                .setEqualsBehavior(EqualityBehaviorOption.EQUALITY)
-                .setEventProcessingMode(EventProcessingOption.STREAM);
-
-        KieSessionModel ksession1 = kieBaseModel1.newKieSessionModel("KSession1").setDefault(isdefault)
-                .setType(KieSessionModel.KieSessionType.STATEFUL)
-                .setClockType(ClockTypeOption.get("realtime"));
-
-        KieFileSystem kfs = ks.newKieFileSystem();
-        kfs.writeKModuleXML(kproj.toXML());
-        return kfs;
-    }
-
-    protected File createKPom(ReleaseId releaseId) throws IOException {
-        File pomFile = fileManager.newFile("pom.xml");
-        fileManager.write(pomFile, getPom(releaseId));
-        return pomFile;
-    }
-
-    protected String getPom(ReleaseId releaseId, ReleaseId... dependencies) {
-        String pom =
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                        "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                        "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
-                        "  <modelVersion>4.0.0</modelVersion>\n" +
-                        "\n" +
-                        "  <groupId>" + releaseId.getGroupId() + "</groupId>\n" +
-                        "  <artifactId>" + releaseId.getArtifactId() + "</artifactId>\n" +
-                        "  <version>" + releaseId.getVersion() + "</version>\n" +
-                        "\n";
-        if (dependencies != null && dependencies.length > 0) {
-            pom += "<dependencies>\n";
-            for (ReleaseId dep : dependencies) {
-                pom += "<dependency>\n";
-                pom += "  <groupId>" + dep.getGroupId() + "</groupId>\n";
-                pom += "  <artifactId>" + dep.getArtifactId() + "</artifactId>\n";
-                pom += "  <version>" + dep.getVersion() + "</version>\n";
-                pom += "</dependency>\n";
-            }
-            pom += "</dependencies>\n";
-        }
-        pom += "</project>";
-        return pom;
-    }
-
-    protected String createDRL(int value) {
-        return "package org.kie.test\n" +
-                "global java.util.List list\n" +
-                "rule simple\n" +
-                "when\n" +
-                "then\n" +
-                "   list.add(" + value + ");\n" +
-                "end\n";
-    }
 }
