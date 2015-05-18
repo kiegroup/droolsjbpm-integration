@@ -25,6 +25,7 @@ import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 
 public interface KieServicesClient {
@@ -94,6 +95,8 @@ public interface KieServicesClient {
 
     ProcessInstance getProcessInstance(String containerId, Long processInstanceId);
 
+    ProcessInstance getProcessInstance(String containerId, Long processInstanceId, boolean withVars);
+
 
     // task operations
     void activateTask(String containerId, Long taskId, String userId);
@@ -159,6 +162,10 @@ public interface KieServicesClient {
     Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId);
 
     List<TaskAttachment> getTaskAttachmentsByTaskId(String containerId, Long taskId);
+
+    TaskInstance getTaskInstance(String containerId, Long taskId);
+
+    TaskInstance getTaskInstance(String containerId, Long taskId, boolean withInputs, boolean withOutputs, boolean withAssignments);
 
     // task searches
     TaskSummaryList getTasksAssignedAsPotentialOwner(String containerId, String userId, Integer page, Integer pageSize);

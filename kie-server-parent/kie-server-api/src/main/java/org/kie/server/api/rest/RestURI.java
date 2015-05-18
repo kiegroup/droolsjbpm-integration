@@ -81,6 +81,8 @@ public class RestURI {
     public static final String TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}/content";
     public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
 
+    public static final String TASK_INSTANCE_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}";
+
 
     // task search related
     public static final String TASKS_ASSIGN_POT_OWNERS_GET_URI = "containers/{" + CONTAINER_ID + "}/task/instances";

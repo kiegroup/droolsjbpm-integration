@@ -65,6 +65,7 @@ import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskCommentList;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbDate;
@@ -610,6 +611,21 @@ public class KieServicesClientImpl
     }
 
     @Override
+    public ProcessInstance getProcessInstance(String containerId, Long processInstanceId, boolean withVars) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_GET_URI, valuesMap) + "?withVars=" + withVars , ProcessInstance.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
     public void activateTask(String containerId, Long taskId, String userId) {
         if( config.isRest() ) {
 
@@ -1095,6 +1111,47 @@ public class KieServicesClientImpl
             }
 
             return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskInstance getTaskInstance(String containerId, Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            TaskInstance result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_GET_URI, valuesMap), TaskInstance.class);
+
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskInstance getTaskInstance(String containerId, Long taskId, boolean withInputs, boolean withOutputs, boolean withAssignments) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            StringBuilder queryString = new StringBuilder();
+            queryString.append("?withInputData").append("=").append(withInputs)
+                    .append("&withOutputData").append("=").append(withOutputs)
+                    .append("&withAssignments").append("=").append(withAssignments);
+
+            TaskInstance result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_INSTANCE_GET_URI, valuesMap) + queryString.toString(), TaskInstance.class);
+
+
+            return result;
 
         } else {
             throw new UnsupportedOperationException("Not yet supported");

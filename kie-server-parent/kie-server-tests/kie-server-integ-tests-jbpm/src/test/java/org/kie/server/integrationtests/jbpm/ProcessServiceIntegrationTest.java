@@ -363,6 +363,63 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals(-1l, processInstance.getParentId().longValue());
             assertNull(processInstance.getCorrelationKey());
             assertNotNull(processInstance.getDate());
+
+            Map<String, Object> variables = processInstance.getVariables();
+            assertNotNull(variables);
+            assertEquals(0, variables.size());
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+        }
+
+    }
+
+    @Test
+    public void testGetProcessInstanceWithVariables() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess", parameters);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        try {
+            ProcessInstance processInstance = client.getProcessInstance("definition-project", processInstanceId, true);
+            assertNotNull(processInstance);
+            assertEquals(processInstanceId, processInstance.getId());
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
+            assertEquals("definition-project.signalprocess", processInstance.getProcessId());
+            assertEquals("signalprocess", processInstance.getProcessName());
+            assertEquals("1.0", processInstance.getProcessVersion());
+            assertEquals("definition-project", processInstance.getContainerId());
+            assertEquals("signalprocess", processInstance.getProcessInstanceDescription());
+            if (TestConfig.isLocalServer()) {
+                assertEquals("unknown", processInstance.getInitiator());
+            } else {
+                assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
+            }
+            assertEquals(-1l, processInstance.getParentId().longValue());
+            assertNull(processInstance.getCorrelationKey());
+            assertNotNull(processInstance.getDate());
+
+            Map<String, Object> variables = processInstance.getVariables();
+            assertNotNull(variables);
+            assertEquals(2, variables.size());
+
+            assertTrue(variables.containsKey("stringData"));
+            assertTrue(variables.containsKey("personData"));
+
+            String stringVar = (String) variables.get("stringData");
+            Object personVar = variables.get("personData");
+
+            assertNotNull(personVar);
+            assertEquals("john", valueOf(personVar, "name"));
+
+            assertNotNull(personVar);
+            assertEquals("waiting for signal", stringVar);
+
         } finally {
             client.abortProcessInstance("definition-project", processInstanceId);
         }

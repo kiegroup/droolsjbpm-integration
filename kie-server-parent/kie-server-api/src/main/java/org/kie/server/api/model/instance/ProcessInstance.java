@@ -1,10 +1,14 @@
 package org.kie.server.api.model.instance;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.kie.server.api.model.type.JaxbMap;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance")
@@ -32,6 +36,9 @@ public class ProcessInstance {
     private String correlationKey;
     @XmlElement(name="parent-instance-id")
     private Long parentId;
+
+    @XmlElement(name="process-instance-variables")
+    private JaxbMap variables;
 
     public ProcessInstance() {
     }
@@ -128,6 +135,18 @@ public class ProcessInstance {
         this.parentId = parentId;
     }
 
+    public Map<String, Object> getVariables() {
+        if (variables != null) {
+            return variables.unwrap();
+        }
+
+        return Collections.emptyMap();
+    }
+
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = new JaxbMap(variables);
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{" +
@@ -199,6 +218,11 @@ public class ProcessInstance {
 
         public Builder parentInstanceId(Long parentInstanceId) {
             processInstance.setParentId(parentInstanceId);
+            return this;
+        }
+
+        public Builder variables(Map<String, Object> variables) {
+            processInstance.setVariables(variables);
             return this;
         }
     }

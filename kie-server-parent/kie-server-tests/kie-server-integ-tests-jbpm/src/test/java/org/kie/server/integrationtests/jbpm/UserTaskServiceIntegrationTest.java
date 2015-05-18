@@ -12,6 +12,7 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.client.KieServicesClient;
@@ -392,6 +393,128 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, tasks.length);
             taskSummary = tasks[0];
             assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    @Test
+    public void testUserTaskById() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            assertNotNull(taskList);
+            assertNotNull(taskList.getTasks());
+
+            TaskSummary[] tasks = taskList.getTasks();
+            assertEquals(1, tasks.length);
+            TaskSummary taskSummary = tasks[0];
+            assertEquals("First task", taskSummary.getName());
+
+            TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId());
+            assertNotNull(taskInstance);
+            assertEquals("First task", taskInstance.getName());
+            assertEquals("", taskInstance.getDescription());
+            assertEquals("", taskInstance.getSubject());
+            assertEquals("Reserved", taskInstance.getStatus());
+            assertEquals(0, taskInstance.getPriority().intValue());
+            assertEquals("yoda", taskInstance.getActualOwner());
+            assertEquals("yoda", taskInstance.getCreatedBy());
+            assertEquals("definition-project.usertask", taskInstance.getProcessId());
+            assertEquals("definition-project", taskInstance.getContainerId());
+            assertEquals(taskSummary.getId(), taskInstance.getId());
+            assertEquals(-1, taskInstance.getParentId().longValue());
+            assertEquals(true, taskInstance.getSkipable());
+            assertEquals(processInstanceId, taskInstance.getProcessInstanceId());
+
+            assertNotNull(taskInstance.getWorkItemId());
+            assertTrue(taskInstance.getWorkItemId().longValue() > 0);
+
+            assertNull(taskInstance.getExcludedOwners());
+            assertNull(taskInstance.getPotentialOwners());
+            assertNull(taskInstance.getBusinessAdmins());
+            assertNotNull(taskInstance.getInputData());
+            assertEquals(0, taskInstance.getInputData().size());
+            assertNotNull(taskInstance.getOutputData());
+            assertEquals(0, taskInstance.getOutputData().size());
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    @Test
+    public void testUserTaskByIdWithDetails() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "john is working on it");
+        parameters.put("personData", createPersonInstance("john"));
+
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask", parameters);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            assertNotNull(taskList);
+            assertNotNull(taskList.getTasks());
+
+            TaskSummary[] tasks = taskList.getTasks();
+            assertEquals(1, tasks.length);
+            TaskSummary taskSummary = tasks[0];
+            assertEquals("First task", taskSummary.getName());
+
+            TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId(), true, true, true);
+            assertNotNull(taskInstance);
+            assertEquals("First task", taskInstance.getName());
+            assertEquals("", taskInstance.getDescription());
+            assertEquals("", taskInstance.getSubject());
+            assertEquals("Reserved", taskInstance.getStatus());
+            assertEquals(0, taskInstance.getPriority().intValue());
+            assertEquals("yoda", taskInstance.getActualOwner());
+            assertEquals("yoda", taskInstance.getCreatedBy());
+            assertEquals("definition-project.usertask", taskInstance.getProcessId());
+            assertEquals("definition-project", taskInstance.getContainerId());
+            assertEquals(taskSummary.getId(), taskInstance.getId());
+            assertEquals(-1, taskInstance.getParentId().longValue());
+            assertEquals(true, taskInstance.getSkipable());
+            assertEquals(processInstanceId, taskInstance.getProcessInstanceId());
+
+            assertNotNull(taskInstance.getWorkItemId());
+            assertTrue(taskInstance.getWorkItemId().longValue() > 0);
+
+            assertNotNull(taskInstance.getExcludedOwners());
+            assertEquals(0, taskInstance.getExcludedOwners().size());
+            assertNotNull(taskInstance.getPotentialOwners());
+            assertEquals(1, taskInstance.getPotentialOwners().size());
+            assertTrue(taskInstance.getPotentialOwners().contains("yoda"));
+
+            assertNotNull(taskInstance.getBusinessAdmins());
+            assertEquals(2, taskInstance.getBusinessAdmins().size());
+            assertTrue(taskInstance.getBusinessAdmins().contains("Administrator"));
+            assertTrue(taskInstance.getBusinessAdmins().contains("Administrators"));
+
+            assertNotNull(taskInstance.getInputData());
+            assertEquals(5, taskInstance.getInputData().size());
+
+            Map<String, Object> inputs = taskInstance.getInputData();
+            assertTrue(inputs.containsKey("ActorId"));
+            assertTrue(inputs.containsKey("_string"));
+            assertTrue(inputs.containsKey("Skippable"));
+            assertTrue(inputs.containsKey("_person"));
+            assertTrue(inputs.containsKey("NodeName"));
+
+            assertEquals("yoda", inputs.get("ActorId"));
+            assertEquals("john is working on it", inputs.get("_string"));
+            assertEquals("true", inputs.get("Skippable"));
+            assertEquals("First task", inputs.get("NodeName"));
+            assertEquals("john", valueOf(inputs.get("_person"), "name"));
+
+            assertNotNull(taskInstance.getOutputData());
+            assertEquals(0, taskInstance.getOutputData().size());
 
         } finally {
             client.abortProcessInstance("definition-project", processInstanceId);

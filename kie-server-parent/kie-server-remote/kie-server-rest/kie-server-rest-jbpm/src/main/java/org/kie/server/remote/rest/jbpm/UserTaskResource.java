@@ -20,8 +20,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.task.model.Attachment;
@@ -30,16 +28,18 @@ import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Task;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.TaskModelProvider;
+import org.kie.internal.task.api.model.InternalPeopleAssignments;
+import org.kie.internal.task.api.model.InternalTask;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskCommentList;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbInteger;
-import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
@@ -874,7 +874,91 @@ public class UserTaskResource {
         }
     }
 
-    Task getTask(Long taskId) {
-        return null;
+    @GET
+    @Path(TASK_INSTANCE_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response  getTask(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
+            @QueryParam("withInputData") boolean withInput, @QueryParam("withOutputData") boolean withOutput, @QueryParam("withAssignments") boolean withAssignments) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+
+            Task task = userTaskService.getTask(taskId);
+            TaskInstance.Builder builder = TaskInstance.builder();
+            builder
+                    .id(task.getId())
+                    .name(task.getName())
+                    .subject(task.getSubject())
+                    .description(task.getDescription())
+                    .priority(task.getPriority())
+                    .taskType(task.getTaskType())
+                    .formName(((InternalTask) task).getFormName())
+                    .status(task.getTaskData().getStatus().name())
+                    .actualOwner(getOrgEntityIfNotNull(task.getTaskData().getActualOwner()))
+                    .createdBy(getOrgEntityIfNotNull(task.getTaskData().getCreatedBy()))
+                    .createdOn(task.getTaskData().getCreatedOn())
+                    .activationTime(task.getTaskData().getActivationTime())
+                    .expirationTime(task.getTaskData().getExpirationTime())
+                    .skippable(task.getTaskData().isSkipable())
+                    .workItemId(task.getTaskData().getWorkItemId())
+                    .processInstanceId(task.getTaskData().getProcessInstanceId())
+                    .parentId(task.getTaskData().getParentId())
+                    .processId(task.getTaskData().getProcessId())
+                    .containerId(task.getTaskData().getDeploymentId());
+
+            if (Boolean.TRUE.equals(withInput)) {
+                Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskId);
+                builder.inputData(variables);
+            }
+
+            if (Boolean.TRUE.equals(withOutput)) {
+                Map<String, Object> variables = userTaskService.getTaskOutputContentByTaskId(taskId);
+                builder.outputData(variables);
+            }
+
+            if (Boolean.TRUE.equals(withAssignments)) {
+                builder.potentialOwners(orgEntityAsList(task.getPeopleAssignments().getPotentialOwners()));
+
+                builder.excludedOwners(orgEntityAsList(((InternalPeopleAssignments) task.getPeopleAssignments()).getExcludedOwners()));
+
+                builder.businessAdmins(orgEntityAsList(task.getPeopleAssignments().getBusinessAdministrators()));
+            }
+
+            TaskInstance taskInstance = builder.build();
+
+
+            logger.debug("About to marshal task '{}' representation {}", taskId, taskInstance);
+            String response = marshallerHelper.marshal(containerId, type, taskInstance);
+
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+
+        } catch (TaskNotFoundException e){
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
+
+    private String getOrgEntityIfNotNull(OrganizationalEntity organizationalEntity) {
+        if (organizationalEntity == null) {
+            return "";
+        }
+
+        return organizationalEntity.getId();
+    }
+
+    private List<String> orgEntityAsList(List<OrganizationalEntity> organizationalEntities) {
+        ArrayList<String> entities = new ArrayList<String>();
+        if (organizationalEntities == null) {
+            return entities;
+        }
+
+        for (OrganizationalEntity entity : organizationalEntities) {
+            entities.add(entity.getId());
+        }
+
+        return entities;
     }
 }

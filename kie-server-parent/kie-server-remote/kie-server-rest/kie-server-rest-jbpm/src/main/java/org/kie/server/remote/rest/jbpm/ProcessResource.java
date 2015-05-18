@@ -205,7 +205,7 @@ public class ProcessResource  {
     @Path(PROCESS_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
-            @PathParam("pInstanceId") Long processInstanceId) {
+            @PathParam("pInstanceId") Long processInstanceId, @QueryParam("withVars") boolean withVars) {
         Variant v = getVariant(headers);
         String type = v.getMediaType().getSubtype();
         try {
@@ -227,6 +227,11 @@ public class ProcessResource  {
                     .processInstanceDescription(instanceDesc.getProcessInstanceDescription())
                     .parentInstanceId(instanceDesc.getParentId())
                     .build();
+
+            if (Boolean.TRUE.equals(withVars)) {
+                Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId);
+                processInstance.setVariables(variables);
+            }
 
             logger.debug("About to marshal process instance with id '{}' {}", processInstanceId, processInstance);
             String response = marshallerHelper.marshal(containerId, type, processInstance);
