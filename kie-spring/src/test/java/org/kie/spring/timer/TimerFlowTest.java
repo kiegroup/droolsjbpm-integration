@@ -16,6 +16,11 @@
 
 package org.kie.spring.timer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Properties;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,11 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.Properties;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TimerFlowTest {
 
@@ -39,7 +39,7 @@ public class TimerFlowTest {
     @Before
     public void createSpringContext() {
         try {
-            log.info("creating spring context");
+            log.debug("creating spring context");
             PropertyPlaceholderConfigurer configurer = new PropertyPlaceholderConfigurer();
             Properties properties = new Properties();
             properties.setProperty("temp.dir",
@@ -57,9 +57,8 @@ public class TimerFlowTest {
     }
 
     @Test
-    @Ignore // test randomly fails on some computer architectures.
+    @Ignore // I don't know how to fix the test-resources org/kie/spring/timer/conf/spring-conf.xml file
     public void doTest() throws Exception {
-        //  do not use Thread.sleep() in MyDroolsBean, but use Object.wait() and Object.notifyAll() or a Latch instead
 
         MyDroolsBean myDroolsBean = (MyDroolsBean) ctx.getBean("myDroolsBean");
 
@@ -70,6 +69,11 @@ public class TimerFlowTest {
         int n = myDroolsBean.getTimerTriggerCount();
         assertTrue(n > 0);
 
+        for( int i = 0; i < 2; ++i ) { 
+            // wait 2 more times for the timer to fire
+            MyDroolsBean.waitForOtherThread();
+        }
+        
         myDroolsBean.endTheProcess();
         assertTrue(myDroolsBean.getTimerTriggerCount() > n);
     }

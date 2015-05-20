@@ -23,9 +23,11 @@ import org.drools.core.util.DroolsStreamUtils;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
+import org.jbpm.process.builder.ReturnValueEvaluatorBuilder;
 import org.jbpm.process.core.timer.Timer;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
+import org.jbpm.workflow.core.Constraint;
 import org.jbpm.workflow.core.Node;
 import org.jbpm.workflow.core.impl.ConnectionImpl;
 import org.jbpm.workflow.core.impl.DroolsConsequenceAction;
@@ -48,6 +50,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 import static org.junit.Assert.*;
 
@@ -67,22 +71,22 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         h2Server.start();
         try {
             TMPDIR = JPASingleSessionCommandServiceFactoryEnvTest.class.getResource("/kb_persistence").getFile();
-            log.info("creating: {}",
+            log.debug("creating: {}",
                     TMPDIR + "/processWorkItems.pkg");
             writePackage(getProcessWorkItems(),
                     new File(TMPDIR + "/processWorkItems.pkg"));
 
-            log.info("creating: {}",
+            log.debug("creating: {}",
                     TMPDIR + "/processSubProcess.pkg");
             writePackage(getProcessSubProcess(),
                     new File(TMPDIR + "/processSubProcess.pkg"));
 
-            log.info("creating: {}",
+            log.debug("creating: {}",
                     TMPDIR + "/processTimer.pkg");
             writePackage(getProcessTimer(),
                     new File(TMPDIR + "/processTimer.pkg"));
 
-            log.info("creating: {}",
+            log.debug("creating: {}",
                     TMPDIR + "/processTimer2.pkg");
             writePackage(getProcessTimer2(),
                     new File(TMPDIR + "/processTimer2.pkg"));
@@ -95,7 +99,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
     @AfterClass
     public static void stopH2Database() throws Exception {
-        log.info("stopping database");
+        log.debug("stopping database");
         h2Server.stop();
         DeleteDbFiles.execute("",
                 "DroolsFlow",
@@ -105,7 +109,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     @Before
     public void createSpringContext() {
         try {
-            log.info("creating spring context");
+            log.debug("creating spring context");
             ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_beans_env.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
@@ -116,21 +120,21 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
     @After
     public void destroySpringContext() {
-        log.info("destroy spring context");
+        log.debug("destroy spring context");
     }
 
     @Test
     public void testPersistenceWorkItems() throws Exception {
-        log.info("---> get bean jpaSingleSessionCommandService");
+        log.debug("---> get bean jpaSingleSessionCommandService");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
-        log.info("---> create new SingleSessionCommandService");
+        log.debug("---> create new SingleSessionCommandService");
 
         long sessionId = service.getIdentifier();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
+        log.debug("---> created SingleSessionCommandService id: " + sessionId);
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.TestProcess");
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
@@ -218,7 +222,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         long sessionId = service.getIdentifier();
         ProcessInstance processInstance = service.startProcess("org.drools.test.TestProcess");
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
@@ -301,7 +305,6 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         service.dispose();
     }
 
-    @SuppressWarnings("unused")
     private static KnowledgePackage getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.TestProcess");
@@ -400,7 +403,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         long sessionId = service.getIdentifier();
 
         RuleFlowProcessInstance processInstance = (RuleFlowProcessInstance) service.startProcess("org.drools.test.ProcessSubProcess");
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
         long processInstanceId = processInstance.getId();
 
@@ -547,20 +550,20 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
     @Test
     public void testPersistenceTimer() throws Exception {
-        System.out.println("TMPDIR == " + TMPDIR);
-        log.info("---> get bean jpaSingleSessionCommandService2");
+        log.debug("TMPDIR == " + TMPDIR);
+        log.debug("---> get bean jpaSingleSessionCommandService2");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
         long sessionId = service.getIdentifier();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
+        log.debug("---> created SingleSessionCommandService id: " + sessionId);
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.ProcessTimer");
         long procId = processInstance.getId();
-        log.info("---> Started ProcessTimer id: {}",
+        log.debug("---> Started ProcessTimer id: {}",
                 procId);
 
         service.dispose();
-        log.info("---> session disposed");
+        log.debug("---> session disposed");
 
         final Environment env = (Environment) ctx.getBean("env");
         /*
@@ -577,25 +580,27 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
                 null,
                 env);
 
-        log.info("---> load session: " + sessionId);
+        log.debug("---> load session: " + sessionId);
         processInstance = service.getProcessInstance(procId);
-        log.info("---> GetProcessInstanceCommand id: " + procId);
+        log.debug("---> GetProcessInstanceCommand id: " + procId);
         assertNotNull(processInstance);
 
-        Thread.sleep(1000);
-        log.info("---> session disposed");
+        waitForTimer();
+        // wait for process to complete
+        Thread.sleep(500);
+        
+        log.debug("---> session disposed");
         service.dispose();
 
         service = kstore.loadKieSession(sessionId,
                 kbase1,
                 null,
                 env);
-        log.info("---> load session: " + sessionId);
-        Thread.sleep(3000);
+        log.debug("---> load session: " + sessionId);
 
-        log.info("---> GetProcessInstanceCommand id: " + procId);
+        log.debug("---> GetProcessInstanceCommand id: " + procId);
         processInstance = service.getProcessInstance(procId);
-        log.info("---> session disposed");
+        log.debug("---> session disposed");
         assertNull(processInstance);
     }
 
@@ -613,7 +618,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         timerNode.setId(2);
         timerNode.setName("Timer");
         Timer timer = new Timer();
-        timer.setDelay("2000");
+        timer.setDelay("750");
         timerNode.setTimer(timer);
         process.addNode(timerNode);
         new ConnectionImpl(start,
@@ -625,7 +630,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         actionNode.setName("Action");
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect("java");
-        action.setConsequence("System.out.println(\"Executed action\");");
+        action.setConsequence("try { org.kie.spring.tests.persistence.JPASingleSessionCommandServiceFactoryEnvTest.waitForTest(); } catch (Throwable t) { t.printStackTrace(); } System.out.println(\"Executed timer action\");");
         actionNode.setAction(action);
         process.addNode(actionNode);
         new ConnectionImpl(timerNode,
@@ -655,10 +660,12 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         long sessionId = service.getIdentifier();
 
         ProcessInstance processInstance = service.startProcess("org.drools.test.ProcessTimer2");
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
 
-        Thread.sleep(2000);
+        waitForTimer();
+        // wait for process to complete
+        Thread.sleep(500);
 
         final Environment env = (Environment) ctx.getBean("env");
         /*
@@ -705,7 +712,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         actionNode.setName("Action");
         DroolsConsequenceAction action = new DroolsConsequenceAction();
         action.setDialect("java");
-        action.setConsequence("try { Thread.sleep(1000); } catch (Throwable t) {} System.out.println(\"Executed action\");");
+        action.setConsequence("try { org.kie.spring.tests.persistence.JPASingleSessionCommandServiceFactoryEnvTest.waitForTest(); } catch (Throwable t) { t.printStackTrace(); } System.out.println(\"Executed timer action\");");
         actionNode.setAction(action);
         process.addNode(actionNode);
         new ConnectionImpl(timerNode,
@@ -726,5 +733,27 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         processBuilder.buildProcess(process,
                 null);
         return packageBuilder.getPackage();
+    }
+    
+    private static CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
+    
+    public static void waitForTest() { 
+        try {
+            cyclicBarrier.await();
+        } catch( InterruptedException ie ) {
+            // do nothing
+        } catch( BrokenBarrierException bbe ) {
+            throw new IllegalStateException("The barrier is broken!", bbe);
+        }
+    }
+
+    public static void waitForTimer() { 
+        try {
+            cyclicBarrier.await();
+        } catch( InterruptedException ie ) {
+            // do nothing
+        } catch( BrokenBarrierException bbe ) {
+            throw new IllegalStateException("The barrier is broken!", bbe);
+        }
     }
 }

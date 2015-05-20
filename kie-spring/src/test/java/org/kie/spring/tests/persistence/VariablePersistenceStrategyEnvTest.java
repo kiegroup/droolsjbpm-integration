@@ -65,7 +65,7 @@ public class VariablePersistenceStrategyEnvTest {
 
     @AfterClass
     public static void stopH2Database() throws Exception {
-        log.info("stoping database");
+        log.debug("stoping database");
         h2Server.stop();
         DeleteDbFiles.execute("",
                 "DroolsFlow",
@@ -75,7 +75,7 @@ public class VariablePersistenceStrategyEnvTest {
     @Before
     public void createSpringContext() {
         try {
-            log.info("creating spring context");
+            log.debug("creating spring context");
             ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_var_beans_env.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
@@ -86,7 +86,7 @@ public class VariablePersistenceStrategyEnvTest {
 
     @After
     public void destroySpringContext() {
-        log.info("destroy spring context");
+        log.debug("destroy spring context");
     }
 
     @Test
@@ -234,13 +234,13 @@ public class VariablePersistenceStrategyEnvTest {
         em.getTransaction().commit();
         em.close();
 
-        log.info("---> get bean jpaSingleSessionCommandService");
+        log.debug("---> get bean jpaSingleSessionCommandService");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
         long sessionId = service.getIdentifier();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
+        log.debug("---> created SingleSessionCommandService id: " + sessionId);
 
-        log.info("### Starting process ###");
+        log.debug("### Starting process ###");
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("x",
                 "SomeString");
@@ -254,7 +254,7 @@ public class VariablePersistenceStrategyEnvTest {
                 myVariableSerializable);
         WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess("com.sample.ruleflow",
                 parameters);
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
@@ -267,7 +267,7 @@ public class VariablePersistenceStrategyEnvTest {
         //        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
         //        assertEquals( 5,
         //                      result.size() );
-        log.info("### Retrieving process instance ###");
+        log.debug("### Retrieving process instance ###");
 
 /*        Environment env = KnowledgeBaseFactory.newEnvironment();
         env.set( EnvironmentName.ENTITY_MANAGER_FACTORY,

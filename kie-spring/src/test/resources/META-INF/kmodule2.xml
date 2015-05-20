@@ -22,7 +22,7 @@
   </kbase>
 
   <kbase name="drl_timer_flow" packages="drl_timer_flow">
-    <ksession name="knowledgeBase"/>
+    <ksession name="jpaSSCS"/>
   </kbase>
 
 </kmodule>
