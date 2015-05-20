@@ -1,8 +1,16 @@
 package org.kie.spring.jbpm;
 
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
@@ -10,39 +18,25 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.*;
+@RunWith(Parameterized.class)
+public class AuditLogSpringTest extends AbstractJbpmSpringTest {
 
-public class LocalEntityManagerLocalAuditSpringTest extends AbstractJbpmSpringTest {
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> contextPath() {
+        Object[][] data = new Object[][] {
+                { "jbpm/jta-em/singleton.xml" },
+                { "jbpm/local-em/singleton.xml" }
+             };
+        return Arrays.asList(data);
+    };
 
-    @Test
-    public void testAuditLogTxLocal() throws Exception {
-
-        context = new ClassPathXmlApplicationContext("jbpm/local-em/per-process-instance.xml");
-
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-        AuditLogService auditLogService = (AuditLogService) context.getBean("logService");
-
-        RuntimeEngine engine = manager.getRuntimeEngine(EmptyContext.get());
-        final KieSession ksession = engine.getKieSession();
-        final ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
-
-        ProcessInstanceLog instanceLog = auditLogService.findProcessInstance(processInstance.getId());
-        assertNotNull(instanceLog);
-        assertEquals(ProcessInstance.STATE_ACTIVE, instanceLog.getStatus().intValue());
-
-        ksession.abortProcessInstance(processInstance.getId());
-
-        instanceLog = auditLogService.findProcessInstance(processInstance.getId());
-        assertNotNull(instanceLog);
-        assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
-
-        manager.disposeRuntimeEngine(engine);
-    }
+    @Parameterized.Parameter(0)
+    public String contextPath;
 
     @Test
-    public void testAuditLogTxJTA() throws Exception {
+    public void testAuditLog() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-em/singleton.xml");
+        context = new ClassPathXmlApplicationContext(contextPath);
 
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
         AuditLogService auditLogService = (AuditLogService) context.getBean("logService");

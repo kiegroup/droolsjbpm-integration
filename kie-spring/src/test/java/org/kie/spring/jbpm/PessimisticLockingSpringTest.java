@@ -3,8 +3,6 @@ package org.kie.spring.jbpm;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,8 +12,6 @@ import javax.persistence.LockTimeoutException;
 import javax.persistence.PessimisticLockException;
 
 import org.jbpm.process.audit.AuditLogService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -31,17 +27,17 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @RunWith(Parameterized.class)
-public class PessimisticLockingSpringTest  {
+public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(PessimisticLockingSpringTest.class);
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
@@ -51,6 +47,8 @@ public class PessimisticLockingSpringTest  {
         return Arrays.asList(data);
     };
 
+    @Parameterized.Parameter(0)
+    public String contextPath;
 
     @Rule
     public TestRule watcher = new TestWatcher() {
@@ -63,74 +61,15 @@ public class PessimisticLockingSpringTest  {
         };
     };
 
-    protected static void cleanupSingletonSessionId() {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"));
-        if (tempDir.exists()) {
-
-            String[] jbpmSerFiles = tempDir.list(new FilenameFilter() {
-
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith("-jbpmSessionId.ser");
-                }
-            });
-            for (String file : jbpmSerFiles) {
-                new File(tempDir, file).delete();
-            }
-        }
-    }
-
-    protected ConfigurableApplicationContext context;
-    protected String contextPath;
-    protected RuntimeManager manager;
-    protected AbstractPlatformTransactionManager tm;
-
-    public PessimisticLockingSpringTest(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    @Before
-    public void setup() {
-        cleanupSingletonSessionId();
-        LOG.info("Creating spring context - " + contextPath);
-        context = new ClassPathXmlApplicationContext(contextPath);
-        LOG.info("The spring context created.");
-        tm = (AbstractPlatformTransactionManager) context.getBean("jbpmTxManager");
-        assertNotNull(tm);
-
-
-        manager = (RuntimeManager) context.getBean("runtimeManager");
-    }
-
-    @After
-    public void cleanup() {
-        try {
-            if (manager != null) {
-                manager.close();
-                manager = null;
-            }
-
-
-        } catch (Exception ex) {
-
-        }
-        try {
-            if (context != null) {
-                context.close();
-                context = null;
-            }
-        } catch (Exception ex) {
-
-        }
-    }
-
-    public AuditLogService getAuditLogService() {
-        return (AuditLogService) context.getBean("logService");
-    }
-
-
     @Test
     public void testPessimisticLock() throws Exception {
+
+        context = new ClassPathXmlApplicationContext(contextPath);
+
+        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
+        final AbstractPlatformTransactionManager tm = (AbstractPlatformTransactionManager) context.getBean("jbpmTxManager");
+        AuditLogService logService = (AuditLogService) context.getBean("logService");
+
         final DefaultTransactionDefinition defTransDefinition = new DefaultTransactionDefinition();
         final List<Exception> exceptions = new ArrayList<Exception>();
         RuntimeEngine engine = manager.getRuntimeEngine(EmptyContext.get());
@@ -198,7 +137,7 @@ public class PessimisticLockingSpringTest  {
         }
 
         TransactionStatus status = tm.getTransaction(defTransDefinition);
-        ProcessInstanceLog instanceLog = getAuditLogService().findProcessInstance(processInstance.getId());
+        ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
         tm.commit(status);
         assertNotNull(instanceLog);
         assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
