@@ -37,6 +37,9 @@ public class ProcessInstance {
     @XmlElement(name="parent-instance-id")
     private Long parentId;
 
+    @XmlElement(name="active-user-tasks")
+    private TaskSummaryList activeUserTasks;
+
     @XmlElement(name="process-instance-variables")
     private JaxbMap variables;
 
@@ -147,6 +150,14 @@ public class ProcessInstance {
         this.variables = new JaxbMap(variables);
     }
 
+    public TaskSummaryList getActiveUserTasks() {
+        return activeUserTasks;
+    }
+
+    public void setActiveUserTasks(TaskSummaryList activeUserTasks) {
+        this.activeUserTasks = activeUserTasks;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{" +
@@ -223,6 +234,11 @@ public class ProcessInstance {
 
         public Builder variables(Map<String, Object> variables) {
             processInstance.setVariables(variables);
+            return this;
+        }
+
+        public Builder activeUserTasks(TaskSummaryList activeUserTasks) {
+            processInstance.setActiveUserTasks(activeUserTasks);
             return this;
         }
     }

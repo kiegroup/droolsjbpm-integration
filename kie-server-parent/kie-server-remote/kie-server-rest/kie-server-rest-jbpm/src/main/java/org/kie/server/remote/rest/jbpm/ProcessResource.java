@@ -1,6 +1,7 @@
 package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +30,13 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.internal.KieInternalServices;
+import org.kie.internal.process.CorrelationKey;
+import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.ModelWrapper;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
@@ -51,6 +57,8 @@ public class ProcessResource  {
     private DefinitionService definitionService;
     private RuntimeDataService runtimeDataService;
     private MarshallerHelper marshallerHelper;
+
+    private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
     public ProcessResource(ProcessService processService, DefinitionService definitionService, RuntimeDataService runtimeDataService, KieServerRegistry context) {
         this.processService = processService;
@@ -88,6 +96,47 @@ public class ProcessResource  {
 
         logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
         Long processInstanceId = processService.startProcess(containerId, processId, parameters);
+
+        // return response
+        try {
+            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(processInstanceId));
+            logger.debug("Returning CREATED response with content '{}'", response);
+            return createResponse(response, v, Response.Status.CREATED);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(
+                    MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
+        }
+    }
+
+    @POST
+    @Path(START_PROCESS_WITH_CORRELATION_KEY_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response startProcessWithCorrelation(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId,
+            @PathParam("correlationKey") String correlationKey, @DefaultValue("") String payload) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        // Check for presence of process id
+        try {
+            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
+            if( procDef == null ) {
+                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+            }
+        } catch( Exception e ) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(
+                    MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
+        }
+        logger.debug("About to unmarshal parameters from payload: '{}'", payload);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+
+        String[] correlationProperties = correlationKey.split(":");
+
+        CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
+
+        logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
+        Long processInstanceId = processService.startProcess(containerId, processId, actualCorrelationKey, parameters);
 
         // return response
         try {
@@ -393,23 +442,140 @@ public class ProcessResource  {
     }
 
 
-    public void completeWorkItem(Long aLong, Map<String, Object> map) {
+    @PUT
+    @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response completeWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId, String resultPayload) {
+
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            logger.debug("About to unmarshal work item result from payload: '{}'", resultPayload);
+            Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, type, JaxbMap.class, Map.class);
+
+            logger.debug("Completing work item '{}' on process instance id {} with value {}", workItemId, processInstanceId, results);
+            processService.completeWorkItem(workItemId, results);
+
+            return createResponse("", v, Response.Status.CREATED);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
+
+
+    @PUT
+    @Path(PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response abortWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId) {
+        Variant v = getVariant(headers);
+
+        try {
+            logger.debug("Aborting work item '{}' on process instance id {}", workItemId, processInstanceId);
+            processService.abortWorkItem(workItemId);
+
+            return createResponse("", v, Response.Status.CREATED);
+
+        } catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
+
+
+    @GET
+    @Path(PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            WorkItem workItem = processService.getWorkItem(workItemId);
+
+            if (workItem == null) {
+                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v);
+            }
+
+            WorkItemInstance workItemInstance = WorkItemInstance.builder()
+                    .id(workItem.getId())
+                    .nodeInstanceId(((org.drools.core.process.instance.WorkItem)workItem).getNodeInstanceId())
+                    .processInstanceId(workItem.getProcessInstanceId())
+                    .containerId(((org.drools.core.process.instance.WorkItem)workItem).getDeploymentId())
+                    .name(workItem.getName())
+                    .nodeId(((org.drools.core.process.instance.WorkItem)workItem).getNodeId())
+                    .parameters(workItem.getParameters())
+                    .state(workItem.getState())
+                    .build();
+
+            logger.debug("About to marshal work item {}", workItemInstance);
+            String response = marshallerHelper.marshal(containerId, type, workItemInstance);
+
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+        }  catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
 
     }
 
 
-    public void abortWorkItem(Long aLong) {
+    @GET
+    @Path(PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getWorkItemByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @PathParam("pInstanceId") Long processInstanceId) {
+        Variant v = getVariant(headers);
+        String type = v.getMediaType().getSubtype();
+        try {
+            List<WorkItem> workItems = processService.getWorkItemByProcessInstance(processInstanceId);
 
-    }
+            WorkItemInstance[] instances = new WorkItemInstance[workItems.size()];
+            int counter = 0;
+            for (WorkItem workItem : workItems) {
+                WorkItemInstance workItemInstance = WorkItemInstance.builder()
+                        .id(workItem.getId())
+                        .nodeInstanceId(((org.drools.core.process.instance.WorkItem) workItem).getNodeInstanceId())
+                        .processInstanceId(workItem.getProcessInstanceId())
+                        .containerId(((org.drools.core.process.instance.WorkItem) workItem).getDeploymentId())
+                        .name(workItem.getName())
+                        .nodeId(((org.drools.core.process.instance.WorkItem) workItem).getNodeId())
+                        .parameters(workItem.getParameters())
+                        .state(workItem.getState())
+                        .build();
+                instances[counter] = workItemInstance;
+                counter++;
+            }
+            WorkItemInstanceList result = new WorkItemInstanceList(instances);
+            logger.debug("About to marshal work items {}", result);
+            String response = marshallerHelper.marshal(containerId, type, result);
 
-
-    public WorkItem getWorkItem(Long aLong) {
-        return null;
-    }
-
-
-    public List<WorkItem> getWorkItemByProcessInstance(Long aLong) {
-        return null;
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+        }  catch (ProcessInstanceNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+        } catch (DeploymentNotFoundException e) {
+            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
     }
 
 

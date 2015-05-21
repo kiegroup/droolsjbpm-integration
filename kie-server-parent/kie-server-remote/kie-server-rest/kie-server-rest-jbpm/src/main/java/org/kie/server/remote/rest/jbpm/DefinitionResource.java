@@ -30,11 +30,11 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 import static org.kie.server.api.rest.RestURI.*;
 
 @Path("/server")
-public class DefinitionServiceResource {
+public class DefinitionResource {
 
     private DefinitionService definitionService;
 
-    public DefinitionServiceResource(DefinitionService definitionService) {
+    public DefinitionResource(DefinitionService definitionService) {
         this.definitionService = definitionService;
     }
 

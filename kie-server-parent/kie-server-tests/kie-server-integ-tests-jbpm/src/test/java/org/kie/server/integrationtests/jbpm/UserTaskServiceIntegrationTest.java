@@ -1,20 +1,18 @@
 package org.kie.server.integrationtests.jbpm;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
-import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -64,13 +62,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             // startTask and completeTask task
@@ -91,13 +87,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNotNull(personVar);
             assertEquals("my custom data", stringVar);
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
@@ -112,38 +106,32 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
             client.releaseTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Ready", taskSummary.getStatus());
 
             client.claimTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
@@ -159,38 +147,32 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
             client.startTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("InProgress", taskSummary.getStatus());
 
             client.stopTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
@@ -206,34 +188,30 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
             client.suspendTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            if (taskList.getTasks() != null && taskList.getTasks().length > 0) {
+            if (taskList.size() > 0) {
                 fail("Should not be any tasks for yoda as potential owner");
             }
 
             client.resumeTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
             assertEquals("Reserved", taskSummary.getStatus());
 
@@ -249,13 +227,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             // startTask and completeTask task
@@ -267,13 +243,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             client.failTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
@@ -288,24 +262,20 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             client.skipTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
@@ -325,13 +295,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
-
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+         ;
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             // start task
@@ -385,13 +353,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNotNull(personVar);
             assertEquals("my custom data 2", stringVar);
 
-            taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
@@ -406,13 +372,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId());
@@ -458,13 +422,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            TaskSummaryList taskList = client.getTasksAssignedAsPotentialOwner("definition-project", "yoda", 0, 10);
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
-            assertNotNull(taskList.getTasks());
 
-            TaskSummary[] tasks = taskList.getTasks();
-            assertEquals(1, tasks.length);
-            TaskSummary taskSummary = tasks[0];
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
             TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId(), true, true, true);

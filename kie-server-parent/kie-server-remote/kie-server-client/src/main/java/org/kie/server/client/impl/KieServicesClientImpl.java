@@ -22,6 +22,7 @@ import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.KieServerConstants;
@@ -54,19 +55,30 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskCommentList;
+import org.kie.server.api.model.instance.TaskEventInstance;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbInteger;
@@ -388,7 +400,7 @@ public class KieServicesClientImpl
 
     @Override
     public Long startProcess(String containerId, String processId) {
-        return startProcess(containerId, processId, null);
+        return startProcess(containerId, processId, (Map<String, Object>) null);
     }
 
     @Override
@@ -402,6 +414,35 @@ public class KieServicesClientImpl
             JaxbLong result = makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, START_PROCESS_POST_URI, valuesMap), (variables == null ? null : new JaxbMap(variables)),
                             JaxbLong.class);
+
+            if (result == null) {
+                return null;
+            }
+
+            return result.getValue();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public Long startProcess(String containerId, String processId, CorrelationKey correlationKey) {
+        return startProcess(containerId, processId, correlationKey, null);
+    }
+
+    @Override
+    public Long startProcess(String containerId, String processId, CorrelationKey correlationKey, Map<String, Object> variables) {
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+            valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
+
+            JaxbLong result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap), (variables == null ? null : new JaxbMap(variables)),
+                    JaxbLong.class);
 
             if (result == null) {
                 return null;
@@ -619,6 +660,76 @@ public class KieServicesClientImpl
 
             return makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_GET_URI, valuesMap) + "?withVars=" + withVars , ProcessInstance.class);
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void completeWorkItem(String containerId, Long processInstanceId, Long id, Map<String, Object> results) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(WORK_ITEM_ID, id);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI, valuesMap), results == null?null:new JaxbMap(results),
+                    String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public void abortWorkItem(String containerId, Long processInstanceId, Long id) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(WORK_ITEM_ID, id);
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap), null,
+                    String.class, getHeaders(null));
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public WorkItemInstance getWorkItem(String containerId, Long processInstanceId, Long id) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(WORK_ITEM_ID, id);
+
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI, valuesMap), WorkItemInstance.class);
+
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<WorkItemInstance> getWorkItemByProcessInstance(String containerId, Long processInstanceId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            WorkItemInstanceList list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI, valuesMap), WorkItemInstanceList.class);
+
+            if (list != null && list.getWorkItems() != null) {
+                return Arrays.asList(list.getWorkItems());
+            }
+
+            return Collections.emptyList();
 
         } else {
             throw new UnsupportedOperationException("Not yet supported");
@@ -1159,15 +1270,645 @@ public class KieServicesClientImpl
     }
 
     @Override
-    public TaskSummaryList getTasksAssignedAsPotentialOwner(String containerId, String userId, Integer page, Integer pageSize) {
+    public List<ProcessDefinition> findProcessesById(String processId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_ID, processId);
+
+            ProcessDefinitionList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_DEFINITIONS_BY_ID_GET_URI, valuesMap), ProcessDefinitionList.class);
+
+            if (result != null && result.getProcesses() != null) {
+                return Arrays.asList(result.getProcesses());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public ProcessDefinition findProcessByContainerIdProcessId(String containerId, String processId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_ID, processId);
+
+            ProcessDefinition result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI, valuesMap), ProcessDefinition.class);
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            ProcessDefinitionList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+
+            if (result != null && result.getProcesses() != null) {
+                return Arrays.asList(result.getProcesses());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getPagingQueryString("?filter=" + filter, page, pageSize);
+
+            ProcessDefinitionList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+
+            if (result != null && result.getProcesses() != null) {
+                return Arrays.asList(result.getProcesses());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
 
-            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            ProcessDefinitionList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+
+            if (result != null && result.getProcesses() != null) {
+                return Arrays.asList(result.getProcesses());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_ID, processId);
+
+            String statusQueryString = getAdditionalParams("", "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String statusQueryString = getAdditionalParams("?processName=" + processName, "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String statusQueryString = getAdditionalParams("", "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String statusQueryString = getAdditionalParams("", "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String statusQueryString = getAdditionalParams("?initiator=" + initiator, "status", status);
+            String queryString = getPagingQueryString(statusQueryString, page, pageSize);
+
+            ProcessInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+
+            if (result != null && result.getProcessInstances() != null) {
+                return Arrays.asList(result.getProcessInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public ProcessInstance findProcessInstanceById(Long processInstanceId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            ProcessInstance result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI, valuesMap), ProcessInstance.class);
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
+
+            ProcessInstance result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstance.class);
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public NodeInstance findNodeInstanceByWorkItemId(Long processInstanceId, Long workItemId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(WORK_ITEM_ID, workItemId);
+
+            NodeInstance result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI, valuesMap), NodeInstance.class);
+
+            return result;
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<NodeInstance> findActiveNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("?activeOnly=true", page, pageSize);
+
+            NodeInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+            if (result != null && result.getNodeInstances() != null) {
+                return Arrays.asList(result.getNodeInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<NodeInstance> findCompletedNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("?completedOnly=true", page, pageSize);
+
+            NodeInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+            if (result != null && result.getNodeInstances() != null) {
+                return Arrays.asList(result.getNodeInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<NodeInstance> findNodeInstances(Long processInstanceId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            NodeInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+            if (result != null && result.getNodeInstances() != null) {
+                return Arrays.asList(result.getNodeInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<VariableInstance> findVariablesCurrentState(Long processInstanceId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            VariableInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, VAR_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap), VariableInstanceList.class);
+
+            if (result != null && result.getVariableInstances() != null) {
+                return Arrays.asList(result.getVariableInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<VariableInstance> findVariableHistory(Long processInstanceId, String variableName, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(VAR_NAME, variableName);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            VariableInstanceList result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
+
+            if (result != null && result.getVariableInstances() != null) {
+                return Arrays.asList(result.getVariableInstances());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskInstance findTaskByWorkItemId(Long workItemId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(WORK_ITEM_ID, workItemId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_BY_WORK_ITEM_ID_GET_URI, valuesMap), TaskInstance.class);
+
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public TaskInstance findTaskById(Long taskId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            return makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_GET_URI, valuesMap), TaskInstance.class);
+
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String groupsQuery = getAdditionalParams(statusQuery, "groups", groups);
+            String queryString = getPagingQueryString(groupsQuery, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String statusQuery = getAdditionalParams("", "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+
+            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+                return Arrays.asList(taskSummaryList.getTasks());
+            }
+
+            return Collections.emptyList();
+
+        } else {
+            throw new UnsupportedOperationException("Not yet supported");
+        }
+    }
+
+    @Override
+    public List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            TaskEventInstanceList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, TASKS_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
+
+            if (taskSummaryList != null && taskSummaryList.getTaskEvents() != null) {
+                return Arrays.asList(taskSummaryList.getTaskEvents());
+            }
+
+            return Collections.emptyList();
 
         } else {
             throw new UnsupportedOperationException("Not yet supported");
@@ -1565,15 +2306,46 @@ public class KieServicesClientImpl
 
     private String getUserAndAdditionalParams(String userId, String name, List<?> values) {
         StringBuilder queryString = new StringBuilder(getUserQueryStr(userId));
+        if (values != null) {
+            if (queryString.length() == 0) {
+                queryString.append("?");
+            } else {
+                queryString.append("&");
+            }
+            for (Object value : values) {
+                queryString.append(name).append("=").append(value).append("&");
+            }
+            queryString.deleteCharAt(queryString.length() - 1);
+        }
+        return queryString.toString();
+    }
+
+    private String getPagingQueryString(String inQueryString, Integer page, Integer pageSize) {
+        StringBuilder queryString = new StringBuilder(inQueryString);
         if (queryString.length() == 0) {
             queryString.append("?");
         } else {
             queryString.append("&");
         }
-        for (Object value : values) {
-            queryString.append(name).append("=").append(value).append("&");
+        queryString.append("page=" + page).append("&pageSize=" + pageSize);
+
+        return queryString.toString();
+    }
+
+    private String getAdditionalParams(String inQueryString, String name, List<?> values) {
+        StringBuilder queryString = new StringBuilder(inQueryString);
+
+        if (values != null) {
+            if (queryString.length() == 0) {
+                queryString.append("?");
+            } else {
+                queryString.append("&");
+            }
+            for (Object value : values) {
+                queryString.append(name).append("=").append(value).append("&");
+            }
+            queryString.deleteCharAt(queryString.length() - 1);
         }
-        queryString.deleteCharAt(queryString.length() - 1);
         return queryString.toString();
     }
 

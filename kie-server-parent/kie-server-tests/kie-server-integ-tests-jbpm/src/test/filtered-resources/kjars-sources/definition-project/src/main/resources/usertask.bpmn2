@@ -11,7 +11,7 @@
   <bpmn2:process id="definition-project.usertask" drools:packageName="org.jbpm" drools:version="1.0" name="usertask" isExecutable="true">
     <bpmn2:property id="stringData" itemSubjectRef="_stringDataItem"/>
     <bpmn2:property id="personData" itemSubjectRef="_personDataItem"/>
-    <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="">
+    <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="start">
       <bpmn2:outgoing>_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4</bpmn2:outgoing>
     </bpmn2:startEvent>
     <bpmn2:userTask id="_44BE4412-91B0-4707-89DD-D45CECA36413" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="First task">

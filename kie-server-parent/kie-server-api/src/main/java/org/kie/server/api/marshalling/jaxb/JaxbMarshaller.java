@@ -4,10 +4,21 @@ import org.kie.server.api.commands.*;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.TaskEventInstance;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 
@@ -50,11 +61,27 @@ public class JaxbMarshaller implements Marshaller {
                 JaxbList.class,
                 JaxbMap.class,
 
+                ProcessDefinition.class,
+                ProcessDefinitionList.class,
+
                 ProcessInstance.class,
+                ProcessInstanceList.class,
+
+                NodeInstance.class,
+                NodeInstanceList.class,
+
+                VariableInstance.class,
+                VariableInstanceList.class,
 
                 TaskInstance.class,
                 TaskSummary.class,
-                TaskSummaryList.class
+                TaskSummaryList.class,
+
+                TaskEventInstance.class,
+                TaskEventInstanceList.class,
+
+                WorkItemInstance.class,
+                WorkItemInstanceList.class
         };
     }
 

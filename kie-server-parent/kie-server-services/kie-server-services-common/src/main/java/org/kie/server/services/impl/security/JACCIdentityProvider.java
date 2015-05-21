@@ -5,14 +5,17 @@ import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
-
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.server.api.security.SecurityAdapter;
 
 public class JACCIdentityProvider implements IdentityProvider {
+
+    private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
 
     @Override
     public String getName() {
@@ -21,7 +24,7 @@ public class JACCIdentityProvider implements IdentityProvider {
         if (subject != null) {
             return subject.getPrincipals().iterator().next().getName();
         }
-        return "unknown";
+        return getNameFromAdapter();
     }
 
     @Override
@@ -50,6 +53,8 @@ public class JACCIdentityProvider implements IdentityProvider {
 
         }
 
+        roles.addAll(getRolesFromAdapter());
+
         return roles;
     }
 
@@ -64,5 +69,29 @@ public class JACCIdentityProvider implements IdentityProvider {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    protected String getNameFromAdapter() {
+        for (SecurityAdapter adapter : securityAdapters) {
+            String name = adapter.getUser();
+            if (name != null && !name.isEmpty()) {
+                return name;
+            }
+        }
+
+        return "unknown";
+    }
+
+    protected List<String> getRolesFromAdapter() {
+        List<String> roles = new ArrayList<String>();
+
+        for (SecurityAdapter adapter : securityAdapters) {
+            List<String> adapterRoles = adapter.getRoles();
+            if (adapterRoles != null && !adapterRoles.isEmpty()) {
+                roles.addAll(adapterRoles);
+            }
+        }
+
+        return roles;
     }
 }

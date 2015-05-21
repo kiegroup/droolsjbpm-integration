@@ -47,8 +47,8 @@ public class JbpmApplicationComponentsServiceTest {
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
                     appComponent instanceof ProcessResource
-                    || appComponent instanceof RuntimeDataServiceResource
-                    || appComponent instanceof DefinitionServiceResource
+                    || appComponent instanceof RuntimeDataResource
+                    || appComponent instanceof DefinitionResource
                     || appComponent instanceof UserTaskResource
                     );
         }

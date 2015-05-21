@@ -13,6 +13,7 @@ import org.kie.api.KieServices;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -72,7 +73,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         List<Object> list = new ArrayList<Object>();
         list.add("item");
 
-        parameters.put("list", new JaxbList(list));
+        parameters.put("list", list);
         parameters.put("person", person);
 
         Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
@@ -119,7 +120,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test(expected = KieServicesException.class)
     public void testStartNotExistingProcess() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        client.startProcess("definition-project", "not-existing", null);
+        client.startProcess("definition-project", "not-existing", (Map)null);
     }
 
 
@@ -355,11 +356,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals("1.0", processInstance.getProcessVersion());
             assertEquals("definition-project", processInstance.getContainerId());
             assertEquals("signalprocess", processInstance.getProcessInstanceDescription());
-            if (TestConfig.isLocalServer()) {
-                assertEquals("unknown", processInstance.getInitiator());
-            } else {
-                assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
-            }
+            assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
             assertEquals(-1l, processInstance.getParentId().longValue());
             assertNull(processInstance.getCorrelationKey());
             assertNotNull(processInstance.getDate());
@@ -395,11 +392,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals("1.0", processInstance.getProcessVersion());
             assertEquals("definition-project", processInstance.getContainerId());
             assertEquals("signalprocess", processInstance.getProcessInstanceDescription());
-            if (TestConfig.isLocalServer()) {
-                assertEquals("unknown", processInstance.getInitiator());
-            } else {
-                assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
-            }
+            assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
             assertEquals(-1l, processInstance.getParentId().longValue());
             assertNull(processInstance.getCorrelationKey());
             assertNotNull(processInstance.getDate());
@@ -430,5 +423,67 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     public void testGetNonExistingProcessInstance() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
         client.getProcessInstance("definition-project", 9999l);
+    }
+
+    @Test
+    public void testWorkItemOperations() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        parameters.put("person", createPersonInstance("john"));
+
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        try {
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            List<WorkItemInstance> workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            assertNotNull(workItems);
+            assertEquals(1, workItems.size());
+
+            WorkItemInstance workItemInstance = workItems.get(0);
+            assertNotNull(workItemInstance);
+            assertEquals(processInstanceId, workItemInstance.getProcessInstanceId());
+            assertEquals("Human Task", workItemInstance.getName());
+            assertEquals("definition-project", workItemInstance.getContainerId());
+            assertEquals(0, workItemInstance.getState().intValue());
+            assertEquals(4, workItemInstance.getParameters().size());
+
+            assertNotNull(workItemInstance.getId());
+            assertNotNull(workItemInstance.getNodeId());
+            assertNotNull(workItemInstance.getProcessInstanceId());
+
+
+            workItemInstance = client.getWorkItem("definition-project", processInstanceId, workItemInstance.getId());
+            assertNotNull(workItemInstance);
+            assertEquals(processInstanceId, workItemInstance.getProcessInstanceId());
+            assertEquals("Human Task", workItemInstance.getName());
+            assertEquals("definition-project", workItemInstance.getContainerId());
+            assertEquals(0, workItemInstance.getState().intValue());
+            assertEquals(4, workItemInstance.getParameters().size());
+
+            assertNotNull(workItemInstance.getId());
+            assertNotNull(workItemInstance.getNodeId());
+            assertNotNull(workItemInstance.getProcessInstanceId());
+
+            client.abortWorkItem("definition-project", processInstanceId, workItemInstance.getId());
+
+            workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            assertNotNull(workItems);
+            assertEquals(1, workItems.size());
+
+            workItemInstance = workItems.get(0);
+            assertNotNull(workItemInstance);
+
+            client.completeWorkItem("definition-project", processInstanceId, workItemInstance.getId(), parameters);
+
+            workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            assertNotNull(workItems);
+            assertEquals(0, workItems.size());
+
+        } catch (Exception e){
+            client.abortProcessInstance("definition-project", processInstanceId);
+        }
     }
 }

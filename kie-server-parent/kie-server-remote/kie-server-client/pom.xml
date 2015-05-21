@@ -14,6 +14,10 @@
   <description>KIE Execution Server Client</description>
 
   <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
     <!-- kie server dependencies -->
     <dependency>
       <groupId>org.kie.server</groupId>

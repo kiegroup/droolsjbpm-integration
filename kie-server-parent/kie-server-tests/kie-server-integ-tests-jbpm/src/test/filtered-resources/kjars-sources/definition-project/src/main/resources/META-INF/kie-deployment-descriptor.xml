@@ -24,6 +24,12 @@
         </work-item-handler>
         <work-item-handler>
             <resolver>mvel</resolver>
+            <identifier>new org.jbpm.process.instance.impl.demo.DoNothingWorkItemHandler()</identifier>
+            <parameters/>
+            <name>Email</name>
+        </work-item-handler>
+        <work-item-handler>
+            <resolver>mvel</resolver>
             <identifier>new org.jbpm.process.workitem.webservice.WebServiceWorkItemHandler(ksession, classLoader)</identifier>
             <parameters/>
             <name>WebService</name>

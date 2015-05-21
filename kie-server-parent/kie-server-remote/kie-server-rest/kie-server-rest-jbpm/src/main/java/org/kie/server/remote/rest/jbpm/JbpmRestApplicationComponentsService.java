@@ -51,8 +51,8 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         }
         List<Object> components = new ArrayList<Object>(4);
         components.add(new ProcessResource(processService, definitionService, runtimeDataService, context));
-        components.add(new RuntimeDataServiceResource(runtimeDataService, context));
-        components.add(new DefinitionServiceResource(definitionService));
+        components.add(new RuntimeDataResource(runtimeDataService, context));
+        components.add(new DefinitionResource(definitionService));
         components.add(new UserTaskResource(userTaskService, context));
 
         return components;
