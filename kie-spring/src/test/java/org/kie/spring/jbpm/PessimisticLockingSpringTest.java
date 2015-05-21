@@ -1,21 +1,21 @@
 package org.kie.spring.jbpm;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.persistence.LockTimeoutException;
 import javax.persistence.PessimisticLockException;
 
 import org.jbpm.process.audit.AuditLogService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -31,17 +31,17 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @RunWith(Parameterized.class)
-public class PessimisticLockingSpringTest  {
+public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(PessimisticLockingSpringTest.class);
+    private static final Logger log = LoggerFactory.getLogger(PessimisticLockingSpringTest.class);
+
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
@@ -51,86 +51,29 @@ public class PessimisticLockingSpringTest  {
         return Arrays.asList(data);
     };
 
+    @Parameterized.Parameter(0)
+    public String contextPath;
 
     @Rule
     public TestRule watcher = new TestWatcher() {
         protected void starting(Description description) {
-            LOG.info(">>> " + description.getMethodName() + " <<<");
+            log.debug(">>> " + description.getMethodName() + " <<<");
         };
 
         protected void finished(Description description) {
-            LOG.info("<<< DONE >>>");
+            log.debug("<<< DONE >>>");
         };
     };
 
-    protected static void cleanupSingletonSessionId() {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"));
-        if (tempDir.exists()) {
-
-            String[] jbpmSerFiles = tempDir.list(new FilenameFilter() {
-
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith("-jbpmSessionId.ser");
-                }
-            });
-            for (String file : jbpmSerFiles) {
-                new File(tempDir, file).delete();
-            }
-        }
-    }
-
-    protected ConfigurableApplicationContext context;
-    protected String contextPath;
-    protected RuntimeManager manager;
-    protected AbstractPlatformTransactionManager tm;
-
-    public PessimisticLockingSpringTest(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    @Before
-    public void setup() {
-        cleanupSingletonSessionId();
-        LOG.info("Creating spring context - " + contextPath);
-        context = new ClassPathXmlApplicationContext(contextPath);
-        LOG.info("The spring context created.");
-        tm = (AbstractPlatformTransactionManager) context.getBean("jbpmTxManager");
-        assertNotNull(tm);
-
-
-        manager = (RuntimeManager) context.getBean("runtimeManager");
-    }
-
-    @After
-    public void cleanup() {
-        try {
-            if (manager != null) {
-                manager.close();
-                manager = null;
-            }
-
-
-        } catch (Exception ex) {
-
-        }
-        try {
-            if (context != null) {
-                context.close();
-                context = null;
-            }
-        } catch (Exception ex) {
-
-        }
-    }
-
-    public AuditLogService getAuditLogService() {
-        return (AuditLogService) context.getBean("logService");
-    }
-
-
     @Test
     public void testPessimisticLock() throws Exception {
+
+        context = new ClassPathXmlApplicationContext(contextPath);
+
+        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
+        final AbstractPlatformTransactionManager tm = (AbstractPlatformTransactionManager) context.getBean("jbpmTxManager");
+        AuditLogService logService = (AuditLogService) context.getBean("logService");
+
         final DefaultTransactionDefinition defTransDefinition = new DefaultTransactionDefinition();
         final List<Exception> exceptions = new ArrayList<Exception>();
         RuntimeEngine engine = manager.getRuntimeEngine(EmptyContext.get());
@@ -140,33 +83,48 @@ public class PessimisticLockingSpringTest  {
         final ProcessInstance processInstance = ksession.startProcess("org.jboss.qa.bpms.HumanTask");
         final ProcessInstanceStatus abortedProcessInstanceStatus = new ProcessInstanceStatus();
 
+        final CountDownLatch txAcquiredSignal = new CountDownLatch(1);
+        final CountDownLatch pessLockExceptionSignal = new CountDownLatch(1);
+        final CountDownLatch threadsAreDoneLatch = new CountDownLatch(2);
+        
         Thread t1 = new Thread() {
             @Override
             public void run() {
                 TransactionStatus status = tm.getTransaction(defTransDefinition);
-                LOG.info("Attempting to abort to lock process instance for 3 secs ");
+                log.debug("Attempting to abort to lock process instance for 3 secs ");
                 // getProcessInstance does not lock reliably so let's make a change that actually does something to the entity
                 ksession.abortProcessInstance(processInstance.getId());
+                
+                // let thread 2 start once we have the transaction
+                txAcquiredSignal.countDown();
+                
 
                 try {
-                    Thread.sleep(3000);
+                    // keep the lock until thread 2 let's us know it's done
+                    pessLockExceptionSignal.await();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // do nothing
                 }
-                LOG.info("Commited process instance aborting after 3 secs");
+                log.debug("Commited process instance aborting after 3 secs");
                 tm.commit(status);
+                
+                // let main test thread know we're done
+                threadsAreDoneLatch.countDown();
             }
         };
-
-        t1.start();
-        Thread.sleep(1000);
 
         // Trying to retrieve process instance in second thread.
         // Should throw PessimisticLockException because we are trying to get write lock on process instance which already have lock
         Thread t2 = new Thread() {
             @Override
             public void run() {
-                LOG.info("Trying to get process instance - should fail because process instance is locked or wait until thread 1 finish and return null because process instance is deleted.");
+                try { 
+                    // wait for thread 1 to tell us it has the lock
+                    txAcquiredSignal.await();
+                } catch( InterruptedException e ) { 
+                    // do nothing
+                }
+                log.debug("Trying to get process instance - should fail because process instance is locked or wait until thread 1 finish and return null because process instance is deleted.");
                 try {
                     ProcessInstance abortedProcessInstance = ksession.getProcessInstance(processInstance.getId(), true);
 
@@ -174,16 +132,25 @@ public class PessimisticLockingSpringTest  {
                         abortedProcessInstanceStatus.setAbortedProcessInstance(true);
                     }
 
-                    LOG.info("Get request worked well");
+                    log.debug("Get request worked well");
                 } catch (Exception e) {
-                    LOG.info("Get request failed with error {}", e.getMessage());
+                    log.debug("Get request failed with error {}", e.getMessage());
                     exceptions.add(e);
+                } finally {
+                    // Tell thread 1 that we're done
+                    pessLockExceptionSignal.countDown();
                 }
+                
+                // let main test thread know we're done
+                threadsAreDoneLatch.countDown();
             }
         };
+        
+        t1.start();
         t2.start();
 
-        Thread.sleep(3000);
+        // wait for both threads to finish!
+        threadsAreDoneLatch.await();
 
         // If process instance read by thread 2 is aborted then it means that database transaction timeout is bigger than waiting time set here and
         // getProcessInstance was waiting for thread 1 to finish its work.
@@ -198,7 +165,7 @@ public class PessimisticLockingSpringTest  {
         }
 
         TransactionStatus status = tm.getTransaction(defTransDefinition);
-        ProcessInstanceLog instanceLog = getAuditLogService().findProcessInstance(processInstance.getId());
+        ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
         tm.commit(status);
         assertNotNull(instanceLog);
         assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());

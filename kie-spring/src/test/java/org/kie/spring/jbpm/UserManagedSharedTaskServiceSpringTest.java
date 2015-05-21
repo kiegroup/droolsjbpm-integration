@@ -1,17 +1,20 @@
 package org.kie.spring.jbpm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.transaction.UserTransaction;
 
+import org.drools.persistence.jta.JtaTransactionManager;
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
@@ -20,24 +23,37 @@ import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class JTAUserManagedSharedEntityManagerFactorySpringTest extends AbstractJbpmSpringTest {
-	
+@RunWith(Parameterized.class)
+public class UserManagedSharedTaskServiceSpringTest extends AbstractJbpmSpringTest {
+
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> contextPath() {
+        Object[][] data = new Object[][] {
+                { "jbpm/shared-taskservice/jta-em-singleton.xml" },
+                { "jbpm/shared-taskservice/jta-emf-singleton.xml" }
+        };
+        return Arrays.asList(data);
+    };
+
+    @Parameterized.Parameter(0)
+    public String contextPath;
+
 	/* The purpose of the shared entity manager is to allow the application domain
 	 * and JBPM domain to be persisted by a single entity manager and transaction. 
 	 */
     @Test
     public void testSpringWithJTAAndSharedEMFAndUserManagedTx() throws Exception {
-    	
-    	context = new ClassPathXmlApplicationContext("jbpm/shared-taskservice/jta-emf-spring.xml");
 
-    	UserTransaction ut = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
+        context = new ClassPathXmlApplicationContext(contextPath);
+
+        UserTransaction ut = (UserTransaction) new InitialContext().lookup(JtaTransactionManager.DEFAULT_USER_TRANSACTION_NAME);
         ut.begin();
-        
+
         RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
 
         RuntimeEngine engine = manager.getRuntimeEngine(null);
         KieSession ksession = engine.getKieSession();
-        
+
         TaskService taskService = (TaskService) context.getBean("taskService");
 
         ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
@@ -67,7 +83,7 @@ public class JTAUserManagedSharedEntityManagerFactorySpringTest extends Abstract
         processInstance = ksession.getProcessInstance(processInstance.getId());
         assertNull(processInstance);
         System.out.println("Process instance completed");
-        
+
         ut.commit();
     }
 

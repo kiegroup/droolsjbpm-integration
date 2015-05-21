@@ -72,7 +72,7 @@ public class VariablePersistenceStrategyTest {
 
     @AfterClass
     public static void stopH2Database() throws Exception {
-        log.info("stoping database");
+        log.debug("stoping database");
         h2Server.stop();
         DeleteDbFiles.execute("",
                 "DroolsFlow",
@@ -82,7 +82,7 @@ public class VariablePersistenceStrategyTest {
     @Before
     public void createSpringContext() {
         try {
-            log.info("creating spring context");
+            log.debug("creating spring context");
             ctx = new ClassPathXmlApplicationContext("org/kie/spring/persistence/persistence_var_beans.xml");
         } catch (Exception e) {
             log.error("can't create spring context",
@@ -93,7 +93,7 @@ public class VariablePersistenceStrategyTest {
 
     @After
     public void destroySpringContext() {
-        log.info("destroy spring context");
+        log.debug("destroy spring context");
     }
 
     @Test
@@ -240,13 +240,13 @@ public class VariablePersistenceStrategyTest {
         em.getTransaction().commit();
         em.close();
 
-        log.info("---> get bean jpaSingleSessionCommandService");
+        log.debug("---> get bean jpaSingleSessionCommandService");
         KieSession service = (KieSession) ctx.getBean("jpaSingleSessionCommandService2");
 
         long sessionId = service.getIdentifier();
-        log.info("---> created SingleSessionCommandService id: " + sessionId);
+        log.debug("---> created SingleSessionCommandService id: " + sessionId);
 
-        log.info("### Starting process ###");
+        log.debug("### Starting process ###");
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("x",
                 "SomeString");
@@ -260,7 +260,7 @@ public class VariablePersistenceStrategyTest {
                 myVariableSerializable);
         WorkflowProcessInstance processInstance = (WorkflowProcessInstance) service.startProcess("com.sample.ruleflow",
                 parameters);
-        log.info("Started process instance {}",
+        log.debug("Started process instance {}",
                 processInstance.getId());
 
         TestWorkItemHandler handler = TestWorkItemHandler.getInstance();
@@ -273,7 +273,7 @@ public class VariablePersistenceStrategyTest {
         //        List< ? > result = emf.createEntityManager().createQuery( "select i from VariableInstanceInfo i" ).getResultList();
         //        assertEquals( 5,
         //                      result.size() );
-        log.info("### Retrieving process instance ###");
+        log.debug("### Retrieving process instance ###");
 
         Environment env = KnowledgeBaseFactory.newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
@@ -313,21 +313,21 @@ public class VariablePersistenceStrategyTest {
 
         service.dispose();
 
-        //        log.info("### Completing first work item ###");
+        //        log.debug("### Completing first work item ###");
         //        ksession.getWorkItemManager().completeWorkItem( workItem.getId(), null );
         //
         //        workItem = handler.getWorkItem();
         //        assertNotNull( workItem );
         //        
-        //        log.info("### Retrieving variable instance infos ###");
+        //        log.debug("### Retrieving variable instance infos ###");
         //        result = emf.createEntityManager().createQuery("select i from VariableInstanceInfo i").getResultList();
         //        assertEquals(8, result.size());
         //        for (Object o: result) {
         //            assertTrue(VariableInstanceInfo.class.isAssignableFrom(o.getClass()));
-        //            log.info(o);
+        //            log.debug(o);
         //        }
         //        
-        //        log.info("### Retrieving process instance ###");
+        //        log.debug("### Retrieving process instance ###");
         //        ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(id, kbase, null, env);
         //        processInstance = (WorkflowProcessInstance)
         //            ksession.getProcessInstance(processInstance.getId());
@@ -340,7 +340,7 @@ public class VariablePersistenceStrategyTest {
         //        assertEquals("Some new String", processInstance.getVariable("a"));
         //        assertEquals("This is a new test Entity", ((MyEntity) processInstance.getVariable("b")).getTest());
         //        assertEquals("This is a new test SerializableObject", ((MyVariableSerializable) processInstance.getVariable("c")).getText());
-        //        log.info("### Completing second work item ###");
+        //        log.debug("### Completing second work item ###");
         //        ksession.getWorkItemManager().completeWorkItem(workItem.getId(), null);
         //
         //        workItem = handler.getWorkItem();
@@ -349,7 +349,7 @@ public class VariablePersistenceStrategyTest {
         //        result = emf.createEntityManager().createQuery("select i from VariableInstanceInfo i").getResultList();
         //        assertEquals(8, result.size());
         //        
-        //        log.info("### Retrieving process instance ###");
+        //        log.debug("### Retrieving process instance ###");
         //        ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(id, kbase, null, env);
         //        processInstance = (WorkflowProcessInstance)
         //            ksession.getProcessInstance(processInstance.getId());
@@ -362,7 +362,7 @@ public class VariablePersistenceStrategyTest {
         //        assertEquals("Some changed String", processInstance.getVariable("a"));
         //        assertEquals("This is a changed test Entity", ((MyEntity) processInstance.getVariable("b")).getTest());
         //        assertEquals("This is a changed test SerializableObject", ((MyVariableSerializable) processInstance.getVariable("c")).getText());
-        //        log.info("### Completing third work item ###");
+        //        log.debug("### Completing third work item ###");
         //        ksession.getWorkItemManager().completeWorkItem(workItem.getId(), null);
         //
         //        workItem = handler.getWorkItem();
@@ -383,7 +383,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
     //        kbuilder.add( new ClassPathResource( "VariablePersistenceStrategyProcessTypeChange.rf" ), ResourceType.DRF );
     //        for (KnowledgeBuilderError error: kbuilder.getErrors()) {
-    //            log.info(error);
+    //            log.debug(error);
     //        }
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
@@ -434,7 +434,7 @@ public class VariablePersistenceStrategyTest {
     //        KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
     //        kbuilder.add( new ClassPathResource( "VariablePersistenceStrategySubProcess.rf" ), ResourceType.DRF );
     //        for (KnowledgeBuilderError error: kbuilder.getErrors()) {
-    //            log.info("{}", error);
+    //            log.debug("{}", error);
     //        }
     //        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
     //        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );

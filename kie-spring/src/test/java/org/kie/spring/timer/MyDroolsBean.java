@@ -16,6 +16,14 @@
 
 package org.kie.spring.timer;
 
+import static org.junit.Assert.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.drools.core.base.MapGlobalResolver;
 import org.kie.api.KieBase;
 import org.kie.api.persistence.jpa.KieStoreServices;
@@ -32,10 +40,10 @@ import javax.persistence.EntityManagerFactory;
 
 public class MyDroolsBean {
 
-    private static int timerTriggerCount;
+    private static AtomicInteger timerTriggerCount = new AtomicInteger();
     private static long sessionId;
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static Logger logger = LoggerFactory.getLogger(MyDroolsBean.class);
 
     private EntityManagerFactory emf;
     private KieBase kbase;
@@ -44,45 +52,47 @@ public class MyDroolsBean {
 
     private TestWorkItemHandler workItemHandler = new TestWorkItemHandler();
 
+    private static CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
+    
     public void initStartDisposeAndLoadSession() {
         try {
             EntityManager em = txm.getEntityManagerFactory().createEntityManager();
             // create new ksession with kstore
-            KieSession ksession = kstore.newKieSession(kbase,
-                    null,
-                    getEnvironment());
+            KieSession ksession = kstore.newKieSession(kbase, null, getEnvironment());
             sessionId = ksession.getIdentifier();
 
-            logger.info("\n\tSession id: " + sessionId + "\n");
+            logger.debug("\n\tSession id: " + sessionId + "\n");
 
-            ksession.getWorkItemManager().registerWorkItemHandler("testWorkItemHandler",
-                    workItemHandler);
+            ksession.getWorkItemManager().registerWorkItemHandler("testWorkItemHandler", workItemHandler);
 
-            ksession.startProcess("timer-flow",
-                    null);
-            Thread.sleep(4000);
+            ksession.startProcess("timer-flow", null);
+         
+            // wait for process to start and for first timer to finish
+            waitForOtherThread();
+            
             ksession.dispose();
         } catch (Exception ex) {
             throw new IllegalStateException("The endTheProcess method has been interrupted", ex);
         }
+        
     }
 
-    /**
-     * Thread safe increment.
-     */
-    public static synchronized void incrementTimerTriggerCount() {
-        timerTriggerCount++;
+    public static void waitForOtherThread() { 
+        try {
+            cyclicBarrier.await();
+        } catch( InterruptedException ie ) {
+            // do nothing
+        } catch( BrokenBarrierException bbe ) {
+            logger.error("cyclic barrier has a broken state!", bbe );
+        }
+    }
+    
+    public static void incrementTimerTriggerCount() {
+        timerTriggerCount.incrementAndGet();
     }
 
-    /**
-     * Thread safe getter.
-     * Note that if this method is not synchronized, there is no visibility guarantee,
-     * so the returned value might be a stale cache.
-     *
-     * @return >= 0
-     */
-    public static synchronized int getTimerTriggerCount() {
-        return timerTriggerCount;
+    public static int getTimerTriggerCount() {
+        return timerTriggerCount.get();
     }
 
     public void endTheProcess() {
@@ -93,15 +103,33 @@ public class MyDroolsBean {
                     getEnvironment());
 
             //Sleep to check if the timer continues executing.
-            logger.info("\n\nSleeping to check that the timer is still running");
-            Thread.sleep(5000);
+            logger.debug("\n\nSleeping to check that the timer is still running");
 
-            ksession.getWorkItemManager().completeWorkItem(TestWorkItemHandler.getWorkItem().getId(),
-                    null);
+            // wait for a possible timer to run
+            try {
+                cyclicBarrier.await(3, TimeUnit.SECONDS);
+            } catch( BrokenBarrierException e1 ) {
+                // do nothing
+            } catch( TimeoutException e1 ) {
+                // do nothing
+            }
+                
+            ksession.getWorkItemManager().completeWorkItem(TestWorkItemHandler.getWorkItem().getId(), null);
 
-            logger.info("\n\nSleeping to check that the timer is no longer running");
-            Thread.sleep(3000);
-            logger.info("Ok");
+            logger.debug("\n\nSleeping to check that the timer is no longer running");
+           
+            boolean waitFailed = false;
+            try {
+                cyclicBarrier.await(3, TimeUnit.SECONDS);
+                fail( "The timer should not have been running!" );
+            } catch( BrokenBarrierException bbe ) {
+                fail( "The barrier should not be broken: " + bbe.getMessage());
+            } catch( TimeoutException e ) {
+                waitFailed = true;
+            }
+            assertTrue( waitFailed );
+            
+            logger.debug("Ok");
 
             ksession.dispose();
 

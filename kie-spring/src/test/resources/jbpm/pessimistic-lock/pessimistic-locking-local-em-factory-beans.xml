@@ -1,85 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-  <bean id="poolingDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
-    <property name="className" value="bitronix.tm.resource.jdbc.lrc.LrcXADataSource" />
-    <property name="uniqueName" value="jdbc/jbpm-ds" />
-    <property name="maxPoolSize" value="5" />
-    <property name="allowLocalTransactions" value="true" />
-    <property name="driverProperties">
-      <props>
-        <prop key="user">sa</prop>
-        <prop key="password">sa</prop>
-        <prop key="url">jdbc:h2:mem:jbpm-db;MVCC=true</prop>
-        <prop key="driverClassName">org.h2.Driver</prop>
-      </props>
+  <import resource="classpath:jbpm/configuration-template/local-em-spring.xml" />
+
+  <bean id="pessimisticLockingRuntimeEnvironment" parent="runtimeEnvironment">
+    <property name="pessimisticLocking" value="true" />
+    <property name="environmentEntries">
+      <map>
+        <entry key="TRANSACTION_LOCK_ENABLED">
+          <value type="java.lang.Boolean">false</value>
+        </entry>
+      </map>
     </property>
   </bean>
 
   <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
-    <property name="identifier" value="spring-rm" />
-    <property name="runtimeEnvironment" ref="runtimeEnvironment" />
+    <property name="identifier" value="spring-rm"/>
+    <property name="runtimeEnvironment" ref="pessimisticLockingRuntimeEnvironment"/>
   </bean>
-
-  <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="poolingDataSource">
-    <property name="persistenceUnitName" value="org.jbpm.persistence.spring.local" />
-    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-local.xml" />
-    <property name="dataSource" ref="poolingDataSource" />
-  </bean>
-
-  <bean id="jbpmTxManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="entityManagerFactory" ref="jbpmEMF" />
-  </bean>
-
-  <bean id="userGroupCallback" class="org.jbpm.services.task.identity.JBossUserGroupCallbackImpl">
-    <constructor-arg value="classpath:jbpm/pessimistic-lock/usergroups.properties" />
-  </bean>
-
-  <bean id="runtimeEnvironment" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean">
-    <property name="type" value="DEFAULT" />
-    <property name="entityManagerFactory" ref="jbpmEMF" />
-    <property name="entityManager" ref="jbpmEM" />
-    <property name="transactionManager" ref="jbpmTxManager" />
-    <property name="userGroupCallback" ref="userGroupCallback" />
-    <property name="taskService" ref="taskService" />
-    <property name="pessimisticLocking" value="true" />
-    <property name="assets">
-      <map>
-        <entry key-ref="process"><util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/></entry>
-      </map>
-    </property>
-    <property name="environmentEntries">
-      <map>
-        <entry key="TRANSACTION_LOCK_ENABLED"><value type="java.lang.Boolean">false</value></entry>
-      </map>
-    </property>
-  </bean>
-
-  <bean id="process" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
-    <constructor-arg>
-      <value>jbpm/processes/HumanTaskProcess.bpmn2</value>
-    </constructor-arg>
-  </bean>
-
-  <bean id="taskService" class="org.kie.spring.factorybeans.TaskServiceFactoryBean" destroy-method="close">
-    <property name="entityManagerFactory" ref="jbpmEMF" />
-    <property name="entityManager" ref="jbpmEM" />
-    <property name="transactionManager" ref="jbpmTxManager" />
-    <property name="userGroupCallback" ref="userGroupCallback" />
-  </bean>
-
-  <bean id="jbpmEM" class="org.springframework.orm.jpa.support.SharedEntityManagerBean">
-    <property name="entityManagerFactory" ref="jbpmEMF" />
-  </bean>
-
-  <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService">
-    <constructor-arg ref="jbpmEMF" />
-    <constructor-arg>
-      <value>STANDALONE_LOCAL</value>
-    </constructor-arg>
-  </bean>
-
 </beans>
