@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.jbpm.simulation.SimulationContextFactory;
 import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
