@@ -14,7 +14,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
@@ -49,7 +48,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-
+            localServerConfig.setTimeout(100000);
             localServerConfig.addJaxbClasses(extraClasses);
             return KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
@@ -85,7 +84,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertNotNull(personVariable);
         assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
-        personVariable = client.getProcessInstanceVariable("definition-project", processInstanceId, "person", personClass);
+        personVariable = client.getProcessInstanceVariable("definition-project", processInstanceId, "person");
         assertNotNull(personVariable);
         assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
@@ -184,6 +183,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             client.signalProcessInstance("definition-project", processInstanceId, "Signal2", "My custom string event");
         } catch (Exception e){
             client.abortProcessInstance("definition-project", processInstanceId);
+            e.printStackTrace();
+            fail(e.getMessage());
         }
 
     }
@@ -208,6 +209,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             client.signalProcessInstance("definition-project", processInstanceId, "Signal2", null);
         } catch (Exception e){
             client.abortProcessInstance("definition-project", processInstanceId);
+            e.printStackTrace();
+            fail(e.getMessage());
         }
 
     }
@@ -248,6 +251,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } catch (Exception e){
             client.abortProcessInstance("definition-project", processInstanceId);
             client.abortProcessInstance("definition-project", processInstanceId2);
+            e.printStackTrace();
+            fail(e.getMessage());
         }
 
     }
@@ -362,8 +367,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNotNull(processInstance.getDate());
 
             Map<String, Object> variables = processInstance.getVariables();
-            assertNotNull(variables);
-            assertEquals(0, variables.size());
+            assertNull(variables);
         } finally {
             client.abortProcessInstance("definition-project", processInstanceId);
         }

@@ -1,7 +1,5 @@
 package org.kie.server.jms;
 
-import static org.kie.server.api.jms.JMSConstants.SERIALIZATION_FORMAT_PROPERTY_NAME;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,6 +35,8 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.api.jms.JMSConstants.*;
 
 @TransactionManagement(TransactionManagementType.BEAN)
 @MessageDriven(name = "KieServerMDB", activationConfig = {
@@ -161,12 +161,18 @@ public class KieServerMDB
 
         // 1. get marshalling info
         MarshallingFormat format = null;
+        String classType = null;
         try {
+            classType = message.getStringProperty(CLASS_TYPE_PROPERTY_NAME);
+
             if ( !message.propertyExists( SERIALIZATION_FORMAT_PROPERTY_NAME ) ) {
                 format = MarshallingFormat.JAXB;
             } else {
+
                 int intFormat = message.getIntProperty( SERIALIZATION_FORMAT_PROPERTY_NAME );
+                logger.debug("Serialization format (int) is " + intFormat);
                 format = MarshallingFormat.fromId( intFormat );
+                logger.debug("Serialization format is " + format);
                 if( format == null ) {
                     String errMsg = "Unsupported marshalling format '"+ intFormat +"' from message " + msgCorrId + ".";
                     throw new JMSRuntimeException( errMsg );
@@ -179,12 +185,13 @@ public class KieServerMDB
 
         // 2. get marshaller
         Marshaller marshaller = marshallers.get( format );
+        logger.debug("Selected marshaller is " + marshaller);
 
         // 3. deserialize request
         CommandScript script = unmarshallRequest( message, msgCorrId, marshaller, format );
 
         // 4. process request
-        ServiceResponsesList response = executor.executeScript( script );
+        ServiceResponsesList response = executor.executeScript( script, format, classType );
 
         // 5. serialize response
         Message msg = marshallResponse( session, msgCorrId, format, marshaller, response );
@@ -202,6 +209,7 @@ public class KieServerMDB
         CommandScript cmdMsg = null;
         try {
             String msgStrContent = ((TextMessage) message).getText();
+            logger.info("About to unmarshal content '{}'", msgStrContent);
             cmdMsg = serializationProvider.unmarshall( msgStrContent, CommandScript.class );
         } catch (JMSException jmse) {
             String errMsg = "Unable to read information from message " + msgId + ".";

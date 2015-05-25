@@ -2,15 +2,29 @@ package org.kie.server.api.marshalling.json;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.Version;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.deser.std.UntypedObjectDeserializer;
 import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
@@ -19,6 +33,8 @@ public class JSONMarshaller implements Marshaller {
 
     private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
+
+//    private final ObjectMapper wrappedObjectMapper;
 
     private final ObjectMapper fallbackObjectMapper;
 
@@ -35,6 +51,22 @@ public class JSONMarshaller implements Marshaller {
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
         objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
         objectMapper.setSerializationConfig(objectMapper.getSerializationConfig().withAnnotationIntrospector(introspectorPair));
+        // in case there are custom classes register module to deal with them both for serialization and deserialization
+        // this module makes sure that only custom classes are equipped with type information
+        if (classes != null && !classes.isEmpty()) {
+            ObjectMapper customObjectMapper = new ObjectMapper();
+            customObjectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT);
+
+            SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
+            mod.addDeserializer(Object.class, new CustomObjectDeserializer(classes, customObjectMapper));
+
+            CustomObjectSerializer customObjectSerializer = new CustomObjectSerializer(customObjectMapper);
+
+            for (Class<?> clazz : classes) {
+                mod.addSerializer(clazz, customObjectSerializer);
+            }
+            objectMapper.registerModule(mod);
+        }
 
         fallbackObjectMapper = new ObjectMapper();
 
@@ -56,6 +88,7 @@ public class JSONMarshaller implements Marshaller {
     public String marshall(Object objectInput) {
         try {
             return objectMapper.writeValueAsString(objectInput);
+
         } catch (IOException e) {
             throw new MarshallingException("Error marshalling input", e);
         }
@@ -77,17 +110,6 @@ public class JSONMarshaller implements Marshaller {
             throw new MarshallingException("Error unmarshalling input", e);
         } catch (IOException e) {
 
-            throw new MarshallingException("Error unmarshalling input", e);
-        }
-    }
-
-    @Override
-    public <T> T unmarshall(String input, String type) {
-        try {
-            Class<?> clazz = Class.forName(type, true, this.classLoader);
-
-            return (T) unmarshall(input, clazz);
-        } catch (Exception e) {
             throw new MarshallingException("Error unmarshalling input", e);
         }
     }
@@ -117,6 +139,85 @@ public class JSONMarshaller implements Marshaller {
                 complete.addAll(customClasses);
             }
             return complete;
+        }
+    }
+
+    class CustomObjectSerializer extends JsonSerializer<Object> {
+
+        private ObjectMapper customObjectMapper;
+
+        public CustomObjectSerializer(ObjectMapper customObjectMapper) {
+            this.customObjectMapper = customObjectMapper;
+        }
+
+        @Override
+        public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
+
+            String json = customObjectMapper.writeValueAsString(value);
+            jgen.writeRawValue(json);
+        }
+    }
+
+    class CustomObjectDeserializer extends UntypedObjectDeserializer {
+
+        private static final long serialVersionUID = 7764405880012867708L;
+
+        private Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
+        private ObjectMapper customObjectMapper;
+
+        public CustomObjectDeserializer(Set<Class<?>> classes,  ObjectMapper customObjectMapper) {
+            this.customObjectMapper = customObjectMapper;
+            for (Class<?> c : classes) {
+                this.classes.put(c.getSimpleName(), c);
+                this.classes.put(c.getName(), c);
+            }
+        }
+
+        @Override
+        protected Object mapObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+            JsonToken t = jp.getCurrentToken();
+            if (t == JsonToken.START_OBJECT) {
+                t = jp.nextToken();
+            }
+            // 1.6: minor optimization; let's handle 1 and 2 entry cases separately
+            if (t != JsonToken.FIELD_NAME) { // and empty one too
+                // empty map might work; but caller may want to modify... so better just give small modifiable
+                return new LinkedHashMap<String,Object>(4);
+            }
+            String field1 = jp.getText();
+            jp.nextToken();
+            if (classes.containsKey(field1)) {
+                Object value = objectMapper.readValue(jp, classes.get(field1));
+                jp.nextToken();
+
+                return value;
+            } else {
+                Object value1 = deserialize(jp, ctxt);
+                if (jp.nextToken() != JsonToken.FIELD_NAME) { // single entry; but we want modifiable
+                    LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(4);
+                    result.put(field1, value1);
+                    return result;
+                }
+                String field2 = jp.getText();
+                jp.nextToken();
+                Object value2 = deserialize(jp, ctxt);
+                if (jp.nextToken() != JsonToken.FIELD_NAME) {
+                    LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(4);
+                    result.put(field1, value1);
+                    result.put(field2, value2);
+                    return result;
+                }
+                // And then the general case; default map size is 16
+                LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>();
+                result.put(field1, value1);
+                result.put(field2, value2);
+                do {
+                    String fieldName = jp.getText();
+                    jp.nextToken();
+                    result.put(fieldName, deserialize(jp, ctxt));
+                } while (jp.nextToken() != JsonToken.END_OBJECT);
+                return result;
+            }
         }
     }
 }

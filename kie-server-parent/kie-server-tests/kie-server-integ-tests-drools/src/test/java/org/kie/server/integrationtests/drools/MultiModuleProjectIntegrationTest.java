@@ -5,11 +5,11 @@ import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
 import static org.junit.Assert.assertTrue;
 
-public class MultiModuleProjectIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class MultiModuleProjectIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseIdRules1 = new ReleaseId("org.kie.server.testing", "multimodule-project-rules1",
             "2.0.0.Final");

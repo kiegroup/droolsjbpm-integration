@@ -1,5 +1,7 @@
 package org.kie.server.remote.rest.drools;
 
+import java.util.Collections;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -9,18 +11,30 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.services.api.KieContainerCommandService;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 @Path("/server")
 public class CommandResource {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
+
     private KieContainerCommandService delegate;
 
-    public CommandResource(KieContainerCommandService delegate) {
+    private MarshallerHelper marshallerHelper;
+
+    public CommandResource(KieContainerCommandService delegate, KieServerRegistry registry) {
         this.delegate = delegate;
+        this.marshallerHelper = new MarshallerHelper(registry);
     }
 
     @POST
@@ -28,7 +42,28 @@ public class CommandResource {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response manageContainer(@Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload) {
-        return createCorrectVariant(delegate.callContainer(id, cmdPayload), headers);
+
+        Variant v = getVariant(headers);
+        String contentType = getContentType(headers);
+
+        String classType = getClassType(headers);
+        MarshallingFormat format = MarshallingFormat.fromType(contentType);
+        if (format == null) {
+            format = MarshallingFormat.valueOf(contentType);
+        }
+
+        Object result = delegate.callContainer(id, cmdPayload, format, classType);
+        try {
+            String response = marshallerHelper.marshal(id, format.getType(), result);
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+        } catch (IllegalArgumentException e) {
+            // in case marshalling failed return the call container response to keep backward compatibility
+            String response = marshallerHelper.marshal(format.getType(), result);
+            logger.debug("Returning OK response with content '{}'", response);
+            return createResponse(response, v, Response.Status.OK);
+        }
+
     }
 
 }

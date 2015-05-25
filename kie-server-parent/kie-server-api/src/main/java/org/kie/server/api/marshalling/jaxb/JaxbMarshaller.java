@@ -1,9 +1,39 @@
 package org.kie.server.api.marshalling.jaxb;
 
-import org.kie.server.api.commands.*;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.common.DefaultFactHandle;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.kie.server.api.commands.CallContainerCommand;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetScannerInfoCommand;
+import org.kie.server.api.commands.GetServerInfoCommand;
+import org.kie.server.api.commands.ListContainersCommand;
+import org.kie.server.api.commands.UpdateReleaseIdCommand;
+import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
-import org.kie.server.api.model.*;
+import org.kie.server.api.marshalling.ModelWrapper;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -21,15 +51,6 @@ import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class JaxbMarshaller implements Marshaller {
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
@@ -54,6 +75,10 @@ public class JaxbMarshaller implements Marshaller {
                 ReleaseId.class,
                 ServiceResponse.class,
                 ServiceResponsesList.class,
+
+                BatchExecutionCommandImpl.class,
+                ExecutionResultImpl.class,
+                DefaultFactHandle.class,
 
                 KieServerConfig.class,
                 KieServerConfigItem.class,
@@ -114,7 +139,7 @@ public class JaxbMarshaller implements Marshaller {
     public String marshall(Object input) {
         StringWriter writer = new StringWriter();
         try {
-            marshaller.marshal( input, writer );
+            marshaller.marshal(ModelWrapper.wrap(input), writer );
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Can't marshall input object: "+input, e );
         }
@@ -130,16 +155,6 @@ public class JaxbMarshaller implements Marshaller {
         }
     }
 
-    @Override
-    public <T> T unmarshall(String input, String type) {
-        try {
-            Class<?> clazz = Class.forName(type, true, this.classLoader);
-
-            return (T) unmarshall(input, clazz);
-        } catch (Exception e) {
-            throw new MarshallingException("Error unmarshalling input", e);
-        }
-    }
 
     @Override
     public void dispose() {

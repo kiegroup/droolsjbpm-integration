@@ -26,7 +26,7 @@ public class RestURI {
     public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "containers/{" + CONTAINER_ID + "}/process/{" + PROCESS_ID +"}/instances/correlation/{" + CORRELATION_KEY + "}";
     public static final String ABORT_PROCESS_INST_DEL_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID +"}";
     public static final String ABORT_PROCESS_INSTANCES_DEL_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
-    public static final String SIGNAL_PROCESS_INST_POST_URI = "containers/{" + CONTAINER_ID + "}/process/instance/" + PROCESS_INST_ID +"/signal/{" + SIGNAL_NAME + "}";
+    public static final String SIGNAL_PROCESS_INST_POST_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID +"}/signal/{" + SIGNAL_NAME + "}";
     public static final String SIGNAL_PROCESS_INSTANCES_PORT_URI = "containers/{" + CONTAINER_ID + "}/process/instances/signal/{" + SIGNAL_NAME + "}";
     public static final String PROCESS_INSTANCE_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}";
     public static final String PROCESS_INSTANCE_VAR_PUT_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";

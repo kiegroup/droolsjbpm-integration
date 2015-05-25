@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 
 public class DroolsRestApplicationComponentsService implements KieServerApplicationComponentsService {
@@ -21,17 +22,21 @@ public class DroolsRestApplicationComponentsService implements KieServerApplicat
         }
 
         KieContainerCommandService batchCommandService = null;
+        KieServerRegistry context = null;
        
         for( Object object : services ) { 
             if( KieContainerCommandService.class.isAssignableFrom(object.getClass()) ) { 
-               batchCommandService = (KieContainerCommandService) object; 
-               break;
-            } 
+               batchCommandService = (KieContainerCommandService) object;
+                continue;
+            } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
+                context = (KieServerRegistry) object;
+                continue;
+            }
         }
         
         List<Object> components = new ArrayList<Object>(1);
         if( SupportedTransports.REST.equals(type) ) {
-            components.add(new CommandResource(batchCommandService));
+            components.add(new CommandResource(batchCommandService, context));
         }
         
         return components;

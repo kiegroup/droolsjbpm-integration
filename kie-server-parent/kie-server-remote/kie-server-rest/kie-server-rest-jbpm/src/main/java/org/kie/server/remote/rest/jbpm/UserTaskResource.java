@@ -126,11 +126,11 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String payload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             userId = getUser(userId);
             logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
             logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
             userTaskService.complete(taskId, userId, parameters);
@@ -194,11 +194,11 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String payload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             userId = getUser(userId);
             logger.debug("About to unmarshal task failure data from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
             logger.debug("About to fail task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
             userTaskService.fail(taskId, userId, parameters);
@@ -386,11 +386,11 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String priorityPayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task priority from payload: '{}'", priorityPayload);
-            Integer priority = marshallerHelper.unmarshal(containerId, priorityPayload, type, JaxbInteger.class, Integer.class);
+            Integer priority = marshallerHelper.unmarshal(containerId, priorityPayload, type, Integer.class);
 
             logger.debug("About to set priority for a task with id '{}' with value '{}'", taskId, priority);
             userTaskService.setPriority(taskId, priority);
@@ -411,11 +411,11 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String datePayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task priority from payload: '{}'", datePayload);
-            Date expirationDate = marshallerHelper.unmarshal(containerId, datePayload, type, JaxbDate.class, Date.class);
+            Date expirationDate = marshallerHelper.unmarshal(containerId, datePayload, type, Date.class);
 
             logger.debug("About to set expiration date for a task with id '{}' with value '{}'", taskId, expirationDate);
             userTaskService.setExpirationDate(taskId, expirationDate);
@@ -436,11 +436,11 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String skipablePayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task skipable from payload: '{}'", skipablePayload);
-            Boolean skipable = marshallerHelper.unmarshal(containerId, skipablePayload, type, JaxbBoolean.class, Boolean.class);
+            Boolean skipable = marshallerHelper.unmarshal(containerId, skipablePayload, type, Boolean.class);
 
             logger.debug("About to set skipable attribute for a task with id '{}' with value '{}'", taskId, skipable);
             userTaskService.setSkipable(taskId, skipable);
@@ -460,11 +460,11 @@ public class UserTaskResource {
     public Response setName(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, String namePayload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task name from payload: '{}'", namePayload);
-            String name = marshallerHelper.unmarshal(containerId, namePayload, type, JaxbString.class, String.class);
+            String name = marshallerHelper.unmarshal(containerId, namePayload, type, String.class);
 
             logger.debug("About to set name for a task with id '{}' with value '{}'", taskId, name);
             userTaskService.setName(taskId, name);
@@ -484,11 +484,11 @@ public class UserTaskResource {
     public Response setDescription(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, String descriptionPayload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task description from payload: '{}'", descriptionPayload);
-            String description = marshallerHelper.unmarshal(containerId, descriptionPayload, type, JaxbString.class, String.class);
+            String description = marshallerHelper.unmarshal(containerId, descriptionPayload, type, String.class);
 
             logger.debug("About to set name for a task with id '{}' with value '{}'", taskId, description);
             userTaskService.setDescription(taskId, description);
@@ -508,16 +508,16 @@ public class UserTaskResource {
     public Response saveContent(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, String payload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task content parameters from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
             logger.debug("About to set content of a task with id '{}' with data {}", taskId, parameters);
             Long contentId = userTaskService.saveContent(taskId, parameters);
 
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(contentId));
+            String response = marshallerHelper.marshal(containerId, type, contentId);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -535,12 +535,12 @@ public class UserTaskResource {
     public Response getTaskOutputContentByTaskId(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Map<String, Object> variables = userTaskService.getTaskOutputContentByTaskId(taskId);
 
             logger.debug("About to marshal task '{}' output variables {}", taskId, variables);
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(variables));
+            String response = marshallerHelper.marshal(containerId, type, variables);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -559,12 +559,12 @@ public class UserTaskResource {
     public Response getTaskInputContentByTaskId(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskId);
 
             logger.debug("About to marshal task '{}' input variables {}", taskId, variables);
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(variables));
+            String response = marshallerHelper.marshal(containerId, type, variables);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -603,16 +603,16 @@ public class UserTaskResource {
     public Response addComment(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, String payload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal task comment from payload: '{}'", payload);
-            TaskComment comment = marshallerHelper.unmarshal(containerId, payload, type, TaskComment.class, TaskComment.class);
+            TaskComment comment = marshallerHelper.unmarshal(containerId, payload, type, TaskComment.class);
 
             logger.debug("About to set comment on a task with id '{}' with data {}", taskId, comment);
             Long commentId = userTaskService.addComment(taskId, comment.getText(), comment.getAddedBy(), comment.getAddedAt());
 
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(commentId));
+            String response = marshallerHelper.marshal(containerId, type, commentId);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -650,7 +650,7 @@ public class UserTaskResource {
     public Response getCommentsByTaskId(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             List<Comment> comments = userTaskService.getCommentsByTaskId(taskId);
 
@@ -690,7 +690,7 @@ public class UserTaskResource {
     public Response getCommentById(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @PathParam("commentId") Long commentId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Comment comment = userTaskService.getCommentById(taskId, commentId);
 
@@ -726,16 +726,15 @@ public class UserTaskResource {
     public Response addAttachment(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String attachmentPayload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
-            String classType = getClassType(headers);
             logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
-            Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, classType, Object.class);
+            Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, Object.class);
 
             logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
             Long attachmentId = userTaskService.addAttachment(taskId, getUser(userId), attachment);
 
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(attachmentId));
+            String response = marshallerHelper.marshal(containerId, type, attachmentId);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -773,7 +772,7 @@ public class UserTaskResource {
     public Response getAttachmentById(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @PathParam("attachmentId") Long attachmentId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Attachment attachment = userTaskService.getAttachmentById(taskId, attachmentId);
 
@@ -807,7 +806,7 @@ public class UserTaskResource {
     public Response getAttachmentContentById(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @PathParam("attachmentId") Long attachmentId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             Object attachment = userTaskService.getAttachmentContentById(taskId, attachmentId);
@@ -818,11 +817,11 @@ public class UserTaskResource {
             }
 
             logger.debug("About to marshal task attachment with id '{}' {}", attachmentId, attachment);
-            Object wrappedObject = ModelWrapper.wrap(attachment);
-            String response = marshallerHelper.marshal(containerId, type, wrappedObject);
+
+            String response = marshallerHelper.marshal(containerId, type, attachment);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, Collections.singletonMap(KieServerConstants.CLASS_TYPE_HEADER, wrappedObject.getClass().getName()), v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
             throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
@@ -837,7 +836,7 @@ public class UserTaskResource {
     public Response getAttachmentsByTaskId(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             List<Attachment> attachments = userTaskService.getAttachmentsByTaskId(taskId);
 
@@ -880,7 +879,7 @@ public class UserTaskResource {
     public Response  getTask(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
             @QueryParam("withInputData") boolean withInput, @QueryParam("withOutputData") boolean withOutput, @QueryParam("withAssignments") boolean withAssignments) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             Task task = userTaskService.getTask(taskId);

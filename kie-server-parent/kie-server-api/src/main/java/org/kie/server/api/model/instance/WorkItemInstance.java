@@ -1,14 +1,10 @@
 package org.kie.server.api.model.instance;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.kie.server.api.model.type.JaxbMap;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "work-item-instance")
@@ -21,7 +17,7 @@ public class WorkItemInstance {
     @XmlElement(name="work-item-state")
     private Integer state = 0;
     @XmlElement(name="work-item-params")
-    private JaxbMap parameters;
+    private Map<String, Object> parameters;
     @XmlElement(name="process-instance-id")
     private Long processInstanceId;
     @XmlElement(name="container-id")
@@ -63,14 +59,11 @@ public class WorkItemInstance {
     }
 
     public Map<String, Object> getParameters() {
-        if (parameters != null) {
-            return parameters.unwrap();
-        }
-        return Collections.emptyMap();
+        return parameters;
     }
 
     public void setParameters(Map<String, Object> parameters) {
-        this.parameters = new JaxbMap(parameters);
+        this.parameters = parameters;
     }
 
     public Long getProcessInstanceId() {

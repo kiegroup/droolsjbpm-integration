@@ -305,7 +305,7 @@ public class RuntimeDataResource {
     @Path(PROCESS_DEFINITIONS_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesById(@Context HttpHeaders headers, @PathParam("pId") String processId) {
-        Variant v = getVariant(headers);
+
         Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesById(processId);
 
         ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
@@ -377,7 +377,7 @@ public class RuntimeDataResource {
             logger.debug("Found {} tasks for user '{}' assigned as business admin", tasks.size(), userId);
             TaskSummaryList result = convertToTaskSummaryList(tasks);
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -419,7 +419,7 @@ public class RuntimeDataResource {
             logger.debug("Found {} tasks for user '{}' assigned as potential owner", tasks.size(), userId);
             TaskSummaryList result = convertToTaskSummaryList(tasks);
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -453,7 +453,7 @@ public class RuntimeDataResource {
             logger.debug("Found {} tasks owned by user '{}'", tasks.size(), userId);
             TaskSummaryList result = convertToTaskSummaryList(tasks);
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -485,7 +485,7 @@ public class RuntimeDataResource {
             logger.debug("Found {} tasks attached to process instance with id '{}'", tasks.size(), processInstanceId);
             TaskSummaryList result = convertToTaskSummaryList(tasks);
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -538,7 +538,7 @@ public class RuntimeDataResource {
             }
 
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -583,7 +583,7 @@ public class RuntimeDataResource {
             }
 
 
-            return createResponse(result, v, Response.Status.OK);
+            return createCorrectVariant(result, headers, Response.Status.OK);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);

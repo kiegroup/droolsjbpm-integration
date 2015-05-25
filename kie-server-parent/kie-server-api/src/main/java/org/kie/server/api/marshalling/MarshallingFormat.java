@@ -13,6 +13,10 @@ public enum MarshallingFormat {
 
     public int getId() { return id; }
 
+    public String getType() {
+        return type;
+    }
+
     public static MarshallingFormat fromId( int id ) {
         switch ( id ) {
             case 0 : return XSTREAM;

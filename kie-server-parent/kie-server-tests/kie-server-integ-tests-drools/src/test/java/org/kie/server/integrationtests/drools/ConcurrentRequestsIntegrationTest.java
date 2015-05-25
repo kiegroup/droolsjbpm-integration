@@ -6,7 +6,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConcurrentRequestsIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestsIntegrationTest.class);
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");

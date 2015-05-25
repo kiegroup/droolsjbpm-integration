@@ -10,9 +10,9 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class KieServerContainerCRUDIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");

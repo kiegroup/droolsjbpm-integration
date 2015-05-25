@@ -20,11 +20,11 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     private KieContainerResource               resource;
     private InternalKieContainer               kieContainer;
     private InternalKieScanner                 scanner;
-    private Map<MarshallingFormat, Marshaller> marshallers;
+    private transient Map<MarshallingFormat, Marshaller> marshallers;
 
-    private Map<String, Object> serviceContainer;
+    private transient Map<String, Object> serviceContainer;
 
-    private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+    private transient Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
         this( containerId, status, null );

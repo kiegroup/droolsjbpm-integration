@@ -1,7 +1,5 @@
 package org.kie.server.remote.rest.common.resource;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -26,19 +24,25 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
+
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 @Path("/server")
 public class KieServerRestImpl {
 
     private KieServerImpl server;
+    private MarshallerHelper marshallerHelper;
 
     public KieServerRestImpl() {
         // for now, if no server impl is passed as parameter, create one
         this.server = KieServerLocator.getInstance();
+        this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
     }
 
     public KieServerRestImpl(KieServerImpl server) {
         this.server = server;
+        this.marshallerHelper = new MarshallerHelper(server.getServerRegistry());
     }
 
     public KieServerImpl getServer() {
@@ -82,7 +86,11 @@ public class KieServerRestImpl {
     @Path("containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, KieContainerResource container ) {
+    public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, String containerPayload ) {
+        String contentType = getContentType(headers);
+
+        KieContainerResource container = marshallerHelper.unmarshal(containerPayload, contentType, KieContainerResource.class);
+
         ServiceResponse<KieContainerResource> response = server.createContainer(id, container);
         if( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
             return createCorrectVariant(response, headers, Status.CREATED);
@@ -115,7 +123,11 @@ public class KieServerRestImpl {
     @Path("containers/{id}/scanner")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateScanner( @Context HttpHeaders headers, @PathParam("id") String id, KieScannerResource resource ) {
+    public Response updateScanner( @Context HttpHeaders headers, @PathParam("id") String id, String resourcePayload ) {
+        String contentType = getContentType(headers);
+
+        KieScannerResource resource = marshallerHelper.unmarshal(resourcePayload, contentType, KieScannerResource.class);
+
         return createCorrectVariant(server.updateScanner(id, resource), headers);
     };
 
@@ -130,7 +142,12 @@ public class KieServerRestImpl {
     @Path("containers/{id}/release-id")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateReleaseId( @Context HttpHeaders headers, @PathParam("id") String id, ReleaseId releaseId ) {
+    public Response updateReleaseId( @Context HttpHeaders headers, @PathParam("id") String id, String releaseIdPayload) {
+
+        String contentType = getContentType(headers);
+
+        ReleaseId releaseId = marshallerHelper.unmarshal(releaseIdPayload, contentType, ReleaseId.class);
+
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers);
     }
 

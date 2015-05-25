@@ -32,9 +32,9 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-public class KieServerDroolsIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
 

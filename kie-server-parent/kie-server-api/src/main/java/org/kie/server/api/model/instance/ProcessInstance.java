@@ -1,14 +1,11 @@
 package org.kie.server.api.model.instance;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.kie.server.api.model.type.JaxbMap;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance")
@@ -41,7 +38,7 @@ public class ProcessInstance {
     private TaskSummaryList activeUserTasks;
 
     @XmlElement(name="process-instance-variables")
-    private JaxbMap variables;
+    private Map<String, Object> variables;
 
     public ProcessInstance() {
     }
@@ -139,15 +136,13 @@ public class ProcessInstance {
     }
 
     public Map<String, Object> getVariables() {
-        if (variables != null) {
-            return variables.unwrap();
-        }
 
-        return Collections.emptyMap();
+
+        return variables;
     }
 
     public void setVariables(Map<String, Object> variables) {
-        this.variables = new JaxbMap(variables);
+        this.variables = variables;
     }
 
     public TaskSummaryList getActiveUserTasks() {

@@ -45,8 +45,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
         this.context = context;
     }
 
-    @Override
-    public ServiceResponse<String> callContainer(String containerId, String payload) {
+    public ServiceResponse<String> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
         if( payload == null ) {
             return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
         }
@@ -82,7 +81,12 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     ks = kci.getKieContainer().getKieSession();
                 }
                 if (ks != null) {
-                    Command<?> cmd = kci.getMarshaller( MarshallingFormat.XSTREAM ).unmarshall(payload, Command.class);
+                    Class<? extends Command> type =  Command.class;
+                    if (classType != null && !classType.isEmpty()) {
+                        type = (Class<? extends Command>) Class.forName(classType, true, kci.getKieContainer().getClassLoader());
+                    }
+
+                    Command<?> cmd = kci.getMarshaller( marshallingFormat ).unmarshall(payload, type);
 
                     if (cmd == null) {
                         return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
@@ -92,7 +96,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     }
 
                     ExecutionResults results = ks.execute((BatchExecutionCommandImpl) cmd);
-                    String result = kci.getMarshaller( MarshallingFormat.XSTREAM ).marshall(results);
+                    String result = kci.getMarshaller( marshallingFormat ).marshall(results);
                     return new ServiceResponse<String>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
                 } else {
                     return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");
@@ -107,7 +111,8 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
         }
     }
 
-    public ServiceResponsesList executeScript(CommandScript commands) {
+    @Override
+    public ServiceResponsesList executeScript(CommandScript commands, MarshallingFormat marshallingFormat, String classType) {
         List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
         if( commands != null ) {
             for (KieServerCommand command : commands.getCommands()) {
@@ -118,7 +123,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 } else if (command instanceof ListContainersCommand) {
                     responses.add(this.kieServer.listContainers());
                 } else if (command instanceof CallContainerCommand) {
-                    responses.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload()));
+                    responses.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload(), marshallingFormat, classType));
                 } else if (command instanceof DisposeContainerCommand) {
                     responses.add(this.kieServer.disposeContainer(((DisposeContainerCommand) command).getContainerId()));
                 } else if (command instanceof GetContainerInfoCommand) {

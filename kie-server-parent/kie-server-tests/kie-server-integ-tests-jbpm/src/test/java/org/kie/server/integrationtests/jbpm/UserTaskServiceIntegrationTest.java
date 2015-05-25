@@ -401,10 +401,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNull(taskInstance.getExcludedOwners());
             assertNull(taskInstance.getPotentialOwners());
             assertNull(taskInstance.getBusinessAdmins());
-            assertNotNull(taskInstance.getInputData());
-            assertEquals(0, taskInstance.getInputData().size());
-            assertNotNull(taskInstance.getOutputData());
-            assertEquals(0, taskInstance.getOutputData().size());
+            assertNull(taskInstance.getInputData());
+            assertNull(taskInstance.getOutputData());
+
         } finally {
             client.abortProcessInstance("definition-project", processInstanceId);
         }

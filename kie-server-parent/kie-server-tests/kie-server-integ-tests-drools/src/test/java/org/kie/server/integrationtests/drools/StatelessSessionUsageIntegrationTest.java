@@ -21,11 +21,11 @@ import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
 import static org.junit.Assert.*;
 
-public class StatelessSessionUsageIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class StatelessSessionUsageIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar",
             "1.0.0-SNAPSHOT");

@@ -43,7 +43,7 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
-      <scope>runtime</scope>
+      <!--<scope>runtime</scope>-->
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>

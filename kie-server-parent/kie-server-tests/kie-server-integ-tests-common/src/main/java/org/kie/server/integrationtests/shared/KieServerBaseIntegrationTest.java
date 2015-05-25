@@ -126,8 +126,10 @@ public abstract class KieServerBaseIntegrationTest {
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, response.getType());
         List<KieContainerResource> containers = response.getResult().getContainers();
-        for (KieContainerResource container : containers) {
-            client.disposeContainer(container.getContainerId());
+        if (containers != null) {
+            for (KieContainerResource container : containers) {
+                client.disposeContainer(container.getContainerId());
+            }
         }
     }
 

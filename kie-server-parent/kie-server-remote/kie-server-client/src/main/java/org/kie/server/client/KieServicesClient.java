@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.server.api.commands.CommandScript;
@@ -50,6 +51,8 @@ public interface KieServicesClient {
     ServiceResponse<Void> disposeContainer(String id);
 
     ServiceResponse<String> executeCommands(String id, String payload);
+
+    ServiceResponse<String> executeCommands(String id, Command<?> cmd);
 
     ServiceResponsesList executeScript(CommandScript script);
 

@@ -1,6 +1,5 @@
 package org.kie.server.api.model.instance;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.kie.server.api.model.type.JaxbMap;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-instance")
@@ -68,10 +65,10 @@ public class TaskInstance {
     private List<String> businessAdmins;
 
     @XmlElement(name="task-input-data")
-    private JaxbMap inputData;
+    private Map<String, Object> inputData;
 
     @XmlElement(name="task-output-data")
-    private JaxbMap outputData;
+    private Map<String, Object> outputData;
 
     public TaskInstance() {
     }
@@ -257,27 +254,19 @@ public class TaskInstance {
     }
 
     public Map<String, Object> getInputData() {
-        if (inputData != null) {
-            return inputData.unwrap();
-        }
-
-        return Collections.emptyMap();
+        return inputData;
     }
 
     public void setInputData(Map<String, Object> inputData) {
-        this.inputData = new JaxbMap(inputData);
+        this.inputData = inputData;
     }
 
     public Map<String, Object> getOutputData() {
-        if (outputData != null) {
-            return outputData.unwrap();
-        }
-
-        return Collections.emptyMap();
+        return outputData;
     }
 
     public void setOutputData(Map<String, Object> outputData) {
-        this.outputData = new JaxbMap(outputData);
+        this.outputData = outputData;
     }
 
     @Override

@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-public class RuleFlowIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class RuleFlowIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "ruleflow-group",
             "1.0.0.Final");

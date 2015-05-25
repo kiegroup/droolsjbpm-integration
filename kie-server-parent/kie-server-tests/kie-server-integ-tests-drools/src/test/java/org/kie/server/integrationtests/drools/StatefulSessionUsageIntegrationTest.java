@@ -5,12 +5,11 @@ import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class StatefulSessionUsageIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "state-is-kept-for-stateful-session",
             "1.0.0-SNAPSHOT");
@@ -20,6 +19,7 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsSharedBaseIntegr
     public static void deployArtifacts() {
         buildAndDeployCommonMavenParent();
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
+
     }
 
     @Test
@@ -60,6 +60,7 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsSharedBaseIntegr
         assertTrue("The 'duplicated' field should be true! Got response: " + result2,
                 result2.contains("<duplicated>true</duplicated>"));
     }
+
 
     @Test
     public void testErrorHandlingWhenContainerIsDisposedBetweenCalls() {

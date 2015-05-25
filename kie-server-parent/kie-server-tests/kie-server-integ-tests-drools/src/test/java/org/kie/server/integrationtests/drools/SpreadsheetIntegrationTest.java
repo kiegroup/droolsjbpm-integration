@@ -5,12 +5,12 @@ import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
 /**
  * Test used for verification of spreadsheet decision table processing.
  */
-public class SpreadsheetIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class SpreadsheetIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "spreadsheet", "1.0.0-SNAPSHOT");
 

@@ -3,7 +3,6 @@ package org.kie.server.remote.rest.jbpm;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -33,11 +32,8 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
-import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -79,7 +75,7 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         // Check for presence of process id
         try {
             ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
@@ -92,14 +88,14 @@ public class ProcessResource  {
                         MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
         }
         logger.debug("About to unmarshal parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
         logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
         Long processInstanceId = processService.startProcess(containerId, processId, parameters);
 
         // return response
         try {
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(processInstanceId));
+            String response = marshallerHelper.marshal(containerId, type, processInstanceId);
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
@@ -116,7 +112,7 @@ public class ProcessResource  {
     public Response startProcessWithCorrelation(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId,
             @PathParam("correlationKey") String correlationKey, @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         // Check for presence of process id
         try {
             ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
@@ -129,7 +125,7 @@ public class ProcessResource  {
                     MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
         }
         logger.debug("About to unmarshal parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, JaxbMap.class, Map.class);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
         String[] correlationProperties = correlationKey.split(":");
 
@@ -140,7 +136,7 @@ public class ProcessResource  {
 
         // return response
         try {
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(processInstanceId));
+            String response = marshallerHelper.marshal(containerId, type, processInstanceId);
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
@@ -201,11 +197,10 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("sName") String signalName, String eventPayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
-            String classType = getClassType(headers);
             logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, classType, Object.class);
+            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, Object.class);
 
             logger.debug("Calling signal '{}' process instance with id {} on container {} and event {}", signalName, processInstanceId, containerId, event);
             processService.signalProcessInstance(processInstanceId, signalName, event);
@@ -229,11 +224,11 @@ public class ProcessResource  {
     public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @QueryParam("instanceId") List<Long> processInstanceIds, @PathParam("sName") String signalName, String eventPayload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
-            String classType = getClassType(headers);
+
             logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, classType, Object.class);
+            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, Object.class);
 
             logger.debug("Calling signal '{}' process instances with id {} on container {} and event {}", signalName, processInstanceIds, containerId, event);
             processService.signalProcessInstances(processInstanceIds, signalName, event);
@@ -256,7 +251,7 @@ public class ProcessResource  {
     public Response getProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @QueryParam("withVars") boolean withVars) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             ProcessInstanceDesc instanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
@@ -302,11 +297,11 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName, String variablePayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
-            String classType = getClassType(headers);
+
             logger.debug("About to unmarshal variable from payload: '{}'", variablePayload);
-            Object variable = marshallerHelper.unmarshal(containerId, variablePayload, type, classType, Object.class);
+            Object variable = marshallerHelper.unmarshal(containerId, variablePayload, type, Object.class);
 
             logger.debug("Setting variable '{}' on process instance with id {} with value {}", varName, processInstanceId, variable);
             processService.setProcessVariable(processInstanceId, varName, variable);
@@ -329,11 +324,11 @@ public class ProcessResource  {
     public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, String variablePayload) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
-            Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, type, JaxbMap.class, Map.class);
+            Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, type, Map.class);
 
             logger.debug("Setting variables '{}' on process instance with id {} with value {}", variables.keySet(), processInstanceId, variables.values());
             processService.setProcessVariables(processInstanceId, variables);
@@ -356,7 +351,7 @@ public class ProcessResource  {
     public Object getProcessInstanceVariable(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
                                              @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
 
             Object variable = processService.getProcessInstanceVariable(processInstanceId, varName);
@@ -367,11 +362,10 @@ public class ProcessResource  {
             }
 
             logger.debug("About to marshal process variable with name '{}' {}", varName, variable);
-            Object wrappedObject = ModelWrapper.wrap(variable);
-            String response = marshallerHelper.marshal(containerId, type, wrappedObject);
+            String response = marshallerHelper.marshal(containerId, type, variable);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, Collections.singletonMap(KieServerConstants.CLASS_TYPE_HEADER, wrappedObject.getClass().getName()), v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
             throw ExecutionServerRestOperationException.notFound(
@@ -391,12 +385,12 @@ public class ProcessResource  {
     public Response getProcessInstanceVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId);
 
             logger.debug("About to marshal process variables {}", variables);
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(variables));
+            String response = marshallerHelper.marshal(containerId, type, variables);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -421,12 +415,12 @@ public class ProcessResource  {
     public Response getAvailableSignals(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             Collection<String> signals = processService.getAvailableSignals(processInstanceId);
 
             logger.debug("About to marshal available signals {}", signals);
-            String response = marshallerHelper.marshal(containerId, type, ModelWrapper.wrap(signals));
+            String response = marshallerHelper.marshal(containerId, type, signals);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -449,10 +443,10 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId, String resultPayload) {
 
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             logger.debug("About to unmarshal work item result from payload: '{}'", resultPayload);
-            Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, type, JaxbMap.class, Map.class);
+            Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, type, Map.class);
 
             logger.debug("Completing work item '{}' on process instance id {} with value {}", workItemId, processInstanceId, results);
             processService.completeWorkItem(workItemId, results);
@@ -500,7 +494,7 @@ public class ProcessResource  {
     public Response getWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             WorkItem workItem = processService.getWorkItem(workItemId);
 
@@ -542,7 +536,7 @@ public class ProcessResource  {
     public Response getWorkItemByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
-        String type = v.getMediaType().getSubtype();
+        String type = getContentType(headers);
         try {
             List<WorkItem> workItems = processService.getWorkItemByProcessInstance(processInstanceId);
 
