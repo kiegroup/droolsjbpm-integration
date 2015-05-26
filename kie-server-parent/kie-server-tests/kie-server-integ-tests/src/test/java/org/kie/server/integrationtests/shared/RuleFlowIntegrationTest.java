@@ -34,4 +34,22 @@ public class RuleFlowIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         assertResultContainsStringRegex(result,
                 ".*<string>Rule from first ruleflow group executed</string>\\s*<string>Rule from second ruleflow group executed</string>.*");
     }
+
+    @Test
+    public void testExecuteSimpleRuleFlowProcessInStatelessSession() {
+        assertSuccess(client.createContainer("ruleflow-stateless", new KieContainerResource("ruleflow-stateless", releaseId)));
+        String payload = "<batch-execution lookup=\"defaultStatelessKieSession\">\n" +
+                "  <set-global identifier=\"list\" out-identifier=\"output-list\">\n" +
+                "    <java.util.ArrayList/>\n" +
+                "  </set-global>\n" +
+                "  <start-process processId=\"simple-ruleflow\" out-identifier=\"process-out\"/>\n" +
+                "  <fire-all-rules/>\n" +
+                "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
+                "</batch-execution>\n";
+        ServiceResponse<String> response = client.executeCommands("ruleflow-stateless", payload);
+        assertSuccess(response);
+        String result = response.getResult();
+        assertResultContainsStringRegex(result,
+                ".*<string>Rule from first ruleflow group executed</string>\\s*<string>Rule from second ruleflow group executed</string>.*");
+    }
 }
