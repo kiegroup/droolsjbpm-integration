@@ -1,6 +1,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,9 +11,12 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -431,6 +435,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testWorkItemOperations() throws Exception {
+
+        changeUser("john");
+
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -442,6 +449,22 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNotNull(processInstanceId);
             assertTrue(processInstanceId.longValue() > 0);
 
+            // Completing human task so we can move in process flow to work item.
+            // User task shouldn't be handled as work item because in such case it doesn't behave consistently:
+            // i.e. leaving open tasks after finishing process instance.
+            List<String> status = Arrays.asList(Status.Ready.toString());
+            List<TaskSummary> taskList = client.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            client.startTask("definition-project", taskSummary.getId(), "john");
+            client.completeTask("definition-project", taskSummary.getId(), "john", null);
+
+            TaskInstance userTask = client.findTaskById(taskSummary.getId());
+            assertNotNull(userTask);
+            assertEquals("Evaluate items", userTask.getName());
+            assertEquals(Status.Completed.toString(), userTask.getStatus());
+
             List<WorkItemInstance> workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
             assertEquals(1, workItems.size());
@@ -449,10 +472,10 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             WorkItemInstance workItemInstance = workItems.get(0);
             assertNotNull(workItemInstance);
             assertEquals(processInstanceId, workItemInstance.getProcessInstanceId());
-            assertEquals("Human Task", workItemInstance.getName());
+            assertEquals("Email", workItemInstance.getName());
             assertEquals("definition-project", workItemInstance.getContainerId());
             assertEquals(0, workItemInstance.getState().intValue());
-            assertEquals(4, workItemInstance.getParameters().size());
+            assertEquals(5, workItemInstance.getParameters().size());
 
             assertNotNull(workItemInstance.getId());
             assertNotNull(workItemInstance.getNodeId());
@@ -462,10 +485,10 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             workItemInstance = client.getWorkItem("definition-project", processInstanceId, workItemInstance.getId());
             assertNotNull(workItemInstance);
             assertEquals(processInstanceId, workItemInstance.getProcessInstanceId());
-            assertEquals("Human Task", workItemInstance.getName());
+            assertEquals("Email", workItemInstance.getName());
             assertEquals("definition-project", workItemInstance.getContainerId());
             assertEquals(0, workItemInstance.getState().intValue());
-            assertEquals(4, workItemInstance.getParameters().size());
+            assertEquals(5, workItemInstance.getParameters().size());
 
             assertNotNull(workItemInstance.getId());
             assertNotNull(workItemInstance.getNodeId());
@@ -475,9 +498,51 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
+            assertEquals(0, workItems.size());
+
+        } catch (Exception e){
+            client.abortProcessInstance("definition-project", processInstanceId);
+            throw e;
+        } finally {
+            changeUser(TestConfig.getUsername());
+        }
+    }
+
+    @Test
+    public void testWorkItemOperationComplete() throws Exception {
+
+        changeUser("john");
+
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        try {
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            // Completing human task so we can move in process flow to work item.
+            // User task shouldn't be handled as work item because in such case it doesn't behave consistently:
+            // i.e. leaving open tasks after finishing process instance.
+            List<String> status = Arrays.asList(Status.Ready.toString());
+            List<TaskSummary> taskList = client.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            client.startTask("definition-project", taskSummary.getId(), "john");
+            client.completeTask("definition-project", taskSummary.getId(), "john", null);
+
+            TaskInstance userTask = client.findTaskById(taskSummary.getId());
+            assertNotNull(userTask);
+            assertEquals("Evaluate items", userTask.getName());
+            assertEquals(Status.Completed.toString(), userTask.getStatus());
+
+            List<WorkItemInstance> workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            assertNotNull(workItems);
             assertEquals(1, workItems.size());
 
-            workItemInstance = workItems.get(0);
+            WorkItemInstance workItemInstance = workItems.get(0);
             assertNotNull(workItemInstance);
 
             client.completeWorkItem("definition-project", processInstanceId, workItemInstance.getId(), parameters);
@@ -488,6 +553,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         } catch (Exception e){
             client.abortProcessInstance("definition-project", processInstanceId);
+            throw e;
+        } finally {
+            changeUser(TestConfig.getUsername());
         }
     }
 }
