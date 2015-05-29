@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
@@ -41,5 +42,18 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Change user used by client.
+     *
+     * @param username Name of user, default user taken from TestConfig in case of null parameter.
+     */
+    protected void changeUser(String username) {
+        if(username == null) {
+            username = TestConfig.getUsername();
+        }
+        configuration.setUserName(username);
+        client = createDefaultClient();
     }
 }
