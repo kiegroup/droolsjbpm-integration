@@ -1,0 +1,8 @@
+import org.kie.server.testing.Person;
+
+rule "Update person's id"
+when
+    $person : Person(id == null)
+then
+    $person.updateId();
+end

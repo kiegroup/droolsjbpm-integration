@@ -8,14 +8,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="kie-server-info")
 @XStreamAlias( "kie-server-info" )
 public class KieServerInfo {
+
+    private String serverId;
     private String version;
     
     public KieServerInfo() {
         super();
     }
 
-    public KieServerInfo(String version) {
+    public KieServerInfo(String serverId, String version) {
         super();
+        this.serverId = serverId;
         this.version = version;
     }
 
@@ -28,8 +31,20 @@ public class KieServerInfo {
         this.version = version;
     }
 
+    @XmlElement(name="id")
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
+    }
+
     @Override
     public String toString() {
-        return "KieServerInfo [version=" + version + "]";
+        return "KieServerInfo{" +
+                "serverId='" + serverId + '\'' +
+                ", version='" + version + '\'' +
+                '}';
     }
 }

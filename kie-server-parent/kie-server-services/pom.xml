@@ -1,114 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>org.kie</groupId>
+    <groupId>org.kie.server</groupId>
     <artifactId>kie-server-parent</artifactId>
     <version>6.3.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>kie-server-services</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>KIE :: Execution Server :: Services</name>
   <description>KIE Execution Server Services</description>
 
-  <dependencies>
-    <!-- kie server dependencies -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-server-api</artifactId>
-    </dependency>
-    <!-- core dependencies -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-compiler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-decisiontables</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-ci</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-common</artifactId>
-    </dependency>
-    <!-- needed for ruleflow processes -->
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-bpmn2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    
-    <!-- RestEasy JAX-RS dependencies -->
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxb-provider</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- JSON (un)marshalling -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-xc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-    </dependency>
-
-    <!-- log -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>kie-server-services-common</module>
+    <module>kie-server-services-drools</module>
+    <module>kie-server-services-jbpm</module>
+  </modules>
 
 </project>
