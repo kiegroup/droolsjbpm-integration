@@ -34,6 +34,7 @@ import org.kie.internal.query.QueryContext;
 import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
@@ -57,7 +58,7 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 public class RuntimeDataResource {
 
     public static final Logger logger = LoggerFactory.getLogger(RuntimeDataResource.class);
-    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty("org.kie.server.bypass.auth.user", "false"));
+    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     private RuntimeDataService runtimeDataService;
     private IdentityProvider identityProvider;

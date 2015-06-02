@@ -16,7 +16,7 @@
 
   <persistence-unit name="org.jbpm.domain" transaction-type="JTA">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
-    <jta-data-source>jdbc/jbpm-ds</jta-data-source>
+    <jta-data-source>java:comp/env/jdbc/jbpm</jta-data-source>
     <mapping-file>META-INF/Taskorm.xml</mapping-file>
     <mapping-file>META-INF/JBPMorm.xml</mapping-file>
     <mapping-file>META-INF/Servicesorm.xml</mapping-file>

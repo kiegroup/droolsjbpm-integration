@@ -44,6 +44,12 @@
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>
         <include>org.slf4j:slf4j-jdk14</include>
+
+        <include>org.hibernate.common:hibernate-commons-annotations</include>
+        <include>org.hibernate:hibernate-entitymanager</include>
+        <include>org.hibernate:hibernate-core</include>
+        <include>org.hibernate:hibernate-validator</include>
+        <include>dom4j:dom4j</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

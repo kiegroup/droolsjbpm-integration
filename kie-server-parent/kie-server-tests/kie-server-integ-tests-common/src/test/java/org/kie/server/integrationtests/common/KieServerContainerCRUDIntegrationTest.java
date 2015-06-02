@@ -107,7 +107,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsXstreamSharedB
         ServiceResponse<KieContainerResourceList> listReply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, listReply.getType());
         List<KieContainerResource> containers = listReply.getResult().getContainers();
-        Assert.assertEquals("No containers returned!", 0, containers.size());
+        Assert.assertNull("No containers returned!", containers);
     }
 
     @Test

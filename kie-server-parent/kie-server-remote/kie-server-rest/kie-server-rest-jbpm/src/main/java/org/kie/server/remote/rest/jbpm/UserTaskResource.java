@@ -56,7 +56,7 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 public class UserTaskResource {
 
     public static final Logger logger = LoggerFactory.getLogger(UserTaskResource.class);
-    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty("org.kie.server.bypass.auth.user", "false"));
+    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     private IdentityProvider identityProvider;
     private UserTaskService userTaskService;

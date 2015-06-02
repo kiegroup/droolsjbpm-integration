@@ -91,7 +91,7 @@ public class KieServicesClientImpl
         implements KieServicesClient {
     private static Logger logger = LoggerFactory.getLogger( KieServicesClientImpl.class );
 
-    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty("org.kie.server.bypass.auth.user", "false"));
+    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     private       String                   baseURI;
     private final KieServicesConfiguration config;

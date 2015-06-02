@@ -31,6 +31,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.scanner.MavenRepository;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -83,7 +84,7 @@ public abstract class KieServerBaseIntegrationTest {
         if (!TestConfig.isLocalServer()) {
             String clientDeploymentSettingsXml = ClassLoader.class.getResource(
                     "/kie-server-testing-client-deployment-settings.xml").getFile();
-            System.setProperty("kie.maven.settings.custom", clientDeploymentSettingsXml);
+            System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, clientDeploymentSettingsXml);
         }
     }
 
@@ -143,9 +144,11 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static void startServer() throws Exception {
         System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
-        System.setProperty("org.kie.server.bypass.auth.user", "true");
-        System.setProperty("org.jbpm.ht.callback", "custom");
-        System.setProperty("org.jbpm.ht.custom.callback", "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");
+        System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
+        System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
+        System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");
+        System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm-ds");
+        System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(TestConfig.getAllocatedPort());
         server.start();

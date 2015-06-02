@@ -2,11 +2,13 @@ package org.kie.server.services.jbpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.jbpm.executor.ExecutorServiceFactory;
@@ -37,6 +39,7 @@ import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -78,15 +81,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         // if no other callback set, use jaas by default
-        if (System.getProperty("org.jbpm.ht.callback") == null) {
-            System.setProperty("org.jbpm.ht.callback", "jaas");
+        if (System.getProperty(KieServerConstants.CFG_HT_CALLBACK) == null) {
+            System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
         }
         this.isExecutorAvailable = isExecutorOnClasspath();
 
         this.kieServer = kieServer;
         this.context = registry;
-
-        EntityManagerFactory emf = EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName);
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties());
+        EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
 
         // build definition service
         definitionService = new BPMN2DataServiceImpl();
@@ -136,6 +139,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((AbstractDeploymentService)deploymentService).shutdown();
 
         executorService.destroy();
+
+        EntityManagerFactory emf = EntityManagerFactoryManager.get().remove(persistenceUnitName);
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
     }
 
     @Override
@@ -275,5 +283,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    protected Map<String, String> getPersistenceProperties() {
+        Map<String, String> persistenceProperties = new HashMap<String, String>();
+
+        persistenceProperties.put("hibernate.dialect", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
+        persistenceProperties.put("hibernate.transaction.jta.platform", System.getProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
+        persistenceProperties.put("javax.persistence.jtaDataSource", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
+
+        return persistenceProperties;
     }
 }
