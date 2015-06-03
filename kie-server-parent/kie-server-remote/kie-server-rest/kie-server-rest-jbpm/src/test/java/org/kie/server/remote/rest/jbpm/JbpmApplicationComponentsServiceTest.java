@@ -2,7 +2,7 @@ package org.kie.server.remote.rest.jbpm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,13 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.junit.Test;
 import org.kie.internal.executor.api.ExecutorService;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.mockito.Answers;
+import org.mockito.Mockito;
 
 public class JbpmApplicationComponentsServiceTest {
 
@@ -34,7 +37,7 @@ public class JbpmApplicationComponentsServiceTest {
                 mock(UserTaskService.class),
                 mock(RuntimeDataService.class),
                 mock(ExecutorService.class),
-                mock(KieServerRegistry.class)
+                mock(KieServerRegistry.class, Mockito.RETURNS_MOCKS)
                 };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll(appComponentsService.getAppComponents(

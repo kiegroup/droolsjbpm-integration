@@ -40,6 +40,8 @@ import org.kie.internal.executor.api.ExecutorService;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -80,15 +82,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+        KieServerConfig config = registry.getConfig();
+
+        KieServerConfigItem callbackConfig = config.getConfigItem(KieServerConstants.CFG_HT_CALLBACK);
+
         // if no other callback set, use jaas by default
-        if (System.getProperty(KieServerConstants.CFG_HT_CALLBACK) == null) {
+        if (callbackConfig == null) {
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
         }
         this.isExecutorAvailable = isExecutorOnClasspath();
 
         this.kieServer = kieServer;
         this.context = registry;
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties());
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties(config));
         EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
 
         // build definition service
@@ -285,12 +291,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
     }
 
-    protected Map<String, String> getPersistenceProperties() {
+    protected Map<String, String> getPersistenceProperties(KieServerConfig config) {
         Map<String, String> persistenceProperties = new HashMap<String, String>();
 
-        persistenceProperties.put("hibernate.dialect", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
-        persistenceProperties.put("hibernate.transaction.jta.platform", System.getProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
-        persistenceProperties.put("javax.persistence.jtaDataSource", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
+        persistenceProperties.put("hibernate.dialect", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
+        persistenceProperties.put("hibernate.transaction.jta.platform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
+        persistenceProperties.put("javax.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
 
         return persistenceProperties;
     }

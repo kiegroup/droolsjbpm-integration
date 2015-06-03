@@ -58,20 +58,23 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 public class RuntimeDataResource {
 
     public static final Logger logger = LoggerFactory.getLogger(RuntimeDataResource.class);
-    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     private RuntimeDataService runtimeDataService;
     private IdentityProvider identityProvider;
+
+    private boolean bypassAuthUser;
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
     public RuntimeDataResource(RuntimeDataService delegate, KieServerRegistry context) {
         this.runtimeDataService = delegate;
         this.identityProvider = context.getIdentityProvider();
+
+        this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
 
     protected String getUser(String queryParamUser) {
-        if (BYPASS_AUTH_USER) {
+        if (bypassAuthUser) {
             return queryParamUser;
         }
 
@@ -266,7 +269,7 @@ public class RuntimeDataResource {
 
         logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
 
-        Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize));
+        Collection<ProcessDefinition> definitions = runtimeDataService.getProcessesByDeploymentId(containerId, buildQueryContext(page, pageSize, "ProcessName", true));
         logger.debug("Found {} process definitions within container '{}'", definitions.size(), containerId);
 
         ProcessDefinitionList processDefinitionList = convertToProcessList(definitions);
@@ -287,7 +290,7 @@ public class RuntimeDataResource {
         if (filter != null && !filter.isEmpty()) {
             logger.debug("About to search for process definitions with filter '{}' with page {} and page size {}", filter, page, pageSize);
 
-            definitions = runtimeDataService.getProcessesByFilter(filter, buildQueryContext(page, pageSize));
+            definitions = runtimeDataService.getProcessesByFilter(filter, buildQueryContext(page, pageSize, "ProcessName", true));
             logger.debug("Found {} process definitions with filter '{}'", definitions.size(), filter);
         } else {
             logger.debug("About to search for process definitions with page {} and page size {}", page, pageSize);
@@ -678,6 +681,10 @@ public class RuntimeDataResource {
 
     protected QueryContext buildQueryContext(Integer page, Integer pageSize) {
         return new QueryContext(page * pageSize, pageSize);
+    }
+
+    protected QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        return new QueryContext(page * pageSize, pageSize, orderBy, asc);
     }
 
     protected QueryFilter buildQueryFilter(Integer page, Integer pageSize) {

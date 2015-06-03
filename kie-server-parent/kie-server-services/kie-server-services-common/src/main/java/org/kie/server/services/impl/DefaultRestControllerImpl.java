@@ -8,12 +8,14 @@ import javax.ws.rs.core.Response;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.KieController;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +24,18 @@ public class DefaultRestControllerImpl implements KieController {
     private static final Logger logger = LoggerFactory.getLogger(DefaultRestControllerImpl.class);
 
     @Override
-    public Set<KieContainerResource> getContainers(Set<String> controllers, String serverId) {
+    public Set<KieContainerResource> getContainers(Set<String> controllers, String serverId, KieServerConfig config) {
 
         for (String controllerUrl : controllers ) {
 
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
                 String connectAndSyncUrl = controllerUrl + "/controller/server/" + KieServerEnvironment.getServerId();
 
+                String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+
                 try {
-                    KieContainerResourceList containerResourceList = makeHttpGetRequestAndCreateServiceResponse(connectAndSyncUrl, KieContainerResourceList.class);
+                    KieContainerResourceList containerResourceList = makeHttpGetRequestAndCreateServiceResponse(connectAndSyncUrl, KieContainerResourceList.class, userName, password);
 
                     if (containerResourceList != null) {
                         // once there is non null list let's return it
@@ -50,9 +55,9 @@ public class DefaultRestControllerImpl implements KieController {
         return null;
     }
 
-    private <T> T makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+    private <T> T makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType, String userName, String password) {
         try {
-            KieRemoteHttpRequest request = newRequest( uri ).get();
+            KieRemoteHttpRequest request = newRequest( uri, userName, password ).get();
             KieRemoteHttpResponse response = request.response();
 
             if ( response.code() == Response.Status.OK.getStatusCode() ) {
@@ -70,11 +75,11 @@ public class DefaultRestControllerImpl implements KieController {
         }
     }
 
-    private KieRemoteHttpRequest newRequest(String uri) {
+    private KieRemoteHttpRequest newRequest(String uri, String userName, String password) {
 
         KieRemoteHttpRequest httpRequest = KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
         httpRequest.accept(MediaType.APPLICATION_JSON);
-        httpRequest.basicAuthorization(KieServerEnvironment.getUsername(), KieServerEnvironment.getPassword());
+        httpRequest.basicAuthorization(userName, password);
 
         return httpRequest;
 

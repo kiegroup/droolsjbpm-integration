@@ -56,9 +56,11 @@ public class KieServerImpl {
 
 
     public KieServerImpl() {
+        this.repository = new KieServerStateFileRepository();
+
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
-        repository = new KieServerStateFileRepository();
+        this.context.registerStateRepository(repository);
 
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
@@ -82,7 +84,7 @@ public class KieServerImpl {
 
         KieController kieController = getController();
         // try to load container information from available controllers if any...
-        Set<KieContainerResource> containers = kieController.getContainers(controllers, KieServerEnvironment.getServerId());
+        Set<KieContainerResource> containers = kieController.getContainers(controllers, KieServerEnvironment.getServerId(), currentState.getConfiguration());
         if (containers == null || containers.isEmpty()) {
             // if no containers from controller use local storage
             containers = currentState.getContainers();

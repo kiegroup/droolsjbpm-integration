@@ -56,21 +56,24 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 public class UserTaskResource {
 
     public static final Logger logger = LoggerFactory.getLogger(UserTaskResource.class);
-    private static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
     private IdentityProvider identityProvider;
     private UserTaskService userTaskService;
 
     private MarshallerHelper marshallerHelper;
 
+    private boolean bypassAuthUser = false;
+
     public UserTaskResource(UserTaskService userTaskService, KieServerRegistry context) {
         this.userTaskService = userTaskService;
         this.identityProvider = context.getIdentityProvider();
         this.marshallerHelper = new MarshallerHelper(context);
+
+        this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
 
     protected String getUser(String queryParamUser) {
-        if (BYPASS_AUTH_USER) {
+        if (bypassAuthUser) {
             return queryParamUser;
         }
 

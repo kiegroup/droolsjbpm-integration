@@ -36,6 +36,43 @@ public class KieServerConfig {
         this.configItems.add(configItem);
     }
 
+    public void removeConfigItem(KieServerConfigItem configItem) {
+        this.configItems.remove(configItem);
+    }
+
+    public KieServerConfigItem getConfigItem(String name) {
+        KieServerConfigItem configItem = null;
+
+        for (KieServerConfigItem item : configItems) {
+            if (name.equals(item.getName())) {
+                configItem = item;
+                break;
+            }
+        }
+
+        return configItem;
+    }
+
+    public String getConfigItemValue(String name) {
+        KieServerConfigItem item = getConfigItem(name);
+
+        if (item != null) {
+            return item.getValue();
+        }
+
+        return null;
+    }
+
+    public String getConfigItemValue(String name, String defaultValue) {
+        KieServerConfigItem item = getConfigItem(name);
+
+        if (item != null) {
+            return item.getValue();
+        }
+
+        return defaultValue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
