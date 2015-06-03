@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -482,4 +483,145 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
+    /**
+     * Test verifying forwardTask method and its functionality.
+     * Also check task status changes when forwarding task.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testForwardUserTask() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
+
+            // forwarding Reserved task to john (forwarding Reserved -> Ready)
+            client.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
+
+            // user yoda has empty task list now
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+            assertEquals(0, taskList.size());
+
+            // forwarded task is set to Ready state and is assigned to john as potential owner
+            changeUser("john");
+            taskList = client.findTasksAssignedAsPotentialOwner("john", 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            assertEquals(taskSummary.getId(), taskList.get(0).getId());
+
+            checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "john");
+
+            // forwarding task in Ready state back to yoda (forwarding Ready -> Ready)
+            client.forwardTask("definition-project", taskSummary.getId(), "john", "yoda");
+
+            // forwarded task stays in Ready state and is assigned to yoda as potential owner
+            changeUser("yoda");
+            checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "yoda");
+
+            // starting task to change its status to In progress
+            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.InProgress, "yoda");
+
+            // forwarding task In progress back to john (forwarding In progress -> Ready)
+            client.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
+
+            // forwarded task change state to Ready and is assigned to john as potential owner
+            changeUser("john");
+            checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "john");
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+
+    /**
+     * Test verifying delegateTask method and its functionality.
+     * Also check task status changes when delegating task.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDelegateUserTask() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
+
+            // delegating Reserved task to john (delegating Reserved -> Reserved)
+            client.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
+
+            // user yoda has empty task list now
+            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+            assertEquals(0, taskList.size());
+
+            // delegated task stays in Reserved state and is assigned to john as actual owner
+            changeUser("john");
+            taskList = client.findTasksAssignedAsPotentialOwner("john", 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            assertEquals(taskSummary.getId(), taskList.get(0).getId());
+
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "john");
+
+            // releasing task to change its state to Ready
+            client.releaseTask("definition-project", taskSummary.getId(), "john");
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Ready, "");
+
+            // delegating task in Ready state back to yoda (delegating Ready -> Reserved)
+            client.delegateTask("definition-project", taskSummary.getId(), "john", "yoda");
+
+            // delegated task change its state to Reserved and is assigned to yoda as actual owner
+            changeUser("yoda");
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
+
+            // starting task to change its status to In progress
+            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.InProgress, "yoda");
+
+            // delegating task In progress back to john (delegating In progress -> Reserved)
+            client.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
+
+            // delegated task change state to Reserved and is assigned to john as actual owner
+            changeUser("john");
+            checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "john");
+        } finally {
+            client.abortProcessInstance("definition-project", processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+
+    private void checkTaskStatusAndOwners(String containerId, Long taskId, Status status, String actualOwner, String potentialOwner) {
+        TaskInstance task = client.getTaskInstance(containerId, taskId, false, false, true);
+        checkTaskStatusAndActualOwner(containerId, taskId, status, actualOwner);
+        assertEquals(1, task.getPotentialOwners().size());
+        assertEquals(potentialOwner, task.getPotentialOwners().get(0));
+    }
+
+    private void checkTaskStatusAndActualOwner(String containerId, Long taskId, Status status, String actualOwner) {
+        TaskInstance task = client.getTaskInstance(containerId, taskId);
+        assertEquals(taskId, task.getId());
+        assertEquals(status.toString(), task.getStatus());
+        assertEquals(actualOwner, task.getActualOwner());
+    }
 }
