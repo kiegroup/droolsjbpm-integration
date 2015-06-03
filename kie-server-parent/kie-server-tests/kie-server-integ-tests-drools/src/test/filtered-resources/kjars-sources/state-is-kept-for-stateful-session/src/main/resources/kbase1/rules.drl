@@ -24,5 +24,16 @@ then
    }
 end
 
+rule "Rule with agenda group"
+    agenda-group "ag1"
+    lock-on-active
+when
+    $p : Person( firstname == "Bob" )
+then
+    modify($p){
+       setSurname("Sponge")
+    }
+end
+
 
 

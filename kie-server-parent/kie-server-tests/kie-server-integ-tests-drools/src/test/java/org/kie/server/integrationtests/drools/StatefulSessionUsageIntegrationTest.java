@@ -84,4 +84,27 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBas
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
                 reply.getMsg().contains("Container stateful-session2 is not instantiated"));
     }
+
+    @Test
+    public void testAgendaGroup() {
+        client.createContainer("stateful-session1", new KieContainerResource("stateful-session1", releaseId));
+        String payload1 = "<batch-execution lookup=\"kbase1.stateful\">\n" +
+                          "  <insert out-identifier=\"person1\">\n" +
+                          "    <org.kie.server.testing.Person>\n" +
+                          "      <firstname>Bob</firstname>\n" +
+                          "    </org.kie.server.testing.Person>\n" +
+                          "  </insert>\n" +
+                          "  <set-focus name=\"ag1\"/>\n" +
+                          "  <fire-all-rules />\n" +
+                          "  <clear-agenda-group name=\"ag1\"/>\n" + // this is just to test marshalling
+                          "  <clear-agenda />\n" + // this is just to test marshalling
+                          "</batch-execution>";
+        ServiceResponse<String> reply1 = client.executeCommands("stateful-session1", payload1);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
+        // first call should set the surname for the inserted person
+        String result1 = reply1.getResult();
+        assertTrue("Expected surname to be set to 'Sponge'. Got response: " + result1,
+                   result1.contains("<surname>Sponge</surname>"));
+    }
+
 }
