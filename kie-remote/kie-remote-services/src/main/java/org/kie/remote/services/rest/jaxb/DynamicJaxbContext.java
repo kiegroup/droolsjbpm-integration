@@ -207,7 +207,7 @@ public class DynamicJaxbContext extends JAXBContext {
      * @param deploymentId The deployment identifier.
      */
     private void setupDeploymentJaxbContext(String deploymentId) { 
-        if( contextsCache.contains(deploymentId) ) { 
+        if( contextsCache.containsKey(deploymentId) ) { 
             logger.error("JAXB context instance already found when deploying deployment '" + deploymentId + "'!");
             contextsCache.remove(deploymentId);
         }
