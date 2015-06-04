@@ -92,14 +92,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
-        assertTrue(processIds.contains("definition-project.usertask"));
+        assertTrue(processIds.contains("definition-project.signalprocess"));
 
         definitions = client.findProcesses(1, 3);
         assertNotNull(definitions);
 
         assertEquals(1, definitions.size());
         processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.usertask"));
 
     }
 

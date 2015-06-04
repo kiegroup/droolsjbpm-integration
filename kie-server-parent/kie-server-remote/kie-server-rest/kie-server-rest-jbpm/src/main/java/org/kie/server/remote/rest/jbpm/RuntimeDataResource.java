@@ -295,7 +295,7 @@ public class RuntimeDataResource {
         } else {
             logger.debug("About to search for process definitions with page {} and page size {}", page, pageSize);
 
-            definitions = runtimeDataService.getProcesses(buildQueryContext(page, pageSize));
+            definitions = runtimeDataService.getProcesses(buildQueryContext(page, pageSize, "ProcessName", true));
             logger.debug("Found {} process definitions", definitions.size(), filter);
         }
 
