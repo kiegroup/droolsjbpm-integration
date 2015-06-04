@@ -3,6 +3,6 @@ package org.kie.spring;
 public class CodeVersion {
 
     // Do not modify this: this is automatically incremented by the maven replacer plugin
-    public final static String VERSION = "6.3.0-SNAPSHOT";
+    public final static String VERSION = "6.3.0.Beta1";
 
 }
