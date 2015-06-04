@@ -500,7 +500,7 @@ public class ResourceBase {
     
     protected String getRelativePath() { 
         String url =  httpRequest.getRequestURI();
-        url.replaceAll( ".*/rest", "");
+        url = url.replaceAll( ".*/rest", "");
         return url;
     }
     

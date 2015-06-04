@@ -65,7 +65,7 @@ public class ProcessResource  {
 
     protected static String getRelativePath(HttpServletRequest httpRequest) {
         String url =  httpRequest.getRequestURI();
-        url.replaceAll( ".*/rest", "");
+        url = url.replaceAll( ".*/rest", "");
         return url;
     }
 
