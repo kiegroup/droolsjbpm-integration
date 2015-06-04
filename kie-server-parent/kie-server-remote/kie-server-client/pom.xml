@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.kie.server</groupId>
     <artifactId>kie-server-remote</artifactId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>6.3.0.Beta1</version>
   </parent>
 
   <artifactId>kie-server-client</artifactId>
