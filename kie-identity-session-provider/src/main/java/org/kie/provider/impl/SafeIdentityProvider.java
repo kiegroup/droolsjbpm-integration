@@ -30,7 +30,6 @@ public class SafeIdentityProvider implements IdentityProvider, Serializable {
     private Instance<User> identityInstance;
     
     @Inject
-    @RequestScoped
     private Instance<HttpServletRequest> request;
     
     @Override
