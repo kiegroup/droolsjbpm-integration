@@ -269,6 +269,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
+            assertTrue(taskSummary.getSkipable().booleanValue());
 
             client.skipTask("definition-project", taskSummary.getId(), "yoda");
 
