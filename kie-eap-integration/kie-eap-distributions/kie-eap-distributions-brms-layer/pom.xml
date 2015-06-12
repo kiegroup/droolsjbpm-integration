@@ -219,6 +219,12 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>org-apache-commons-lang3</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
 
   </dependencies>
 
