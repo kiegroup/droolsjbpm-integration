@@ -29,6 +29,7 @@
 
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    #if( $layersDescriptorFile )
     <files>
         <file>
             <source>$layersDescriptorFile</source>
@@ -36,6 +37,7 @@
             <destName>layers.conf</destName>
         </file>
     </files>
+    #end
 
     <componentDescriptors>
         #foreach($component in $sorter.sort($components))

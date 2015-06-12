@@ -386,6 +386,9 @@
           <!-- Do not include the dependencies marked as optional. -->
           <includeOptionalDependencies>false</includeOptionalDependencies>
 
+          <!-- Do not generate the "layers.conf" file.. -->
+          <generateLayersDefinition>false</generateLayersDefinition>
+
         </configuration>
         <executions>
           <execution>

@@ -66,6 +66,13 @@ public class EAPStaticModulesBuilderMojo extends EAPBaseMojo {
      */
     protected String assemblyFormats;
 
+    /**
+     * Indicates if layers definition file (named layers.conf) must be created inside the distribution;
+     *
+     * @parameter default-value="false"
+     */
+    protected Boolean generateLayersDefinition = false;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         super.execute();
@@ -92,11 +99,13 @@ public class EAPStaticModulesBuilderMojo extends EAPBaseMojo {
                 append(distributionName);
 
         // Generate the layer configuration descriptor for EAP.
-        String layersDescriptor = generateLayersDescriptor(distribution.getGraph());
-        try {
-            EAPFileUtils.writeFile(distroOutputPathFile, LAYERS_DESCRIPTOR_NAME, layersDescriptor);
-        } catch (IOException e) {
-            throw new MojoExecutionException("Cannot write layer descriptor file.", e);
+        if (generateLayersDefinition) {
+            String layersDescriptor = generateLayersDescriptor(distribution.getGraph());
+            try {
+                EAPFileUtils.writeFile(distroOutputPathFile, LAYERS_DESCRIPTOR_NAME, layersDescriptor);
+            } catch (IOException e) {
+                throw new MojoExecutionException("Cannot write layer descriptor file.", e);
+            }
         }
 
         String[] componentDescriptors = new String[distribution.getGraph().getNodes().size()];
@@ -133,8 +142,8 @@ public class EAPStaticModulesBuilderMojo extends EAPBaseMojo {
         // Generate the global assembly file for all module assembly component files generated.
         String layerId = new StringBuilder(distributionName).append("-layer").toString();
         String[] formats = getAssemblyFormats();
-        String layerDescriptorFilePath = new StringBuilder(distroOutputPath).
-                append(File.separator).append(LAYERS_DESCRIPTOR_NAME).toString();
+        String layerDescriptorFilePath = generateLayersDefinition ? new StringBuilder(distroOutputPath).
+                append(File.separator).append(LAYERS_DESCRIPTOR_NAME).toString() : null;
         String globalAssemblyFileName = new StringBuilder(distributionName).
                 append(GLOBAL_ASSEMBLY__DESCRIPTOR_NAME).toString();
         String globalAssembly = generateGlobalAssembly(layerId, formats, layerDescriptorFilePath, componentDescriptors);
