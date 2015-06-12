@@ -62,6 +62,7 @@
     <module>kie-server-parent</module>
     <module>kie-examples-api</module>
     <module>kie-identity-session-provider</module>
+    <module>drools-osgi</module>
   </modules>
 
   <profiles>

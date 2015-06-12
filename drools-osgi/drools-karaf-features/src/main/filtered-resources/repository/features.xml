@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="camel-drools-example-${project.version}"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
+
+  <feature name="drools-common" version="${version.org.drools}" description="Drools Commons">
+    <feature version="[2.6,3.0)">cxf-specs</feature>
+    <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/${karaf.servicemix.version.javax.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-xjc/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
+    <bundle start-level='10'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/${karaf.servicemix.version.com.sun.xml.bind.jaxb}</bundle>
+    <bundle>mvn:org.mvel/mvel2/${version.org.mvel}</bundle>
+    <bundle>wrap:mvn:org.eclipse.jdt.core.compiler/ecj/${karaf.version.org.eclipse.jdt.core.compiler}$Bundle-SymbolicName=Eclipse-JDT-Compiler&amp;Bundle-Version=${karaf.version.org.eclipse.jdt.core.compiler}</bundle>
+    <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
+    <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
+    <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+  </feature>
+
+  <feature name="drools-module" version="${version.org.drools}" description="Drools core">
+    <feature version="${version.org.drools}">drools-common</feature>
+    <feature version="${version.org.drools}">kie</feature>
+    <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-osgi-integration/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="drools-templates" version="${version.org.drools}" description="Drools Templates">
+    <bundle>mvn:org.drools/drools-templates/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="drools-decisiontable" description="Drools Decision Tables" version="${version.org.drools}">
+    <feature version="${version.org.drools}">drools-module</feature>
+    <feature version="${version.org.drools}">drools-templates</feature>
+    <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
+    <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
+    <feature version="${project.version}">drools-module</feature>
+    <feature version="[3.1,4.0)">spring-orm</feature>
+    <feature version="[${karaf.version.org.apache.aries.jpa},2.0)">jpa</feature>
+    <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="kie" version="${version.org.drools}">
+    <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
+    <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="kie-ci" version="${version.org.drools}">
+    <bundle>mvn:org.kie/kie-ci-osgi/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="kie-spring" version="${version.org.drools}">
+    <feature version="${version.org.drools}">kie</feature>
+    <feature version="${version.org.drools}">drools-jpa</feature>
+    <feature version="${version.org.drools}">jbpm</feature>
+    <feature version="${version.org.drools}">jbpm-human-task</feature>
+    <feature version="[3.1,4.0)">spring</feature>
+    <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="kie-aries-blueprint" version="${version.org.drools}">
+    <feature version="${version.org.drools}">kie</feature>
+    <feature version="${version.org.drools}">drools-jpa</feature>
+    <feature version="${version.org.drools}">jbpm</feature>
+    <feature version="${version.org.drools}">jbpm-human-task</feature>
+    <bundle>mvn:org.kie/kie-aries-blueprint/${version.org.drools}</bundle>
+  </feature>
+
+  <feature name="jbpm-commons" version="${version.org.drools}" description="jBPM Commons">
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
+    <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/${karaf.version.org.jboss.spec.javax.security.jacc}</bundle>
+    <bundle>mvn:joda-time/joda-time/${karaf.version.joda-time}</bundle>
+    <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${karaf.version.org.apache.geronimo.specs.servlet}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jpa_2.0_spec/${karaf.version.org.apache.geronimo.specs.jpa}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
+  </feature>
+
+  <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
+    <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-human-task-audit/${version.org.jbpm}</bundle>
+  </feature>
+
+  <feature name="jbpm" version="${project.version}" description="jBPM engine">
+    <feature version="${project.version}">drools-module</feature>
+    <feature version="${project.version}">drools-jpa</feature>
+    <feature version="${project.version}">jbpm-commons</feature>
+    <feature version="${project.version}">jbpm-human-task</feature>
+    <bundle>mvn:org.jbpm/jbpm-flow-builder/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-bpmn2/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
+  </feature>
+
+  <feature name="jbpm-example" version="${version.org.drools}" description="jBPM Spring Example">
+    <feature version="${version.org.drools}">jbpm</feature>
+    <bundle>mvn:org.drools/spring-jbpm-osgi-example/${version.org.drools}</bundle>
+  </feature>
+
+  <!-- This bundle should be removed with next release of Drools 6.1.Beta4 -->
+  <feature name="lib" version="${project.version}">
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
+  </feature>
+
+  <!-- Spring jBPM Persistent OSGi -->
+  <feature name="jbpm-spring-persistent" version="${version.org.drools}" description="jBPM Spring OSGi Example">
+    <feature version="${version.org.drools}">jbpm</feature>
+    <feature version="${project.version}">lib</feature>
+    <feature>spring-dm</feature>
+    <feature version="${version.org.drools}">kie-spring</feature>
+    <feature>droolsjbpm-hibernate</feature>
+    <feature version="${h2.version}">h2</feature>
+  </feature>
+
+  <feature name="droolsjbpm-hibernate" version="${version.org.hibernate}" description="Hibernate 4.2.x JPA persistence engine support">
+    <details>Enable Hibernate 4.2.x as persistence engine.</details>
+    <feature>transaction</feature>
+    <feature>jpa</feature>
+    <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.version.org.apache.servicemix.bundles.antlr}</bundle>
+    <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${karaf.version.org.apache.servicemix.bundles.ant}</bundle>
+    <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${karaf.version.org.apache.servicemix.bundles.dom4j}</bundle>
+    <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.serp/${karaf.version.org.apache.servicemix.bundles.serp}</bundle>
+    <bundle dependency="true">mvn:com.fasterxml/classmate/${karaf.version.com.fasterxml.classmate}</bundle>
+    <bundle dependency="true">mvn:org.javassist/javassist/${version.org.javassist}</bundle>
+    <bundle dependency="true">mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.4_spec/${version.org.jboss.spec.javax.security.jacc.jboss-jacc-api_1.4_spec}</bundle>
+    <bundle dependency="true">wrap:mvn:org.jboss/jandex/${karaf.version.org.jboss.jandex}</bundle>
+    <bundle dependency="true">mvn:javax.validation/validation-api/${karaf.version.javax.validation}</bundle>
+    <bundle dependency="true">mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
+    <bundle dependency="true">mvn:org.hibernate.common/hibernate-commons-annotations/${version.org.hibernate.commons.annotations}</bundle>
+    <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-core/${version.org.hibernate}$overwrite=merge&amp;Import-Package=org.jbpm.services.task*,*</bundle>
+    <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-entitymanager/${version.org.hibernate}$overwrite=merge&amp;DynamicImport-Package=*</bundle>
+    <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
+  </feature>
+
+  <feature name="hibernate-validator" version="${version.org.hibernate.validator}">
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/${karaf.version.org.apache.servicemix.specs.jsr303-api}</bundle>
+    <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
+    <bundle>mvn:org.hibernate/hibernate-validator/${version.org.hibernate.validator}</bundle>
+  </feature>
+
+  <feature name="h2" version="${h2.version}" description="h2 database">
+    <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
+    <bundle start-level="100">mvn:commons-dbcp/commons-dbcp/${version.commons-dbcp}</bundle>
+    <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
+  </feature>
+
+</features>
