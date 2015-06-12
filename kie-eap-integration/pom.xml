@@ -12,6 +12,20 @@
   <packaging>pom</packaging>
   <name>KIE EAP - Drools and jBPM Module layers for JBoss EAP</name>
 
+  <properties>
+    <version.fuse.eap>6.2.0.redhat-124</version.fuse.eap>
+  </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.redhat.fuse</groupId>
+        <artifactId>fuse-eap-config</artifactId>
+        <version>${version.fuse.eap}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <repositories>
     <!-- Bootstrap repository to locate the parent pom when the parent pom has not been build locally. -->
     <repository>
@@ -28,12 +42,26 @@
         <updatePolicy>daily</updatePolicy>
       </snapshots>
     </repository>
+    <!-- Note: repo.fusesource.com is the correct repo for JBoss Fuse and it is not a mistake -->
+    <repository>
+      <id>fusesource.ea</id>
+      <name>JBoss Community Early Access Release Repository</name>
+      <url>https://repo.fusesource.com/nexus/content/groups/ea</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+    </repository>
   </repositories>
   
   <modules>
     <module>kie-jboss-modules-plugin</module>
     <module>kie-eap-modules</module>
     <module>kie-eap-distributions</module>
+    <module>kie-fuse-config-editor</module>
   </modules>
 
   <dependencies>
