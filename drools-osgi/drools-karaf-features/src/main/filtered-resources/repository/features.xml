@@ -5,7 +5,7 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
   <feature name="drools-common" version="${version.org.drools}" description="Drools Commons">
-    <feature version="[2.6,3.0)">cxf-specs</feature>
+    <feature version="[2.6,4.0)">cxf-specs</feature>
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
