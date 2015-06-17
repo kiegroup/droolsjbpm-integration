@@ -4,7 +4,8 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
-  <feature name="drools-common" version="${version.org.drools}" description="Drools Commons">
+
+  <feature name="drools-common" version="${project.version}" description="Drools Commons">
     <feature version="[2.6,4.0)">cxf-specs</feature>
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
@@ -20,21 +21,21 @@
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
   </feature>
 
-  <feature name="drools-module" version="${version.org.drools}" description="Drools core">
-    <feature version="${version.org.drools}">drools-common</feature>
-    <feature version="${version.org.drools}">kie</feature>
+  <feature name="drools-module" version="${project.version}" description="Drools core">
+    <feature version="${project.version}">drools-common</feature>
+    <feature version="${project.version}">kie</feature>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-osgi-integration/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="drools-templates" version="${version.org.drools}" description="Drools Templates">
+  <feature name="drools-templates" version="${project.version}" description="Drools Templates">
     <bundle>mvn:org.drools/drools-templates/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="drools-decisiontable" description="Drools Decision Tables" version="${version.org.drools}">
-    <feature version="${version.org.drools}">drools-module</feature>
-    <feature version="${version.org.drools}">drools-templates</feature>
+  <feature name="drools-decisiontable" description="Drools Decision Tables" version="${project.version}">
+    <feature version="${project.version}">drools-module</feature>
+    <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
@@ -47,33 +48,33 @@
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie" version="${version.org.drools}">
+  <feature name="kie" version="${project.version}">
     <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-ci" version="${version.org.drools}">
+  <feature name="kie-ci" version="${project.version}">
     <bundle>mvn:org.kie/kie-ci-osgi/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-spring" version="${version.org.drools}">
-    <feature version="${version.org.drools}">kie</feature>
-    <feature version="${version.org.drools}">drools-jpa</feature>
-    <feature version="${version.org.drools}">jbpm</feature>
-    <feature version="${version.org.drools}">jbpm-human-task</feature>
+  <feature name="kie-spring" version="${project.version}">
+    <feature version="${project.version}">kie</feature>
+    <feature version="${project.version}">drools-jpa</feature>
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">jbpm-human-task</feature>
     <feature version="[3.1,4.0)">spring</feature>
     <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-aries-blueprint" version="${version.org.drools}">
-    <feature version="${version.org.drools}">kie</feature>
-    <feature version="${version.org.drools}">drools-jpa</feature>
-    <feature version="${version.org.drools}">jbpm</feature>
-    <feature version="${version.org.drools}">jbpm-human-task</feature>
+  <feature name="kie-aries-blueprint" version="${project.version}">
+    <feature version="${project.version}">kie</feature>
+    <feature version="${project.version}">drools-jpa</feature>
+    <feature version="${project.version}">jbpm</feature>
+    <feature version="${project.version}">jbpm-human-task</feature>
     <bundle>mvn:org.kie/kie-aries-blueprint/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="jbpm-commons" version="${version.org.drools}" description="jBPM Commons">
+  <feature name="jbpm-commons" version="${project.version}" description="jBPM Commons">
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/${karaf.servicemix.version.org.quartz-scheduler}</bundle>
     <bundle>mvn:org.jboss.spec.javax.security.jacc/jboss-jacc-api_1.5_spec/${karaf.version.org.jboss.spec.javax.security.jacc}</bundle>
@@ -106,8 +107,8 @@
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
   </feature>
 
-  <feature name="jbpm-example" version="${version.org.drools}" description="jBPM Spring Example">
-    <feature version="${version.org.drools}">jbpm</feature>
+  <feature name="jbpm-example" version="${project.version}" description="jBPM Spring Example">
+    <feature version="${project.version}">jbpm</feature>
     <bundle>mvn:org.drools/spring-jbpm-osgi-example/${version.org.drools}</bundle>
   </feature>
 
@@ -117,11 +118,11 @@
   </feature>
 
   <!-- Spring jBPM Persistent OSGi -->
-  <feature name="jbpm-spring-persistent" version="${version.org.drools}" description="jBPM Spring OSGi Example">
-    <feature version="${version.org.drools}">jbpm</feature>
+  <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring OSGi Example">
+    <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">lib</feature>
     <feature>spring-dm</feature>
-    <feature version="${version.org.drools}">kie-spring</feature>
+    <feature version="${project.version}">kie-spring</feature>
     <feature>droolsjbpm-hibernate</feature>
     <feature version="${h2.version}">h2</feature>
   </feature>
