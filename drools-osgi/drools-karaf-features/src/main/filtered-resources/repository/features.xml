@@ -107,6 +107,11 @@
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
   </feature>
 
+  <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner engine">
+    <feature version="${project.version}">drools-module</feature>
+    <bundle>mvn:org.optaplanner/optaplanner-core/${version.org.optaplanner}</bundle>
+  </feature>
+
   <feature name="jbpm-example" version="${project.version}" description="jBPM Spring Example">
     <feature version="${project.version}">jbpm</feature>
     <bundle>mvn:org.drools/spring-jbpm-osgi-example/${version.org.drools}</bundle>
