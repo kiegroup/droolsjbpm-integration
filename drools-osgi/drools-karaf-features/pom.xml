@@ -22,7 +22,6 @@
     -->
     <!-- TODO we should use the karaf features-maven-plugin -->
     <!-- Normal reuses -->
-    <karaf.version.org.apache.cxf>${version.org.apache.cxf}</karaf.version.org.apache.cxf>
     <karaf.version.org.apache.helix>${version.org.apache.helix}</karaf.version.org.apache.helix>
     <karaf.version.com.google.protobuf>${version.com.google.protobuf}</karaf.version.com.google.protobuf>
     <karaf.version.joda-time>${version.joda-time}</karaf.version.joda-time>
