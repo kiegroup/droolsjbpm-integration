@@ -18,6 +18,7 @@
   <modules>
     <module>drools-osgi-integration</module>
     <module>drools-karaf-features</module>
+    <module>drools-karaf-itests</module>
   </modules>
 
 </project>
