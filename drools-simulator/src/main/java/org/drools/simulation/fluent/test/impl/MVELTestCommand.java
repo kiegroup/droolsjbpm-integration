@@ -16,16 +16,16 @@
 
 package org.drools.simulation.fluent.test.impl;
 
-import static org.junit.Assert.fail;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.util.MVELSafeHelper;
 import org.kie.internal.command.Context;
 import org.mvel2.MVEL;
 import org.mvel2.ParserContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.fail;
 
 public class MVELTestCommand implements GenericCommand<Void>  {
 
@@ -79,7 +79,7 @@ public class MVELTestCommand implements GenericCommand<Void>  {
         }
         
         if ( ! (( Boolean ) MVELSafeHelper.getEvaluator().eval( headerText + text, vars )).booleanValue() ) {
-            fail( text + "\n" + reason );
+            fail( text + "\n" + (reason != null ? reason : "") );
         }
         return null;
     }

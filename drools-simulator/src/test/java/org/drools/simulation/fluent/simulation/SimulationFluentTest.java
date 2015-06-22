@@ -17,16 +17,17 @@
 package org.drools.simulation.fluent.simulation;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.simulation.fluent.test.CheckableFluent;
 import org.drools.simulation.fluent.test.impl.ReflectiveMatcherFactory;
 import org.drools.simulation.impl.Person;
 import org.junit.Test;
 import org.kie.api.builder.ReleaseId;
 import org.kie.internal.fluent.VariableContext;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimulationFluentTest extends SimulateTestBase {
 
@@ -64,12 +65,17 @@ public class SimulationFluentTest extends SimulateTestBase {
             .end()
         .newPath( "path1" )
         .newStep( 1000 )
-        .newKieSession( releaseId, "org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "yoda", 150 ) ).set( "y" )
             .fireAllRules()
              // show testing inside of ksession execution
-            .test( "y.name == 'yoda'" )
+             //.test( "y.name == 'yoda'" )
+            .given( "y" ).as( Person.class ).test( new CheckableFluent.Predicate1<Person>() {
+            @Override
+            public boolean test( Person y ) {
+                return y.getName().equals( "yoda" );
+            }})
             .test( "y.age == 160" )
             .test( "list[list.size()-1] - list[0] == 1000" )
             .end()
@@ -84,9 +90,9 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "y.age == 160" )
             .test( "list[list.size()-1] - list[0] == 2000" )
             .end()
-        .newPath(  "path2" )
+        .newPath( "path2" )
         .newStep( 1500 )
-        .newKieSession( releaseId, "org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal( "list", list ).set( "list" )
             .insert( new Person( "bobba", 75 ) ).set( "b" )
             .fireAllRules()
@@ -96,9 +102,9 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "b.age == 85" )
             .test( "list[list.size()-1] - list[0] == 1500" )
             .end()
-        .getPath(  "path1" )
+        .getPath( "path1" )
         .newStep( 1300 )
-        .newKieSession( releaseId, "org.test.KBase1.KSession1")
+        .newKieSession( releaseId, "org.test.KBase1.KSession1" )
             .setGlobal( "list", list )
             .insert( new Person( "luke", 35 ) ).set( "b" )
             .fireAllRules()
@@ -107,6 +113,11 @@ public class SimulationFluentTest extends SimulateTestBase {
             .test( "y.age == 160" )
             .test( "b.name == 'luke'" )
             .test( "b.age == 45" )
+            .given( "y" ).as( Person.class ).given( "b" ).as( Person.class ).test( new CheckableFluent.Predicate2<Person, Person>() {
+            @Override
+            public boolean test( Person y, Person b ) {
+                return y.getAge() > b.getAge();
+            }}, "yoda has to be older than luke" )
             .test( "list[list.size()-1] - list[0] == 1300" )
             .end()
         .runSimulation();

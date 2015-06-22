@@ -16,12 +16,13 @@
 
 package org.drools.simulation.fluent.test.impl;
 
-import static org.junit.Assert.assertThat;
-
+import org.drools.simulation.fluent.test.CheckableFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.hamcrest.Matcher;
 import org.kie.api.command.Command;
 import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
+
+import static org.junit.Assert.assertThat;
 
 public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
     
@@ -43,7 +44,7 @@ public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
         return (P) this;
     }
     
-    public <T> P test(String text) {
+    public P test(String text) {
         MVELTestCommand testCmd = new MVELTestCommand();
         testCmd.setText( text );
         
@@ -51,11 +52,14 @@ public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
         return (P) this;
     }
     
-    public <T> P test(ReflectiveMatcherAssert matcherAssert) {
+    public P test(ReflectiveMatcherAssert matcherAssert) {
         ReflectiveMatcherAssertCommand matcherCmd = new ReflectiveMatcherAssertCommand( matcherAssert );
 
         addCommand(matcherCmd);
         return (P) this;
     }
 
+    public CheckableFluent<P> given(String name) {
+        return new CheckableFactory<P>(this, name);
+    }
 }
