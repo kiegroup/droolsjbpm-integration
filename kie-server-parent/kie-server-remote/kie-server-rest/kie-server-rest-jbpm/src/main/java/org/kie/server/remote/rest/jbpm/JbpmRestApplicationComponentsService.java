@@ -32,6 +32,10 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         KieServerRegistry context = null;
 
         for( Object object : services ) {
+            // in case given service is null (meaning was not configured) continue with next one
+            if (object == null) {
+                continue;
+            }
             if( ProcessService.class.isAssignableFrom(object.getClass()) ) {
                processService = (ProcessService) object;
                continue;

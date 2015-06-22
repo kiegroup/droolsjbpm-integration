@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -135,16 +136,24 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
-        // build executor service
-        executorService = ExecutorServiceFactory.newExecutorService(emf);
-        executorService.init();
+        if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
+            // build executor service
+            executorService = ExecutorServiceFactory.newExecutorService(emf);
+            executorService.setInterval(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_INTERVAL, "3")));
+            executorService.setRetries(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_RETRIES, "3")));
+            executorService.setThreadPoolSize(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_POOL, "1")));
+            executorService.setTimeunit(TimeUnit.valueOf(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_TIME_UNIT, "SECONDS")));
+            executorService.init();
+        }
     }
 
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
         ((AbstractDeploymentService)deploymentService).shutdown();
 
-        executorService.destroy();
+        if (executorService != null) {
+            executorService.destroy();
+        }
 
         EntityManagerFactory emf = EntityManagerFactoryManager.get().remove(persistenceUnitName);
         if (emf != null && emf.isOpen()) {
@@ -268,7 +277,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     protected void addAsyncHandler(KModuleDeploymentUnit unit) {
         // add async only when the executor component is not disabled
-        if (isExecutorAvailable) {
+        if (isExecutorAvailable && executorService != null) {
             DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
             if (descriptor == null) {
                 descriptor = new DeploymentDescriptorImpl(persistenceUnitName);

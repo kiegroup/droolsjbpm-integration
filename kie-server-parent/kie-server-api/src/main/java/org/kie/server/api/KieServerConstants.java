@@ -21,6 +21,12 @@ public class KieServerConstants {
     public static final String CFG_HT_CALLBACK = "org.jbpm.ht.callback";
     public static final String CFG_HT_CALLBACK_CLASS = "org.jbpm.ht.custom.callback";
 
+    public static final String CFG_EXECUTOR_INTERVAL = "org.kie.executor.interval";
+    public static final String CFG_EXECUTOR_POOL = "org.kie.executor.pool.size";
+    public static final String CFG_EXECUTOR_RETRIES = "org.kie.executor.retry.count";
+    public static final String CFG_EXECUTOR_TIME_UNIT = "org.kie.executor.timeunit";
+    public static final String CFG_EXECUTOR_DISABLED = "org.kie.executor.disabled";
+
     public static final String CFG_KIE_MVN_SETTINGS = "kie.maven.settings.custom";
 
 
