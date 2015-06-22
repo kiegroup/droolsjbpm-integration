@@ -24,8 +24,9 @@ public interface TestableFluent<P> {
     
     <T> P test(T actual, org.hamcrest.Matcher<T> matcher);
     
-    <T> P test(String text);
+    P test(String text);
     
-    <T> P test(ReflectiveMatcherAssert matcher);
+    P test(ReflectiveMatcherAssert matcher);
 
+    CheckableFluent<P> given(String name);
 }

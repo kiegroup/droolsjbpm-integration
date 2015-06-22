@@ -88,7 +88,7 @@ public class SimulationJoinNodeInstance extends NodeInstanceImpl {
     }
 
     private boolean checkAllActivated(Join join) {
-        // check whether all parent nodes have been triggered
+        // test whether all parent nodes have been triggered
         for (final Connection connection: join.getDefaultIncomingConnections()) {
             if ( this.triggers.get( connection.getFrom().getId() ) == null ) {
                 return false;

@@ -200,7 +200,7 @@ public class BPMN2SimulationDataProvider implements SimulationDataProvider {
         Set<String> processedSourceElems = new LinkedHashSet<String>();
         for (String sequenceFlowId : path.getSequenceFlowsIds()) {
             String sourceElemId = path.getSeqenceFlowsSources().get(sequenceFlowId);
-            // need to check if given source (gateway) was already processed as it can be twice or more when loops are
+            // need to test if given source (gateway) was already processed as it can be twice or more when loops are
             // modeled in the process, for probability counting only single outgoing flow is taken - currently supports
             // only XOR and AND gateways
             if (processedSourceElems.contains(sourceElemId)) {
