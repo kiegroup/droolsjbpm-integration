@@ -16,6 +16,7 @@
   <name>Drools :: OSGi Parent project</name>
 
   <modules>
+    <module>drools-osgi-integration</module>
     <module>drools-karaf-features</module>
   </modules>
 
