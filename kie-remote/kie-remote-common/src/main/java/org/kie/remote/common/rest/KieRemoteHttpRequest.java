@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2014 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
+/*
  * Copyright (c) 2014 Kevin Sawicki <kevinsawicki@gmail.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
