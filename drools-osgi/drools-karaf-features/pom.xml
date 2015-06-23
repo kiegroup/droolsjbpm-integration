@@ -22,8 +22,6 @@
     -->
     <!-- TODO we should use the karaf features-maven-plugin -->
     <!-- Normal reuses -->
-    <karaf.version.org.apache.camel>${version.org.apache.camel}</karaf.version.org.apache.camel>
-    <karaf.version.org.apache.cxf>${version.org.apache.cxf}</karaf.version.org.apache.cxf>
     <karaf.version.org.apache.helix>${version.org.apache.helix}</karaf.version.org.apache.helix>
     <karaf.version.com.google.protobuf>${version.com.google.protobuf}</karaf.version.com.google.protobuf>
     <karaf.version.joda-time>${version.joda-time}</karaf.version.joda-time>
@@ -61,7 +59,7 @@
     <!-- Overwrites with a servicemix version -->
     <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.1.1_2</karaf.servicemix.version.com.sun.xml.bind.jaxb>
-    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.3_1</karaf.servicemix.version.com.thoughtworks.xstream>
+    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.7_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.javax.xml.bind.jaxb>1.9.0</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
     <karaf.servicemix.version.org.apache.poi>3.9_2</karaf.servicemix.version.org.apache.poi>
