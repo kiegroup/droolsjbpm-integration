@@ -58,34 +58,6 @@
       </modules>
     </profile>
 
-    <!-- Profile for dynamic (webapp) modules in bpms layer. -->
-    <profile>
-      <id>dynamic-modules-bpms</id>
-      <activation>
-        <property>
-          <name>bpms-webapp</name>
-        </property>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-dynamic-modules</module>
-      </modules>
-    </profile>
-
-    <!-- Profile for dynamic (webapp) modules in brms layer. -->
-    <profile>
-      <id>dynamic-modules-brms</id>
-      <activation>
-        <property>
-          <name>brms-webapp</name>
-        </property>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-dynamic-modules</module>
-      </modules>
-    </profile>
-
   </profiles>
 
 </project>

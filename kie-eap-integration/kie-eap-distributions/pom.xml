@@ -29,20 +29,6 @@
       </modules>
     </profile>
 
-    <!-- Profile for BPMS webapp. -->
-    <profile>
-      <id>bpms-webapp</id>
-      <activation>
-        <property>
-          <name>bpms-webapp</name>
-        </property>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-distributions-bpms-webapp</module>
-      </modules>
-    </profile>
-
     <!-- Profile for BRMS layer. -->
     <profile>
       <id>brms-layer</id>
@@ -54,20 +40,6 @@
       </activation>
       <modules>
         <module>kie-eap-distributions-brms-layer</module>
-      </modules>
-    </profile>
-
-    <!-- Profile for BRMS webapp. -->
-    <profile>
-      <id>brms-webapp</id>
-      <activation>
-        <property>
-          <name>brms-webapp</name>
-        </property>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-distributions-brms-webapp</module>
       </modules>
     </profile>
 
