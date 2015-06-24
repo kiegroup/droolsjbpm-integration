@@ -7,6 +7,11 @@ The idea is to deploy some of the common resources that a single or several appl
 
 For more information about JBoss EAP/AS modules refer to [JBoss community documentation](https://docs.jboss.org/author/display/MODULES/Home)
 
+**IMPORTANT NOTE**
+
+* For `master` branch, the jboss-modules-plugin uses Maven `3.2.3`, as the modules build are only used by Fuse team. This plugin for this branch is ONLY compatible with Maven > 3.1.X.              
+* For `6.2.x`branch, the jboss-modules-plugin uses Maven `3.0.5`, as the productization team uses this Maven version. This plugin for this branch is ONLY compatible with Maven 3.0.X.         
+
 Table of contents
 ------------------
 
