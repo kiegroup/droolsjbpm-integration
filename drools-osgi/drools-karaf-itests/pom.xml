@@ -118,6 +118,39 @@
 
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-jbpm-jpa-orm-files</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jbpm</groupId>
+                  <artifactId>jbpm-persistence-jpa</artifactId>
+                  <includes>META-INF/JBPMorm.xml</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jbpm</groupId>
+                  <artifactId>jbpm-human-task-jpa</artifactId>
+                  <includes>META-INF/Taskorm.xml</includes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jbpm</groupId>
+                  <artifactId>jbpm-human-task-audit</artifactId>
+                  <includes>META-INF/TaskAuditorm.xml</includes>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!--TODO - Version number should be moved to BOM, ... -->
         <groupId>org.apache.servicemix.tooling</groupId>
         <artifactId>depends-maven-plugin</artifactId>
