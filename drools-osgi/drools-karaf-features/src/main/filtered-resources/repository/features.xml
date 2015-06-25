@@ -4,9 +4,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
 
-
   <feature name="drools-common" version="${project.version}" description="Drools Commons">
-    <feature version="[2.6,4.0)">cxf-specs</feature>
     <bundle>mvn:com.google.protobuf/protobuf-java/${karaf.version.com.google.protobuf}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.servicemix.version.org.antlr}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${karaf.servicemix.version.com.thoughtworks.xstream}</bundle>
@@ -21,7 +19,7 @@
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
   </feature>
 
-  <feature name="drools-module" version="${project.version}" description="Drools core">
+  <feature name="drools-module" version="${project.version}" description="Drools Core">
     <feature version="${project.version}">drools-common</feature>
     <feature version="${project.version}">kie</feature>
     <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
@@ -48,25 +46,28 @@
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie" version="${project.version}">
+  <feature name="kie" version="${project.version}" description="KIE API">
     <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-ci" version="${project.version}">
+  <feature name="kie-ci" version="${project.version}" description="KIE CI">
     <bundle>mvn:org.kie/kie-ci-osgi/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-spring" version="${project.version}">
+  <feature name="kie-spring" version="${project.version}" description="KIE Spring">
     <feature version="${project.version}">kie</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
     <feature version="[3.1,4.0)">spring</feature>
+    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/${version.org.springframework.osgi}</bundle>
+    <bundle>mvn:org.springframework.osgi/spring-osgi-core/${version.org.springframework.osgi}</bundle>
+    <bundle>mvn:org.springframework.osgi/spring-osgi-io/${version.org.springframework.osgi}</bundle>
     <bundle>mvn:org.kie/kie-spring/${version.org.drools}</bundle>
   </feature>
 
-  <feature name="kie-aries-blueprint" version="${project.version}">
+  <feature name="kie-aries-blueprint" version="${project.version}" description="KIE Aries Blueprint">
     <feature version="${project.version}">kie</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm</feature>
@@ -86,7 +87,7 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
   </feature>
 
-  <feature name="jbpm-human-task" version="${project.version}" description="jBPM engine">
+  <feature name="jbpm-human-task" version="${project.version}" description="jBPM Human Task">
     <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
@@ -94,7 +95,7 @@
     <bundle>mvn:org.jbpm/jbpm-human-task-audit/${version.org.jbpm}</bundle>
   </feature>
 
-  <feature name="jbpm" version="${project.version}" description="jBPM engine">
+  <feature name="jbpm" version="${project.version}" description="jBPM Engine">
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
@@ -105,26 +106,7 @@
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
-  </feature>
-
-  <feature name="jbpm-example" version="${project.version}" description="jBPM Spring Example">
-    <feature version="${project.version}">jbpm</feature>
-    <bundle>mvn:org.drools/spring-jbpm-osgi-example/${version.org.drools}</bundle>
-  </feature>
-
-  <!-- This bundle should be removed with next release of Drools 6.1.Beta4 -->
-  <feature name="lib" version="${project.version}">
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/${karaf.servicemix.version.scripting-api}</bundle>
-  </feature>
-
-  <!-- Spring jBPM Persistent OSGi -->
-  <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring OSGi Example">
-    <feature version="${project.version}">jbpm</feature>
-    <feature version="${project.version}">lib</feature>
-    <feature>spring-dm</feature>
-    <feature version="${project.version}">kie-spring</feature>
-    <feature>droolsjbpm-hibernate</feature>
-    <feature version="${h2.version}">h2</feature>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/1.4.1_5</bundle>
   </feature>
 
   <feature name="droolsjbpm-hibernate" version="${version.org.hibernate}" description="Hibernate 4.2.x JPA persistence engine support">
@@ -147,13 +129,21 @@
     <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
   </feature>
 
-  <feature name="hibernate-validator" version="${version.org.hibernate.validator}">
+  <feature name="hibernate-validator" version="${version.org.hibernate.validator}" description="Hibernate Validator">
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/${karaf.version.org.apache.servicemix.specs.jsr303-api}</bundle>
     <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
     <bundle>mvn:org.hibernate/hibernate-validator/${version.org.hibernate.validator}</bundle>
   </feature>
 
-  <feature name="h2" version="${h2.version}" description="h2 database">
+  <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring Persistence support">
+    <feature version="${project.version}">jbpm</feature>
+    <feature>spring-dm</feature>
+    <feature version="${project.version}">kie-spring</feature>
+    <feature>droolsjbpm-hibernate</feature>
+    <feature version="${h2.version}">h2</feature>
+  </feature>
+
+  <feature name="h2" version="${h2.version}" description="H2 database">
     <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
     <bundle start-level="100">mvn:commons-dbcp/commons-dbcp/${version.commons-dbcp}</bundle>
     <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
