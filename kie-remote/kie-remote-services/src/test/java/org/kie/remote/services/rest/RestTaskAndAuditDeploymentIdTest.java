@@ -35,6 +35,7 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.TaskDeploymentIdTest;
@@ -50,6 +51,8 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
     
     private UriInfo uriInfoMock;
     private HttpServletRequest httpRequestMock;
+    
+    private boolean getTasksTest = false;
 
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
@@ -61,6 +64,16 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         this.userTaskServiceMock = userTaskServiceMock;
     }
 
+    @Override
+    public boolean getTasksTest() {
+        return this.getTasksTest;
+    }
+   
+    @Before
+    public void before() { 
+        this.getTasksTest = false;
+    }
+    
     public void setupTestMocks() {
         // REST
         uriInfoMock = mock(UriInfo.class);
