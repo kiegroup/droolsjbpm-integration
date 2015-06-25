@@ -128,7 +128,11 @@ public class KieRemoteRestOperationException extends RuntimeException {
     public static KieRemoteRestOperationException conflict(String msg, Exception e) { 
         return new KieRemoteRestOperationException(msg, e, Status.CONFLICT);
     }
-  
+ 
+    public static KieRemoteRestOperationException conflict(String msg) { 
+        return new KieRemoteRestOperationException(msg, Status.CONFLICT);
+    } 
+        
     // instance does not exist
     public static KieRemoteRestOperationException notFound(String msg) { 
         return new KieRemoteRestOperationException(msg, Status.NOT_FOUND);

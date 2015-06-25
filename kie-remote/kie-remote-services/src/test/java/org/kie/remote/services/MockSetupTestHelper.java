@@ -27,6 +27,8 @@ import static org.mockito.Mockito.spy;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
@@ -42,22 +44,29 @@ import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.impl.factories.TaskFactory;
 import org.jbpm.services.task.impl.model.TaskDataImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.UserImpl;
+import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.TaskSummary;
+import org.kie.api.task.model.User;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.internal.task.api.model.InternalTaskData;
+import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -66,6 +75,8 @@ import org.mockito.stubbing.Answer;
 public class MockSetupTestHelper {
 
     public static final String USER = "user";
+    public static final String PASSWORD = "password";
+    
     public static final long TASK_ID = 1;
     public static final String DEPLOYMENT_ID = "deployment";
     
@@ -87,6 +98,18 @@ public class MockSetupTestHelper {
         // UserTaskService setup
         UserTaskService userTaskServiceMock = mock(UserTaskService.class);
         test.setUserTaskServiceMock(userTaskServiceMock);
+       
+        if( test.getTasksTest() ) { 
+            List<TaskSummary> taskSumList = new ArrayList<TaskSummary>();
+            TaskSummaryImpl taskSum = new TaskSummaryImpl(2l, "test-task", "Test", "A Test Task Summary", 
+                    Status.Created, 0, false, 
+                    new UserImpl(USER), new UserImpl(USER), new Date(), new Date(), new Date(), 
+                    "org.test.process", 4l, 28l, "org.test.deployment", 
+                    SubTasksStrategy.NoAction, -1l);
+
+            taskSumList.add(taskSum);
+            doReturn(taskSumList).when(userTaskServiceMock).execute(any(String.class), any(GetTasksOwnedCommand.class));
+        }
 
         // TaskService
         InternalTaskService injectedTaskServiceMock = mock(InternalTaskService.class);
@@ -116,6 +139,7 @@ public class MockSetupTestHelper {
             doReturn(null).when(injectedTaskServiceMock).execute(any(ReleaseTaskCommand.class));
             doReturn(null).when(injectedTaskServiceMock).execute(any(ExitTaskCommand.class));
             doReturn(null).when(injectedTaskServiceMock).execute(any(SkipTaskCommand.class));
+           
         } else {
             // deployment id available == process task
             ((InternalTaskData) task.getTaskData()).setDeploymentId(DEPLOYMENT_ID);
@@ -131,6 +155,8 @@ public class MockSetupTestHelper {
             doReturn(null).when(runtimeTaskServiceMock).execute(any(ExitTaskCommand.class));
             doReturn(null).when(runtimeTaskServiceMock).execute(any(SkipTaskCommand.class));
         }
+        
+
 
         test.setupTestMocks();
     }
