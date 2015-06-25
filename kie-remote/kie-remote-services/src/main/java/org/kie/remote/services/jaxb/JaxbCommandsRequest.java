@@ -97,7 +97,8 @@ public class JaxbCommandsRequest {
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
-   
+  
+    // This array is set during server-side processing of the JMS
     private transient String [] userPass;
 
     // This list should match the list in AcceptedCommands

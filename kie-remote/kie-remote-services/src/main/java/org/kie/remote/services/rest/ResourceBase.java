@@ -28,7 +28,6 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.query.TaskSummaryImpl;
-import org.kie.api.command.Command;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
@@ -36,10 +35,7 @@ import org.kie.api.task.model.User;
 import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
-import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.jaxb.JaxbCommandsRequest;
-import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
@@ -67,7 +63,7 @@ public class ResourceBase {
     
     @Context
     private HttpServletRequest httpRequest;
-
+    
     /**
      * In order to be able to inject a mock instance for tests.
      * @param processRequestBean
@@ -126,39 +122,6 @@ public class ResourceBase {
     
     public AuditLogService getAuditLogService() { 
         return processRequestBean.getAuditLogService();
-    }
-    
-    // execute --------------------------------------------------------------------------------------------------------------------
-    
-    @SuppressWarnings("rawtypes")
-    protected JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request) {
-        // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
-        JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
-        List<Command> commands = request.getCommands();
-
-        if (commands != null) {
-            int cmdListSize = commands.size(); 
-           
-            // First check to make sure that all commands will be processed
-            for (int i = 0; i < cmdListSize; ++i) {
-                Command<?> cmd = commands.get(i);
-                if (!AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass()) ) {
-                    throw KieRemoteRestOperationException.forbidden("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
-                }
-            }
-           
-            // Execute commands
-            for (int i = 0; i < cmdListSize; ++i) {
-                Command<?> cmd = commands.get(i);
-                processRequestBean.processCommand(cmd, request, i, jaxbResponse);
-            }
-        }
-
-        if (commands == null || commands.isEmpty()) {
-            logger.info("Commands request object with no commands sent!");
-        }
-
-        return jaxbResponse;
     }
     
     // JSON / JAXB ---------------------------------------------------------------------------------------------------------------

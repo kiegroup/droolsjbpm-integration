@@ -10,11 +10,14 @@ import javax.xml.transform.Source;
 import javax.xml.ws.Provider;
 import javax.xml.ws.WebServiceProvider;
 
+import org.kie.internal.identity.IdentityProvider;
+import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.jaxb.DynamicJaxbContext;
+import org.kie.remote.services.util.ExecuteCommandUtil;
 import org.kie.remote.services.ws.command.generated.Execute;
 import org.kie.remote.services.ws.command.generated.ExecuteResponse;
 import org.kie.remote.services.ws.command.generated.ObjectFactory;
@@ -35,6 +38,12 @@ public class CommandWebServiceImpl extends ResourceBase implements Provider<Sour
     @Inject
     private DynamicJaxbContext dynamicJaxbContext;
    
+    @Inject
+    private IdentityProvider identityProvider;
+    
+    @Inject
+    private ProcessRequestBean processRequesBean;
+    
     // Useful for a number of reasons: among others, user principal is available here
     // @Resource
     // private WebServiceContext context;
@@ -43,7 +52,7 @@ public class CommandWebServiceImpl extends ResourceBase implements Provider<Sour
     public Source invoke( Source requestSource ) {
 
         JaxbCommandsRequest request = deserializeAndUnwrapRequest(requestSource);
-        JaxbCommandsResponse response = restProcessJaxbCommandsRequest(request);
+        JaxbCommandsResponse response = ExecuteCommandUtil.restProcessJaxbCommandsRequest(request, identityProvider, processRequesBean);
         JAXBSource responseSource = wrapAndSerializeResponse(response); 
      
         return responseSource;

@@ -299,7 +299,6 @@ public class ProcessRequestBean {
      * @return
      */
     private <T> T doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<T> cmd) { 
-
         // take care of serialization
         if( cmd instanceof GetTaskCommand 
                 || cmd instanceof GetContentCommand 

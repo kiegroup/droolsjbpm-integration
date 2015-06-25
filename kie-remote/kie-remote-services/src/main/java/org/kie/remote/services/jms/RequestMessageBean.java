@@ -3,7 +3,7 @@ package org.kie.remote.services.jms;
 import static org.kie.services.client.serialization.JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
-import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FORBIDDEN;
+import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.*;
 
 import java.security.Principal;
 import java.security.acl.Group;
@@ -48,10 +48,12 @@ import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.kie.remote.services.jms.request.BackupIdentityProviderProducer;
 import org.kie.remote.services.jms.security.JmsUserGroupAdapter;
 import org.kie.remote.services.jms.security.UserPassCallbackHandler;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.jaxb.DynamicJaxbContext;
 import org.kie.remote.services.rest.jaxb.DynamicJaxbContextFilter;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
+import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -329,6 +331,7 @@ public class RequestMessageBean implements MessageListener {
             try { 
                 for (int i = 0; i < commands.size(); ++i) {
 
+                    // TODO: unify/DRY this code with the ExecuteCommandUtil code?
                     Command<?> cmd = commands.get(i);
                     if (!AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass())) {
                         String cmdName = cmd.getClass().getName();
@@ -339,9 +342,44 @@ public class RequestMessageBean implements MessageListener {
                         continue;
                     }
 
+
                     List<String> userRoles = new ArrayList<String>();
-                    if( cmd instanceof TaskCommand && userGroupAdapter == null ) { 
-                        userGroupAdapter = getUserFromMessageAndLookupAndInjectGroups(request.getUserPass(), userRoles);
+                    if( cmd instanceof TaskCommand ) { 
+                        String [] userPass = request.getUserPass();
+                        if( userGroupAdapter == null ) { 
+                            userGroupAdapter = getUserFromMessageAndLookupAndInjectGroups(userPass, userRoles);
+                            // FAIL: user/pass combo is not valid!
+                            if( userGroupAdapter == null ) {
+                                String msg;
+                                if( userPass == null ) { 
+                                    msg = "No user/password combination passed in command request and can not login";
+                                } else { 
+                                    msg = "Unable to login for user '" + userPass[0] + "'";
+                                }
+                                IllegalStateException ise = new IllegalStateException(msg);
+                                jaxbResponse.addException(ise, i, cmd, PERMISSIONS_CONFLICT);
+                                continue;
+                            }
+                        }
+                        String cmdName = cmd.getClass().getSimpleName();
+                        if( cmdName.startsWith("GetTask") ) { 
+                            String cmdUserId = ((TaskCommand) cmd).getUserId();
+                            if( cmdUserId == null ) { 
+                                // FAIL: null user id
+                                IllegalStateException ise = new IllegalStateException("A null user id for a '" + cmdName + "' is not allowed!");
+                                jaxbResponse.addException(ise, i, cmd, PERMISSIONS_CONFLICT);
+                                continue;
+                            }
+                            String authUserId = userPass[0];
+                            if( ! cmdUserId.equals(authUserId) ) { 
+                                // FAIL: user id does not match authenticated user id
+                                IllegalStateException ise = new IllegalStateException("The user id used"
+                                        + " when retrieving task information (" + cmdUserId + ")"
+                                        + " must match the authenticating user (" + authUserId + ")!");
+                                jaxbResponse.addException(ise, i, cmd, PERMISSIONS_CONFLICT);
+                                continue;
+                            }
+                        }
                     }
                     backupIdentityProviderProducer.createBackupIdentityProvider(request.getUser(), userRoles);
 
@@ -436,12 +474,14 @@ public class RequestMessageBean implements MessageListener {
 
     /**
      * Try to login to the underlying JAAS module via a {@link LoginException}.
-     * 
+     * </p>
+     * This method is protected so that tests can overwrite it. 
+     *  
      * @param userPass A String array containing the user and password information.
      * @return The logged-in {@link Subject}
      * @throws LoginException If something goes wrong when trying to login. 
      */
-    private Subject tryLogin(String[] userPass) throws LoginException {
+    protected Subject tryLogin(String[] userPass) throws LoginException {
         try { 
             CallbackHandler handler = new UserPassCallbackHandler(userPass);
             final String domain = System.getProperty( "org.uberfire.domain", "kie-jms-login-context");
@@ -453,7 +493,7 @@ public class RequestMessageBean implements MessageListener {
             return null; 
         }
     }
-
+    
     /**
      * Extracts the list of roles from the subject.
      * 

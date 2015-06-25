@@ -1,7 +1,6 @@
 package org.kie.remote.services.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_INDEPENDENT_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_PROCESS_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.TASK_ID;
@@ -23,12 +22,16 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
+import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.junit.Before;
 import org.junit.Test;
+import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
 import org.kie.remote.services.jaxb.JaxbCommandsResponse;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
@@ -40,10 +43,9 @@ public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDepl
     private ProcessService processServiceMock;
     private UserTaskService userTaskServiceMock;
     
-    private UriInfo uriInfoMock;
-    private HttpServletRequest httpRequestMock;
-
     private AuditLogService auditLogService = mock(AuditLogService.class);
+    
+    private boolean getTasksTest = false;
     
     @Override
     public void setProcessServiceMock(ProcessService processServiceMock) {
@@ -55,17 +57,24 @@ public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDepl
         this.userTaskServiceMock = userTaskServiceMock;
     }
 
+    @Override
+    public boolean getTasksTest() {
+        return this.getTasksTest;
+    }
+   
+    @Before
+    public void before() { 
+        this.getTasksTest = false;
+    }
+    
     public void setupTestMocks() {
         // REST
-        uriInfoMock = mock(UriInfo.class);
-        setUriInfo(uriInfoMock);
-        doReturn(new MultivaluedMapImpl<String,String>()).when(uriInfoMock).getQueryParameters();
-        httpRequestMock = mock(HttpServletRequest.class);
-        setHttpServletRequest(httpRequestMock);
-        
         this.processRequestBean = new ProcessRequestBean();
         this.processRequestBean.setProcessService(processServiceMock);
         this.processRequestBean.setUserTaskService(userTaskServiceMock);
+        
+        this.identityProvider = mock(IdentityProvider.class);
+        doReturn(USER).when(this.identityProvider).getName();
     }
 
     /**
@@ -86,6 +95,43 @@ public class ExecuteResourceTest extends ExecuteResourceImpl implements TaskDepl
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
     }
 
+    /**
+     * When a GetTask* command is processed, the user id should be checked 
+     * against the authenticated user. An exception should be thrown if
+     * a different user is used. 
+     */
+    @Test
+    public void testRestExecuteCommandChecksAgainstAuthUser() {
+        this.getTasksTest = true;
+        setupTaskMocks(this, FOR_INDEPENDENT_TASKS);
+       
+        // control case
+        JaxbCommandsRequest 
+        cmdsRequest = new JaxbCommandsRequest(new GetTasksOwnedCommand(USER));
+        this.execute(cmdsRequest);
+       
+        String otherUser = "differentUser";
+        cmdsRequest = new JaxbCommandsRequest(new GetTasksOwnedCommand(otherUser));
+        try { 
+            this.execute(cmdsRequest);
+            fail("Processing the GetTask* command should have failed!");
+        } catch( KieRemoteRestOperationException krroe ) { 
+            assertTrue( "Exception should reference incorrect user", krroe.getMessage().contains(otherUser) );
+            assertTrue( "Exception should reference correct/auth user", krroe.getMessage().contains(USER) );
+            assertTrue( "Exception should explain fault", krroe.getMessage().contains("must match the authenticating user"));
+        }
+        
+        otherUser = null;
+        cmdsRequest = new JaxbCommandsRequest(new GetTasksOwnedCommand(otherUser));
+        try { 
+            this.execute(cmdsRequest);
+            fail("Processing the GetTask* command should have failed!");
+        } catch( KieRemoteRestOperationException krroe ) { 
+            assertTrue( "Exception should reference correct/auth user", krroe.getMessage().contains(USER) );
+            assertTrue( "Exception should explain fault", krroe.getMessage().contains("null user id"));
+        }
+    }
+    
     @Test
     public void testRestExecuteCommandProcessTaskProcessing() {
         setupTaskMocks(this, FOR_PROCESS_TASKS);
