@@ -15,7 +15,8 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.isSpecialParameter;
+import static org.kie.remote.services.rest.query.QueryResourceData.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -153,13 +154,20 @@ public class QueryResourceImpl extends ResourceBase {
    
     // helper methods -------------------------------------------------------------------------------------------------------------
    
-    private static Map<String, String[]> makeQueryParametersLowerCase(Map<String, String[]> params) { 
+    static Map<String, String[]> makeQueryParametersLowerCase(Map<String, String[]> params) { 
         if( params == null || params.isEmpty() )  { 
             return params;
         }
         Map<String, String[]> lowerCaseParams = new HashMap<String, String[]>(params.size());
         for( Entry<String, String[]> entry : params.entrySet() ) { 
-           lowerCaseParams.put(entry.getKey().toLowerCase(), entry.getValue()) ;
+            String varName = entry.getKey();
+            if( isNameValueParam(varName) ) { 
+                int _index = varName.indexOf('_');
+                varName = varName.substring(0, _index).toLowerCase() + varName.substring(_index);
+            } else { 
+                varName = varName.toLowerCase();
+            }
+            lowerCaseParams.put(varName, entry.getValue()) ;
         }
         return lowerCaseParams;
     }

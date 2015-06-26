@@ -13,17 +13,22 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.QueryResourceData;
 
 public class QueryResourceMethodsTest {
 
@@ -64,5 +69,38 @@ public class QueryResourceMethodsTest {
         String [] valArr = { paramValue };
         params.put(paramName, valArr);
     }
-    
+   
+    @Test
+    public void lowerCaseParameterTest() throws Exception  {
+        Map<String, String[]> wrongCaseParams = new LinkedHashMap<String, String[]>();
+        List<String> correctCaseParamList = new ArrayList<String>();
+       
+        String [] varValue = { "value1", "valTwo" };
+        wrongCaseParams.put("VaR_ParamName", varValue);
+        correctCaseParamList.add("var_ParamName");
+        
+        wrongCaseParams.put("VR_ParamName", varValue);
+        correctCaseParamList.add("var_ParamName");
+        
+        wrongCaseParams.put("VarRegex_ParamNamePlus", varValue);
+        correctCaseParamList.add("varregex_ParamNamePlus");
+        
+        wrongCaseParams.put("PiId_MaX", varValue);
+        correctCaseParamList.add("piid_max");
+        
+        wrongCaseParams.put("DeploymendId_RE", varValue);
+        correctCaseParamList.add("deploymendid_re");
+       
+        Map<String, String[]> correctCaseParams 
+            = QueryResourceImpl.makeQueryParametersLowerCase(wrongCaseParams);
+     
+        Iterator<String> iter = correctCaseParamList.iterator();
+        while( iter.hasNext() ) { 
+            String correctParam = iter.next();
+            assertTrue( "Parameter was not modified/found: " + correctParam, 
+                    correctCaseParams.containsKey(correctParam) );
+            iter.remove();
+        }
+        assertTrue( "Not all parameters were found!" , correctCaseParamList.isEmpty() ) ;
+    } 
 }
