@@ -144,7 +144,11 @@ public class QueryResourceImpl extends ResourceBase {
         }
         Map<String, String[]> lowerCaseParams = new HashMap<String, String[]>(params.size());
         for( Entry<String, String[]> entry : params.entrySet() ) { 
-           lowerCaseParams.put(entry.getKey().toLowerCase(), entry.getValue()) ;
+            String param = entry.getKey();
+            if(!isSpecialParameter(param)) {
+         	   param = param.toLowerCase(); 
+            }
+            lowerCaseParams.put(param, entry.getValue());
         }
         return lowerCaseParams;
     }
