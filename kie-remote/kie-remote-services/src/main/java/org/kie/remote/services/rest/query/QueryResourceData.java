@@ -282,11 +282,18 @@ public class QueryResourceData {
        return result;
     }
    
-    public static boolean isSpecialParameter(String queryParam) { 
+    public static boolean isNameValueParam(String queryParam) { 
         for( String allowedParam : nameValueParams ) {
             if( queryParam.toLowerCase().startsWith(allowedParam + "_")) {
                 return true;
             }
+        }
+        return false;
+    }
+    
+    public static boolean isSpecialParameter(String queryParam) { 
+        if( isNameValueParam(queryParam) ) { 
+            return true;
         }
         for( String allowedParam : minMaxParams ) {
             String start = allowedParam + "_";
