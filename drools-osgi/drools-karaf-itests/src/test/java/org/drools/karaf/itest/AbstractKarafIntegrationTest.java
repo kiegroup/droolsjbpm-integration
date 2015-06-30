@@ -16,7 +16,6 @@
 package org.drools.karaf.itest;
 
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
@@ -29,9 +28,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 abstract public class AbstractKarafIntegrationTest {
 
@@ -77,27 +77,29 @@ abstract public class AbstractKarafIntegrationTest {
     public static Option getKarafDistributionOption() {
         String karafVersion = getKarafVersion();
         logger.info("*** The karaf version is " + karafVersion + " ***");
-        String localRepo = System.getProperty("maven.repo.local", "");
-        if (localRepo.length() > 0) {
-            logger.info("Using alternative local Maven repository in {}.", new File(localRepo).getAbsolutePath());
-            localRepo = new File(localRepo).getAbsolutePath().toString() + "@id=local,";
-        }
-        return new DefaultCompositeOption(KarafDistributionOption.karafDistributionConfiguration()
+        return new DefaultCompositeOption(karafDistributionConfiguration()
                 .frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
                 .karafVersion(karafVersion)
                 .name("Apache Karaf")
-                .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/"))
-                ,
-                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
-                        localRepo +
-                                "http://repo1.maven.org/maven2@id=central," +
-                                "    http://svn.apache.org/repos/asf/servicemix/m2-repo@id=servicemix," +
-                                "    http://repository.springsource.com/maven/bundles/release@id=springsource.release," +
-                                "    http://repository.springsource.com/maven/bundles/external@id=springsource.external," +
-                                "    https://oss.sonatype.org/content/repositories/releases/@id=sonatype, " +
-                                "    https://repository.jboss.org/nexus/content/groups/ea@id=ea"
+                .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/")),
+                localMavenRepoOption(),
+                editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
+                        "http://repo1.maven.org/maven2@id=central," +
+                        "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public"
                 ));
 
+    }
+
+    public static Option localMavenRepoOption() {
+        String localRepo = System.getProperty("maven.repo.local", "");
+        if (localRepo.length() > 0) {
+            logger.info("Using alternative local Maven repository in {}.", new File(localRepo).getAbsolutePath());
+        }
+        return when(localRepo.length() > 0).useOptions(
+                //                systemProperty("org.ops4j.pax.url.mvn.localRepository").value(new File(localRepo).getAbsolutePath()));
+                editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
+                        "org.ops4j.pax.url.mvn.localRepository",
+                        new File(localRepo).getAbsolutePath()));
     }
 
     public static MavenArtifactProvisionOption getFeaturesUrl(String groupId, String artifactId, String version) {

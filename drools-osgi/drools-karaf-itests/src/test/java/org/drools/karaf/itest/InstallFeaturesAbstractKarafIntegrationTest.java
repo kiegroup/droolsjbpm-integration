@@ -65,7 +65,6 @@ public class InstallFeaturesAbstractKarafIntegrationTest extends AbstractKarafIn
                 {"jbpm-commons"},
                 //{"jbpm-human-task"}, // TODO: feature install fails, needs to be investigated
                 {"jbpm"},
-                //{"optaplanner-engine"}, // TODO: feature install fails, needs to be investigated
                 {"jbpm-spring-persistent"},
                 //{"droolsjbpm-hibernate"}, // TODO: feature install fails, needs to be investigated
                 {"hibernate-validator"},
@@ -75,8 +74,7 @@ public class InstallFeaturesAbstractKarafIntegrationTest extends AbstractKarafIn
 
     @Configuration
     public static Option[] configure() {
-        return OptionUtils.combine(
-                CommonKarafOptions.get(),
+        return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
 
@@ -91,7 +89,7 @@ public class InstallFeaturesAbstractKarafIntegrationTest extends AbstractKarafIn
                 loadKieFeaturesRepo()
                 // Option to be used to do remote debugging
                 //  debugConfiguration("5005", true),
-        );
+        };
     }
 
     @Test

@@ -171,9 +171,7 @@ public class KieSpringjBPMPersistenceOnKarafKarafIntegrationTest extends Abstrac
 
     @Configuration
     public static Option[] configure() {
-        return OptionUtils.combine(
-                CommonKarafOptions.get(),
-
+        return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
 
@@ -191,7 +189,7 @@ public class KieSpringjBPMPersistenceOnKarafKarafIntegrationTest extends Abstrac
                 // Load Kie-Spring
                 loadKieFeatures("jbpm-spring-persistent")
 
-        );
+        };
     }
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
