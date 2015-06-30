@@ -1,10 +1,29 @@
 package org.kie.remote.services.rest.query;
 
-import static org.jbpm.process.audit.JPAAuditLogService.*;
-import static org.kie.internal.query.QueryParameterIdentifiers.*;
+import static org.jbpm.process.audit.JPAAuditLogService.addVarValCriteria;
+import static org.jbpm.process.audit.JPAAuditLogService.checkVarValCriteria;
+import static org.kie.internal.query.QueryParameterIdentifiers.ACTUAL_OWNER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.BUSINESS_ADMIN_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.CREATED_BY_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.END_DATE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.EXTERNAL_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.LAST_VARIABLE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_INSTANCE_STATUS_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.PROCESS_VERSION_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.STAKEHOLDER_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.START_DATE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.TASK_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.TASK_STATUS_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VALUE_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_INSTANCE_ID_LIST;
+import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VALUE_ID_LIST;
+import static org.jbpm.services.task.impl.TaskQueryServiceImpl.addJoinTables;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +33,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.services.task.impl.TaskQueryServiceImpl;
+import org.jbpm.services.task.impl.model.OrganizationalEntityImpl;
+import org.jbpm.services.task.impl.model.TaskImpl;
 import org.kie.internal.query.QueryAndParameterAppender;
 import org.kie.internal.query.QueryModificationService;
 import org.kie.internal.query.data.QueryData;
@@ -32,8 +53,7 @@ public class RemoteServicesQueryModificationService implements QueryModification
     }
 
     private static Map<String, Class<?>> taskCriteriaFieldClasses = TaskQueryServiceImpl.criteriaFieldClasses;
-    private static Map<String, String> taskCriteriaFields = TaskQueryServiceImpl.criteriaFields;
-    private static Map<String, String> taskCriteriaFieldJoinClauses = TaskQueryServiceImpl.criteriaFieldJoinClauses;
+    private static Map<String, String> taskCriteriaFields = new HashMap<String, String>(TaskQueryServiceImpl.criteriaFields);
    
     private static Map<String, Class<?>> auditCriteriaFieldClasses = JPAAuditLogService.criteriaFieldClasses;
     private static Map<String, String> auditCriteriaFields = JPAAuditLogService.criteriaFields;
@@ -62,9 +82,10 @@ public class RemoteServicesQueryModificationService implements QueryModification
         taskNeededCriterias.add(TASK_ID_LIST);
         taskNeededCriterias.add(TASK_STATUS_LIST);
         taskNeededCriterias.add(CREATED_BY_LIST);
+        taskNeededCriterias.add(ACTUAL_OWNER_ID_LIST);
+        
         taskNeededCriterias.add(STAKEHOLDER_ID_LIST);
         taskNeededCriterias.add(POTENTIAL_OWNER_ID_LIST);
-        taskNeededCriterias.add(ACTUAL_OWNER_ID_LIST);
         taskNeededCriterias.add(BUSINESS_ADMIN_ID_LIST);
         
         // when doing a task or var inst log query, add task if these criteria are used
@@ -165,6 +186,11 @@ public class RemoteServicesQueryModificationService implements QueryModification
         // Add the extra tables
         for( String table : additionalTables ) { 
            queryBuilder.append(", " + table + "\n");
+           if( type != TASK_SUMMARY_QUERY_TYPE ) { 
+               if( taskTable.equals(table) ) { 
+                   addJoinTables(queryBuilder, queryData, false);
+               }
+           }
         }
     }
 
@@ -177,23 +203,23 @@ public class RemoteServicesQueryModificationService implements QueryModification
        boolean addVariableValueQueryClause = false;
        String varInstLogTableId = "l";
        if( type != VARIABLE_INSTANCE_LOG_QUERY_TYPE ) { 
-           Set<String> queryDataParms = new HashSet<String>();
+           Set<String> checkVarValuePresenceParams = new HashSet<String>();
            if( ! queryData.intersectParametersAreEmpty() ) { 
-               queryDataParms.addAll(queryData.getIntersectParameters().keySet());
+               checkVarValuePresenceParams.addAll(queryData.getIntersectParameters().keySet());
            }
            if( ! queryData.intersectRangeParametersAreEmpty() ) { 
-               queryDataParms.addAll(queryData.getIntersectRangeParameters().keySet());
+               checkVarValuePresenceParams.addAll(queryData.getIntersectRangeParameters().keySet());
            }
            if( ! queryData.intersectRegexParametersAreEmpty() ) { 
-               queryDataParms.addAll(queryData.getIntersectRegexParameters().keySet());
+               checkVarValuePresenceParams.addAll(queryData.getIntersectRegexParameters().keySet());
            }
            for( String listId : varInstLogNeededCriterias ) { 
-               if( queryDataParms.contains(listId) ) { 
+               if( checkVarValuePresenceParams.contains(listId) ) { 
                    addLastVariableQueryClause = true;
                    break;
                }
            }
-           for( String listId : queryDataParms ) { 
+           for( String listId : checkVarValuePresenceParams ) { 
               if( VAR_VALUE_ID_LIST.equals(listId) )  { 
                   addVariableValueQueryClause = true;
                   break;
@@ -201,50 +227,50 @@ public class RemoteServicesQueryModificationService implements QueryModification
            }
        }
        
-       Map<String, String> emptyJoinClauses = Collections.emptyMap();
        // task queries
        if( type == TASK_SUMMARY_QUERY_TYPE ) { 
            varInstLogTableId = "v";
-           internalAddCriteriaToQuery(
-                   queryBuilder, queryData, queryAppender, 
+           internalAddJoinCriteriaToQuery(
+                   queryBuilder, queryData, queryAppender,
                    
                    procInstLogNeededCriterias, "p", 
                    auditCriteriaFieldClasses, auditCriteriaFields, 
                    ".processInstanceId = t.taskData.processInstanceId",
                    
                    varInstLogNeededCriterias, varInstLogTableId,
-                   auditCriteriaFieldClasses, auditCriteriaFields, emptyJoinClauses, 
+                   auditCriteriaFieldClasses, auditCriteriaFields, 
                    ".processInstanceId = t.taskData.processInstanceId");
        } 
       
        // variable log queries
        else if( type == VARIABLE_INSTANCE_LOG_QUERY_TYPE ) { 
-           internalAddCriteriaToQuery(
-                   queryBuilder, queryData, queryAppender, 
+           internalAddJoinCriteriaToQuery(
+                   queryBuilder, queryData, queryAppender,
                    
                    procInstLogNeededWithVarInstLogCriterias, "p", 
                    auditCriteriaFieldClasses, auditCriteriaFields, 
                    ".processInstanceId = l.processInstanceId",
                    
                    taskNeededCriterias, "t",
-                   taskCriteriaFieldClasses, taskCriteriaFields, taskCriteriaFieldJoinClauses,
+                   taskCriteriaFieldClasses, taskCriteriaFields,
                    ".taskData.processInstanceId = l.processInstanceId");
        }
        
        // process log queries
        else if( type == PROCESS_INSTANCE_LOG_QUERY_TYPE ) { 
            varInstLogTableId = "v";
-           internalAddCriteriaToQuery(
-                   queryBuilder, queryData, queryAppender, 
+           internalAddJoinCriteriaToQuery(
+                   queryBuilder, queryData, queryAppender,
                    
                    varInstLogNeededCriterias, varInstLogTableId,
                    auditCriteriaFieldClasses, auditCriteriaFields, 
                    ".processInstanceId = l.processInstanceId",
                    
                    taskNeededCriterias, "t",
-                   taskCriteriaFieldClasses, taskCriteriaFields, taskCriteriaFieldJoinClauses,
+                   taskCriteriaFieldClasses, taskCriteriaFields,
                    ".taskData.processInstanceId = l.processInstanceId");
        }
+       
        if( type != VARIABLE_INSTANCE_LOG_QUERY_TYPE ) { 
            if( addLastVariableQueryClause ) { 
                queryData.getIntersectParameters().remove(LAST_VARIABLE_LIST);
@@ -278,20 +304,19 @@ public class RemoteServicesQueryModificationService implements QueryModification
                }
            }
        }
-       
+
        int end = "SELECT".length();
        if( type == VARIABLE_INSTANCE_LOG_QUERY_TYPE || type == PROCESS_INSTANCE_LOG_QUERY_TYPE ) { 
            queryBuilder.replace(0, end, "SELECT DISTINCT");
        }
     } 
 
-    private static void internalAddCriteriaToQuery(StringBuilder queryBuilder, QueryData queryData, QueryAndParameterAppender queryAppender,
+    private static void internalAddJoinCriteriaToQuery(StringBuilder queryBuilder, QueryData queryData, QueryAndParameterAppender queryAppender,
            Set<String> firstNeededCriterias, String firstTableId, 
            Map<String, Class<?>> firstCriteriaFieldClasses, Map<String, String> firstCriteriaFields, 
            String firstTableIdJoinClause,
            Set<String> otherNeededCriterias, String otherTableId, 
            Map<String, Class<?>> otherCriteriaFieldClasses, Map<String, String> otherCriteriaFields,
-           Map<String, String> otherCriteriaFieldJoinClauses, 
            String otherTableJoinClause ) { 
         
         boolean addFirstTableJoinClause = false;
@@ -313,7 +338,7 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 if( firstNeededCriterias.contains(listId) )   { 
                     addFirstTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = firstTableId + firstCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(firstTableId, listId, firstCriteriaFields);
                     queryAppender.addQueryParameters(
                             entry.getValue(), listId, 
                             firstCriteriaFieldClasses.get(listId), fieldName, 
@@ -321,11 +346,10 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 } else if( otherNeededCriterias.contains(listId) ) { 
                     addOtherTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = otherTableId + otherCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(otherTableId, listId, otherCriteriaFields);
                     queryAppender.addQueryParameters(
                             entry.getValue(), listId, 
                             otherCriteriaFieldClasses.get(listId), fieldName,
-                            otherCriteriaFieldJoinClauses.get(listId),
                             false);
                 }
             }
@@ -342,7 +366,7 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 if( firstNeededCriterias.contains(listId) )   { 
                     addFirstTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = firstTableId + firstCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(firstTableId, listId, firstCriteriaFields);
                     queryAppender.addRangeQueryParameters(
                             entry.getValue(), listId, 
                             firstCriteriaFieldClasses.get(listId), fieldName, 
@@ -350,11 +374,10 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 } else if( otherNeededCriterias.contains(listId) ) { 
                     addOtherTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = otherTableId + otherCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(otherTableId, listId, otherCriteriaFields);
                     queryAppender.addRangeQueryParameters(
                             entry.getValue(), listId, 
                             otherCriteriaFieldClasses.get(listId), fieldName,
-                            otherCriteriaFieldJoinClauses.get(listId),
                             false);
                 }
             }
@@ -379,7 +402,7 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 if( firstNeededCriterias.contains(listId) )   { 
                     addFirstTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = firstTableId + firstCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(firstTableId, listId, firstCriteriaFields);
                     queryAppender.addRegexQueryParameters(
                             entry.getValue(), listId, 
                             fieldName, 
@@ -387,11 +410,10 @@ public class RemoteServicesQueryModificationService implements QueryModification
                 } else if( otherNeededCriterias.contains(listId) ) { 
                     addOtherTableJoinClause = true;
                     processedListIds.add(listId);
-                    String fieldName = otherTableId + otherCriteriaFields.get(listId).substring(1);
+                    String fieldName = modifyFieldNameUsingTableId(otherTableId, listId, otherCriteriaFields);
                     queryAppender.addRegexQueryParameters(
                             entry.getValue(), listId, 
                             fieldName,
-                            otherCriteriaFieldJoinClauses.get(listId),
                             false);
                 }
             }
@@ -412,6 +434,31 @@ public class RemoteServicesQueryModificationService implements QueryModification
             queryAppender.markAsUsed();
             queryBuilder.append("\n").append(jpqlOp).append(" ").append(otherTableId).append(otherTableJoinClause);
         }
+    }
+ 
+    /**
+     * The issue here is that the stakeholder, potential owner and business administrator are all not part of 
+     * the {@link TaskImpl} table, but in the {@link OrganizationalEntityImpl} table, via a join from the Task Table.
+     * </p>
+     * That means that the table id for those fields is not the one used for the {@link TaskImpl} table, but 
+     * the 3 letter id used for those join tables (see the {@link TaskQueryServiceImpl} code). 
+     *  
+     * @param tableId The (new or to be used) identification sequence to be used for the table
+     * @param listId The id of the critieria being added
+     * @param criteriaFields The map mapping list id's to field names.
+     * @return The (new) field name.
+     */
+    private static String modifyFieldNameUsingTableId(String tableId, String listId, Map<String, String> criteriaFields) { 
+        String fieldName;
+        if( STAKEHOLDER_ID_LIST.equals(listId)
+                || POTENTIAL_OWNER_ID_LIST.equals(listId)
+                || BUSINESS_ADMIN_ID_LIST.equals(listId) ) { 
+            fieldName = criteriaFields.get(listId);
+        } else { 
+            fieldName = tableId + criteriaFields.get(listId).substring(1);
+
+        }
+        return fieldName;
     }
     
 }

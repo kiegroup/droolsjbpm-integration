@@ -2,8 +2,10 @@ package org.kie.remote.services.rest.query;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -130,28 +132,50 @@ public class QueryResourceData {
         return idGen;
     }
  
-    private static Set<String> queryParameters = new HashSet<String>();
+    private static Set<String> allQueryParameters = new HashSet<String>();
+    private static Set<String> procInstOnlyQueryParameters = new HashSet<String>();
     
-    public static Set<String> getQueryParameters() { 
-        synchronized(queryParameters) { 
-            if( queryParameters.isEmpty() ) { 
-                String [][] queryParamArrs = { 
-                        generalQueryParams, generalQueryParamsShort,
-                        taskQueryParams, taskQueryParamsShort,
-                        procInstQueryParams, procInstQueryParamsShort,
-                        varInstQueryParams, varInstQueryParamsShort
-                      // metaRuntimeParams, metaRuntimeParamsShort
-                };
-                for( String [] paramArr : queryParamArrs ) { 
-                    for( String param : paramArr ) { 
-                       if( param != null ) { 
-                           queryParameters.add(param);
-                       }
+    public static Set<String> getQueryParameters(boolean includeTaskQueryParams) { 
+        if( includeTaskQueryParams ) { 
+            synchronized(allQueryParameters) { 
+                if( allQueryParameters.isEmpty() ) { 
+                    String [][] queryParamArrs = { 
+                            generalQueryParams, generalQueryParamsShort,
+                            taskQueryParams, taskQueryParamsShort,
+                            procInstQueryParams, procInstQueryParamsShort,
+                            varInstQueryParams, varInstQueryParamsShort
+                            // metaRuntimeParams, metaRuntimeParamsShort
+                    };
+                    for( String [] paramArr : queryParamArrs ) { 
+                        for( String param : paramArr ) { 
+                            if( param != null ) { 
+                                allQueryParameters.add(param);
+                            }
+                        }
                     }
                 }
             }
+            return allQueryParameters;
+        } else { 
+            synchronized(procInstOnlyQueryParameters) { 
+                if( procInstOnlyQueryParameters.isEmpty() ) { 
+                    String [][] queryParamArrs = { 
+                            generalQueryParams, generalQueryParamsShort,
+                            procInstQueryParams, procInstQueryParamsShort,
+                            varInstQueryParams, varInstQueryParamsShort
+                            // metaRuntimeParams, metaRuntimeParamsShort
+                    };
+                    for( String [] paramArr : queryParamArrs ) { 
+                        for( String param : paramArr ) { 
+                            if( param != null ) { 
+                                procInstOnlyQueryParameters.add(param);
+                            }
+                        }
+                    }
+                }
+            } 
+            return procInstOnlyQueryParameters;
         }
-        return queryParameters;
     }
     
     // "get" parser methods -------------------------------------------------------------------------------------------------------

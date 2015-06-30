@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.map.SerializationConfig.Feature;
+import org.hibernate.internal.jaxb.mapping.hbm.JaxbQueryElement;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.instance.ProcessInstance;
@@ -31,6 +32,7 @@ import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessIns
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbVariableInfo;
+import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 
 @SuppressWarnings({"null"})
 public class QueryResourceTest extends AbstractQueryResourceTest {
@@ -93,28 +95,34 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
     @Test
-    public void queryTaskRestCallTest() throws Exception  {
+    public void simpleQueryTaskRestCallTest() throws Exception { 
         int [] pageInfo = { 0, 0 };
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
-        
+
         // simple (everything) 
         JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
         assertNotNull( "null result", result );
         assertFalse( "empty result", result.getTaskInfoList().isEmpty() );
         assertTrue( "empty result", result.getTaskInfoList().size() > 2 );
         assertTrue( "pagination should not have happened: " + result.getTaskInfoList().size(), result.getTaskInfoList().size() >= 20 );
-        
+
         for( JaxbQueryTaskInfo taskInfo : result.getTaskInfoList() ) { 
-           long procInstId = taskInfo.getProcessInstanceId();
-           assertEquals( procInstId, taskInfo.getTaskSummaries().get(0).getProcessInstanceId().longValue() );
+            long procInstId = taskInfo.getProcessInstanceId();
+            assertEquals( procInstId, taskInfo.getTaskSummaries().get(0).getProcessInstanceId().longValue() );
         }
-      
+
         roundTripJson(result);
         roundTripXml(result);
-      
+    }
+        
+    @Test
+    public void queryTaskRestCallTest() throws Exception  {
+        int [] pageInfo = { 0, 0 };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        
         // pagination
         pageInfo[1] = 3; // page size 
-        result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+        JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
         assertTrue( "Expected a page of size " + pageInfo[1] + ", not "  + result.getTaskInfoList().size(), result.getTaskInfoList().size() == pageInfo[1] );
       
         pageInfo[0] = 2; // page number 2
@@ -136,6 +144,11 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
                    origResultSet.contains(procInstId) );
         } 
         pageInfo[0] = pageInfo[1] = 0; // reset page info for other tests
+       
+        // potential owner 
+        addParams(queryParams, "potentialowner", USER_ID);
+        result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+        queryParams.clear();
         
         // complicated 
         long procInstId = result.getTaskInfoList().get(0).getProcessInstanceId();
