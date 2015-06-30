@@ -69,8 +69,7 @@ public class KieSpringOnKarafKarafIntegrationTest extends AbstractKieSpringKaraf
 
     @Configuration
     public static Option[] configure() {
-        return OptionUtils.combine(
-                CommonKarafOptions.get(),
+        return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
 
@@ -87,7 +86,7 @@ public class KieSpringOnKarafKarafIntegrationTest extends AbstractKieSpringKaraf
 
                 // Load Kie-Spring
                 loadKieFeatures("kie-spring")
-        );
+        };
     }
 
     protected OsgiBundleXmlApplicationContext createApplicationContext() {
