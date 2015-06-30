@@ -144,6 +144,14 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Used by dependency:unpack. The explicit dependency is needed
+         in order to make parallel builds work. -->
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-jaxb-gen</artifactId>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- serialization -->
     <dependency>
