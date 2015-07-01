@@ -1,0 +1,20 @@
+package org.kie.server.testing.agenda;
+
+import java.util.List;
+
+global List list
+
+rule "Rule in first agenda group" @Propagation(IMMEDIATE)
+agenda-group "first-agenda"
+    salience 10
+when
+then
+    list.add("Rule in first agenda group executed");
+end
+
+rule "Rule without agenda group" @Propagation(IMMEDIATE)
+    salience 100 // higher salience should not make the rule fire first as it is in the main agenda group
+when
+then
+    list.add("Rule without agenda group executed");
+end
