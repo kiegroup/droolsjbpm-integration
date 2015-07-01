@@ -60,6 +60,7 @@
     <module>kie-examples-api</module>
     <module>jbpm-process-svg</module>
     <module>drools-osgi</module>
+    <module>kie-performance-kit</module>
   </modules>
 
   <profiles>
