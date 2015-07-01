@@ -52,12 +52,20 @@ public class Executor {
         if (reporterType == ReporterType.CONSOLE) {
             reporter = ConsoleReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build();
         } else if (reporterType == ReporterType.CSV) {
+            File reportDataLocation = new File(tc.getReportDataLocation());
+            if (!reportDataLocation.exists()) {
+                reportDataLocation.mkdirs();
+            }
             reporter = CsvReporter.forRegistry(metrics).formatFor(Locale.US).convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS).build(new File(tc.getReportDataLocation()));
+                    .convertDurationsTo(TimeUnit.MILLISECONDS).build(reportDataLocation);
             reporter.start(tc.getPeriodicity(), TimeUnit.SECONDS);
         } else if (reporterType == ReporterType.CSVSINGLE) {
+            File reportDataLocation = new File(tc.getReportDataLocation());
+            if (!reportDataLocation.exists()) {
+                reportDataLocation.mkdirs();
+            }
             reporter = CsvSingleReporter.forRegistry(metrics).formatFor(Locale.US).convertRatesTo(TimeUnit.SECONDS)
-                    .convertDurationsTo(TimeUnit.MILLISECONDS).build(new File(tc.getReportDataLocation()));
+                    .convertDurationsTo(TimeUnit.MILLISECONDS).build(reportDataLocation);
         }
         
         for (Measure m : tc.getMeasure()) {
