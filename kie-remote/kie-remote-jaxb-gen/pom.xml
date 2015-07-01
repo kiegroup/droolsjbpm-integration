@@ -73,9 +73,20 @@
 
   <build>
     <plugins>
-      <!-- 0. deleted unpacked and generated classes -->
+      <!-- 0. delete unpacked and generated classes -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <!-- We need to delete the generated resources before every single build to make it all work.
+               (even when running just "mvn install", instead of "mvn clean install") -->
+          <execution>
+            <id>clean-generated-resources</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <filesets>
             <fileset>
