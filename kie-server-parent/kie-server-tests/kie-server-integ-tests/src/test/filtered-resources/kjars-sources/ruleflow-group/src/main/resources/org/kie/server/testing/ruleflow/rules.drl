@@ -4,7 +4,7 @@ import java.util.List;
 
 global List list
 
-rule "Rule in first ruleflow group"
+rule "Rule in first ruleflow group" @Propagation(IMMEDIATE)
     salience 10
     ruleflow-group "ruleflow-group1"
 when
@@ -12,7 +12,7 @@ then
     list.add("Rule from first ruleflow group executed");
 end
 
-rule "Rule in second ruleflow group"
+rule "Rule in second ruleflow group" @Propagation(IMMEDIATE)
     salience 100 // higher salience should not make the rule fire first as it is in the second ruleflow-group
     ruleflow-group "ruleflow-group2"
 when

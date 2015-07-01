@@ -1,0 +1,28 @@
+package org.kie.server.testing.activation;
+
+import java.util.List;
+
+global List list
+
+rule "First rule in first activation group" @Propagation(IMMEDIATE)
+activation-group "first-group"
+    salience 10
+when
+then
+    list.add("First rule in first activation group executed");
+end
+
+rule "Second rule in first activation group" @Propagation(IMMEDIATE)
+activation-group "first-group"
+    salience 5
+when
+then
+    list.add("Second rule in first activation group executed");
+end
+
+rule "Rule without activation group" @Propagation(IMMEDIATE)
+    salience 2
+when
+then
+    list.add("Rule without activation group executed");
+end
