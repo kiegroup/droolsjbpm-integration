@@ -15,6 +15,10 @@
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
     <dependency>
@@ -34,8 +38,8 @@
       <artifactId>kie-remote-services</artifactId>
       <scope>provided</scope>
     </dependency>
-   
-    <!--  drools/jbpm --> 
+
+    <!--  drools/jbpm -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-kie-services</artifactId>
@@ -51,8 +55,8 @@
       <artifactId>jbpm-services-cdi</artifactId>
       <scope>provided</scope>
     </dependency>
-    
-    
+
+
     <!-- reflection -->
     <dependency>
       <groupId>org.reflections</groupId>
@@ -65,5 +69,5 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
-  
+
 </project>

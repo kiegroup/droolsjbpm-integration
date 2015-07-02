@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -739,7 +739,7 @@ public class UserTaskResource {
     @Path(TASK_INSTANCE_ATTACHMENT_ADD_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addAttachment(@Context HttpHeaders headers, @PathParam("id") String containerId,
-            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String attachmentPayload) {
+            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("name") String name, String attachmentPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
@@ -747,7 +747,7 @@ public class UserTaskResource {
             Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, Object.class);
 
             logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
-            Long attachmentId = userTaskService.addAttachment(taskId, getUser(userId), attachment);
+            Long attachmentId = userTaskService.addAttachment(taskId, getUser(userId), name, attachment);
 
             String response = marshallerHelper.marshal(containerId, type, attachmentId);
 
