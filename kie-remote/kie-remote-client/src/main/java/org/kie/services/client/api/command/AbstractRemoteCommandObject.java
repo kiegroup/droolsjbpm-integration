@@ -148,8 +148,7 @@ public abstract class AbstractRemoteCommandObject {
            if( cmdUserId == null ) { 
                taskCmd.setUserId(authUserId);
                logger.debug("Using user id '" + authUserId + "' for '" + cmdName + "'.");
-           }
-           if( ! cmdUserId.equals(authUserId) ) {
+           } else if( ! cmdUserId.equals(authUserId) ) {
               throw new RemoteApiException("The user id used when retrieving task information (" + cmdUserId + ")"
                       + " must match the authenticating user (" + authUserId + ")!");
            }
