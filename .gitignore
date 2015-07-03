@@ -8,7 +8,7 @@
 /nbproject
 /*.ipr
 /*.iws
-/*.iml
+*.iml
 .classpath
 .project
 .settings
