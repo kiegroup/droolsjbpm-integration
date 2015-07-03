@@ -248,6 +248,13 @@ public class ResourceBase {
         }
     }
 
+    private final static int MAX_LENGTH_INT = 9;
+    private final static int MAX_LENGTH_LONG = 18;
+    private final static int MAX_LENGTH_FLOAT = 10;
+   
+    public static String LONG_INTEGER_REGEX ="^\\d+[li]?$";
+    public static String FLOAT_REGEX = "^\\d[\\d\\.]{1,9}(E-?\\d{1,2})?f?$";
+    
     /**
      * Returns a Long if no suffix is present.
      * Otherwise, possible suffixes are:
@@ -261,7 +268,7 @@ public class ResourceBase {
      * @return
      */
     private static Number getNumberFromString(String paramName, String paramVal, boolean mustBeLong) {
-        if (paramVal.matches("^\\d+[li]?$")) {
+        if (paramVal.matches(LONG_INTEGER_REGEX)) { 
             if (paramVal.matches(".*i$")) {
                 if (mustBeLong) {
                     throw KieRemoteRestOperationException.badRequest( paramName 
@@ -269,13 +276,13 @@ public class ResourceBase {
                             + paramVal + ")");
                 }
                 paramVal = paramVal.substring(0, paramVal.length() - 1);
-                if (paramVal.length() > 9) {
+                if (paramVal.length() > MAX_LENGTH_INT) {
                     throw KieRemoteRestOperationException.badRequest(paramName + " parameter is numerical but too large to be an integer ("
                             + paramVal + "i)");
                 }
                 return Integer.parseInt(paramVal);
             } else {
-                if (paramVal.length() > 18) {
+                if (paramVal.length() > MAX_LENGTH_LONG) {
                     throw KieRemoteRestOperationException.badRequest(paramName + " parameter is numerical but too large to be a long ("
                             + paramVal + ")");
                 }
@@ -284,6 +291,16 @@ public class ResourceBase {
                 }
                 return Long.parseLong(paramVal);
             }
+        } else if(paramVal.matches(FLOAT_REGEX)) { 
+            if (mustBeLong) {
+                throw KieRemoteRestOperationException.badRequest( paramName 
+                        + " parameter is numerical but contains the \"Integer\" suffix 'i' and must have no suffix or \"Long\" suffix 'l' ("
+                        + paramVal + ")");
+            } 
+            if (paramVal.matches(".*f$")) { 
+                paramVal = paramVal.substring(0, paramVal.length() - 1); 
+            }
+            return Float.parseFloat(paramVal);
         }
         throw KieRemoteRestOperationException.badRequest(paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }

@@ -15,7 +15,7 @@
 
 package org.kie.remote.services.rest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -61,5 +61,42 @@ public class ResourceBaseTest extends ResourceBase {
         assertNotNull(value);
         assertTrue(value instanceof Number);
         assertEquals(10L, value);
+    }
+    
+    @Test
+    public void testFloatRegex() {
+        String regex = FLOAT_REGEX;
+        String floot = String.valueOf(Float.MAX_VALUE);
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = String.valueOf(Float.MIN_NORMAL);
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = String.valueOf(Float.MIN_VALUE);
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = String.valueOf(new Float(103030303.0202030504502101f));
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        
+        floot = "1.00f";
+        float flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
+        assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = "1034500f";
+        flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
+        assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = "1.00E32f";
+        flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
+        assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = "1.00E-3f";
+        flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
+        assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
+        assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+    
+        floot = ".00f"; // .\d
+        assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = "1.1234567891f"; // \d.\d{10,}
+        assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+        floot = "1.123E-293"; // E-\d{3}
+        assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
     }
 }
