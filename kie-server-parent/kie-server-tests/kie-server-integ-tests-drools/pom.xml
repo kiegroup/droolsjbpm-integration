@@ -336,6 +336,46 @@
             <artifactId>httpcore</artifactId>
             <version>${version.org.apache.httpcomponents.httpcore}</version>
           </dependency>
+          <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${version.org.apache.maven}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
