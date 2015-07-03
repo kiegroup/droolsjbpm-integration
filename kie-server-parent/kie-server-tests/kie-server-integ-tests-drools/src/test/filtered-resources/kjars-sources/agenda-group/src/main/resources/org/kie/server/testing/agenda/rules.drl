@@ -13,24 +13,23 @@
  * limitations under the License.
 */
 
-package org.kie.server.testing.ruleflow;
+package org.kie.server.testing.agenda;
 
 import java.util.List;
 
 global List list
 
-rule "Rule in first ruleflow group" @Propagation(IMMEDIATE)
+rule "Rule in first agenda group" @Propagation(IMMEDIATE)
+agenda-group "first-agenda"
     salience 10
-    ruleflow-group "ruleflow-group1"
 when
 then
-    list.add("Rule from first ruleflow group executed");
+    list.add("Rule in first agenda group executed");
 end
 
-rule "Rule in second ruleflow group" @Propagation(IMMEDIATE)
-    salience 100 // higher salience should not make the rule fire first as it is in the second ruleflow-group
-    ruleflow-group "ruleflow-group2"
+rule "Rule without agenda group" @Propagation(IMMEDIATE)
+    salience 100 // higher salience should not make the rule fire first as it is in the main agenda group
 when
 then
-    list.add("Rule from second ruleflow group executed");
+    list.add("Rule without agenda group executed");
 end
