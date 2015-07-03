@@ -13,24 +13,31 @@
  * limitations under the License.
 */
 
-package org.kie.server.testing.ruleflow;
+package org.kie.server.testing.activation;
 
 import java.util.List;
 
 global List list
 
-rule "Rule in first ruleflow group" @Propagation(IMMEDIATE)
+rule "First rule in first activation group" @Propagation(IMMEDIATE)
+activation-group "first-group"
     salience 10
-    ruleflow-group "ruleflow-group1"
 when
 then
-    list.add("Rule from first ruleflow group executed");
+    list.add("First rule in first activation group executed");
 end
 
-rule "Rule in second ruleflow group" @Propagation(IMMEDIATE)
-    salience 100 // higher salience should not make the rule fire first as it is in the second ruleflow-group
-    ruleflow-group "ruleflow-group2"
+rule "Second rule in first activation group" @Propagation(IMMEDIATE)
+activation-group "first-group"
+    salience 5
 when
 then
-    list.add("Rule from second ruleflow group executed");
+    list.add("Second rule in first activation group executed");
+end
+
+rule "Rule without activation group" @Propagation(IMMEDIATE)
+    salience 2
+when
+then
+    list.add("Rule without activation group executed");
 end
