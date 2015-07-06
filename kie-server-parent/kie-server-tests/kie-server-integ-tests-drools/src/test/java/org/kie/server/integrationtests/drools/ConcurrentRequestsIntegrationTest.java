@@ -21,6 +21,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +67,11 @@ public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseI
     public static class Worker implements Callable<String> {
         private static Logger logger = LoggerFactory.getLogger(Worker.class);
         private final KieServicesClient client;
+        private final RuleServicesClient ruleServicesClient;
 
         public Worker(KieServicesClient client) {
             this.client = client;
+            this.ruleServicesClient = client.getServicesClient(RuleServicesClient.class);
         }
 
         @Override
@@ -84,7 +87,7 @@ public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseI
             ServiceResponse<String> reply;
             for (int i = 0; i < NR_OF_REQUESTS_PER_THREAD; i++) {
                 logger.trace("Container call #{}, thread-id={}", i, threadId);
-                reply = client.executeCommands(CONTAINER_ID, payload);
+                reply = ruleServicesClient.executeCommands(CONTAINER_ID, payload);
                 logger.trace("Container reply for request #{}: {}, thread-id={}", i, reply, threadId);
                 assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
             }

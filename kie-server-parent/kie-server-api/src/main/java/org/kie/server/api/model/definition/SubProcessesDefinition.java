@@ -46,4 +46,11 @@ public class SubProcessesDefinition {
     public void setSubProcesses(Collection<String> subProcesses) {
         this.subProcesses = subProcesses;
     }
+
+    @Override
+    public String toString() {
+        return "SubProcessesDefinition{" +
+                "subProcesses=" + subProcesses +
+                '}';
+    }
 }

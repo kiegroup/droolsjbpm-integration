@@ -105,9 +105,7 @@ public class KieServerImpl {
             containers = currentState.getContainers();
         }
         for (KieContainerResource containerResource : containers) {
-//                if (containerResource.getStatus() != KieContainerStatus.STARTED) {
-//                    continue;
-//                }
+
             createContainer(containerResource.getContainerId(), containerResource);
         }
 
@@ -161,7 +159,13 @@ public class KieServerImpl {
             Version version = KieServerEnvironment.getVersion();
             String serverId = KieServerEnvironment.getServerId();
             String versionStr = version != null ? version.toString() : "Unknown-Version";
-            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(serverId, versionStr));
+
+            List<String> capabilities = new ArrayList<String>();
+            for (KieServerExtension extension : context.getServerExtensions()) {
+                capabilities.add(extension.getImplementedCapability());
+            }
+
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(serverId, versionStr, capabilities));
         } catch (Exception e) {
             logger.error("Error retrieving server info:", e);
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: " +

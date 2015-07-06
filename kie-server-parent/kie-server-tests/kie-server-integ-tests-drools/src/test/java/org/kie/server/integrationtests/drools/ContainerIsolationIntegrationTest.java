@@ -47,7 +47,7 @@ public class ContainerIsolationIntegrationTest extends RestJmsXstreamSharedBaseI
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> response1 = client.executeCommands("container-isolation-kjar1", payload1);
+        ServiceResponse<String> response1 = ruleClient.executeCommands("container-isolation-kjar1", payload1);
         assertSuccess(response1);
         String result1 = response1.getResult();
         assertTrue("Person's id should be 'Person from kjar1'!. Got result: " + result1, result1.contains("<id>Person from kjar1</id>"));
@@ -62,7 +62,7 @@ public class ContainerIsolationIntegrationTest extends RestJmsXstreamSharedBaseI
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
 
-        ServiceResponse<String> response2 = client.executeCommands("container-isolation-kjar2", payload2);
+        ServiceResponse<String> response2 = ruleClient.executeCommands("container-isolation-kjar2", payload2);
         assertSuccess(response2);
         String result2 = response2.getResult();
         assertTrue("Person's id should be 'Person from kjar2'!. Got result: " + result2, result2.contains("<id>Person from kjar2</id>"));

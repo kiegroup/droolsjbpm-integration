@@ -151,8 +151,6 @@ public class ProcessInstance {
     }
 
     public Map<String, Object> getVariables() {
-
-
         return variables;
     }
 

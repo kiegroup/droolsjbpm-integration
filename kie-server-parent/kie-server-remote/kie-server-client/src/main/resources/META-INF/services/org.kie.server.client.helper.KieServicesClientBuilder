@@ -1,0 +1,2 @@
+org.kie.server.client.helper.JBPMServicesClientBuilder
+org.kie.server.client.helper.DroolsServicesClientBuilder

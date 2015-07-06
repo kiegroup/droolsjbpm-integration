@@ -44,4 +44,11 @@ public class VariablesDefinition {
     public void setVariables(Map<String, String> variables) {
         this.variables = variables;
     }
+
+    @Override
+    public String toString() {
+        return "VariablesDefinition{" +
+                "variables=" + variables +
+                '}';
+    }
 }

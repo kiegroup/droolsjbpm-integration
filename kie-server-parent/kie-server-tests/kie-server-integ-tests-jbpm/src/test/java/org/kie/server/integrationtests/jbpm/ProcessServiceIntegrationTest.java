@@ -64,17 +64,22 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        KieServicesClient kieServicesClient = null;
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             localServerConfig.setTimeout(100000);
             localServerConfig.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
     @Test
@@ -94,20 +99,20 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         parameters.put("list", list);
         parameters.put("person", person);
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
 
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
-        Object personVariable = client.getProcessInstanceVariable("definition-project", processInstanceId, "person");
+        Object personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
         assertNotNull(personVariable);
         assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
-        personVariable = client.getProcessInstanceVariable("definition-project", processInstanceId, "person");
+        personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
         assertNotNull(personVariable);
         assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
-        Map<String, Object> variables = client.getProcessInstanceVariables("definition-project", processInstanceId);
+        Map<String, Object> variables = processClient.getProcessInstanceVariables("definition-project", processInstanceId);
         assertNotNull(variables);
         assertEquals(4, variables.size());
         assertTrue(variables.containsKey("test"));
@@ -131,21 +136,21 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertEquals("item", ((List)variables.get("list")).get(0));
         assertEquals("john", valueOf(variables.get("person"), "name"));
 
-        client.abortProcessInstance("definition-project", processInstanceId);
+        processClient.abortProcessInstance("definition-project", processInstanceId);
 
     }
 
     @Test(expected = KieServicesException.class)
     public void testStartNotExistingProcess() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        client.startProcess("definition-project", "not-existing", (Map)null);
+        processClient.startProcess("definition-project", "not-existing", (Map)null);
     }
 
 
     @Test(expected = KieServicesException.class)
     public void testAbortExistingProcess() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        client.abortProcessInstance("definition-project", 9999l);
+        processClient.abortProcessInstance("definition-project", 9999l);
     }
 
     @Test(expected = KieServicesException.class)
@@ -153,11 +158,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
         try {
-            client.getProcessInstanceVariable("definition-project", processInstanceId, "person");
+            processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
 
     }
@@ -167,10 +172,10 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
 
-        Long processInstanceId1 = client.startProcess("definition-project", "definition-project.evaluation");
-        Long processInstanceId2 = client.startProcess("definition-project", "definition-project.evaluation");
-        Long processInstanceId3 = client.startProcess("definition-project", "definition-project.evaluation");
-        Long processInstanceId4 = client.startProcess("definition-project", "definition-project.evaluation");
+        Long processInstanceId1 = processClient.startProcess("definition-project", "definition-project.evaluation");
+        Long processInstanceId2 = processClient.startProcess("definition-project", "definition-project.evaluation");
+        Long processInstanceId3 = processClient.startProcess("definition-project", "definition-project.evaluation");
+        Long processInstanceId4 = processClient.startProcess("definition-project", "definition-project.evaluation");
 
         List<Long> processInstances = new ArrayList<Long>();
         processInstances.add(processInstanceId1);
@@ -178,30 +183,30 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         processInstances.add(processInstanceId3);
         processInstances.add(processInstanceId4);
 
-        client.abortProcessInstances("definition-project", processInstances);
+        processClient.abortProcessInstances("definition-project", processInstances);
     }
 
     @Test
     public void testSignalProcessInstance() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
 
-            List<String> availableSignals = client.getAvailableSignals("definition-project", processInstanceId);
+            List<String> availableSignals = processClient.getAvailableSignals("definition-project", processInstanceId);
             assertNotNull(availableSignals);
             assertEquals(2, availableSignals.size());
             assertTrue(availableSignals.contains("Signal1"));
             assertTrue(availableSignals.contains("Signal2"));
 
             Object person = createPersonInstance("john");
-            client.signalProcessInstance("definition-project", processInstanceId, "Signal1", person);
+            processClient.signalProcessInstance("definition-project", processInstanceId, "Signal1", person);
 
-            client.signalProcessInstance("definition-project", processInstanceId, "Signal2", "My custom string event");
+            processClient.signalProcessInstance("definition-project", processInstanceId, "Signal2", "My custom string event");
         } catch (Exception e){
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             e.printStackTrace();
             fail(e.getMessage());
         }
@@ -211,23 +216,23 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testSignalProcessInstanceNullEvent() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
 
-            List<String> availableSignals = client.getAvailableSignals("definition-project", processInstanceId);
+            List<String> availableSignals = processClient.getAvailableSignals("definition-project", processInstanceId);
             assertNotNull(availableSignals);
             assertEquals(2, availableSignals.size());
             assertTrue(availableSignals.contains("Signal1"));
             assertTrue(availableSignals.contains("Signal2"));
 
-            client.signalProcessInstance("definition-project", processInstanceId, "Signal1", null);
+            processClient.signalProcessInstance("definition-project", processInstanceId, "Signal1", null);
 
-            client.signalProcessInstance("definition-project", processInstanceId, "Signal2", null);
+            processClient.signalProcessInstance("definition-project", processInstanceId, "Signal2", null);
         } catch (Exception e){
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             e.printStackTrace();
             fail(e.getMessage());
         }
@@ -237,11 +242,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testSignalProcessInstances() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
-        Long processInstanceId2 = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId2 = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId2);
         assertTrue(processInstanceId2.longValue() > 0);
 
@@ -251,25 +256,25 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         try {
 
-            List<String> availableSignals = client.getAvailableSignals("definition-project", processInstanceId);
+            List<String> availableSignals = processClient.getAvailableSignals("definition-project", processInstanceId);
             assertNotNull(availableSignals);
             assertEquals(2, availableSignals.size());
             assertTrue(availableSignals.contains("Signal1"));
             assertTrue(availableSignals.contains("Signal2"));
 
-            availableSignals = client.getAvailableSignals("definition-project", processInstanceId2);
+            availableSignals = processClient.getAvailableSignals("definition-project", processInstanceId2);
             assertNotNull(availableSignals);
             assertEquals(2, availableSignals.size());
             assertTrue(availableSignals.contains("Signal1"));
             assertTrue(availableSignals.contains("Signal2"));
 
             Object person = createPersonInstance("john");
-            client.signalProcessInstances("definition-project", processInstanceIds, "Signal1", person);
+            processClient.signalProcessInstances("definition-project", processInstanceIds, "Signal1", person);
 
-            client.signalProcessInstances("definition-project", processInstanceIds, "Signal2", "My custom string event");
+            processClient.signalProcessInstances("definition-project", processInstanceIds, "Signal2", "My custom string event");
         } catch (Exception e){
-            client.abortProcessInstance("definition-project", processInstanceId);
-            client.abortProcessInstance("definition-project", processInstanceId2);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId2);
             e.printStackTrace();
             fail(e.getMessage());
         }
@@ -279,14 +284,14 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testManipulateProcessVariable() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
             Object personVar = null;
             try {
-                personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+                personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
                 fail("Should fail as there is no process variable personData set yet");
             } catch (KieServicesException e) {
                 // expected
@@ -294,21 +299,21 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNull(personVar);
 
             personVar = createPersonInstance("john");
-            client.setProcessVariable("definition-project", processInstanceId, "personData", personVar);
+            processClient.setProcessVariable("definition-project", processInstanceId, "personData", personVar);
 
-            personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
             assertNotNull(personVar);
             assertEquals("john", valueOf(personVar, "name"));
 
 
-            client.setProcessVariable("definition-project", processInstanceId, "stringData", "custom value");
+            processClient.setProcessVariable("definition-project", processInstanceId, "stringData", "custom value");
 
-            String stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            String stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
             assertNotNull(personVar);
             assertEquals("custom value", stringVar);
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
 
     }
@@ -316,7 +321,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testManipulateProcessVariables() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
@@ -324,7 +329,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             Object personVar = null;
             String stringVar = null;
             try {
-                personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+                personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
                 fail("Should fail as there is no process variable personData set yet");
             } catch (KieServicesException e) {
                 // expected
@@ -332,7 +337,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNull(personVar);
 
             try {
-                stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+                stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
                 fail("Should fail as there is no process variable personData set yet");
             } catch (KieServicesException e) {
                 // expected
@@ -347,18 +352,18 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             variables.put("personData", personVar);
             variables.put("stringData", stringVar);
 
-            client.setProcessVariables("definition-project", processInstanceId, variables);
+            processClient.setProcessVariables("definition-project", processInstanceId, variables);
 
-            personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
             assertNotNull(personVar);
             assertEquals("john", valueOf(personVar, "name"));
 
-            stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
             assertNotNull(personVar);
             assertEquals("string variable test", stringVar);
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
 
     }
@@ -366,12 +371,12 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testGetProcessInstance() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
-            ProcessInstance processInstance = client.getProcessInstance("definition-project", processInstanceId);
+            ProcessInstance processInstance = processClient.getProcessInstance("definition-project", processInstanceId);
             assertNotNull(processInstance);
             assertEquals(processInstanceId, processInstance.getId());
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
@@ -388,7 +393,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             Map<String, Object> variables = processInstance.getVariables();
             assertNull(variables);
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
 
     }
@@ -401,12 +406,12 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance("john"));
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.signalprocess", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess", parameters);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
-            ProcessInstance processInstance = client.getProcessInstance("definition-project", processInstanceId, true);
+            ProcessInstance processInstance = processClient.getProcessInstance("definition-project", processInstanceId, true);
             assertNotNull(processInstance);
             assertEquals(processInstanceId, processInstance.getId());
             assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
@@ -437,7 +442,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals("waiting for signal", stringVar);
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
 
     }
@@ -445,7 +450,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test(expected = KieServicesException.class)
     public void testGetNonExistingProcessInstance() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        client.getProcessInstance("definition-project", 9999l);
+        processClient.getProcessInstance("definition-project", 9999l);
     }
 
     @Test
@@ -459,7 +464,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         parameters.put("person", createPersonInstance("john"));
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
         try {
             assertNotNull(processInstanceId);
             assertTrue(processInstanceId.longValue() > 0);
@@ -468,19 +473,19 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             // User task shouldn't be handled as work item because in such case it doesn't behave consistently:
             // i.e. leaving open tasks after finishing process instance.
             List<String> status = Arrays.asList(Status.Ready.toString());
-            List<TaskSummary> taskList = client.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
-            client.startTask("definition-project", taskSummary.getId(), "john");
-            client.completeTask("definition-project", taskSummary.getId(), "john", null);
+            taskClient.startTask("definition-project", taskSummary.getId(), "john");
+            taskClient.completeTask("definition-project", taskSummary.getId(), "john", null);
 
-            TaskInstance userTask = client.findTaskById(taskSummary.getId());
+            TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);
             assertEquals("Evaluate items", userTask.getName());
             assertEquals(Status.Completed.toString(), userTask.getStatus());
 
-            List<WorkItemInstance> workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            List<WorkItemInstance> workItems = processClient.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
             assertEquals(1, workItems.size());
 
@@ -497,7 +502,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNotNull(workItemInstance.getProcessInstanceId());
 
 
-            workItemInstance = client.getWorkItem("definition-project", processInstanceId, workItemInstance.getId());
+            workItemInstance = processClient.getWorkItem("definition-project", processInstanceId, workItemInstance.getId());
             assertNotNull(workItemInstance);
             assertEquals(processInstanceId, workItemInstance.getProcessInstanceId());
             assertEquals("Email", workItemInstance.getName());
@@ -509,14 +514,14 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNotNull(workItemInstance.getNodeId());
             assertNotNull(workItemInstance.getProcessInstanceId());
 
-            client.abortWorkItem("definition-project", processInstanceId, workItemInstance.getId());
+            processClient.abortWorkItem("definition-project", processInstanceId, workItemInstance.getId());
 
-            workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            workItems = processClient.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
             assertEquals(0, workItems.size());
 
         } catch (Exception e){
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             throw e;
         } finally {
             changeUser(TestConfig.getUsername());
@@ -532,7 +537,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         Map<String, Object> parameters = new HashMap<String, Object>();
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.evaluation", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
         try {
             assertNotNull(processInstanceId);
             assertTrue(processInstanceId.longValue() > 0);
@@ -541,33 +546,33 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             // User task shouldn't be handled as work item because in such case it doesn't behave consistently:
             // i.e. leaving open tasks after finishing process instance.
             List<String> status = Arrays.asList(Status.Ready.toString());
-            List<TaskSummary> taskList = client.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, status, 0, 10);
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
-            client.startTask("definition-project", taskSummary.getId(), "john");
-            client.completeTask("definition-project", taskSummary.getId(), "john", null);
+            taskClient.startTask("definition-project", taskSummary.getId(), "john");
+            taskClient.completeTask("definition-project", taskSummary.getId(), "john", null);
 
-            TaskInstance userTask = client.findTaskById(taskSummary.getId());
+            TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);
             assertEquals("Evaluate items", userTask.getName());
             assertEquals(Status.Completed.toString(), userTask.getStatus());
 
-            List<WorkItemInstance> workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            List<WorkItemInstance> workItems = processClient.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
             assertEquals(1, workItems.size());
 
             WorkItemInstance workItemInstance = workItems.get(0);
             assertNotNull(workItemInstance);
 
-            client.completeWorkItem("definition-project", processInstanceId, workItemInstance.getId(), parameters);
+            processClient.completeWorkItem("definition-project", processInstanceId, workItemInstance.getId(), parameters);
 
-            workItems = client.getWorkItemByProcessInstance("definition-project", processInstanceId);
+            workItems = processClient.getWorkItemByProcessInstance("definition-project", processInstanceId);
             assertNotNull(workItems);
             assertEquals(0, workItems.size());
 
         } catch (Exception e){
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             throw e;
         } finally {
             changeUser(TestConfig.getUsername());

@@ -87,6 +87,17 @@ public class VariableInstance {
         this.date = date;
     }
 
+    @Override
+    public String toString() {
+        return "VariableInstance{" +
+                "variableName='" + variableName + '\'' +
+                ", oldValue='" + oldValue + '\'' +
+                ", value='" + value + '\'' +
+                ", processInstanceId=" + processInstanceId +
+                ", date=" + date +
+                '}';
+    }
+
     public static class Builder {
 
         private VariableInstance variableInstance = new VariableInstance();

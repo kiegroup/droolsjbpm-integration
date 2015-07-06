@@ -45,4 +45,11 @@ public class TaskOutputsDefinition {
     public void setTaskOutputs(Map<String, String> taskOutputs) {
         this.taskOutputs = taskOutputs;
     }
+
+    @Override
+    public String toString() {
+        return "TaskOutputsDefinition{" +
+                "taskOutputs=" + taskOutputs +
+                '}';
+    }
 }

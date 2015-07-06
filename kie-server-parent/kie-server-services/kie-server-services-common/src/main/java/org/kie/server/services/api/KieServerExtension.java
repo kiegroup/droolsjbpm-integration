@@ -35,4 +35,6 @@ public interface KieServerExtension {
     List<Object> getAppComponents(SupportedTransports type);
 
     <T> T getAppComponents(Class<T> serviceType);
+
+    String getImplementedCapability();
 }

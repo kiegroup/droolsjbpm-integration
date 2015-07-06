@@ -54,4 +54,11 @@ public class AssociatedEntitiesDefinition {
     public void setAssociatedEntities(Map<String, String[]> associatedEntities) {
         this.associatedEntities = associatedEntities;
     }
+
+    @Override
+    public String toString() {
+        return "AssociatedEntitiesDefinition{" +
+                "associatedEntities=" + associatedEntities +
+                '}';
+    }
 }

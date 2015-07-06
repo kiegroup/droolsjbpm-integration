@@ -120,6 +120,11 @@ public class DroolsKieServerExtension implements KieServerExtension {
     }
 
     @Override
+    public String getImplementedCapability() {
+        return "BRM";
+    }
+
+    @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
     }

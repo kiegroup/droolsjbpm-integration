@@ -85,7 +85,7 @@ public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseInte
                 "  <fire-all-rules/>\n" +
                 "</batch-execution>";
 
-        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
@@ -109,7 +109,7 @@ public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseInte
 
         String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
 
-        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
         XStream xs = BatchExecutionHelper.newXStreamMarshaller();
@@ -163,7 +163,7 @@ public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseInte
                 "  </insert>\n" +
                 "</batch-execution>";
 
-        ServiceResponse<String> reply = client.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", payload);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 

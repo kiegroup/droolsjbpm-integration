@@ -64,18 +64,22 @@ public class StatefulSessionUsageAllFormatsIntegrationTest extends RestJmsShared
             e.printStackTrace();
         }
         this.marshaller = MarshallerFactory.getMarshaller(extraClasses, marshallingFormat, kieContainer.getClassLoader());
+        KieServicesClient kieServicesClient = null;
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
 
             localServerConfig.addJaxbClasses(extraClasses);
             localServerConfig.setTimeout(10000);
-            return KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+            kieServicesClient = KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
+            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+
+        setupClients(kieServicesClient);
+        return kieServicesClient;
     }
 
     @Test
@@ -96,13 +100,13 @@ public class StatefulSessionUsageAllFormatsIntegrationTest extends RestJmsShared
         commands.add(insertObjectCommand);
         commands.add(fireAllRulesCommand);
 
-        ServiceResponse<String> reply = client.executeCommands("stateful-session2", executionCommand);
+        ServiceResponse<String> reply = ruleClient.executeCommands("stateful-session2", executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         // now dispose the container
         ServiceResponse<Void> disposeReply = client.disposeContainer("stateful-session2");
         assertEquals("Dispose reply response type.", ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
         // and try to call the container again. The call should fail as the container no longer exists
-        reply = client.executeCommands("stateful-session2", executionCommand);
+        reply = ruleClient.executeCommands("stateful-session2", executionCommand);
         assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
                 reply.getMsg().contains("Container stateful-session2 is not instantiated"));
@@ -126,7 +130,7 @@ public class StatefulSessionUsageAllFormatsIntegrationTest extends RestJmsShared
         commands.add(insertObjectCommand);
         commands.add(fireAllRulesCommand);
 
-        ServiceResponse<String> reply1 = client.executeCommands("stateful-session1", executionCommand);
+        ServiceResponse<String> reply1 = ruleClient.executeCommands("stateful-session1", executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
         // first call should set the surname for the inserted person
         String result1 = reply1.getResult();
@@ -157,7 +161,7 @@ public class StatefulSessionUsageAllFormatsIntegrationTest extends RestJmsShared
         commands.add(insertObjectCommand);
         commands.add(fireAllRulesCommand);
 
-        ServiceResponse<String> reply2 = client.executeCommands("stateful-session1", executionCommand);
+        ServiceResponse<String> reply2 = ruleClient.executeCommands("stateful-session1", executionCommand);
         String result2 = reply2.getResult();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply2.getType());
 

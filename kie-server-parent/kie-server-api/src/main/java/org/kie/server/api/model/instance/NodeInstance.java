@@ -133,6 +133,21 @@ public class NodeInstance {
         this.completed = completed;
     }
 
+    @Override
+    public String toString() {
+        return "NodeInstance{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", processInstanceId=" + processInstanceId +
+                ", workItemId=" + workItemId +
+                ", containerId='" + containerId + '\'' +
+                ", date=" + date +
+                ", nodeId='" + nodeId + '\'' +
+                ", nodeType='" + nodeType + '\'' +
+                ", completed=" + completed +
+                '}';
+    }
+
     public static class Builder {
         private NodeInstance processInstance = new NodeInstance();
 

@@ -58,27 +58,34 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+        KieServicesClient kieServicesClient = null;
+
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             localServerConfig.setTimeout(30000);
             localServerConfig.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
     @Test
     public void testProcessWithUserTasks() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -86,24 +93,24 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
 
             // startTask and completeTask task
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
 
             Map<String, Object> taskOutcome = new HashMap<String, Object>();
             taskOutcome.put("string_", "my custom data");
             taskOutcome.put("person_", createPersonInstance("mary"));
 
-            client.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
+            taskClient.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
 
             // check if task outcomes are properly set as process variables
-            Object personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            Object personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
             assertNotNull(personVar);
             assertEquals("mary", valueOf(personVar, "name"));
 
-            String stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            String stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
             assertNotNull(personVar);
             assertEquals("my custom data", stringVar);
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -111,18 +118,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testReleaseAndClaim() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -131,9 +138,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
-            client.releaseTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.releaseTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -141,9 +148,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
             assertEquals("Ready", taskSummary.getStatus());
 
-            client.claimTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.claimTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -152,18 +159,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testStartAndStop() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -172,9 +179,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -182,9 +189,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
             assertEquals("InProgress", taskSummary.getStatus());
 
-            client.stopTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.stopTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -193,18 +200,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testSuspendAndResume() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -213,17 +220,17 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
             // release task
-            client.suspendTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.suspendTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
             if (taskList.size() > 0) {
                 fail("Should not be any tasks for yoda as potential owner");
             }
 
-            client.resumeTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.resumeTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -232,18 +239,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Reserved", taskSummary.getStatus());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testFailUserTask() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -251,15 +258,15 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
 
             // startTask and completeTask task
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
 
             Map<String, Object> taskOutcome = new HashMap<String, Object>();
             taskOutcome.put("string_", "my custom data");
             taskOutcome.put("person_", createPersonInstance("mary"));
 
-            client.failTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
+            taskClient.failTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -267,18 +274,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testSkipUserTask() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -286,9 +293,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
             assertTrue(taskSummary.getSkipable().booleanValue());
 
-            client.skipTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.skipTask("definition-project", taskSummary.getId(), "yoda");
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -296,7 +303,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
@@ -308,11 +315,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance("john"));
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
          ;
             assertEquals(1, taskList.size());
@@ -320,10 +327,10 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("First task", taskSummary.getName());
 
             // start task
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
 
             // first verify task input
-            Map<String, Object> taskInput = client.getTaskInputContentByTaskId("definition-project", taskSummary.getId());
+            Map<String, Object> taskInput = taskClient.getTaskInputContentByTaskId("definition-project", taskSummary.getId());
             assertNotNull(taskInput);
             assertEquals(5, taskInput.size());
             assertTrue(taskInput.containsKey("_string"));
@@ -336,9 +343,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             taskOutcome.put("string_", "my custom data");
             taskOutcome.put("person_", createPersonInstance("mary"));
 
-            Long outputContentId = client.saveTaskContent("definition-project", taskSummary.getId(), taskOutcome);
+            Long outputContentId = taskClient.saveTaskContent("definition-project", taskSummary.getId(), taskOutcome);
 
-            taskInput = client.getTaskOutputContentByTaskId("definition-project", taskSummary.getId());
+            taskInput = taskClient.getTaskOutputContentByTaskId("definition-project", taskSummary.getId());
             assertNotNull(taskInput);
             assertEquals(2, taskInput.size());
             assertTrue(taskInput.containsKey("string_"));
@@ -348,9 +355,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("mary", valueOf(taskInput.get("person_"), "name"));
 
             // let's delete the content as we won't need it
-            client.deleteTaskContent("definition-project", taskSummary.getId(), outputContentId);
+            taskClient.deleteTaskContent("definition-project", taskSummary.getId(), outputContentId);
 
-            taskInput = client.getTaskOutputContentByTaskId("definition-project", taskSummary.getId());
+            taskInput = taskClient.getTaskOutputContentByTaskId("definition-project", taskSummary.getId());
             assertNotNull(taskInput);
             assertEquals(0, taskInput.size());
 
@@ -359,18 +366,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             taskOutcomeComplete.put("string_", "my custom data 2");
             taskOutcomeComplete.put("person_", createPersonInstance("peter"));
 
-            client.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcomeComplete);
+            taskClient.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcomeComplete);
 
             // check if task outcomes are properly set as process variables
-            Object personVar = client.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            Object personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
             assertNotNull(personVar);
             assertEquals("peter", valueOf(personVar, "name"));
 
-            String stringVar = (String) client.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            String stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
             assertNotNull(personVar);
             assertEquals("my custom data 2", stringVar);
 
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -378,25 +385,25 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Second task", taskSummary.getName());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
     @Test
     public void testUserTaskById() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
-            TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId());
+            TaskInstance taskInstance = taskClient.getTaskInstance("definition-project", taskSummary.getId());
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
             assertEquals("", taskInstance.getDescription());
@@ -422,7 +429,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNull(taskInstance.getOutputData());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
@@ -434,18 +441,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance("john"));
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
 
-            TaskInstance taskInstance = client.getTaskInstance("definition-project", taskSummary.getId(), true, true, true);
+            TaskInstance taskInstance = taskClient.getTaskInstance("definition-project", taskSummary.getId(), true, true, true);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
             assertEquals("", taskInstance.getDescription());
@@ -495,7 +502,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(0, taskInstance.getOutputData().size());
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
@@ -508,11 +515,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     @Test
     public void testForwardUserTask() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -522,16 +529,16 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
 
             // forwarding Reserved task to john (forwarding Reserved -> Ready)
-            client.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
+            taskClient.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
 
             // user yoda has empty task list now
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
             assertEquals(0, taskList.size());
 
             // forwarded task is set to Ready state and is assigned to john as potential owner
             changeUser("john");
-            taskList = client.findTasksAssignedAsPotentialOwner("john", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("john", 0, 10);
             assertNotNull(taskList);
             assertEquals(1, taskList.size());
             assertEquals(taskSummary.getId(), taskList.get(0).getId());
@@ -539,24 +546,24 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "john");
 
             // forwarding task in Ready state back to yoda (forwarding Ready -> Ready)
-            client.forwardTask("definition-project", taskSummary.getId(), "john", "yoda");
+            taskClient.forwardTask("definition-project", taskSummary.getId(), "john", "yoda");
 
             // forwarded task stays in Ready state and is assigned to yoda as potential owner
             changeUser("yoda");
             checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "yoda");
 
             // starting task to change its status to In progress
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.InProgress, "yoda");
 
             // forwarding task In progress back to john (forwarding In progress -> Ready)
-            client.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
+            taskClient.forwardTask("definition-project", taskSummary.getId(), "yoda", "john");
 
             // forwarded task change state to Ready and is assigned to john as potential owner
             changeUser("john");
             checkTaskStatusAndOwners("definition-project", taskSummary.getId(), Status.Ready, "", "john");
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             changeUser(TestConfig.getUsername());
         }
     }
@@ -570,11 +577,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     @Test
     public void testDelegateUserTask() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask");
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -584,16 +591,16 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
 
             // delegating Reserved task to john (delegating Reserved -> Reserved)
-            client.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
+            taskClient.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
 
             // user yoda has empty task list now
-            taskList = client.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
             assertNotNull(taskList);
             assertEquals(0, taskList.size());
 
             // delegated task stays in Reserved state and is assigned to john as actual owner
             changeUser("john");
-            taskList = client.findTasksAssignedAsPotentialOwner("john", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("john", 0, 10);
             assertNotNull(taskList);
             assertEquals(1, taskList.size());
             assertEquals(taskSummary.getId(), taskList.get(0).getId());
@@ -601,41 +608,41 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "john");
 
             // releasing task to change its state to Ready
-            client.releaseTask("definition-project", taskSummary.getId(), "john");
+            taskClient.releaseTask("definition-project", taskSummary.getId(), "john");
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Ready, "");
 
             // delegating task in Ready state back to yoda (delegating Ready -> Reserved)
-            client.delegateTask("definition-project", taskSummary.getId(), "john", "yoda");
+            taskClient.delegateTask("definition-project", taskSummary.getId(), "john", "yoda");
 
             // delegated task change its state to Reserved and is assigned to yoda as actual owner
             changeUser("yoda");
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "yoda");
 
             // starting task to change its status to In progress
-            client.startTask("definition-project", taskSummary.getId(), "yoda");
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.InProgress, "yoda");
 
             // delegating task In progress back to john (delegating In progress -> Reserved)
-            client.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
+            taskClient.delegateTask("definition-project", taskSummary.getId(), "yoda", "john");
 
             // delegated task change state to Reserved and is assigned to john as actual owner
             changeUser("john");
             checkTaskStatusAndActualOwner("definition-project", taskSummary.getId(), Status.Reserved, "john");
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             changeUser(TestConfig.getUsername());
         }
     }
 
     private void checkTaskStatusAndOwners(String containerId, Long taskId, Status status, String actualOwner, String potentialOwner) {
-        TaskInstance task = client.getTaskInstance(containerId, taskId, false, false, true);
+        TaskInstance task = taskClient.getTaskInstance(containerId, taskId, false, false, true);
         checkTaskStatusAndActualOwner(containerId, taskId, status, actualOwner);
         assertEquals(1, task.getPotentialOwners().size());
         assertEquals(potentialOwner, task.getPotentialOwners().get(0));
     }
 
     private void checkTaskStatusAndActualOwner(String containerId, Long taskId, Status status, String actualOwner) {
-        TaskInstance task = client.getTaskInstance(containerId, taskId);
+        TaskInstance task = taskClient.getTaskInstance(containerId, taskId);
         assertEquals(taskId, task.getId());
         assertEquals(status.toString(), task.getStatus());
         assertEquals(actualOwner, task.getActualOwner());

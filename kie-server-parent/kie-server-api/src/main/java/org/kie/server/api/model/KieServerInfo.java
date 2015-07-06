@@ -15,7 +15,10 @@
 
 package org.kie.server.api.model;
 
+import java.util.List;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,6 +29,9 @@ public class KieServerInfo {
 
     private String serverId;
     private String version;
+
+    @XStreamImplicit(itemFieldName = "capability")
+    private List<String> capabilities;
     
     public KieServerInfo() {
         super();
@@ -35,6 +41,13 @@ public class KieServerInfo {
         super();
         this.serverId = serverId;
         this.version = version;
+    }
+
+    public KieServerInfo(String serverId, String version, List<String> capabilities) {
+        super();
+        this.serverId = serverId;
+        this.version = version;
+        this.capabilities = capabilities;
     }
 
     @XmlElement(name="version")
@@ -53,6 +66,15 @@ public class KieServerInfo {
 
     public void setServerId(String serverId) {
         this.serverId = serverId;
+    }
+
+    @XmlElement(name="capabilities")
+    public List<String> getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(List<String> capabilities) {
+        this.capabilities = capabilities;
     }
 
     @Override

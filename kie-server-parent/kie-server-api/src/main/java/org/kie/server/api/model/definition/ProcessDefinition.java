@@ -133,6 +133,16 @@ public class ProcessDefinition {
         this.reusableSubProcesses = reusableSubProcesses;
     }
 
+    @Override
+    public String toString() {
+        return "ProcessDefinition{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", version='" + version + '\'' +
+                ", containerId='" + containerId + '\'' +
+                '}';
+    }
+
     public static class Builder {
 
         private ProcessDefinition definition = new ProcessDefinition();

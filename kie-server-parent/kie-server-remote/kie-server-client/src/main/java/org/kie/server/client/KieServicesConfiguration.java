@@ -21,6 +21,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 public interface KieServicesConfiguration {
@@ -83,5 +84,9 @@ public interface KieServicesConfiguration {
     void dispose();
 
     KieServicesConfiguration clone();
+
+    void setCapabilities(List<String> capabilities);
+
+    List<String> getCapabilities();
 
 }

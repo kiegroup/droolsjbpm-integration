@@ -271,6 +271,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
     }
 
     @Override
+    public String getImplementedCapability() {
+        return "BPM";
+    }
+
+    @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
     }
