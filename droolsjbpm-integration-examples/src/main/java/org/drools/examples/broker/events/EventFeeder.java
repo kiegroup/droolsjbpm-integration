@@ -16,13 +16,14 @@
 
 package org.drools.examples.broker.events;
 
-import java.util.Date;
-
+import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.time.Job;
 import org.drools.core.time.JobContext;
 import org.drools.core.time.JobHandle;
 import org.drools.core.time.TimerService;
 import org.drools.core.time.Trigger;
+
+import java.util.Date;
 
 /**
  * An event feeder reads an event data file and publishes
@@ -103,6 +104,11 @@ public class EventFeeder {
 
         public JobHandle getJobHandle() {
             return this.handle;
+        }
+
+        @Override
+        public InternalWorkingMemory getWorkingMemory() {
+            return null;
         }
 
         public void setJobHandle(JobHandle handle) {
