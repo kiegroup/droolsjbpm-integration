@@ -27,6 +27,7 @@ import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
@@ -51,6 +52,7 @@ public abstract class AbstractRemoteClientSerializationTest extends JbpmJUnitBas
     }
     
     @Test
+    @Ignore
     public void taskSummaryListTest() throws Exception {
         RuntimeManager runtimeManager = createRuntimeManager(Strategy.SINGLETON, "test", "BPMN2-HumanTaskWithTaskContent.bpmn2");
         RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(null);
