@@ -77,6 +77,15 @@
         <module>droolsjbpm-brms-distribution</module>
       </modules>
     </profile>
+    <profile>
+      <id>android</id>
+      <activation>
+        <file><exists>${env.ANDROID_HOME}</exists></file>
+      </activation>
+      <modules>
+        <module>drools-android</module>
+        <module>drools-examples-android</module>
+      </modules>
+    </profile>
   </profiles>
-
 </project>

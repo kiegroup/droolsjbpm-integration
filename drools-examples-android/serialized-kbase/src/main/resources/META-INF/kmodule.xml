@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<kmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://jboss.org/kie/6.0.0/kmodule">
+
+    <kbase name="HelloKB" packages="org.drools.examples.helloworld"
+           equalsBehavior="equality">
+        <ksession name="android-session" type="stateless" default="true">
+            <listeners>
+                <ruleRuntimeEventListener type="org.kie.api.event.rule.DebugRuleRuntimeEventListener"/>
+                <agendaEventListener type="org.kie.api.event.rule.DebugAgendaEventListener"/>
+            </listeners>
+        </ksession>
+    </kbase>
+
+</kmodule>
