@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -68,7 +68,7 @@ public class ServiceResponse<T> {
     public static enum ResponseType {
         SUCCESS, FAILURE;
     }
-    
+
     @XmlAttribute
     private ServiceResponse.ResponseType type;
     @XmlAttribute
@@ -127,30 +127,30 @@ public class ServiceResponse<T> {
 
     })
     private T result;
-    
-    
+
+
     public ServiceResponse() {
     }
-    
+
     public ServiceResponse(ServiceResponse.ResponseType type, String msg) {
         this.type = type;
         this.msg = msg;
     }
-    
+
     public ServiceResponse(ServiceResponse.ResponseType type, String msg, T result ) {
         this.type = type;
         this.msg = msg;
         this.result = result;
     }
-    
+
     public ServiceResponse.ResponseType getType() {
         return type;
     }
-    
+
     public String getMsg() {
         return msg;
     }
-    
+
     public void setType(ServiceResponse.ResponseType type) {
         this.type = type;
     }
@@ -158,11 +158,11 @@ public class ServiceResponse<T> {
     public void setMsg(String msg) {
         this.msg = msg;
     }
-    
+
     public T getResult() {
         return result;
     }
-    
+
     public void setResult(T result) {
         this.result = result;
     }

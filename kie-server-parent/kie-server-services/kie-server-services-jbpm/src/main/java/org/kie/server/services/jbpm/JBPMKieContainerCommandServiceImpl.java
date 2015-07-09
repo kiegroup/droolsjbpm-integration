@@ -55,6 +55,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
             RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase) {
+
         this.context = context;
         this.deploymentService = deploymentService;
         this.definitionServiceBase = definitionServiceBase;

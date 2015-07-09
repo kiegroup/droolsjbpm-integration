@@ -55,6 +55,7 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.api.executor.ExecutorService;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
