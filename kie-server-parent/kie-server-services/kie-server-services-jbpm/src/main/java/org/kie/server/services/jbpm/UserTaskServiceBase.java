@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -338,11 +338,11 @@ public class UserTaskServiceBase {
     }
 
     public String addAttachment(String containerId, Number taskId, String userId, String name, String attachmentPayload, String marshallingType) {
-
         logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
         Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, marshallingType, Object.class);
 
         logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
+
         Long attachmentId = userTaskService.addAttachment(taskId.longValue(), getUser(userId), name, attachment);
 
         String response = marshallerHelper.marshal(containerId, marshallingType, attachmentId);
