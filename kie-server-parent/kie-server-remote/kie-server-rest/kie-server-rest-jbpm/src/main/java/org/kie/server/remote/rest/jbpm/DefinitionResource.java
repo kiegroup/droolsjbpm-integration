@@ -16,8 +16,6 @@
 package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,9 +26,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.services.api.DefinitionService;
-import org.jbpm.services.api.model.ProcessDefinition;
-import org.jbpm.services.api.model.UserTaskDefinition;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
@@ -39,18 +34,19 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
+import org.kie.server.services.jbpm.DefinitionServiceBase;
 
+import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
-import static org.kie.server.api.rest.RestURI.*;
 
 @Path("/server")
 public class DefinitionResource {
 
-    private DefinitionService definitionService;
+    private DefinitionServiceBase definitionServiceBase;
 
-    public DefinitionResource(DefinitionService definitionService) {
-        this.definitionService = definitionService;
+    public DefinitionResource(DefinitionServiceBase definitionServiceBase) {
+        this.definitionServiceBase = definitionServiceBase;
     }
 
 
@@ -60,20 +56,13 @@ public class DefinitionResource {
     public Response getProcessDefinition(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            ProcessDefinition procDef = findProcessDefinition(containerId, processId, v);
 
-            Object responseObject = org.kie.server.api.model.definition.ProcessDefinition.builder()
-                    .id(procDef.getId())
-                    .name(procDef.getName())
-                    .version(procDef.getVersion())
-                    .packageName(procDef.getPackageName())
-                    .containerId(procDef.getDeploymentId())
-                    .entitiesAsCollection(procDef.getAssociatedEntities())
-                    .serviceTasks(procDef.getServiceTasks())
-                    .subprocesses(procDef.getReusableSubProcesses())
-                    .variables(procDef.getProcessVariables())
-                    .build();
+            Object responseObject = definitionServiceBase.getProcessDefinition(containerId, processId);
+
             return createCorrectVariant(responseObject, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -86,11 +75,12 @@ public class DefinitionResource {
     public Response getReusableSubProcesses(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
+            SubProcessesDefinition definition = definitionServiceBase.getReusableSubProcesses(containerId, processId);
 
-            Collection<String> reusableSubProcesses = definitionService.getReusableSubProcesses(containerId, processId);
-
-            return createCorrectVariant(new SubProcessesDefinition(reusableSubProcesses), headers, Response.Status.OK);
+            return createCorrectVariant(definition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -103,11 +93,12 @@ public class DefinitionResource {
     public Response getProcessVariables(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
+            VariablesDefinition variablesDefinition = definitionServiceBase.getProcessVariables(containerId, processId);
 
-            Map<String, String> processVariables = definitionService.getProcessVariables(containerId, processId);
-
-            return createCorrectVariant(new VariablesDefinition(processVariables), headers, Response.Status.OK);
+            return createCorrectVariant(variablesDefinition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -120,11 +111,11 @@ public class DefinitionResource {
     public Response getServiceTasks(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
-
-            Map<String, String> serviceTasks = definitionService.getServiceTasks(containerId, processId);
-
-            return createCorrectVariant(new ServiceTasksDefinition(serviceTasks), headers, Response.Status.OK);
+            ServiceTasksDefinition serviceTasksDefinition = definitionServiceBase.getServiceTasks(containerId, processId);
+            return createCorrectVariant(serviceTasksDefinition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -137,11 +128,11 @@ public class DefinitionResource {
     public Response getAssociatedEntities(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
-
-            Map<String, Collection<String>> entities = definitionService.getAssociatedEntities(containerId, processId);
-
-            return createCorrectVariant(AssociatedEntitiesDefinition.from(entities), headers, Response.Status.OK);
+            AssociatedEntitiesDefinition associatedEntitiesDefinition = definitionServiceBase.getAssociatedEntities(containerId, processId);
+            return createCorrectVariant(associatedEntitiesDefinition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -154,11 +145,11 @@ public class DefinitionResource {
     public Response getTasksDefinitions(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
-
-            Collection<UserTaskDefinition> userTaskDefinitions = definitionService.getTasksDefinitions(containerId, processId);
-
-            return createCorrectVariant(convert(userTaskDefinitions), headers, Response.Status.OK);
+            UserTaskDefinitionList userTaskDefinitions = definitionServiceBase.getTasksDefinitions(containerId, processId);
+            return createCorrectVariant(userTaskDefinitions, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -171,11 +162,11 @@ public class DefinitionResource {
     public Response getTaskInputMappings(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
-
-            Map<String, String> taskInputs = definitionService.getTaskInputMappings(containerId, processId, taskName);
-
-            return createCorrectVariant(new TaskInputsDefinition(taskInputs), headers, Response.Status.OK);
+            TaskInputsDefinition taskInputsDefinition = definitionServiceBase.getTaskInputMappings(containerId, processId, taskName);
+            return createCorrectVariant(taskInputsDefinition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
@@ -188,53 +179,16 @@ public class DefinitionResource {
     public Response getTaskOutputMappings(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @PathParam("taskName") String taskName) {
         Variant v = getVariant(headers);
         try {
-            findProcessDefinition(containerId, processId, v);
-
-            Map<String, String> taskOutputs = definitionService.getTaskOutputMappings(containerId, processId, taskName);
-
-            return createCorrectVariant(new TaskOutputsDefinition(taskOutputs), headers, Response.Status.OK);
+            TaskOutputsDefinition taskOutputsDefinition = definitionServiceBase.getTaskOutputMappings(containerId, processId, taskName);
+            return createCorrectVariant(taskOutputsDefinition, headers, Response.Status.OK);
+        } catch (IllegalStateException e) {
+            throw ExecutionServerRestOperationException.notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
             throw ExecutionServerRestOperationException.internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
-    protected ProcessDefinition findProcessDefinition(String containerId, String processId, Variant v) {
-        try {
 
-            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-            if (procDef == null) {
-                throw ExecutionServerRestOperationException.notFound(
-                        MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
-            }
-
-            return procDef;
-        } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
-                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
-        }
-
-    }
-
-    protected UserTaskDefinitionList convert(Collection<UserTaskDefinition> taskDefinitions) {
-        org.kie.server.api.model.definition.UserTaskDefinition[] userTaskDefinitions = new org.kie.server.api.model.definition.UserTaskDefinition[taskDefinitions.size()];
-
-        int i = 0;
-        for (UserTaskDefinition orig : taskDefinitions) {
-            org.kie.server.api.model.definition.UserTaskDefinition definition = org.kie.server.api.model.definition.UserTaskDefinition.builder()
-                    .name(orig.getName())
-                    .comment(orig.getComment())
-                    .createdBy(orig.getCreatedBy())
-                    .priority(orig.getPriority())
-                    .skippable(orig.isSkippable())
-                    .entities(orig.getAssociatedEntities().toArray(new String[orig.getAssociatedEntities().size()]))
-                    .taskInputs(orig.getTaskInputMappings())
-                    .taskOutputs(orig.getTaskOutputMappings())
-                    .build();
-            userTaskDefinitions[i] = definition;
-            i++;
-        }
-
-        return new UserTaskDefinitionList(userTaskDefinitions);
-    }
 }

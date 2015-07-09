@@ -16,11 +16,7 @@
 package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,30 +32,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.TaskNotFoundException;
-import org.jbpm.services.api.UserTaskService;
-import org.kie.api.task.model.Attachment;
-import org.kie.api.task.model.Comment;
-import org.kie.api.task.model.OrganizationalEntity;
-import org.kie.api.task.model.Task;
-import org.kie.internal.identity.IdentityProvider;
-import org.kie.internal.task.api.TaskModelProvider;
-import org.kie.internal.task.api.model.InternalPeopleAssignments;
-import org.kie.internal.task.api.model.InternalTask;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.ModelWrapper;
-import org.kie.server.api.model.instance.TaskAttachment;
-import org.kie.server.api.model.instance.TaskAttachmentList;
-import org.kie.server.api.model.instance.TaskComment;
-import org.kie.server.api.model.instance.TaskCommentList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.type.JaxbBoolean;
-import org.kie.server.api.model.type.JaxbDate;
-import org.kie.server.api.model.type.JaxbInteger;
-import org.kie.server.api.model.type.JaxbMap;
-import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.kie.server.services.jbpm.UserTaskServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,28 +46,13 @@ public class UserTaskResource {
 
     public static final Logger logger = LoggerFactory.getLogger(UserTaskResource.class);
 
-    private IdentityProvider identityProvider;
-    private UserTaskService userTaskService;
+    private UserTaskServiceBase userTaskServiceBase;
 
-    private MarshallerHelper marshallerHelper;
 
-    private boolean bypassAuthUser = false;
-
-    public UserTaskResource(UserTaskService userTaskService, KieServerRegistry context) {
-        this.userTaskService = userTaskService;
-        this.identityProvider = context.getIdentityProvider();
-        this.marshallerHelper = new MarshallerHelper(context);
-
-        this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
+    public UserTaskResource(UserTaskServiceBase userTaskServiceBase) {
+        this.userTaskServiceBase = userTaskServiceBase;
     }
 
-    protected String getUser(String queryParamUser) {
-        if (bypassAuthUser) {
-            return queryParamUser;
-        }
-
-        return identityProvider.getName();
-    }
 
     @PUT
     @Path(TASK_INSTANCE_ACTIVATE_PUT_URI)
@@ -103,9 +62,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to activate task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.activate(taskId, userId);
+
+            userTaskServiceBase.activate(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -124,9 +82,8 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user")  String userId) {
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to claim task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.claim(taskId, userId);
+
+            userTaskServiceBase.claim(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -146,12 +103,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
-
-            logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
-            userTaskService.complete(taskId, userId, parameters);
+            userTaskServiceBase.complete(containerId, taskId, userId, payload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -170,9 +122,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to delegate task with id '{}' as user '{}' to user '{}'", taskId, userId, targetUserId);
-            userTaskService.delegate(taskId, userId, targetUserId);
+
+            userTaskServiceBase.delegate(containerId, taskId, userId, targetUserId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -192,9 +143,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to exit task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.exit(taskId, userId);
+
+            userTaskServiceBase.exit(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -214,12 +164,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to unmarshal task failure data from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
-
-            logger.debug("About to fail task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
-            userTaskService.fail(taskId, userId, parameters);
+            userTaskServiceBase.fail(containerId, taskId, userId, payload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -238,9 +183,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to forward task with id '{}' as user '{}' to user '{}'", taskId, userId, targetUserId);
-            userTaskService.forward(taskId, userId, targetUserId);
+
+            userTaskServiceBase.forward(containerId, taskId, userId, targetUserId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -258,9 +202,7 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to release task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.release(taskId, userId);
+            userTaskServiceBase.release(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -278,9 +220,8 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to resume task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.resume(taskId, userId);
+
+            userTaskServiceBase.resume(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -298,9 +239,8 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to skip task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.skip(taskId, userId);
+
+            userTaskServiceBase.skip(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -318,9 +258,7 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to start task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.start(taskId, userId);
+            userTaskServiceBase.start(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -339,9 +277,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to stop task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.stop(taskId, userId);
+
+            userTaskServiceBase.stop(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -359,9 +296,7 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to suspend task with id '{}' as user '{}'", taskId, userId);
-            userTaskService.suspend(taskId, userId);
+            userTaskServiceBase.suspend(containerId, taskId, userId);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -380,13 +315,8 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         try {
-            userId = getUser(userId);
-            logger.debug("About to nominate task with id '{}' as user '{}' to potential owners", taskId, userId, potentialOwners);
-            List<OrganizationalEntity> potOwnerEntities = new ArrayList<OrganizationalEntity>();
-            for (String potOwnerId : potentialOwners) {
-                potOwnerEntities.add(TaskModelProvider.getFactory().newUser(potOwnerId));
-            }
-            userTaskService.nominate(taskId, userId, potOwnerEntities);
+
+            userTaskServiceBase.nominate(containerId, taskId, userId, potentialOwners);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -407,11 +337,7 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal task priority from payload: '{}'", priorityPayload);
-            Integer priority = marshallerHelper.unmarshal(containerId, priorityPayload, type, Integer.class);
-
-            logger.debug("About to set priority for a task with id '{}' with value '{}'", taskId, priority);
-            userTaskService.setPriority(taskId, priority);
+            userTaskServiceBase.setPriority(containerId, taskId, priorityPayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -432,11 +358,7 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal task priority from payload: '{}'", datePayload);
-            Date expirationDate = marshallerHelper.unmarshal(containerId, datePayload, type, Date.class);
-
-            logger.debug("About to set expiration date for a task with id '{}' with value '{}'", taskId, expirationDate);
-            userTaskService.setExpirationDate(taskId, expirationDate);
+            userTaskServiceBase.setExpirationDate(containerId, taskId, datePayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -457,11 +379,7 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal task skipable from payload: '{}'", skipablePayload);
-            Boolean skipable = marshallerHelper.unmarshal(containerId, skipablePayload, type, Boolean.class);
-
-            logger.debug("About to set skipable attribute for a task with id '{}' with value '{}'", taskId, skipable);
-            userTaskService.setSkipable(taskId, skipable);
+            userTaskServiceBase.setSkipable(containerId, taskId, skipablePayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -480,12 +398,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-
-            logger.debug("About to unmarshal task name from payload: '{}'", namePayload);
-            String name = marshallerHelper.unmarshal(containerId, namePayload, type, String.class);
-
-            logger.debug("About to set name for a task with id '{}' with value '{}'", taskId, name);
-            userTaskService.setName(taskId, name);
+            userTaskServiceBase.setName(containerId, taskId, namePayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -505,11 +418,7 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal task description from payload: '{}'", descriptionPayload);
-            String description = marshallerHelper.unmarshal(containerId, descriptionPayload, type, String.class);
-
-            logger.debug("About to set name for a task with id '{}' with value '{}'", taskId, description);
-            userTaskService.setDescription(taskId, description);
+            userTaskServiceBase.setDescription(containerId, taskId, descriptionPayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
@@ -529,13 +438,7 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal task content parameters from payload: '{}'", payload);
-            Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
-
-            logger.debug("About to set content of a task with id '{}' with data {}", taskId, parameters);
-            Long contentId = userTaskService.saveContent(taskId, parameters);
-
-            String response = marshallerHelper.marshal(containerId, type, contentId);
+            String response = userTaskServiceBase.saveContent(containerId, taskId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -555,10 +458,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Map<String, Object> variables = userTaskService.getTaskOutputContentByTaskId(taskId);
-
-            logger.debug("About to marshal task '{}' output variables {}", taskId, variables);
-            String response = marshallerHelper.marshal(containerId, type, variables);
+            String response = userTaskServiceBase.getTaskOutputContentByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -579,10 +479,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskId);
-
-            logger.debug("About to marshal task '{}' input variables {}", taskId, variables);
-            String response = marshallerHelper.marshal(containerId, type, variables);
+            String response = userTaskServiceBase.getTaskInputContentByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -604,7 +501,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         try {
 
-            userTaskService.deleteContent(taskId, contentId);
+            userTaskServiceBase.deleteContent(containerId, taskId, contentId);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
@@ -623,14 +520,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-
-            logger.debug("About to unmarshal task comment from payload: '{}'", payload);
-            TaskComment comment = marshallerHelper.unmarshal(containerId, payload, type, TaskComment.class);
-
-            logger.debug("About to set comment on a task with id '{}' with data {}", taskId, comment);
-            Long commentId = userTaskService.addComment(taskId, comment.getText(), comment.getAddedBy(), comment.getAddedAt());
-
-            String response = marshallerHelper.marshal(containerId, type, commentId);
+            String response = userTaskServiceBase.addComment(containerId, taskId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -651,7 +541,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         try {
 
-            userTaskService.deleteComment(taskId, commentId);
+            userTaskServiceBase.deleteComment(containerId, taskId, commentId);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
@@ -670,26 +560,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            List<Comment> comments = userTaskService.getCommentsByTaskId(taskId);
-
-            TaskComment[] taskComments = new TaskComment[comments.size()];
-            int counter = 0;
-            for (Comment comment : comments) {
-
-                TaskComment taskComment = TaskComment.builder()
-                        .id(comment.getId())
-                        .text(comment.getText())
-                        .addedBy(comment.getAddedBy().getId())
-                        .addedAt(comment.getAddedAt())
-                        .build();
-
-                taskComments[counter] = taskComment;
-                counter++;
-            }
-            TaskCommentList result = new TaskCommentList(taskComments);
-
-            logger.debug("About to marshal task '{}' comments {}", taskId, result);
-            String response = marshallerHelper.marshal(containerId, type, result);
+            String response = userTaskServiceBase.getCommentsByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -710,22 +581,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Comment comment = userTaskService.getCommentById(taskId, commentId);
-
-            if (comment == null) {
-                throw ExecutionServerRestOperationException.notFound(
-                        MessageFormat.format(TASK_COMMENT_NOT_FOUND, commentId, taskId), v);
-            }
-
-            TaskComment taskComment = TaskComment.builder()
-                    .id(comment.getId())
-                    .text(comment.getText())
-                    .addedBy(comment.getAddedBy().getId())
-                    .addedAt(comment.getAddedAt())
-                    .build();
-
-            logger.debug("About to marshal task '{}' comment {}", taskId, taskComment);
-            String response = marshallerHelper.marshal(containerId, type, taskComment);
+            String response = userTaskServiceBase.getCommentById(containerId, taskId, commentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -746,13 +602,8 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
-            Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, Object.class);
 
-            logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
-            Long attachmentId = userTaskService.addAttachment(taskId, getUser(userId), attachment);
-
-            String response = marshallerHelper.marshal(containerId, type, attachmentId);
+            String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, attachmentPayload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
@@ -773,7 +624,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         try {
 
-            userTaskService.deleteAttachment(taskId, attachmentId);
+            userTaskServiceBase.deleteAttachment(containerId, taskId, attachmentId);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
@@ -792,20 +643,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Attachment attachment = userTaskService.getAttachmentById(taskId, attachmentId);
-
-            TaskAttachment taskAttachment = TaskAttachment.builder()
-                    .id(attachment.getId())
-                    .name(attachment.getName())
-                    .addedBy(attachment.getAttachedBy().getId())
-                    .addedAt(attachment.getAttachedAt())
-                    .attachmentContentId(attachment.getAttachmentContentId())
-                    .contentType(attachment.getContentType())
-                    .size(attachment.getSize())
-                    .build();
-
-            logger.debug("About to marshal task '{}' attachment {} with content {}", taskId, attachmentId, taskAttachment);
-            String response = marshallerHelper.marshal(containerId, type, taskAttachment);
+            String response = userTaskServiceBase.getAttachmentById(containerId, taskId, attachmentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -826,17 +664,7 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-
-            Object attachment = userTaskService.getAttachmentContentById(taskId, attachmentId);
-
-            if (attachment == null) {
-                throw ExecutionServerRestOperationException.notFound(
-                        MessageFormat.format(TASK_ATTACHMENT_NOT_FOUND, attachmentId, taskId), v);
-            }
-
-            logger.debug("About to marshal task attachment with id '{}' {}", attachmentId, attachment);
-
-            String response = marshallerHelper.marshal(containerId, type, attachment);
+            String response = userTaskServiceBase.getAttachmentContentById(containerId, taskId, attachmentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -856,29 +684,8 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            List<Attachment> attachments = userTaskService.getAttachmentsByTaskId(taskId);
 
-            TaskAttachment[] taskComments = new TaskAttachment[attachments.size()];
-            int counter = 0;
-            for (Attachment attachment : attachments) {
-
-                TaskAttachment taskComment = TaskAttachment.builder()
-                        .id(attachment.getId())
-                        .name(attachment.getName())
-                        .addedBy(attachment.getAttachedBy().getId())
-                        .addedAt(attachment.getAttachedAt())
-                        .contentType(attachment.getContentType())
-                        .attachmentContentId(attachment.getAttachmentContentId())
-                        .size(attachment.getSize())
-                        .build();
-
-                taskComments[counter] = taskComment;
-                counter++;
-            }
-            TaskAttachmentList result = new TaskAttachmentList(taskComments);
-
-            logger.debug("About to marshal task '{}' attachments {}", taskId, result);
-            String response = marshallerHelper.marshal(containerId, type, result);
+            String response = userTaskServiceBase.getAttachmentsByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -900,82 +707,16 @@ public class UserTaskResource {
         String type = getContentType(headers);
         try {
 
-            Task task = userTaskService.getTask(taskId);
-            TaskInstance.Builder builder = TaskInstance.builder();
-            builder
-                    .id(task.getId())
-                    .name(task.getName())
-                    .subject(task.getSubject())
-                    .description(task.getDescription())
-                    .priority(task.getPriority())
-                    .taskType(task.getTaskType())
-                    .formName(((InternalTask) task).getFormName())
-                    .status(task.getTaskData().getStatus().name())
-                    .actualOwner(getOrgEntityIfNotNull(task.getTaskData().getActualOwner()))
-                    .createdBy(getOrgEntityIfNotNull(task.getTaskData().getCreatedBy()))
-                    .createdOn(task.getTaskData().getCreatedOn())
-                    .activationTime(task.getTaskData().getActivationTime())
-                    .expirationTime(task.getTaskData().getExpirationTime())
-                    .skippable(task.getTaskData().isSkipable())
-                    .workItemId(task.getTaskData().getWorkItemId())
-                    .processInstanceId(task.getTaskData().getProcessInstanceId())
-                    .parentId(task.getTaskData().getParentId())
-                    .processId(task.getTaskData().getProcessId())
-                    .containerId(task.getTaskData().getDeploymentId());
-
-            if (Boolean.TRUE.equals(withInput)) {
-                Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskId);
-                builder.inputData(variables);
-            }
-
-            if (Boolean.TRUE.equals(withOutput)) {
-                Map<String, Object> variables = userTaskService.getTaskOutputContentByTaskId(taskId);
-                builder.outputData(variables);
-            }
-
-            if (Boolean.TRUE.equals(withAssignments)) {
-                builder.potentialOwners(orgEntityAsList(task.getPeopleAssignments().getPotentialOwners()));
-
-                builder.excludedOwners(orgEntityAsList(((InternalPeopleAssignments) task.getPeopleAssignments()).getExcludedOwners()));
-
-                builder.businessAdmins(orgEntityAsList(task.getPeopleAssignments().getBusinessAdministrators()));
-            }
-
-            TaskInstance taskInstance = builder.build();
-
-
-            logger.debug("About to marshal task '{}' representation {}", taskId, taskInstance);
-            String response = marshallerHelper.marshal(containerId, type, taskInstance);
+            String response = userTaskServiceBase.getTask(containerId, taskId, withInput, withOutput, withAssignments, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
 
-        } catch (TaskNotFoundException e){
+        } catch (TaskNotFoundException e) {
             throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
-    }
-
-    private String getOrgEntityIfNotNull(OrganizationalEntity organizationalEntity) {
-        if (organizationalEntity == null) {
-            return "";
-        }
-
-        return organizationalEntity.getId();
-    }
-
-    private List<String> orgEntityAsList(List<OrganizationalEntity> organizationalEntities) {
-        ArrayList<String> entities = new ArrayList<String>();
-        if (organizationalEntities == null) {
-            return entities;
-        }
-
-        for (OrganizationalEntity entity : organizationalEntities) {
-            entities.add(entity.getId());
-        }
-
-        return entities;
     }
 }

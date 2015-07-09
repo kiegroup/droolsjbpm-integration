@@ -18,6 +18,7 @@ package org.kie.server.client.impl;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,12 @@ public abstract class AbstractKieServicesClientImpl {
         }
 
         return urlString;
+    }
+
+    protected void throwExceptionOnFailure(ServiceResponse<?> serviceResponse) {
+        if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())){
+            throw new KieServicesException(serviceResponse.getMsg());
+        }
     }
 
     protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString) {
@@ -302,6 +309,10 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected ServiceResponsesList executeJmsCommand( CommandScript command, String classType ) {
+        return executeJmsCommand(command, classType, null);
+    }
+
+    protected ServiceResponsesList executeJmsCommand( CommandScript command, String classType, String targetCapability ) {
         ConnectionFactory factory = config.getConnectionFactory();
         Queue sendQueue = config.getRequestQueue();
         Queue responseQueue = config.getResponseQueue();
@@ -336,7 +347,7 @@ public abstract class AbstractKieServicesClientImpl {
             try {
 
                 // serialize request
-                marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), CommandScript.class.getClassLoader() );
+                marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader );
                 String xmlStr = marshaller.marshall( command );
                 textMsg = session.createTextMessage(xmlStr);
 
@@ -348,6 +359,13 @@ public abstract class AbstractKieServicesClientImpl {
                 if (classType != null) {
                     textMsg.setStringProperty(JMSConstants.CLASS_TYPE_PROPERTY_NAME, classType);
                 }
+
+                if (targetCapability != null) {
+                    textMsg.setStringProperty(JMSConstants.TARGET_CAPABILITY_PROPERTY_NAME, targetCapability);
+                }
+                textMsg.setStringProperty(JMSConstants.USER_PROPERTY_NAME, config.getUserName());
+                textMsg.setStringProperty(JMSConstants.PASSWRD_PROPERTY_NAME, config.getPassword());
+
                 // send
                 producer.send(textMsg);
             } catch( JMSException jmse ) {
@@ -371,6 +389,7 @@ public abstract class AbstractKieServicesClientImpl {
             assert response != null: "Response is empty.";
             try {
                 String responseStr = ((TextMessage) response).getText();
+                logger.info("Received response from server '{}'", responseStr);
                 cmdResponse = marshaller.unmarshall(responseStr, ServiceResponsesList.class);
                 return cmdResponse;
             } catch( JMSException jmse ) {
@@ -542,5 +561,22 @@ public abstract class AbstractKieServicesClientImpl {
             queryString.deleteCharAt(queryString.length() - 1);
         }
         return queryString.toString();
+    }
+
+
+    protected Map<?, ?> safeMap(Map<?, ?> map) {
+        if (map == null) {
+
+            return new HashMap<Object, Object>();
+        }
+        return new HashMap<Object, Object>(map);
+    }
+
+    protected List<?> safeList(List<?> list) {
+        if (list == null) {
+
+            return new ArrayList<Object>();
+        }
+        return new ArrayList<Object>(list);
     }
 }

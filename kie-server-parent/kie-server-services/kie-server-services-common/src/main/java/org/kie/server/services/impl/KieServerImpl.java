@@ -284,7 +284,7 @@ public class KieServerImpl {
                                 logger.debug("Container {} (for release id {}) {} shutdown: DONE", containerId, kci.getResource().getReleaseId(), extension);
                             }
                         } catch (Exception e) {
-                            logger.warn("Container '" + containerId + "' disposed, but an unexpected exception was raised", e);
+//                            logger.warn("Container '" + containerId + "' disposed, but an unexpected exception was raised", e);
                             return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId +
                                     " disposed, but exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
                         }

@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
@@ -31,6 +32,19 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.TaskEventInstance;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
 import org.kie.server.api.model.type.JaxbCharacter;
@@ -84,7 +98,23 @@ public class ServiceResponse<T> {
         @XmlElement(name = "user-task-definition", type = UserTaskDefinition.class),
         @XmlElement(name = "user-task-definitions", type = UserTaskDefinitionList.class),
         @XmlElement(name = "process-variables", type = VariablesDefinition.class),
-        @XmlElement(name = "process-subprocesses", type = SubProcessesDefinition.class)
+        @XmlElement(name = "process-subprocesses", type = SubProcessesDefinition.class),
+
+        @XmlElement(name = "process-definitions", type = ProcessDefinitionList.class),
+        @XmlElement(name = "process-instance", type = ProcessInstance.class),
+        @XmlElement(name = "process-instance-list", type = ProcessInstanceList.class),
+        @XmlElement(name = "node-instance", type = NodeInstance.class),
+        @XmlElement(name = "node-instance-list", type = NodeInstanceList.class),
+        @XmlElement(name = "variable-instance", type = VariableInstance.class),
+        @XmlElement(name = "variable-instance-list", type = VariableInstanceList.class),
+        @XmlElement(name = "task-instance", type = TaskInstance.class),
+        @XmlElement(name = "task-summary", type = TaskSummary.class),
+        @XmlElement(name = "task-summary-list", type = TaskSummaryList.class),
+        @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
+        @XmlElement(name = "task-event-instance-list", type = TaskEventInstanceList.class),
+        @XmlElement(name = "work-item-instance", type = WorkItemInstance.class),
+        @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class)
+
     })
     private T result;
     

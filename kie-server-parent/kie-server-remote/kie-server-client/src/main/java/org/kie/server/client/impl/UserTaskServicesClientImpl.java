@@ -15,6 +15,7 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -22,7 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -53,7 +59,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_ACTIVATE_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "activate", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -63,7 +72,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_CLAIM_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "claim", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -78,7 +90,12 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     build(baseURI, TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + getUserQueryStr(userId),
                     params, String.class, getHeaders(null));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "complete", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -88,7 +105,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_DELEGATE_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetUserId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "delegate", new Object[]{containerId, taskId, userId, targetUserId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -98,7 +118,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_EXIT_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "exit", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -115,7 +138,12 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     params, String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "fail", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -125,7 +153,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_FORWARD_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetEntityId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "forward", new Object[]{containerId, taskId, userId, targetEntityId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -135,7 +166,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_RELEASE_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "release", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<TaskOutputsDefinition> response = (ServiceResponse<TaskOutputsDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -145,7 +179,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_RESUME_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "resume", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -155,7 +192,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_SKIP_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "skip", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -165,7 +205,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_START_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "start", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -175,7 +218,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_STOP_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "stop", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -185,7 +231,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_SUSPEND_PUT_URI, getUserQueryStr(userId));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "suspend", new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -195,7 +244,10 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             sendTaskOperation(containerId, taskId, TASK_INSTANCE_NOMINATE_PUT_URI, getUserAndAdditionalParams(userId, "potOwner", potentialOwners));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "nominate", new Object[]{containerId, taskId, userId, potentialOwners}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -211,7 +263,11 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     priority, String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "setPriority", serialize(priority), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -224,10 +280,14 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_EXPIRATION_DATE_PUT_URI, valuesMap),
-                    date, String.class, getHeaders(null));
+                    serialize(date), String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "setExpirationDate", serialize(date), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -240,10 +300,14 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_SKIPABLE_PUT_URI, valuesMap),
-                    skipable, String.class, getHeaders(null));
+                    serialize(skipable), String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "setSkipable", serialize(skipable), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -256,10 +320,14 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_NAME_PUT_URI, valuesMap),
-                    name, String.class, getHeaders(null));
+                    serialize(name), String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "setName", serialize(name), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -272,72 +340,97 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_DESCRIPTION_PUT_URI, valuesMap),
-                    description, String.class, getHeaders(description));
+                    serialize(description), String.class, getHeaders(null));
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "setDescription", serialize(description), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
     public Long saveTaskContent(String containerId, Long taskId, Map<String, Object> values) {
+        Object contentId = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            Object contentId = makeHttpPutRequestAndCreateCustomResponse(
+            contentId = makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap),
                     values, Object.class, getHeaders(null));
 
-            if (contentId instanceof Wrapped) {
-                return (Long) ((Wrapped) contentId).unwrap();
-            }
-
-            return ((Number) contentId).longValue();
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "saveContent", serialize(values), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            contentId = deserialize(response.getResult(), Object.class);
         }
+
+        if (contentId instanceof Wrapped) {
+            return (Long) ((Wrapped) contentId).unwrap();
+        }
+
+        return ((Number) contentId).longValue();
     }
 
     @Override
     public Map<String, Object> getTaskOutputContentByTaskId(String containerId, Long taskId) {
+        Object variables = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            Object variables = makeHttpGetRequestAndCreateCustomResponse(
+            variables = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_OUTPUT_DATA_GET_URI, valuesMap), Object.class);
 
-            if (variables instanceof Wrapped) {
-                return (Map) ((Wrapped) variables).unwrap();
-            }
-
-            return (Map) variables;
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getTaskOutputContentByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            variables = deserialize(response.getResult(), Object.class);
         }
+        if (variables instanceof Wrapped) {
+            return (Map) ((Wrapped) variables).unwrap();
+        }
+
+        return (Map) variables;
     }
 
     @Override
     public Map<String, Object> getTaskInputContentByTaskId(String containerId, Long taskId) {
+        Object variables = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            Object variables = makeHttpGetRequestAndCreateCustomResponse(
+            variables = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_INPUT_DATA_GET_URI, valuesMap), Object.class);
 
-            if (variables instanceof Wrapped) {
-                return (Map) ((Wrapped) variables).unwrap();
-            }
-
-            return (Map) variables;
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getTaskInputContentByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            variables = deserialize(response.getResult(), Object.class);
         }
+        if (variables instanceof Wrapped) {
+            return (Map) ((Wrapped) variables).unwrap();
+        }
+
+        return (Map) variables;
     }
 
     @Override
@@ -354,34 +447,47 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     null);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteContent", new Object[]{containerId, taskId, contentId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
     public Long addTaskComment(String containerId, Long taskId, String text, String addedBy, Date addedOn) {
+        Object commentId = null;
+        TaskComment taskComment = TaskComment.builder()
+                .text(text)
+                .addedBy(addedBy)
+                .addedAt(addedOn)
+                .build();
+
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            TaskComment taskComment = TaskComment.builder()
-                    .text(text)
-                    .addedBy(addedBy)
-                    .addedAt(addedOn)
-                    .build();
 
-            Object commentId = makeHttpPostRequestAndCreateCustomResponse(
+            commentId = makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_COMMENT_ADD_POST_URI, valuesMap), taskComment, Object.class, getHeaders(taskComment));
 
-            if (commentId instanceof Wrapped) {
-                return (Long) ((Wrapped) commentId).unwrap();
-            }
 
-            return ((Number) commentId).longValue();
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "addComment", serialize(taskComment), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            commentId = deserialize(response.getResult(), Object.class);
         }
+
+        if (commentId instanceof Wrapped) {
+            return (Long) ((Wrapped) commentId).unwrap();
+        }
+
+        return ((Number) commentId).longValue();
     }
 
     @Override
@@ -397,68 +503,92 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     null);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteComment", new Object[]{containerId, taskId, commentId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
     public List<TaskComment> getTaskCommentsByTaskId(String containerId, Long taskId) {
+        TaskCommentList commentList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            TaskCommentList commentList = makeHttpGetRequestAndCreateCustomResponse(
+            commentList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_COMMENTS_GET_URI, valuesMap), TaskCommentList.class);
 
-            if (commentList.getTasks() != null) {
-                return Arrays.asList(commentList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getCommentsByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<TaskCommentList> response = (ServiceResponse<TaskCommentList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            commentList = response.getResult();
         }
+
+        if (commentList.getTasks() != null) {
+            return Arrays.asList(commentList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public TaskComment getTaskCommentById(String containerId, Long taskId, Long commentId) {
+        TaskComment taskComment = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(COMMENT_ID, commentId);
 
-            TaskComment taskComment = makeHttpGetRequestAndCreateCustomResponse(
+            taskComment = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_COMMENT_GET_URI, valuesMap), TaskComment.class);
 
-            return taskComment;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getCommentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, commentId}) ) );
+            ServiceResponse<TaskComment> response = (ServiceResponse<TaskComment>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskComment = response.getResult();
         }
+
+        return taskComment;
     }
 
     @Override
     public Long addTaskAttachment(String containerId, Long taskId, String userId, Object attachment) {
+        Object attachmentId = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            Object attachmentId = makeHttpPostRequestAndCreateCustomResponse(
+            attachmentId = makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserQueryStr(userId),
                     attachment, Object.class, getHeaders(null));
 
-            if (attachmentId instanceof Wrapped) {
-                return (Long) ((Wrapped) attachmentId).unwrap();
-            }
-
-            return ((Number) attachmentId).longValue();
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "addAttachment", serialize(attachment), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            attachmentId = deserialize(response.getResult(), Object.class);
         }
+        if (attachmentId instanceof Wrapped) {
+            return (Long) ((Wrapped) attachmentId).unwrap();
+        }
+
+        return ((Number) attachmentId).longValue();
     }
 
     @Override
@@ -474,91 +604,124 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     null);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteAttachment", new Object[]{containerId, taskId, attachmentId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
     public TaskAttachment getTaskAttachmentById(String containerId, Long taskId, Long attachmentId) {
+        TaskAttachment attachment = null;
+
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
-            TaskAttachment attachment = makeHttpGetRequestAndCreateCustomResponse(
+            attachment = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_ATTACHMENT_GET_URI, valuesMap), TaskAttachment.class);
 
-            return attachment;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getAttachmentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, attachmentId}) ) );
+            ServiceResponse<TaskAttachment> response = (ServiceResponse<TaskAttachment>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            attachment = response.getResult();
         }
+
+        return attachment;
     }
 
     @Override
     public Object getTaskAttachmentContentById(String containerId, Long taskId, Long attachmentId) {
+        Object result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
-            Object result = makeHttpGetRequestAndCreateCustomResponse(
+            result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap), Object.class);
 
-            if (result instanceof Wrapped) {
-                return ((Wrapped) result).unwrap();
-            }
-
-            return result;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getAttachmentContentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, attachmentId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = deserialize(response.getResult(), Object.class);
         }
+        if (result instanceof Wrapped) {
+            return ((Wrapped) result).unwrap();
+        }
+
+        return result;
+
     }
 
     @Override
     public List<TaskAttachment> getTaskAttachmentsByTaskId(String containerId, Long taskId) {
+        TaskAttachmentList attachmentList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            TaskAttachmentList attachmentList = makeHttpGetRequestAndCreateCustomResponse(
+            attachmentList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_ATTACHMENTS_GET_URI, valuesMap), TaskAttachmentList.class);
 
-            if (attachmentList.getTasks() != null) {
-                return Arrays.asList(attachmentList.getTasks());
-            }
 
-            return Collections.emptyList();
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getAttachmentsByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
+            ServiceResponse<TaskAttachmentList> response = (ServiceResponse<TaskAttachmentList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            attachmentList = response.getResult();
         }
+
+        if (attachmentList.getTasks() != null) {
+            return Arrays.asList(attachmentList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public TaskInstance getTaskInstance(String containerId, Long taskId) {
+        TaskInstance result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            TaskInstance result = makeHttpGetRequestAndCreateCustomResponse(
+            result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_GET_URI, valuesMap), TaskInstance.class);
 
-
-            return result;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getTask", marshaller.getFormat().getType(), new Object[]{containerId, taskId, false, false, false}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = deserialize(response.getResult(), TaskInstance.class);
         }
+
+        return result;
     }
 
     @Override
     public TaskInstance getTaskInstance(String containerId, Long taskId, boolean withInputs, boolean withOutputs, boolean withAssignments) {
+        TaskInstance result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
@@ -569,15 +732,19 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     .append("&withOutputData").append("=").append(withOutputs)
                     .append("&withAssignments").append("=").append(withAssignments);
 
-            TaskInstance result = makeHttpGetRequestAndCreateCustomResponse(
+            result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_INSTANCE_GET_URI, valuesMap) + queryString.toString(), TaskInstance.class);
 
-
-            return result;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "getTask", marshaller.getFormat().getType(), new Object[]{containerId, taskId, withInputs, withOutputs, withAssignments}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = deserialize(response.getResult(), TaskInstance.class);
         }
+
+        return result;
     }
 
     // task basic queries
@@ -593,7 +760,12 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "QueryService", "getTaskByWorkItemId", new Object[]{workItemId}) ) );
+            ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            return response.getResult();
         }
     }
 
@@ -608,33 +780,48 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "QueryService", "getTaskById", new Object[]{taskId}) ) );
+            ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            return response.getResult();
         }
     }
 
     @Override
     public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{new ArrayList(), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+
+
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
@@ -642,44 +829,56 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String statusQuery = getAdditionalParams(userQuery, "status", status);
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{safeList(status), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
 
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{new ArrayList(), new ArrayList(), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
@@ -687,22 +886,30 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String statusQuery = getAdditionalParams(userQuery, "status", status);
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), new ArrayList(), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
@@ -711,43 +918,57 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String groupsQuery = getAdditionalParams(statusQuery, "groups", groups);
             String queryString = getPagingQueryString(groupsQuery, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), safeList(groups), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{new ArrayList(), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
@@ -755,22 +976,28 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String statusQuery = getAdditionalParams(userQuery, "status", status);
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{safeList(status), userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
@@ -778,61 +1005,83 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String statusQuery = getAdditionalParams("", "status", status);
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksByStatusByProcessInstanceId", new Object[]{processInstanceId, safeList(status), page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize) {
+        TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
 
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
-            TaskSummaryList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
-                return Arrays.asList(taskSummaryList.getTasks());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getAllAuditTask", new Object[]{userId, page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+
+
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize) {
+        TaskEventInstanceList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             String queryString = getPagingQueryString("", page, pageSize);
 
-            TaskEventInstanceList taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, TASKS_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
 
-            if (taskSummaryList != null && taskSummaryList.getTaskEvents() != null) {
-                return Arrays.asList(taskSummaryList.getTaskEvents());
-            }
-
-            return Collections.emptyList();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTaskEvents", new Object[]{taskId, page, pageSize}) ) );
+            ServiceResponse<TaskEventInstanceList> response = (ServiceResponse<TaskEventInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            taskSummaryList = response.getResult();
         }
+
+
+        if (taskSummaryList != null && taskSummaryList.getTaskEvents() != null) {
+            return Arrays.asList(taskSummaryList.getTaskEvents());
+        }
+
+        return Collections.emptyList();
     }
+
 }

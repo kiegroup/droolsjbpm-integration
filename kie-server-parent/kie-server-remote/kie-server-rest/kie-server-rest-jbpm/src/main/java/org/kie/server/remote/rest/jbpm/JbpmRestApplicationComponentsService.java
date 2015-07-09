@@ -27,7 +27,11 @@ import org.jbpm.services.api.UserTaskService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.jbpm.DefinitionServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.kie.server.services.jbpm.UserTaskServiceBase;
 
 public class JbpmRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -69,10 +73,15 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             }
         }
         List<Object> components = new ArrayList<Object>(4);
-        components.add(new ProcessResource(processService, definitionService, runtimeDataService, context));
-        components.add(new RuntimeDataResource(runtimeDataService, context));
-        components.add(new DefinitionResource(definitionService));
-        components.add(new UserTaskResource(userTaskService, context));
+        DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService);
+        ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
+        UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
+        RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
+
+        components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
+        components.add(new RuntimeDataResource(runtimeDataServiceBase));
+        components.add(new DefinitionResource(definitionServiceBase));
+        components.add(new UserTaskResource(userTaskServiceBase));
 
         return components;
     }

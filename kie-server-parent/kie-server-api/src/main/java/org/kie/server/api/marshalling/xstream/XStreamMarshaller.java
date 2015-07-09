@@ -28,6 +28,7 @@ import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -82,6 +83,11 @@ public class XStreamMarshaller
     @Override
     public void dispose() {
         // nothing to do
+    }
+
+    @Override
+    public MarshallingFormat getFormat() {
+        return MarshallingFormat.XSTREAM;
     }
 
     @Override

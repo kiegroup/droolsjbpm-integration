@@ -43,6 +43,7 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
+import org.kie.server.api.marshalling.MarshallingFormat;
 
 public class JSONMarshaller implements Marshaller {
 
@@ -132,6 +133,11 @@ public class JSONMarshaller implements Marshaller {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public MarshallingFormat getFormat() {
+        return MarshallingFormat.JSON;
     }
 
     class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {

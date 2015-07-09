@@ -34,6 +34,7 @@ import org.kie.server.client.KieServicesException;
 
 import static org.junit.Assert.*;
 
+
 public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",

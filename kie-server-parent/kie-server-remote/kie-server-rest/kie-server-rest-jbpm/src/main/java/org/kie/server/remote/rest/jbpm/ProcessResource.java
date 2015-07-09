@@ -16,10 +16,7 @@
 package org.kie.server.remote.rest.jbpm;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -36,22 +33,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.model.ProcessDefinition;
-import org.jbpm.services.api.model.ProcessInstanceDesc;
-import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.KieInternalServices;
-import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.kie.server.services.jbpm.DefinitionServiceBase;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,17 +56,17 @@ public class ProcessResource  {
 
     public static final Logger logger = LoggerFactory.getLogger(ProcessResource.class);
 
-    private ProcessService processService;
-    private DefinitionService definitionService;
-    private RuntimeDataService runtimeDataService;
+    private ProcessServiceBase processServiceBase;
+    private DefinitionServiceBase definitionServiceBase;
+    private RuntimeDataServiceBase runtimeDataServiceBase;
     private MarshallerHelper marshallerHelper;
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
-    public ProcessResource(ProcessService processService, DefinitionService definitionService, RuntimeDataService runtimeDataService, KieServerRegistry context) {
-        this.processService = processService;
-        this.definitionService = definitionService;
-        this.runtimeDataService = runtimeDataService;
+    public ProcessResource(ProcessServiceBase processServiceBase, DefinitionServiceBase definitionService, RuntimeDataServiceBase runtimeDataServiceBase, KieServerRegistry context) {
+        this.processServiceBase = processServiceBase;
+        this.definitionServiceBase = definitionServiceBase;
+        this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.marshallerHelper = new MarshallerHelper(context);
     }
 
@@ -91,26 +83,10 @@ public class ProcessResource  {
     public Response startProcess(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId, @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
-        // Check for presence of process id
-        try {
-            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-            if( procDef == null ) {
-                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
-            }
-        } catch( Exception e ) {
-            logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(
-                        MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
-        }
-        logger.debug("About to unmarshal parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
 
-        logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
-        Long processInstanceId = processService.startProcess(containerId, processId, parameters);
-
-        // return response
         try {
-            String response = marshallerHelper.marshal(containerId, type, processInstanceId);
+            String response = processServiceBase.startProcess(containerId, processId, payload, type);
+
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
@@ -128,30 +104,10 @@ public class ProcessResource  {
             @PathParam("correlationKey") String correlationKey, @DefaultValue("") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
-        // Check for presence of process id
+
         try {
-            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-            if( procDef == null ) {
-                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
-            }
-        } catch( Exception e ) {
-            logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(
-                    MessageFormat.format(PROCESS_DEFINITION_FETCH_ERROR, processId, containerId, e.getMessage()), v);
-        }
-        logger.debug("About to unmarshal parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, type, Map.class);
+            String response = processServiceBase.startProcessWithCorrelation(containerId, processId, correlationKey, payload, type);
 
-        String[] correlationProperties = correlationKey.split(":");
-
-        CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
-
-        logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, parameters);
-        Long processInstanceId = processService.startProcess(containerId, processId, actualCorrelationKey, parameters);
-
-        // return response
-        try {
-            String response = marshallerHelper.marshal(containerId, type, processInstanceId);
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
@@ -168,7 +124,7 @@ public class ProcessResource  {
     public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
         try {
-            processService.abortProcessInstance(processInstanceId);
+            processServiceBase.abortProcessInstance(containerId, processInstanceId);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (ProcessInstanceNotFoundException e) {
@@ -190,7 +146,7 @@ public class ProcessResource  {
     public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("instanceId") List<Long> processInstanceIds) {
         Variant v = getVariant(headers);
         try {
-            processService.abortProcessInstances(processInstanceIds);
+            processServiceBase.abortProcessInstances(containerId, processInstanceIds);
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (ProcessInstanceNotFoundException e) {
@@ -207,6 +163,7 @@ public class ProcessResource  {
 
     @POST
     @Path(SIGNAL_PROCESS_INST_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response signalProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("sName") String signalName, String eventPayload) {
@@ -214,11 +171,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, Object.class);
 
-            logger.debug("Calling signal '{}' process instance with id {} on container {} and event {}", signalName, processInstanceId, containerId, event);
-            processService.signalProcessInstance(processInstanceId, signalName, event);
+            processServiceBase.signalProcessInstance(containerId, processInstanceId, signalName, eventPayload, type);
 
             return createResponse(null, v, Response.Status.OK);
 
@@ -235,18 +189,14 @@ public class ProcessResource  {
 
     @POST
     @Path(SIGNAL_PROCESS_INSTANCES_PORT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response signalProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @QueryParam("instanceId") List<Long> processInstanceIds, @PathParam("sName") String signalName, String eventPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-
-            logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-            Object event = marshallerHelper.unmarshal(containerId, eventPayload, type, Object.class);
-
-            logger.debug("Calling signal '{}' process instances with id {} on container {} and event {}", signalName, processInstanceIds, containerId, event);
-            processService.signalProcessInstances(processInstanceIds, signalName, event);
+            processServiceBase.signalProcessInstances(containerId, processInstanceIds, signalName, eventPayload, type);
 
             return createResponse("", v, Response.Status.OK);
 
@@ -269,31 +219,7 @@ public class ProcessResource  {
         String type = getContentType(headers);
         try {
 
-            ProcessInstanceDesc instanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
-            if (instanceDesc == null) {
-                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
-            }
-
-            org.kie.server.api.model.instance.ProcessInstance processInstance = org.kie.server.api.model.instance.ProcessInstance.builder()
-                    .id(instanceDesc.getId())
-                    .processId(instanceDesc.getProcessId())
-                    .processName(instanceDesc.getProcessName())
-                    .processVersion(instanceDesc.getProcessVersion())
-                    .state(instanceDesc.getState())
-                    .containerId(instanceDesc.getDeploymentId())
-                    .date(instanceDesc.getDataTimeStamp())
-                    .initiator(instanceDesc.getInitiator())
-                    .processInstanceDescription(instanceDesc.getProcessInstanceDescription())
-                    .parentInstanceId(instanceDesc.getParentId())
-                    .build();
-
-            if (Boolean.TRUE.equals(withVars)) {
-                Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId);
-                processInstance.setVariables(variables);
-            }
-
-            logger.debug("About to marshal process instance with id '{}' {}", processInstanceId, processInstance);
-            String response = marshallerHelper.marshal(containerId, type, processInstance);
+            String response = processServiceBase.getProcessInstance(containerId, processInstanceId, withVars, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -307,6 +233,7 @@ public class ProcessResource  {
 
     @PUT
     @Path(PROCESS_INSTANCE_VAR_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setProcessVariable(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName, String variablePayload) {
@@ -315,11 +242,7 @@ public class ProcessResource  {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal variable from payload: '{}'", variablePayload);
-            Object variable = marshallerHelper.unmarshal(containerId, variablePayload, type, Object.class);
-
-            logger.debug("Setting variable '{}' on process instance with id {} with value {}", varName, processInstanceId, variable);
-            processService.setProcessVariable(processInstanceId, varName, variable);
+            processServiceBase.setProcessVariable(containerId, processInstanceId, varName, variablePayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
 
@@ -335,6 +258,7 @@ public class ProcessResource  {
 
     @POST
     @Path(PROCESS_INSTANCE_VARS_POST_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setProcessVariables(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, String variablePayload) {
@@ -342,11 +266,7 @@ public class ProcessResource  {
         String type = getContentType(headers);
         try {
 
-            logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
-            Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, type, Map.class);
-
-            logger.debug("Setting variables '{}' on process instance with id {} with value {}", variables.keySet(), processInstanceId, variables.values());
-            processService.setProcessVariables(processInstanceId, variables);
+            processServiceBase.setProcessVariables(containerId, processInstanceId, variablePayload, type);
 
             return createResponse("", v, Response.Status.OK);
 
@@ -369,15 +289,7 @@ public class ProcessResource  {
         String type = getContentType(headers);
         try {
 
-            Object variable = processService.getProcessInstanceVariable(processInstanceId, varName);
-
-            if (variable == null) {
-                throw ExecutionServerRestOperationException.notFound(
-                        MessageFormat.format(VARIABLE_INSTANCE_NOT_FOUND, varName, processInstanceId), v);
-            }
-
-            logger.debug("About to marshal process variable with name '{}' {}", varName, variable);
-            String response = marshallerHelper.marshal(containerId, type, variable);
+            String response = processServiceBase.getProcessInstanceVariable(containerId, processInstanceId, varName, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -402,10 +314,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId);
 
-            logger.debug("About to marshal process variables {}", variables);
-            String response = marshallerHelper.marshal(containerId, type, variables);
+            String response = processServiceBase.getProcessInstanceVariables(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -432,10 +342,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            Collection<String> signals = processService.getAvailableSignals(processInstanceId);
 
-            logger.debug("About to marshal available signals {}", signals);
-            String response = marshallerHelper.marshal(containerId, type, signals);
+            String response = processServiceBase.getAvailableSignals(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -453,6 +361,7 @@ public class ProcessResource  {
 
     @PUT
     @Path(PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI)
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response completeWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId, String resultPayload) {
@@ -460,11 +369,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            logger.debug("About to unmarshal work item result from payload: '{}'", resultPayload);
-            Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, type, Map.class);
 
-            logger.debug("Completing work item '{}' on process instance id {} with value {}", workItemId, processInstanceId, results);
-            processService.completeWorkItem(workItemId, results);
+            processServiceBase.completeWorkItem(containerId, processInstanceId, workItemId, resultPayload, type);
 
             return createResponse("", v, Response.Status.CREATED);
 
@@ -487,8 +393,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
 
         try {
-            logger.debug("Aborting work item '{}' on process instance id {}", workItemId, processInstanceId);
-            processService.abortWorkItem(workItemId);
+
+            processServiceBase.abortWorkItem(containerId, processInstanceId, workItemId);
 
             return createResponse("", v, Response.Status.CREATED);
 
@@ -511,25 +417,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            WorkItem workItem = processService.getWorkItem(workItemId);
 
-            if (workItem == null) {
-                throw ExecutionServerRestOperationException.notFound(MessageFormat.format(WORK_ITEM_NOT_FOUND, workItemId), v);
-            }
-
-            WorkItemInstance workItemInstance = WorkItemInstance.builder()
-                    .id(workItem.getId())
-                    .nodeInstanceId(((org.drools.core.process.instance.WorkItem)workItem).getNodeInstanceId())
-                    .processInstanceId(workItem.getProcessInstanceId())
-                    .containerId(((org.drools.core.process.instance.WorkItem)workItem).getDeploymentId())
-                    .name(workItem.getName())
-                    .nodeId(((org.drools.core.process.instance.WorkItem)workItem).getNodeId())
-                    .parameters(workItem.getParameters())
-                    .state(workItem.getState())
-                    .build();
-
-            logger.debug("About to marshal work item {}", workItemInstance);
-            String response = marshallerHelper.marshal(containerId, type, workItemInstance);
+            String response = processServiceBase.getWorkItem(containerId, processInstanceId, workItemId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
@@ -553,27 +442,8 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            List<WorkItem> workItems = processService.getWorkItemByProcessInstance(processInstanceId);
 
-            WorkItemInstance[] instances = new WorkItemInstance[workItems.size()];
-            int counter = 0;
-            for (WorkItem workItem : workItems) {
-                WorkItemInstance workItemInstance = WorkItemInstance.builder()
-                        .id(workItem.getId())
-                        .nodeInstanceId(((org.drools.core.process.instance.WorkItem) workItem).getNodeInstanceId())
-                        .processInstanceId(workItem.getProcessInstanceId())
-                        .containerId(((org.drools.core.process.instance.WorkItem) workItem).getDeploymentId())
-                        .name(workItem.getName())
-                        .nodeId(((org.drools.core.process.instance.WorkItem) workItem).getNodeId())
-                        .parameters(workItem.getParameters())
-                        .state(workItem.getState())
-                        .build();
-                instances[counter] = workItemInstance;
-                counter++;
-            }
-            WorkItemInstanceList result = new WorkItemInstanceList(instances);
-            logger.debug("About to marshal work items {}", result);
-            String response = marshallerHelper.marshal(containerId, type, result);
+            String response = processServiceBase.getWorkItemByProcessInstance(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);

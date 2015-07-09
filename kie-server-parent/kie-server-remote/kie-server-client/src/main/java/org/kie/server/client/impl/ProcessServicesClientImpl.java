@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.internal.process.CorrelationKey;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
@@ -60,7 +64,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, PROCESS_DEF_GET_URI, valuesMap),
                     ProcessDefinition.class);
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getProcessDefinition",  new Object[]{containerId, processId}) ) );
+            ServiceResponse<ProcessDefinition> response = (ServiceResponse<ProcessDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -76,7 +84,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     SubProcessesDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getReusableSubProcesses", new Object[]{containerId, processId}) ) );
+            ServiceResponse<SubProcessesDefinition> response = (ServiceResponse<SubProcessesDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -92,7 +104,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     VariablesDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getProcessVariables", new Object[]{containerId, processId}) ) );
+            ServiceResponse<VariablesDefinition> response = (ServiceResponse<VariablesDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -108,7 +124,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     ServiceTasksDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getServiceTasks", new Object[]{containerId, processId}) ) );
+            ServiceResponse<ServiceTasksDefinition> response = (ServiceResponse<ServiceTasksDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -124,7 +144,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     AssociatedEntitiesDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getAssociatedEntities", new Object[]{containerId, processId}) ) );
+            ServiceResponse<AssociatedEntitiesDefinition> response = (ServiceResponse<AssociatedEntitiesDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -140,7 +164,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     UserTaskDefinitionList.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getTasksDefinitions", new Object[]{containerId, processId}) ) );
+            ServiceResponse<UserTaskDefinitionList> response = (ServiceResponse<UserTaskDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -157,7 +185,11 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     TaskInputsDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getTaskInputMappings", new Object[]{containerId, processId, taskName}) ) );
+            ServiceResponse<TaskInputsDefinition> response = (ServiceResponse<TaskInputsDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
@@ -174,36 +206,47 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     TaskOutputsDefinition.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getTaskOutputMappings", new Object[]{containerId, processId, taskName}) ) );
+            ServiceResponse<TaskOutputsDefinition> response = (ServiceResponse<TaskOutputsDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return response.getResult();
         }
     }
 
     @Override
     public Long startProcess(String containerId, String processId) {
-        return startProcess(containerId, processId, (Map<String, Object>) null);
+        return startProcess(containerId, processId, new HashMap<String, Object>());
     }
 
     @Override
     public Long startProcess(String containerId, String processId, Map<String, Object> variables) {
+        Object result = null;
+
         if( config.isRest() ) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_ID, processId);
 
-            Object result = makeHttpPostRequestAndCreateCustomResponse(
+            result = makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, START_PROCESS_POST_URI, valuesMap), variables,
                     Object.class);
 
-            if (result instanceof Wrapped) {
-                return (Long) ((Wrapped) result).unwrap();
-            }
-
-            return ((Number) result).longValue();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "startProcess", serialize(variables), marshaller.getFormat().getType(), new Object[]{containerId, processId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = deserialize(response.getResult(), Object.class);
         }
+
+        if (result instanceof Wrapped) {
+            return (Long) ((Wrapped) result).unwrap();
+        }
+
+        return ((Number) result).longValue();
     }
 
     @Override
@@ -213,6 +256,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
     @Override
     public Long startProcess(String containerId, String processId, CorrelationKey correlationKey, Map<String, Object> variables) {
+        Object result = null;
         if( config.isRest() ) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -220,19 +264,24 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
-            Object result = makeHttpPostRequestAndCreateCustomResponse(
+            result = makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap), variables,
                     Object.class);
 
-            if (result instanceof Wrapped) {
-                return (Long) ((Wrapped) result).unwrap();
-            }
-
-            return ((Number) result).longValue();
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "startProcessWithCorrelation", serialize(variables), marshaller.getFormat().getType(), new Object[]{containerId, processId, correlationKey.toExternalForm()}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = deserialize(response.getResult(), Object.class);
         }
+
+        if (result instanceof Wrapped) {
+            return (Long) ((Wrapped) result).unwrap();
+        }
+
+        return ((Number) result).longValue();
     }
 
     @Override
@@ -247,7 +296,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     null);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "abortProcessInstance", new Object[]{containerId, processInstanceId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -264,7 +316,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     null);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "abortProcessInstances", new Object[]{containerId, processInstanceIds})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -275,47 +330,59 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
     @Override
     public <T> T getProcessInstanceVariable(String containerId, Long processInstanceId, String variableName, Class<T> type) {
+        Object result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
             valuesMap.put(VAR_NAME, variableName);
 
-            Object result = makeHttpGetRequestAndCreateCustomResponse(
+            result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_VAR_GET_URI, valuesMap), type);
 
-            if (result instanceof Wrapped) {
-                return (T) ((Wrapped) result).unwrap();
-            }
-
-            return (T) result;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getProcessInstanceVariable",  marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, variableName}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = deserialize(response.getResult(), type);
         }
+
+        if (result instanceof Wrapped) {
+            return (T) ((Wrapped) result).unwrap();
+        }
+
+        return (T) result;
     }
 
     @Override
     public Map<String, Object> getProcessInstanceVariables(String containerId, Long processInstanceId) {
+        Object variables = null;
         if( config.isRest() ) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
-            Object variables = makeHttpGetRequestAndCreateCustomResponse(
+            variables = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_VARS_GET_URI, valuesMap),
                     Object.class);
 
-            if (variables instanceof Wrapped) {
-                return (Map) ((Wrapped) variables).unwrap();
-            }
-
-            return (Map) variables;
-
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getProcessInstanceVariables", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            variables = deserialize(response.getResult(), Object.class);
         }
+
+        if (variables instanceof Wrapped) {
+            return (Map) ((Wrapped) variables).unwrap();
+        }
+
+        return (Map) variables;
     }
 
     @Override
@@ -332,7 +399,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             makeHttpPostRequestAndCreateCustomResponse(
                     build(baseURI, SIGNAL_PROCESS_INST_POST_URI, valuesMap), event, String.class, headers);
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstance", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, signalName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -352,29 +422,39 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap) + queryStr
                     , event, String.class, headers);
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstances", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceIds, signalName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
     public List<String> getAvailableSignals(String containerId, Long processInstanceId) {
+        Object signals = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
-            Object signals = makeHttpGetRequestAndCreateCustomResponse(
+            signals = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_SIGNALS_GET_URI, valuesMap), Object.class);
 
-            if (signals instanceof Wrapped) {
-                return (List<String>) ((Wrapped)signals).unwrap();
-            }
-
-            return (List<String>) signals;
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getAvailableSignals", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            signals = deserialize(response.getResult(), Object.class);
         }
+
+        if (signals instanceof Wrapped) {
+            return (List<String>) ((Wrapped)signals).unwrap();
+        }
+
+        return (List<String>) signals;
     }
 
     @Override
@@ -387,7 +467,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             makeHttpPutRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_VAR_PUT_URI, valuesMap), value, String.class, getHeaders(null));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "setProcessVariable", serialize(value), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, variableId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -403,7 +486,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     String.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "setProcessVariables", serialize(variables), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -418,7 +504,12 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, PROCESS_INSTANCE_GET_URI, valuesMap) , ProcessInstance.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getProcessInstance", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, false} )) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return deserialize(response.getResult(), ProcessInstance.class);
         }
     }
 
@@ -433,7 +524,12 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, PROCESS_INSTANCE_GET_URI, valuesMap) + "?withVars=" + withVars , ProcessInstance.class);
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getProcessInstance", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, withVars}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return deserialize(response.getResult(), ProcessInstance.class);
         }
     }
 
@@ -449,7 +545,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI, valuesMap), results,
                     String.class, getHeaders(null));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "completeWorkItem", serialize(safeMap(results)), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, id})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -465,7 +564,10 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
                     build(baseURI, PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap), null,
                     String.class, getHeaders(null));
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "abortWorkItem",  new Object[]{containerId, processInstanceId, id})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
@@ -482,28 +584,41 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getWorkItem", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, id}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            return deserialize(response.getResult(), WorkItemInstance.class);
         }
     }
 
     @Override
     public List<WorkItemInstance> getWorkItemByProcessInstance(String containerId, Long processInstanceId) {
+        WorkItemInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
-            WorkItemInstanceList list = makeHttpGetRequestAndCreateCustomResponse(
+            list = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI, valuesMap), WorkItemInstanceList.class);
 
-            if (list != null && list.getWorkItems() != null) {
-                return Arrays.asList(list.getWorkItems());
-            }
 
-            return Collections.emptyList();
 
         } else {
-            throw new UnsupportedOperationException("Not yet supported");
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "getWorkItemByProcessInstance", marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            list = deserialize(response.getResult(), WorkItemInstanceList.class);
         }
+
+        if (list != null && list.getWorkItems() != null) {
+            return Arrays.asList(list.getWorkItems());
+        }
+
+        return Collections.emptyList();
     }
 }

@@ -41,6 +41,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
+
 public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
@@ -68,7 +69,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            localServerConfig.setTimeout(100000);
             localServerConfig.addJaxbClasses(extraClasses);
             kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
@@ -76,7 +76,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             configuration.addJaxbClasses(extraClasses);
             kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
-
+        configuration.setTimeout(5000);
         setupClients(kieServicesClient);
 
         return kieServicesClient;
@@ -98,45 +98,51 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         parameters.put("list", list);
         parameters.put("person", person);
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
 
-        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", parameters);
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
 
-        assertNotNull(processInstanceId);
-        assertTrue(processInstanceId.longValue() > 0);
+            Object personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
+            assertNotNull(personVariable);
+            assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
-        Object personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
-        assertNotNull(personVariable);
-        assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
+            personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
+            assertNotNull(personVariable);
+            assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
 
-        personVariable = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "person");
-        assertNotNull(personVariable);
-        assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
+            Map<String, Object> variables = processClient.getProcessInstanceVariables("definition-project", processInstanceId);
+            assertNotNull(variables);
+            assertEquals(4, variables.size());
+            assertTrue(variables.containsKey("test"));
+            assertTrue(variables.containsKey("number"));
+            assertTrue(variables.containsKey("list"));
+            assertTrue(variables.containsKey("person"));
 
-        Map<String, Object> variables = processClient.getProcessInstanceVariables("definition-project", processInstanceId);
-        assertNotNull(variables);
-        assertEquals(4, variables.size());
-        assertTrue(variables.containsKey("test"));
-        assertTrue(variables.containsKey("number"));
-        assertTrue(variables.containsKey("list"));
-        assertTrue(variables.containsKey("person"));
+            assertNotNull(variables.get("test"));
+            assertNotNull(variables.get("number"));
+            assertNotNull(variables.get("list"));
+            assertNotNull(variables.get("person"));
 
-        assertNotNull(variables.get("test"));
-        assertNotNull(variables.get("number"));
-        assertNotNull(variables.get("list"));
-        assertNotNull(variables.get("person"));
+            assertTrue(String.class.isAssignableFrom(variables.get("test").getClass()));
+            assertTrue(Integer.class.isAssignableFrom(variables.get("number").getClass()));
+            assertTrue(List.class.isAssignableFrom(variables.get("list").getClass()));
+            assertTrue(personClass.isAssignableFrom(variables.get("person").getClass()));
 
-        assertTrue(String.class.isAssignableFrom(variables.get("test").getClass()));
-        assertTrue(Integer.class.isAssignableFrom(variables.get("number").getClass()));
-        assertTrue(List.class.isAssignableFrom(variables.get("list").getClass()));
-        assertTrue(personClass.isAssignableFrom(variables.get("person").getClass()));
+            assertEquals("mary", variables.get("test"));
+            assertEquals(12345, variables.get("number"));
+            assertEquals(1, ((List) variables.get("list")).size());
+            assertEquals("item", ((List) variables.get("list")).get(0));
+            assertEquals("john", valueOf(variables.get("person"), "name"));
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance("definition-project", processInstanceId);
+            }
+        }
 
-        assertEquals("mary", variables.get("test"));
-        assertEquals(12345, variables.get("number"));
-        assertEquals(1, ((List)variables.get("list")).size());
-        assertEquals("item", ((List)variables.get("list")).get(0));
-        assertEquals("john", valueOf(variables.get("person"), "name"));
 
-        processClient.abortProcessInstance("definition-project", processInstanceId);
 
     }
 

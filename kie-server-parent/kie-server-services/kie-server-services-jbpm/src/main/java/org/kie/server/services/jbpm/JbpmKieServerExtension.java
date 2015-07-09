@@ -46,24 +46,29 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.executor.api.ExecutorService;
+import org.kie.internal.query.QueryContext;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +96,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private ExecutorService executorService;
 
+    private KieContainerCommandService kieContainerCommandService;
+
     @Override
     public boolean isActive() {
         return disabled == false;
@@ -105,7 +112,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
         // if no other callback set, use jaas by default
         if (callbackConfig == null) {
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
+            JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
         }
+
         this.isExecutorAvailable = isExecutorOnClasspath();
 
         this.kieServer = kieServer;
@@ -151,6 +160,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
+
+
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
             // build executor service
             executorService = ExecutorServiceFactory.newExecutorService(emf);
@@ -160,6 +171,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
             executorService.setTimeunit(TimeUnit.valueOf(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_TIME_UNIT, "SECONDS")));
             executorService.init();
         }
+
+        this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
+                new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
+                new RuntimeDataServiceBase(runtimeDataService, context), executorService);
     }
 
     @Override
@@ -240,6 +255,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
             logger.warn("No container with id {} found", id);
             return;
         }
+        List<Integer> states = new ArrayList<Integer>();
+        states.add(ProcessInstance.STATE_ACTIVE);
+        states.add(ProcessInstance.STATE_PENDING);
+        states.add(ProcessInstance.STATE_SUSPENDED);
+
+        // force all active instances to be aborted to properly dispose container
+        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByDeploymentId(id, states, new QueryContext(0, 100));
+        for (ProcessInstanceDesc instanceDesc : instances) {
+            processService.abortProcessInstance(instanceDesc.getId());
+        }
+
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
         deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         logger.info("Container {} disposed successfully", id);
@@ -267,6 +293,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
+        if (serviceType.isAssignableFrom(kieContainerCommandService.getClass())) {
+            return (T) kieContainerCommandService;
+        }
+
         return null;
     }
 

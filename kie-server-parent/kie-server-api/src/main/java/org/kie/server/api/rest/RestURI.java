@@ -71,6 +71,7 @@ public class RestURI {
     public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
     public static final String PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI = "process/instances/correlation/{" + CORRELATION_KEY + "}";
     public static final String PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI = "process/instances/{" + PROCESS_INST_ID + "}";
+    public static final String PROCESS_INSTANCE_BY_VAR_NAME_GET_URI = "process/instances/variables/{" + VAR_NAME + "}";
 
     public static final String PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definitions";
     public static final String PROCESS_DEFINITIONS_GET_URI = "process/definitions";

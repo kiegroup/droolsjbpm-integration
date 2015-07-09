@@ -53,7 +53,7 @@ public class TaskInstance {
     @XmlElement(name="task-activation-time")
     private Date activationTime;
     @XmlElement(name="task-expiration-time")
-    private Date expirationTime;
+    private Date expirationDate;
     @XmlElement(name="task-skippable")
     private Boolean skipable;
     @XmlElement(name="task-workitem-id")
@@ -188,12 +188,12 @@ public class TaskInstance {
         this.activationTime = activationTime;
     }
 
-    public Date getExpirationTime() {
-        return expirationTime;
+    public Date getExpirationDate() {
+        return expirationDate;
     }
 
-    public void setExpirationTime(Date expirationTime) {
-        this.expirationTime = expirationTime;
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public Boolean getSkipable() {
@@ -367,7 +367,7 @@ public class TaskInstance {
         }
 
         public Builder expirationTime(Date expirationTime) {
-            taskInstance.setExpirationTime(expirationTime);
+            taskInstance.setExpirationDate(expirationTime);
             return this;
         }
 

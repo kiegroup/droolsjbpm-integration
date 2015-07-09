@@ -17,6 +17,7 @@ package org.kie.server.api.marshalling.jaxb;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
+import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
@@ -39,6 +41,7 @@ import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -64,6 +67,7 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 
@@ -82,6 +86,7 @@ public class JaxbMarshaller implements Marshaller {
                 GetServerInfoCommand.class,
                 UpdateScannerCommand.class,
                 UpdateReleaseIdCommand.class,
+                DescriptorCommand.class,
 
                 KieContainerResource.class,
                 KieContainerResourceList.class,
@@ -100,6 +105,7 @@ public class JaxbMarshaller implements Marshaller {
 
                 JaxbList.class,
                 JaxbMap.class,
+                JaxbDate.class,
 
                 ProcessDefinition.class,
                 ProcessDefinitionList.class,
@@ -121,7 +127,9 @@ public class JaxbMarshaller implements Marshaller {
                 TaskEventInstanceList.class,
 
                 WorkItemInstance.class,
-                WorkItemInstanceList.class
+                WorkItemInstanceList.class,
+
+                ArrayList.class
         };
     }
 
@@ -144,6 +152,7 @@ public class JaxbMarshaller implements Marshaller {
 
             this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
             this.marshaller = jaxbContext.createMarshaller();
+            this.marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
             this.unmarshaller = jaxbContext.createUnmarshaller();
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Error while creating JAXB context from default classes!", e );
@@ -174,5 +183,10 @@ public class JaxbMarshaller implements Marshaller {
     @Override
     public void dispose() {
 
+    }
+
+    @Override
+    public MarshallingFormat getFormat() {
+        return MarshallingFormat.JAXB;
     }
 }

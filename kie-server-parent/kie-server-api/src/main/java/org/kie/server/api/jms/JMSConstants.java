@@ -21,4 +21,8 @@ public class JMSConstants {
     public static final String CONTAINER_ID_PROPERTY_NAME         = "container_id";
 
     public static final String CLASS_TYPE_PROPERTY_NAME = "kie_class_type";
+
+    public static final String TARGET_CAPABILITY_PROPERTY_NAME = "kie_target_capability";
+    public static final String USER_PROPERTY_NAME = "kie_user";
+    public static final String PASSWRD_PROPERTY_NAME = "kie_password";
 }

@@ -48,6 +48,10 @@ public interface QueryServicesClient {
 
     List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize);
 
+    List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize);
+
+    List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize);
+
     ProcessInstance findProcessInstanceById(Long processInstanceId);
 
     ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey);

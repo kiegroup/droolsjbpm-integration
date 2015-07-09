@@ -41,7 +41,7 @@ public final class KieServicesConfigurationImpl
     public static final String REQUEST_QUEUE_NAME          = "jms/queue/KIE.SERVER.REQUEST";
     public static final String RESPONSE_QUEUE_NAME         = "jms/queue/KIE.SERVER.RESPONSE";
 
-    private             long timeoutInMillisecs      = 5000; // in milliseconds
+    private             long timeoutInMillisecs      = 10000; // in milliseconds
 
     // REST or JMS
     private final Transport transport;

@@ -16,13 +16,19 @@
 package org.kie.server.api.marshalling;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
 import org.kie.server.api.model.type.JaxbCharacter;
+import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbDouble;
 import org.kie.server.api.model.type.JaxbFloat;
 import org.kie.server.api.model.type.JaxbInteger;
@@ -59,11 +65,23 @@ public class ModelWrapper {
 
     public static Object wrapSkipPrimitives(Object object) {
 
-         if (object instanceof List) {
+        if (object instanceof List) {
             return new JaxbList((List) object);
         } else if (object instanceof Map) {
             return new JaxbMap((Map) object);
-        }
+        } else if (object instanceof Date) {
+            return new JaxbDate((Date) object);
+        } else if (object instanceof CommandScript) {
+             for (KieServerCommand cmd : ((CommandScript) object).getCommands()) {
+                 if (cmd instanceof DescriptorCommand) {
+                     List<Object> arguments = new ArrayList<Object>();
+                     for (Object o : ((DescriptorCommand) cmd).getArguments()) {
+                         arguments.add(wrap(o));
+                     }
+                     ((DescriptorCommand) cmd).setArguments(arguments);
+                 }
+             }
+         }
 
         return object;
     }

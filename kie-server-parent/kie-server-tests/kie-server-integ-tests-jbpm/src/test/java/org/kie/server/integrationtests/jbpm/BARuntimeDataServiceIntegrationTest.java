@@ -36,6 +36,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
+
 public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
@@ -72,7 +73,7 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             configuration.setUserName("Administrator");
             kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
-
+        configuration.setTimeout(5000);
         setupClients(kieServicesClient);
 
         return kieServicesClient;

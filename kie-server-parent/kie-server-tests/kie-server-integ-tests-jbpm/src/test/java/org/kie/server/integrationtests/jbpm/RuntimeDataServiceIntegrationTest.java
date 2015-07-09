@@ -49,6 +49,8 @@ import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
+
+
 public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
@@ -86,6 +88,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             configuration.addJaxbClasses(extraClasses);
             kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+        configuration.setTimeout(5000);
 
         setupClients(kieServicesClient);
 
@@ -522,6 +525,80 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
         }
+    }
+
+    @Test
+    public void testGetProcessInstancesByVariableName() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariable("stringData", null, 0, 10);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            List<Long> found = collectInstances(instances);
+            assertEquals(processInstanceIds, found);
+
+            instances = queryClient.findProcessInstancesByVariable("stringData", null, 0, 3);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+
+            instances = queryClient.findProcessInstancesByVariable("stringData", null, 1, 3);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+
+    }
+
+    @Test
+    public void testGetProcessInstancesByVariableNameAndValue() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            List<Long> found = collectInstances(instances);
+            assertEquals(processInstanceIds, found);
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 3);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 1, 3);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+            processClient.setProcessVariable("definition-project", processInstanceIds.get(0), "stringData", "updated value");
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10);
+            assertNotNull(instances);
+            assertEquals(4, instances.size());
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "updated value", null, 0, 10);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+
     }
 
     @Test

@@ -64,7 +64,7 @@ public abstract class RestJmsXstreamSharedBaseIntegrationTest extends KieServerB
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            localServerConfig.setTimeout(100000);
+
             kieServicesClient = KieServicesFactory.newKieServicesClient(localServerConfig);
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
