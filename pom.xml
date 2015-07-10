@@ -82,9 +82,15 @@
     </profile>
     <profile>
       <id>android</id>
+      <!-- Do not active the profile automatically even if the ANDROID_HOME is set.
+           On most CI machines, the ANDROID_HOME is set, but the SDK is outdated and
+           the build then fails.
+
+           One needs to use "-Pandroid" explicitly to get the profile activated.
       <activation>
         <file><exists>${env.ANDROID_HOME}</exists></file>
       </activation>
+      -->
       <modules>
         <module>drools-examples-android</module>
       </modules>
