@@ -15,6 +15,8 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -631,6 +633,54 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
             changeUser(TestConfig.getUsername());
+        }
+    }
+
+    @Test
+    public void testUserTaskSetTaskProperties() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // verify current task properties
+            assertEquals(0, taskSummary.getPriority().intValue());
+            assertNull(taskSummary.getExpirationTime());
+            assertTrue(taskSummary.getSkipable().booleanValue());
+            assertEquals("First task", taskSummary.getName());
+            assertTrue(taskSummary.getDescription().isEmpty());
+
+            // set task properties
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.add(Calendar.DAY_OF_YEAR, 1);
+            Date expirationDate = currentTime.getTime();
+            taskClient.setTaskDescription("definition-project", taskSummary.getId(), "Simple user task.");
+            taskClient.setTaskExpirationDate("definition-project", taskSummary.getId(), expirationDate);
+            taskClient.setTaskName("definition-project", taskSummary.getId(), "Modified name");
+            taskClient.setTaskPriority("definition-project", taskSummary.getId(), 10);
+            taskClient.setTaskSkipable("definition-project", taskSummary.getId(), false);
+
+            // start task
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
+
+            // retrieve started task
+            TaskInstance taskInstance = taskClient.getTaskInstance("definition-project", taskSummary.getId());
+
+            // verify modified task properties
+            assertEquals(10, taskInstance.getPriority().intValue());
+            assertEquals(expirationDate.getTime(), taskInstance.getExpirationTime().getTime());
+            assertFalse(taskInstance.getSkipable().booleanValue());
+            assertEquals("Modified name", taskInstance.getName());
+            assertEquals("Simple user task.", taskInstance.getDescription());
+        } finally {
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 
