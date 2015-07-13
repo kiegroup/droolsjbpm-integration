@@ -47,7 +47,6 @@
     <module>org-junit</module>
     <module>org-apache-xmlbeans</module>
     <module>org-apache-commons-lang3</module>
-
     <module>aopalliance</module>
     <module>asm</module>
     <module>ch-qos-logback</module>
@@ -76,6 +75,7 @@
     <module>xmlpull</module>
     <module>xpp3</module>
     <module>com-google-code-gson</module>
+    <module>com-fasterxml-jackson</module>
   </modules>
 
 </project>
