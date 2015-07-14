@@ -29,6 +29,7 @@ import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
@@ -43,6 +44,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
+
+    private static final String CONTAINER_ID = "definition-project";
 
 
     @BeforeClass
@@ -681,6 +684,66 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("Simple user task.", taskInstance.getDescription());
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    /**
+     * Test verifying client methods concerning task comments - addTaskComment(), getTaskCommentById(), getTaskCommentsByTaskId().
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUserTaskComments() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // Adding comment to user task as yoda.
+            String firstComment = "First comment.";
+            Calendar firstCommentTime = Calendar.getInstance();
+            Long firstCommentId = taskClient.addTaskComment(CONTAINER_ID, taskSummary.getId(), firstComment, USER_YODA, firstCommentTime.getTime());
+
+            // Adding second comment to user task as john.
+            String secondComment = "Second comment.";
+            Calendar secondCommentTime = Calendar.getInstance();
+            secondCommentTime.add(Calendar.MINUTE, 5);
+            Long secondCommentId = taskClient.addTaskComment(CONTAINER_ID, taskSummary.getId(), secondComment, USER_JOHN, secondCommentTime.getTime());
+
+            // start task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            // Verifying first comment returned by getTaskCommentById().
+            TaskComment firstTaskComment = taskClient.getTaskCommentById(CONTAINER_ID, taskSummary.getId(), firstCommentId);
+            assertEquals(firstCommentTime.getTime(), firstTaskComment.getAddedAt());
+            assertEquals(USER_YODA, firstTaskComment.getAddedBy());
+            assertEquals(firstCommentId, firstTaskComment.getId());
+            assertEquals(firstComment, firstTaskComment.getText());
+
+            // Verifying second comment returned by getTaskCommentsByTaskId().
+            List<TaskComment> taskComments = taskClient.getTaskCommentsByTaskId(CONTAINER_ID, taskSummary.getId());
+            assertEquals(2, taskComments.size());
+            TaskComment secondTaskComment = taskComments.get(1);
+            assertEquals(secondCommentTime.getTime(), secondTaskComment.getAddedAt());
+            assertEquals(USER_JOHN, secondTaskComment.getAddedBy());
+            assertEquals(secondCommentId, secondTaskComment.getId());
+            assertEquals(secondComment, secondTaskComment.getText());
+
+            // Delete task comment.
+            taskClient.deleteTaskComment(CONTAINER_ID, taskSummary.getId(), secondCommentId);
+
+            // Now there is just one comment left.
+            taskComments = taskClient.getTaskCommentsByTaskId(CONTAINER_ID, taskSummary.getId());
+            assertEquals(1, taskComments.size());
+            assertEquals(firstCommentId, taskComments.get(0).getId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
     }
 
