@@ -35,6 +35,10 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
 
+    protected static final String USER_YODA = "yoda";
+    protected static final String USER_JOHN = "john";
+
+    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
 
     protected ProcessServicesClient processClient;
     protected UserTaskServicesClient taskClient;
