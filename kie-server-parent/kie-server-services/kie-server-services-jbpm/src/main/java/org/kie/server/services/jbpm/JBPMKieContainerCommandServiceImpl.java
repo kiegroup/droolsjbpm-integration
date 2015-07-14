@@ -49,19 +49,19 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     private ProcessServiceBase processServiceBase;
     private UserTaskServiceBase userTaskServiceBase;
     private RuntimeDataServiceBase runtimeDataServiceBase;
+    private ExecutorServiceBase executorServiceBase;
 
-    private ExecutorService executorService;
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
-            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorService executorService) {
+            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase) {
         this.context = context;
         this.deploymentService = deploymentService;
         this.definitionServiceBase = definitionServiceBase;
         this.processServiceBase = processServiceBase;
         this.userTaskServiceBase = userTaskServiceBase;
         this.runtimeDataServiceBase = runtimeDataServiceBase;
-        this.executorService = executorService;
+        this.executorServiceBase = executorServiceBase;
     }
 
     @Override
@@ -92,7 +92,9 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     handler = userTaskServiceBase;
                 } else if ("QueryService".equals(descriptorCommand.getService())) {
                     handler = runtimeDataServiceBase;
-                }  else {
+                } else if ("JobService".equals(descriptorCommand.getService())) {
+                    handler = executorServiceBase;
+                } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }
 

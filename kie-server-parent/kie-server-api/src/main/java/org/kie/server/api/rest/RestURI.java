@@ -34,6 +34,9 @@ public class RestURI {
     public static final String ATTACHMENT_ID = "attachmentId";
     public static final String CORRELATION_KEY = "correlationKey";
     public static final String WORK_ITEM_ID = "workItemId";
+    public static final String JOB_ID = "jobId";
+    public static final String JOB_CMD_NAME = "cmd";
+    public static final String JOB_KEY = "key";
 
     // uris
     // process related
@@ -135,6 +138,15 @@ public class RestURI {
     public static final String TASK_GET_URI = "task/instances/{" + TASK_INSTANCE_ID + "}";
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "task/instances/workitem/{" + WORK_ITEM_ID + "}";
     public static final String TASK_BY_PROCESS_INST_ID_GET_URI = "task/instances/process/{" + PROCESS_INST_ID + "}";
+
+    // job executor
+    public static final String SCHEDULE_JOB_POST_URI = "jobs";
+    public static final String CANCEL_JOB_DEL_URI = "jobs/{" + JOB_ID + "}";
+    public static final String REQUEUE_JOB_PUT_URI = "jobs/{" + JOB_ID + "}";
+    public static final String JOB_INSTANCES_GET_URI = "jobs";
+    public static final String JOB_INSTANCES_BY_KEY_GET_URI = "jobs/key/{" + JOB_KEY + "}";
+    public static final String JOB_INSTANCES_BY_CMD_GET_URI = "jobs/command/{" + JOB_CMD_NAME + "}";
+    public static final String JOB_INSTANCE_GET_URI = "jobs/{" + JOB_ID + "}";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

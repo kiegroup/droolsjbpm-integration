@@ -24,10 +24,12 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.kie.internal.executor.api.ExecutorService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
+import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.jbpm.ProcessServiceBase;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
@@ -48,6 +50,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         RuntimeDataService runtimeDataService = null;
         DefinitionService definitionService = null;
         UserTaskService userTaskService = null;
+        ExecutorService executorService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -67,21 +70,26 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( UserTaskService.class.isAssignableFrom(object.getClass()) ) {
                 userTaskService = (UserTaskService) object;
                 continue;
+            } else if( ExecutorService.class.isAssignableFrom(object.getClass()) ) {
+                executorService = (ExecutorService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
             }
         }
-        List<Object> components = new ArrayList<Object>(4);
+        List<Object> components = new ArrayList<Object>(5);
         DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService);
         ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
         RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
+        ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase));
         components.add(new DefinitionResource(definitionServiceBase));
         components.add(new UserTaskResource(userTaskServiceBase));
+        components.add(new ExecutorResource(executorServiceBase));
 
         return components;
     }

@@ -32,10 +32,15 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.ErrorInfoInstance;
+import org.kie.server.api.model.instance.ErrorInfoInstanceList;
+import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -113,7 +118,12 @@ public class ServiceResponse<T> {
         @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
         @XmlElement(name = "task-event-instance-list", type = TaskEventInstanceList.class),
         @XmlElement(name = "work-item-instance", type = WorkItemInstance.class),
-        @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class)
+        @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class),
+        @XmlElement(name = "request-info-instance", type = RequestInfoInstance.class),
+        @XmlElement(name = "request-info-instance-list", type = RequestInfoInstanceList.class),
+        @XmlElement(name = "error-info-instance", type = ErrorInfoInstance.class),
+        @XmlElement(name = "error-info-instance-list", type = ErrorInfoInstanceList.class),
+        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class)
 
     })
     private T result;

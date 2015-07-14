@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
+import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
@@ -39,6 +40,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected ProcessServicesClient processClient;
     protected UserTaskServicesClient taskClient;
     protected QueryServicesClient queryClient;
+    protected JobServicesClient jobServicesClient;
 
     @Before
     public void cleanup() {
@@ -58,6 +60,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         this.processClient = client.getServicesClient(ProcessServicesClient.class);
         this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
         this.queryClient = client.getServicesClient(QueryServicesClient.class);
+        this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
     }
 
     protected Object createPersonInstance(String name) {

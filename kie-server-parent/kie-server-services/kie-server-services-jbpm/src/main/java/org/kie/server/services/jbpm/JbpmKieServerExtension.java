@@ -174,7 +174,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
-                new RuntimeDataServiceBase(runtimeDataService, context), executorService);
+                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context));
     }
 
     @Override

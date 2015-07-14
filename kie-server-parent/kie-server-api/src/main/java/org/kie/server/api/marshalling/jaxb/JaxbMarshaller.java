@@ -54,10 +54,15 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.ErrorInfoInstance;
+import org.kie.server.api.model.instance.ErrorInfoInstanceList;
+import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -128,6 +133,12 @@ public class JaxbMarshaller implements Marshaller {
 
                 WorkItemInstance.class,
                 WorkItemInstanceList.class,
+
+                RequestInfoInstance.class,
+                RequestInfoInstanceList.class,
+                ErrorInfoInstance.class,
+                ErrorInfoInstanceList.class,
+                JobRequestInstance.class,
 
                 ArrayList.class
         };
