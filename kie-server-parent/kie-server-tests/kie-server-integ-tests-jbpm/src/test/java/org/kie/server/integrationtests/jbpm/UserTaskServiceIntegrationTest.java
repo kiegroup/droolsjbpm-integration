@@ -687,11 +687,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
-    /**
-     * Test verifying client methods concerning task comments - addTaskComment(), getTaskCommentById(), getTaskCommentsByTaskId().
-     *
-     * @throws Exception
-     */
     @Test
     public void testUserTaskComments() throws Exception {
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));

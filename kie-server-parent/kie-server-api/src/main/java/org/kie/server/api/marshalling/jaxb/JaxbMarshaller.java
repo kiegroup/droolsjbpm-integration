@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.kie.api.task.model.Task;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -63,6 +64,10 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
+import org.kie.server.api.model.instance.TaskAttachment;
+import org.kie.server.api.model.instance.TaskAttachmentList;
+import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -130,6 +135,11 @@ public class JaxbMarshaller implements Marshaller {
 
                 TaskEventInstance.class,
                 TaskEventInstanceList.class,
+
+                TaskComment.class,
+                TaskCommentList.class,
+                TaskAttachment.class,
+                TaskAttachmentList.class,
 
                 WorkItemInstance.class,
                 WorkItemInstanceList.class,
