@@ -29,6 +29,7 @@ import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -737,6 +738,94 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             taskComments = taskClient.getTaskCommentsByTaskId(CONTAINER_ID, taskSummary.getId());
             assertEquals(1, taskComments.size());
             assertEquals(firstCommentId, taskComments.get(0).getId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testUserTaskAttachments() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // Adding attachments to user task.
+            Object firstAttachmentContent = createPersonInstance("mary");
+            Long firstAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, firstAttachmentContent);
+            String secondAttachmentContent = "This is second attachment.";
+            Long secondAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_JOHN, secondAttachmentContent);
+
+            // start task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            // Verifying first attachment returned by getTaskAttachmentById().
+            TaskAttachment firstTaskAttachment = taskClient.getTaskAttachmentById(CONTAINER_ID, taskSummary.getId(), firstAttachmentId);
+            assertNotNull(firstTaskAttachment.getAddedAt());
+            assertEquals(USER_YODA, firstTaskAttachment.getAddedBy());
+            assertNotNull(firstTaskAttachment.getAttachmentContentId());
+            assertEquals(firstAttachmentContent.getClass().getName(), firstTaskAttachment.getContentType());
+            assertEquals(firstAttachmentId, firstTaskAttachment.getId());
+            assertNotNull(firstTaskAttachment.getName());
+            assertNotNull(firstTaskAttachment.getSize());
+
+            // Verifying second attachment returned by getTaskAttachmentsByTaskId().
+            List<TaskAttachment> taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary.getId());
+            assertEquals(2, taskAttachments.size());
+            TaskAttachment secondTaskAttachment = taskAttachments.get(1);
+            assertNotNull(secondTaskAttachment.getAddedAt());
+            assertEquals(USER_JOHN, secondTaskAttachment.getAddedBy());
+            assertNotNull(secondTaskAttachment.getAttachmentContentId());
+            assertEquals(String.class.getName(), secondTaskAttachment.getContentType());
+            assertEquals(secondAttachmentId, secondTaskAttachment.getId());
+            assertNotNull(secondTaskAttachment.getName());
+            assertNotNull(secondTaskAttachment.getSize());
+
+            // Verifying second attachment content returned by getTaskAttachmentContentById().
+            Object taskAttachmentContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary.getId(), secondAttachmentId);
+            assertEquals(secondAttachmentContent, taskAttachmentContent);
+
+            // Delete task attachment.
+            taskClient.deleteTaskAttachment(CONTAINER_ID, taskSummary.getId(), firstAttachmentId);
+
+            // Now there is just one attachment left.
+            taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary.getId());
+            assertEquals(1, taskAttachments.size());
+            assertEquals(secondAttachmentId, taskAttachments.get(0).getId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testUserTaskAttachmentsAsByteArray() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+
+            // Adding attachments to user task.
+            byte[] attachmentContent = new String("This is first attachment.").getBytes();
+            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, attachmentContent);
+
+            // start task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            // Verifying attachment returned by getTaskAttachmentById().
+            Object taskAttachmentContent = taskClient.getTaskAttachmentContentById(CONTAINER_ID, taskSummary.getId(), attachmentId);
+            assertArrayEquals(attachmentContent, (byte[])taskAttachmentContent);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
