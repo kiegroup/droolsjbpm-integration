@@ -26,12 +26,13 @@ import java.util.Map;
 
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.jbpm.executor.RequeueAware;
-import org.kie.internal.executor.api.CommandContext;
-import org.kie.internal.executor.api.ErrorInfo;
-import org.kie.internal.executor.api.ExecutionResults;
-import org.kie.internal.executor.api.ExecutorService;
-import org.kie.internal.executor.api.RequestInfo;
-import org.kie.internal.executor.api.STATUS;
+import org.kie.api.executor.CommandContext;
+import org.kie.api.executor.ErrorInfo;
+import org.kie.api.executor.ExecutionResults;
+import org.kie.api.executor.ExecutorService;
+import org.kie.api.executor.RequestInfo;
+import org.kie.api.executor.STATUS;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.model.instance.ErrorInfoInstance;
 import org.kie.server.api.model.instance.ErrorInfoInstanceList;
 import org.kie.server.api.model.instance.JobRequestInstance;
@@ -99,7 +100,6 @@ public class ExecutorServiceBase {
 
     public RequestInfoInstanceList getRequestsByStatus(List<String> statuses, Integer page, Integer pageSize) {
 
-        // TODO use paging when executor service supports it
         List<STATUS> statusList = new ArrayList<STATUS>();
         if (statuses != null && !statuses.isEmpty()) {
             for (String status : statuses) {
@@ -108,7 +108,7 @@ public class ExecutorServiceBase {
         } else {
             statusList.add(STATUS.QUEUED);
         }
-        List<RequestInfo> requests = executorService.getRequestsByStatus(statusList);
+        List<RequestInfo> requests = executorService.getRequestsByStatus(statusList, buildQueryContext(page, pageSize));
 
         RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
 
@@ -116,8 +116,8 @@ public class ExecutorServiceBase {
     }
 
     public RequestInfoInstanceList getRequestsByBusinessKey(String businessKey, Integer page, Integer pageSize) {
-        // TODO use paging when executor service supports it
-        List<RequestInfo> requests = executorService.getRequestsByBusinessKey(businessKey);
+
+        List<RequestInfo> requests = executorService.getRequestsByBusinessKey(businessKey, buildQueryContext(page, pageSize));
 
         RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
 
@@ -125,14 +125,12 @@ public class ExecutorServiceBase {
     }
 
     public RequestInfoInstanceList getRequestsByCommand(String command, Integer page, Integer pageSize) {
-        // TODO use paging when executor service supports it and enable this method when executor service support it
-//        List<RequestInfo> requests = executorService.getRequestsByCommand(businessKey);
-//
-//        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
-//
-//        return result;
 
-        return new RequestInfoInstanceList();
+        List<RequestInfo> requests = executorService.getRequestsByCommand(command, buildQueryContext(page, pageSize));
+
+        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
+
+        return result;
     }
 
     // instance details
@@ -241,5 +239,9 @@ public class ExecutorServiceBase {
         }
 
         return new HashMap<String, Object>();
+    }
+
+    protected QueryContext buildQueryContext(Integer page, Integer pageSize) {
+        return new QueryContext(page * pageSize, pageSize);
     }
 }
