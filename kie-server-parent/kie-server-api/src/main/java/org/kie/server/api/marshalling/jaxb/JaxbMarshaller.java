@@ -77,6 +77,7 @@ import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
@@ -116,6 +117,7 @@ public class JaxbMarshaller implements Marshaller {
                 JaxbList.class,
                 JaxbMap.class,
                 JaxbDate.class,
+                JaxbByteArray.class,
 
                 ProcessDefinition.class,
                 ProcessDefinitionList.class,

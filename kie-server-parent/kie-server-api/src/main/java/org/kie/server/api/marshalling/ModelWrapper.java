@@ -27,6 +27,7 @@ import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
+import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbCharacter;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbDouble;
@@ -51,6 +52,7 @@ public class ModelWrapper {
         wrapperPrimitives.put(Double.class, JaxbDouble.class);
         wrapperPrimitives.put(Float.class, JaxbFloat.class);
         wrapperPrimitives.put(String.class, JaxbString.class);
+        wrapperPrimitives.put(byte[].class, JaxbByteArray.class);
 
     }
 

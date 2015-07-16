@@ -337,13 +337,13 @@ public class UserTaskServiceBase {
         return response;
     }
 
-    public String addAttachment(String containerId, Number taskId, String userId, String attachmentPayload, String marshallingType) {
+    public String addAttachment(String containerId, Number taskId, String userId, String name, String attachmentPayload, String marshallingType) {
 
         logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
         Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, marshallingType, Object.class);
 
         logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
-        Long attachmentId = userTaskService.addAttachment(taskId.longValue(), getUser(userId), attachment);
+        Long attachmentId = userTaskService.addAttachment(taskId.longValue(), getUser(userId), name, attachment);
 
         String response = marshallerHelper.marshal(containerId, marshallingType, attachmentId);
 

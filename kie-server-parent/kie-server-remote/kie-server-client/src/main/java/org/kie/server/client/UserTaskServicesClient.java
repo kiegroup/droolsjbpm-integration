@@ -82,7 +82,7 @@ public interface UserTaskServicesClient {
 
     TaskComment getTaskCommentById(String containerId, Long taskId, Long commentId);
 
-    Long addTaskAttachment(String containerId, Long taskId, String userId, Object attachment);
+    Long addTaskAttachment(String containerId, Long taskId, String userId, String name, Object attachment);
 
     void deleteTaskAttachment(String containerId, Long taskId, Long attachmentId);
 

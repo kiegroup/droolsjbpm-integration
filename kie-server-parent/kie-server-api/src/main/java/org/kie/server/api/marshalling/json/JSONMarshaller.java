@@ -18,6 +18,7 @@ package org.kie.server.api.marshalling.json;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,19 +45,25 @@ import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.type.JaxbByteArray;
 
 public class JSONMarshaller implements Marshaller {
 
     private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
-//    private final ObjectMapper wrappedObjectMapper;
-
     private final ObjectMapper fallbackObjectMapper;
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         objectMapper = new ObjectMapper();
+
+        if (classes == null) {
+            classes = new HashSet<Class<?>>();
+        }
+        // add byte array handling support to allow byte[] to be send as payload
+        classes.add(JaxbByteArray.class);
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
@@ -81,6 +88,7 @@ public class JSONMarshaller implements Marshaller {
             for (Class<?> clazz : classes) {
                 mod.addSerializer(clazz, customObjectSerializer);
             }
+
             objectMapper.registerModule(mod);
         }
 
@@ -96,14 +104,13 @@ public class JSONMarshaller implements Marshaller {
                 customClasses.add(new NamedType(clazz, clazz.getName()));
             }
         }
-
         return customClasses;
     }
 
     @Override
     public String marshall(Object objectInput) {
         try {
-            return objectMapper.writeValueAsString(objectInput);
+            return objectMapper.writeValueAsString(wrap(objectInput));
 
         } catch (IOException e) {
             throw new MarshallingException("Error marshalling input", e);
@@ -114,12 +121,12 @@ public class JSONMarshaller implements Marshaller {
     public <T> T unmarshall(String serializedInput, Class<T> type) {
         try {
 
-            return objectMapper.readValue(serializedInput, type);
+            return (T) unwrap(objectMapper.readValue(serializedInput, type));
         } catch (JsonMappingException e){
 
             // in case of mapping exception try with object mapper without annotation introspection
             try {
-                return fallbackObjectMapper.readValue(serializedInput, type);
+                return (T) unwrap(fallbackObjectMapper.readValue(serializedInput, type));
             } catch (IOException ex) {
 
             }
@@ -138,6 +145,22 @@ public class JSONMarshaller implements Marshaller {
     @Override
     public MarshallingFormat getFormat() {
         return MarshallingFormat.JSON;
+    }
+
+    protected Object wrap(Object data) {
+        if (data instanceof byte[]) {
+            return new JaxbByteArray((byte[]) data);
+        }
+
+        return data;
+    }
+
+    protected Object unwrap(Object data) {
+        if (data instanceof Wrapped) {
+            return ((Wrapped) data).unwrap();
+        }
+
+        return data;
     }
 
     class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {

@@ -756,12 +756,18 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
 
+            String attachment1Name = "First attachment";
+            String attachment2Name = "Second attachment";
+
             // Adding attachments to user task.
             Object firstAttachmentContent = createPersonInstance("mary");
-            Long firstAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, firstAttachmentContent);
-            String secondAttachmentContent = "This is second attachment.";
-            Long secondAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_JOHN, secondAttachmentContent);
+            Long firstAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, attachment1Name, firstAttachmentContent);
 
+            changeUser(USER_JOHN);
+            String secondAttachmentContent = "This is second attachment.";
+            Long secondAttachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_JOHN, attachment2Name, secondAttachmentContent);
+
+            changeUser(USER_YODA);
             // start task
             taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
@@ -773,6 +779,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(firstAttachmentContent.getClass().getName(), firstTaskAttachment.getContentType());
             assertEquals(firstAttachmentId, firstTaskAttachment.getId());
             assertNotNull(firstTaskAttachment.getName());
+            assertEquals(attachment1Name, firstTaskAttachment.getName());
             assertNotNull(firstTaskAttachment.getSize());
 
             // Verifying second attachment returned by getTaskAttachmentsByTaskId().
@@ -785,6 +792,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(String.class.getName(), secondTaskAttachment.getContentType());
             assertEquals(secondAttachmentId, secondTaskAttachment.getId());
             assertNotNull(secondTaskAttachment.getName());
+            assertEquals(attachment2Name, secondTaskAttachment.getName());
             assertNotNull(secondTaskAttachment.getSize());
 
             // Verifying second attachment content returned by getTaskAttachmentContentById().
@@ -818,7 +826,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             // Adding attachments to user task.
             byte[] attachmentContent = new String("This is first attachment.").getBytes();
-            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, attachmentContent);
+            Long attachmentId = taskClient.addTaskAttachment(CONTAINER_ID, taskSummary.getId(), USER_YODA, "my attachment", attachmentContent);
 
             // start task
             taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);

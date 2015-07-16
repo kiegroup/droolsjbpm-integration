@@ -598,12 +598,12 @@ public class UserTaskResource {
     @Path(TASK_INSTANCE_ATTACHMENT_ADD_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addAttachment(@Context HttpHeaders headers, @PathParam("id") String containerId,
-            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String attachmentPayload) {
+            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("name") String name, String attachmentPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
 
-            String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, attachmentPayload, type);
+            String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, name, attachmentPayload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);

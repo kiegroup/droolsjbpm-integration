@@ -564,7 +564,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public Long addTaskAttachment(String containerId, Long taskId, String userId, Object attachment) {
+    public Long addTaskAttachment(String containerId, Long taskId, String userId, String name, Object attachment) {
         Object attachmentId = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -572,12 +572,12 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             attachmentId = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserQueryStr(userId),
+                    build(baseURI, TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserAndAdditionalParam(userId, "name", name),
                     attachment, Object.class, getHeaders(null));
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "UserTaskService", "addAttachment", serialize(attachment), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+                    new DescriptorCommand( "UserTaskService", "addAttachment", serialize(attachment), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId, name}) ) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
