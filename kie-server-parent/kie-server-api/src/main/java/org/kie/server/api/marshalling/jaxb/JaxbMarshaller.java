@@ -117,6 +117,7 @@ public class JaxbMarshaller implements Marshaller {
                 JaxbList.class,
                 JaxbMap.class,
                 JaxbDate.class,
+                JaxbByteArray.class,
 
                 JaxbByteArray.class,
 

@@ -605,9 +605,6 @@ public class UserTaskResource {
             logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
             Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, Object.class);
 
-            logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
-            Long attachmentId = userTaskService.addAttachment(taskId, getUser(userId), name, attachment);
-
             String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, name, attachmentPayload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);

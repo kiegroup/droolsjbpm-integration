@@ -163,7 +163,8 @@ public class JSONMarshaller implements Marshaller {
         return data;
     }
 
-  class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
+
+    class ExtendedJaxbAnnotationIntrospector extends JaxbAnnotationIntrospector {
 
         private List<NamedType> customClasses;
 

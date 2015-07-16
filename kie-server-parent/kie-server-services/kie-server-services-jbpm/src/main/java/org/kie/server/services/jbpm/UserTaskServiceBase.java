@@ -342,7 +342,6 @@ public class UserTaskServiceBase {
         Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, marshallingType, Object.class);
 
         logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
-
         Long attachmentId = userTaskService.addAttachment(taskId.longValue(), getUser(userId), name, attachment);
 
         String response = marshallerHelper.marshal(containerId, marshallingType, attachmentId);
