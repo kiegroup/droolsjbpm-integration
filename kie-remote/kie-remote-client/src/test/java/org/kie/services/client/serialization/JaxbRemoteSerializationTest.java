@@ -15,15 +15,12 @@
 
 package org.kie.services.client.serialization;
 
-import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
-
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,6 +29,7 @@ import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
@@ -45,6 +43,8 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
+
+import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 
 public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest {
 
@@ -79,7 +79,7 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
     public void uniqueRootElementTest() throws Exception {
         Reflections reflections = new Reflections(
                 ClasspathHelper.forPackage("org.kie.services"),
-                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
+                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
         Set<String> idSet = new HashSet<String>();
         Map<String, Class> idClassMap = new HashMap<String, Class>();
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
@@ -284,7 +284,7 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         }
         assertTrue( "There is " + copyExtraJaxbClasses.size() + " class left over in the round-tripped class set!", copyExtraJaxbClasses.isEmpty() );
     }
-    
+
     @Test
     public void jaxbTaskSummarySerialization() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));

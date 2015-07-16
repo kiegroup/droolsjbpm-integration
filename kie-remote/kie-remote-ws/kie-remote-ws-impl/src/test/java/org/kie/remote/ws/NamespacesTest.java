@@ -26,13 +26,14 @@ import org.junit.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
 public class NamespacesTest {
 
     Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.remote.services.ws"),
-            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
+            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
     
     @Test
     public void nameSpacesAreCoorrectTest() throws Exception { 
