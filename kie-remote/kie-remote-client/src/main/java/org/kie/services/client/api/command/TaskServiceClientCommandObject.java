@@ -538,4 +538,31 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         return (List<TaskSummary>) executeCommand(cmd);
     }
 
+    @Override
+    public long addComment(long taskId, Comment comment) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deleteComment(long taskId, long commentId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Comment> getAllCommentsByTaskId(long taskId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Comment getCommentById(long commentId) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setExpirationDate(long taskId, Date date) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+
 }
