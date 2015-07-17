@@ -54,7 +54,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     private static Logger logger = LoggerFactory.getLogger( KieServicesClientImpl.class );
 
-    private static final ServiceLoader<KieServicesClientBuilder> clientBuilders = ServiceLoader.load(KieServicesClientBuilder.class);
+    private static final ServiceLoader<KieServicesClientBuilder> clientBuilders = ServiceLoader.load(KieServicesClientBuilder.class, KieServicesClientImpl.class.getClassLoader());
     private KieServerInfo kieServerInfo;
     private Map<Class<?>, Object> servicesClients = new HashMap<Class<?>, Object>();
 
