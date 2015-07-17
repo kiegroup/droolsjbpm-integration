@@ -49,16 +49,20 @@ import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.AddCommentCommand;
+import org.jbpm.services.task.commands.GetCommentByIdCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.DeleteCommentCommand;
 import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
@@ -74,6 +78,7 @@ import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ProcessSubTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SetTaskPropertyCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
@@ -160,6 +165,12 @@ public class AcceptedServerCommands {
         acceptedCommands.add(FindSubProcessInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesByNameCommand.class);
+        
+        acceptedCommands.add(DeleteCommentCommand.class);
+        acceptedCommands.add(AddCommentCommand.class);
+        acceptedCommands.add(GetAllCommentsCommand.class);
+        acceptedCommands.add(GetCommentByIdCommand.class);
+        acceptedCommands.add(SetTaskPropertyCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
