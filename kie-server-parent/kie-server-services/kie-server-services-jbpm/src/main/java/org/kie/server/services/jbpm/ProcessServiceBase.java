@@ -191,6 +191,7 @@ public class ProcessServiceBase {
                 .initiator(instanceDesc.getInitiator())
                 .processInstanceDescription(instanceDesc.getProcessInstanceDescription())
                 .parentInstanceId(instanceDesc.getParentId())
+                .correlationKey(instanceDesc.getCorrelationKey())
                 .build();
 
         if (Boolean.TRUE.equals(withVars)) {

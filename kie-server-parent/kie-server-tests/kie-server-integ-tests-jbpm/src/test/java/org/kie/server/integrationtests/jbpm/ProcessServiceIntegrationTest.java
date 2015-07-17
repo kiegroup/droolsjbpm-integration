@@ -397,7 +397,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals("signalprocess", processInstance.getProcessInstanceDescription());
             assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
             assertEquals(-1l, processInstance.getParentId().longValue());
-            assertNull(processInstance.getCorrelationKey());
+            assertNotNull(processInstance.getCorrelationKey());
             assertNotNull(processInstance.getDate());
 
             Map<String, Object> variables = processInstance.getVariables();
@@ -432,7 +432,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals("signalprocess", processInstance.getProcessInstanceDescription());
             assertEquals(TestConfig.getUsername(), processInstance.getInitiator());
             assertEquals(-1l, processInstance.getParentId().longValue());
-            assertNull(processInstance.getCorrelationKey());
+            assertNotNull(processInstance.getCorrelationKey());
             assertNotNull(processInstance.getDate());
 
             Map<String, Object> variables = processInstance.getVariables();

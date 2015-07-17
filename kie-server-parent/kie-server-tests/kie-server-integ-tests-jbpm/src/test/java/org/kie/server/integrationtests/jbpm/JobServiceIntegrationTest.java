@@ -213,7 +213,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     public void testScheduleSearchByStatusAndCancelJob() {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
-        int currentNumberOfCancelled = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.CANCELLED.toString()), 0, 10).size();
+        int currentNumberOfCancelled = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.CANCELLED.toString()), 0, 100).size();
 
         String businessKey = "test key";
         String command = "org.jbpm.executor.commands.PrintOutCommand";
@@ -232,7 +232,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         List<String> status = new ArrayList<String>();
         status.add(STATUS.QUEUED.toString());
 
-        List<RequestInfoInstance> result = jobServicesClient.getRequestsByStatus(status, 0, 10);
+        List<RequestInfoInstance> result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
         assertEquals(1, result.size());
 
@@ -245,7 +245,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         jobServicesClient.cancelRequest(jobId);
 
-        result = jobServicesClient.getRequestsByStatus(status, 0, 10);
+        result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
         assertEquals(0, result.size());
 
@@ -253,7 +253,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         status.clear();
         status.add(STATUS.CANCELLED.toString());
 
-        result = jobServicesClient.getRequestsByStatus(status, 0, 10);
+        result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
         assertEquals(1 + currentNumberOfCancelled, result.size());
 
@@ -314,7 +314,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         String businessKey = "testkey";
         String command = "org.jbpm.executor.commands.PrintOutCommand";
 
-        int currentNumberOfCancelled = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 10).size();
+        int currentNumberOfCancelled = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 100).size();
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
@@ -327,7 +327,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobId);
         assertTrue(jobId.longValue() > 0);
 
-        List<RequestInfoInstance> result = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 10);
+        List<RequestInfoInstance> result = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 100);
         assertNotNull(result);
         assertEquals(1 + currentNumberOfCancelled, result.size());
 
