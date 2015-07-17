@@ -742,6 +742,35 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
+    @Test
+    public void testExitUserTask() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals(Status.Reserved.toString(), taskSummary.getStatus());
+
+            // exit task
+            changeUser(USER_ADMINISTRATOR);
+            taskClient.exitTask(CONTAINER_ID, taskSummary.getId(), USER_ADMINISTRATOR);
+            changeUser(USER_YODA);
+
+            TaskInstance task = taskClient.findTaskById(taskSummary.getId());
+            assertNotNull(task);
+            assertEquals(taskSummary.getId(), task.getId());
+            assertEquals(Status.Exited.toString(), task.getStatus());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+
     private void checkTaskStatusAndOwners(String containerId, Long taskId, Status status, String actualOwner, String potentialOwner) {
         TaskInstance task = taskClient.getTaskInstance(containerId, taskId, false, false, true);
         checkTaskStatusAndActualOwner(containerId, taskId, status, actualOwner);

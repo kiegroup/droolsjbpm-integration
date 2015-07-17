@@ -27,6 +27,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
+import org.kie.internal.KieInternalServices;
+import org.kie.internal.process.CorrelationKey;
+import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -47,6 +50,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    private static final String CONTAINER_ID = "definition-project";
 
 
     @BeforeClass
@@ -582,6 +586,56 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             throw e;
         } finally {
             changeUser(TestConfig.getUsername());
+        }
+    }
+
+    @Test
+    public void testStartCheckProcessWithCorrelationKey() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        String firstSimpleKey = "first-simple-key";
+        String secondSimpleKey = "second-simple-key";
+        String stringVarName = "stringData";
+        String stringVarValue = "string variable test";
+
+        CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+
+        CorrelationKey firstKey = correlationKeyFactory.newCorrelationKey(firstSimpleKey);
+        CorrelationKey secondKey = correlationKeyFactory.newCorrelationKey(secondSimpleKey);
+
+        Long firstProcessInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, firstKey);
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(stringVarName, stringVarValue);
+        Long secondProcessInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, secondKey, parameters);
+        try {
+            ProcessInstance instance = processClient.getProcessInstance(CONTAINER_ID, firstProcessInstanceId);
+            assertNotNull(instance);
+            assertEquals(firstProcessInstanceId, instance.getId());
+            assertEquals(PROCESS_ID_EVALUATION, instance.getProcessId());
+            assertEquals("evaluation", instance.getProcessName());
+            assertEquals("1.0", instance.getProcessVersion());
+            assertEquals(USER_YODA, instance.getInitiator());
+            assertEquals(CONTAINER_ID, instance.getContainerId());
+            assertEquals(firstSimpleKey, instance.getCorrelationKey());
+            assertEquals("evaluation", instance.getProcessInstanceDescription());
+            assertEquals(-1, instance.getParentId().longValue());
+
+            instance = processClient.getProcessInstance(CONTAINER_ID, secondProcessInstanceId, true);
+            assertNotNull(instance);
+            assertEquals(secondProcessInstanceId, instance.getId());
+            assertEquals(PROCESS_ID_EVALUATION, instance.getProcessId());
+            assertEquals("evaluation", instance.getProcessName());
+            assertEquals("1.0", instance.getProcessVersion());
+            assertEquals(USER_YODA, instance.getInitiator());
+            assertEquals(CONTAINER_ID, instance.getContainerId());
+            assertEquals(secondSimpleKey, instance.getCorrelationKey());
+            assertEquals("evaluation", instance.getProcessInstanceDescription());
+            assertEquals(-1, instance.getParentId().longValue());
+            assertTrue(instance.getVariables().containsKey(stringVarName));
+            assertEquals(stringVarValue, instance.getVariables().get(stringVarName));
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, firstProcessInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, secondProcessInstanceId);
         }
     }
 }
