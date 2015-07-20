@@ -117,9 +117,10 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             String statusQuery = getAdditionalParams("", "status", statuses);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_GET_URI, valuesMap) + statusQuery, RequestInfoInstanceList.class);
+                    build(baseURI, JOB_INSTANCES_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
 
 
@@ -146,8 +147,10 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(JOB_KEY, businessKey);
 
+            String queryString = getPagingQueryString("", page, pageSize);
+
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_BY_KEY_GET_URI, valuesMap), RequestInfoInstanceList.class);
+                    build(baseURI, JOB_INSTANCES_BY_KEY_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -173,8 +176,10 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(JOB_CMD_NAME, command);
 
+            String queryString = getPagingQueryString("", page, pageSize);
+
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_BY_CMD_GET_URI, valuesMap), RequestInfoInstanceList.class);
+                    build(baseURI, JOB_INSTANCES_BY_CMD_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(

@@ -16,12 +16,14 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +31,6 @@ import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.KieServicesClient;
@@ -38,12 +39,16 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.core.AnyOf.*;
+import static org.hamcrest.core.IsEqual.*;
 
 public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    private static final long SERVICE_TIMEOUT = 5000;
+    private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -101,11 +106,23 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.DONE.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
         jobServicesClient.cancelRequest(jobId);
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+
+        // If job finished before we canceled it then create new job and cancel it.
+        if(STATUS.DONE.toString().equals(jobRequest.getStatus())) {
+            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+
+            jobServicesClient.cancelRequest(jobId);
+            jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        }
+
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
@@ -136,10 +153,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.DONE.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
-        Thread.sleep(3000);
+        waitForJobToFinish(jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         assertNotNull(jobRequest);
@@ -174,10 +194,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.DONE.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
-        Thread.sleep(3000);
+        waitForJobToFinish(jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, true);
         assertNotNull(jobRequest);
@@ -231,8 +254,16 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         List<String> status = new ArrayList<String>();
         status.add(STATUS.QUEUED.toString());
+        status.add(STATUS.RUNNING.toString());
 
         List<RequestInfoInstance> result = jobServicesClient.getRequestsByStatus(status, 0, 100);
+
+        // If job isn't found using status QUEUED or RUNNING it means that job was triggered and finished.
+        // So will start another job, this one will be processed after 3 seconds - default executor interval.
+        if(result == null || result.size() == 0) {
+            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+            result = jobServicesClient.getRequestsByStatus(status, 0, 100);
+        }
         assertNotNull(result);
         assertEquals(1, result.size());
 
@@ -240,10 +271,19 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
         jobServicesClient.cancelRequest(jobId);
+
+        // If job finished before we canceled it then create new job and cancel it.
+        jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        if(STATUS.DONE.toString().equals(jobRequest.getStatus())) {
+            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+            jobServicesClient.cancelRequest(jobId);
+        }
 
         result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
@@ -282,10 +322,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.ERROR.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
-        Thread.sleep(3000);
+        waitForJobToFinish(jobId);
 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         assertNotNull(jobRequest);
@@ -335,11 +378,71 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
+        assertThat(jobRequest.getStatus(),anyOf(
+            equalTo(STATUS.QUEUED.toString()),
+            equalTo(STATUS.RUNNING.toString()),
+            equalTo(STATUS.DONE.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
         jobServicesClient.cancelRequest(jobId);
 
     }
 
+    @Test
+    public void testScheduleSearchByCommandCancelJob() throws Exception {
+        String firstCommand = "org.jbpm.executor.commands.PrintOutCommand";
+        String secondCommand = "org.jbpm.executor.commands.PrintOutCommand123";
+        String businessKey = "test key";
+
+        int originalNumberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, 0, 100).size();
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("businessKey", businessKey);
+
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(firstCommand);
+        jobRequestInstance.setData(data);
+
+        // Executing fist command.
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        // Number of commands should be same as we are checking second command.
+        int numberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, 0, 100).size();
+        assertEquals(originalNumberOfSecondCommands, numberOfSecondCommands);
+
+        jobServicesClient.cancelRequest(jobId);
+
+        jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(secondCommand);
+        jobRequestInstance.setData(data);
+
+        // Executing second command.
+        jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        // Number of commands should raise.
+        numberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, 0, 100).size();
+        assertEquals(1 + originalNumberOfSecondCommands, numberOfSecondCommands);
+
+        jobServicesClient.cancelRequest(jobId);
+    }
+
+    private void waitForJobToFinish(Long jobId) throws Exception {
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
+        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
+            RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
+
+            // If job finished (to one of final states) then return.
+            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
+                STATUS.DONE.toString().equals(result.getStatus()) ||
+                STATUS.ERROR.toString().equals(result.getStatus())) {
+                return;
+            }
+            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
+        }
+        throw new TimeoutException("Timeout while waiting for job executor to finish job.");
+    }
 }
