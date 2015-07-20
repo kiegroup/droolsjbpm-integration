@@ -156,11 +156,38 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         processClient.startProcess("definition-project", "not-existing", (Map)null);
     }
 
+    @Test()
+    public void testAbortExistingProcess() {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+        try {
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            // Process instance is running and is active.
+            ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
+
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+            // Process instance is now aborted.
+            processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED, processInstance.getState().intValue());
+        } catch (Exception e) {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            fail(e.getMessage());
+        }
+    }
 
     @Test(expected = KieServicesException.class)
-    public void testAbortExistingProcess() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        processClient.abortProcessInstance("definition-project", 9999l);
+    public void testAbortNonExistingProcess() {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        processClient.abortProcessInstance(CONTAINER_ID, 9999l);
     }
 
     @Test(expected = KieServicesException.class)

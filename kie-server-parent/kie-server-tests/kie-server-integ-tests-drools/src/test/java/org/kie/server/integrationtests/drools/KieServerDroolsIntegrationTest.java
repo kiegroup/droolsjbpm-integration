@@ -60,19 +60,6 @@ public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseInte
     }
 
     @Test
-    public void testGetServerInfo() throws Exception {
-        ServiceResponse<KieServerInfo> reply = client.getServerInfo();
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        KieServerInfo info = reply.getResult();
-        Assert.assertEquals(getServerVersion(), info.getVersion());
-    }
-
-    private String getServerVersion() {
-        // use the property if specified and fallback to KieServerEnvironment if no property set
-        return System.getProperty("kie.server.version", KieServerEnvironment.getVersion().toString());
-    }
-
-    @Test
     public void testCallContainer() throws Exception {
         client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
 
