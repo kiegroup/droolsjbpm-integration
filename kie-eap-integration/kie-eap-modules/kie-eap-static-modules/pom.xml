@@ -76,6 +76,7 @@
     <module>xpp3</module>
     <module>com-google-code-gson</module>
     <module>com-fasterxml-jackson</module>
+    <module>org-reflections</module>
   </modules>
 
 </project>
