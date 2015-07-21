@@ -318,7 +318,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         GetProcessInstanceCommand cmd = new GetProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
         cmd.setReadOnly(readonly);
-        return (ProcessInstance) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override

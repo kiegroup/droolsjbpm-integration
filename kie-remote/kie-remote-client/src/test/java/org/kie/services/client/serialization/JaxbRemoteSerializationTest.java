@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -55,14 +55,14 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
     }
 
     protected JaxbSerializationProvider jaxbProvider = ClientJaxbSerializationProvider.newInstance();
-    { 
+    {
         jaxbProvider.setPrettyPrint(true);
     }
 
     public JaxbRemoteSerializationTest() {
         addClassesToSerializationProvider(MyType.class);
     }
-    
+
     @Override
     public void addClassesToSerializationProvider(Class<?>... extraClass) {
         jaxbProvider.addJaxbClassesAndReinitialize(extraClass);
@@ -79,11 +79,12 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
     public void uniqueRootElementTest() throws Exception {
         Reflections reflections = new Reflections(
                 ClasspathHelper.forPackage("org.kie.services"),
-                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
+                new TypeAnnotationsScanner(), new SubTypesScanner());
+        
         Set<String> idSet = new HashSet<String>();
         Map<String, Class> idClassMap = new HashMap<String, Class>();
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {
-            if( ! jaxbClass.getPackage().getName().startsWith("org.kie") ) { 
+            if( ! jaxbClass.getPackage().getName().startsWith("org.kie") ) {
                 continue;
             }
             XmlRootElement rootElemAnno = jaxbClass.getAnnotation(XmlRootElement.class);
@@ -243,13 +244,13 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
                     if( xmlAttribute != null ) {
                         xmlAttrName = xmlAttribute.name();
                     }
-                    if( "processInstanceId".equals(field.getName()) )  { 
+                    if( "processInstanceId".equals(field.getName()) )  {
                         continue;
-                    } 
+                    }
                     if( xmlElemName != null ) {
                         assertEquals( fullFieldName + " is incorrectly annotated with name '" + xmlElemName + "'",
                                 PROCESS_INSTANCE_ID_NAME, xmlElemName );
-                    } else if( xmlAttrName != null ) { 
+                    } else if( xmlAttrName != null ) {
                         assertEquals( fullFieldName + " is incorrectly annotated with name '" + xmlAttrName + "'",
                                 PROCESS_INSTANCE_ID_NAME, xmlAttrName );
                     } else {
@@ -261,25 +262,25 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
 
         }
     }
-    
-    private void testRoundTripClassesSet(Set<Class<?>> extraJaxbClasses ) { 
+
+    private void testRoundTripClassesSet(Set<Class<?>> extraJaxbClasses ) {
         boolean emptySet = extraJaxbClasses.isEmpty();
         assertNotNull( "Test class set is null!", extraJaxbClasses);
         String classesStrProp = JaxbSerializationProvider.classSetToCommaSeperatedString(extraJaxbClasses);
         assertNotNull( "Classes list string is null!", classesStrProp );
-        assertTrue( "Classes list string is incorrectly formatted!", 
+        assertTrue( "Classes list string is incorrectly formatted!",
                 (! classesStrProp.isEmpty() || emptySet )
                 && ( ! classesStrProp.contains(" ") )
                 && ( classesStrProp.length() > 10 || emptySet) );
-        
-        Set<Class<?>> copyExtraJaxbClasses 
+
+        Set<Class<?>> copyExtraJaxbClasses
             = JaxbSerializationProvider.commaSeperatedStringToClassSet(this.getClass().getClassLoader(), classesStrProp);
         assertNotNull( "Round-tripped classes set is null!", copyExtraJaxbClasses );
         assertTrue( "Round-tripped classes set is empty!", ! copyExtraJaxbClasses.isEmpty() || emptySet );
-        
+
         assertEquals( "Round-tripped classes size is incorrect!", extraJaxbClasses.size(), copyExtraJaxbClasses.size() );
-        
-        for( Class<?>  origClass : extraJaxbClasses ) { 
+
+        for( Class<?>  origClass : extraJaxbClasses ) {
            assertTrue( "Round-tripped class set did not contain " + origClass.getSimpleName(), copyExtraJaxbClasses.remove(origClass) );
         }
         assertTrue( "There is " + copyExtraJaxbClasses.size() + " class left over in the round-tripped class set!", copyExtraJaxbClasses.isEmpty() );
@@ -290,12 +291,12 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         Assume.assumeFalse(getType().equals(TestType.YAML));
 
         TaskSummaryImpl taskSumImpl = new TaskSummaryImpl(
-                1l, 
-                "a", "b", "c", 
-                Status.Completed, 
-                3, true, 
-                new UserImpl("d"), new UserImpl("e"), 
-                new Date(), new Date(), new Date(), 
+                1l,
+                "a", "b", "c",
+                Status.Completed,
+                3, true,
+                new UserImpl("d"), new UserImpl("e"),
+                new Date(), new Date(), new Date(),
                 "f", 5, 2l, "deploymentId",
                 SubTasksStrategy.EndParentOnAllSubTasksEnd, 6l);
         taskSumImpl.setParentId(4l);

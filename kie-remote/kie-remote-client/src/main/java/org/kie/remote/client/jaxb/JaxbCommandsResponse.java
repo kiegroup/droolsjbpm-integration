@@ -93,6 +93,8 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "task-response", type = JaxbTaskResponse.class),
             @XmlElement(name = "content-response", type = JaxbContentResponse.class ),
             @XmlElement(name = "task-content-response", type = JaxbTaskContentResponse.class ),
+            @XmlElement(name = "task-comment-response", type = JaxbTaskCommentResponse.class ),
+            @XmlElement(name = "task-comment-list-response", type = JaxbTaskCommentListResponse.class ),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
             @XmlElement(name = "work-item", type = JaxbWorkItemResponse.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
@@ -103,40 +105,6 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "var-inst-log", type = JaxbVariableInstanceLog.class)
             })
     private List<JaxbCommandResponse<?>> responses;
-
-    @XmlTransient
-    private static Map<Class, Class> cmdListTypes;
-    static { 
-        cmdListTypes = new HashMap<Class, Class>();
-        // tasksummary
-        cmdListTypes.put(GetTaskAssignedAsBusinessAdminCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTaskAssignedAsPotentialOwnerCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksByStatusByProcessInstanceIdCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksOwnedCommand.class, TaskSummary.class);
-        cmdListTypes.put(GetTasksByVariousFieldsCommand.class, TaskSummary.class);
-        
-        // long
-        cmdListTypes.put(GetTaskByWorkItemIdCommand.class, Long.class);
-        cmdListTypes.put(GetTasksByProcessInstanceIdCommand.class, Long.class);
-        
-        // string
-        cmdListTypes.put(GetProcessIdsCommand.class, String.class);
-        
-        // processInstance
-        cmdListTypes.put(GetProcessInstancesCommand.class, ProcessInstance.class);
-        
-        // processInstanceLog
-        cmdListTypes.put(FindProcessInstancesCommand.class, ProcessInstanceLog.class);
-        cmdListTypes.put(FindActiveProcessInstancesCommand.class, ProcessInstanceLog.class);
-        cmdListTypes.put(FindSubProcessInstancesCommand.class, ProcessInstanceLog.class);
-        
-        // variableInstanceLog
-        cmdListTypes.put(FindVariableInstancesByNameCommand.class, VariableInstanceLog.class);
-        cmdListTypes.put(FindVariableInstancesCommand.class, VariableInstanceLog.class);
-       
-        // nodeInstanceLog
-        cmdListTypes.put(FindNodeInstancesCommand.class, NodeInstanceLog.class);
-    }
 
     public JaxbCommandsResponse() {
         // Default constructor

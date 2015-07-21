@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 
@@ -34,11 +35,10 @@ import org.reflections.util.ClasspathHelper;
 public class NamespacesTest {
 
     Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.remote.services.ws"),
-            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
+            new TypeAnnotationsScanner(), new SubTypesScanner());
     
     @Test
-    @Ignore
-    public void nameSpacesAreCoorrectTest() throws Exception { 
+    public void nameSpacesAreCorrectTest() throws Exception { 
         Set<Class<?>> webServiceImplClasses = reflections.getTypesAnnotatedWith(WebService.class);
         assertTrue( "No classes found!", webServiceImplClasses.size() > 0 );
 

@@ -40,6 +40,7 @@ import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
+import org.kie.api.task.model.Comment;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
@@ -85,6 +86,8 @@ public class JaxbCommandsResponse {
             @XmlElement(name = "task-response", type = JaxbTaskResponse.class),
             @XmlElement(name = "content-response", type = JaxbContentResponse.class ),
             @XmlElement(name = "task-content-response", type = JaxbTaskContentResponse.class ),
+            @XmlElement(name = "task-comment-response", type = JaxbTaskCommentResponse.class ),
+            @XmlElement(name = "task-comment-list-response", type = JaxbTaskCommentListResponse.class ),
             @XmlElement(name = "task-summary-list", type = JaxbTaskSummaryListResponse.class),
             @XmlElement(name = "work-item", type = JaxbWorkItemResponse.class),
             @XmlElement(name = "variables", type = JaxbVariablesResponse.class),
@@ -156,6 +159,8 @@ public class JaxbCommandsResponse {
         boolean unknownResultType = false;
         
         String className = result.getClass().getName();
+        // DBG
+        System.out.println( ">> Adding " + className + " result");
         if (result instanceof ProcessInstance) {
             this.responses.add(new JaxbProcessInstanceResponse((ProcessInstance) result, i, cmd));
         } else if (result instanceof JaxbTask) {
@@ -183,6 +188,8 @@ public class JaxbCommandsResponse {
                     || listType.equals(NodeInstanceLog.class)
                     || listType.equals(VariableInstanceLog.class) ) {
                 this.responses.add(new JaxbHistoryLogList((List<AuditEvent>) result));
+            } else if( listType.equals(Comment.class) ) { 
+                this.responses.add(new JaxbTaskCommentListResponse((List<Comment>) result));
             } else { 
                 throw new IllegalStateException(listType.getSimpleName() + " should be handled but is not in " + this.getClass().getSimpleName() + "!" );
             }
@@ -208,6 +215,9 @@ public class JaxbCommandsResponse {
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
         } else if( cmd instanceof GetTaskContentCommand ) { 
            this.responses.add(new JaxbTaskContentResponse((Map<String, Object>) result, i, cmd));
+        } else if( Comment.class.isAssignableFrom(result.getClass()) ) { 
+            System.out.println( ">> Adding JaxbTaskCommentResponse to response list");
+           this.responses.add(new JaxbTaskCommentResponse((Comment) result, i, cmd));
         }
         // Other
         else if( result instanceof JaxbExceptionResponse ) { 

@@ -189,7 +189,12 @@
                     org/jbpm/services/task/commands/GetAttachmentCommand.java,
                     org/jbpm/services/task/commands/GetContentCommand.java,
                     org/jbpm/services/task/commands/GetTask*Command.java,
-                    org/jbpm/services/task/impl/model/xml/JaxbContent.java</includes>
+                    org/jbpm/services/task/impl/model/xml/JaxbContent.java,
+                    org/jbpm/services/task/commands/DeleteCommentCommand.java,
+                    org/jbpm/services/task/commands/AddCommentCommand.java,
+                    org/jbpm/services/task/commands/GetAllCommentsCommand.java,
+                    org/jbpm/services/task/commands/GetCommentByIdCommand.java,
+                    org/jbpm/services/task/commands/SetTaskPropertyCommand.java</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.jbpm</groupId>

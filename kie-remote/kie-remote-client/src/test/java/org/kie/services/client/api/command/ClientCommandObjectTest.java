@@ -23,34 +23,39 @@ import static org.mockito.Mockito.spy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.jbpm.services.task.impl.model.GroupImpl;
 import org.jbpm.services.task.impl.model.OrganizationalEntityImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
-import org.junit.Ignore;
+import org.jbpm.services.task.impl.model.xml.JaxbComment;
 import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.Comment;
 import org.kie.api.task.model.Task;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
+import org.kie.remote.jaxb.gen.AddCommentCommand;
 import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
-import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.OrganizationalEntity;
 import org.kie.remote.jaxb.gen.QueryFilter;
+import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
-import org.kie.remote.jaxb.gen.Type;
 import org.mockito.ArgumentCaptor;
 
 public class ClientCommandObjectTest {
@@ -128,6 +133,11 @@ public class ClientCommandObjectTest {
                    params[i] = random.nextInt(Integer.MAX_VALUE);
                } else if( boolean.class.isAssignableFrom(paramTypes[i]) ) { 
                    params[i] = false;
+               } else if( Comment.class.isAssignableFrom(paramTypes[i]) ) { 
+                   JaxbComment comment = new JaxbComment("user", new Date(), UUID.randomUUID().toString());
+                   params[i] = comment;
+               } else if( Date.class.isAssignableFrom(paramTypes[i]) ) { 
+                   params[i] = new Date();
                } else { 
                    fail( taskMethod.getName() + ": param type " + paramTypes[i].getSimpleName() + " encountered!");
                }
@@ -145,7 +155,7 @@ public class ClientCommandObjectTest {
             int paramsChecked = 0;
             List<Field> cmdFields = new ArrayList<Field>(Arrays.asList(methodCmd.getClass().getDeclaredFields()));
             cmdFields.addAll(Arrays.asList(TaskCommand.class.getDeclaredFields()));
-            for( Field cmdField : cmdFields ) { 
+            FIELD_CHECK: for( Field cmdField : cmdFields ) { 
                cmdField.setAccessible(true);
                Object fieldVal = cmdField.get(methodCmd);
                if( fieldVal == null ) { 
@@ -175,10 +185,23 @@ public class ClientCommandObjectTest {
                    } 
                    continue;
                }
+               if( methodCmd instanceof SetTaskPropertyCommand && fieldVal instanceof BigInteger ) { 
+                 if( ((BigInteger) fieldVal).longValue() == 5 ) { 
+                    for( Object param : params ) { 
+                       if( param instanceof Date ) { 
+                          ++paramsChecked;
+                          continue FIELD_CHECK;
+                       }
+                    }
+                 }
+               }
                boolean found = matchFieldValue(fieldVal, params);
 
                assertTrue( methodCmd.getClass().getSimpleName() + "." + cmdField.getName() + " not filled!", found);
                ++paramsChecked;
+            }
+            if( methodCmd instanceof AddCommentCommand && params.length == 3 ) { 
+                ++paramsChecked;
             }
             
             // WACKY!?!
@@ -211,6 +234,27 @@ public class ClientCommandObjectTest {
                 if( val instanceof Map ) { 
                     found = true;
                     break;
+                }
+            } else if( fieldVal instanceof org.kie.remote.jaxb.gen.Comment ) { 
+                org.kie.remote.jaxb.gen.Comment fieldComment 
+                    = (org.kie.remote.jaxb.gen.Comment) fieldVal;
+                if( val instanceof JaxbComment ) { 
+                   JaxbComment jaxbVal = (JaxbComment) val;
+                   if( jaxbVal.getText().equals(fieldComment.getText()) ) { 
+                       found = true;
+                       break;
+                   }
+                } else if( val instanceof String ) { 
+                    if( fieldComment.getAddedBy().equals(val) 
+                            || fieldComment.getText().equals(val) ) { 
+                        found = true;
+                        break;
+                    } 
+                } 
+            } else if( fieldVal instanceof XMLGregorianCalendar && val instanceof Date ) { 
+                if( ((XMLGregorianCalendar) fieldVal).toGregorianCalendar().getTime().equals(val) ) { 
+                   found = true;
+                   break;
                 }
             } else if( fieldVal instanceof List && val instanceof List ) { 
                for( Object elem : (List) fieldVal ) { 
