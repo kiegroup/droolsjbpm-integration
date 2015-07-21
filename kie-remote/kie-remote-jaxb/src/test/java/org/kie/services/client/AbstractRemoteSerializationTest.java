@@ -112,7 +112,7 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
     private static Reflections reflections = new Reflections(
             ClasspathHelper.forPackage("org.kie.services.client"),
             ClasspathHelper.forPackage("org.kie.remote"),
-            new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner(), new SubTypesScanner());
+            new TypeAnnotationsScanner(), new SubTypesScanner());
 
     // TESTS
     

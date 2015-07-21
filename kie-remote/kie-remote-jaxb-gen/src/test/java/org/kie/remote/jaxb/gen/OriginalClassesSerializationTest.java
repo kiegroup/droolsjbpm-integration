@@ -50,8 +50,13 @@ public class OriginalClassesSerializationTest {
             if( cmdClass.getAnnotation(XmlEnum.class) != null ) { 
                 continue;
             }
+            if( cmdClass.isAnonymousClass() ) { 
+                // query builders
+                continue;
+            }
             ++i;
             try {
+                
                 cmdClass.getConstructor(new Class[0]);
             } catch (Exception e) {
                 fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");

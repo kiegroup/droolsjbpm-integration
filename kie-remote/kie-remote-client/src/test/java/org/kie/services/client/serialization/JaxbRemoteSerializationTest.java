@@ -79,7 +79,8 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
     public void uniqueRootElementTest() throws Exception {
         Reflections reflections = new Reflections(
                 ClasspathHelper.forPackage("org.kie.services"),
-                new TypeAnnotationsScanner(), new FieldAnnotationsScanner(), new MethodAnnotationsScanner());
+                new TypeAnnotationsScanner(), new SubTypesScanner());
+        
         Set<String> idSet = new HashSet<String>();
         Map<String, Class> idClassMap = new HashMap<String, Class>();
         for (Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class)) {

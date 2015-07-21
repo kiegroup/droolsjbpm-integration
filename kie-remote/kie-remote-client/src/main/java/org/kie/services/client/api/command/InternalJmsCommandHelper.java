@@ -49,7 +49,7 @@ import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
 public class InternalJmsCommandHelper {
 
-    public static Object internalExecuteJmsCommand( Command command, 
+    public static <T> T internalExecuteJmsCommand( Command command, 
             String connUser, String connPassword,
             String userName, String password, String deploymentId, Long processInstanceId, 
             ConnectionFactory factory, Queue sendQueue, Queue responseQueue,
@@ -183,7 +183,7 @@ public class InternalJmsCommandHelper {
                 JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
                 throw new RemoteApiException(exceptionResponse.getMessage());
             } else {
-                return response.getResult();
+                return (T) response.getResult();
             }
         } else {
             assert responses.size() == 0: "There should only be 1 response, not " + responses.size() + ", returned by a command!";

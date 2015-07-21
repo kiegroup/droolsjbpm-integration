@@ -105,7 +105,7 @@ public abstract class AbstractRemoteCommandObject {
 
     // Execute methods -----------------------------------------------------------------------------------------------------
 
-    protected Object executeCommand( Command cmd ) {
+    protected <T> T executeCommand( Command cmd ) {
         if( AcceptedClientCommands.isSendObjectParameterCommandClass(cmd.getClass()) ) {
             List<Object> extraClassInstanceList = new ArrayList<Object>();
             preprocessParameterCommand(cmd, extraClassInstanceList);
@@ -229,7 +229,7 @@ public abstract class AbstractRemoteCommandObject {
      * @param command The {@link Command} object to be executed.
      * @return The result of the {@link Command} object execution.
      */
-    private Object executeJmsCommand( Command command ) {
+    private <T> T executeJmsCommand( Command command ) {
        
         Queue sendQueue;
         boolean isTaskCommand = (command instanceof TaskCommand);
@@ -338,11 +338,14 @@ public abstract class AbstractRemoteCommandObject {
             if( responses.size() == 0 ) {
                 return null;
             } else if( responses.size() == 1 ) {
-                JaxbCommandResponse<?> responseObject = responses.get(0);
+                // The type information *should* come from the Command class -- but it's a jaxb-gen class, 
+                // which means that it has lost it's type information.. 
+                // TODO: fix this?
+                JaxbCommandResponse<T> responseObject = (JaxbCommandResponse<T>) responses.get(0);
                 if( responseObject instanceof JaxbExceptionResponse ) {
                     exceptionResponse = (JaxbExceptionResponse) responseObject;
                 } else {
-                    return (T) responseObject.getResult();
+                    return responseObject.getResult();
                 }
             } else {
                 throw new RemoteCommunicationException("Unexpected number of results from " + command.getClass().getSimpleName()

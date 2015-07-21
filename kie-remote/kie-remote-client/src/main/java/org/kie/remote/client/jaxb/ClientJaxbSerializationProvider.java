@@ -38,8 +38,10 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
                 JaxbCommandsRequest.class,
                 JaxbCommandsResponse.class,
                 JaxbContentResponse.class,
+                JaxbTaskCommentResponse.class,
                 JaxbTaskResponse.class,
                 JaxbTaskSummaryListResponse.class,
+                JaxbTaskCommentListResponse.class,
                 
                 // used with gnerated classes
                 JaxbListWrapper.class

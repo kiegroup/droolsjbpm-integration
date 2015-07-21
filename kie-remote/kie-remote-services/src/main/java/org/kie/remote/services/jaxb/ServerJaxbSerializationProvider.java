@@ -40,8 +40,10 @@ public class ServerJaxbSerializationProvider extends JaxbSerializationProvider {
                 JaxbCommandsRequest.class,
                 JaxbCommandsResponse.class,
                 JaxbContentResponse.class,
+                JaxbTaskCommentResponse.class,
                 JaxbTaskResponse.class,
                 JaxbTaskSummaryListResponse.class,
+                JaxbTaskCommentListResponse.class,
                 
                 // webservice classes
                 Execute.class, 

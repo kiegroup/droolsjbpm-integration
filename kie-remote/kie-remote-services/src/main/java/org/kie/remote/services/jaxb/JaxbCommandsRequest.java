@@ -58,17 +58,21 @@ import org.jbpm.process.audit.command.FindSubProcessInstancesCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
+import org.jbpm.services.task.commands.AddCommentCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
 import org.jbpm.services.task.commands.ClaimTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.DelegateTaskCommand;
+import org.jbpm.services.task.commands.DeleteCommentCommand;
 import org.jbpm.services.task.commands.ExecuteTaskRulesCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
+import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
+import org.jbpm.services.task.commands.GetCommentByIdCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
@@ -83,6 +87,7 @@ import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ProcessSubTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.ResumeTaskCommand;
+import org.jbpm.services.task.commands.SetTaskPropertyCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
@@ -156,16 +161,22 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-attachment", type = GetAttachmentCommand.class),
 
             @XmlElement(name = "get-content", type = GetContentCommand.class),
-            @XmlElement(name = "get-task-content-command", type = GetTaskContentCommand.class),
+            @XmlElement(name = "get-task-content", type = GetTaskContentCommand.class),
 
+            @XmlElement(name = "delete-comment", type = DeleteCommentCommand.class),
+            @XmlElement(name = "add-comment", type = AddCommentCommand.class),
+            @XmlElement(name = "get-all-comments", type = GetAllCommentsCommand.class),
+            @XmlElement(name = "get-comment-by-id", type = GetCommentByIdCommand.class),
+            
             @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
-            @XmlElement(name = "get-tasks-by-various-command", type = GetTasksByVariousFieldsCommand.class),
+            @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
+            
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
             @XmlElement(name = "resume-task", type = ResumeTaskCommand.class),
@@ -173,9 +184,10 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "start-task", type = StartTaskCommand.class),
             @XmlElement(name = "stop-task", type = StopTaskCommand.class),
             @XmlElement(name = "suspend-task", type = SuspendTaskCommand.class),
-            @XmlElement(name = "process-sub-tasks-command", type = ProcessSubTaskCommand.class),
-            @XmlElement(name = "execute-task-rules-command", type = ExecuteTaskRulesCommand.class),
-            @XmlElement(name = "cancel-deadline-command", type = CancelDeadlineCommand.class),
+            @XmlElement(name = "process-sub-tasks", type = ProcessSubTaskCommand.class),
+            @XmlElement(name = "execute-task-rules", type = ExecuteTaskRulesCommand.class),
+            @XmlElement(name = "cancel-deadline", type = CancelDeadlineCommand.class),
+            @XmlElement(name = "set-task-property", type = SetTaskPropertyCommand.class),
             
             // audit
             @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),

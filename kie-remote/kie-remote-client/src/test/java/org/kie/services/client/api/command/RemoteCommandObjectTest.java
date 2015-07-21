@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -238,6 +239,8 @@ public class RemoteCommandObjectTest {
             } else if( fieldType.equals(XMLGregorianCalendar.class) ) { 
                 XMLGregorianCalendar date = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
                 field.set(obj, date);
+            } else if( fieldType.equals(BigInteger.class) ) { 
+                field.set(obj, new BigInteger("23"));
             } else if( fieldType.equals(Object.class) ) { 
                 field.set(obj, "Object");
             } else if( fieldType.equals(byte[].class) ) { 

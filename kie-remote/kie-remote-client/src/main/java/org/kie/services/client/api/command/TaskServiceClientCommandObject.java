@@ -18,10 +18,13 @@ package org.kie.services.client.api.command;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertDateToXmlGregorianCalendar;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.kie.api.command.Command;
 import org.kie.api.task.TaskService;
@@ -39,15 +42,19 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
+import org.kie.remote.jaxb.gen.AddCommentCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
 import org.kie.remote.jaxb.gen.ClaimTaskCommand;
 import org.kie.remote.jaxb.gen.CompleteTaskCommand;
 import org.kie.remote.jaxb.gen.DelegateTaskCommand;
+import org.kie.remote.jaxb.gen.DeleteCommentCommand;
 import org.kie.remote.jaxb.gen.ExitTaskCommand;
 import org.kie.remote.jaxb.gen.FailTaskCommand;
 import org.kie.remote.jaxb.gen.ForwardTaskCommand;
+import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
+import org.kie.remote.jaxb.gen.GetCommentByIdCommand;
 import org.kie.remote.jaxb.gen.GetContentCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
@@ -63,12 +70,14 @@ import org.kie.remote.jaxb.gen.NominateTaskCommand;
 import org.kie.remote.jaxb.gen.QueryFilter;
 import org.kie.remote.jaxb.gen.ReleaseTaskCommand;
 import org.kie.remote.jaxb.gen.ResumeTaskCommand;
+import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
 import org.kie.remote.jaxb.gen.SkipTaskCommand;
 import org.kie.remote.jaxb.gen.StartTaskCommand;
 import org.kie.remote.jaxb.gen.StopTaskCommand;
 import org.kie.remote.jaxb.gen.SuspendTaskCommand;
 import org.kie.remote.jaxb.gen.Type;
 
+@SuppressWarnings("unchecked")
 public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject implements TaskService {
 
     public TaskServiceClientCommandObject(RemoteConfiguration config) {
@@ -326,7 +335,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Task getTaskById( long taskId ) {
         GetTaskCommand cmd = new GetTaskCommand();
         cmd.setTaskId(taskId);
-        return (Task) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -334,7 +343,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskAssignedAsBusinessAdminCommand cmd = new GetTaskAssignedAsBusinessAdminCommand();
         cmd.setUserId(userId);
         // no query filter for language
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -342,7 +351,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
         cmd.setUserId(userId);
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -353,7 +362,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             cmd.getStatuses().addAll(status);
         }
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -361,7 +370,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
         cmd.setUserId(userId);
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -372,7 +381,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             cmd.getStatuses().addAll(status);
         }
         cmd.setFilter(addLanguageFilter(language));
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -383,14 +392,14 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             cmd.getStatuses().addAll(status);
         }
         // no query filter for language
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
     public List<Long> getTasksByProcessInstanceId( long processInstanceId ) {
         GetTasksByProcessInstanceIdCommand cmd = new GetTasksByProcessInstanceIdCommand();
         cmd.setProcessInstanceId(processInstanceId);
-        return (List<Long>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -400,7 +409,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setJaxbTask(genTask);
         JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(params);
         cmd.setParameter(values);
-        return (Long) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -467,21 +476,21 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Content getContentById( long contentId ) {
         GetContentCommand cmd = new GetContentCommand();
         cmd.setContentId(contentId);
-        return (Content) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
     public Attachment getAttachmentById( long attachId ) {
         GetAttachmentCommand cmd = new GetAttachmentCommand();
         cmd.setAttachmentId(attachId);
-        return (Attachment) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
     public Map<String, Object> getTaskContent( long taskId ) {
         GetTaskContentCommand cmd = new GetTaskContentCommand();
         cmd.setTaskId(taskId);
-        return (Map<String, Object>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -516,7 +525,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             cmd.getLanguages().addAll(languages);
         }
         cmd.setUnion(union);
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
@@ -535,34 +544,79 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         filter.setCount(maxResults);
         filter.setLanguage(language);
         cmd.setFilter(filter);
-        return (List<TaskSummary>) executeCommand(cmd);
+        return executeCommand(cmd);
     }
 
     @Override
-    public long addComment(long taskId, Comment comment) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Long addComment(long taskId, Comment comment) {
+        // fill jaxbComment
+        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
+        Date addedAt = comment.getAddedAt();
+        if( addedAt != null ) { 
+            XMLGregorianCalendar jaxbAddedAt = convertDateToXmlGregorianCalendar(addedAt);
+            jaxbComment.setAddedAt(jaxbAddedAt);
+        }
+        User addedBy = comment.getAddedBy();
+        if( addedBy != null ) { 
+            jaxbComment.setAddedBy(addedBy.getId());
+        }
+        jaxbComment.setText(comment.getText());
+        jaxbComment.setId(comment.getId());
+
+        //  create command
+        AddCommentCommand cmd = new AddCommentCommand();
+        cmd.setTaskId(taskId);
+        cmd.setJaxbComment(jaxbComment);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public Long addComment( long taskId, String addedByUserId, String commentText ) {
+        AddCommentCommand cmd = new AddCommentCommand();
+        cmd.setTaskId(taskId);
+        
+        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
+        jaxbComment.setAddedBy(addedByUserId);
+        jaxbComment.setAddedAt(convertDateToXmlGregorianCalendar(new Date()));
+        jaxbComment.setText(commentText);
+        
+        cmd.setJaxbComment(jaxbComment);
+        
+        return executeCommand(cmd);
     }
 
     @Override
     public void deleteComment(long taskId, long commentId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DeleteCommentCommand cmd = new DeleteCommentCommand();
+        cmd.setTaskId(taskId);
+        cmd.setCommentId(commentId);
+        executeCommand(cmd);
     }
 
     @Override
     public List<Comment> getAllCommentsByTaskId(long taskId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        GetAllCommentsCommand cmd = new GetAllCommentsCommand();
+        cmd.setTaskId(taskId);
+      
+        return executeCommand(cmd);
     }
 
     @Override
     public Comment getCommentById(long commentId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        GetCommentByIdCommand cmd = new GetCommentByIdCommand();
+        cmd.setCommentId(commentId);
+        
+        return executeCommand(cmd);
     }
 
     @Override
     public void setExpirationDate(long taskId, Date date) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SetTaskPropertyCommand cmd = new SetTaskPropertyCommand();
+        cmd.setExpirationDate(convertDateToXmlGregorianCalendar(date));
+        cmd.setProperty(BigInteger.valueOf(5l));
+        
+        executeCommand(cmd);
     }
-    
-    
 
 }
