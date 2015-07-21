@@ -150,12 +150,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Extra test -->
-   <dependency>
-      <groupId>org.mortbay.jetty</groupId>
-      <artifactId>jetty-embedded</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <!--
