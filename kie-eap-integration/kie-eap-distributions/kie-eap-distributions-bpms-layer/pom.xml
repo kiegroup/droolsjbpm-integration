@@ -300,9 +300,25 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+
+    <!-- Dependency on the BRMS distribution layer is to make sure this module gets build after that one.
+         (the kie-jboss-modules-plugin is not thread safe and building them in parallel causes build failures).
+         Once the plugin is fixed this can be removed. -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-eap-distributions-brms-layer</artifactId>
+      <version>${project.version}</version>
+      <!-- Using test scope to fool the kie-jboss-modules-plugin. Otherwise it will think the brms-layer is
+           module dependency (and the build then fails).-->
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
-
-
 
   <build>
     <plugins>
