@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.jbpm.kie.services.impl.CommonUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.kie.api.command.Command;
@@ -188,9 +189,8 @@ public abstract class AbstractRemoteCommandObject {
             req = new JaxbCommandsRequest(config.getDeploymentId(), command);
         }
 
-        Long processInstanceId = findProcessInstanceId(command);
-        if( processInstanceId == null ) {
-            processInstanceId = config.getProcessInstanceId();
+        if( processInstanceId -= null ) { 
+            processInstanceId = CommonUtils.findProcessInstanceId(command);
         }
         req.setProcessInstanceId(processInstanceId);
         req.setUser(config.getUserName());
@@ -479,37 +479,6 @@ public abstract class AbstractRemoteCommandObject {
            throw new RemoteApiException("Unexpected entity in response body, expected " + entityClass.getName() + " instance.", cce);
        }
        return responseEntity;
-    }
-
-    // TODO: https://issues.jboss.org/browse/JBPM-4296
-    private Long findProcessInstanceId( Object command ) {
-        if( command instanceof AuditCommand ) {
-            return null;
-        }
-        try {
-            Field[] fields = command.getClass().getDeclaredFields();
-
-            for( Field field : fields ) {
-                field.setAccessible(true);
-                if( field.isAnnotationPresent(XmlAttribute.class) ) {
-                    String attributeName = field.getAnnotation(XmlAttribute.class).name();
-                    if( "process-instance-id".equalsIgnoreCase(attributeName) ) {
-                        return (Long) field.get(command);
-                    }
-                } else if( field.isAnnotationPresent(XmlElement.class) ) {
-                    String elementName = field.getAnnotation(XmlElement.class).name();
-                    if( "process-instance-id".equalsIgnoreCase(elementName) ) {
-                        return (Long) field.get(command);
-                    }
-                } else if( field.getName().equals("processInstanceId") ) {
-                    return (Long) field.get(command);
-                }
-            }
-        } catch( Exception e ) {
-            logger.debug("Unable to find process instance id on command {} due to {}", command, e.getMessage());
-        }
-
-        return null;
     }
 
     // Command Object helper methods --

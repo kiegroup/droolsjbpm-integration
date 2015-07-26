@@ -44,6 +44,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
+import org.kie.internal.command.ProcessInstanceIdCommand;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
