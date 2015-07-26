@@ -9,6 +9,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 
+import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
@@ -21,9 +22,9 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  * It takes care of implementing the methods specified as well as managing the 
  * state of the internal {@link RemoteConfiguration} instance.
  */
-class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder {
-
-    private RemoteConfiguration config;
+class RemoteJmsRuntimeEngineBuilderImpl 
+    extends AbstractRemoteRuntimeEngineBuilderImpl<RemoteJmsRuntimeEngineBuilder, RemoteJmsRuntimeEngineFactory> 
+    implements org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder { 
     
     InitialContext remoteInitialContext = null;
     String jbossServerHostName = null;
@@ -54,52 +55,6 @@ class RemoteJmsRuntimeEngineBuilderImpl implements org.kie.remote.client.api.Rem
     
     RemoteJmsRuntimeEngineBuilderImpl() {
         this.config = new RemoteConfiguration(Type.JMS);
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addDeploymentId(String deploymentId) {
-        this.config.setDeploymentId(deploymentId);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addProcessInstanceId(long processInstanceId) {
-        this.config.setProcessInstanceId(processInstanceId);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addUserName(String userName) {
-        this.config.setUserName(userName);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addPassword(String password) {
-        this.config.setPassword(password);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addTimeout(int timeoutInSeconds) {
-        this.config.setTimeout((long) timeoutInSeconds);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl addExtraJaxbClasses(Class... classes) {
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
-        for( Class clazz : classes ) { 
-            classSet.add(clazz);
-        }
-        this.config.addJaxbClasses(classSet);
-        return this;
-    }
-
-    @Override
-    public RemoteJmsRuntimeEngineBuilderImpl clearJaxbClasses() {
-        this.config.clearJaxbClasses();
-        return this;
     }
 
     @Override

@@ -68,11 +68,11 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
         if( builder instanceof org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl ) { 
             org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl jmsBuilder = (org.kie.services.client.api.RemoteJmsRuntimeEngineBuilderImpl) builder;
             // check
-            if( config.getUserName() == null ) { 
-                throw new InsufficientInfoToBuildException("A user name is required to access the JMS queues!"); 
+            if( config.getConnectionUserName() == null ) { 
+                throw new InsufficientInfoToBuildException("A connection user name is required to access the JMS queues!"); 
             } 
-            if( config.getPassword() == null ) { 
-                throw new InsufficientInfoToBuildException("A password is required to access the JMS queues!"); 
+            if( config.getConnectionPassword() == null ) { 
+                throw new InsufficientInfoToBuildException("A connection password is required to access the JMS queues!"); 
             }
 
             // Connection Factory
@@ -112,7 +112,7 @@ public abstract class RemoteRuntimeEngineFactory extends org.kie.remote.client.a
             } 
 
             if( jmsBuilder.jbossServerHostName != null && jmsBuilder.remoteInitialContext == null ) { 
-                jmsBuilder.remoteInitialContext = getRemoteJbossInitialContext(jmsBuilder.jbossServerHostName, config.getUserName(), config.getPassword());
+                jmsBuilder.remoteInitialContext = getRemoteJbossInitialContext(jmsBuilder.jbossServerHostName, config.getConnectionUserName(), config.getConnectionPassword());
             }
 
             if( jmsBuilder.remoteInitialContext != null ) {

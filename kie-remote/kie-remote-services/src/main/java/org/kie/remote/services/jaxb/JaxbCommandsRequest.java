@@ -74,6 +74,8 @@ import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.kie.api.command.Command;
+import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
+import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.shared.ServicesVersion;
 
@@ -97,7 +99,12 @@ public class JaxbCommandsRequest {
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
-   
+
+    @XmlElement
+    @XmlSchemaType(name = "string")
+    private String correlationKeyString;
+    
+    // This array is set during server-side processing of the JMS
     private transient String [] userPass;
 
     // This list should match the list in AcceptedCommands
@@ -257,6 +264,18 @@ public class JaxbCommandsRequest {
         this.user = user;
     }
 
+    public String getCorrelationKeyString() {
+        return correlationKeyString;
+    }
+
+    public void setCorrelationKeyString(String correlationKeyString) {
+        this.correlationKeyString = correlationKeyString;
+    }
+    
+    public CorrelationKey getCorrelationKey() {
+        return CorrelationKeyXmlAdapter.unmarshalCorrelationKey(this.correlationKeyString);
+    }
+    
     public void setCommands(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = commands;

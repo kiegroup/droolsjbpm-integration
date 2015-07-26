@@ -29,6 +29,8 @@ import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
 import org.kie.api.time.SessionClock;
+import org.kie.internal.process.CorrelationAwareProcessRuntime;
+import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
@@ -36,14 +38,16 @@ import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
 import org.kie.remote.jaxb.gen.FireAllRulesCommand;
 import org.kie.remote.jaxb.gen.GetFactCountCommand;
 import org.kie.remote.jaxb.gen.GetGlobalCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstanceByCorrelationKeyCommand;
 import org.kie.remote.jaxb.gen.GetProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.GetProcessInstancesCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.SetGlobalCommand;
 import org.kie.remote.jaxb.gen.SignalEventCommand;
+import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
 
-public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession {
+public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession, CorrelationAwareProcessRuntime {
 
     private WorkItemManager workItemManager;
     
@@ -258,8 +262,25 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
     }
 
     @Override
+    public ProcessInstance startProcess( String processId, CorrelationKey correlationKey, Map<String, Object> parameters ) {
+        StartCorrelatedProcessCommand cmd = new StartCorrelatedProcessCommand();
+        cmd.setProcessId(processId);
+        JaxbStringObjectPairArray arrayMap = convertMapToJaxbStringObjectPairArray(parameters);
+        cmd.setParameter(arrayMap);
+        String strCorrKey = convertCorrelationKeyToString(correlationKey);
+        cmd.setCorrelationKey(strCorrKey);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
     public ProcessInstance createProcessInstance( String processId, Map<String, Object> parameters ) {
         return unsupported(KieSession.class, ProcessInstance.class);
+    }
+
+    @Override
+    public ProcessInstance createProcessInstance( String processId, CorrelationKey correlationKey, Map<String, Object> parameters ) {
+        return unsupported(CorrelationAwareProcessRuntime.class, ProcessInstance.class);
     }
 
     @Override
@@ -307,6 +328,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
     }
 
     @Override
+    public ProcessInstance getProcessInstance( CorrelationKey correlationKey ) {
+        GetProcessInstanceByCorrelationKeyCommand cmd = new GetProcessInstanceByCorrelationKeyCommand();
+        String strCorrKey = convertCorrelationKeyToString(correlationKey);
+        cmd.setCorrelationKey(strCorrKey);
+        return executeCommand(cmd);
+    }
+
+    @Override
     public void abortProcessInstance( long processInstanceId ) {
         AbortProcessInstanceCommand cmd = new AbortProcessInstanceCommand();
         cmd.setProcessInstanceId(processInstanceId);
@@ -345,63 +374,63 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public KieRuntimeLogger getLogger() {
-        return unsupported(WorkItemManager.class, KieRuntimeLogger.class);
+        return unsupported(KieSession.class, KieRuntimeLogger.class);
     }
 
     @Override
     public void addEventListener( RuleRuntimeEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
     public void removeEventListener( RuleRuntimeEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
     public Collection<RuleRuntimeEventListener> getRuleRuntimeEventListeners() {
-        return unsupported(WorkItemManager.class, Collection.class);
+        return unsupported(KieSession.class, Collection.class);
     }
 
     @Override
     public void addEventListener( AgendaEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
 
     }
 
     @Override
     public void removeEventListener( AgendaEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
     public Collection<AgendaEventListener> getAgendaEventListeners() {
-        return unsupported(WorkItemManager.class, Collection.class);
+        return unsupported(KieSession.class, Collection.class);
     }
 
     @Override
     public void addEventListener( ProcessEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
     public void removeEventListener( ProcessEventListener listener ) {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
     @Override
     public Collection<ProcessEventListener> getProcessEventListeners() {
-        return unsupported(WorkItemManager.class, Collection.class);
+        return unsupported(KieSession.class, Collection.class);
     }
 
     @Override
     public int getId() {
-        return unsupported(WorkItemManager.class, Integer.class);
+        return unsupported(KieSession.class, Integer.class);
     }
 
     @Override
     public long getIdentifier() {
-        return unsupported(WorkItemManager.class, Long.class);
+        return unsupported(KieSession.class, Long.class);
     }
 
     @Override
@@ -411,7 +440,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public void destroy() {
-        unsupported(WorkItemManager.class, Void.class);
+        unsupported(KieSession.class, Void.class);
     }
 
 }

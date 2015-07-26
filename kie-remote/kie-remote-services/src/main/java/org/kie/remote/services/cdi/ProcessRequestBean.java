@@ -1,10 +1,11 @@
 package org.kie.remote.services.cdi;
 
-import static org.kie.remote.services.cdi.DeploymentInfoBean.*;
+import static org.kie.remote.services.cdi.DeploymentInfoBean.emptyDeploymentId;
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.FAILURE;
 import static org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus.PERMISSIONS_CONFLICT;
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
+import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.jbpm.process.audit.AuditLogService;
@@ -41,10 +43,18 @@ import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
+import org.kie.internal.KieInternalServices;
+import org.kie.internal.command.CorrelationKeyCommand;
 import org.kie.internal.command.ProcessInstanceIdCommand;
+import org.kie.internal.process.CorrelationKey;
+import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.internal.runtime.manager.context.CorrelationKeyContext;
+import org.kie.internal.runtime.manager.context.EmptyContext;
+import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.remote.services.exception.DeploymentNotFoundException;
 import org.kie.remote.services.jaxb.JaxbCommandsRequest;
@@ -118,7 +128,7 @@ public class ProcessRequestBean {
     
     // Methods used
     
-    public void processCommand(Command cmd, JaxbCommandsRequest request, int i, JaxbCommandsResponse jaxbResponse) { 
+    public <T> void processCommand(Command<T> cmd, JaxbCommandsRequest request, int i, JaxbCommandsResponse jaxbResponse) { 
         String version = request.getVersion();
         if( version == null ) { 
             version = "pre-6.0.3";
@@ -136,9 +146,19 @@ public class ProcessRequestBean {
         try {
             // check that all parameters have been correctly deserialized/unmarshalled
             preprocessCommand(cmd);
+          
+            String corrKeyString = request.getCorrelationKeyString();
+            List<String> correlationKeyProps = null;
+            if( corrKeyString != null ) { 
+                String [] correlationKeyPropsArr = corrKeyString.split(":");
+                if( correlationKeyPropsArr.length > 0 ) { 
+                    correlationKeyProps = Arrays.asList(correlationKeyPropsArr);
+                }
+            }
             
             if( cmd instanceof TaskCommand<?> ) { 
                 TaskCommand<?> taskCmd = (TaskCommand<?>) cmd;
+                // TODO: correlation key sessions and task completion! BZ-1245616-related
                 cmdResult = doTaskOperation(
                         taskCmd.getTaskId(), 
                         request.getDeploymentId(), 
@@ -153,6 +173,7 @@ public class ProcessRequestBean {
                 cmdResult = doKieSessionOperation(
                         cmd, 
                         request.getDeploymentId(), 
+                        correlationKeyProps,
                         request.getProcessInstanceId());
             }
         } catch (PermissionDeniedException pde) {
@@ -172,7 +193,7 @@ public class ProcessRequestBean {
                 jaxbResponse.addException(e, i, cmd, FAILURE);
             }
         }
-    }
+    };
    
     void preprocessCommand(Command cmd) { 
        if( AcceptedServerCommands.SEND_OBJECT_PARAMETER_COMMANDS.contains(cmd.getClass()) ) { 
@@ -230,18 +251,19 @@ public class ProcessRequestBean {
      * ends up synchronizing around the retrieved {@link KieSession} in order to avoid race-conditions.
      * 
      * @param cmd The command to be executed.
-     * @param deploymentId The id of the runtime.
-     * @param processInstanceId The process instance id, if available.
+     * @param deploymentId The id of the runtim 
+     * @param correlationKeyProps The defining properties for a correlation key
+     * @param processInstanceId The process instance id, if available (otherwise null).
      * @return The result of the {@link Command}.
      */
-    public <T> T doKieSessionOperation(Command<T> cmd, String deploymentId, Long processInstanceId) {
+    public <T> T doKieSessionOperation(Command<T> cmd, String deploymentId, List<String> correlationKeyProps,  Long processInstanceId) {
         if( emptyDeploymentId(deploymentId) ) {
             throw new DeploymentNotFoundException("No deployment id supplied! Could not retrieve runtime to execute " + cmd.getClass().getSimpleName());
         }
 
         try {
-            T result = processService.execute(deploymentId, cmd);
-
+            Context cmdContext = getDeploymentCommandContext(correlationKeyProps, processInstanceId, cmd);
+            T result = processService.execute(deploymentId, cmdContext, cmd);
             return result;
         } catch (ProcessInstanceNotFoundException e) {
             throw KieRemoteRestOperationException.notFound("Process instance " + processInstanceId + " could not be found!");
@@ -252,6 +274,36 @@ public class ProcessRequestBean {
         }
     }
 
+    private Context getDeploymentCommandContext(List<String> correlationKeyProps, Long processInstanceId, Command cmd) { 
+        if( cmd instanceof StartCorrelatedProcessCommand || cmd instanceof StartProcessInstanceCommand ) { 
+            return EmptyContext.get();
+        }
+        // correlation key
+        CorrelationKey correlationKey = null;
+        if( correlationKeyProps != null && ! correlationKeyProps.isEmpty() ) { 
+            CorrelationKeyFactory factory = KieInternalServices.Factory.get().newCorrelationKeyFactory(); 
+            correlationKey = factory.newCorrelationKey(correlationKeyProps);
+        } else if (cmd instanceof CorrelationKeyCommand ) { 
+            correlationKey = ((CorrelationKeyCommand) cmd).getCorrelationKey();
+        } 
+        if( correlationKey != null ) { 
+            return CorrelationKeyContext.get(correlationKey);
+        }
+        
+        // process instance
+        if( processInstanceId == null && cmd instanceof ProcessInstanceIdCommand ) { 
+            processInstanceId = ((ProcessInstanceIdCommand) cmd).getProcessInstanceId();
+            if( processInstanceId != null ) { 
+               return ProcessInstanceIdContext.get(processInstanceId);
+            }
+        }
+        if( processInstanceId != null ) { 
+            return ProcessInstanceIdContext.get(processInstanceId);
+        }
+       
+        // empty
+        return EmptyContext.get();
+    }
    
     /**
      * Returns the actual variable instance from the runtime (as opposed to retrieving the string value of the

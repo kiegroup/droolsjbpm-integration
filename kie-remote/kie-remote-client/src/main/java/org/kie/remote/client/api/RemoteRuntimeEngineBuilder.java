@@ -1,5 +1,8 @@
 package org.kie.remote.client.api;
 
+import java.util.Map;
+
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
@@ -10,7 +13,7 @@ import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
  * runtime engine instance. 
  * 
  * @param <B> The builder instance type
- * @param <R> The factory instance type
+ * @param <F> The factory instance type
  */
 public interface RemoteRuntimeEngineBuilder<B, F> extends RemoteClientBuilder<B> {
 
@@ -21,6 +24,26 @@ public interface RemoteRuntimeEngineBuilder<B, F> extends RemoteClientBuilder<B>
      * @return The builder instance
      */
     B addProcessInstanceId(long processInstanceId);
+    
+    /**
+     * Adds correlation key properties, which are necessary when interacting
+     * with a correlation-key identitied {@link KieSession}.
+     * @param correlationKeyNameValueProperties a {@link Map} of the correlation key properties,
+     * where each entry key is a property name, and the entry value is the property value
+     * 
+     * @return The builder instance
+     */
+    B addCorrelationProperties(String... correlationProperty);
+   
+    /**
+     * Adds correlation key properties, which are necessary when interacting
+     * with a correlation-key identitied {@link KieSession}.
+     * @param correlationKeyNameValueProperties a {@link Map} of the correlation key properties,
+     * where each entry key is a property name, and the entry value is the property value
+     * 
+     * @return The builder instance
+     */
+    B clearCorrelationProperties();
     
     /**
      * If the {@link RemoteRuntimeEngineBuilder} is being reused (in order to build

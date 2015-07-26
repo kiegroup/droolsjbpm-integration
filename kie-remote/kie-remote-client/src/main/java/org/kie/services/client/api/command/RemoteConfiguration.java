@@ -3,7 +3,11 @@ package org.kie.services.client.api.command;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.ConnectionFactory;
@@ -44,8 +48,12 @@ public final class RemoteConfiguration {
 
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     private JaxbSerializationProvider jaxbSerializationProvider;
+    
+    private List<String> correlationProperties = new ArrayList<String>();
 
     // JMS
+    private String connectionUserName;
+    private String connectionPassword;
     private boolean useSsl = false;
     private boolean disableTaskSecurity = false;
     private ConnectionFactory connectionFactory;
@@ -242,11 +250,11 @@ public final class RemoteConfiguration {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("The user name may not be empty or null.");
         }
-        this.userName = username;
+        setUserName(username);
         if (password == null) {
             throw new IllegalArgumentException("The password may not be null.");
         }
-        this.password = password;
+        setPassword(password);
     }
 
     /**
@@ -280,13 +288,19 @@ public final class RemoteConfiguration {
     }
     
     public String getUserName() {
-        // assert userName != null : "username value should not be null!"; // disabled for tests
         return userName;
     }
 
     public String getPassword() {
-        // assert password != null : "password value should not be null!"; // disabled for tests
         return password;
+    }
+
+    public String getConnectionUserName() {
+        return connectionUserName;
+    }
+
+    public String getConnectionPassword() {
+        return connectionPassword;
     }
 
     ConnectionFactory getConnectionFactory() {
@@ -295,12 +309,10 @@ public final class RemoteConfiguration {
     }
 
     Queue getKsessionQueue() {
-        // assert ksessionQueue != null : "ksessionQueue value should not be null!"; // disabled for testing
         return ksessionQueue;
     }
 
     Queue getTaskQueue() {
-        // assert taskQueue != null : "taskQueue value should not be null!"; // disabled for testing
         return taskQueue;
     }
 
@@ -345,6 +357,11 @@ public final class RemoteConfiguration {
         return processInstanceId;
     }
 
+    List<String> getCorrelationProperties() { 
+        return correlationProperties;
+    }
+
+    
     public String getWsdlLocationRelativePath() {
         return wsdlLocRelativePath;
     }
@@ -367,6 +384,14 @@ public final class RemoteConfiguration {
         this.processInstanceId = processInstanceId;
     }
 
+    public void addCorrelationProperties( String... correlationProperty ) {
+        this.correlationProperties.addAll(Arrays.asList(correlationProperty));
+    }
+
+    public void clearCorrelationProperties() {
+        this.correlationProperties.clear();
+    }
+
     public void setServerBaseRestUrl(URL url) {
         URL checkedModifiedUrl = initializeRestServicesUrl(url);
         this.serverBaseUrl = checkedModifiedUrl;
@@ -379,10 +404,16 @@ public final class RemoteConfiguration {
     
     public void setUserName(String userName) {
         this.userName = userName;
+        if( this.connectionUserName == null ) { 
+            this.connectionUserName = userName;
+        }
     }
 
     public void setPassword(String password) {
         this.password = password;
+        if( this.connectionPassword == null ) { 
+            this.connectionPassword = password;
+        }
     }
 
     public void setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses) {
@@ -425,6 +456,8 @@ public final class RemoteConfiguration {
    
     private RemoteConfiguration(RemoteConfiguration config) { 
        this.connectionFactory = config.connectionFactory;
+       this.connectionPassword = config.connectionPassword;
+       this.connectionUserName = config.connectionUserName;
        
        this.deploymentId = config.deploymentId;
        this.extraJaxbClasses = config.extraJaxbClasses;

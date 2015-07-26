@@ -43,6 +43,8 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
+import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationKey;
+import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationProperty;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskFormResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
@@ -99,6 +101,10 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
                 JaxbDeploymentUnit.class,
                 JaxbDeploymentUnitList.class,
                 JaxbDeploymentDescriptor.class,
+               
+                // correlation key
+                JaxbCorrelationKey.class,
+                JaxbCorrelationProperty.class,
                 
                 // process
                 JaxbProcessDefinition.class,
@@ -123,7 +129,7 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
                 // exception
                 JaxbRestRequestException.class,
 
-                // vairable wrapper element for primitives and their wrappers
+                // variable wrapper element for primitives and their wrappers
                 JaxbBoolean.class,
                 JaxbByte.class,
                 JaxbCharacter.class,

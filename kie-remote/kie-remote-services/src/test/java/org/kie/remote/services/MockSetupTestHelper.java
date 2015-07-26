@@ -13,6 +13,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.util.ArrayList;
 
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
 import org.jbpm.runtime.manager.impl.PerProcessInstanceRuntimeManager;
@@ -30,13 +31,15 @@ import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
-import org.jbpm.services.task.impl.factories.TaskFactory;
 import org.jbpm.services.task.impl.model.TaskDataImpl;
 import org.jbpm.services.task.impl.model.TaskImpl;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
@@ -139,12 +142,25 @@ public class MockSetupTestHelper {
             doReturn(runtimeEngineMock).when(runtimeMgrMock).getRuntimeEngine(any(ProcessInstanceIdContext.class));
             // throw exception is EmptyContext.get()
             mockStatic( EmptyContext.class, ProcessInstanceIdContext.class );
-            Mockito.when(EmptyContext.get()).thenThrow(new IllegalStateException("A ProcessInstanceIdContext is expected to be used here!"));
+            final EmptyContext realEmptyContext = new EmptyContext() {
+                @Override
+                public String getContextId() { return "EmptyContext"; } 
+                
+            };
+            Mockito.when(EmptyContext.get()).then(new Answer<EmptyContext>() {
+                int times = 0;
+                public EmptyContext answer(InvocationOnMock invocation) throws Throwable {
+                    // allow once during process instance creation
+                    if( ++times > 1 ) { 
+                        throw new IllegalStateException("An EmptyContext should NOT have been used here!");
+                    }
+                    return realEmptyContext;
+                }
+            });
             Mockito.when(ProcessInstanceIdContext.get()).then(new Answer<ProcessInstanceIdContext>() {
                 int times = 0;
                 public ProcessInstanceIdContext answer(InvocationOnMock invocation) throws Throwable {
-                    ++times;
-                    if( times > 1 ) { 
+                    if( ++times > 1 ) { 
                         throw new IllegalStateException("A process instance id is expected to be passed, received and used in the second call.");
                     }
                     return new ProcessInstanceIdContext(null);
@@ -195,7 +211,14 @@ public class MockSetupTestHelper {
         ProcessInstance procInstMock = spy(procInst);
         doReturn(procInstMock).when(kieSessionMock).execute(any(StartProcessCommand.class));
 
-        doReturn(procInstMock).when(processServiceMock).execute(any(String.class), any(StartProcessCommand.class));
+        doReturn(procInstMock).when(processServiceMock).execute(
+                any(String.class), 
+                any(Context.class),
+                any(StartProcessCommand.class));
+        doReturn(procInstMock).when(processServiceMock).execute(
+                any(String.class), 
+                any(Context.class),
+                any(StartCorrelatedProcessCommand.class));
         
         // have test setup mocks
         test.setupTestMocks();
