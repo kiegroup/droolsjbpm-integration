@@ -38,12 +38,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.manager.Context;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.remote.services.StartProcessEveryStrategyTest;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -93,7 +95,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
     }
 
     @Test
-    public void startProcessAndDoStuffPerProcessStartegyTest() throws Exception {
+    public void startProcessAndDoStuffPerProcessStrategyTest() throws Exception {
         // This method does some static mock magic to make sure
         // that EmptyContext.get() throws an exception if it is called here
         // (since a ProcessInstanceIdContext should be used instead
@@ -101,6 +103,8 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         setupProcessMocks(this, RuntimeStrategy.PER_PROCESS_INSTANCE);
         doReturn(new String("http://localhost:8080/test/rest/process/" + TEST_PROCESS_DEF_NAME + "/start")).when(httpRequestMock)
                 .getRequestURI();
+        String [] corrProps = { "anton" };
+        this.queryParams.put("corrProp", corrProps);
 
         Response resp = startProcessInstance(TEST_PROCESS_DEF_NAME);
         // verify ksession is called
@@ -117,8 +121,8 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         resp = signalProcessInstances();
 
         // verify ksession is called
-        verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
-        PowerMockito.verifyStatic(times(0));
+        verify(processServiceMock, times(2)).execute(any(String.class), any(Context.class), any(Command.class));
+        PowerMockito.verifyStatic(times(1));
         EmptyContext.get();
     }
 
@@ -138,7 +142,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         resp = signalProcessInstances();
 
         // verify ksession is called
-        verify(processServiceMock, times(2)).execute(any(String.class), any(Command.class));
+        verify(processServiceMock, times(2)).execute(any(String.class), any(Context.class), any(Command.class));
     }
 
     @Test
@@ -157,7 +161,7 @@ public class RestStartProcessEveryStrategyTest extends RuntimeResourceImpl imple
         resp = signalProcessInstances();
 
         // verify ksession is called
-        verify(processServiceMock, times(2)).execute(any(String.class),any(Command.class));
+        verify(processServiceMock, times(2)).execute(any(String.class), any(Context.class), any(Command.class));
     }
 
 }

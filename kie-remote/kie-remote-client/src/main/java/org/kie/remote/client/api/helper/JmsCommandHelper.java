@@ -74,7 +74,7 @@ public class JmsCommandHelper {
         
         return InternalJmsCommandHelper.internalExecuteJmsCommand(command, 
                 connectionUserName, connectionPassword,
-                userName, password, deploymentId, processInstanceId, 
+                userName, password, deploymentId, processInstanceId, null,
                 factory, sendQueue, responseQueue, 
                 serializationProvider, extraJaxbClasses, serializationProvider.getSerializationType(), 
                 maxTimeoutInMillisecs);

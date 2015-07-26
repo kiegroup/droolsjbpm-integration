@@ -23,20 +23,23 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.jms.Queue;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 
-import org.jbpm.kie.services.impl.CommonUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
+import org.kie.internal.command.ProcessInstanceIdCommand;
+import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
+import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.client.api.exception.RemoteApiException;
 import org.kie.remote.client.api.exception.RemoteCommunicationException;
@@ -90,6 +93,16 @@ public abstract class AbstractRemoteCommandObject {
         
     }
 
+    // Client object helper methods -----------------------------------------------------------------------------------------------
+  
+    protected String convertCorrelationKeyToString(CorrelationKey correlationKey) { 
+        try {
+            return CorrelationKeyXmlAdapter.marshalCorrelationKey(correlationKey);
+        } catch( Exception e ) {
+            throw new RemoteApiException("Unable to marshal correlation key to a string value", e);
+        }
+    }
+        
     // Compatibility methods -----------------------------------------------------------------------------------------------------
 
     public void readExternal( ObjectInput arg0 ) throws IOException, ClassNotFoundException {
@@ -202,7 +215,13 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    static JaxbCommandsRequest prepareCommandRequest( Command command, String userName, String deploymentId, Long processInstanceId ) {
+    static JaxbCommandsRequest prepareCommandRequest( 
+            Command command, 
+            String userName, 
+            String deploymentId, 
+            Long processInstanceId,
+            Collection<String> correlationKeyProps) {
+        
         if( deploymentId == null && !(command instanceof TaskCommand || command instanceof AuditCommand) ) {
             throw new MissingRequiredInfoException("A deployment id is required when sending commands involving the KieSession.");
         }
@@ -214,7 +233,19 @@ public abstract class AbstractRemoteCommandObject {
         }
 
         if( processInstanceId != null ) { 
-            processInstanceId = CommonUtils.findProcessInstanceId(command);
+            if (command instanceof ProcessInstanceIdCommand) {
+                processInstanceId = ((ProcessInstanceIdCommand) command).getProcessInstanceId();
+            } 
+        }
+      
+        if( correlationKeyProps != null && ! correlationKeyProps.isEmpty() ) {
+            StringBuffer correlationKeyString = new StringBuffer();
+            Iterator<String> iter = correlationKeyProps.iterator();
+            correlationKeyString.append(iter.next());
+            while( iter.hasNext() ) { 
+                correlationKeyString.append(":").append(iter.next());
+            }
+            req.setCorrelationKeyString(correlationKeyString.toString());
         }
         
         req.setProcessInstanceId(processInstanceId);
@@ -245,7 +276,8 @@ public abstract class AbstractRemoteCommandObject {
         
         return internalExecuteJmsCommand(command,
                 config.getConnectionUserName(), config.getConnectionPassword(), 
-                config.getUserName(), config.getPassword(), config.getDeploymentId(), config.getProcessInstanceId(),
+                config.getUserName(), config.getPassword(), 
+                config.getDeploymentId(), config.getProcessInstanceId(), config.getCorrelationProperties(),
                 config.getConnectionFactory(), sendQueue, config.getResponseQueue(),
                 (SerializationProvider) config.getJaxbSerializationProvider(), config.getExtraJaxbClasses(),
                 config.getSerializationType(), config.getTimeout());
@@ -259,7 +291,12 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeRestCommand( Command command ) {
-        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(command, config.getUserName(), config.getDeploymentId(), config.getProcessInstanceId());
+        JaxbCommandsRequest jaxbRequest = prepareCommandRequest(
+                command, 
+                config.getUserName(), 
+                config.getDeploymentId(), 
+                config.getProcessInstanceId(), 
+                config.getCorrelationProperties());
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
         
         // necessary for deserialization

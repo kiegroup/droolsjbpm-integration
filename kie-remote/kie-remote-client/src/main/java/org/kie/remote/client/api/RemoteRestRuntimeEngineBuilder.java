@@ -24,7 +24,7 @@ import org.kie.api.runtime.manager.RuntimeEngine;
  * This is fluent API builder class for creating a remote {@link RuntimeEngine} instance 
  * or a {@link RemoteRestRuntimeEngineFactory}.
  */
-public interface RemoteRestRuntimeEngineBuilder extends  RemoteRuntimeEngineBuilder<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> {
+public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuilder<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> {
 
     /**
      * The URL used here should be in the following form:

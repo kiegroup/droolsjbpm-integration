@@ -18,7 +18,11 @@ package org.kie.services.client.api.command;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.ConnectionFactory;
@@ -59,6 +63,8 @@ public final class RemoteConfiguration {
 
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     private JaxbSerializationProvider jaxbSerializationProvider;
+    
+    private List<String> correlationProperties = new ArrayList<String>();
 
     // JMS
     private boolean useSsl = false;
@@ -374,6 +380,11 @@ public final class RemoteConfiguration {
         return processInstanceId;
     }
 
+    List<String> getCorrelationProperties() { 
+        return correlationProperties;
+    }
+
+    
     public String getWsdlLocationRelativePath() {
         return wsdlLocRelativePath;
     }
@@ -394,6 +405,14 @@ public final class RemoteConfiguration {
 
     public void setProcessInstanceId(long processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    public void addCorrelationProperties( String... correlationProperty ) {
+        this.correlationProperties.addAll(Arrays.asList(correlationProperty));
+    }
+
+    public void clearCorrelationProperties() {
+        this.correlationProperties.clear();
     }
 
     public void setServerBaseRestUrl(URL url) {

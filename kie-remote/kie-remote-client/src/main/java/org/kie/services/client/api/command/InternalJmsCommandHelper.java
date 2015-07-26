@@ -15,13 +15,15 @@
 
 package org.kie.services.client.api.command;
 
-import static org.kie.services.client.api.command.AbstractRemoteCommandObject.*;
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.emptyDeploymentId;
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.logger;
+import static org.kie.services.client.api.command.AbstractRemoteCommandObject.prepareCommandRequest;
 import static org.kie.services.client.serialization.SerializationConstants.DEPLOYMENT_ID_PROPERTY_NAME;
 import static org.kie.services.client.serialization.SerializationConstants.SERIALIZATION_TYPE_PROPERTY_NAME;
 import static org.kie.services.shared.ServicesVersion.VERSION;
-import static org.kie.services.client.api.command.AbstractRemoteCommandObject.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,6 +41,7 @@ import org.kie.api.command.Command;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.client.api.exception.RemoteApiException;
 import org.kie.remote.client.api.exception.RemoteCommunicationException;
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.jaxb.gen.TaskCommand;
@@ -47,15 +50,47 @@ import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 
+/**
+ * This class has been created to help users find the correct logic to 
+ * send {@link JaxbCommandsRequest} instances to a server instance.
+ */
 public class InternalJmsCommandHelper {
 
-    public static <T> T internalExecuteJmsCommand( Command command, 
+    public static <T> T internalExecuteJmsCommand( Command command,  // required
+            ConnectionFactory factory,  // required
+            Queue sendQueue, // required
+            Queue responseQueue, // required
+            SerializationProvider serializationProvider) { 
+            
+       return internalExecuteJmsCommand(command, 
+               null, null, 
+               null, null, 
+               null, 
+               null, 
+               null, 
+               factory, 
+               sendQueue, 
+               responseQueue, 
+               serializationProvider, 
+               null, 
+               ClientJaxbSerializationProvider.JMS_SERIALIZATION_TYPE, 
+               null);
+    }
+    
+    public static <T> T internalExecuteJmsCommand( Command command,  // required
             String connUser, String connPassword,
-            String userName, String password, String deploymentId, Long processInstanceId, 
-            ConnectionFactory factory, Queue sendQueue, Queue responseQueue,
-            SerializationProvider serializationProvider, Set<Class<?>> extraJaxbClasses, int serializationType, 
-            long timeoutInMillisecs) {
-        JaxbCommandsRequest req = prepareCommandRequest(command, userName, deploymentId, processInstanceId );
+            String userName, String password, 
+            String deploymentId,  // required for all non-audit commands
+            Long processInstanceId,  // required for process instance runtimes
+            List<String> rorrelationKeyProperties, // required for correlated sessions
+            ConnectionFactory factory,  // required
+            Queue sendQueue, // required
+            Queue responseQueue, // required
+            SerializationProvider serializationProvider,  // required
+            Set<Class<?>> extraJaxbClasses, 
+            int serializationType, // required
+            Long timeoutInMillisecs) {
+        JaxbCommandsRequest req = prepareCommandRequest(command, userName, deploymentId, processInstanceId, rorrelationKeyProperties );
 
         Connection connection = null;
         Session session = null;
@@ -134,7 +169,11 @@ public class InternalJmsCommandHelper {
             // receive
             Message response;
             try {
-                response = consumer.receive(timeoutInMillisecs);
+                if( timeoutInMillisecs != null ) { 
+                    response = consumer.receive(timeoutInMillisecs);
+                } else { 
+                    response = consumer.receive();
+                }
             } catch( JMSException jmse ) {
                 throw new RemoteCommunicationException("Unable to receive or retrieve the JMS response.", jmse);
             }

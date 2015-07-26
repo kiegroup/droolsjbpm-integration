@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
+import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
+import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
@@ -115,6 +117,10 @@ public class JaxbCommandsRequest {
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
+    
+    @XmlElement
+    @XmlSchemaType(name = "string")
+    private String correlationKeyString;
    
     // This list should match the list in AcceptedCommands
     @XmlElements({
@@ -279,6 +285,14 @@ public class JaxbCommandsRequest {
         this.user = user;
     }
 
+    public String getCorrelationKeyString() {
+        return correlationKeyString;
+    }
+
+    public void setCorrelationKeyString(String correlationKeyString) {
+        this.correlationKeyString = correlationKeyString;
+    }
+    
     public void setCommands(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = commands;

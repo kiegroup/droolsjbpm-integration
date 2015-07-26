@@ -52,8 +52,6 @@ import org.kie.internal.task.api.model.InternalOrganizationalEntity;
 import org.kie.internal.task.api.model.InternalTask;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
-import org.kie.remote.services.jaxb.JaxbCommandsRequest;
-import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
@@ -305,18 +303,39 @@ public class ResourceBase {
         throw KieRemoteRestOperationException.badRequest(paramName + " parameter does not have a numerical format (" + paramVal + ")");
     }
 
+    public static final String CORR_KEY_SHORT_QUERY_PARAM_PREFIX = "corrProp";
+    
+    protected static List<String> getCorrelationKeyProperties(Map<String, String[]> params) {
+        List<String> correlationKeyProperties = null;
+
+        for (Entry<String, String[]> entry : params.entrySet()) {
+            String key = entry.getKey();
+            String[] paramValues = entry.getValue();
+            if (key.equals(CORR_KEY_SHORT_QUERY_PARAM_PREFIX) ) {
+                if( correlationKeyProperties == null ) { 
+                    correlationKeyProperties = new ArrayList<String>(Arrays.asList(paramValues));
+                } else { 
+                    correlationKeyProperties.addAll(Arrays.asList(paramValues));
+                }
+            }
+        }
+        return correlationKeyProperties;
+    }
+
+    public static final String MAP_QUERY_PARAM_PREFIX = "map_";
+    
     protected static Map<String, Object> extractMapFromParams(Map<String, String[]> params, String operation) {
         Map<String, Object> map = new HashMap<String, Object>();
 
         for (Entry<String, String[]> entry : params.entrySet()) {
-            if (entry.getKey().startsWith("map_")) {
+            if (entry.getKey().startsWith(MAP_QUERY_PARAM_PREFIX)) { 
                 String key = entry.getKey();
                 String[] paramValues = entry.getValue();
                 if (paramValues.length != 1) {
                     throw KieRemoteRestOperationException.badRequest("Only one map_* (" + key + ") query parameter allowed for '" + operation
                             + "' operation (" + paramValues.length + " passed).");
                 }
-                String mapKey = key.substring("map_".length());
+                String mapKey = key.substring(MAP_QUERY_PARAM_PREFIX.length());
                 String mapVal = paramValues[0].trim();
 
                 map.put(mapKey, getObjectFromString(key, mapVal));
@@ -325,6 +344,7 @@ public class ResourceBase {
         return map;
     }
 
+    
     protected static List<OrganizationalEntity> getOrganizationalEntityListFromParams(Map<String, String[]> params, boolean required, String operation) {
         List<OrganizationalEntity> orgEntList = new ArrayList<OrganizationalEntity>();
 

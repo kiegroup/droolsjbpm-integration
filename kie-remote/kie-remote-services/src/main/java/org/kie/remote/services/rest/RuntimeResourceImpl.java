@@ -18,6 +18,7 @@ package org.kie.remote.services.rest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +42,7 @@ import org.drools.core.command.runtime.process.GetProcessIdsCommand;
 import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.core.command.runtime.process.GetWorkItemCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
+import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.process.instance.WorkItem;
 import org.drools.core.util.StringUtils;
@@ -53,7 +55,10 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.remote.services.exception.KieRemoteServicesInternalError;
+import org.kie.internal.KieInternalServices;
+import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
+import org.kie.internal.process.CorrelationKey;
+import org.kie.internal.process.CorrelationProperty;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
@@ -109,8 +114,9 @@ public class RuntimeResourceImpl extends ResourceBase {
         Map<String, String[]> requestParams = getRequestParams();
         String oper = getRelativePath();
         Map<String, Object> params = extractMapFromParams(requestParams, oper);
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
 
-        ProcessInstance result = startProcessInstance(processId, params);
+        ProcessInstance result = startProcessInstance(processId, params, correlationKeyProps);
 
         JaxbProcessInstanceResponse responseObj = new JaxbProcessInstanceResponse(result, getRequestUri());
         return createCorrectVariant(responseObj, headers);
@@ -119,7 +125,14 @@ public class RuntimeResourceImpl extends ResourceBase {
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/startform")
     public Response getProcessInstanceStartForm(@PathParam("processDefId") String processId) {
-        List<String> result = (List<String>) processRequestBean.doKieSessionOperation(new GetProcessIdsCommand(), deploymentId, null);
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
+        List<String> result = (List<String>) processRequestBean.doKieSessionOperation(
+                new GetProcessIdsCommand(), 
+                deploymentId, 
+                correlationKeyProps,
+                null);
 
         if (result != null && result.contains(processId)) {
             String opener = "";
@@ -152,6 +165,9 @@ public class RuntimeResourceImpl extends ResourceBase {
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
     public Response abortProcessInstance(@PathParam("procInstId") Long procInstId) {
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
        
@@ -159,6 +175,7 @@ public class RuntimeResourceImpl extends ResourceBase {
             processRequestBean.doKieSessionOperation(
                 cmd, 
                 deploymentId, 
+                correlationKeyProps,
                 procInstId);
         } catch( IllegalArgumentException iae ) { 
             if( iae.getMessage().startsWith("Could not find process instance") ) {
@@ -174,12 +191,14 @@ public class RuntimeResourceImpl extends ResourceBase {
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
     public Response signalProcessInstance(@PathParam("procInstId") Long procInstId) {
         String oper = getRelativePath();
-        Map<String, String[]> params = getRequestParams();
-        String eventType = getStringParam("signal", true, params, oper);
-        Object event = getObjectParam("event", false, params, oper);
+        Map<String, String[]> requestParams = getRequestParams();
+        String eventType = getStringParam("signal", true, requestParams, oper);
+        Object event = getObjectParam("event", false, requestParams, oper);
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
         
-        processRequestBean.doKieSessionOperation(cmd, deploymentId, procInstId);
+        processRequestBean.doKieSessionOperation(cmd, deploymentId, correlationKeyProps, procInstId);
         
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
 
@@ -212,10 +231,12 @@ public class RuntimeResourceImpl extends ResourceBase {
         Map<String, String[]> requestParams = getRequestParams();
         String eventType = getStringParam("signal", true, requestParams, oper);
         Object event = getObjectParam("event", false, requestParams, oper);
-
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(eventType, event),
                 deploymentId, 
+                correlationKeyProps,
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
         
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
@@ -225,9 +246,13 @@ public class RuntimeResourceImpl extends ResourceBase {
     @Path("/workitem/{workItemId: [0-9-]+}")
     public Response getWorkItem(@PathParam("workItemId") Long workItemId) { 
         String oper = getRelativePath();
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
         WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
                 deploymentId, 
+                correlationKeyProps,
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(), oper, true));
                
         if( workItem == null ) { 
@@ -241,10 +266,12 @@ public class RuntimeResourceImpl extends ResourceBase {
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     public Response doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         String oper = getRelativePath();
-        Map<String, String[]> params = getRequestParams();
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+        
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
-            Map<String, Object> results = extractMapFromParams(params, operation);
+            Map<String, Object> results = extractMapFromParams(requestParams, operation);
             cmd = new CompleteWorkItemCommand(workItemId, results);
         } else if ("abort".equalsIgnoreCase(operation.toLowerCase())) {
             cmd = new AbortWorkItemCommand(workItemId);
@@ -256,7 +283,8 @@ public class RuntimeResourceImpl extends ResourceBase {
         processRequestBean.doKieSessionOperation(
                 cmd, 
                 deploymentId, 
-                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, params, oper, true));
+                correlationKeyProps,
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
                 
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
@@ -272,10 +300,11 @@ public class RuntimeResourceImpl extends ResourceBase {
         Map<String, String[]> requestParams = getRequestParams();
         String oper = getRelativePath();
         Map<String, Object> params = extractMapFromParams(requestParams, oper );
+        List<String> corrKeyProps = getCorrelationKeyProperties(requestParams);
 
-        ProcessInstance procInst = startProcessInstance(processId, params);
+        ProcessInstance procInst = startProcessInstance(processId, params, corrKeyProps);
         
-        Map<String, String> vars = getVariables(procInst.getId());
+        Map<String, String> vars = getVariables(procInst.getId(), corrKeyProps);
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
         
         return createCorrectVariant(resp, headers);
@@ -284,8 +313,11 @@ public class RuntimeResourceImpl extends ResourceBase {
     @GET
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
     public Response withVarsGetProcessInstance(@PathParam("procInstId") Long procInstId) {
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> corrKeyProps = getCorrelationKeyProperties(requestParams);
+        
         ProcessInstance procInst = getProcessInstance(procInstId, true);
-        Map<String, String> vars = getVariables(procInstId);
+        Map<String, String> vars = getVariables(procInstId, corrKeyProps);
         JaxbProcessInstanceWithVariablesResponse responseObj 
             = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
         
@@ -296,17 +328,19 @@ public class RuntimeResourceImpl extends ResourceBase {
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
     public Response withVarsSignalProcessInstance(@PathParam("procInstId") Long procInstId) {
         String oper = getRelativePath();
-        Map<String, String[]> params = getRequestParams();
-        String eventType = getStringParam("signal", true, params, oper);
-        Object event = getObjectParam("event", false, params, oper);
+        Map<String, String[]> requestParams = getRequestParams();
+        String eventType = getStringParam("signal", true, requestParams, oper);
+        Object event = getObjectParam("event", false, requestParams, oper);
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
 
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(procInstId, eventType, event),
                 deploymentId, 
+                correlationKeyProps,
                 procInstId);
         
         ProcessInstance processInstance = getProcessInstance(procInstId, false);
-        Map<String, String> vars = getVariables(procInstId);
+        Map<String, String> vars = getVariables(procInstId, correlationKeyProps);
         
         return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars), headers);
     }
@@ -314,11 +348,15 @@ public class RuntimeResourceImpl extends ResourceBase {
     // Helper methods --------------------------------------------------------------------------------------------------------------
     
     private ProcessInstance getProcessInstance(long procInstId, boolean throwEx ) { 
+        Map<String, String[]> params = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(params);
+        
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         Object procInstResult = processRequestBean.doKieSessionOperation(
                 cmd,
                 deploymentId, 
+                correlationKeyProps,
                 procInstId);
         
         if (procInstResult != null) {
@@ -331,18 +369,17 @@ public class RuntimeResourceImpl extends ResourceBase {
         }
     }
     
-    private Map<String, String> getVariables(long processInstanceId) {
-        Object result = processRequestBean.doKieSessionOperation(
+    private Map<String, String> getVariables(long processInstanceId, List<String> corrKeyProps) {
+        List<VariableInstanceLog> varInstLogList = processRequestBean.doKieSessionOperation(
                 new FindVariableInstancesCommand(processInstanceId),
                 deploymentId, 
+                corrKeyProps,
                 processInstanceId);
-        List<VariableInstanceLog> varInstLogList = (List<VariableInstanceLog>) result;
         
         Map<String, String> vars = new HashMap<String, String>();
         if( varInstLogList.isEmpty() ) { 
             return vars;
         }
-        
         Map<String, VariableInstanceLog> varLogMap = new HashMap<String, VariableInstanceLog>();
         for( VariableInstanceLog varLog: varInstLogList ) {
             String varId = varLog.getVariableId();
@@ -361,12 +398,20 @@ public class RuntimeResourceImpl extends ResourceBase {
         return vars;
     }
     
-    private ProcessInstance startProcessInstance(String processId, Map<String, Object> params) { 
-        Object result = null;
+    private ProcessInstance startProcessInstance(String processId, Map<String, Object> params, List<String> corrKeyProps) { 
+        ProcessInstance result = null;
+        Command<ProcessInstance> cmd = null;
+        if( corrKeyProps != null && ! corrKeyProps.isEmpty() ) { 
+            CorrelationKey key =  KieInternalServices.Factory.get().newCorrelationKeyFactory().newCorrelationKey(corrKeyProps);
+            cmd = new StartCorrelatedProcessCommand(processId, key);
+        } else { 
+            cmd = new StartProcessCommand(processId, params);
+        }
         try { 
             result = processRequestBean.doKieSessionOperation(
-                new StartProcessCommand(processId, params),
+                cmd,
                 deploymentId, 
+                corrKeyProps,
                 null);
         } catch( IllegalArgumentException iae ) { 
             if( iae.getMessage().startsWith("Unknown process ID")) { 
@@ -374,7 +419,7 @@ public class RuntimeResourceImpl extends ResourceBase {
             }
             throw KieRemoteRestOperationException.internalServerError("Unable to start process instance '" + processId + "'", iae);
         }
-        return (ProcessInstance) result;
+        return result;
     }
 
     protected QName getRootElementName(Object object) { 
