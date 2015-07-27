@@ -110,6 +110,12 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/1.4.1_5</bundle>
   </feature>
 
+  <feature name="jbpm-executor" version="${project.version}" description="jBPM Executor">
+    <feature version="${project.version}">jbpm</feature>
+    <bundle>wrap:mvn:org.jbpm/jbpm-executor/${version.org.jbpm}$DynamicImport-Package=org.hibernate.*,javassist.*</bundle>
+    <bundle>wrap:mvn:org.jbpm/jbpm-workitems/${version.org.jbpm}</bundle>
+  </feature>
+
   <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
     <feature version="${project.version}">drools-module</feature>
     <bundle>mvn:org.optaplanner/optaplanner-core/${version.org.optaplanner}</bundle>
@@ -170,6 +176,12 @@
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
+  </feature>
+
+  <feature name="kie-remote-client" version="${project.version}" description="KIE Remote Client">
+    <bundle>wrap:mvn:org.kie.remote/kie-remote-client/${version.org.kie}</bundle>
+    <bundle>wrap:mvn:org.kie.remote/kie-remote-common/${version.org.kie}</bundle>
+    <bundle>wrap:mvn:org.kie.remote/kie-remote-jaxb/${version.org.kie}</bundle>
   </feature>
 
 </features>
