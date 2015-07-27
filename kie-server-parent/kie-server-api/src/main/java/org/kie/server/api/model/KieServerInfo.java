@@ -21,6 +21,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="kie-server-info")
@@ -30,7 +31,9 @@ public class KieServerInfo {
     private String serverId;
     private String version;
 
-    @XStreamImplicit(itemFieldName = "capability")
+    private String name;
+    private String location;
+
     private List<String> capabilities;
     
     public KieServerInfo() {
@@ -43,11 +46,13 @@ public class KieServerInfo {
         this.version = version;
     }
 
-    public KieServerInfo(String serverId, String version, List<String> capabilities) {
+    public KieServerInfo(String serverId, String name, String version, List<String> capabilities, String location) {
         super();
         this.serverId = serverId;
+        this.name = name;
         this.version = version;
         this.capabilities = capabilities;
+        this.location = location;
     }
 
     @XmlElement(name="version")
@@ -64,6 +69,15 @@ public class KieServerInfo {
         return serverId;
     }
 
+    @XmlElement(name="name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
@@ -77,11 +91,20 @@ public class KieServerInfo {
         this.capabilities = capabilities;
     }
 
+    @XmlElement(name="location")
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
     @Override
     public String toString() {
         return "KieServerInfo{" +
                 "serverId='" + serverId + '\'' +
                 ", version='" + version + '\'' +
+                ", location='" + location + '\'' +
                 '}';
     }
 }

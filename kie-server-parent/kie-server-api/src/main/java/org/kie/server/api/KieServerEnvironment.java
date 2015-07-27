@@ -27,6 +27,7 @@ public class KieServerEnvironment {
     private static final Pattern VERSION_PAT = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)([\\.-].*)?");
     private static Version version;
     private static String serverId;
+    private static String name;
 
     static {
         String kieServerString = KieServerEnvironment.class.getPackage().getImplementationVersion();
@@ -76,6 +77,13 @@ public class KieServerEnvironment {
 
     public static void setServerId(String serverIdIn) {
         serverId = serverIdIn;
+    }
+    public static String getServerName() {
+        return name;
+    }
+
+    public static void setServerName(String nameIn) {
+        name = nameIn;
     }
 
 }

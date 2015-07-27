@@ -30,14 +30,12 @@ import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
-import org.kie.server.api.commands.RegisterServerControllerCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -120,16 +118,6 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         }
 
         throw new KieServicesException("Server that this client is connected to has no capabilities to handle " + serviceClient.getSimpleName());
-    }
-
-    @Override
-    public ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig) {
-        if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateServiceResponse( baseURI+"/controller/"+controllerEndpoint, kieServerConfig, KieServerInfo.class );
-        } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new RegisterServerControllerCommand( controllerEndpoint, kieServerConfig ) ) );
-            return (ServiceResponse<KieServerInfo>) executeJmsCommand( script ).getResponses().get( 0 );
-        }
     }
 
     @Override

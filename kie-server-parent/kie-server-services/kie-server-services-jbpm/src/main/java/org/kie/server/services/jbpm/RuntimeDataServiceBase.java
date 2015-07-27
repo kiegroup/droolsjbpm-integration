@@ -139,14 +139,18 @@ public class RuntimeDataServiceBase {
     }
 
 
-    public org.kie.server.api.model.instance.ProcessInstance getProcessInstanceByCorrelationKey(String correlationKey) {
+    public ProcessInstanceList getProcessInstanceByCorrelationKey(String correlationKey) {
 
         String[] correlationProperties = correlationKey.split(":");
 
         CorrelationKey actualCorrelationKey = correlationKeyFactory.newCorrelationKey(Arrays.asList(correlationProperties));
 
-        ProcessInstanceDesc processInstanceDesc = runtimeDataService.getProcessInstanceByCorrelationKey(actualCorrelationKey);
-        return convertToProcessInstance(processInstanceDesc);
+        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByCorrelationKey(actualCorrelationKey);
+
+        ProcessInstanceList processInstanceList = convertToProcessInstanceList(instances);
+        logger.debug("Returning result of process instance search: {}", processInstanceList);
+
+        return processInstanceList;
     }
 
 

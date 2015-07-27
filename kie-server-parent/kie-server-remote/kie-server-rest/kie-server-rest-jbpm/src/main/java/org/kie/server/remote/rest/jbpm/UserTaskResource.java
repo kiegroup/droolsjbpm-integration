@@ -602,8 +602,6 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
-            Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, type, Object.class);
 
             String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, name, attachmentPayload, type);
 

@@ -21,6 +21,7 @@
     <module>kie-server-api</module>
     <module>kie-server-tests</module>
     <module>kie-server-wars</module>
+    <module>kie-server-controller</module>
   </modules>
 
  <dependencyManagement>
@@ -92,6 +93,18 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-ws</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- controller -->
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-controller-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-controller-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 

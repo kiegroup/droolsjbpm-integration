@@ -123,6 +123,11 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     }
 
     @Override
+    public KieServerStateRepository getStateRepository() {
+        return this.repository;
+    }
+
+    @Override
     public KieServerConfig getConfig() {
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
         return currentState.getConfiguration();

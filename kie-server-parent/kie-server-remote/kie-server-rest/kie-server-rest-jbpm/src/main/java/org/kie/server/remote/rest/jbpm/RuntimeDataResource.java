@@ -106,12 +106,9 @@ public class RuntimeDataResource {
 
         Variant v = getVariant(headers);
 
-        org.kie.server.api.model.instance.ProcessInstance processInstanceDesc = runtimeDataServiceBase.getProcessInstanceByCorrelationKey(correlationKey);
-        if (processInstanceDesc == null) {
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstanceByCorrelationKey(correlationKey);
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, correlationKey), v);
-        }
-        return createCorrectVariant(processInstanceDesc, headers, Response.Status.OK);
+        return createCorrectVariant(processInstanceList, headers, Response.Status.OK);
     }
 
     @GET

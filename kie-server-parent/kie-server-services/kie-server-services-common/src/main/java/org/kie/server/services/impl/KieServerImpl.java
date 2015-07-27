@@ -22,32 +22,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
-import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.remote.common.rest.KieRemoteHttpResponse;
-import org.kie.server.api.KieController;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingException;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.controller.api.KieServerController;
+import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
@@ -63,7 +56,9 @@ public class KieServerImpl {
 
     private static final ServiceLoader<KieServerExtension> serverExtensions = ServiceLoader.load(KieServerExtension.class);
 
-    private static final ServiceLoader<KieController> kieControllers = ServiceLoader.load(KieController.class);
+    private static final ServiceLoader<KieServerController> kieControllers = ServiceLoader.load(KieServerController.class);
+    // TODO figure out how to get actual URL of the kie server
+    private String kieServerLocation = System.getProperty("org.kie.server.location", "http://localhost:8230/kie-server/services/rest/server");
 
     private final KieServerRegistry context;
 
@@ -94,21 +89,25 @@ public class KieServerImpl {
             }
         }
 
-        // once all extensions are loaded connect and sync with controller if exists
-        Set<String> controllers = currentState.getControllers();
-
-        KieController kieController = getController();
+        KieServerController kieController = getController();
         // try to load container information from available controllers if any...
-        Set<KieContainerResource> containers = kieController.getContainers(controllers, KieServerEnvironment.getServerId(), currentState.getConfiguration());
+        KieServerInfo kieServerInfo = getInfoInternal();
+        KieServerSetup kieServerSetup = kieController.connect(kieServerInfo);
+
+        Set<KieContainerResource> containers = kieServerSetup.getContainers();
         if (containers == null || containers.isEmpty()) {
             // if no containers from controller use local storage
             containers = currentState.getContainers();
         }
         for (KieContainerResource containerResource : containers) {
-
-            createContainer(containerResource.getContainerId(), containerResource);
+            if (containerResource.getStatus().equals(KieContainerStatus.STARTED)) {
+                createContainer(containerResource.getContainerId(), containerResource);
+            }
         }
-
+        currentState.setContainers(containers);
+        if (kieServerSetup.getServerConfig() != null) {
+            currentState.setConfiguration(kieServerSetup.getServerConfig());
+        }
         repository.store(KieServerEnvironment.getServerId(), currentState);
 
     }
@@ -116,22 +115,13 @@ public class KieServerImpl {
     public KieServerRegistry getServerRegistry() { 
         return context;
     }
-    
-    public ServiceResponse<KieServerInfo> registerController(String controller, KieServerConfig kieServerConfig) {
-        if (controller != null && !controller.isEmpty()) {
-            this.context.registerController(controller);
 
-            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
-            currentState.setControllers(this.context.getControllers());
-            currentState.setConfiguration(kieServerConfig);
-
-            repository.store(KieServerEnvironment.getServerId(), currentState);
-        }
-
-        return getInfo();
-    }
 
     public void destroy() {
+        // disconnect from controller
+        KieServerController kieController = getController();
+        kieController.disconnect(getInfoInternal());
+
         for (KieServerExtension extension : context.getServerExtensions()) {
 
             try {
@@ -152,20 +142,26 @@ public class KieServerImpl {
         return this.context.getServerExtensions();
     }
 
+    protected KieServerInfo getInfoInternal() {
+        Version version = KieServerEnvironment.getVersion();
+        String serverId = KieServerEnvironment.getServerId();
+        String serverName = KieServerEnvironment.getServerName();
+        String versionStr = version != null ? version.toString() : "Unknown-Version";
 
+        List<String> capabilities = new ArrayList<String>();
+        for (KieServerExtension extension : context.getServerExtensions()) {
+            capabilities.add(extension.getImplementedCapability());
+        }
+
+        return new KieServerInfo(serverId, serverName, versionStr, capabilities, kieServerLocation);
+
+    }
 
     public ServiceResponse<KieServerInfo> getInfo() {
         try {
-            Version version = KieServerEnvironment.getVersion();
-            String serverId = KieServerEnvironment.getServerId();
-            String versionStr = version != null ? version.toString() : "Unknown-Version";
+            KieServerInfo kieServerInfo = getInfoInternal();
 
-            List<String> capabilities = new ArrayList<String>();
-            for (KieServerExtension extension : context.getServerExtensions()) {
-                capabilities.add(extension.getImplementedCapability());
-            }
-
-            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", new KieServerInfo(serverId, versionStr, capabilities));
+            return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.SUCCESS, "Kie Server info", kieServerInfo);
         } catch (Exception e) {
             logger.error("Error retrieving server info:", e);
             return new ServiceResponse<KieServerInfo>(ServiceResponse.ResponseType.FAILURE, "Error retrieving kie server info: " +
@@ -554,9 +550,9 @@ public class KieServerImpl {
         }
     }
 
-    protected KieController getController() {
-        KieController controller = new DefaultRestControllerImpl();
-        Iterator<KieController> it = kieControllers.iterator();
+    protected KieServerController getController() {
+        KieServerController controller = new DefaultRestControllerImpl(context);
+        Iterator<KieServerController> it = kieControllers.iterator();
         if (it != null && it.hasNext()) {
             controller = it.next();
         }

@@ -220,6 +220,33 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
+    public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize) {
+        ProcessInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getProcessInstanceByCorrelationKey", new Object[]{correlationKey.toExternalForm()}) ) );
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+        if (result != null && result.getProcessInstances() != null) {
+            return Arrays.asList(result.getProcessInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
@@ -459,25 +486,31 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
     @Override
     public ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey) {
-        ProcessInstance result = null;
+        ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstance.class);
+                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "QueryService", "getProcessInstanceByCorrelationKey", new Object[]{correlationKey.toExternalForm()}) ) );
-            ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
             result = response.getResult();
         }
-
-        return result;
+        if (result != null && result.getProcessInstances()!= null && result.getProcessInstances().length > 0) {
+            for (ProcessInstance instance : result.getProcessInstances()) {
+                if (instance.getState() == org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE) {
+                    return instance;
+                }
+            }
+        }
+        return null;
     }
 
     @Override

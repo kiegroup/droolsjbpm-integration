@@ -30,8 +30,6 @@ public interface KieServicesClient {
 
     <T> T getServicesClient(Class<T> serviceClient);
 
-    ServiceResponse<KieServerInfo> register(String controllerEndpoint, KieServerConfig kieServerConfig);
-
     ServiceResponse<KieServerInfo> getServerInfo();
 
     ServiceResponse<KieContainerResourceList> listContainers();

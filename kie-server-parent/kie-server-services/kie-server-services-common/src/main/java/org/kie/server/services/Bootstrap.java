@@ -44,6 +44,7 @@ public class Bootstrap implements ServletContextListener {
         UUID serverId = UUID.nameUUIDFromBytes(serverIdString.getBytes(Charset.forName("UTF-8")));
 
         KieServerEnvironment.setServerId(serverId.toString());
+        KieServerEnvironment.setServerName(serverIdString);
         logger.info("KieServer (id {}) started initialization process", KieServerEnvironment.getServerId());
     }
 

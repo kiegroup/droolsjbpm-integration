@@ -179,6 +179,7 @@ public abstract class KieServerBaseIntegrationTest {
         server.setPort(TestConfig.getAllocatedPort());
         server.start();
         KieServerEnvironment.setServerId("target/" + KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));
+        KieServerEnvironment.setServerName("KieServer");
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
 
         KieServerImpl kieServer = KieServerLocator.getInstance();

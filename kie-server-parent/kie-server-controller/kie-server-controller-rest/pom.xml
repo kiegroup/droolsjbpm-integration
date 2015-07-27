@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>kie-server-controller</artifactId>
+    <groupId>org.kie.server</groupId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>kie-server-controller-rest</artifactId>
+  <name>KIE :: Execution Server :: Controller :: REST Implementation</name>
+  <description>KIE Execution Server Controller REST Implementation</description>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-impl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>jaxrs-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+    </dependency>
+
+  </dependencies>
+
+</project>

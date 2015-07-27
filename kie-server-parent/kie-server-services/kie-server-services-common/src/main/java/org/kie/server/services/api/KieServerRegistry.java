@@ -52,4 +52,6 @@ public interface KieServerRegistry {
     KieServerConfig getConfig();
 
     void registerStateRepository(KieServerStateRepository repository);
+
+    KieServerStateRepository getStateRepository();
 }
