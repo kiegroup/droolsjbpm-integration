@@ -14,23 +14,6 @@
   <description>Examples for Drools Expert, Fusion and/or jBPM.</description>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <manifest>
-                <!-- Needed for runExamples.sh and runExamples.bat -->
-                <addClasspath>true</addClasspath>
-                <classpathPrefix>../../binaries/</classpathPrefix>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
