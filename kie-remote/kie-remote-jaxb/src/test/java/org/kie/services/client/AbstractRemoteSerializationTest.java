@@ -351,6 +351,7 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         origLog.setEnd(new Date((new Date()).getTime() + 1000));
         origLog.setExternalId("testDomainId");
         origLog.setIdentity("identityNotMemory");
+        origLog.setProcessInstanceDescription("What a process, say!");
 
         // nullable
         origLog.setStatus(2);

@@ -84,13 +84,17 @@ public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessIns
     @XmlElement(name="external-id")
     @XmlSchemaType(name = "string")
     private String externalId;
+   
+    @XmlElement(name="process-instance-description")
+    @XmlSchemaType(name = "string")
+    private String processInstanceDescription;
     
     public JaxbProcessInstanceLog() { 
         super(ProcessInstanceLog.class);
     }
     
     public JaxbProcessInstanceLog(ProcessInstanceLog processInstanceLog) { 
-       super(processInstanceLog, ProcessInstanceLog.class);
+        super(processInstanceLog, ProcessInstanceLog.class);
     }
 
     public Long getId() {
@@ -195,6 +199,14 @@ public class JaxbProcessInstanceLog extends AbstractJaxbHistoryObject<ProcessIns
 
     public void setExternalId(String externalId) {
         this.externalId = externalId;
+    }
+
+    public String getProcessInstanceDescription() {
+        return processInstanceDescription;
+    }
+
+    public void setProcessInstanceDescription( String processInstanceDescription ) {
+        this.processInstanceDescription = processInstanceDescription;
     }
 
     /**
