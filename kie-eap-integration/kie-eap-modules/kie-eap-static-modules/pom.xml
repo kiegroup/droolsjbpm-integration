@@ -77,6 +77,7 @@
     <module>com-google-code-gson</module>
     <module>com-fasterxml-jackson</module>
     <module>org-reflections</module>
+    <module>com-sun-xml-bind-core</module>
   </modules>
 
 </project>
