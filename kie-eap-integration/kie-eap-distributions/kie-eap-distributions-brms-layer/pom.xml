@@ -237,6 +237,12 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+    <dependency>
+      <groupId>org.kie.modules</groupId>
+      <artifactId>com-sun-xml-bind-core</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
     
   </dependencies>
 
