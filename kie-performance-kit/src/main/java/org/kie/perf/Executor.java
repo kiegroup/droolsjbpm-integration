@@ -29,7 +29,7 @@ import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
 
 public class Executor {
-    
+
     protected static final Logger log = LoggerFactory.getLogger(Executor.class);
 
     private ScheduledReporter reporter;
@@ -67,7 +67,7 @@ public class Executor {
             reporter = CsvSingleReporter.forRegistry(metrics).formatFor(Locale.US).convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS).build(reportDataLocation);
         }
-        
+
         for (Measure m : tc.getMeasure()) {
             if (m == Measure.MEMORYUSAGE) {
                 metrics.registerAll(new MemoryUsageGaugeSet(scenario.getClass()));
@@ -82,7 +82,7 @@ public class Executor {
                             method.setAccessible(true);
                             return (Long) method.invoke(os);
                         } catch (Exception e) {
-                            
+
                         }
                         return -1L;
                     }
@@ -154,7 +154,7 @@ public class Executor {
             }
             msg += " ========";
             log.info(msg);
-            
+
             if (scenario != null) {
                 // this is a child process for this scenario with own JVM
                 exec.initMetrics(scenario);
@@ -162,7 +162,7 @@ public class Executor {
                 if (tc.isWarmUp()) {
                     SharedMetricRegistry.setWarmUp(true);
                     scenario.initMetrics();
-                    for (int i=0; i<tc.getWarmUpCount(); ++i) {
+                    for (int i = 0; i < tc.getWarmUpCount(); ++i) {
                         scenario.execute();
                     }
                     SharedMetricRegistry.setWarmUp(false);

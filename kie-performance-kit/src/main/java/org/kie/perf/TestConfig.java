@@ -41,40 +41,50 @@ public class TestConfig {
 
     public Properties loadProperties() throws Exception {
         Properties props = new Properties();
-        props.load(TestConfig.class.getClassLoader().getResourceAsStream("performance.properties"));
+        //props.load(TestConfig.class.getClassLoader().getResourceAsStream("performance.properties"));
 
-        suite = props.getProperty("suite");
-        if (suite == null) {
-            suite = System.getProperty("suite");
-        }
-        scenario = props.getProperty("scenario");
-        if (scenario == null) {
-            scenario = System.getProperty("scenario");
-            if (scenario.isEmpty() || scenario.equals("${scenario}")) {
-                scenario = null;
-            }
-        }
+        suite = System.getProperty("suite");
+        props.put("suite", suite);
 
-        startScriptLocation = props.getProperty("startScriptLocation");
+        scenario = System.getProperty("scenario");
+        if (scenario.isEmpty() || scenario.equals("${scenario}")) {
+            scenario = null;
+        }
+        props.put("scenario", scenario);
+
+        startScriptLocation = System.getProperty("startScriptLocation");
         if (startScriptLocation == null) {
             startScriptLocation = "./run.sh";
         }
+        props.put("startScriptLocation", startScriptLocation);
 
-        runType = RunType.valueOf(props.getProperty("runType").toUpperCase());
-        duration = Integer.valueOf(props.getProperty("duration"));
-        iterations = Integer.valueOf(props.getProperty("iterations"));
-
-        reporterType = ReporterType.valueOf(props.getProperty("reporterType").toUpperCase());
-        periodicity = Integer.valueOf(props.getProperty("periodicity"));
-        reportDataLocation = props.getProperty("reportDataLocation");
-
-        threads = Integer.valueOf(props.getProperty("threads"));
+        runType = RunType.valueOf(System.getProperty("runType").toUpperCase());
+        duration = Integer.valueOf(System.getProperty("duration"));
+        iterations = Integer.valueOf(System.getProperty("iterations"));
         
-        warmUp = Boolean.valueOf(props.getProperty("warmUp"));
-        warmUpCount = Integer.valueOf(props.getProperty("warmUpCount"));
+        props.put("runType", runType);
+        props.put("duration", duration);
+        props.put("iterations", iterations);
+
+        reporterType = ReporterType.valueOf(System.getProperty("reporterType").toUpperCase());
+        periodicity = Integer.valueOf(System.getProperty("periodicity"));
+        reportDataLocation = System.getProperty("reportDataLocation");
+        
+        props.put("reporterType", reporterType);
+        props.put("periodicity", periodicity);
+        props.put("reportDataLocation", reportDataLocation);
+
+        threads = Integer.valueOf(System.getProperty("threads"));
+        props.put("threads", threads);
+        
+        warmUp = Boolean.valueOf(System.getProperty("warmUp"));
+        warmUpCount = Integer.valueOf(System.getProperty("warmUpCount"));
+        
+        props.put("warmUp", warmUp);
+        props.put("warmUpCount", warmUpCount);
         
         measure = new ArrayList<TestConfig.Measure>();
-        String mprop = props.getProperty("measure");
+        String mprop = System.getProperty("measure");
         String[] mlist = (mprop != null)?mprop.toUpperCase().split(","):new String[0];
         for (String m : mlist) {
             try {
@@ -83,6 +93,7 @@ public class TestConfig {
                 
             }
         }
+        props.put("measure", measure);
 
         return props;
     }
