@@ -21,6 +21,11 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
+import org.kie.server.client.JobServicesClient;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
@@ -31,12 +36,38 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
 
+    protected static final String USER_YODA = "yoda";
+    protected static final String USER_JOHN = "john";
+    protected static final String USER_ADMINISTRATOR = "Administrator";
+
+    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
+    protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
+
+    protected ProcessServicesClient processClient;
+    protected UserTaskServicesClient taskClient;
+    protected QueryServicesClient queryClient;
+    protected JobServicesClient jobServicesClient;
 
     @Before
     public void cleanup() {
         cleanupSingletonSessionId();
     }
 
+    @Override
+    protected KieServicesClient createDefaultClient() {
+        KieServicesClient kieServicesClient = super.createDefaultClient();
+
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
+    }
+
+    protected void setupClients(KieServicesClient client) {
+        this.processClient = client.getServicesClient(ProcessServicesClient.class);
+        this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
+        this.queryClient = client.getServicesClient(QueryServicesClient.class);
+        this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
+    }
 
     protected Object createPersonInstance(String name) {
         try {

@@ -19,10 +19,8 @@ package org.kie.server.api.commands;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -43,7 +41,6 @@ public class CommandScript implements Serializable {
     private static final long serialVersionUID = 510l;
 
     @XmlElements({
-                         @XmlElement(name = "register-server-controller", type = RegisterServerControllerCommand.class),
                          @XmlElement(name = "get-server-info", type = GetServerInfoCommand.class),
                          @XmlElement(name = "create-container", type = CreateContainerCommand.class),
                          @XmlElement(name = "get-container-info", type = GetContainerInfoCommand.class),
@@ -53,6 +50,7 @@ public class CommandScript implements Serializable {
                          @XmlElement(name = "update-scanner", type = UpdateScannerCommand.class),
                          @XmlElement(name = "update-release-id", type = UpdateReleaseIdCommand.class),
                          @XmlElement(name = "call-container", type = CallContainerCommand.class),
+                         @XmlElement(name = "descriptor-command", type = DescriptorCommand.class),
 
             // TODO can this be added somewhere else? if not here JAXRS cannot deserialize content
             @XmlElement(name = "kie-server-config", type = KieServerConfig.class),

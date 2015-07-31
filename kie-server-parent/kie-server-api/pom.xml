@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>kie-server-api</artifactId>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
 
   <name>KIE :: Execution Server :: API</name>
   <description>KIE Execution Server API</description>
@@ -102,6 +102,24 @@
               </content>
             </file>
           </additionalConfig>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.kie.server.api</Bundle-SymbolicName>
+            <Export-Package>
+              org.kie.server.api.*
+            </Export-Package>
+            <Import-Package>
+              com.thoughtworks.xstream;resolution:=optional,
+              org.codehaus.jackson;resolution:=optional,
+              *
+            </Import-Package>
+          </instructions>
         </configuration>
       </plugin>
     </plugins>

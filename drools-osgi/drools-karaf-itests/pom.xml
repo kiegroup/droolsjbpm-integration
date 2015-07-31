@@ -32,6 +32,11 @@
       <artifactId>jbpm-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-client</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Features XML Dependencies used by pax-exam to resolve features to be deployed during test -->
     <dependency>

@@ -48,6 +48,7 @@ import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
+import org.kie.server.services.impl.security.adapters.JMSSecurityAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,93 +131,98 @@ public class KieServerMDB
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void onMessage(Message message) {
-//        String msgId = null;
-//        boolean redelivered = false;
-//        try {
-//            msgId = message.getJMSMessageID();
-//            redelivered = message.getJMSRedelivered();
-//        } catch ( JMSException jmse ) {
-//            String errMsg = "Unable to retrieve JMS " + (msgId == null ? "redelivered flag" : "message id")
-//                            + " from JMS message. Message will not be returned to queue.";
-//            logger.warn( errMsg, jmse );
-//        }
-//
-//        if ( redelivered ) {
-//            if ( retryTracker.maxRetriesReached( msgId ) ) {
-//                logger.warn( "Maximum number of retries (" + retryTracker.getMaximumLimitRetries() + ") reached for message " + msgId );
-//                logger.warn( "Acknowledging message but NOT processing it." );
-//                return;
-//            } else {
-//                logger.warn( "Retry number " + retryTracker.incrementRetries( msgId ) + " of message " + msgId );
-//            }
-//        }
-//
+        try {
+            String username = null;
+            String password = null;
+            try {
+                username = message.getStringProperty(USER_PROPERTY_NAME);
+                password = message.getStringProperty(PASSWRD_PROPERTY_NAME);
+            } catch (JMSException jmse) {
 
-        KieContainerCommandService executor = null;
-
-        // TODO temp lookup as currently this MDB does support rule operations only
-        for (KieServerExtension extension : kieServer.getServerExtensions()) {
-            executor = extension.getAppComponents(KieContainerCommandService.class);
-            if (executor != null) {
-                break;
             }
-        }
-        if (executor == null) {
-            throw new IllegalStateException("No executor found for script execution");
-        }
+            if (username != null && password != null) {
+                JMSSecurityAdapter.login(username, password);
+            }
 
-        // 0. Get msg correlation id (for response)
-        String msgCorrId = null;
-        try {
-            msgCorrId = message.getJMSCorrelationID();
-        } catch ( JMSException jmse ) {
-            String errMsg = "Unable to retrieve JMS correlation id from message! " + ID_NECESSARY;
-            throw new JMSRuntimeException( errMsg, jmse );
-        }
+            KieContainerCommandService executor = null;
 
-        // 1. get marshalling info
-        MarshallingFormat format = null;
-        String classType = null;
-        try {
-            classType = message.getStringProperty(CLASS_TYPE_PROPERTY_NAME);
+            // 0. Get msg correlation id (for response)
+            String msgCorrId = null;
+            try {
+                msgCorrId = message.getJMSCorrelationID();
+            } catch (JMSException jmse) {
+                String errMsg = "Unable to retrieve JMS correlation id from message! " + ID_NECESSARY;
+                throw new JMSRuntimeException(errMsg, jmse);
+            }
 
-            if ( !message.propertyExists( SERIALIZATION_FORMAT_PROPERTY_NAME ) ) {
-                format = MarshallingFormat.JAXB;
-            } else {
+            String targetCapability = "KieServer"; // for backward compatibility default to KieServer
+            try {
+                if (message.propertyExists(TARGET_CAPABILITY_PROPERTY_NAME)) {
+                    targetCapability = message.getStringProperty(TARGET_CAPABILITY_PROPERTY_NAME);
+                }
+            } catch (JMSException jmse) {
+                String errMsg = "Unable to retrieve property '" + TARGET_CAPABILITY_PROPERTY_NAME + "' from message " + msgCorrId + ".";
+                throw new JMSRuntimeException(errMsg, jmse);
+            }
 
-                int intFormat = message.getIntProperty( SERIALIZATION_FORMAT_PROPERTY_NAME );
-                logger.debug("Serialization format (int) is " + intFormat);
-                format = MarshallingFormat.fromId( intFormat );
-                logger.debug("Serialization format is " + format);
-                if( format == null ) {
-                    String errMsg = "Unsupported marshalling format '"+ intFormat +"' from message " + msgCorrId + ".";
-                    throw new JMSRuntimeException( errMsg );
+            // 1. get marshalling info
+            MarshallingFormat format = null;
+            String classType = null;
+            try {
+                classType = message.getStringProperty(CLASS_TYPE_PROPERTY_NAME);
+
+                if (!message.propertyExists(SERIALIZATION_FORMAT_PROPERTY_NAME)) {
+                    format = MarshallingFormat.JAXB;
+                } else {
+
+                    int intFormat = message.getIntProperty(SERIALIZATION_FORMAT_PROPERTY_NAME);
+                    logger.debug("Serialization format (int) is " + intFormat);
+                    format = MarshallingFormat.fromId(intFormat);
+                    logger.debug("Serialization format is " + format);
+                    if (format == null) {
+                        String errMsg = "Unsupported marshalling format '" + intFormat + "' from message " + msgCorrId + ".";
+                        throw new JMSRuntimeException(errMsg);
+                    }
+                }
+            } catch (JMSException jmse) {
+                String errMsg = "Unable to retrieve property '" + SERIALIZATION_FORMAT_PROPERTY_NAME + "' from message " + msgCorrId + ".";
+                throw new JMSRuntimeException(errMsg, jmse);
+            }
+
+            // 2. get marshaller
+            Marshaller marshaller = marshallers.get(format);
+            logger.debug("Selected marshaller is " + marshaller);
+
+            // 3. deserialize request
+            CommandScript script = unmarshallRequest(message, msgCorrId, marshaller, format);
+
+            logger.info("Target capability is {}", targetCapability);
+            for (KieServerExtension extension : kieServer.getServerExtensions()) {
+                KieContainerCommandService tmp = extension.getAppComponents(KieContainerCommandService.class);
+
+                if (tmp != null && extension.getImplementedCapability().equalsIgnoreCase(targetCapability)) {
+                    executor = tmp;
+                    logger.info("Extension {} returned command executor {} with capability {}", extension, executor, extension.getImplementedCapability());
+                    break;
                 }
             }
-        } catch ( JMSException jmse ) {
-            String errMsg = "Unable to retrieve property '"+ SERIALIZATION_FORMAT_PROPERTY_NAME +"' from message " + msgCorrId + ".";
-            throw new JMSRuntimeException( errMsg, jmse );
+            if (executor == null) {
+                throw new IllegalStateException("No executor found for script execution");
+            }
+
+            // 4. process request
+            ServiceResponsesList response = executor.executeScript(script, format, classType);
+
+            // 5. serialize response
+            Message msg = marshallResponse(session, msgCorrId, format, marshaller, response);
+
+            // 6. send response
+            sendResponse(msgCorrId, format, msg);
+
+        } finally {
+
+            JMSSecurityAdapter.logout();
         }
-
-        // 2. get marshaller
-        Marshaller marshaller = marshallers.get( format );
-        logger.debug("Selected marshaller is " + marshaller);
-
-        // 3. deserialize request
-        CommandScript script = unmarshallRequest( message, msgCorrId, marshaller, format );
-
-        // 4. process request
-        ServiceResponsesList response = executor.executeScript( script, format, classType );
-
-        // 5. serialize response
-        Message msg = marshallResponse( session, msgCorrId, format, marshaller, response );
-
-        // 6. send response
-        sendResponse( msgCorrId, format, msg );
-
-//        if ( redelivered ) {
-//            retryTracker.clearRetries( msgId );
-//        }
 
     }
 

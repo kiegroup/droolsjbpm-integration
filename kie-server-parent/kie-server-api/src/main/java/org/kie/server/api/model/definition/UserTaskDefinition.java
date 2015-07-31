@@ -112,6 +112,17 @@ public class UserTaskDefinition {
         this.taskOutputMappings = taskOutputMappings;
     }
 
+    @Override
+    public String toString() {
+        return "UserTaskDefinition{" +
+                "name='" + name + '\'' +
+                ", priority=" + priority +
+                ", skippable=" + skippable +
+                ", createdBy='" + createdBy + '\'' +
+                ", comment='" + comment + '\'' +
+                '}';
+    }
+
     public static class Builder {
 
         private UserTaskDefinition definition = new UserTaskDefinition();

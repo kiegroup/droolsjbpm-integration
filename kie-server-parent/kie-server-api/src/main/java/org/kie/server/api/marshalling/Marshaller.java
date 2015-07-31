@@ -26,4 +26,6 @@ public interface Marshaller {
    
     public void dispose();
 
+    public MarshallingFormat getFormat();
+
 }

@@ -24,9 +24,13 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.storage.KieServerState;
+import org.kie.server.services.impl.storage.KieServerStateRepository;
 
 public class KieServerRegistryImpl implements KieServerRegistry {
 
@@ -35,6 +39,8 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     private Set<KieServerExtension> serverExtensions = new CopyOnWriteArraySet<KieServerExtension>();
 
     private Set<String> controllers = new CopyOnWriteArraySet<String>();
+
+    private KieServerStateRepository repository;
 
     @Override
     public KieContainerInstanceImpl registerContainer(String id, KieContainerInstanceImpl kieContainerInstance) {
@@ -109,5 +115,21 @@ public class KieServerRegistryImpl implements KieServerRegistry {
         }
 
         return new HashSet<String>(controllers);
+    }
+
+    @Override
+    public void registerStateRepository(KieServerStateRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public KieServerStateRepository getStateRepository() {
+        return this.repository;
+    }
+
+    @Override
+    public KieServerConfig getConfig() {
+        KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+        return currentState.getConfiguration();
     }
 }

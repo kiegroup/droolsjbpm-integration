@@ -55,7 +55,7 @@ public class TomcatSecurityAdapter implements SecurityAdapter {
                 return request.getUserPrincipal().getName();
             }
         }
-        return "unknown";
+        return null;
     }
 
     @Override

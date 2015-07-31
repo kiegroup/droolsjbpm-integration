@@ -15,9 +15,13 @@
 
 package org.kie.server.api.model;
 
+import java.util.List;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="kie-server-info")
@@ -26,6 +30,11 @@ public class KieServerInfo {
 
     private String serverId;
     private String version;
+
+    private String name;
+    private String location;
+
+    private List<String> capabilities;
     
     public KieServerInfo() {
         super();
@@ -35,6 +44,15 @@ public class KieServerInfo {
         super();
         this.serverId = serverId;
         this.version = version;
+    }
+
+    public KieServerInfo(String serverId, String name, String version, List<String> capabilities, String location) {
+        super();
+        this.serverId = serverId;
+        this.name = name;
+        this.version = version;
+        this.capabilities = capabilities;
+        this.location = location;
     }
 
     @XmlElement(name="version")
@@ -51,15 +69,42 @@ public class KieServerInfo {
         return serverId;
     }
 
+    @XmlElement(name="name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
 
+    @XmlElement(name="capabilities")
+    public List<String> getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(List<String> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    @XmlElement(name="location")
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
     @Override
     public String toString() {
         return "KieServerInfo{" +
                 "serverId='" + serverId + '\'' +
                 ", version='" + version + '\'' +
+                ", location='" + location + '\'' +
                 '}';
     }
 }

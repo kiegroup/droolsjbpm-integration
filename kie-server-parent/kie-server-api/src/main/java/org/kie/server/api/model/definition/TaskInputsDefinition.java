@@ -44,4 +44,11 @@ public class TaskInputsDefinition {
     public void setTaskInputs(Map<String, String> taskInputs) {
         this.taskInputs = taskInputs;
     }
+
+    @Override
+    public String toString() {
+        return "TaskInputsDefinition{" +
+                "taskInputs=" + taskInputs +
+                '}';
+    }
 }

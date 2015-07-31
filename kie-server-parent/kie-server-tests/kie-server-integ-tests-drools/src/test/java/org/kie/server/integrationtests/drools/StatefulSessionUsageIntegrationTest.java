@@ -48,7 +48,7 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBas
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> reply1 = client.executeCommands("stateful-session1", payload1);
+        ServiceResponse<String> reply1 = ruleClient.executeCommands("stateful-session1", payload1);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
         // first call should set the surname for the inserted person
         String result1 = reply1.getResult();
@@ -69,7 +69,7 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBas
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> reply2 = client.executeCommands("stateful-session1", payload2);
+        ServiceResponse<String> reply2 = ruleClient.executeCommands("stateful-session1", payload2);
         String result2 = reply2.getResult();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply2.getType());
         assertTrue("The 'duplicated' field should be true! Got response: " + result2,
@@ -88,13 +88,13 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBas
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> reply = client.executeCommands("stateful-session2", payload);
+        ServiceResponse<String> reply = ruleClient.executeCommands("stateful-session2", payload);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         // now dispose the container
         ServiceResponse<Void> disposeReply = client.disposeContainer("stateful-session2");
         assertEquals("Dispose reply response type.", ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
         // and try to call the container again. The call should fail as the container no longer exists
-        reply = client.executeCommands("stateful-session2", payload);
+        reply = ruleClient.executeCommands("stateful-session2", payload);
         assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
         assertTrue("Expected message about non-instantiated container. Got: " + reply.getMsg(),
                 reply.getMsg().contains("Container stateful-session2 is not instantiated"));
@@ -114,7 +114,7 @@ public class StatefulSessionUsageIntegrationTest extends RestJmsXstreamSharedBas
                           "  <clear-agenda-group name=\"ag1\"/>\n" + // this is just to test marshalling
                           "  <clear-agenda />\n" + // this is just to test marshalling
                           "</batch-execution>";
-        ServiceResponse<String> reply1 = client.executeCommands("stateful-session1", payload1);
+        ServiceResponse<String> reply1 = ruleClient.executeCommands("stateful-session1", payload1);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
         // first call should set the surname for the inserted person
         String result1 = reply1.getResult();

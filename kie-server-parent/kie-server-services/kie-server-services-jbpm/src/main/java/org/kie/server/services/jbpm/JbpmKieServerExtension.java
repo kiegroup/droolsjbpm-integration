@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -45,22 +46,29 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.api.executor.ExecutorService;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +78,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private static final Logger logger = LoggerFactory.getLogger(JbpmKieServerExtension.class);
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.jbpm.server.ext.disabled", "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
 
     private boolean isExecutorAvailable = false;
@@ -88,6 +96,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private ExecutorService executorService;
 
+    private KieContainerCommandService kieContainerCommandService;
+
     @Override
     public boolean isActive() {
         return disabled == false;
@@ -95,15 +105,21 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+        KieServerConfig config = registry.getConfig();
+
+        KieServerConfigItem callbackConfig = config.getConfigItem(KieServerConstants.CFG_HT_CALLBACK);
+
         // if no other callback set, use jaas by default
-        if (System.getProperty(KieServerConstants.CFG_HT_CALLBACK) == null) {
+        if (callbackConfig == null) {
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
+            JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
         }
+
         this.isExecutorAvailable = isExecutorOnClasspath();
 
         this.kieServer = kieServer;
         this.context = registry;
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties());
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties(config));
         EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
 
         // build definition service
@@ -144,16 +160,30 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
-        // build executor service
-        executorService = ExecutorServiceFactory.newExecutorService(emf);
-        executorService.init();
+
+
+        if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
+            // build executor service
+            executorService = ExecutorServiceFactory.newExecutorService(emf);
+            executorService.setInterval(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_INTERVAL, "3")));
+            executorService.setRetries(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_RETRIES, "3")));
+            executorService.setThreadPoolSize(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_POOL, "1")));
+            executorService.setTimeunit(TimeUnit.valueOf(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_TIME_UNIT, "SECONDS")));
+            executorService.init();
+        }
+
+        this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
+                new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
+                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context));
     }
 
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
         ((AbstractDeploymentService)deploymentService).shutdown();
 
-        executorService.destroy();
+        if (executorService != null) {
+            executorService.destroy();
+        }
 
         EntityManagerFactory emf = EntityManagerFactoryManager.get().remove(persistenceUnitName);
         if (emf != null && emf.isOpen()) {
@@ -225,6 +255,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
             logger.warn("No container with id {} found", id);
             return;
         }
+        List<Integer> states = new ArrayList<Integer>();
+        states.add(ProcessInstance.STATE_ACTIVE);
+        states.add(ProcessInstance.STATE_PENDING);
+        states.add(ProcessInstance.STATE_SUSPENDED);
+
+        // force all active instances to be aborted to properly dispose container
+        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByDeploymentId(id, states, new QueryContext(0, 100));
+        for (ProcessInstanceDesc instanceDesc : instances) {
+            processService.abortProcessInstance(instanceDesc.getId());
+        }
+
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
         deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
         logger.info("Container {} disposed successfully", id);
@@ -252,7 +293,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
+        if (serviceType.isAssignableFrom(kieContainerCommandService.getClass())) {
+            return (T) kieContainerCommandService;
+        }
+
         return null;
+    }
+
+    @Override
+    public String getImplementedCapability() {
+        return "BPM";
     }
 
     @Override
@@ -277,7 +327,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     protected void addAsyncHandler(KModuleDeploymentUnit unit) {
         // add async only when the executor component is not disabled
-        if (isExecutorAvailable) {
+        if (isExecutorAvailable && executorService != null) {
             DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
             if (descriptor == null) {
                 descriptor = new DeploymentDescriptorImpl(persistenceUnitName);
@@ -300,12 +350,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
     }
 
-    protected Map<String, String> getPersistenceProperties() {
+    protected Map<String, String> getPersistenceProperties(KieServerConfig config) {
         Map<String, String> persistenceProperties = new HashMap<String, String>();
 
-        persistenceProperties.put("hibernate.dialect", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
-        persistenceProperties.put("hibernate.transaction.jta.platform", System.getProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
-        persistenceProperties.put("javax.persistence.jtaDataSource", System.getProperty(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
+        persistenceProperties.put("hibernate.dialect", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect"));
+        persistenceProperties.put("hibernate.transaction.jta.platform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
+        persistenceProperties.put("javax.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
 
         return persistenceProperties;
     }

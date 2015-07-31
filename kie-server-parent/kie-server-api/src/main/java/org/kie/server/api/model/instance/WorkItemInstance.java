@@ -113,6 +113,20 @@ public class WorkItemInstance {
         this.nodeId = nodeId;
     }
 
+    @Override
+    public String toString() {
+        return "WorkItemInstance{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", state=" + state +
+                ", parameters=" + parameters +
+                ", processInstanceId=" + processInstanceId +
+                ", containerId='" + containerId + '\'' +
+                ", nodeInstanceId=" + nodeInstanceId +
+                ", nodeId=" + nodeId +
+                '}';
+    }
+
     public static class Builder {
 
         private WorkItemInstance workItemInstance = new WorkItemInstance();

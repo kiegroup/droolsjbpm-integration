@@ -15,8 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm.rest;
 
-import static org.kie.server.api.rest.RestURI.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
@@ -38,6 +36,9 @@ import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.api.rest.RestURI.*;
+
 
 public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 

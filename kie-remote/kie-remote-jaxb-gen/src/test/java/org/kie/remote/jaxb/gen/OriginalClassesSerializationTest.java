@@ -47,7 +47,7 @@ public class OriginalClassesSerializationTest {
       
         int i = 0;
         for (Class<?> cmdClass : reflections.getTypesAnnotatedWith(XmlAccessorType.class) ) {
-            if( cmdClass.getAnnotation(XmlEnum.class) != null ) { 
+            if( cmdClass.getAnnotation(XmlEnum.class) != null || cmdClass.isAnonymousClass()) {
                 continue;
             }
             if( cmdClass.isAnonymousClass() ) { 
@@ -59,7 +59,7 @@ public class OriginalClassesSerializationTest {
                 
                 cmdClass.getConstructor(new Class[0]);
             } catch (Exception e) {
-                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor.");
+                fail("Class " + cmdClass.getSimpleName() + " does not have a no-arg constructor. " + e.getMessage());
             }
         }
         assertTrue( "No classes checked! [" + i + "]", i > 30 );

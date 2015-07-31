@@ -49,7 +49,7 @@ public class MultiModuleProjectIntegrationTest extends RestJmsXstreamSharedBaseI
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> response = client.executeCommands("multimodule-rules1", payload1);
+        ServiceResponse<String> response = ruleClient.executeCommands("multimodule-rules1", payload1);
         assertSuccess(response);
         String result1 = response.getResult();
         assertResultContainsString(result1, "<result identifier=\"car\">");
@@ -61,7 +61,7 @@ public class MultiModuleProjectIntegrationTest extends RestJmsXstreamSharedBaseI
                 "  </insert>\n" +
                 "  <fire-all-rules />\n" +
                 "</batch-execution>";
-        ServiceResponse<String> response2 = client.executeCommands("multimodule-rules2", payload2);
+        ServiceResponse<String> response2 = ruleClient.executeCommands("multimodule-rules2", payload2);
         String result2 = response2.getResult();
         assertSuccess(response2);
         assertResultContainsString(result2, "<result identifier=\"bus\">");

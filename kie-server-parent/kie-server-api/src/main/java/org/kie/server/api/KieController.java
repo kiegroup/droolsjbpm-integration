@@ -18,6 +18,7 @@ package org.kie.server.api;
 import java.util.Set;
 
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieServerConfig;
 
 public interface KieController {
 
@@ -33,5 +34,5 @@ public interface KieController {
      * @param serverId
      * @return
      */
-    Set<KieContainerResource> getContainers(Set<String> controllers, String serverId);
+    Set<KieContainerResource> getContainers(Set<String> controllers, String serverId, KieServerConfig config);
 }

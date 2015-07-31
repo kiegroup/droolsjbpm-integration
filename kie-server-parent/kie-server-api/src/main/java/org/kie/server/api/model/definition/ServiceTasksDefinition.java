@@ -44,4 +44,11 @@ public class ServiceTasksDefinition {
     public void setServiceTasks(Map<String, String> serviceTasks) {
         this.serviceTasks = serviceTasks;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceTasksDefinition{" +
+                "serviceTasks=" + serviceTasks +
+                '}';
+    }
 }
