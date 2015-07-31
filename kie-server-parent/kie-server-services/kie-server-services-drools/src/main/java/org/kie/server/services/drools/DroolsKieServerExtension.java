@@ -24,6 +24,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.kie.scanner.KieModuleMetaData;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -41,7 +42,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "Drools";
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty("org.drools.server.ext.disabled", "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
 
     private KieContainerCommandService batchCommandService;
     private KieServerRegistry registry;
@@ -117,6 +118,11 @@ public class DroolsKieServerExtension implements KieServerExtension {
         }
 
         return null;
+    }
+
+    @Override
+    public String getImplementedCapability() {
+        return "BRM";
     }
 
     @Override

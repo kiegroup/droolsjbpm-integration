@@ -191,6 +191,22 @@ public class TaskSummary {
         this.parentId = parentId;
     }
 
+    @Override
+    public String toString() {
+        return "TaskSummary{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                ", actualOwner='" + actualOwner + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdOn=" + createdOn +
+                ", processInstanceId=" + processInstanceId +
+                ", processId='" + processId + '\'' +
+                ", containerId='" + containerId + '\'' +
+                '}';
+    }
+
     public static class Builder {
 
         private TaskSummary taskSummary = new TaskSummary();

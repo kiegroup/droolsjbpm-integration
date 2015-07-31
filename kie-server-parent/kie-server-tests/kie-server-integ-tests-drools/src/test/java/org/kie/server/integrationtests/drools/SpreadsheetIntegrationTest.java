@@ -46,7 +46,7 @@ public class SpreadsheetIntegrationTest extends RestJmsXstreamSharedBaseIntegrat
             "  </insert>\n" +
             "  <fire-all-rules />\n" +
             "</batch-execution>";
-        ServiceResponse<String> response = client.executeCommands("spreadsheet", payload);
+        ServiceResponse<String> response = ruleClient.executeCommands("spreadsheet", payload);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsString(result, "<canBuyAlcohol>true</canBuyAlcohol>");

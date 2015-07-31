@@ -80,6 +80,11 @@ public class KieServerContainerExtension implements KieServerExtension {
     }
 
     @Override
+    public String getImplementedCapability() {
+        return "KieServer";
+    }
+
+    @Override
     public String toString() {
         return "Server Default Extension";
     }

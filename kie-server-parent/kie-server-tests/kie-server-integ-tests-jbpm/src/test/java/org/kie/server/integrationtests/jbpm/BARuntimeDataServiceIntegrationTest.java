@@ -36,6 +36,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
+
 public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
@@ -59,18 +60,23 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        KieServicesClient kieServicesClient = null;
         if (TestConfig.isLocalServer()) {
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
 
             localServerConfig.addJaxbClasses(extraClasses);
-            return KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(extraClasses);
             configuration.setUserName("Administrator");
-            return KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
+        configuration.setTimeout(5000);
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
 
@@ -83,11 +89,11 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance("john"));
 
-        Long processInstanceId = client.startProcess("definition-project", "definition-project.usertask", parameters);
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
 
         try {
 
-            List<TaskSummary> tasks = client.findTasksAssignedAsBusinessAdministrator("Administrator", 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator("Administrator", 0, 10);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
 
@@ -107,13 +113,13 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<String> status = new ArrayList<String>();
             status.add(Status.InProgress.toString());
 
-            tasks = client.findTasksAssignedAsBusinessAdministrator("Administrator", status, 0, 10);
+            tasks = taskClient.findTasksAssignedAsBusinessAdministrator("Administrator", status, 0, 10);
             assertNotNull(tasks);
             assertEquals(0, tasks.size());
 
 
         } finally {
-            client.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance("definition-project", processInstanceId);
         }
     }
 }

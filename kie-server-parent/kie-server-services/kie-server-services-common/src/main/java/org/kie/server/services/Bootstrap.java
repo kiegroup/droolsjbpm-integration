@@ -21,6 +21,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
@@ -34,17 +35,18 @@ public class Bootstrap implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        String serverIdSuffix = System.getProperty("org.kie.server.id.suffix");
-        String serverIdString = sce.getServletContext().getServletContextName() +"@"+ sce.getServletContext().getContextPath();
 
-        if (serverIdSuffix != null) {
-            serverIdString = serverIdString+"_"+serverIdSuffix;
+        String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
+        String serverName = System.getProperty(KieServerConstants.KIE_SERVER_ID);
+
+        if (serverId == null) {
+            serverName = sce.getServletContext().getServletContextName() +"@"+ sce.getServletContext().getContextPath();
+            serverId = UUID.nameUUIDFromBytes(serverName.getBytes(Charset.forName("UTF-8"))).toString();
         }
 
-        UUID serverId = UUID.nameUUIDFromBytes(serverIdString.getBytes(Charset.forName("UTF-8")));
-
         KieServerEnvironment.setServerId(serverId.toString());
-        logger.info("KieServer (id {}) started initialization process", KieServerEnvironment.getServerId());
+        KieServerEnvironment.setServerName(serverName);
+        logger.info("KieServer (id {} (name {})) started initialization process", KieServerEnvironment.getServerId(), serverName);
     }
 
     @Override

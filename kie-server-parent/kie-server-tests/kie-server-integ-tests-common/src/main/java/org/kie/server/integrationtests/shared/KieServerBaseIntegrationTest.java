@@ -54,7 +54,9 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
@@ -75,6 +77,7 @@ public abstract class KieServerBaseIntegrationTest {
     protected static MavenRepository repository;
 
     protected KieServicesClient client;
+    protected RuleServicesClient ruleClient;
     /*
        Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
        kjars depend on that parent, but it is not necessary to deploy it multiple times. This flag is set the first time
@@ -138,6 +141,14 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
+    protected void setupClients(KieServicesClient kieServicesClient) {
+        try {
+            this.ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
+        } catch (KieServicesException e) {
+            // does not support rule services client - common integration tests do not have drools not jbpm capabilities set
+        }
+    }
+
     protected void disposeAllContainers() {
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, response.getType());
@@ -168,6 +179,7 @@ public abstract class KieServerBaseIntegrationTest {
         server.setPort(TestConfig.getAllocatedPort());
         server.start();
         KieServerEnvironment.setServerId("target/" + KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));
+        KieServerEnvironment.setServerName("KieServer");
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
 
         KieServerImpl kieServer = KieServerLocator.getInstance();

@@ -44,7 +44,7 @@ public class RuleFlowIntegrationTest extends RestJmsXstreamSharedBaseIntegration
                 "  <fire-all-rules/>\n" +
                 "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
                 "</batch-execution>\n";
-        ServiceResponse<String> response = client.executeCommands("ruleflow", payload);
+        ServiceResponse<String> response = ruleClient.executeCommands("ruleflow", payload);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsStringRegex(result,
@@ -62,7 +62,7 @@ public class RuleFlowIntegrationTest extends RestJmsXstreamSharedBaseIntegration
                          "  <fire-all-rules/>\n" +
                          "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
                          "</batch-execution>\n";
-        ServiceResponse<String> response = client.executeCommands("ruleflow-stateless", payload);
+        ServiceResponse<String> response = ruleClient.executeCommands("ruleflow-stateless", payload);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsStringRegex(result,

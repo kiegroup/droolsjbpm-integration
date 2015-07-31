@@ -15,9 +15,6 @@
 
 package org.kie.server.remote.rest.common.resource;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,7 +31,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.impl.KieServerImpl;
@@ -68,21 +64,6 @@ public class KieServerRestImpl {
         this.server = server;
     }
 
-    @POST
-    @Path("/controller/{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response register(@Context HttpHeaders headers, @PathParam("id") String controllerEndpoint, KieServerConfig kieServerConfig) { 
-        if (controllerEndpoint != null) {
-            try {
-                controllerEndpoint = URLDecoder.decode(controllerEndpoint, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-
-            }
-            server.registerController(controllerEndpoint, kieServerConfig);
-        }
-
-        return createCorrectVariant(server.getInfo(), headers);
-    }
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

@@ -1,1 +1,2 @@
 org.kie.server.services.impl.security.adapters.TomcatSecurityAdapter
+org.kie.server.services.impl.security.adapters.JMSSecurityAdapter

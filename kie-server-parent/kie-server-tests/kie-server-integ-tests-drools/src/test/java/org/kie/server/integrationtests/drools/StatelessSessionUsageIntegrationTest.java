@@ -47,7 +47,7 @@ public class StatelessSessionUsageIntegrationTest extends RestJmsXstreamSharedBa
                 "    </org.kie.server.testing.Person>\n" +
                 "  </insert>\n" +
                 "</batch-execution>";
-        ServiceResponse<String> reply1 = client.executeCommands("stateless-kjar1", payload1);
+        ServiceResponse<String> reply1 = ruleClient.executeCommands("stateless-kjar1", payload1);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
         // first call should set the surname for the inserted person
         String result1 = reply1.getResult();

@@ -109,6 +109,19 @@ public class TaskEventInstance {
         this.workItemId = workItemId;
     }
 
+    @Override
+    public String toString() {
+        return "TaskEventInstance{" +
+                "id=" + id +
+                ", taskId=" + taskId +
+                ", type='" + type + '\'' +
+                ", userId='" + userId + '\'' +
+                ", logTime=" + logTime +
+                ", processInstanceId=" + processInstanceId +
+                ", workItemId=" + workItemId +
+                '}';
+    }
+
     public static class Builder {
 
         private TaskEventInstance taskEventInstance = new TaskEventInstance();

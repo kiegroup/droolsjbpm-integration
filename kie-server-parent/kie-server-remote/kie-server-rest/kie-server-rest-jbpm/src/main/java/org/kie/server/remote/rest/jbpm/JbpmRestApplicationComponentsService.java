@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -24,10 +24,16 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.kie.api.executor.ExecutorService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.jbpm.DefinitionServiceBase;
+import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
+import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
+import org.kie.server.services.jbpm.UserTaskServiceBase;
 
 public class JbpmRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -44,9 +50,14 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         RuntimeDataService runtimeDataService = null;
         DefinitionService definitionService = null;
         UserTaskService userTaskService = null;
+        ExecutorService executorService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
+            // in case given service is null (meaning was not configured) continue with next one
+            if (object == null) {
+                continue;
+            }
             if( ProcessService.class.isAssignableFrom(object.getClass()) ) {
                processService = (ProcessService) object;
                continue;
@@ -59,16 +70,27 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( UserTaskService.class.isAssignableFrom(object.getClass()) ) {
                 userTaskService = (UserTaskService) object;
                 continue;
+            } else if( ExecutorService.class.isAssignableFrom(object.getClass()) ) {
+                executorService = (ExecutorService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
             }
         }
-        List<Object> components = new ArrayList<Object>(4);
-        components.add(new ProcessResource(processService, definitionService, runtimeDataService, context));
-        components.add(new RuntimeDataResource(runtimeDataService, context));
-        components.add(new DefinitionResource(definitionService));
-        components.add(new UserTaskResource(userTaskService, context));
+
+        List<Object> components = new ArrayList<Object>(5);
+        DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService);
+        ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
+        UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
+        RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
+        ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
+
+        components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
+        components.add(new RuntimeDataResource(runtimeDataServiceBase));
+        components.add(new DefinitionResource(definitionServiceBase));
+        components.add(new UserTaskResource(userTaskServiceBase));
+        components.add(new ExecutorResource(executorServiceBase));
 
         return components;
     }

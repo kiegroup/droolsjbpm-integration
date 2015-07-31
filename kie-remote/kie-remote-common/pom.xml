@@ -10,6 +10,7 @@
 
   <artifactId>kie-remote-common</artifactId>
   <name>KIE Remote Services :: Common</name>
+  <packaging>bundle</packaging>
 
   <dependencies>
     <!-- REST -->
@@ -43,6 +44,26 @@
     </dependency>
     
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.kie.remote.common</Bundle-SymbolicName>
+            <Export-Package>
+              org.kie.remote.common.rest.*
+            </Export-Package>
+            <Import-Package>
+              javax.ws.rs.core,
+              javax.ws.rs,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
 

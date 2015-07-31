@@ -22,8 +22,10 @@ import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ public class KieServerState {
     private Set<KieContainerResource> containers = new HashSet<KieContainerResource>();
 
     public KieServerState() {
-        String defaultController = System.getProperty("org.kie.server.controller");
+        String defaultController = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
         if (defaultController != null) {
             String[] controllerList = defaultController.split(",");
 
@@ -74,6 +76,17 @@ public class KieServerState {
     }
 
     public void setConfiguration(KieServerConfig configuration) {
-        this.configuration = configuration;
+        if (this.configuration != null) {
+            // if config already exists merge it with precedence given by the argument
+            for (KieServerConfigItem item : configuration.getConfigItems()) {
+                KieServerConfigItem existing = this.configuration.getConfigItem(item.getName());
+                if (existing != null) {
+                    this.configuration.removeConfigItem(existing);
+                }
+                configuration.addConfigItem(item);
+            }
+        } else {
+            this.configuration = configuration;
+        }
     }
 }

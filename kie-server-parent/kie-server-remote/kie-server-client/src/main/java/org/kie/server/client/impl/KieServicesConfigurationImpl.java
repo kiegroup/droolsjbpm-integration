@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,7 +41,7 @@ public final class KieServicesConfigurationImpl
     public static final String REQUEST_QUEUE_NAME          = "jms/queue/KIE.SERVER.REQUEST";
     public static final String RESPONSE_QUEUE_NAME         = "jms/queue/KIE.SERVER.RESPONSE";
 
-    private             long timeoutInMillisecs      = 5000; // in milliseconds
+    private             long timeoutInMillisecs      = 10000; // in milliseconds
 
     // REST or JMS
     private final Transport transport;
@@ -49,6 +50,8 @@ public final class KieServicesConfigurationImpl
     private String userName;
     private String password;
     private String serverUrl;
+
+    private List<String> capabilities;
 
     // JMS
     private boolean useSsl = false;
@@ -319,6 +322,16 @@ public final class KieServicesConfigurationImpl
         return this;
     }
 
+    @Override
+    public void setCapabilities(List<String> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    @Override
+    public List<String> getCapabilities() {
+        return this.capabilities;
+    }
+
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
         this.connectionFactory = config.connectionFactory;
@@ -333,11 +346,13 @@ public final class KieServicesConfigurationImpl
         this.transport = config.transport;
         this.userName = config.userName;
         this.useSsl = config.useSsl;
+        this.capabilities = config.capabilities;
     }
 
     @Override
     public KieServicesConfiguration clone() {
         return new KieServicesConfigurationImpl( this );
     }
+
 
 }
