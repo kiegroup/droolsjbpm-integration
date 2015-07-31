@@ -190,19 +190,4 @@
     <bundle>wrap:mvn:org.kie.remote/kie-remote-jaxb/${version.org.kie}</bundle>
   </feature>
 
-  <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
-    <feature version="${project.version}">drools-module</feature>
-    <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
-    <bundle>mvn:org.kie.remote/kie-remote-common/${version.org.drools.droolsjbpm-integration}</bundle>
-    <bundle>mvn:org.kie.server/kie-server-client/${version.org.drools.droolsjbpm-integration}</bundle>
-    <bundle>wrap:mvn:org.jboss.resteasy/jaxrs-api/${version.org.jboss.resteasy}</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
-    <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
-    <bundle>mvn:org.codehaus.jackson/jackson-xc/${version.org.codehaus.jackson}</bundle>
-    <bundle>mvn:org.codehaus.jackson/jackson-mapper-asl/${version.org.codehaus.jackson}</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
-    <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
-  </feature>
-
 </features>
