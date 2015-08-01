@@ -48,6 +48,11 @@
       <artifactId>jbpm-audit</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-query-jpa</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- other dependencies -->
     <dependency>
@@ -198,7 +203,8 @@
                     org/jbpm/services/task/commands/AddCommentCommand.java,
                     org/jbpm/services/task/commands/GetAllCommentsCommand.java,
                     org/jbpm/services/task/commands/GetCommentByIdCommand.java,
-                    org/jbpm/services/task/commands/SetTaskPropertyCommand.java</includes>
+                    org/jbpm/services/task/commands/SetTaskPropertyCommand.java,
+                    org/jbpm/services/task/commands/TaskQueryWhereCommand.java</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.jbpm</groupId>

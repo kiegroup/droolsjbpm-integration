@@ -80,6 +80,7 @@ public class AcceptedClientCommands {
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(TaskQueryWhereCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
         acceptedCommands.add(ReleaseTaskCommand.class);
         acceptedCommands.add(ResumeTaskCommand.class);

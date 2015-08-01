@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -53,7 +54,9 @@ import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.OrganizationalEntity;
+import org.kie.remote.jaxb.gen.QueryCriteria;
 import org.kie.remote.jaxb.gen.QueryFilter;
+import org.kie.remote.jaxb.gen.QueryWhere;
 import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.mockito.ArgumentCaptor;
@@ -265,6 +268,22 @@ public class ClientCommandObjectTest {
                          break;
                       }
                   }
+               }
+            } else if( fieldVal instanceof QueryWhere ) { 
+               List<QueryCriteria> criteriaList = ((QueryWhere) fieldVal).getQueryCriterias();
+               while( ! criteriaList.isEmpty() ) { 
+                   List<QueryCriteria> moreCriterias = new ArrayList<QueryCriteria>();
+                   Iterator<QueryCriteria> iter = criteriaList.iterator();
+                   while( iter.hasNext() ) { 
+                       QueryCriteria crit = iter.next();
+                       iter.remove();
+                       moreCriterias.addAll(crit.getCriterias());
+                       if( crit.getParameters().contains(val)
+                               || crit.getDateParameters().contains(val) ) { 
+                           return true;
+                       }
+                   }
+                   criteriaList.addAll(moreCriterias);
                }
             }
         } 
