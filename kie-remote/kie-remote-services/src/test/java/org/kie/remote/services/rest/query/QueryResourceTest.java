@@ -15,7 +15,7 @@
 
 package org.kie.remote.services.rest.query;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.QUERY_PARAM_DATE_FORMAT;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.QUERY_PARAM_DATE_FORMAT;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,6 +42,8 @@ import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.QueryResourceImpl;
+import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
+import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskInfo;
@@ -88,6 +90,9 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         queryResource.setProcessRequestBean(processRequestBean);
         
         processRequestBean.setAuditLogService(new JPAAuditLogService(getEmf()));
+        processRequestBean.setJPAService(new RemoteServicesQueryJPAService(getEmf()));
+       
+        queryResource.setUserGroupCallback(userGroupCallback);
         
         queryTaskHelper = new InternalTaskQueryHelper(queryResource);
         queryProcInstHelper = new InternalProcInstQueryHelper(queryResource);
@@ -150,7 +155,6 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         
         result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
     }
-   
     
     @Test
     public void queryTaskRestCallTest() throws Exception  {

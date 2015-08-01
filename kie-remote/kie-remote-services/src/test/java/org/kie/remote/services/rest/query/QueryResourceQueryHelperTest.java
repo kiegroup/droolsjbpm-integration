@@ -34,10 +34,15 @@ import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.QueryResourceImpl;
+import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
+import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 
-public class QueryResourceMoreTest extends AbstractQueryResourceTest {
+/**
+ * This tests Internal*QueryHelper logic
+ */
+public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
 
     public static final String OBJECT_VARIABLE_PROCESS_ID = "org.jboss.qa.bpms.ObjectVariableProcess";
     public static final String OBJECT_VARIABLE_PROCESS_FILE = "BPMN2-ObjectVariables.bpmn2";
@@ -52,7 +57,6 @@ public class QueryResourceMoreTest extends AbstractQueryResourceTest {
         engine = getRuntimeEngine();
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
-   
         
         queryResource = new QueryResourceImpl();
         
@@ -69,8 +73,8 @@ public class QueryResourceMoreTest extends AbstractQueryResourceTest {
         userTaskService.setDeploymentService(mockDepService);
         queryResource.setProcessRequestBean(processRequestBean);
         
-        
         processRequestBean.setAuditLogService(new JPAAuditLogService(getEmf()));
+        processRequestBean.setJPAService(new RemoteServicesQueryJPAService(getEmf()));
         
         queryTaskHelper = new InternalTaskQueryHelper(queryResource);
         queryProcInstHelper = new InternalProcInstQueryHelper(queryResource);
