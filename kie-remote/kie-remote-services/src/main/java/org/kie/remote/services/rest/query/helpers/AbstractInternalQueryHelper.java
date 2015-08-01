@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.helpers;
 
 import static org.kie.remote.services.rest.ResourceBase.*;
 import static org.kie.internal.query.QueryParameterIdentifiers.OLD_VALUE_LIST;
@@ -21,16 +21,16 @@ import static org.kie.internal.query.QueryParameterIdentifiers.VALUE_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_INSTANCE_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VALUE_ID_LIST;
-import static org.kie.remote.services.rest.query.QueryResourceData.actionParamNameMap;
-import static org.kie.remote.services.rest.query.QueryResourceData.getDates;
-import static org.kie.remote.services.rest.query.QueryResourceData.getInts;
-import static org.kie.remote.services.rest.query.QueryResourceData.getLongs;
-import static org.kie.remote.services.rest.query.QueryResourceData.getTaskStatuses;
-import static org.kie.remote.services.rest.query.QueryResourceData.metaRuntimeParams;
-import static org.kie.remote.services.rest.query.QueryResourceData.metaRuntimeParamsShort;
-import static org.kie.remote.services.rest.query.QueryResourceData.paramNameActionMap;
-import static org.kie.remote.services.rest.query.QueryResourceData.varInstQueryParams;
-import static org.kie.remote.services.rest.query.QueryResourceData.varInstQueryParamsShort;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.actionParamNameMap;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.getDates;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.getInts;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.getLongs;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.getTaskStatuses;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.metaRuntimeParams;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.metaRuntimeParamsShort;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.paramNameActionMap;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.varInstQueryParams;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.varInstQueryParamsShort;
 
 import java.util.ArrayDeque;
 import java.util.Date;
@@ -43,10 +43,14 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
+import org.jbpm.query.jpa.data.QueryCriteria;
+import org.jbpm.query.jpa.data.QueryWhere;
 import org.kie.api.task.model.Status;
 import org.kie.internal.query.data.QueryData;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder;
+import org.kie.remote.services.rest.query.data.QueryAction;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 
@@ -315,12 +319,19 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(VAR_VALUE_ID_LIST);
     }
     
-    protected boolean variableCriteriaInQuery(QueryData queryData) { 
-        if( ! queryData.intersectParametersAreEmpty() )  {
-           for( String key : queryData.getIntersectParameters().keySet() ) { 
-              if( VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.contains(key) ) { 
+    protected boolean variableCriteriaInQuery(List<QueryCriteria> criteriaList) { 
+        for( QueryCriteria criteria : criteriaList ) { 
+            if( criteria.isUnion() ) { 
+                return false;
+            }
+            if( criteria.isGroupCriteria() ) { 
+               if( variableCriteriaInQuery(criteria.getCriteria()) )  {
+                   return true;
+               }
+               continue;
+            }
+            if( VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.contains(criteria.getListId()) ) {
                  return true; 
-              }
            }
         }
         return false;

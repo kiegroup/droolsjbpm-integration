@@ -13,11 +13,12 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.helpers;
 
 import java.util.Date;
 
 import org.kie.api.task.model.Status;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder;
 
 /**
  * This class contains all of the methods that add a specific query criteria to the 
