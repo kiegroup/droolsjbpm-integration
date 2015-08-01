@@ -55,6 +55,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -64,6 +65,7 @@ import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.DeleteCommand;
+import org.kie.remote.jaxb.gen.QueryCriteria;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.mockito.Mockito;
 import org.reflections.Reflections;
@@ -175,6 +177,15 @@ public class RemoteCommandObjectTest {
         return cmdObj;
     }
 
+    private static DatatypeFactory factory;
+    static { 
+        try {
+            factory = DatatypeFactory.newInstance();
+        } catch( DatatypeConfigurationException e ) {
+            // do nothing
+        }
+    }
+    
     private void fillField( Field field, Object obj ) throws Exception {
         field.setAccessible(true);
         String fieldTypeName = field.getType().getName();
@@ -217,9 +228,13 @@ public class RemoteCommandObjectTest {
                             listItem = UUID.randomUUID().toString();
                         } else if( Object.class.equals(listItemClass) ) {
                             listItem = "Object";
+                        } else if( XMLGregorianCalendar.class.equals(listItemClass) ) {
+                            listItem = factory.newXMLGregorianCalendar(new GregorianCalendar());
                         } else {
-                            fail(listItemClass.getName());
+                            fail("Please add logic to deal with the " + listItemClass.getName());
                         }
+                    } else if( listItemClass.equals(QueryCriteria.class) ) { 
+                            // do nothing
                     } else {
                         if( TaskCommand.class.equals(listItemClass) ) {
                             ActivateTaskCommand cmd = new ActivateTaskCommand();

@@ -40,6 +40,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
+import org.kie.internal.query.QueryParameterIdentifiers;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.AddCommentCommand;
@@ -67,7 +68,9 @@ import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
 import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.NominateTaskCommand;
+import org.kie.remote.jaxb.gen.QueryCriteria;
 import org.kie.remote.jaxb.gen.QueryFilter;
+import org.kie.remote.jaxb.gen.QueryWhere;
 import org.kie.remote.jaxb.gen.ReleaseTaskCommand;
 import org.kie.remote.jaxb.gen.ResumeTaskCommand;
 import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
@@ -325,94 +328,6 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     }
 
     @Override
-    public Task getTaskByWorkItemId( long workItemId ) {
-        GetTaskByWorkItemIdCommand cmd = new GetTaskByWorkItemIdCommand();
-        cmd.setWorkItemId(workItemId);
-        return (Task) executeCommand(cmd);
-    }
-
-    @Override
-    public Task getTaskById( long taskId ) {
-        GetTaskCommand cmd = new GetTaskCommand();
-        cmd.setTaskId(taskId);
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksAssignedAsBusinessAdministrator( String userId, String language ) {
-        GetTaskAssignedAsBusinessAdminCommand cmd = new GetTaskAssignedAsBusinessAdminCommand();
-        cmd.setUserId(userId);
-        // no query filter for language
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, String language ) {
-        GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
-        cmd.setUserId(userId);
-        cmd.setFilter(addLanguageFilter(language));
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksAssignedAsPotentialOwnerByStatus( String userId, List<Status> status, String language ) {
-        GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
-        cmd.setUserId(userId);
-        if( status != null ) {
-            cmd.getStatuses().addAll(status);
-        }
-        cmd.setFilter(addLanguageFilter(language));
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksOwned( String userId, String language ) {
-        GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
-        cmd.setUserId(userId);
-        cmd.setFilter(addLanguageFilter(language));
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksOwnedByStatus( String userId, List<Status> status, String language ) {
-        GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
-        cmd.setUserId(userId);
-        if( status != null ) {
-            cmd.getStatuses().addAll(status);
-        }
-        cmd.setFilter(addLanguageFilter(language));
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<TaskSummary> getTasksByStatusByProcessInstanceId( long processInstanceId, List<Status> status, String language ) {
-        GetTasksByStatusByProcessInstanceIdCommand cmd = new GetTasksByStatusByProcessInstanceIdCommand();
-        cmd.setProcessInstanceId(processInstanceId);
-        if( status != null ) {
-            cmd.getStatuses().addAll(status);
-        }
-        // no query filter for language
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public List<Long> getTasksByProcessInstanceId( long processInstanceId ) {
-        GetTasksByProcessInstanceIdCommand cmd = new GetTasksByProcessInstanceIdCommand();
-        cmd.setProcessInstanceId(processInstanceId);
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public long addTask( Task task, Map<String, Object> params ) {
-        AddTaskCommand cmd = new AddTaskCommand();
-        org.kie.remote.jaxb.gen.Task genTask = convertKieTaskToGenTask(task);
-        cmd.setJaxbTask(genTask);
-        JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(params);
-        cmd.setParameter(values);
-        return executeCommand(cmd);
-    }
-
-    @Override
     public void release( long taskId, String userId ) {
         ReleaseTaskCommand cmd = new ReleaseTaskCommand();
         cmd.setTaskId(taskId);
@@ -473,6 +388,16 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     }
 
     @Override
+    public long addTask( Task task, Map<String, Object> params ) {
+        AddTaskCommand cmd = new AddTaskCommand();
+        org.kie.remote.jaxb.gen.Task genTask = convertKieTaskToGenTask(task);
+        cmd.setJaxbTask(genTask);
+        JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(params);
+        cmd.setParameter(values);
+        return executeCommand(cmd);
+    }
+
+    @Override
     public Content getContentById( long contentId ) {
         GetContentCommand cmd = new GetContentCommand();
         cmd.setContentId(contentId);
@@ -490,6 +415,175 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Map<String, Object> getTaskContent( long taskId ) {
         GetTaskContentCommand cmd = new GetTaskContentCommand();
         cmd.setTaskId(taskId);
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public Long addComment(long taskId, Comment comment) {
+        // fill jaxbComment
+        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
+        Date addedAt = comment.getAddedAt();
+        if( addedAt != null ) { 
+            XMLGregorianCalendar jaxbAddedAt = convertDateToXmlGregorianCalendar(addedAt);
+            jaxbComment.setAddedAt(jaxbAddedAt);
+        }
+        User addedBy = comment.getAddedBy();
+        if( addedBy != null ) { 
+            jaxbComment.setAddedBy(addedBy.getId());
+        }
+        jaxbComment.setText(comment.getText());
+        jaxbComment.setId(comment.getId());
+    
+        //  create command
+        AddCommentCommand cmd = new AddCommentCommand();
+        cmd.setTaskId(taskId);
+        cmd.setJaxbComment(jaxbComment);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public Long addComment( long taskId, String addedByUserId, String commentText ) {
+        AddCommentCommand cmd = new AddCommentCommand();
+        cmd.setTaskId(taskId);
+        
+        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
+        jaxbComment.setAddedBy(addedByUserId);
+        jaxbComment.setAddedAt(convertDateToXmlGregorianCalendar(new Date()));
+        jaxbComment.setText(commentText);
+        
+        cmd.setJaxbComment(jaxbComment);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public void deleteComment(long taskId, long commentId) {
+        DeleteCommentCommand cmd = new DeleteCommentCommand();
+        cmd.setTaskId(taskId);
+        cmd.setCommentId(commentId);
+        executeCommand(cmd);
+    }
+
+    @Override
+    public List<Comment> getAllCommentsByTaskId(long taskId) {
+        GetAllCommentsCommand cmd = new GetAllCommentsCommand();
+        cmd.setTaskId(taskId);
+    
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public Comment getCommentById(long commentId) {
+        GetCommentByIdCommand cmd = new GetCommentByIdCommand();
+        cmd.setCommentId(commentId);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public void setExpirationDate(long taskId, Date date) {
+        SetTaskPropertyCommand cmd = new SetTaskPropertyCommand();
+        cmd.setExpirationDate(convertDateToXmlGregorianCalendar(date));
+        cmd.setProperty(BigInteger.valueOf(5l));
+        
+        executeCommand(cmd);
+    }
+
+    @Override
+    public Task getTaskByWorkItemId( long workItemId ) {
+        GetTaskByWorkItemIdCommand cmd = new GetTaskByWorkItemIdCommand();
+        cmd.setWorkItemId(workItemId);
+        return (Task) executeCommand(cmd);
+    }
+
+    @Override
+    public Task getTaskById( long taskId ) {
+        GetTaskCommand cmd = new GetTaskCommand();
+        cmd.setTaskId(taskId);
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsBusinessAdministrator( String userId, String language ) {
+        GetTaskAssignedAsBusinessAdminCommand cmd = new GetTaskAssignedAsBusinessAdminCommand();
+        cmd.setUserId(userId);
+        // no query filter for language
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, String language ) {
+        GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
+        cmd.setUserId(userId);
+        cmd.setFilter(addLanguageFilter(language));
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, List<String> groupIds, String language, int firstResult, int maxResults ) {
+        GetTaskAssignedAsPotentialOwnerCommand cmd 
+            = new GetTaskAssignedAsPotentialOwnerCommand();
+        cmd.setUserId(userId); 
+        cmd.getGroupIds().addAll(groupIds);
+        QueryFilter filter = new QueryFilter();
+        filter.setOffset(firstResult);
+        filter.setCount(maxResults);
+        filter.setLanguage(language);
+        cmd.setFilter(filter);
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsPotentialOwnerByProcessId( String userId, String processId ) {
+        org.kie.remote.jaxb.gen.TaskQueryWhereCommand cmd = new org.kie.remote.jaxb.gen.TaskQueryWhereCommand();
+        cmd.setUserId(userId);
+        
+        QueryWhere queryWhere = new QueryWhere();
+        cmd.setQueryWhere(queryWhere);
+        
+        QueryCriteria criteria = new QueryCriteria();
+        criteria.setUnion(false);
+        criteria.setFirst(true);
+        criteria.setListId(QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST);
+        criteria.getParameters().add(userId);
+        queryWhere.getQueryCriterias().add(criteria);
+        
+        criteria = new QueryCriteria();
+        criteria.setUnion(false);
+        criteria.setListId(QueryParameterIdentifiers.PROCESS_ID_LIST);
+        criteria.getParameters().add(processId);
+        queryWhere.getQueryCriterias().add(criteria);
+        
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksAssignedAsPotentialOwnerByStatus( String userId, List<Status> status, String language ) {
+        GetTaskAssignedAsPotentialOwnerCommand cmd = new GetTaskAssignedAsPotentialOwnerCommand();
+        cmd.setUserId(userId);
+        if( status != null ) {
+            cmd.getStatuses().addAll(status);
+        }
+        cmd.setFilter(addLanguageFilter(language));
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<Long> getTasksByProcessInstanceId( long processInstanceId ) {
+        GetTasksByProcessInstanceIdCommand cmd = new GetTasksByProcessInstanceIdCommand();
+        cmd.setProcessInstanceId(processInstanceId);
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksByStatusByProcessInstanceId( long processInstanceId, List<Status> status, String language ) {
+        GetTasksByStatusByProcessInstanceIdCommand cmd = new GetTasksByStatusByProcessInstanceIdCommand();
+        cmd.setProcessInstanceId(processInstanceId);
+        if( status != null ) {
+            cmd.getStatuses().addAll(status);
+        }
+        // no query filter for language
         return executeCommand(cmd);
     }
 
@@ -534,89 +628,22 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     }
 
     @Override
-    public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, List<String> groupIds, String language, int firstResult, int maxResults ) {
-        GetTaskAssignedAsPotentialOwnerCommand cmd 
-            = new GetTaskAssignedAsPotentialOwnerCommand();
-        cmd.setUserId(userId); 
-        cmd.getGroupIds().addAll(groupIds);
-        QueryFilter filter = new QueryFilter();
-        filter.setOffset(firstResult);
-        filter.setCount(maxResults);
-        filter.setLanguage(language);
-        cmd.setFilter(filter);
+    public List<TaskSummary> getTasksOwned( String userId, String language ) {
+        GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
+        cmd.setUserId(userId);
+        cmd.setFilter(addLanguageFilter(language));
         return executeCommand(cmd);
     }
 
     @Override
-    public Long addComment(long taskId, Comment comment) {
-        // fill jaxbComment
-        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
-        Date addedAt = comment.getAddedAt();
-        if( addedAt != null ) { 
-            XMLGregorianCalendar jaxbAddedAt = convertDateToXmlGregorianCalendar(addedAt);
-            jaxbComment.setAddedAt(jaxbAddedAt);
+    public List<TaskSummary> getTasksOwnedByStatus( String userId, List<Status> status, String language ) {
+        GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
+        cmd.setUserId(userId);
+        if( status != null ) {
+            cmd.getStatuses().addAll(status);
         }
-        User addedBy = comment.getAddedBy();
-        if( addedBy != null ) { 
-            jaxbComment.setAddedBy(addedBy.getId());
-        }
-        jaxbComment.setText(comment.getText());
-        jaxbComment.setId(comment.getId());
-
-        //  create command
-        AddCommentCommand cmd = new AddCommentCommand();
-        cmd.setTaskId(taskId);
-        cmd.setJaxbComment(jaxbComment);
-        
+        cmd.setFilter(addLanguageFilter(language));
         return executeCommand(cmd);
-    }
-
-    @Override
-    public Long addComment( long taskId, String addedByUserId, String commentText ) {
-        AddCommentCommand cmd = new AddCommentCommand();
-        cmd.setTaskId(taskId);
-        
-        org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
-        jaxbComment.setAddedBy(addedByUserId);
-        jaxbComment.setAddedAt(convertDateToXmlGregorianCalendar(new Date()));
-        jaxbComment.setText(commentText);
-        
-        cmd.setJaxbComment(jaxbComment);
-        
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public void deleteComment(long taskId, long commentId) {
-        DeleteCommentCommand cmd = new DeleteCommentCommand();
-        cmd.setTaskId(taskId);
-        cmd.setCommentId(commentId);
-        executeCommand(cmd);
-    }
-
-    @Override
-    public List<Comment> getAllCommentsByTaskId(long taskId) {
-        GetAllCommentsCommand cmd = new GetAllCommentsCommand();
-        cmd.setTaskId(taskId);
-      
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public Comment getCommentById(long commentId) {
-        GetCommentByIdCommand cmd = new GetCommentByIdCommand();
-        cmd.setCommentId(commentId);
-        
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public void setExpirationDate(long taskId, Date date) {
-        SetTaskPropertyCommand cmd = new SetTaskPropertyCommand();
-        cmd.setExpirationDate(convertDateToXmlGregorianCalendar(date));
-        cmd.setProperty(BigInteger.valueOf(5l));
-        
-        executeCommand(cmd);
     }
 
 }

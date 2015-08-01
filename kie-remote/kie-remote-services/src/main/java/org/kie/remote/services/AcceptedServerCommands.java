@@ -83,6 +83,7 @@ import org.jbpm.services.task.commands.SkipTaskCommand;
 import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
+import org.jbpm.services.task.commands.TaskQueryWhereCommand;
 import org.kie.api.command.Command;
 
 @SuppressWarnings("rawtypes")
@@ -144,6 +145,7 @@ public class AcceptedServerCommands {
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
+        acceptedCommands.add(TaskQueryWhereCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
         acceptedCommands.add(ReleaseTaskCommand.class);
         acceptedCommands.add(ResumeTaskCommand.class);
