@@ -38,25 +38,27 @@ import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VAL_SEPARATOR
 import static org.kie.internal.query.QueryParameterIdentifiers.WORK_ITEM_ID_LIST;
 
 import java.util.Date;
+import java.util.List;
 
-import org.jbpm.process.audit.command.AuditVariableInstanceLogQueryCommand;
+import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.query.jpa.builder.impl.AbstractQueryBuilderImpl;
-import org.jbpm.services.task.commands.TaskQueryDataCommand;
+import org.jbpm.query.jpa.data.QueryWhere;
 import org.kie.api.task.model.Status;
+import org.kie.internal.query.ExtendedParametrizedQueryBuilder;
+import org.kie.internal.query.ParametrizedQuery;
+import org.kie.internal.query.QueryParameterIdentifiers;
 import org.kie.internal.query.data.QueryData;
-import org.kie.internal.runtime.manager.audit.query.NodeInstanceLogQueryBuilder;
-import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
-import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
-import org.kie.internal.runtime.manager.audit.query.NodeInstanceLogQueryBuilder.OrderBy;
-import org.kie.internal.task.query.TaskQueryBuilder;
 
 /**
  * This is the {@link AbstractQueryBuilderImpl} implementation used by the REST query operations
  * to create the queries (the {@link QueryData} instances) needed. 
  */
-class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> {
+public class RemoteServicesQueryCommandBuilder 
+    extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> 
+    implements ExtendedParametrizedQueryBuilder<RemoteServicesQueryCommandBuilder, VariableInstanceLog>{
 
     private final String taskUserId;
+    private RemoteServicesQueryJPAService jpaService = null;
     
     public RemoteServicesQueryCommandBuilder() {
         this.taskUserId = null;
@@ -68,6 +70,12 @@ class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteS
         intersect();
     }
 
+    public RemoteServicesQueryCommandBuilder(String userId, RemoteServicesQueryJPAService jpaService) { 
+        this.taskUserId = userId;
+        this.jpaService = jpaService;
+        intersect();
+    }
+    
     // process related criteria
    
     /**
@@ -297,60 +305,55 @@ class RemoteServicesQueryCommandBuilder extends AbstractQueryBuilderImpl<RemoteS
         return this;
     }
 
-    public RemoteServicesQueryCommandBuilder orderBy( Object orderByField ) {
-        if( orderByField == null ) { 
-            throw new IllegalArgumentException( "A null order by criteria is invalid." );
-        }
-        String orderByString = null;
-        if( orderByField instanceof TaskQueryBuilder.OrderBy ) { 
-            switch( (TaskQueryBuilder.OrderBy) orderByField ) {
-            case processInstanceId:
-                orderByString = "t.taskData.processInstanceId";
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
-            }
-        } else if( orderByField instanceof VariableInstanceLogQueryBuilder.OrderBy ) {
-            switch( (VariableInstanceLogQueryBuilder.OrderBy) orderByField ) { 
-            case processInstanceId:
-                orderByString = "processInstanceId";
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
-            }
-        } else if( orderByField instanceof ProcessInstanceLogQueryBuilder.OrderBy ) {
-            switch( (ProcessInstanceLogQueryBuilder.OrderBy) orderByField ) { 
-            case processInstanceId:
-                orderByString = "processInstanceId";
-                break;
-            default:
-                throw new UnsupportedOperationException("Unsupported order by arqument: " + orderByField.toString() );
-            }
-        }
-        this.queryData.getQueryContext().setOrderBy(orderByString);
+    public RemoteServicesQueryCommandBuilder ascending( RemoteServicesQueryCommandBuilder.OrderBy field ) {
+        String listId = convertOrderByToListId(field);
+        this.queryWhere.setAscending(listId);
         return this;
     }
-        
-    // command generation
+   
+    public RemoteServicesQueryCommandBuilder descending( RemoteServicesQueryCommandBuilder.OrderBy field ) {
+        String listId = convertOrderByToListId(field);
+        this.queryWhere.setDescending(listId);
+        return this;
+    }
+   
+    private String convertOrderByToListId(RemoteServicesQueryCommandBuilder.OrderBy field) { 
+        String listId;
+        switch( field ) { 
+        case processInstanceId:
+            listId = QueryParameterIdentifiers.PROCESS_INSTANCE_ID_LIST;
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown 'order-by' field: " + field.toString() );
+        } 
+        return listId;
+    }
+   
+    public static enum OrderBy { 
+        // order by id
+        processInstanceId, 
+    } 
     
-    public TaskQueryDataCommand createTaskQueryDataCommand() { 
-        if( taskUserId == null ) { 
-            throw new IllegalStateException("A user id is required to create a " + TaskQueryDataCommand.class.getSimpleName() );
-        }
-        TaskQueryDataCommand cmd = new TaskQueryDataCommand(getQueryData());
-        cmd.setUserId(taskUserId);
-        return cmd;
+    public String getTaskUserId() { 
+        return taskUserId;
     }
     
-    public AuditVariableInstanceLogQueryCommand createVariableInstanceLogQueryCommand() { 
-        return new AuditVariableInstanceLogQueryCommand(getQueryData());
-    }
-
     @Override
     public RemoteServicesQueryCommandBuilder clear() { 
       super.clear();
       intersect();
       return this;
+    }
+
+    @Override
+    public ParametrizedQuery<VariableInstanceLog> build() {
+        return new ParametrizedQuery<VariableInstanceLog>() {
+            private QueryWhere queryWhere = new QueryWhere(getQueryWhere()); 
+            @Override
+            public List<VariableInstanceLog> getResultList() {
+                return jpaService.doQuery(queryWhere, VariableInstanceLog.class);
+            }
+        };
     }
     
 }

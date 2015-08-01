@@ -13,10 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.helpers;
 
 import static org.kie.remote.services.rest.ResourceBase.getMaxNumResultsNeeded;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -24,13 +25,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jbpm.services.task.commands.TaskQueryDataCommand;
-import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.instance.command.GetProcessInstanceVariableCommand;
+import org.jbpm.services.task.commands.TaskQueryWhereCommand;
+import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
-import org.kie.internal.task.query.TaskQueryBuilder;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder.OrderBy;
+import org.kie.remote.services.rest.query.RemoteServicesQueryJPAService;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbVariableInfo;
@@ -73,7 +78,7 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper<JaxbQue
         RemoteServicesQueryCommandBuilder taskQueryBuilder = queryBuilders[0];
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = queryBuilders[1];
 
-        if( variableCriteriaInQuery(varInstLogQueryBuilder.getQueryData()) && onlyRetrieveLastVarLogs ) { 
+        if( variableCriteriaInQuery(varInstLogQueryBuilder.getQueryWhere().getCriteria()) && onlyRetrieveLastVarLogs ) { 
             taskQueryBuilder.last();
             varInstLogQueryBuilder.last();
         }
@@ -119,9 +124,17 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper<JaxbQue
          */
         
         // task queries
-        taskQueryBuilder.orderBy(TaskQueryBuilder.OrderBy.processInstanceId);
-        TaskQueryDataCommand taskCmd = taskQueryBuilder.createTaskQueryDataCommand();
-        List<TaskSummary> taskSummaries = resourceBase.doRestTaskOperation(taskCmd);
+        taskQueryBuilder.ascending(OrderBy.processInstanceId);
+        RemoteServicesQueryJPAService jpaService = resourceBase.getJPAService();
+        
+        List taskSummaryImpls = jpaService.doTaskSummaryQuery(
+                taskQueryBuilder.getTaskUserId(),
+                resourceBase.getUserGroupCallback(),
+                taskQueryBuilder.getQueryWhere());
+        List<TaskSummary> taskSummaries = new ArrayList<TaskSummary>(taskSummaryImpls.size());
+        for( Object impl : taskSummaryImpls ) { 
+            taskSummaries.add((TaskSummary) impl);
+        }
        
         if( pageInfo[1] > 0 ) { 
             long [] procInstIds = getIncludedProcessInstanceIdsAndRemoveUnneededTaskSummaries(taskSummaries, pageInfo);
@@ -129,14 +142,21 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper<JaxbQue
         }
        
         // variable queries
-        varInstLogQueryBuilder.orderBy(VariableInstanceLogQueryBuilder.OrderBy.processInstanceId);
-        List<VariableInstanceLog> varLogs = resourceBase.getAuditLogService().queryVariableInstanceLogs(varInstLogQueryBuilder.getQueryData());
+        varInstLogQueryBuilder.ascending(OrderBy.processInstanceId);
+        List<VariableInstanceLog> varLogs = jpaService.doQuery(
+                varInstLogQueryBuilder.getQueryWhere(),
+                VariableInstanceLog.class);
         
         // UNFINISHED FEATURE: using in-memory/proces instance variabels instead of audit/history logs
         List<JaxbVariableInfo> procVars = null;
         if( workFlowInstanceVariables ) {
+            // TODO: you need the user to specify a deployment id
             for( VariableInstanceLog varLog : varLogs ) {
-                // TODO: retrieve process instance variables instead of log string values
+                String deploymentId = varLog.getExternalId();
+                Long processInstId = varLog.getProcessInstanceId();
+                GetProcessInstanceVariableCommand cmd = new GetProcessInstanceVariableCommand();
+                cmd.setProcessInstanceId(processInstId);
+                cmd.setVariableId(varLog.getVariableId());
             }
         }
 
@@ -197,13 +217,18 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper<JaxbQue
         LinkedHashMap<Long, JaxbQueryTaskInfo> procInstIdTaskInfoMap = new LinkedHashMap<Long, JaxbQueryTaskInfo>();
         int maxNumResultsNeeded = getMaxNumResultsNeeded(pageInfo); 
         int i = 0; 
+        Set<Long> uniqueTaskSummaryIds = new HashSet<Long>(0);
         while( procInstIdTaskInfoMap.size() < maxNumResultsNeeded && i < taskSummaries.size() ) {
             TaskSummary taskSum  = taskSummaries.get(i++);
+            assert uniqueTaskSummaryIds.add(taskSum.getId()) : "Duplicate task summary found with id " + taskSum.getId();
             long procInstId = taskSum.getProcessInstanceId();
             JaxbQueryTaskInfo taskInfo = createJaxbQueryTaskInfo(procInstId, procInstIdTaskInfoMap);
             taskInfo.getTaskSummaries().add(new JaxbTaskSummary(taskSum));
         }
+        
+        Set<Long> uniqueVarLogIds = new HashSet<Long>(0);
         for( VariableInstanceLog varLog : varLogs ) {
+            assert uniqueVarLogIds.add(varLog.getId()) : "Duplicate variable instance log found with id " + varLog.getId();
             long procInstId = varLog.getProcessInstanceId();
             // the reasoning here is that the list of task summaries may be constricted by pagination
             JaxbQueryTaskInfo taskInfo = procInstIdTaskInfoMap.get(procInstId);

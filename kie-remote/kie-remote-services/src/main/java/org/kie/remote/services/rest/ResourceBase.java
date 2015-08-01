@@ -43,6 +43,7 @@ import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.task.commands.TaskCommand;
 import org.jbpm.services.task.query.TaskSummaryImpl;
+import org.kie.api.task.UserGroupCallback;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
@@ -53,6 +54,7 @@ import org.kie.internal.task.api.model.InternalTask;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.RemoteServicesQueryJPAService;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPaginatedList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbBoolean;
@@ -80,28 +82,25 @@ public class ResourceBase {
     @Context
     private HttpServletRequest httpRequest;
     
-    /**
-     * In order to be able to inject a mock instance for tests.
-     * @param processRequestBean
-     */
+    @Inject
+    protected UserGroupCallback userGroupCallback;
+   
+    // for use in tests
+    
     public void setProcessRequestBean( ProcessRequestBean processRequestBean ) {
         this.processRequestBean = processRequestBean;
     }
     
-     /**
-      * In order to be able to inject a mock instance for tests.
-      * @param uriInfo
-      */
     void setUriInfo(UriInfo uriInfo) { 
         this.uriInfo = uriInfo;
     }
    
-    /**
-     * In order to be able to inject a mock instance for tests.
-     * @param httpRequest 
-     */
     void setHttpServletRequest(HttpServletRequest httpRequest) { 
         this.httpRequest = httpRequest;
+    }
+    
+    public void setUserGroupCallback(UserGroupCallback userGroupCallback) { 
+        this.userGroupCallback = userGroupCallback;
     }
     
     // Any query parameters used in REST calls (besides the query operations), should be added here 
@@ -139,7 +138,15 @@ public class ResourceBase {
     public AuditLogService getAuditLogService() { 
         return processRequestBean.getAuditLogService();
     }
-    
+   
+    public RemoteServicesQueryJPAService getJPAService() { 
+        return processRequestBean.getJPAService();
+    } 
+       
+    public UserGroupCallback getUserGroupCallback() { 
+        return userGroupCallback;
+    } 
+       
     // JSON / JAXB ---------------------------------------------------------------------------------------------------------------
     
     protected static Response createCorrectVariant(Object responseObj, HttpHeaders headers) { 

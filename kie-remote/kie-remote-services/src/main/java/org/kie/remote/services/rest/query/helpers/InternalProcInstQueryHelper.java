@@ -13,29 +13,22 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.helpers;
 
-import static org.kie.remote.services.rest.ResourceBase.getMaxNumResultsNeeded;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
-import org.drools.core.util.StringUtils;
-import org.jbpm.process.audit.AuditLogService;
-import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
-import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.process.audit.VariableInstanceLog;
 import org.kie.api.task.model.Status;
-import org.kie.internal.query.data.QueryData;
-import org.kie.internal.runtime.manager.audit.query.ProcessInstanceLogQueryBuilder;
-import org.kie.internal.runtime.manager.audit.query.VariableInstanceLogQueryBuilder;
 import org.kie.remote.services.rest.ResourceBase;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder;
+import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder.OrderBy;
+import org.kie.remote.services.rest.query.RemoteServicesQueryJPAService;
+import org.kie.remote.services.rest.query.data.QueryResourceData;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstance;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
@@ -70,18 +63,20 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         RemoteServicesQueryCommandBuilder procInstLogQueryBuilder = getQueryBuilders()[0];
         setPaginationParameters(pageInfo, procInstLogQueryBuilder);
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = getQueryBuilders()[1];
-        AuditLogService auditLogService = resourceBase.getAuditLogService();
+        RemoteServicesQueryJPAService jpaService = resourceBase.getJPAService();
       
         if( onlyRetrieveLastVarLogs ) { 
-            if( variableCriteriaInQuery(procInstLogQueryBuilder.getQueryData()) ) { 
+            if( variableCriteriaInQuery(procInstLogQueryBuilder.getQueryWhere().getCriteria()) ) { 
                 procInstLogQueryBuilder.last();
             }
             varInstLogQueryBuilder.last();
         }
        
         // process instance queries
-        procInstLogQueryBuilder.orderBy(ProcessInstanceLogQueryBuilder.OrderBy.processInstanceId);
-        List<ProcessInstanceLog> procLogs = auditLogService.queryProcessInstanceLogs(procInstLogQueryBuilder.getQueryData());
+        procInstLogQueryBuilder.ascending(OrderBy.processInstanceId);
+        List<ProcessInstanceLog> procLogs = jpaService.doQuery(
+                procInstLogQueryBuilder.getQueryWhere(), 
+                ProcessInstanceLog.class);
 
         // variable instance log queries
         // - limit variable logs retrieved to the process instance ids in the proc logs (since only proc logs have been limited by pagination)
@@ -90,8 +85,10 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
             procLogProcInstIds[i] = procLogs.get(i).getProcessInstanceId();
         }
         varInstLogQueryBuilder.processInstanceId(procLogProcInstIds);
-        varInstLogQueryBuilder.orderBy(VariableInstanceLogQueryBuilder.OrderBy.processInstanceId);
-        List<VariableInstanceLog> varLogs = auditLogService.queryVariableInstanceLogs(varInstLogQueryBuilder.getQueryData());
+        varInstLogQueryBuilder.ascending(OrderBy.processInstanceId);
+        List<VariableInstanceLog> varLogs = jpaService.doQuery(
+                varInstLogQueryBuilder.getQueryWhere(),
+                VariableInstanceLog.class);
         
         // UNFINISHED FEATURE: using in-memory/proces instance variabels instead of audit/history logs
         List<JaxbVariableInfo> procVars = null;

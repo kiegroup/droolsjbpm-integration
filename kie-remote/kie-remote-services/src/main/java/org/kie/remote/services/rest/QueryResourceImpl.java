@@ -15,7 +15,7 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.*;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
-import org.kie.remote.services.rest.query.InternalProcInstQueryHelper;
-import org.kie.remote.services.rest.query.InternalTaskQueryHelper;
-import org.kie.remote.services.rest.query.QueryResourceData;
+import org.kie.remote.services.rest.query.data.QueryResourceData;
+import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
+import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 

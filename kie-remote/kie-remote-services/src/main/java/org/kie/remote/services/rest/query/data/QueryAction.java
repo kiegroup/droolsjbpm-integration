@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.data;
 
 
 /**
@@ -35,7 +35,7 @@ package org.kie.remote.services.rest.query;
  * </p>
  * This array of values (for the example above <code>[2,3]</code>) is then assigned to the {@link QueryAction#paramData} field.
  */
-class QueryAction {
+public class QueryAction {
 
     public final String paramName;
     public final int action;

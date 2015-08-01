@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.rest.query;
+package org.kie.remote.services.rest.query.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,47 +30,47 @@ import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 public class QueryResourceData {
 
     // @formatter:off
-    static final String [] generalQueryParams = { 
+    public static final String [] generalQueryParams = { 
         "processinstanceid", "processid", "workitemid",
         "deploymentid"
     };
     
-    static final String [] generalQueryParamsShort = { 
+    public static final String [] generalQueryParamsShort = { 
         "piid", "pid", "wid",
         "did"
     };
     
-    static final String [] taskQueryParams = { 
+    public static final String [] taskQueryParams = { 
         "taskid", 
         "initiator", "stakeholder", "potentialowner", "taskowner", "businessadmin",
         "taskstatus"
     };
     
-    static final String [] taskQueryParamsShort = { 
+    public static final String [] taskQueryParamsShort = { 
        "tid", 
        "init", "stho", "po", "to", "ba",
        "tst"
     };
     
-    static final String [] procInstQueryParams = { 
+    public static final String [] procInstQueryParams = { 
         "processinstancestatus", 
         "processversion", 
         "startdate", "enddate"
     };
 
-    static final String [] procInstQueryParamsShort = { 
+    public static final String [] procInstQueryParamsShort = { 
         "pist",
         "pv", 
         "stdt", "edt"
     };
 
-    static final String [] varInstQueryParams = { 
+    public static final String [] varInstQueryParams = { 
        "varid", "varvalue", 
        "var", "varregex",
        "all"
     };
     
-    static final String [] varInstQueryParamsShort = { 
+    public static final String [] varInstQueryParamsShort = { 
        "vid", "vv", 
        null, "vr",
        null

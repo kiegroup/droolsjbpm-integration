@@ -78,6 +78,7 @@ import org.kie.remote.services.jaxb.JaxbCommandsResponse;
 import org.kie.remote.services.rest.RuntimeResourceImpl;
 import org.kie.remote.services.rest.TaskResourceImpl;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
+import org.kie.remote.services.rest.query.RemoteServicesQueryJPAService;
 import org.kie.remote.services.util.ExecuteAndSerializeCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +114,8 @@ public class ProcessRequestBean {
     private EntityManagerFactory emf;
    
     private AuditLogService auditLogService;
+    
+    private RemoteServicesQueryJPAService queryJpaService;
   
     // Injection methods for tests
 
@@ -128,18 +131,28 @@ public class ProcessRequestBean {
         this.auditLogService = auditLogService;
     }
 
+    public void setJPAService(RemoteServicesQueryJPAService jpaService) {
+        this.queryJpaService = jpaService;
+    }
+
     // Audit Log Service logic 
     
     @PostConstruct
     public void initAuditLogService() { 
         auditLogService = new JPAAuditLogService(emf);
+        queryJpaService = new RemoteServicesQueryJPAService(emf);
         if( emf == null ) { 
             ((JPAAuditLogService) auditLogService).setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
+            queryJpaService.setPersistenceUnitName(PERSISTENCE_UNIT_NAME);
         }
     }
     
     public AuditLogService getAuditLogService() { 
         return auditLogService;
+    }
+    
+    public RemoteServicesQueryJPAService getJPAService() { 
+        return queryJpaService;
     }
     
     // Methods used
