@@ -15,7 +15,8 @@
 
 package org.kie.remote.services.rest.query;
 
-import static org.junit.Assert.assertFalse;
+import static org.jbpm.query.jpa.data.QueryParameterIdentifiersUtil.*;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.kie.remote.services.rest.ResourceBase.PROC_INST_ID_PARAM_NAME;
 
@@ -32,13 +33,38 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.internal.query.QueryParameterIdentifiers;
 import org.kie.remote.services.rest.ResourceBase;
+import org.kie.remote.services.rest.query.data.QueryResourceData;
 
+/**
+ * This tests minor methods and logic related to the REST Query operation.
+ */
 public class QueryResourceDataTest extends QueryResourceData {
 
+    @Test
+    public void testUniqueQueryParameterIdentifiersBeingUsed() throws Exception { 
+        JbpmJUnitBaseTestCase test = new JbpmJUnitBaseTestCase(true, true, "org.jbpm.domain") { };
+        test.setUp(); 
+        boolean initialized = false;
+        try { 
+            initialized = RemoteServicesQueryData.initializeCriteriaAttributes();
+        } catch( Throwable t ) { 
+           String msg = t.getMessage(); 
+           int length = "List Id [".length();
+           String idStr = msg.substring(length, msg.indexOf(']'));
+           int id = Integer.parseInt(idStr);
+           String name = getQueryParameterIdNameMap().get(id);
+           msg = msg.substring(0,length) + name + msg.substring(length+idStr.length());
+           fail(msg);
+        }
+        assertTrue( "Criteria attributes was not initialized!", initialized);
+        test.tearDown();
+    }
+    
     @Test
     public void testUniqueParameters() throws Exception { 
     
@@ -123,28 +149,14 @@ public class QueryResourceDataTest extends QueryResourceData {
     @Test
     @Ignore
     public void debugPrintQueryParameterIds() throws Exception { 
-        Field [] fields = QueryParameterIdentifiers.class.getDeclaredFields();
-        Map<Integer, String> idMap = new TreeMap<Integer, String>();
-        for( Field field : fields ) { 
-            Object objVal = field.get(null);
-            if( ! (objVal instanceof String) ) { 
-               continue; 
-            }
-            String val = (String) objVal;
-            Integer idVal;
-            try { 
-               idVal = Integer.valueOf(val);
-            } catch( Exception e ) { 
-                continue;
-            }
-           idMap.put(idVal, field.getName());
-        }
-        
+        Map<Integer, String> idMap = getQueryParameterIdNameMap();
         for( Entry<Integer, String> entry : idMap.entrySet() ) { 
             int id = entry.getKey();
             String between = ( id < 10 ? " " : "") + " : ";
             System.out.println( id + between + entry.getValue());
         }
     }
+    
+
     
 }

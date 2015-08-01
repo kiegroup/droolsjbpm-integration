@@ -15,29 +15,43 @@
 
 package org.kie.remote.services.rest.query;
 
-import static org.kie.remote.services.rest.query.QueryResourceData.QUERY_PARAM_DATE_FORMAT;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.QUERY_PARAM_DATE_FORMAT;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+
 import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.JPAAuditLogService;
-import org.jbpm.services.task.commands.TaskQueryDataCommand;
+import org.jbpm.process.audit.ProcessInstanceLog;
+import org.jbpm.process.audit.ProcessInstanceLog_;
+import org.jbpm.process.audit.VariableInstanceLog;
+import org.jbpm.process.audit.VariableInstanceLog_;
+import org.jbpm.services.task.impl.model.TaskDataImpl_;
+import org.jbpm.services.task.impl.model.TaskImpl;
+import org.jbpm.services.task.impl.model.TaskImpl_;
+import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.ParametrizedQuery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class QueryResourceQueryTest extends AbstractQueryResourceTest {
+public class QueryResourceQueryBuilderTest extends AbstractQueryResourceTest {
 
     @Before
     public void init() {
@@ -45,6 +59,8 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         engine = getRuntimeEngine();
         ksession = engine.getKieSession();
         taskService = engine.getTaskService();
+        
+        jpaService = new RemoteServicesQueryJPAService(getEmf());
        
         addObjectProcessInstances = false;
         setupTestData();
@@ -56,16 +72,24 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
             runtimeManager.disposeRuntimeEngine(engine);
             runtimeManager.close();
         }
+        if( jpaService != null ) { 
+            jpaService.dispose();
+            jpaService = null;
+        }
     }
 
     // TESTS ----------------------------------------------------------------------------------------------------------------------
 
+    
     @Test
     public void queryModificationServiceTest() throws Exception {
         RemoteServicesQueryCommandBuilder taskQueryBuilder = new RemoteServicesQueryCommandBuilder(USER_ID);
         
-        TaskQueryDataCommand cmd = taskQueryBuilder.createTaskQueryDataCommand();  
-        List<TaskSummary> taskResult = taskService.execute(cmd);
+        List<TaskSummaryImpl> taskResult = jpaService.doTaskSummaryQuery(
+                taskQueryBuilder.getTaskUserId(), 
+                userGroupCallback, 
+                taskQueryBuilder.getQueryWhere());
+        
         assertNotNull( "Null taskResult!", taskResult );
         assertFalse( "No task summaries found.", taskResult.isEmpty() );
     
@@ -96,7 +120,11 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .value("check-" + procInstId)
         .variableId("inputStr");
         
-        taskResult = taskService.execute(taskQueryBuilder.createTaskQueryDataCommand());
+        taskResult = jpaService.doTaskSummaryQuery(
+                taskQueryBuilder.getTaskUserId(), 
+                userGroupCallback, 
+                taskQueryBuilder.getQueryWhere());
+        
         assertNotNull( "Null taskResult!", taskResult );
         assertFalse( "No task summaries found.", taskResult.isEmpty() );
         assertEquals( "Num task summaries found.", 1, taskResult.size() );
@@ -116,8 +144,7 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .like().value("*-" + procInstId)
         .variableId("input*");
 
-        List<org.kie.api.runtime.manager.audit.VariableInstanceLog> varResult 
-            = ((AuditLogService) engine.getAuditService()).queryVariableInstanceLogs(varLogQueryBuilder.getQueryData());
+        List<VariableInstanceLog> varResult = jpaService.doQuery(varLogQueryBuilder.getQueryWhere(), VariableInstanceLog.class);
 
         assertNotNull( "Null var Result!", varResult );
         assertFalse( "No var logs found.", varResult.isEmpty() );
@@ -134,8 +161,9 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         
         RemoteServicesQueryCommandBuilder procLogQueryBuilder = new RemoteServicesQueryCommandBuilder();
        
-        ParametrizedQuery<ProcessInstanceLog> procQuery = auditLogService.processInstanceLogQuery().processInstanceId(procInstId).buildQuery();
-        List<ProcessInstanceLog> procLogs = procQuery.getResultList();
+        ParametrizedQuery<org.kie.api.runtime.manager.audit.ProcessInstanceLog> procQuery 
+            = auditLogService.processInstanceLogQuery().processInstanceId(procInstId).build();
+        List<org.kie.api.runtime.manager.audit.ProcessInstanceLog> procLogs = procQuery.getResultList();
         assertFalse( "No proc logs?!?", procLogs.isEmpty() );
        
         ParametrizedQuery<org.kie.api.runtime.manager.audit.VariableInstanceLog> varQuery 
@@ -145,7 +173,7 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .last()
         .like().value("*-" + procInstId)
         .variableId("input*")
-        .buildQuery();
+        .build();
         
         List<org.kie.api.runtime.manager.audit.VariableInstanceLog> varLogs = varQuery.getResultList();
         assertFalse( "No last var logs?!?", varLogs.isEmpty() );
@@ -156,8 +184,11 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .like().value("*-" + procInstId)
         .variableId("input*");
         
-        List<org.kie.api.runtime.manager.audit.ProcessInstanceLog> procResult 
-            = ((AuditLogService) engine.getAuditService()).queryProcessInstanceLogs(procLogQueryBuilder.getQueryData());
+        List<ProcessInstanceLog> procResult = jpaService.doQuery(procLogQueryBuilder.getQueryWhere(), ProcessInstanceLog.class);
+        Set<Long> uniqueIds = new HashSet<Long>(procResult.size());
+        for( ProcessInstanceLog procLog : procResult ) { 
+            assertTrue( "Duplicate process instance log found with id " + procLog.getId(), uniqueIds.add(procLog.getId()) );
+        }
         
         assertNotNull( "Null proc Result!", procResult );
         assertFalse( "No proc logs found.", procResult.isEmpty() );
@@ -173,7 +204,7 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .processInstanceId(procInstId)
         .last()
         .variableValue(varLog.getVariableId(), varLog.getValue())
-        .buildQuery();
+        .build();
         
         varLogs = varQuery.getResultList();
         assertFalse( "No last var logs?!?", varLogs.isEmpty() );
@@ -186,7 +217,7 @@ public class QueryResourceQueryTest extends AbstractQueryResourceTest {
         .processInstanceId(procInstId)
         .like()
         .variableValue(varLog.getVariableId(), "*" + varLog.getValue().substring(3))
-        .buildQuery();
+        .build();
         
         varLogs = varQuery.getResultList();
         assertFalse( "No last var logs?!?", varLogs.isEmpty() );

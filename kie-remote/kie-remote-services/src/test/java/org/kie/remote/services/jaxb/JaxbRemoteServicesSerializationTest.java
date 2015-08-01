@@ -15,6 +15,7 @@
 
 package org.kie.remote.services.jaxb;
 
+import static org.jbpm.query.QueryBuilderCoverageTestUtil.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -73,7 +74,12 @@ import ch.qos.logback.classic.Level;
 public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(JaxbRemoteServicesSerializationTest.class);
-   
+
+    @Before
+    public void modifyLogging() { 
+        hackTheDatabaseMetadataLoggerBecauseTheresALogbackXmlInTheClasspath();
+    }
+    
     private static Reflections reflections = new Reflections(
             ClasspathHelper.forPackage("org.kie.remote.services.jaxb"),
             ClasspathHelper.forPackage("org.kie.services.client.serialization.jaxb.rest"),

@@ -44,7 +44,7 @@ import ch.qos.logback.classic.Level;
 
 abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(QueryResourceQueryTest.class);
+    protected static final Logger logger = LoggerFactory.getLogger(QueryResourceQueryBuilderTest.class);
     
     protected static final String PROCESS_STRING_VAR_FILE = "BPMN2-HumanTaskWithStringVariables.bpmn2";
     protected static final String PROCESS_STRING_VAR_ID = "org.var.human.task.string";
@@ -60,6 +60,7 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
     protected TaskService taskService;
     protected RuntimeManager runtimeManager;
     protected RuntimeEngine engine;
+    protected RemoteServicesQueryJPAService jpaService;
 
     public AbstractQueryResourceTest() {
         super(true, true, "org.jbpm.domain");

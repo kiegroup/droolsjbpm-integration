@@ -28,7 +28,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
-import org.kie.remote.services.rest.query.QueryResourceData;
+import org.kie.remote.services.rest.query.data.QueryResourceData;
 
 public class QueryResourceMethodsTest {
 
