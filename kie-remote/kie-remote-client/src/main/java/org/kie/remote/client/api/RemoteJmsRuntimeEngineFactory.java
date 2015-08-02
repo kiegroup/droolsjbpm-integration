@@ -21,8 +21,12 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
 
 /**
  * A factory for creating JMS remote API client instances of the {@link RuntimeEngine}.
+ * </p>
+ * This class will be reomved as of jBPM 7.x
+ * 
  * @see {@link RemoteRuntimeEngineBuilder#buildFactory()}
  */
+@Deprecated
 public class RemoteJmsRuntimeEngineFactory extends org.kie.services.client.api.RemoteJmsRuntimeEngineFactory {
   
     public RemoteJmsRuntimeEngineFactory(RemoteConfiguration config) {

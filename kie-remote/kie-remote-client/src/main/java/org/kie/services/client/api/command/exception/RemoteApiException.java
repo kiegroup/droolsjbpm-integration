@@ -15,6 +15,8 @@
 
 package org.kie.services.client.api.command.exception;
 
+import org.kie.remote.client.internal.RemoteClientException;
+
 
 /**
  * This class will be deleted as of 7.x
@@ -29,14 +31,18 @@ package org.kie.services.client.api.command.exception;
  * @see org.kie.remote.client.api.exception.RemoteApiException
  */
 @Deprecated
-public class RemoteApiException extends RuntimeException {
+public class RemoteApiException extends RemoteClientException {
 
-    public RemoteApiException(String s) {
-        super(s);
+    public RemoteApiException(String shortMsg, String msg) {
+        super(shortMsg, msg);
     }
 
     public RemoteApiException(String s, Throwable throwable) {
         super(s, throwable);
+    }
+
+    public RemoteApiException(String s) {
+        super(s);
     }
 
 }

@@ -15,6 +15,7 @@
 
 package org.kie.remote.client.api.exception;
 
+
 /**
  * This exception is thrown when communications with a remote REST or JMS service 
  * fail in the client RemoteRuntime* classes. 
@@ -28,6 +29,10 @@ public class RemoteCommunicationException extends org.kie.services.client.api.co
     /** generated serial version UID **/
     private static final long serialVersionUID = 7230681758239352495L;
 
+    public RemoteCommunicationException(String message, String stackTrace) {
+        super(message, message + ":\n" + stackTrace);
+    }
+                
     public RemoteCommunicationException(String msg, Throwable cause) { 
         super(msg, cause);
     }
@@ -35,5 +40,5 @@ public class RemoteCommunicationException extends org.kie.services.client.api.co
     public RemoteCommunicationException(String msg) { 
         super(msg);
     }
-    
+
 }

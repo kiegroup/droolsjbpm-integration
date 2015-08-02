@@ -24,9 +24,13 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
  * A builder for creating Rest remote API client instances of the {@link RuntimeEngine}.
  *  * </p>
  * Please see the {@link RemoteRuntimeEngineFactory#newRestBuilder()} method in order to create a {@link RemoteRuntimeEngineBuilder} 
- * instance. 
+ * instance.
+ * </p>
+ * This class will be removed as of jBPM 7.x
+ *  
  * @see {@link RemoteRuntimeEngineBuilder#buildFactory()}
  */
+@Deprecated
 public class RemoteRestRuntimeEngineFactory extends org.kie.services.client.api.RemoteRestRuntimeEngineFactory {
   
     public RemoteRestRuntimeEngineFactory(RemoteConfiguration config) {

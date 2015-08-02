@@ -17,6 +17,7 @@ package org.kie.services.client.api.command;
 
 import static org.kie.remote.client.jaxb.ConversionUtil.convertDateToXmlGregorianCalendar;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToStringKeyObjectValueMap;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -40,23 +41,27 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskData;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
+import org.kie.internal.jaxb.StringKeyObjectValueMap;
 import org.kie.internal.query.QueryParameterIdentifiers;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.AddCommentCommand;
+import org.kie.remote.jaxb.gen.AddContentCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
 import org.kie.remote.jaxb.gen.ClaimTaskCommand;
 import org.kie.remote.jaxb.gen.CompleteTaskCommand;
 import org.kie.remote.jaxb.gen.DelegateTaskCommand;
 import org.kie.remote.jaxb.gen.DeleteCommentCommand;
+import org.kie.remote.jaxb.gen.DeleteContentCommand;
 import org.kie.remote.jaxb.gen.ExitTaskCommand;
 import org.kie.remote.jaxb.gen.FailTaskCommand;
 import org.kie.remote.jaxb.gen.ForwardTaskCommand;
 import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
+import org.kie.remote.jaxb.gen.GetAllContentCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
 import org.kie.remote.jaxb.gen.GetCommentCommand;
-import org.kie.remote.jaxb.gen.GetContentCommand;
+import org.kie.remote.jaxb.gen.GetContentByIdCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
@@ -277,6 +282,10 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public void claimNextAvailable( String userId, String language ) {
+        claimNextAvailable(userId);
+    }
+
+    public void claimNextAvailable( String userId ) { 
         ClaimNextAvailableTaskCommand cmd = new ClaimNextAvailableTaskCommand();
         cmd.setUserId(userId);
         executeCommand(cmd);
@@ -399,8 +408,52 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public Content getContentById( long contentId ) {
-        GetContentCommand cmd = new GetContentCommand();
+        GetContentByIdCommand cmd = new GetContentByIdCommand();
         cmd.setContentId(contentId);
+        return executeCommand(cmd);
+    }
+
+    public Long addContent(long taskId, Content content) {
+        AddContentCommand cmd = new AddContentCommand();
+        cmd.setTaskId(taskId);
+        org.kie.remote.jaxb.gen.Content jaxbContent = new org.kie.remote.jaxb.gen.Content();
+        jaxbContent.setContent(content.getContent());
+        cmd.setTaskId(taskId);
+        
+        return executeCommand(cmd);
+    }
+    
+    public Long addContent(long taskId, Map<String, Object> params) {
+        AddContentCommand cmd = new AddContentCommand();
+        cmd.setTaskId(taskId);
+        org.kie.remote.jaxb.gen.Content jaxbContent = new org.kie.remote.jaxb.gen.Content();
+        StringKeyObjectValueMap jaxbMap = convertMapToStringKeyObjectValueMap(params);
+        jaxbContent.setContentMap(jaxbMap);
+        cmd.setTaskId(taskId);
+
+        return executeCommand(cmd);
+    }
+   
+    public void deleteContent(long taskId, long contentId) { 
+       DeleteContentCommand cmd = new DeleteContentCommand();
+       cmd.setContentId(contentId);
+       cmd.setTaskId(taskId);
+       
+       executeCommand(cmd);
+    }
+
+    public List<Content> getAllContentByTaskId(long taskId) { 
+       GetAllContentCommand cmd = new GetAllContentCommand();
+       cmd.setTaskId(taskId);
+       
+       return executeCommand(cmd);
+    }
+    
+    @Override
+    public Map<String, Object> getTaskContent( long taskId ) {
+        GetTaskContentCommand cmd = new GetTaskContentCommand();
+        cmd.setTaskId(taskId);
+        
         return executeCommand(cmd);
     }
 
@@ -408,13 +461,6 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Attachment getAttachmentById( long attachId ) {
         GetAttachmentCommand cmd = new GetAttachmentCommand();
         cmd.setAttachmentId(attachId);
-        return executeCommand(cmd);
-    }
-
-    @Override
-    public Map<String, Object> getTaskContent( long taskId ) {
-        GetTaskContentCommand cmd = new GetTaskContentCommand();
-        cmd.setTaskId(taskId);
         return executeCommand(cmd);
     }
 

@@ -38,7 +38,7 @@ import org.jbpm.services.task.commands.DelegateTaskCommand;
 import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
@@ -197,7 +197,7 @@ public class TaskResourceImpl extends ResourceBase {
         long contentId = task.getTaskData().getDocumentContentId();
         JaxbContent content = null;
         if( contentId > -1 ) { 
-            cmd = new GetContentCommand(contentId);
+            cmd = new GetContentByIdCommand(contentId);
             result = processRequestBean.doRestTaskOperation(taskId, task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId(), task, cmd);
             content = (JaxbContent) result;
         } else { 
@@ -231,7 +231,7 @@ public class TaskResourceImpl extends ResourceBase {
     @GET
     @Path("/content/{contentId: [0-9-]+}")
     public Response getTaskContentByContentId(@PathParam("contentId") long contentId) { 
-        TaskCommand<?> cmd = new GetContentCommand(contentId);
+        TaskCommand<?> cmd = new GetContentByIdCommand(contentId);
         cmd.setUserId(identityProvider.getName());
         JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
         if( content == null ) { 

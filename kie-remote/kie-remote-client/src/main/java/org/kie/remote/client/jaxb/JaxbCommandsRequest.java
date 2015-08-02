@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
-import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.*;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.AddCommentCommand;
@@ -57,7 +57,8 @@ import org.kie.remote.jaxb.gen.ForwardTaskCommand;
 import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
 import org.kie.remote.jaxb.gen.GetCommentCommand;
-import org.kie.remote.jaxb.gen.GetContentCommand;
+import org.kie.remote.jaxb.gen.GetContentByIdCommand;
+import org.kie.remote.jaxb.gen.GetContentByIdForUserCommand;
 import org.kie.remote.jaxb.gen.GetFactCountCommand;
 import org.kie.remote.jaxb.gen.GetGlobalCommand;
 import org.kie.remote.jaxb.gen.GetIdCommand;
@@ -160,15 +161,19 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "forward-task", type = ForwardTaskCommand.class),
             @XmlElement(name = "get-attachment", type = GetAttachmentCommand.class),
 
-            @XmlElement(name = "get-content", type = GetContentCommand.class),
+            @XmlElement(name = "get-content", type = GetContentByIdCommand.class),
             @XmlElement(name = "get-task-content", type = GetTaskContentCommand.class),
 
             @XmlElement(name = "delete-comment", type = DeleteCommentCommand.class),
             @XmlElement(name = "add-comment", type = AddCommentCommand.class),
             @XmlElement(name = "get-all-comments", type = GetAllCommentsCommand.class),
             @XmlElement(name = "get-comment", type = GetCommentCommand.class),
+            @XmlElement(name = "set-task-property", type = SetTaskPropertyCommand.class),
 
-            @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
+            @XmlElement(name = "add-content-from-user", type = AddContentFromUserCommand.class),
+            @XmlElement(name = "get-content-by-id", type = GetContentByIdForUserCommand.class),
+            @XmlElement(name = "get-content-map-for-user", type = GetContentMapForUserCommand.class),
+            
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
@@ -188,7 +193,6 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "process-sub-tasks", type = ProcessSubTaskCommand.class),
             @XmlElement(name = "execute-task-rules", type = ExecuteTaskRulesCommand.class),
             @XmlElement(name = "cancel-deadline", type = CancelDeadlineCommand.class),
-            @XmlElement(name = "set-task-property", type = SetTaskPropertyCommand.class),
             
             // audit
             @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),

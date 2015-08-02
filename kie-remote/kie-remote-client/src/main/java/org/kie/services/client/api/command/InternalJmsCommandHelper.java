@@ -115,7 +115,7 @@ public class InternalJmsCommandHelper {
 
                 connection.start();
             } catch( JMSException jmse ) {
-                throw new RemoteCommunicationException("Unable to setup a JMS connection.", jmse);
+                throw new RemoteCommunicationException("Unable to setup a JMS connection", jmse);
             }
 
             // Create msg
@@ -220,7 +220,7 @@ public class InternalJmsCommandHelper {
             JaxbCommandResponse<?> response = responses.get(0);
             if( response instanceof JaxbExceptionResponse ) {
                 JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
-                throw new RemoteApiException(exceptionResponse.getMessage());
+                throw new RemoteApiException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
             } else {
                 return (T) response.getResult();
             }

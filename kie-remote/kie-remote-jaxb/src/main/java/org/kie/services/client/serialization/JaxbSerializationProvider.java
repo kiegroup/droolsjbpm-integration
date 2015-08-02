@@ -32,6 +32,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
+import org.kie.internal.jaxb.StringKeyObjectValueEntry;
+import org.kie.internal.jaxb.StringKeyObjectValueMap;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbPrimitiveResponse;
@@ -147,7 +149,11 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
                 JaxbInteger.class,
                 JaxbLong.class,
                 JaxbShort.class,
-                JaxbString.class
+                JaxbString.class,
+                
+                // map classes
+                StringKeyObjectValueMap.class,
+                StringKeyObjectValueEntry.class
         };
         KIE_JAXB_CLASS_SET = new CopyOnWriteArraySet<Class<?>>(Arrays.asList(kieJaxbClasses));
     }

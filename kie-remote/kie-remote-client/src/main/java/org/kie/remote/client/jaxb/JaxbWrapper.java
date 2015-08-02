@@ -366,7 +366,7 @@ abstract class JaxbWrapper {
         }
     
         @Override
-        public long getOutputContentId() {
+        public Long getOutputContentId() {
             return this.taskData.getOutputContentId();
         }
     
@@ -501,7 +501,7 @@ abstract class JaxbWrapper {
         }
 
         @Override
-        public long getId() {
+        public Long getId() {
             return content.getId();
         }
 

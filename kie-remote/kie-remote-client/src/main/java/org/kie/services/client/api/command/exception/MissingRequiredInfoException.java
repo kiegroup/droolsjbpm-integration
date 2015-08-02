@@ -15,7 +15,7 @@
 
 package org.kie.services.client.api.command.exception;
 
-import org.kie.services.client.api.RemoteRuntimeEngineFactory;
+import org.kie.remote.client.internal.RemoteClientException;
 
 /**
  * This class will be deleted as of 7.x
@@ -23,7 +23,7 @@ import org.kie.services.client.api.RemoteRuntimeEngineFactory;
  * @see org.kie.remote.client.api.exception.MissingRequiredInfoException
  */
 @Deprecated
-public class MissingRequiredInfoException extends IllegalStateException {
+public class MissingRequiredInfoException extends RemoteClientException {
 
     public MissingRequiredInfoException() {
         super();
@@ -32,5 +32,5 @@ public class MissingRequiredInfoException extends IllegalStateException {
     public MissingRequiredInfoException(String msg) { 
         super(msg);
     }
-    
+
 }

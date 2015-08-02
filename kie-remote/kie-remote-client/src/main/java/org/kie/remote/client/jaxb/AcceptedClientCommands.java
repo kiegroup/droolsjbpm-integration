@@ -69,9 +69,19 @@ public class AcceptedClientCommands {
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
 
-        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetContentByIdCommand.class);
         acceptedCommands.add(GetTaskContentCommand.class);
 
+        acceptedCommands.add(DeleteCommentCommand.class);
+        acceptedCommands.add(AddCommentCommand.class);
+        acceptedCommands.add(GetAllCommentsCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
+        acceptedCommands.add(SetTaskPropertyCommand.class);
+        
+        acceptedCommands.add(AddContentFromUserCommand.class);
+        acceptedCommands.add(GetContentByIdForUserCommand.class);
+        acceptedCommands.add(GetContentMapForUserCommand.class);
+        
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
@@ -103,12 +113,6 @@ public class AcceptedClientCommands {
         acceptedCommands.add(FindVariableInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesByNameCommand.class);
        
-        acceptedCommands.add(DeleteCommentCommand.class);
-        acceptedCommands.add(AddCommentCommand.class);
-        acceptedCommands.add(GetAllCommentsCommand.class);
-        acceptedCommands.add(GetCommentCommand.class);
-        acceptedCommands.add(SetTaskPropertyCommand.class);
-        
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 

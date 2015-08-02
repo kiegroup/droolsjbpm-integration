@@ -59,6 +59,7 @@ import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
 import org.jbpm.services.task.commands.AddCommentCommand;
+import org.jbpm.services.task.commands.AddContentFromUserCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
@@ -73,7 +74,9 @@ import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
 import org.jbpm.services.task.commands.GetCommentCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
+import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
+import org.jbpm.services.task.commands.GetContentMapForUserCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -167,13 +170,18 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "forward-task", type = ForwardTaskCommand.class),
             @XmlElement(name = "get-attachment", type = GetAttachmentCommand.class),
 
-            @XmlElement(name = "get-content", type = GetContentCommand.class),
+            @XmlElement(name = "get-content", type = GetContentByIdCommand.class),
             @XmlElement(name = "get-task-content", type = GetTaskContentCommand.class),
 
             @XmlElement(name = "delete-comment", type = DeleteCommentCommand.class),
             @XmlElement(name = "add-comment", type = AddCommentCommand.class),
             @XmlElement(name = "get-all-comments", type = GetAllCommentsCommand.class),
             @XmlElement(name = "get-comment", type = GetCommentCommand.class),
+            @XmlElement(name = "set-task-property", type = SetTaskPropertyCommand.class),
+           
+            @XmlElement(name = "add-content-from-user", type = AddContentFromUserCommand.class),
+            @XmlElement(name = "get-content-by-id", type = GetContentByIdForUserCommand.class),
+            @XmlElement(name = "get-content-map-for-user", type = GetContentMapForUserCommand.class),
             
             @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
@@ -195,7 +203,6 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "process-sub-tasks", type = ProcessSubTaskCommand.class),
             @XmlElement(name = "execute-task-rules", type = ExecuteTaskRulesCommand.class),
             @XmlElement(name = "cancel-deadline", type = CancelDeadlineCommand.class),
-            @XmlElement(name = "set-task-property", type = SetTaskPropertyCommand.class),
             
             // audit
             @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),
