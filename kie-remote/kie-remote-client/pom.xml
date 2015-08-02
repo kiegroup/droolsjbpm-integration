@@ -267,6 +267,10 @@
         <executions>
           <execution>
             <id>unpacked-generated-files</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
             <configuration>
               <filesets>
                 <fileset>
@@ -277,6 +281,10 @@
           </execution>
           <execution>
             <id>generated-wsdl-files</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
             <configuration>
               <filesets>
                 <fileset>

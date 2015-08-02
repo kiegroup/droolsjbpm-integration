@@ -106,7 +106,7 @@ public class AcceptedClientCommands {
         acceptedCommands.add(DeleteCommentCommand.class);
         acceptedCommands.add(AddCommentCommand.class);
         acceptedCommands.add(GetAllCommentsCommand.class);
-        acceptedCommands.add(GetCommentByIdCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
         acceptedCommands.add(SetTaskPropertyCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);

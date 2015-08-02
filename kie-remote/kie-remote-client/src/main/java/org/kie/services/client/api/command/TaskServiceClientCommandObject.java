@@ -55,7 +55,7 @@ import org.kie.remote.jaxb.gen.FailTaskCommand;
 import org.kie.remote.jaxb.gen.ForwardTaskCommand;
 import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
-import org.kie.remote.jaxb.gen.GetCommentByIdCommand;
+import org.kie.remote.jaxb.gen.GetCommentCommand;
 import org.kie.remote.jaxb.gen.GetContentCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
 import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
@@ -475,7 +475,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public Comment getCommentById(long commentId) {
-        GetCommentByIdCommand cmd = new GetCommentByIdCommand();
+        GetCommentCommand cmd = new GetCommentCommand();
         cmd.setCommentId(commentId);
         
         return executeCommand(cmd);

@@ -50,7 +50,6 @@ import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
 import org.jbpm.services.task.commands.AddCommentCommand;
-import org.jbpm.services.task.commands.GetCommentByIdCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
@@ -64,6 +63,7 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
+import org.jbpm.services.task.commands.GetCommentCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
@@ -171,7 +171,7 @@ public class AcceptedServerCommands {
         acceptedCommands.add(DeleteCommentCommand.class);
         acceptedCommands.add(AddCommentCommand.class);
         acceptedCommands.add(GetAllCommentsCommand.class);
-        acceptedCommands.add(GetCommentByIdCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
         acceptedCommands.add(SetTaskPropertyCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
