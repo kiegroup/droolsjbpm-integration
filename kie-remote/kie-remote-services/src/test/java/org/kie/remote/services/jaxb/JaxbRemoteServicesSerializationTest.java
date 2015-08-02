@@ -16,6 +16,7 @@
 package org.kie.remote.services.jaxb;
 
 import static org.jbpm.query.QueryBuilderCoverageTestUtil.*;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -53,6 +54,11 @@ import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.jaxb.StringKeyObjectValueMap;
+import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
+import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
+import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationProvider;
@@ -338,5 +344,24 @@ public class JaxbRemoteServicesSerializationTest  extends JbpmJUnitBaseTestCase 
         addClassesToSerializationProvider(DisconnectedFactHandle.class);
         JaxbOtherResponse jor = new JaxbOtherResponse(DisconnectedFactHandle.newFrom(factHandle), 0, cmd);
         testRoundTrip(jor);
+    }
+    
+
+    @Test
+    public void addContentFromUserCmdTest() throws Exception {
+       AddContentFromUserCommand cmd = new AddContentFromUserCommand();
+       cmd.setTaskId(23l);
+       cmd.setUserId("user");
+       String key = "key";
+       Object val = "val";
+       cmd.setOutputContentMap(new JaxbStringObjectPairArray());
+       cmd.getOutputContentMap().getItems().add(new JaxbStringObjectPair(key, val));
+      
+       String xmlStr = ClientJaxbSerializationProvider.newInstance().serialize(cmd);
+       org.jbpm.services.task.commands.AddContentFromUserCommand serverCmd 
+           = (org.jbpm.services.task.commands.AddContentFromUserCommand) 
+           ServerJaxbSerializationProvider.newInstance().deserialize(xmlStr);
+       
+       assertEquals( "cmd map key-val", val, serverCmd.getOutputContentMap().get(key) );
     }
 }

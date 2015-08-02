@@ -19,6 +19,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.audit.AuditService;
 import org.kie.api.task.TaskService;
+import org.kie.remote.client.api.RemoteTaskService;
 
 /**
  * This {@link RuntimeEngine} instance acts as a remote client 
@@ -53,4 +54,10 @@ public class RemoteRuntimeEngine implements RuntimeEngine {
         return new AuditServiceClientCommandObject(config);
     }
 
+    /**
+     * @return a {@link RemoteTaskService} instance that acts as a client instance to the remote API
+     */
+    public RemoteTaskService getRemoteTaskService() {
+        return new RemoteTaskServiceClientImpl(config);
+    }
 }

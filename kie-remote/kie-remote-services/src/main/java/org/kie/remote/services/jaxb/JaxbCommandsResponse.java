@@ -34,6 +34,7 @@ import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.event.AuditEvent;
+import org.jbpm.services.task.commands.GetContentMapForUserCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
@@ -213,7 +214,7 @@ public class JaxbCommandsResponse {
             this.responses.add(new JaxbVariableInstanceLog((VariableInstanceLog) result));
         } else if( result instanceof DefaultFactHandle ) { 
            this.responses.add(new JaxbOtherResponse(result, i, cmd));
-        } else if( cmd instanceof GetTaskContentCommand ) { 
+        } else if( cmd instanceof GetTaskContentCommand || cmd instanceof GetContentMapForUserCommand ) { 
            this.responses.add(new JaxbTaskContentResponse((Map<String, Object>) result, i, cmd));
         } else if( Comment.class.isAssignableFrom(result.getClass()) ) { 
             System.out.println( ">> Adding JaxbTaskCommentResponse to response list");

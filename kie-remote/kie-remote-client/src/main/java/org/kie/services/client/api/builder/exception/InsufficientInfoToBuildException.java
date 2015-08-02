@@ -15,6 +15,8 @@
 
 package org.kie.services.client.api.builder.exception;
 
+import org.kie.remote.client.internal.RemoteClientException;
+
 
 /**
  * This class will be deleted as of 7.x
@@ -22,12 +24,8 @@ package org.kie.services.client.api.builder.exception;
  * @see org.kie.remote.client.api.exception.InsufficientInfoToBuildException
  */
 @Deprecated
-public class InsufficientInfoToBuildException extends IllegalStateException {
+public class InsufficientInfoToBuildException extends RemoteClientException {
 
-    public InsufficientInfoToBuildException() {
-        super();
-    }
-    
     public InsufficientInfoToBuildException(String msg) { 
         super(msg);
     }

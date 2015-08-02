@@ -50,7 +50,7 @@ import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CompleteTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.SkipTaskCommand;
@@ -383,7 +383,7 @@ public class ProcessRequestBean {
     private <T> T doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<T> cmd) { 
         // take care of serialization
         if( cmd instanceof GetTaskCommand 
-                || cmd instanceof GetContentCommand 
+                || cmd instanceof GetContentByIdCommand 
                 || cmd instanceof GetTaskContentCommand ) { 
            cmd = new ExecuteAndSerializeCommand(cmd); 
         }

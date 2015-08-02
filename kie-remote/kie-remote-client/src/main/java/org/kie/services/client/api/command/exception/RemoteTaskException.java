@@ -15,7 +15,7 @@
 
 package org.kie.services.client.api.command.exception;
 
-import org.kie.internal.task.exception.TaskException;
+import org.kie.remote.client.internal.RemoteClientException;
 
 
 /**
@@ -24,13 +24,17 @@ import org.kie.internal.task.exception.TaskException;
  * @see org.kie.remote.client.api.exception.RemoteTaskException
  */
 @Deprecated
-public class RemoteTaskException extends TaskException {
+public class RemoteTaskException extends RemoteClientException {
 
-    public RemoteTaskException(String message) {
-        super(message);
+    public RemoteTaskException(String message, String stackTrace) {
+        super(message, message + ":\n" + stackTrace);
     }
 
     public RemoteTaskException(String message, Throwable cause) {
         super(message, cause);
+    }
+        
+    public RemoteTaskException(String message) {
+        super(message);
     }
 }

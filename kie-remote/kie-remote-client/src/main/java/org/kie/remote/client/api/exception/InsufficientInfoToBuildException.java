@@ -30,10 +30,6 @@ public class InsufficientInfoToBuildException extends org.kie.services.client.ap
     /** generated serial version UID */
     private static final long serialVersionUID = 7415935205523780077L;
 
-    public InsufficientInfoToBuildException() {
-        super();
-    }
-    
     public InsufficientInfoToBuildException(String msg) { 
         super(msg);
     }

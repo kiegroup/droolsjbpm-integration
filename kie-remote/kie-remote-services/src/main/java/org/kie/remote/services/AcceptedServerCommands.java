@@ -50,6 +50,7 @@ import org.jbpm.process.audit.command.FindVariableInstancesByNameCommand;
 import org.jbpm.process.audit.command.FindVariableInstancesCommand;
 import org.jbpm.services.task.commands.ActivateTaskCommand;
 import org.jbpm.services.task.commands.AddCommentCommand;
+import org.jbpm.services.task.commands.AddContentFromUserCommand;
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.jbpm.services.task.commands.CancelDeadlineCommand;
 import org.jbpm.services.task.commands.ClaimNextAvailableTaskCommand;
@@ -64,7 +65,9 @@ import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
 import org.jbpm.services.task.commands.GetCommentCommand;
-import org.jbpm.services.task.commands.GetContentCommand;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
+import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
+import org.jbpm.services.task.commands.GetContentMapForUserCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
@@ -133,9 +136,19 @@ public class AcceptedServerCommands {
         acceptedCommands.add(ForwardTaskCommand.class);
         acceptedCommands.add(GetAttachmentCommand.class);
 
-        acceptedCommands.add(GetContentCommand.class);
+        acceptedCommands.add(GetContentByIdCommand.class);
         acceptedCommands.add(GetTaskContentCommand.class);
 
+        acceptedCommands.add(DeleteCommentCommand.class);
+        acceptedCommands.add(AddCommentCommand.class);
+        acceptedCommands.add(GetAllCommentsCommand.class);
+        acceptedCommands.add(GetCommentCommand.class);
+        acceptedCommands.add(SetTaskPropertyCommand.class);
+       
+        acceptedCommands.add(AddContentFromUserCommand.class);
+        acceptedCommands.add(GetContentByIdForUserCommand.class);
+        acceptedCommands.add(GetContentMapForUserCommand.class);
+        
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
@@ -167,12 +180,6 @@ public class AcceptedServerCommands {
         acceptedCommands.add(FindSubProcessInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesByNameCommand.class);
-        
-        acceptedCommands.add(DeleteCommentCommand.class);
-        acceptedCommands.add(AddCommentCommand.class);
-        acceptedCommands.add(GetAllCommentsCommand.class);
-        acceptedCommands.add(GetCommentCommand.class);
-        acceptedCommands.add(SetTaskPropertyCommand.class);
         
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }

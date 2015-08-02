@@ -89,8 +89,8 @@ public abstract class AbstractRemoteCommandObject {
         this.config.initializeJaxbSerializationProvider();
     }
 
-    protected void dispose() { 
-        
+    RemoteConfiguration getConfig() { 
+       return config; 
     }
 
     // Client object helper methods -----------------------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ public abstract class AbstractRemoteCommandObject {
         if( isTaskCommand ) {
             sendQueue = config.getTaskQueue();
             if( ! config.getUseUssl() && ! config.getDisableTaskSecurity() ) {
-                throw new SecurityException("Task operation requests can only be sent via JMS if SSL is used.");
+                throw new RemoteCommunicationException("Task operation requests can only be sent via JMS if SSL is used.");
             }
         } else {
             sendQueue = config.getKsessionQueue();
@@ -325,15 +325,16 @@ public abstract class AbstractRemoteCommandObject {
             httpResponse = httpRequest.response();
         } catch( Exception e ) {
             httpRequest.disconnect();
-            throw new RemoteCommunicationException("Unable to post request: " + e.getMessage(), e);
+            throw new RemoteCommunicationException("Unable to send HTTP POST request", e);
         } 
         
         // Get response
         boolean htmlException = false;
         JaxbExceptionResponse exceptionResponse = null;
         JaxbCommandsResponse cmdResponse = null;
-        int responseStatus = httpResponse.code();
+        int responseStatus;
         try {
+            responseStatus = httpResponse.code();
             String content = httpResponse.body();
             if( responseStatus < 300 ) {
                 cmdResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
@@ -366,7 +367,7 @@ public abstract class AbstractRemoteCommandObject {
             }
         } catch( Exception e ) {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
-            throw new RemoteCommunicationException("Unable to retrieve content from response!", e);
+            throw new RemoteCommunicationException("Unable to retrieve content from response", e);
         } finally { 
             httpRequest.disconnect();
         }
@@ -395,13 +396,13 @@ public abstract class AbstractRemoteCommandObject {
         // Process exception response
         switch ( responseStatus ) {
         case 409:
-            throw new RemoteTaskException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+            throw new RemoteTaskException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
         default:
             if( exceptionResponse != null ) { 
                 if( ! htmlException ) { 
-                    throw new RemoteApiException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+                    throw new RemoteApiException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
                 } else { 
-                    throw new RemoteCommunicationException(exceptionResponse.getMessage() + ":\n" + exceptionResponse.getStackTrace());
+                    throw new RemoteCommunicationException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
                 } 
             } else { 
                 throw new RemoteCommunicationException("Unable to communicate with remote API via URL " 

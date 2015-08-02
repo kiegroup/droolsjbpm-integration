@@ -16,6 +16,7 @@
 package org.kie.remote.client.api.exception;
 
 
+
 /**
  * This exception is thrown when the remote API returns a message indicating
  * that the request operation (REST or JMS) has failed. 
@@ -30,6 +31,10 @@ public class RemoteApiException extends org.kie.services.client.api.command.exce
     /** Generated serial version UID */
     private static final long serialVersionUID = 9094450426921267633L;
 
+    public RemoteApiException(String message, String stackTrace) {
+        super(message, message + ":\n" + stackTrace);
+    }
+    
     public RemoteApiException(String s) {
         super(s);
     }
