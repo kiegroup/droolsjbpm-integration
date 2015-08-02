@@ -72,7 +72,7 @@ import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetAllCommentsCommand;
 import org.jbpm.services.task.commands.GetAttachmentCommand;
-import org.jbpm.services.task.commands.GetCommentByIdCommand;
+import org.jbpm.services.task.commands.GetCommentCommand;
 import org.jbpm.services.task.commands.GetContentCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
@@ -173,7 +173,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "delete-comment", type = DeleteCommentCommand.class),
             @XmlElement(name = "add-comment", type = AddCommentCommand.class),
             @XmlElement(name = "get-all-comments", type = GetAllCommentsCommand.class),
-            @XmlElement(name = "get-comment-by-id", type = GetCommentByIdCommand.class),
+            @XmlElement(name = "get-comment", type = GetCommentCommand.class),
             
             @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),

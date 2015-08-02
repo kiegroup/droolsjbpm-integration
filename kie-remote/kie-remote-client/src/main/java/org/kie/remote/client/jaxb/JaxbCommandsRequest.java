@@ -27,8 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
-import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
-import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
@@ -58,7 +56,7 @@ import org.kie.remote.jaxb.gen.FireAllRulesCommand;
 import org.kie.remote.jaxb.gen.ForwardTaskCommand;
 import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
 import org.kie.remote.jaxb.gen.GetAttachmentCommand;
-import org.kie.remote.jaxb.gen.GetCommentByIdCommand;
+import org.kie.remote.jaxb.gen.GetCommentCommand;
 import org.kie.remote.jaxb.gen.GetContentCommand;
 import org.kie.remote.jaxb.gen.GetFactCountCommand;
 import org.kie.remote.jaxb.gen.GetGlobalCommand;
@@ -168,7 +166,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "delete-comment", type = DeleteCommentCommand.class),
             @XmlElement(name = "add-comment", type = AddCommentCommand.class),
             @XmlElement(name = "get-all-comments", type = GetAllCommentsCommand.class),
-            @XmlElement(name = "get-comment-by-id", type = GetCommentByIdCommand.class),
+            @XmlElement(name = "get-comment", type = GetCommentCommand.class),
 
             @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
