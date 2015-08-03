@@ -18,11 +18,12 @@ package org.kie.server.integrationtests.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.kie.api.runtime.KieContainer;
-import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -65,19 +66,63 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     @Parameterized.Parameter(1)
     public KieServicesConfiguration configuration;
 
-    protected static KieContainer kieContainer;
+    protected Map<String, Class<?>> extraClasses = new HashMap<String, Class<?>>();
 
-    protected Marshaller marshaller;
-
-    protected KieServicesClient createDefaultClient() {
+    protected KieServicesClient createDefaultClient() throws Exception {
+        KieServicesClient kieServicesClient = null;
+        // Add all extra custom classes defined in tests.
+        addExtraCustomClasses(extraClasses);
         if (TestConfig.isLocalServer()) {
-            KieServicesConfiguration localServerConfig =
+            configuration =
                     KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            return KieServicesFactory.newKieServicesClient(localServerConfig);
+            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
-            return KieServicesFactory.newKieServicesClient(configuration);
+            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         }
+        setupClients(kieServicesClient);
+        return kieServicesClient;
     }
 
+    /**
+     * Add custom classes needed by marshallers.
+     *
+     * @param extraClasses Map with classname keys and respective Class instances.
+     */
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {}
+
+    /**
+     * Initialize Execution server clients.
+     * Override to initialize specific clients.
+     *
+     * @param kieServicesClient Kie services client.
+     */
+    protected void setupClients(KieServicesClient kieServicesClient){}
+
+    /**
+     * Instantiate custom object.
+     *
+     * @param objectClassIdentifier Object class identifier - usually class name.
+     * @param constructorParameters Object's constructor parameters.
+     * @return Instantiated object.
+     */
+    protected Object createInstance(String objectClassIdentifier, Object... constructorParameters) {
+        Class<?>[] parameterClasses = new Class[constructorParameters.length];
+        for(int i = 0; i < constructorParameters.length; i++) {
+            parameterClasses[i] = constructorParameters[i].getClass();
+        }
+
+        try {
+            Class<?> clazz = extraClasses.get(objectClassIdentifier);
+            if (clazz != null) {
+                Object object = clazz.getConstructor(parameterClasses).newInstance(constructorParameters);
+                return object;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create object due " + e.getMessage(), e);
+        }
+        throw new RuntimeException("Instantiated class isn't defined in extraClasses set. Please define it first.");
+    }
 }

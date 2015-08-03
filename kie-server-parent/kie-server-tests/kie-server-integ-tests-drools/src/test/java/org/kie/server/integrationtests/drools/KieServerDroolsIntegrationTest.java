@@ -16,114 +16,126 @@
 package org.kie.server.integrationtests.drools;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import com.thoughtworks.xstream.XStream;
+import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
-import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.internal.runtime.helper.BatchExecutionHelper;
 import org.kie.scanner.MavenRepository;
-import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerCommand;
-import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
-    private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
-    private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
+public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
+    private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
+
+    private static final String CONTAINER_ID = "kie1";
+    private static final String KIE_SESSION = "defaultKieSession";
+
+    private static final String MESSAGE_OUT_IDENTIFIER = "message";
+    private static final String MESSAGE_CLASS_NAME = "org.pkg1.Message";
+    private static final String MESSAGE_REQUEST = "HelloWorld";
+    private static final String MESSAGE_RESPONSE = "echo:HelloWorld";
+
+    private static final String MESSAGE_TEXT_FIELD = "text";
+
+    private static URLClassLoader kjarClassLoader;
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId1);
-        createAndDeployKJar(releaseId2);
+        createAndDeployKJar(releaseId);
+
+        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
+    }
+
+    @AfterClass
+    public static void closeResources() throws Exception {
+        kjarClassLoader.close();
+    }
+
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(MESSAGE_CLASS_NAME, Class.forName(MESSAGE_CLASS_NAME, true, kjarClassLoader));
     }
 
     @Test
     public void testCallContainer() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
-                "  <insert out-identifier=\"message\">\n" +
-                "    <org.pkg1.Message>\n" +
-                "      <text>Hello World</text>\n" +
-                "    </org.pkg1.Message>\n" +
-                "  </insert>\n" +
-                "  <fire-all-rules/>\n" +
-                "</batch-execution>";
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
-        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", payload);
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
-    public void testCallContainerMarshallCommands() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+    public void testCallContainerWithStringPayload() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        KieServices ks = KieServices.Factory.get();
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId1).getFile();
-        URLClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
-        Class<?> messageClass = cl.loadClass("org.pkg1.Message");
-        Object message = messageClass.newInstance();
-        Method setter = messageClass.getMethod("setText", String.class);
-        Method getter = messageClass.getMethod("getText");
-        setter.invoke( message, "HelloWorld");
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
-        KieCommands kcmd = ks.getCommands();
-        Command<?> insert = kcmd.newInsert(message, "message");
-        Command<?> fire = kcmd.newFireAllRules();
-        BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
-        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", batch);
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        String marshalledCommands = marshaller.marshall(batchExecution);
+
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, marshalledCommands);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-
-        XStream xs = BatchExecutionHelper.newXStreamMarshaller();
-        xs.setClassLoader(cl);
-        ExecutionResults results = (ExecutionResults) xs.fromXML(reply.getResult());
-        Object value = results.getValue("message");
-        Assert.assertEquals("echo:HelloWorld", getter.invoke(value));
-        cl.close();
+        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
     public void testCommandScript() throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId1).getFile();
-        URLClassLoader cl = new URLClassLoader(new URL[]{jar.toURI().toURL()});
-        Class<?> messageClass = cl.loadClass("org.pkg1.Message");
-        Object message = messageClass.newInstance();
-        Method setter = messageClass.getMethod("setText", String.class);
-        setter.invoke(message, "HelloWorld");
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
-        KieCommands kcmd = ks.getCommands();
-        Command<?> insert = kcmd.newInsert(message, "message");
-        Command<?> fire = kcmd.newFireAllRules();
-        BatchExecutionCommand batch = kcmd.newBatchExecution(Arrays.asList(insert, fire), "defaultKieSession");
+        Command<?> insert = commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER);
+        Command<?> fire = commandsFactory.newFireAllRules();
+        BatchExecutionCommand batch = commandsFactory.newBatchExecution(Arrays.<Command<?>>asList(insert, fire), KIE_SESSION);
 
-        String payload = BatchExecutionHelper.newXStreamMarshaller().toXML(batch);
+        String payload = marshaller.marshall(batch);
 
         String containerId = "command-script-container";
-        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId1, null));
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId, null));
         KieServerCommand call = new CallContainerCommand(containerId, payload);
         KieServerCommand dispose = new DisposeContainerCommand(containerId);
 
@@ -135,22 +147,16 @@ public class KieServerDroolsIntegrationTest extends RestJmsXstreamSharedBaseInte
         for (ServiceResponse<? extends Object> r : reply.getResponses()) {
             Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
         }
-        cl.close();
     }
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        client.createContainer("kie1", new KieContainerResource("kie1", releaseId1));
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        String payload = "<batch-execution lookup=\"xyz\">\n" +
-                "  <insert out-identifier=\"message\">\n" +
-                "    <org.pkg1.Message>\n" +
-                "      <text>Hello World</text>\n" +
-                "    </org.pkg1.Message>\n" +
-                "  </insert>\n" +
-                "</batch-execution>";
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
 
-        ServiceResponse<String> reply = ruleClient.executeCommands("kie1", payload);
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 }

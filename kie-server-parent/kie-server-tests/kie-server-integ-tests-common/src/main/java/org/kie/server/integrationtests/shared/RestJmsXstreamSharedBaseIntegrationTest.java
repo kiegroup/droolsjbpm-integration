@@ -70,7 +70,6 @@ public abstract class RestJmsXstreamSharedBaseIntegrationTest extends KieServerB
             configuration.setMarshallingFormat(marshallingFormat);
             kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         }
-        setupClients(kieServicesClient);
         return kieServicesClient;
     }
 

@@ -26,9 +26,9 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
-import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
-public class KieServerIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
+public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
 

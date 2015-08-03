@@ -15,14 +15,18 @@
 
 package org.kie.server.integrationtests.shared;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
@@ -54,9 +58,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
@@ -67,8 +69,6 @@ import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.*;
-
 public abstract class KieServerBaseIntegrationTest {
 
     protected static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
@@ -77,7 +77,6 @@ public abstract class KieServerBaseIntegrationTest {
     protected static MavenRepository repository;
 
     protected KieServicesClient client;
-    protected RuleServicesClient ruleClient;
     /*
        Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
        kjars depend on that parent, but it is not necessary to deploy it multiple times. This flag is set the first time
@@ -138,14 +137,6 @@ public abstract class KieServerBaseIntegrationTest {
         if (TestConfig.isLocalServer()) {
             server.stop();
             System.clearProperty("java.naming.factory.initial");
-        }
-    }
-
-    protected void setupClients(KieServicesClient kieServicesClient) {
-        try {
-            this.ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
-        } catch (KieServicesException e) {
-            // does not support rule services client - common integration tests do not have drools not jbpm capabilities set
         }
     }
 
@@ -288,6 +279,17 @@ public abstract class KieServerBaseIntegrationTest {
     protected static void assertResultContainsStringRegex(String result, String regex) {
         assertTrue("Regex '" + regex + "' does not matches result string '" + result + "'!",
                 Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
+    }
+
+    protected static void assertResultNotContainingStringRegex(String result, String regex) {
+        assertFalse("Regex '" + regex + "' matches result string '" + result + "'!",
+                Pattern.compile(regex, Pattern.DOTALL).matcher(result).matches());
+    }
+
+    protected static void assertNullOrEmpty(String errorMessage, Collection<?> result ) {
+        if (result != null) {
+            assertTrue(errorMessage, result.size() == 0);
+        }
     }
 
     protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
