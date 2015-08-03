@@ -54,14 +54,6 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     }
 
     @Override
-    protected KieServicesClient createDefaultClient() {
-        KieServicesClient kieServicesClient = super.createDefaultClient();
-
-        setupClients(kieServicesClient);
-
-        return kieServicesClient;
-    }
-
     protected void setupClients(KieServicesClient client) {
         this.processClient = client.getServicesClient(ProcessServicesClient.class);
         this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
@@ -95,7 +87,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
      *
      * @param username Name of user, default user taken from TestConfig in case of null parameter.
      */
-    protected void changeUser(String username) {
+    protected void changeUser(String username) throws Exception {
         if(username == null) {
             username = TestConfig.getUsername();
         }

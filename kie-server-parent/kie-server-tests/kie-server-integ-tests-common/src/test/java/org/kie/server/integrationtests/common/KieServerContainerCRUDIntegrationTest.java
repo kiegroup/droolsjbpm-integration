@@ -25,9 +25,9 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
-public class KieServerContainerCRUDIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
+public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
@@ -122,7 +122,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsXstreamSharedB
         ServiceResponse<KieContainerResourceList> listReply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, listReply.getType());
         List<KieContainerResource> containers = listReply.getResult().getContainers();
-        Assert.assertNull("No containers returned!", containers);
+        assertNullOrEmpty("No containers returned!", containers);
     }
 
     @Test

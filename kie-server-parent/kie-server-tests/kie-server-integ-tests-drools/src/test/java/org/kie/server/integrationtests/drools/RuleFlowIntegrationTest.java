@@ -15,17 +15,30 @@
 
 package org.kie.server.integrationtests.drools;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.drools.core.command.runtime.rule.ClearRuleFlowGroupCommand;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.Command;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
 
-public class RuleFlowIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
+public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "ruleflow-group",
             "1.0.0.Final");
+
+    private static final String CONTAINER_ID = "ruleflow";
+    private static final String KIE_SESSION = "defaultKieSession";
+    private static final String KIE_SESSION_STATELESS = "defaultStatelessKieSession";
+    private static final String PROCESS_ID = "simple-ruleflow";
+    private static final String LIST_NAME = "list";
+    private static final String LIST_OUTPUT_NAME = "output-list";
+    private static final String RULEFLOW_GROUP_1 = "ruleflow-group1";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -35,56 +48,63 @@ public class RuleFlowIntegrationTest extends RestJmsXstreamSharedBaseIntegration
 
     @Test
     public void testExecuteSimpleRuleFlowProcess() {
-        assertSuccess(client.createContainer("ruleflow", new KieContainerResource("ruleflow", releaseId)));
-        String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
-                "  <set-global identifier=\"list\" out-identifier=\"output-list\">\n" +
-                "    <java.util.ArrayList/>\n" +
-                "  </set-global>\n" +
-                "  <start-process processId=\"simple-ruleflow\"/>\n" +
-                "  <fire-all-rules/>\n" +
-                "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
-                "</batch-execution>\n";
-        ServiceResponse<String> response = ruleClient.executeCommands("ruleflow", payload);
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME));
+        commands.add(commandsFactory.newStartProcess(PROCESS_ID));
+        commands.add(commandsFactory.newFireAllRules());
+        commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
+
+        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsStringRegex(result,
-                ".*<string>Rule from first ruleflow group executed</string>\\s*<string>Rule from second ruleflow group executed</string>.*");
+            ".*Rule from first ruleflow group executed.*Rule from second ruleflow group executed.*");
     }
 
     @Test
     public void testExecuteSimpleRuleFlowProcessInStatelessSession() {
-        assertSuccess(client.createContainer("ruleflow-stateless", new KieContainerResource("ruleflow-stateless", releaseId)));
-        String payload = "<batch-execution lookup=\"defaultStatelessKieSession\">\n" +
-                         "  <set-global identifier=\"list\" out-identifier=\"output-list\">\n" +
-                         "    <java.util.ArrayList/>\n" +
-                         "  </set-global>\n" +
-                         "  <start-process processId=\"simple-ruleflow\" out-identifier=\"process-out\"/>\n" +
-                         "  <fire-all-rules/>\n" +
-                         "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
-                         "</batch-execution>\n";
-        ServiceResponse<String> response = ruleClient.executeCommands("ruleflow-stateless", payload);
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION_STATELESS);
+
+        commands.add(commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME));
+        commands.add(commandsFactory.newStartProcess(PROCESS_ID));
+        commands.add(commandsFactory.newFireAllRules());
+        commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
+
+        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsStringRegex(result,
-                                        ".*<string>Rule from first ruleflow group executed</string>\\s*<string>Rule from second ruleflow group executed</string>.*");
+            ".*Rule from first ruleflow group executed.*Rule from second ruleflow group executed.*");
     }
 
     @Test
     public void testClearRuleFlowGroup() {
-        assertSuccess(client.createContainer("ruleflow", new KieContainerResource("ruleflow", releaseId)));
-        String payload = "<batch-execution lookup=\"defaultKieSession\">\n" +
-                "  <set-global identifier=\"list\" out-identifier=\"output-list\">\n" +
-                "    <java.util.ArrayList/>\n" +
-                "  </set-global>\n" +
-                "  <clear-ruleflow-group name =\"ruleflow-group1\"/>\n" +
-                "  <start-process processId=\"simple-ruleflow\"/>\n" +
-                "  <fire-all-rules/>\n" +
-                "  <get-global identifier=\"list\" out-identifier=\"output-list\"/>\n" +
-                "</batch-execution>\n";
-        ServiceResponse<String> response = client.executeCommands("ruleflow", payload);
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME));
+        // Replace if/after Clear command is added to command factory.
+        // commands.add(commandsFactory.newClearRuleFlowGroup(RULEFLOW_GROUP_1));
+        commands.add(new ClearRuleFlowGroupCommand(RULEFLOW_GROUP_1));
+        commands.add(commandsFactory.newStartProcess(PROCESS_ID));
+        commands.add(commandsFactory.newFireAllRules());
+        commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
+
+        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
         assertSuccess(response);
         String result = response.getResult();
         assertResultContainsStringRegex(result,
-                ".*<list>\\s*<string>Rule from second ruleflow group executed</string>\\s*</list>.*");
+                ".*Rule from second ruleflow group executed.*");
+        assertResultNotContainingStringRegex(result,
+            ".*Rule from first ruleflow group executed.*");
     }
 }

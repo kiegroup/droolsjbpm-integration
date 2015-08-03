@@ -15,34 +15,42 @@
 
 package org.kie.server.integrationtests.drools;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.RuleServicesClient;
-import org.kie.server.integrationtests.shared.RestJmsXstreamSharedBaseIntegrationTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.api.command.BatchExecutionCommand;
+import org.kie.api.command.Command;
+import org.kie.api.runtime.KieContainer;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.RuleServicesClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseIntegrationTest {
-    private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestsIntegrationTest.class);
+public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
+    private static Logger logger = LoggerFactory.getLogger(Worker.class);
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
 
     private static final String CONTAINER_ID = "kie-concurrent";
     private static final int NR_OF_THREADS = 5;
     private static final int NR_OF_REQUESTS_PER_THREAD = 20;
+    private static final String KIE_SESSION = "kbase1.stateless";
+    private static final String PERSON_OUT_IDENTIFIER = "person1";
+    private static final String PERSON_CLASS_NAME = "org.kie.server.testing.Person";
+    private static final String PERSON_NAME = "Darth";
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -50,9 +58,16 @@ public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseI
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
 
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+    }
+
     @Test
     public void testCallingStatelessSessionFromMultipleThreads() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId1));
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
         List<Future<String>> futureResults = new ArrayList<Future<String>>();
         ExecutorService es = Executors.newFixedThreadPool(NR_OF_THREADS);
         for (int i = 0; i < NR_OF_THREADS; i++) {
@@ -64,30 +79,28 @@ public class ConcurrentRequestsIntegrationTest extends RestJmsXstreamSharedBaseI
         }
     }
 
-    public static class Worker implements Callable<String> {
-        private static Logger logger = LoggerFactory.getLogger(Worker.class);
-        private final KieServicesClient client;
+    public class Worker implements Callable<String> {
+
         private final RuleServicesClient ruleServicesClient;
 
         public Worker(KieServicesClient client) {
-            this.client = client;
             this.ruleServicesClient = client.getServicesClient(RuleServicesClient.class);
         }
 
         @Override
         public String call() {
-            String payload = "<batch-execution lookup=\"kbase1.stateless\">\n" +
-                    "  <insert out-identifier=\"person1\">\n" +
-                    "    <org.kie.server.testing.Person>\n" +
-                    "      <firstname>Darth</firstname>\n" +
-                    "    </org.kie.server.testing.Person>\n" +
-                    "  </insert>\n" +
-                    "</batch-execution>";
+            List<Command<?>> commands = new ArrayList<Command<?>>();
+
+            BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+            Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+            commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
+
             long threadId = Thread.currentThread().getId();
             ServiceResponse<String> reply;
             for (int i = 0; i < NR_OF_REQUESTS_PER_THREAD; i++) {
                 logger.trace("Container call #{}, thread-id={}", i, threadId);
-                reply = ruleServicesClient.executeCommands(CONTAINER_ID, payload);
+                reply = ruleServicesClient.executeCommands(CONTAINER_ID, batchExecution);
                 logger.trace("Container reply for request #{}: {}, thread-id={}", i, reply, threadId);
                 assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
             }

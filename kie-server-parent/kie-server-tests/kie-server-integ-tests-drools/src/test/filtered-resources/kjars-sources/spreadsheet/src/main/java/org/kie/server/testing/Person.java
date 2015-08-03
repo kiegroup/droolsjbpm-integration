@@ -34,7 +34,7 @@ public class Person {
         this.age = age;
     }
     
-    public Boolean canBuyAlcohol() {
+    public Boolean getCanBuyAlcohol() {
         return canBuyAlcohol;
     }
 
