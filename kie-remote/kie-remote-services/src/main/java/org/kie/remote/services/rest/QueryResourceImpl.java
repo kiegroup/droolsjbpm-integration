@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -40,10 +41,9 @@ import org.kie.internal.identity.IdentityProvider;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.data.QueryResourceData;
+import org.kie.remote.services.rest.query.helpers.AbstractInternalQueryHelper;
 import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
 import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 
 /**
  * Resource that does various query operations
@@ -69,41 +69,77 @@ public class QueryResourceImpl extends ResourceBase {
 
     // REST operations -----------------------------------------------------------------------------------------------------------
 
+    private static <T> Response doQueryWithQueryHelper(
+            String userId, 
+            Map<String, String[]> queryparams, 
+            AbstractInternalQueryHelper<T> queryHelper, 
+            String oper, 
+            HttpHeaders headers, 
+            boolean taskQuery) {
+        Map<String, String[]> params = makeQueryParametersLowerCase(queryparams);
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(taskQuery), true, oper);
+        
+        int[] pageInfo = getPageNumAndPageSize(params, oper);
+    
+        T result 
+            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(userId, params, pageInfo);
+        queryHelper.dispose();
+        
+        return createCorrectVariant(result, headers);
+    }
+
     @GET
     @Path("/runtime/task")
-    public Response queryTasks() {
-        String oper = getRelativePath();
-        Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
-        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(true), true, oper);
+    public Response getQueryTasks() {
         
-        int[] pageInfo = getPageNumAndPageSize(params, oper);
-
-        InternalTaskQueryHelper queryHelper = new InternalTaskQueryHelper(this);
-        JaxbQueryTaskResult result 
-            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityProvider.getName(), params, pageInfo);
-        queryHelper.dispose();
-        
-        return createCorrectVariant(result, headers);
+        return doQueryWithQueryHelper(
+                identityProvider.getName(),
+                getRequestParams(), 
+                new InternalTaskQueryHelper(this), 
+                getRelativePath(), 
+                headers, 
+                true);
     }
-
+    
+    @POST
+    @Path("/runtime/task")
+    public Response postQueryTasks() {
+        
+        return doQueryWithQueryHelper(
+                identityProvider.getName(),
+                getRequestParams(), 
+                new InternalTaskQueryHelper(this), 
+                getRelativePath(), 
+                headers, 
+                true);
+    }
+    
     @GET
     @Path("/runtime/process")
-    public Response queryProcessInstances() {
-        String oper = getRelativePath();
-        Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
-        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(false), true, oper);
+    public Response getQueryProcessInstances() {
         
-        int[] pageInfo = getPageNumAndPageSize(params, oper);
-
-        String identityNotNeeded = null;
-        InternalProcInstQueryHelper queryHelper = new InternalProcInstQueryHelper(this);
-        JaxbQueryProcessInstanceResult result 
-            = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityNotNeeded, params, pageInfo);
-        queryHelper.dispose();
-
-        return createCorrectVariant(result, headers);
+        return doQueryWithQueryHelper(
+                identityProvider.getName(),
+                getRequestParams(), 
+                new InternalProcInstQueryHelper(this), 
+                getRelativePath(), 
+                headers, 
+                false);
     }
-  
+
+    @POST
+    @Path("/runtime/process")
+    public Response postQueryProcessInstances() {
+        
+        return doQueryWithQueryHelper(
+                identityProvider.getName(),
+                getRequestParams(), 
+                new InternalProcInstQueryHelper(this), 
+                getRelativePath(), 
+                headers, 
+                false);
+    }
+
     private static final String[] allowedQueryParams = { 
         "workItemId",             // 0
         "taskId",                 // 1

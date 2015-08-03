@@ -147,7 +147,7 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
         addParams(queryParams, badParam, "2");
       
         try { 
-            queryResource.queryProcessInstances();
+            queryResource.getQueryProcessInstances();
             fail( "The query proces instances operation should have failed!");
         } catch( KieRemoteRestOperationException krroe ) { 
            assertTrue( krroe.getMessage().contains(badParam) );

@@ -54,7 +54,7 @@ import org.kie.remote.services.rest.query.data.QueryAction;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
 
-abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethods {
+public abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethods {
 
     protected ResourceBase resourceBase;
     
