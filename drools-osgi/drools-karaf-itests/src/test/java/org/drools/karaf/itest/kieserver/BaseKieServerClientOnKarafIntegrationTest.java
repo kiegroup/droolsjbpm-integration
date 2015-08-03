@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.drools.karaf.itest;
+package org.drools.karaf.itest.kieserver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +24,7 @@ import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.drools.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -43,10 +41,7 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,69 +60,20 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  *
  * Tests are very basic and focus only on verification rather than complete test suite.
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationTest.class);
+public class BaseKieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    private static final String SERVER_URL = System.getProperty("org.kie.server.itest.server.url", "http://localhost:8080/kie-server/services/rest/server");
-    private static final String USER = System.getProperty("org.kie.server.itest.user", "kieserver");
-    private static final String PASSWORD = System.getProperty("org.kie.server.itest.password", "kieserver@pwd1");
+    private static final Logger logger = LoggerFactory.getLogger(BaseKieServerClientOnKarafIntegrationTest.class);
 
-    private static final String CONTAINER_ID = System.getProperty("org.kie.server.itest.container", "evaluationproject");
-    private static final String PROCESS_ID = System.getProperty("org.kie.server.itest.process", "evaluation");
+    protected String serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://localhost:8080/kie-server/services/rest/server");
+    protected String user = System.getProperty("org.kie.server.itest.user", "kieserver");
+    protected String password = System.getProperty("org.kie.server.itest.password", "kieserver@pwd1");
 
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testListContainersJSON() throws Exception {
-
-        testListContainers(MarshallingFormat.JSON);
-
-    }
-
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testListContainersJAXB() throws Exception {
-
-        testListContainers(MarshallingFormat.JAXB);
-
-    }
-
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testListContainersXSTREAM() throws Exception {
-
-        testListContainers(MarshallingFormat.XSTREAM);
-
-    }
-
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testCompleteInteractionWithKieServerJSON() throws Exception {
-
-        testCompleteInteractionWithKieServer(MarshallingFormat.JSON);
-
-    }
-
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testCompleteInteractionWithKieServerJAXB() throws Exception {
-
-        testCompleteInteractionWithKieServer(MarshallingFormat.JAXB);
-
-    }
-
-    @Ignore("Ignored by default as it requires KieServer up and running to perform this test")
-    @Test
-    public void testCompleteInteractionWithKieServerXSTREAM() throws Exception {
-
-        testCompleteInteractionWithKieServer(MarshallingFormat.XSTREAM);
-
-    }
+    protected String containerId = System.getProperty("org.kie.server.itest.container", "evaluationproject");
+    protected String processId = System.getProperty("org.kie.server.itest.process", "evaluation");
 
     protected void testListContainers(MarshallingFormat marshallingFormat) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(SERVER_URL, USER, PASSWORD);
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
 
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
@@ -148,7 +94,7 @@ public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrat
 
 
     protected void testCompleteInteractionWithKieServer(MarshallingFormat marshallingFormat) {
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(SERVER_URL, USER, PASSWORD);
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(serverUrl, user, password);
 
         configuration.setMarshallingFormat(marshallingFormat);
 //        configuration.addJaxbClasses(extraClasses);
@@ -162,25 +108,25 @@ public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrat
 
         ProcessServicesClient processClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
         // get details of process definition
-        ProcessDefinition definition = processClient.getProcessDefinition(CONTAINER_ID, PROCESS_ID);
+        ProcessDefinition definition = processClient.getProcessDefinition(containerId, processId);
         System.out.println("\t######### Definition details: " + definition);
 
         // start process instance
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("employee", USER);
-        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID, params);
+        params.put("employee", user);
+        Long processInstanceId = processClient.startProcess(containerId, processId, params);
         System.out.println("\t######### Process instance id: " + processInstanceId);
 
         UserTaskServicesClient taskClient = kieServicesClient.getServicesClient(UserTaskServicesClient.class);
         // find available tasks
-        List<TaskSummary> tasks = taskClient.findTasks(USER, 0, 10);
+        List<TaskSummary> tasks = taskClient.findTasks(user, 0, 10);
         System.out.println("\t######### Tasks: " +tasks);
 
         // complete task
         Long taskId = tasks.get(0).getId();
 
-        taskClient.startTask(CONTAINER_ID, taskId, USER);
-        taskClient.completeTask(CONTAINER_ID, taskId, USER, null);
+        taskClient.startTask(containerId, taskId, user);
+        taskClient.completeTask(containerId, taskId, user, null);
 
         // work with rules
         List<GenericCommand<?>> commands = new ArrayList<GenericCommand<?>>();
@@ -197,11 +143,11 @@ public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrat
         commands.add(fireAllRulesCommand);
 
         RuleServicesClient ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
-        ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        ruleClient.executeCommands(containerId, executionCommand);
         System.out.println("\t######### Rules executed");
 
         // at the end abort process instance
-        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        processClient.abortProcessInstance(containerId, processInstanceId);
 
         ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId);
         System.out.println("\t######### ProcessInstance: " + processInstance);
@@ -209,6 +155,7 @@ public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrat
 
     @Configuration
     public static Option[] configure() {
+
         return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
@@ -228,4 +175,6 @@ public class KieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrat
                 loadKieFeatures("kie-server-client")
         };
     }
+
+
 }
