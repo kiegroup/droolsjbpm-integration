@@ -68,7 +68,7 @@ public class RestUtils {
     }
 
     public static String getClassType(HttpHeaders headers) {
-        String classType = Object.class.getName();
+        String classType = null;
 
         List<String> header = headers.getRequestHeader(KieServerConstants.CLASS_TYPE_HEADER);
         if (header != null && !header.isEmpty()) {

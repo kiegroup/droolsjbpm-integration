@@ -281,6 +281,9 @@ public class TestConfig {
         @Override
         protected String convert(String key) {
             String systemPropertyValue = System.getProperty(key);
+            if (systemPropertyValue == null || systemPropertyValue.isEmpty()) {
+                return null;
+            }
             return systemPropertyValue;
         }
     }

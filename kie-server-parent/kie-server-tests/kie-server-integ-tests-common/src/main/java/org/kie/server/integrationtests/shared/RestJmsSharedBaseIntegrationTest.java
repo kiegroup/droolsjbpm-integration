@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -66,7 +67,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     @Parameterized.Parameter(1)
     public KieServicesConfiguration configuration;
 
-    protected Map<String, Class<?>> extraClasses = new HashMap<String, Class<?>>();
+    protected Map<String, Class<?>> extraClasses = new ConcurrentHashMap<String, Class<?>>();
 
     protected KieServicesClient createDefaultClient() throws Exception {
         KieServicesClient kieServicesClient = null;
