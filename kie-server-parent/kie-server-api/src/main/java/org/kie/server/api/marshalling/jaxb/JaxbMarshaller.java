@@ -174,9 +174,7 @@ public class JaxbMarshaller implements Marshaller {
 
             this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
         } catch ( JAXBException e ) {
-            e.printStackTrace();
-            System.out.println("################ " + e.getMessage());
-            throw new MarshallingException( "Error while creating JAXB context from default classes! " + e.getErrorCode() + " " + e.getMessage(), e );
+            throw new MarshallingException( "Error while creating JAXB context from default classes! " + e.getMessage(), e );
         }
     }
 
