@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
@@ -95,7 +96,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     ks = kci.getKieContainer().getKieSession();
                 }
                 if (ks != null) {
-                    Class<? extends Command> type =  Command.class;
+                    Class<? extends Command> type =  BatchExecutionCommandImpl.class;
                     if (classType != null && !classType.isEmpty()) {
                         type = (Class<? extends Command>) Class.forName(classType, true, kci.getKieContainer().getClassLoader());
                     }

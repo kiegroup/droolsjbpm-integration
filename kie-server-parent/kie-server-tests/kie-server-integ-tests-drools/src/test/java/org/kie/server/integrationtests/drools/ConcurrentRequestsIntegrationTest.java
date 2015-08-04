@@ -60,8 +60,10 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
-        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
-        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+        if (extraClasses.isEmpty()) {
+            KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+            extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+        }
     }
 
     @Test

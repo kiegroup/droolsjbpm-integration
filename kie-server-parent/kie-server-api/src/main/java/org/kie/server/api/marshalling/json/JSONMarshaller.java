@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
@@ -32,9 +35,11 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.deser.std.UntypedObjectDeserializer;
 import org.codehaus.jackson.map.introspect.Annotated;
@@ -42,6 +47,8 @@ import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.drools.core.util.LinkedList;
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -73,7 +80,8 @@ public class JSONMarshaller implements Marshaller {
         AnnotationIntrospector secondary = new JacksonAnnotationIntrospector();
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
         objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
-        objectMapper.setSerializationConfig(objectMapper.getSerializationConfig().withAnnotationIntrospector(introspectorPair));
+        objectMapper.setSerializationConfig(objectMapper.getSerializationConfig().withAnnotationIntrospector(introspectorPair).with(SerializationConfig.Feature.INDENT_OUTPUT));
+
         // in case there are custom classes register module to deal with them both for serialization and deserialization
         // this module makes sure that only custom classes are equipped with type information
         if (classes != null && !classes.isEmpty()) {
@@ -184,6 +192,18 @@ public class JSONMarshaller implements Marshaller {
                 complete.addAll(customClasses);
             }
             return complete;
+        }
+
+        @Override
+        public JsonSerializer<?> findSerializer(Annotated am) {
+            // ignore JaxbUnknownAdapter as it breaks JSON marshaller for list and maps
+            XmlJavaTypeAdapter adapterInfo = findAnnotation(XmlJavaTypeAdapter.class, am, true, false, false);
+            if (adapterInfo != null && adapterInfo.value().isAssignableFrom(JaxbUnknownAdapter.class)) {
+                return null;
+            }
+
+            return super.findSerializer(am);
+
         }
     }
 

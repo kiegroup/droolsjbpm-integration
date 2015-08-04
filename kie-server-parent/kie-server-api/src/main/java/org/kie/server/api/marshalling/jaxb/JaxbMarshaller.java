@@ -162,9 +162,6 @@ public class JaxbMarshaller implements Marshaller {
 
     private final ClassLoader classLoader;
 
-    private final javax.xml.bind.Marshaller marshaller;
-    private final Unmarshaller              unmarshaller;
-
     public JaxbMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         try {
@@ -176,11 +173,10 @@ public class JaxbMarshaller implements Marshaller {
             }
 
             this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
-            this.marshaller = jaxbContext.createMarshaller();
-            this.marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            this.unmarshaller = jaxbContext.createUnmarshaller();
         } catch ( JAXBException e ) {
-            throw new MarshallingException( "Error while creating JAXB context from default classes!", e );
+            e.printStackTrace();
+            System.out.println("################ " + e.getMessage());
+            throw new MarshallingException( "Error while creating JAXB context from default classes! " + e.getErrorCode() + " " + e.getMessage(), e );
         }
     }
 
@@ -188,7 +184,7 @@ public class JaxbMarshaller implements Marshaller {
     public String marshall(Object input) {
         StringWriter writer = new StringWriter();
         try {
-            marshaller.marshal(ModelWrapper.wrap(input), writer );
+            getMarshaller().marshal(ModelWrapper.wrap(input), writer);
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Can't marshall input object: "+input, e );
         }
@@ -198,7 +194,7 @@ public class JaxbMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String input, Class<T> type) {
         try {
-            return (T) unmarshaller.unmarshal( new StringReader( input ) );
+            return (T) getUnmarshaller().unmarshal(new StringReader(input));
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Can't unmarshall input string: "+input, e );
         }
@@ -213,5 +209,17 @@ public class JaxbMarshaller implements Marshaller {
     @Override
     public MarshallingFormat getFormat() {
         return MarshallingFormat.JAXB;
+    }
+
+
+    protected javax.xml.bind.Marshaller getMarshaller() throws JAXBException {
+        javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        return marshaller;
+    }
+
+    protected Unmarshaller getUnmarshaller() throws JAXBException {
+        return jaxbContext.createUnmarshaller();
     }
 }
