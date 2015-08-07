@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.enterprise.inject.AmbiguousResolutionException;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
@@ -83,8 +85,10 @@ public class ResourceBase {
     private HttpServletRequest httpRequest;
     
     @Inject
-    protected UserGroupCallback userGroupCallback;
-   
+    protected Instance<UserGroupCallback> userGroupCallbackInstance;
+
+    private UserGroupCallback userGroupCallback;
+
     // for use in tests
     
     public void setProcessRequestBean( ProcessRequestBean processRequestBean ) {
@@ -143,7 +147,11 @@ public class ResourceBase {
         return processRequestBean.getJPAService();
     } 
        
-    public UserGroupCallback getUserGroupCallback() { 
+    public UserGroupCallback getUserGroupCallback() {
+        if (userGroupCallback == null) {
+            userGroupCallback = safeGet(userGroupCallbackInstance);
+        }
+
         return userGroupCallback;
     } 
        
@@ -583,5 +591,31 @@ public class ResourceBase {
         } catch (Exception e) {
             throw new RuntimeException("Unable to create wrapper for type " + value.getClass() + " with value " + value);
         }
+    }
+
+    protected <T> T safeGet( Instance<T> instance ) {
+        try {
+            T object = instance.get();
+            logger.debug( "About to set object {} on task service", object );
+            return object;
+        } catch ( AmbiguousResolutionException e ) {
+            // special handling in case cdi discovered multiple injections
+            // that are actually same instances - e.g. weld on tomcat
+            HashSet<T> available = new HashSet<T>();
+
+            for ( T object : instance ) {
+                available.add( object );
+            }
+
+            if ( available.size() == 1 ) {
+                return available.iterator().next();
+            } else {
+                throw e;
+            }
+        } catch ( Throwable e ) {
+            logger.debug( "Cannot get value of of instance {} due to {}", instance, e.getMessage() );
+        }
+
+        return null;
     }
 }
