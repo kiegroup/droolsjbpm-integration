@@ -56,7 +56,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
-
+    private static final String CONTAINER_ID = "definition-project";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -490,41 +490,76 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstanceByCorrelationKey() throws Exception {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
-        CorrelationKey key = correlationKeyFactory.newCorrelationKey("simple-key");
+        String businessKey = "simple-key";
+        CorrelationKey key = correlationKeyFactory.newCorrelationKey(businessKey);
 
         Map<String, Object> parameters = new HashMap<String, Object>();
-        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.evaluation", key, parameters);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, key, parameters);
         try {
+            List<ProcessInstance> returnedProcessInstances = new ArrayList<ProcessInstance>();
+
             ProcessInstance instance = queryClient.findProcessInstanceById(processInstanceId);
-            assertNotNull(instance);
-            assertEquals(processInstanceId, instance.getId());
-            assertEquals("definition-project.evaluation", instance.getProcessId());
-            assertEquals("evaluation", instance.getProcessName());
-            assertEquals("1.0", instance.getProcessVersion());
-            assertEquals("yoda", instance.getInitiator());
-            assertEquals("definition-project", instance.getContainerId());
-            assertEquals("simple-key", instance.getCorrelationKey());
-            assertEquals("evaluation", instance.getProcessInstanceDescription());
-            assertEquals(-1, instance.getParentId().longValue());
+            returnedProcessInstances.add(instance);
 
             instance = queryClient.findProcessInstanceByCorrelationKey(key);
-            assertNotNull(instance);
-            assertEquals(processInstanceId, instance.getId());
-            assertEquals("definition-project.evaluation", instance.getProcessId());
-            assertEquals("evaluation", instance.getProcessName());
-            assertEquals("1.0", instance.getProcessVersion());
-            assertEquals("yoda", instance.getInitiator());
-            assertEquals("definition-project", instance.getContainerId());
-            assertEquals("simple-key", instance.getCorrelationKey());
-            assertEquals("evaluation", instance.getProcessInstanceDescription());
-            assertEquals(-1, instance.getParentId().longValue());
+            returnedProcessInstances.add(instance);
+
+            List<ProcessInstance> processInstances = queryClient.findProcessInstancesByCorrelationKey(key, 0, 100);
+            assertNotNull(processInstances);
+            // Separate active instances as response contains also instances already closed or aborted.
+            List<ProcessInstance> activeInstances = new ArrayList<ProcessInstance>();
+            for (ProcessInstance processInstance : processInstances) {
+                if (org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE == processInstance.getState().intValue()) {
+                    activeInstances.add(processInstance);
+                }
+            }
+            assertEquals(1, activeInstances.size());
+            returnedProcessInstances.addAll(activeInstances);
+
+            // All returned instances should contain all values
+            for (ProcessInstance returnedProcessInstance : returnedProcessInstances) {
+                assertNotNull(returnedProcessInstance);
+                assertEquals(processInstanceId, returnedProcessInstance.getId());
+                assertEquals(PROCESS_ID_EVALUATION, returnedProcessInstance.getProcessId());
+                assertEquals("evaluation", returnedProcessInstance.getProcessName());
+                assertEquals("1.0", returnedProcessInstance.getProcessVersion());
+                assertEquals(USER_YODA, returnedProcessInstance.getInitiator());
+                assertEquals(CONTAINER_ID, returnedProcessInstance.getContainerId());
+                assertEquals(businessKey, returnedProcessInstance.getCorrelationKey());
+                assertEquals("evaluation", returnedProcessInstance.getProcessInstanceDescription());
+                assertEquals(-1, returnedProcessInstance.getParentId().longValue());
+                assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, returnedProcessInstance.getState().intValue());
+            }
         } finally {
-            processClient.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
+    }
+
+    @Test
+    public void testGetProcessInstanceByCorrelationKeyPaging() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+
+        String businessKey = "simple-key";
+        CorrelationKey key = correlationKeyFactory.newCorrelationKey(businessKey);
+
+        // Start and abort 2 processes to be sure that there are processes to be returned.
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        Long processInstanceId1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, key, parameters);
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId1);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, key, parameters);
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
+
+        List<ProcessInstance> processInstancesPage0 = queryClient.findProcessInstancesByCorrelationKey(key, 0, 1);
+        List<ProcessInstance> processInstancesPage1 = queryClient.findProcessInstancesByCorrelationKey(key, 1, 1);
+        assertEquals(1, processInstancesPage0.size());
+        assertEquals(1, processInstancesPage1.size());
+        assertNotEquals("Process instances are same! Paging doesn't work.", processInstancesPage0.get(0).getId(), processInstancesPage1.get(0).getId());
     }
 
     @Test
