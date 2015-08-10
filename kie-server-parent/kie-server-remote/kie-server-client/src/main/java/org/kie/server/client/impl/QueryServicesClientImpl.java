@@ -226,8 +226,10 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
+            String queryString = getPagingQueryString("", page, pageSize);
+
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstanceList.class);
+                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
