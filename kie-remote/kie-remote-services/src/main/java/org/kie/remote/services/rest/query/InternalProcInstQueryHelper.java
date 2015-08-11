@@ -160,7 +160,7 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
     public void taskId(long[] longData) { 
         badParameter(QueryResourceData.taskQueryParams[0]);
     }
-    
+   
     @Override
     public void initiator(String[] data) { 
         badParameter(QueryResourceData.taskQueryParams[1]);

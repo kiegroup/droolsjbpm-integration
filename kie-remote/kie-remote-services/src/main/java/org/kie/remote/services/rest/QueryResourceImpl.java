@@ -75,7 +75,7 @@ public class QueryResourceImpl extends ResourceBase {
     public Response queryProcessInstances() {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
-        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(true), true, oper);
+        checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(false), true, oper);
         
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
@@ -164,7 +164,7 @@ public class QueryResourceImpl extends ResourceBase {
                 if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam) ) {
                     continue EACHPARAM;
                 }
-                if( checkSpecial && isSpecialParameter(queryParam) ) { 
+                if( checkSpecial && queryParam.contains(allowedParam) && isSpecialParameter(queryParam) ) { 
                     continue EACHPARAM;
                 }
             }
