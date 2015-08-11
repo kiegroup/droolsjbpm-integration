@@ -49,12 +49,6 @@ abstract class InternalQueryBuilderMethods {
         } 
     }
     
-    public void workItemId(long[] longData) { 
-        for( RemoteServicesQueryCommandBuilder queryBuilder : getQueryBuilders() ) { 
-            queryBuilder.workItemId(longData);
-        } 
-    }
-    
     public void deploymentId(String[] data) { 
         for( RemoteServicesQueryCommandBuilder queryBuilder : getQueryBuilders() ) { 
             queryBuilder.deploymentId(data);

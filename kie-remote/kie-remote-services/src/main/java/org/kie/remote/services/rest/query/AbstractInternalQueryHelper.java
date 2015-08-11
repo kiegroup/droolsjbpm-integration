@@ -369,12 +369,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 processId(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 2: // workitemid
-                assert "workitemid".equals(actionParamNameMap.get(action)): action + " : workitemid";
-                longData = getLongs(action, data);
-                workItemId(longData);
-                break;
-            case 3: // deploymentid
+            case 2: // deploymentid
                 assert "deploymentid".equals(actionParamNameMap.get(action)): action + " : deploymentid";
                 setRegexOnOff(queryAction, true);
                 deploymentId(data);
@@ -382,7 +377,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 break;
     
             // task
-            case 4: // task id
+            case 3: // task id
                 assert "taskid".equals(actionParamNameMap.get(action)): action + " : taskid";
                 longData = getLongs(action, data);
                 if( queryAction.min || queryAction.max ) {
@@ -401,55 +396,55 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                     taskId(longData);
                 }
                 break;
-            case 5: // initiator
+            case 4: // initiator
                 assert "initiator".equals(actionParamNameMap.get(action)): action + " : initiator";
                 setRegexOnOff(queryAction, true);
                 initiator(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 6: // stakeholder
+            case 5: // stakeholder
                 assert "stakeholder".equals(actionParamNameMap.get(action)): action + " : stakeholder";
                 setRegexOnOff(queryAction, true);
                 stakeHolder(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 7: // potential owner
+            case 6: // potential owner
                 assert "potentialowner".equals(actionParamNameMap.get(action)): action + " : potentialowner";
                 setRegexOnOff(queryAction, true);
                 potentialOwner(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 8: // task owner
+            case 7: // task owner
                 assert "taskowner".equals(actionParamNameMap.get(action)): action + " : taskowner";
                 setRegexOnOff(queryAction, true);
                 taskOwner(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 9: // business admin
+            case 8: // business admin
                 assert "businessadmin".equals(actionParamNameMap.get(action)): action + " : businessadmin";
                 setRegexOnOff(queryAction, true);
                 businessAdmin(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 10: // task status
+            case 9: // task status
                 assert "taskstatus".equals(actionParamNameMap.get(action)): action + " : taskstatus";
                 Status[] statuses = getTaskStatuses(data);
                 taskStatus(statuses);
                 break;
     
             // process instance
-            case 11: // process instance status
+            case 10: // process instance status
                 assert "processinstancestatus".equals(actionParamNameMap.get(action)): action + " : processinstancestatus";
                 intData = getInts(action, data);
                 processInstanceStatus(intData);
                 break;
-            case 12: // process version
+            case 11: // process version
                 assert "processversion".equals(actionParamNameMap.get(action)): action + " : processversion";
                 setRegexOnOff(queryAction, true);
                 processVersion(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 13: // start date
+            case 12: // start date
                 assert "startdate".equals(actionParamNameMap.get(action)): action + " : startdate";
                 dateData = getDates(action, data);
                 if( queryAction.min || queryAction.max ) {
@@ -468,7 +463,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                     startDate(dateData);
                 }
                 break;
-            case 14: // end date
+            case 13: // end date
                 assert "enddate".equals(actionParamNameMap.get(action)): action + " : enddate";
                 dateData = getDates(action, data);
                 if( queryAction.min || queryAction.max ) {
@@ -489,7 +484,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 break;
     
             // variable instance
-            case 15: // var id
+            case 14: // var id
                 assert "varid".equals(actionParamNameMap.get(action)): action + " : varid";
                 if( queryAction.regex && workFlowInstanceVariables ) {
                     String param = actionParamNameMap.get(action);
@@ -500,7 +495,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 variableId(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 16: // var value
+            case 15: // var value
                 assert "varvalue".equals(actionParamNameMap.get(action)): action + " : varvalue";
                 if( queryAction.regex && workFlowInstanceVariables ) {
                     String param = actionParamNameMap.get(action);
@@ -511,11 +506,11 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 value(data);
                 setRegexOnOff(queryAction, false);
                 break;
-            case 17: // var
+            case 16: // var
                 assert "var".equals(actionParamNameMap.get(action)): action + " : var";
                 variableValue(data[0], varValueMap.get(data[0]));
                 break;
-            case 18: // varregex
+            case 17: // varregex
                 assert "varregex".equals(actionParamNameMap.get(action)): action + " : varregex";
                 setRegexOnOff(queryAction, true);
                 variableValue(data[0], varRegexMap.get(data[0]));
