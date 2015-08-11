@@ -403,7 +403,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         cmd.setJaxbTask(genTask);
         JaxbStringObjectPairArray values = convertMapToJaxbStringObjectPairArray(params);
         cmd.setParameter(values);
-        return executeCommand(cmd);
+        return (Long) executeCommand(cmd);
     }
 
     @Override
