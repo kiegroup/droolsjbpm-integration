@@ -102,7 +102,7 @@ public abstract class AbstractRemoteCommandObject {
     protected Object executeCommand( Command cmd ) {
         if( AcceptedClientCommands.isSendObjectParameterCommandClass(cmd.getClass()) ) {
             List<Object> extraClassInstanceList = new ArrayList<Object>();
-            preprocessParameterCommand(cmd, extraClassInstanceList);
+            preprocessCommand(cmd, extraClassInstanceList);
 
             if( !extraClassInstanceList.isEmpty() ) {
                 Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
@@ -124,32 +124,14 @@ public abstract class AbstractRemoteCommandObject {
             }
         }
 
-        preprocessCommand(cmd);
-       
         if( config.isRest() ) {
             return executeRestCommand(cmd);
         } else {
             return executeJmsCommand(cmd);
         }
     }
-    
-    void preprocessCommand( Command cmd ) {
-        String cmdName = cmd.getClass().getSimpleName();
-        if( cmd instanceof TaskCommand && cmdName.startsWith("GetTask") ) {
-           TaskCommand taskCmd = (TaskCommand) cmd;
-           String cmdUserId = taskCmd.getUserId();
-           String authUserId = config.getUserName();
-           if( cmdUserId == null ) { 
-               taskCmd.setUserId(authUserId);
-               logger.debug("Using user id '" + authUserId + "' for '" + cmdName + "'.");
-           } else if( ! cmdUserId.equals(authUserId) ) {
-              throw new RemoteApiException("The user id used when retrieving task information (" + cmdUserId + ")"
-                      + " must match the authenticating user (" + authUserId + ")!");
-           }
-        } 
-    }
 
-    void preprocessParameterCommand( Object cmdObj, List<Object> extraClassInstanceList ) {
+    void preprocessCommand( Object cmdObj, List<Object> extraClassInstanceList ) {
         if( cmdObj instanceof CompleteWorkItemCommand ) {
             addPossiblyNullObject(((CompleteWorkItemCommand) cmdObj).getResult(), extraClassInstanceList);
         } else if( cmdObj instanceof SignalEventCommand ) {

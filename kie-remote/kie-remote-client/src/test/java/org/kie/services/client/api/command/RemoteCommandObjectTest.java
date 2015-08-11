@@ -307,10 +307,9 @@ public class RemoteCommandObjectTest {
         
         for( Class clientClass : sendObjectParameterClasses ) { 
             Object inst = clientClass.getConstructor(new Class[0]).newInstance(new Object[0]);
-            spyCmdObj.preprocessParameterCommand(inst, objList);
+            spyCmdObj.preprocessCommand(inst, objList);
             logger.debug( "Are {} instances checked for user-defined classes?", clientClass.getSimpleName() );
             verify(spyCmdObj, atLeastOnce()).addPossiblyNullObject(any(), any(List.class));
         }
     }
-
 }

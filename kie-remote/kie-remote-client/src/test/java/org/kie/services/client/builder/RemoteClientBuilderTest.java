@@ -38,7 +38,6 @@ import org.kie.remote.client.api.RemoteJmsRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteJmsRuntimeEngineFactory;
 import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
-import org.kie.remote.client.api.exception.RemoteApiException;
 import org.kie.services.client.api.RemoteRestRuntimeEngineFactory;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.exception.MissingRequiredInfoException;
@@ -694,28 +693,6 @@ public class RemoteClientBuilderTest extends org.kie.services.client.api.RemoteJ
         } catch( Exception e ) { 
             logger.info("The " + ConnectException.class.getSimpleName() + " above is expected, nothing is wrong.");
             // the above just needs to compile..
-        }
-    }
-    
-    
-    @Test 
-    public void execptionWhenUserIdDoesNotMatchAuthUserId() throws Exception { 
-        String authUser = "user";
-        RuntimeEngine runtimeEngine = 
-                RemoteRuntimeEngineFactory.newRestBuilder()
-                .addUserName(authUser)
-                .addPassword("pass")
-                .addUrl(new URL("http://localhost:8080/business-central"))
-                .build();
-      
-        String otherUser = "notTheSameUser";
-        try { 
-            runtimeEngine.getTaskService().getTasksOwned(otherUser, "en-Uk");
-        } catch( RemoteApiException rae ) { 
-            assertTrue( "Exception should reference incorrect user", rae.getMessage().contains(otherUser));
-            assertTrue( "Exception should reference correct/auth user", rae.getMessage().contains(authUser));
-            assertTrue( "Exception should explain problem", rae.getMessage().contains("must match the authenticating user"));
-            
         }
     }
 }

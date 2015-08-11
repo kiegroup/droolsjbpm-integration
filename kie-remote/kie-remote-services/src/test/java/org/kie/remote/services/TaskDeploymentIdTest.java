@@ -9,6 +9,5 @@ public interface TaskDeploymentIdTest {
     public void setUserTaskServiceMock(UserTaskService userTaskServiceMock);
     
     public void setupTestMocks();
-   
-    public boolean getTasksTest();
+    
 }
