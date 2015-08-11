@@ -30,13 +30,13 @@ import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 public class QueryResourceData {
 
     // @formatter:off
-    public static final String [] generalQueryParams = { 
-        "processinstanceid", "processid", "workitemid",
+    static final String [] generalQueryParams = { 
+        "processinstanceid", "processid", 
         "deploymentid"
     };
     
-    public static final String [] generalQueryParamsShort = { 
-        "piid", "pid", "wid",
+    static final String [] generalQueryParamsShort = { 
+        "piid", "pid", 
         "did"
     };
     
@@ -100,11 +100,11 @@ public class QueryResourceData {
     public static final Map<Integer, String> actionParamNameMap = new ConcurrentHashMap<Integer, String>();
     public static final Map<String, Integer> paramNameActionMap = new ConcurrentHashMap<String, Integer>();
     
-    protected static final int GENERAL_END = 4;
-    protected static final int TASK_END = 11;
-    protected static final int PROCESS_END = 15;
-    protected static final int VARIABLE_END = 20;
-    protected static final int META_END = 22;
+    protected static final int GENERAL_END = 3;
+    protected static final int TASK_END = 10;
+    protected static final int PROCESS_END = 14;
+    protected static final int VARIABLE_END = 19;
+    protected static final int META_END = 21;
     
     static { 
         // there are faster ways to do this, but the checks here are very valuable
