@@ -22,6 +22,10 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.HttpHeaders;
+
+import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.services.api.DeploymentService;
@@ -36,6 +40,7 @@ import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
 import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
+import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
 
@@ -47,9 +52,11 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
     public static final String OBJECT_VARIABLE_PROCESS_ID = "org.jboss.qa.bpms.ObjectVariableProcess";
     public static final String OBJECT_VARIABLE_PROCESS_FILE = "BPMN2-ObjectVariables.bpmn2";
 
-    private QueryResourceImpl queryResource;
-    private InternalTaskQueryHelper queryTaskHelper;
-    private InternalProcInstQueryHelper queryProcInstHelper;
+    private QueryResourceImpl queryResource = null;
+    private InternalTaskQueryHelper queryTaskHelper = null;
+    private InternalProcInstQueryHelper queryProcInstHelper = null;
+    
+    private Map<String, String[]> queryParams = new HashMap<String, String[]>();  
     
     @Before
     public void init() {
@@ -63,6 +70,15 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
         IdentityProvider mockIdProvider = mock(IdentityProvider.class);
         when(mockIdProvider.getName()).thenReturn(USER_ID);
         queryResource.setIdentityProvider(mockIdProvider);
+        
+        HttpServletRequest mockHttpRequest = mock(HttpServletRequest.class);
+        when(mockHttpRequest.getRequestURI()).thenReturn("http://localhost:8080/kie-wb/rest/query/runtime/process");
+        when(mockHttpRequest.getParameterMap()).thenReturn(queryParams);
+        queryResource.setHttpServletRequest(mockHttpRequest);
+        
+        HttpHeaders mockHeaders = mock(HttpHeaders.class);
+        when(mockHeaders.getRequestHeaders()).thenReturn(new MultivaluedMapImpl<String, String>());
+        queryResource.setHeaders(mockHeaders);
         
         ProcessRequestBean processRequestBean = new ProcessRequestBean();
         UserTaskServiceImpl userTaskService = new UserTaskServiceImpl();
@@ -122,6 +138,20 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
         for( JaxbQueryProcessInstanceInfo queryInfo : result.getProcessInstanceInfoList() ) { 
            assertNotNull( "No process instance info!", queryInfo.getProcessInstance() );
            assertEquals( "No variable info!", 1, queryInfo.getVariables().size() );
+        }
+    }
+    
+    @Test
+    public void rejectTaskParamsForProcQueries() {
+        String badParam = "taskid_min";
+        addParams(queryParams, badParam, "2");
+      
+        try { 
+            queryResource.queryProcessInstances();
+            fail( "The query proces instances operation should have failed!");
+        } catch( KieRemoteRestOperationException krroe ) { 
+           assertTrue( krroe.getMessage().contains(badParam) );
+           assertEquals( 400, krroe.getStatus() );
         }
     }
 

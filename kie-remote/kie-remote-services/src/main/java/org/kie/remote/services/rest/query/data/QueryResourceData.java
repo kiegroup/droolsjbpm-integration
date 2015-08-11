@@ -146,11 +146,13 @@ public class QueryResourceData {
         return idGen;
     }
  
-    private static Set<String> queryParameters = new HashSet<String>();
+    private static Set<String> allQueryParameters = new HashSet<String>();
+    private static Set<String> procInstOnlyQueryParameters = new HashSet<String>();
     
-    public static Set<String> getQueryParameters() { 
-        synchronized(queryParameters) { 
-            if( queryParameters.isEmpty() ) { 
+    public static Set<String> getQueryParameters(boolean includeTaskQueryParams) { 
+        if( includeTaskQueryParams ) { 
+            synchronized(allQueryParameters) { 
+                if( allQueryParameters.isEmpty() ) { 
                 String [][] queryParamArrs = { 
                         generalQueryParams, generalQueryParamsShort,
                         taskQueryParams, taskQueryParamsShort,
@@ -161,13 +163,33 @@ public class QueryResourceData {
                 for( String [] paramArr : queryParamArrs ) { 
                     for( String param : paramArr ) { 
                        if( param != null ) { 
-                           queryParameters.add(param);
+                                allQueryParameters.add(param);
+                            }
+                        }
+                    }
+                }
+            }
+            return allQueryParameters;
+        } else { 
+            synchronized(procInstOnlyQueryParameters) { 
+                if( procInstOnlyQueryParameters.isEmpty() ) { 
+                    String [][] queryParamArrs = { 
+                            generalQueryParams, generalQueryParamsShort,
+                            procInstQueryParams, procInstQueryParamsShort,
+                            varInstQueryParams, varInstQueryParamsShort
+                            // metaRuntimeParams, metaRuntimeParamsShort
+                    };
+                    for( String [] paramArr : queryParamArrs ) { 
+                        for( String param : paramArr ) { 
+                            if( param != null ) { 
+                                procInstOnlyQueryParameters.add(param);
                        }
                     }
                 }
             }
         }
-        return queryParameters;
+            return procInstOnlyQueryParameters;
+        }
     }
     
     // "get" parser methods -------------------------------------------------------------------------------------------------------
