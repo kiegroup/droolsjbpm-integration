@@ -36,7 +36,7 @@ public class QueryResourceMethodsTest {
     public void parameterCheckTest() throws Exception  {
         Map<String, String []> params = new HashMap<String, String[]>();
         addParam(params, "piid", "test");
-        Set<String> queryParams = QueryResourceData.getQueryParameters(); 
+        Set<String> queryParams = QueryResourceData.getQueryParameters(true); 
         assertTrue( "No query parameters!", queryParams != null && ! queryParams.isEmpty() );
         assertTrue( "'piid' should be one of the query parameters", queryParams.contains("piid"));
         QueryResourceImpl.checkIfParametersAreAllowed(params, queryParams, "test");

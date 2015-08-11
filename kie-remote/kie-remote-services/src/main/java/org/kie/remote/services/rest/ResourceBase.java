@@ -99,7 +99,11 @@ public class ResourceBase {
         this.uriInfo = uriInfo;
     }
    
-    void setHttpServletRequest(HttpServletRequest httpRequest) { 
+    /**
+     * In order to be able to inject a mock instance for tests.
+     * @param httpRequest 
+     */
+    public void setHttpServletRequest(HttpServletRequest httpRequest) { 
         this.httpRequest = httpRequest;
     }
     
