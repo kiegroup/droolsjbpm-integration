@@ -285,32 +285,19 @@
       <!--  WSDL: 0. delete all generated files because only the WSDL determines code, no code in VCS -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpacked-generated-files</id>
-            <configuration>
-              <filesets>
-                <fileset>
-                  <directory>${basedir}/src/main/unpacked/org</directory>
-                </fileset>
-              </filesets>
-            </configuration>
-          </execution>
-          <execution>
-            <id>generated-wsdl-files</id>
-            <configuration>
-              <filesets>
-                <fileset>
-                  <directory>src/main/generated</directory>
-                  <includes>
-                    <include>**/*.java</include>
-                  </includes>
-                  <followSymlinks>false</followSymlinks>
-                </fileset>
-              </filesets>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}/src/main/unpacked/org</directory>
+            </fileset>
+            <fileset>
+              <directory>src/main/generated</directory>
+              <includes>
+                <include>**/*.java</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
       </plugin>
       <!-- generated 1. add src/main/unpacked so that unpacked classes are added to jar -->
       <!-- WSDL: 1. add src/main/generated so that generated classes are added to jar -->
@@ -363,6 +350,7 @@
                 <artifactItem>
                   <groupId>org.kie.remote</groupId>
                   <artifactId>kie-remote-jaxb-gen</artifactId>
+                  <version>${project.version}</version>
                   <classifier>sources</classifier>
                   <type>jar</type>
                   <overWrite>true</overWrite>
