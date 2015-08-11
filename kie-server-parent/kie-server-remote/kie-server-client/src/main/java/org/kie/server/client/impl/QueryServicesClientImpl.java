@@ -229,11 +229,11 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstanceByCorrelationKey", new Object[]{correlationKey.toExternalForm()}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstancesByCorrelationKey", new Object[]{correlationKey.toExternalForm(), page, pageSize}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -488,31 +488,25 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
     @Override
     public ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey) {
-        ProcessInstanceList result = null;
+        ProcessInstance result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstanceList.class);
+                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "QueryService", "getProcessInstanceByCorrelationKey", new Object[]{correlationKey.toExternalForm()}) ) );
-            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
-            result = response.getResult();
+            return response.getResult();
         }
-        if (result != null && result.getProcessInstances()!= null && result.getProcessInstances().length > 0) {
-            for (ProcessInstance instance : result.getProcessInstances()) {
-                if (instance.getState() == org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE) {
-                    return instance;
-                }
-            }
-        }
-        return null;
+
+        return result;
     }
 
     @Override

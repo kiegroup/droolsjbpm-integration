@@ -32,6 +32,7 @@ import javax.ws.rs.core.Variant;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -104,11 +105,22 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceByCorrelationKey(@Context HttpHeaders headers, @PathParam("correlationKey") String correlationKey) {
 
-        Variant v = getVariant(headers);
+        ProcessInstance processInstance = runtimeDataServiceBase.getProcessInstanceByCorrelationKey(correlationKey);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstanceByCorrelationKey(correlationKey);
+        return createCorrectVariant(processInstance, headers, Response.Status.OK);
+
+    }
+
+    @GET
+    @Path(PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessInstancesByCorrelationKey(@Context HttpHeaders headers, @PathParam("correlationKey") String correlationKey
+            , @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByCorrelationKey(correlationKey, page, pageSize);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK);
+
     }
 
     @GET
