@@ -135,7 +135,7 @@ public class SingleSessionCommandServiceTest {
                                 InfinispanSignalManagerFactory.class.getName() );
         properties.setProperty( "drools.timerService",
                                 JpaJDKTimerService.class.getName() );
-        SessionConfiguration config = new SessionConfiguration( properties );
+        SessionConfiguration config = SessionConfiguration.newInstance( properties );
 
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
@@ -266,7 +266,7 @@ public class SingleSessionCommandServiceTest {
                                 InfinispanSignalManagerFactory.class.getName() );
         properties.setProperty( "drools.timerService",
                                 JpaJDKTimerService.class.getName() );
-        SessionConfiguration config = new SessionConfiguration( properties );
+        SessionConfiguration config = SessionConfiguration.newInstance( properties );
 
         SingleSessionCommandService service = createSingleSessionCommandService( kbase,
                                                                                config,
@@ -464,7 +464,7 @@ public class SingleSessionCommandServiceTest {
                                 InfinispanSignalManagerFactory.class.getName() );
         properties.setProperty( "drools.timerService",
                                 JpaJDKTimerService.class.getName() );
-        SessionConfiguration config = new SessionConfiguration( properties );
+        SessionConfiguration config = SessionConfiguration.newInstance( properties );
 
         KnowledgeBase ruleBase = KnowledgeBaseFactory.newKnowledgeBase();
         InternalKnowledgePackage pkg = getProcessSubProcess();
@@ -650,7 +650,7 @@ public class SingleSessionCommandServiceTest {
         properties.setProperty( "drools.processSignalManagerFactory",
                                 InfinispanSignalManagerFactory.class.getName() );
         
-        SessionConfiguration config = new SessionConfiguration( properties );
+        SessionConfiguration config = SessionConfiguration.newInstance( properties );
         java.lang.reflect.Field timeManagerField = SessionConfiguration.class.getDeclaredField("timerJobFactoryManager");
         timeManagerField.setAccessible(true);
         timeManagerField.set(config, new InfinispanTimeJobFactoryManager());
@@ -756,7 +756,7 @@ public class SingleSessionCommandServiceTest {
         properties.setProperty( "drools.processSignalManagerFactory",
                                 InfinispanSignalManagerFactory.class.getName() );
 
-        SessionConfiguration config = new SessionConfiguration( properties );
+        SessionConfiguration config = SessionConfiguration.newInstance( properties );
         config.setOption( ClockTypeOption.get(ClockType.PSEUDO_CLOCK.getId()) );
         
         KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();

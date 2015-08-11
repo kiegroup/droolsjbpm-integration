@@ -62,7 +62,7 @@ public class KnowledgeStoreServiceImpl
                                                   KieSessionConfiguration configuration,
                                                   Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -95,7 +95,7 @@ public class KnowledgeStoreServiceImpl
                                                    KieSessionConfiguration configuration,
                                                    Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -127,7 +127,7 @@ public class KnowledgeStoreServiceImpl
             KieSessionConfiguration configuration,
             Environment environment) {
         if ( configuration == null ) {
-            configuration = new SessionConfiguration();
+            configuration = SessionConfiguration.newInstance();
         }
 
         if ( environment == null ) {
@@ -241,8 +241,7 @@ public class KnowledgeStoreServiceImpl
     }
 
     private KieSessionConfiguration mergeConfig(KieSessionConfiguration configuration) {
-        ((SessionConfiguration) configuration).addDefaultProperties(configProps);
-        return configuration;
+        return ((SessionConfiguration) configuration).addDefaultProperties(configProps);
     }
 
     public long getStatefulKnowledgeSessionId(StatefulKnowledgeSession ksession) {
