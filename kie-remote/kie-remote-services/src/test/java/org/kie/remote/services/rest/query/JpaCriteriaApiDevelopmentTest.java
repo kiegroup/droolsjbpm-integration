@@ -69,7 +69,7 @@ public class JpaCriteriaApiDevelopmentTest extends AbstractQueryResourceTest {
 
         if( basis ) { 
             int numVarLogs = varLogs.size();
-            System.out.println( "Var logs: " + numVarLogs );
+            logger.debug( "Var logs: " + numVarLogs );
             Set<Long> uniqueIds = new HashSet<Long>(numVarLogs);
             for( VariableInstanceLog varLog : varLogs ) { 
                 assertTrue( "Unique var logs", uniqueIds.add(varLog.getId()) );
@@ -84,7 +84,7 @@ public class JpaCriteriaApiDevelopmentTest extends AbstractQueryResourceTest {
             List<ProcessInstanceLog> procLogs = query.getResultList(); 
 
             int numProcLogs = procLogs.size();
-            System.out.println( "Proc logs: " + numProcLogs );
+            logger.debug( "Proc logs: " + numProcLogs );
 
             // TASK
             {
@@ -95,7 +95,7 @@ public class JpaCriteriaApiDevelopmentTest extends AbstractQueryResourceTest {
             List<TaskImpl> tasks = query.getResultList(); 
 
             int numTasks = tasks.size();
-            System.out.println( "Tasks: " + numTasks );
+            logger.debug( "Tasks: " + numTasks );
         } 
         
         // TEST
@@ -135,11 +135,6 @@ public class JpaCriteriaApiDevelopmentTest extends AbstractQueryResourceTest {
         for( VariableInstanceLog varLog : varLogs ) { 
             assertTrue( "Unique var logs", uniqueIds.add(varLog.getId()) );
         }
-        
-        System.out.println( "=============================");
-        System.out.println( "Var X Proc X Task logs: " + numVarLogs );
-        System.out.println( "=============================");
-        Thread.sleep(5*1000);
         
         Assert.assertEquals( 7, numVarLogs );
     }
