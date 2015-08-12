@@ -41,13 +41,12 @@ public class TestConfig {
 
     public Properties loadProperties() throws Exception {
         Properties props = new Properties();
-        //props.load(TestConfig.class.getClassLoader().getResourceAsStream("performance.properties"));
 
         suite = System.getProperty("suite");
         props.put("suite", suite);
 
         scenario = System.getProperty("scenario");
-        if (scenario.isEmpty() || scenario.equals("${scenario}")) {
+        if (scenario == null || scenario.isEmpty() || scenario.equals("${scenario}")) {
             scenario = null;
         }
         props.put("scenario", scenario);
@@ -167,7 +166,7 @@ public class TestConfig {
     }
     
     public static enum Measure {
-        MEMORYUSAGE, FILEDESCRIPTORS, THREADSTATES
+        MEMORYUSAGE, FILEDESCRIPTORS, THREADSTATES, CPUUSAGE
     }
 
     public static enum RunType {
