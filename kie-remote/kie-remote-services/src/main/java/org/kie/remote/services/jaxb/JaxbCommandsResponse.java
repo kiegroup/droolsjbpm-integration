@@ -160,8 +160,6 @@ public class JaxbCommandsResponse {
         boolean unknownResultType = false;
         
         String className = result.getClass().getName();
-        // DBG
-        System.out.println( ">> Adding " + className + " result");
         if (result instanceof ProcessInstance) {
             this.responses.add(new JaxbProcessInstanceResponse((ProcessInstance) result, i, cmd));
         } else if (result instanceof JaxbTask) {
@@ -217,7 +215,6 @@ public class JaxbCommandsResponse {
         } else if( cmd instanceof GetTaskContentCommand || cmd instanceof GetContentMapForUserCommand ) { 
            this.responses.add(new JaxbTaskContentResponse((Map<String, Object>) result, i, cmd));
         } else if( Comment.class.isAssignableFrom(result.getClass()) ) { 
-            System.out.println( ">> Adding JaxbTaskCommentResponse to response list");
            this.responses.add(new JaxbTaskCommentResponse((Comment) result, i, cmd));
         }
         // Other
