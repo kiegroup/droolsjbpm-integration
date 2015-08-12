@@ -25,7 +25,6 @@ import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.PersistenceMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.services.client.AbstractRemoteSerializationTest;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
 
 public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest {

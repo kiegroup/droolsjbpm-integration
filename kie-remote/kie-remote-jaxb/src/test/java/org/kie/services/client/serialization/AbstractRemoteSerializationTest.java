@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package org.kie.services.client;
+package org.kie.services.client.serialization;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
