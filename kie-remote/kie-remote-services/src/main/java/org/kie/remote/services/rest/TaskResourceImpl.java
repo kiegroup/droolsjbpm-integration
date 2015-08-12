@@ -39,6 +39,7 @@ import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetContentByIdCommand;
+import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
@@ -184,7 +185,8 @@ public class TaskResourceImpl extends ResourceBase {
         }
         throw KieRemoteRestOperationException.badRequest("Operation '" + operation + "' is not supported on tasks.");
     }
-    
+   
+    // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/{taskId: [0-9-]+}/content")
     public Response getTaskContentByTaskId(@PathParam("taskId") long taskId) { 
@@ -195,15 +197,15 @@ public class TaskResourceImpl extends ResourceBase {
         }
         Task task = ((Task) result);
         long contentId = task.getTaskData().getDocumentContentId();
-        JaxbContent content = null;
+        JaxbContent jaxbContent = null;
         if( contentId > -1 ) { 
             cmd = new GetContentByIdCommand(contentId);
             result = processRequestBean.doRestTaskOperation(taskId, task.getTaskData().getDeploymentId(), task.getTaskData().getProcessInstanceId(), task, cmd);
-            content = (JaxbContent) result;
+            jaxbContent = (JaxbContent) result;
         } else { 
             throw KieRemoteRestOperationException.notFound("Content for task " + taskId + " could not be found.");
         }
-        return createCorrectVariant(content, headers);
+        return createCorrectVariant(jaxbContent, headers);
     }
     
     @GET
@@ -228,16 +230,17 @@ public class TaskResourceImpl extends ResourceBase {
         throw KieRemoteRestOperationException.notFound("Task " + taskId + " could not be found.");
     }
     
+    // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/content/{contentId: [0-9-]+}")
     public Response getTaskContentByContentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentByIdCommand(contentId);
         cmd.setUserId(identityProvider.getName());
-        JaxbContent content = (JaxbContent) doRestTaskOperation(cmd);
-        if( content == null ) { 
+        JaxbContent jaxbContent = (JaxbContent) doRestTaskOperation(cmd);
+        if( jaxbContent == null ) { 
             throw KieRemoteRestOperationException.notFound("Content " + contentId + " could not be found.");
         }
-        return createCorrectVariant(new JaxbContent(content), headers);
+        return createCorrectVariant(jaxbContent, headers);
     }
     
     @POST
