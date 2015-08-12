@@ -6,12 +6,15 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.kie.perf.TestConfig.Measure;
 import org.kie.perf.TestConfig.ReporterType;
+import org.kie.perf.annotation.KPKConstraint;
+import org.kie.perf.metrics.CPUUsageHistogramSet;
 import org.kie.perf.metrics.CsvSingleReporter;
 import org.kie.perf.metrics.MemoryUsageGaugeSet;
 import org.kie.perf.metrics.ThreadStatesGaugeSet;
@@ -89,6 +92,8 @@ public class Executor {
                 });
             } else if (m == Measure.THREADSTATES) {
                 metrics.registerAll(new ThreadStatesGaugeSet(scenario.getClass()));
+            } else if (m == Measure.CPUUSAGE) {
+                metrics.registerAll(CPUUsageHistogramSet.getInstance(scenario.getClass()));
             }
         }
     }
@@ -136,6 +141,28 @@ public class Executor {
         return instance;
     }
 
+    public KPKConstraint checkScenarioConstraints(IPerfTest scenario) {
+        KPKConstraint constraint = scenario.getClass().getAnnotation(KPKConstraint.class);
+        if (constraint == null) {
+            return null;
+        }
+
+        for (String c : constraint.value()) {
+            String[] entry = c.split("=");
+            if (entry.length == 2) {
+                String val = System.getProperty(entry[0]);
+                if (val == null || !val.equals(entry[1])) {
+                    return constraint;
+                }
+            } else {
+                log.error("Scenario constraint entry '" + c + "' is in wrong format; should be 'propertyName=expectedValue'");
+                return constraint;
+            }
+        }
+
+        return null;
+    }
+
     public void report() {
         reporter.report();
     }
@@ -157,19 +184,35 @@ public class Executor {
 
             if (scenario != null) {
                 // this is a child process for this scenario with own JVM
-                exec.initMetrics(scenario);
-                testSuite.initScenario(scenario);
-                if (tc.isWarmUp()) {
-                    SharedMetricRegistry.setWarmUp(true);
-                    scenario.initMetrics();
-                    for (int i = 0; i < tc.getWarmUpCount(); ++i) {
-                        scenario.execute();
+                KPKConstraint constraint = exec.checkScenarioConstraints(scenario);
+                if (constraint != null) {
+                    log.info("Scenario '" + scenarioName + "' skipped due to constraints " + Arrays.toString(constraint.value()));
+                } else {
+                    exec.initMetrics(scenario);
+                    testSuite.initScenario(scenario);
+                    if (tc.isWarmUp()) {
+                        SharedMetricRegistry.setWarmUp(true);
+                        scenario.initMetrics();
+                        for (int i = 0; i < tc.getWarmUpCount(); ++i) {
+                            scenario.execute();
+                        }
+                        SharedMetricRegistry.setWarmUp(false);
                     }
-                    SharedMetricRegistry.setWarmUp(false);
+                    scenario.initMetrics();
+
+                    CPUUsageHistogramSet cpuusage = null;
+                    boolean cpuusageEnabled = tc.getMeasure().contains(Measure.CPUUSAGE);
+                    if (cpuusageEnabled) {
+                        cpuusage = CPUUsageHistogramSet.getInstance(scenario.getClass());
+                        cpuusage.start();
+                    }
+                    testSuite.startScenario(scenario);
+                    if (cpuusageEnabled) {
+                        cpuusage.stop();
+                    }
+
+                    exec.report();
                 }
-                scenario.initMetrics();
-                testSuite.startScenario(scenario);
-                exec.report();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
