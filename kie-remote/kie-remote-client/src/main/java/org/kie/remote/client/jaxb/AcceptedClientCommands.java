@@ -143,6 +143,7 @@ public class AcceptedClientCommands {
         sendObjectParameterCommandClasses.add(SignalEventCommand.class);
         sendObjectParameterCommandClasses.add(StartCorrelatedProcessCommand.class);
         sendObjectParameterCommandClasses.add(StartProcessCommand.class);
+        sendObjectParameterCommandClasses.add(SetProcessInstanceVariablesCommand.class);
         
         sendObjectParameterCommandClasses.add(SetGlobalCommand.class);
         sendObjectParameterCommandClasses.add(InsertObjectCommand.class);
@@ -151,8 +152,12 @@ public class AcceptedClientCommands {
         sendObjectParameterCommandClasses.add(AddTaskCommand.class);
         sendObjectParameterCommandClasses.add(CompleteTaskCommand.class);
         sendObjectParameterCommandClasses.add(FailTaskCommand.class);
-
+        
+        sendObjectParameterCommandClasses.add(ExecuteTaskRulesCommand.class);
+        sendObjectParameterCommandClasses.add(ProcessSubTaskCommand.class);
+        sendObjectParameterCommandClasses.add(SetTaskPropertyCommand.class);
         sendObjectParameterCommandClasses.add(AddContentFromUserCommand.class);
+        sendObjectParameterCommandClasses.add(AddContentCommand.class);
 
         sendObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }

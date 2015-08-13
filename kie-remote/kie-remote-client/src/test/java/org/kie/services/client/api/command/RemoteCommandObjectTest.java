@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -40,6 +41,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -54,6 +56,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -65,6 +68,7 @@ import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.DeleteCommand;
+import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.QueryCriteria;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.mockito.Mockito;
@@ -329,20 +333,74 @@ public class RemoteCommandObjectTest {
     }
 
     @Test
-    public void preprocessTest() throws Exception { 
+    public void preprocessTest() throws Throwable { 
+       Set<Class<?>> xmlClasses = reflections.getTypesAnnotatedWith(XmlAccessorType.class);
+    
+       // get all command classes
+       Set<Class> cmdClasses = new HashSet<Class>(xmlClasses.size());
+       for( Class<?> clazz : xmlClasses ) { 
+           if( clazz.getName().endsWith("Command") && clazz.getPackage().getName().startsWith("org.kie.remote.jaxb.gen")) { 
+             XmlRootElement xmlRootElemAnno = clazz.getAnnotation(XmlRootElement.class);
+             if( ! Modifier.isAbstract(clazz.getModifiers()) ) { 
+                 assertNotNull( clazz.getSimpleName() + " is missing @" + XmlRootElement.class.getSimpleName(), 
+                         xmlRootElemAnno );
+                 cmdClasses.add(clazz);
+             }
+           }
+       }
+      
+       // get all command classes that have parameters
+       Set<Class<?>> paramCmdClasses = new HashSet<Class<?>>(cmdClasses.size());
+       for( Class cmdClass : cmdClasses ) { 
+           Field [] cmdFields = cmdClass.getDeclaredFields();
+           for( Field field : cmdFields ) { 
+               field.setAccessible(true);
+              if( field.getType().equals(List.class) )  { 
+                  if( field.getGenericType() instanceof ParameterizedType ) { 
+                      ParameterizedType pType = (ParameterizedType) field.getGenericType();
+                      Type [] listTypes = pType.getActualTypeArguments();
+                      if( listTypes.length > 0 && ! ((Class) listTypes[0]).equals(Object.class) ) {
+                         continue; 
+                      }
+                  }
+                  paramCmdClasses.add(cmdClass);
+              } else if( field.getType().equals(JaxbStringObjectPairArray.class) ) { 
+                  paramCmdClasses.add(cmdClass);
+              } else if( field.getType().equals(Object.class) ) { 
+                  paramCmdClasses.add(cmdClass);
+              }
+           }
+       }
+    
         RemoteConfiguration config = new RemoteConfiguration("adsf", new URL("http://localhost:80808"), "user", "pwd" );
-        KieSessionClientCommandObject spyCmdObj = Mockito.spy(new KieSessionClientCommandObject(config));
+
         
         List<Object> objList = new ArrayList<Object>();
-        Field paramClassesField = AcceptedClientCommands.class.getDeclaredField("sendObjectParameterCommandClasses");
+        String fieldName = "sendObjectParameterCommandClasses";
+        Field paramClassesField = AcceptedClientCommands.class.getDeclaredField(fieldName);
         paramClassesField.setAccessible(true);
         Set<Class> sendObjectParameterClasses = (Set<Class>) paramClassesField.get(null);
+       
+        // verify that the found classes are in the AcceptedClientCommands.sendObjectParameterCommandClasses field
+        if( sendObjectParameterClasses.size() != paramCmdClasses.size() ) { 
+           for( Class foundParamCmdClass : paramCmdClasses ) { 
+              assertTrue( "The " + AcceptedClientCommands.class.getSimpleName() + "." + fieldName
+                      + " does not contain the " + foundParamCmdClass.getSimpleName(),
+                      sendObjectParameterClasses.contains(foundParamCmdClass));
+           }
+        }
         
+        // verify that the parameter command classes are handled in the 
         for( Class clientClass : sendObjectParameterClasses ) { 
+            KieSessionClientCommandObject spyCmdObj = Mockito.spy(new KieSessionClientCommandObject(config));
             Object inst = clientClass.getConstructor(new Class[0]).newInstance(new Object[0]);
             spyCmdObj.preprocessParameterCommand(inst, objList);
             logger.debug( "Are {} instances checked for user-defined classes?", clientClass.getSimpleName() );
-            verify(spyCmdObj, atLeastOnce()).addPossiblyNullObject(any(), any(List.class));
+            try { 
+                verify(spyCmdObj, atLeastOnce()).addPossiblyNullObject(any(), any(List.class));
+            } catch( Throwable t ) { 
+                throw new AssertionError( clientClass.getSimpleName() );
+            }
         }
     }
 
