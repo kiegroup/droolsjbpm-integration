@@ -151,7 +151,9 @@ public class AcceptedClientCommands {
         sendObjectParameterCommandClasses.add(AddTaskCommand.class);
         sendObjectParameterCommandClasses.add(CompleteTaskCommand.class);
         sendObjectParameterCommandClasses.add(FailTaskCommand.class);
-        
+
+        sendObjectParameterCommandClasses.add(AddContentFromUserCommand.class);
+
         sendObjectParameterCommandClasses = Collections.unmodifiableSet(sendObjectParameterCommandClasses);
     }
 

@@ -62,6 +62,7 @@ import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.kie.remote.jaxb.gen.UpdateCommand;
+import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
 import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
@@ -198,7 +199,9 @@ public abstract class AbstractRemoteCommandObject {
             addPossiblyNullObject(((CompleteTaskCommand) cmdObj).getData(), extraClassInstanceList);
         } else if( cmdObj instanceof FailTaskCommand ) {
             addPossiblyNullObject(((FailTaskCommand) cmdObj).getData(), extraClassInstanceList);
-        } 
+        } else if( cmdObj instanceof AddContentFromUserCommand ) {
+            addPossiblyNullObject(((AddContentFromUserCommand) cmdObj).getOutputContentMap(), extraClassInstanceList);
+        }
     }
 
     void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
