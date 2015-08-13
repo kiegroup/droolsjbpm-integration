@@ -39,6 +39,7 @@ import org.kie.api.command.Command;
 import org.kie.api.task.model.Task;
 import org.kie.internal.command.ProcessInstanceIdCommand;
 import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
+import org.kie.internal.jaxb.StringKeyObjectValueMap;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.remote.client.api.exception.MissingRequiredInfoException;
 import org.kie.remote.client.api.exception.RemoteApiException;
@@ -49,14 +50,20 @@ import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
+import org.kie.remote.jaxb.gen.AddContentCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.AuditCommand;
 import org.kie.remote.jaxb.gen.CompleteTaskCommand;
 import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
+import org.kie.remote.jaxb.gen.Content;
+import org.kie.remote.jaxb.gen.ExecuteTaskRulesCommand;
 import org.kie.remote.jaxb.gen.FailTaskCommand;
 import org.kie.remote.jaxb.gen.InsertObjectCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.ProcessSubTaskCommand;
 import org.kie.remote.jaxb.gen.SetGlobalCommand;
+import org.kie.remote.jaxb.gen.SetProcessInstanceVariablesCommand;
+import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
 import org.kie.remote.jaxb.gen.SignalEventCommand;
 import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
@@ -201,6 +208,21 @@ public abstract class AbstractRemoteCommandObject {
             addPossiblyNullObject(((FailTaskCommand) cmdObj).getData(), extraClassInstanceList);
         } else if( cmdObj instanceof AddContentFromUserCommand ) {
             addPossiblyNullObject(((AddContentFromUserCommand) cmdObj).getOutputContentMap(), extraClassInstanceList);
+        } else if( cmdObj instanceof AddContentCommand ) {
+            AddContentCommand cmd = (AddContentCommand) cmdObj;
+            addPossiblyNullObject(cmd.getParameter(), extraClassInstanceList);
+            Content jaxbContent = cmd.getJaxbContent();
+            if( jaxbContent != null ) { 
+                addPossiblyNullObject(jaxbContent.getContentMap(), extraClassInstanceList);
+            }
+        } else if( cmdObj instanceof SetTaskPropertyCommand ) {
+            addPossiblyNullObject(((SetTaskPropertyCommand) cmdObj).getOutput(), extraClassInstanceList);
+        } else if( cmdObj instanceof ExecuteTaskRulesCommand ) {
+            addPossiblyNullObject(((ExecuteTaskRulesCommand) cmdObj).getData(), extraClassInstanceList);
+        } else if( cmdObj instanceof ProcessSubTaskCommand ) {
+            addPossiblyNullObject(((ProcessSubTaskCommand) cmdObj).getData(), extraClassInstanceList);
+        } else if( cmdObj instanceof SetProcessInstanceVariablesCommand ) {
+            addPossiblyNullObject(((SetProcessInstanceVariablesCommand) cmdObj).getVariables(), extraClassInstanceList);
         }
     }
 
@@ -212,6 +234,10 @@ public abstract class AbstractRemoteCommandObject {
                 for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
                     objectList.add(stringObjectPair.getValue());
                 }
+            } else if( inputObject instanceof StringKeyObjectValueMap ) { 
+                for( Object obj : ((StringKeyObjectValueMap) inputObject).values() ) {
+                    objectList.add(obj);
+                } 
             } else {  
                 objectList.add(inputObject);
             }
