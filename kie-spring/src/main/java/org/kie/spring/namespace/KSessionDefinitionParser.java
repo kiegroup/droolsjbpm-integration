@@ -148,7 +148,7 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
                 }
                 factory.addPropertyValue("jpaConfiguration", beanBuilder.getBeanDefinition());
             }
-            BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition(SessionConfiguration.class);
+            BeanDefinitionBuilder rbaseConfBuilder = BeanDefinitionBuilder.rootBeanDefinition(SessionConfiguration.class, "newInstance");
             Element e = DomUtils.getChildElementByTagName(ksessionConf, KEEP_REFERENCE);
             if (e != null && org.springframework.util.StringUtils.hasText(e.getAttribute("enabled"))) {
                 rbaseConfBuilder.addPropertyValue("keepReference", Boolean.parseBoolean(e.getAttribute("enabled")));
