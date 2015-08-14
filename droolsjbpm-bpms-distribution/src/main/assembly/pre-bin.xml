@@ -36,6 +36,7 @@
         <include>org.jbpm:jbpm-shared-services</include>
         <include>org.jbpm:jbpm-test</include>
         <include>org.jbpm:jbpm-runtime-manager</include>
+        <include>org.jbpm:jbpm-services-cdi</include>
         <include>org.jbpm:jbpm-services-ejb-api</include>
         <include>org.jbpm:jbpm-services-ejb-client</include>
         <include>org.jbpm:jbpm-services-ejb-impl</include>
@@ -85,6 +86,7 @@
         <exclude>org.jbpm:jbpm-shared-services</exclude>
         <exclude>org.jbpm:jbpm-test</exclude>
         <exclude>org.jbpm:jbpm-runtime-manager</exclude>
+        <exclude>org.jbpm:jbpm-services-cdi</exclude>
         <exclude>org.jbpm:jbpm-services-ejb-api</exclude>
         <exclude>org.jbpm:jbpm-services-ejb-client</exclude>
         <exclude>org.jbpm:jbpm-services-ejb-impl</exclude>
