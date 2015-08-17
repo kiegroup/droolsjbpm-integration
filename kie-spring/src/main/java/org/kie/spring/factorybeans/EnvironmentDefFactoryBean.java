@@ -20,7 +20,6 @@ import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.drools.core.type.DateFormats;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
@@ -49,7 +48,6 @@ public class EnvironmentDefFactoryBean implements
     private JpaTransactionManager transactionManager;
     private Globals globals;
     private Calendars calendars;
-    private DateFormats dateFormats;
 
     private ObjectMarshallingStrategyAcceptor identityPlaceholderResolverStrategyAcceptor;
     private ObjectMarshallingStrategyAcceptor serializablePlaceholderResolverStrategyAcceptor;
@@ -83,14 +81,6 @@ public class EnvironmentDefFactoryBean implements
 
     public void setCalendars(Calendars calendars) {
         this.calendars = calendars;
-    }
-
-    public DateFormats getDateFormats() {
-        return dateFormats;
-    }
-
-    public void setDateFormats(DateFormats dateFormats) {
-        this.dateFormats = dateFormats;
     }
 
     public Environment getJpaPlaceHolderResolverStrategyEnv() {
@@ -191,10 +181,6 @@ public class EnvironmentDefFactoryBean implements
         }
         if (globals != null) {
             environment.set(EnvironmentName.GLOBALS, globals);
-        }
-
-        if (dateFormats != null) {
-            environment.set(EnvironmentName.DATE_FORMATS, dateFormats);
         }
 
         if (calendars != null) {
