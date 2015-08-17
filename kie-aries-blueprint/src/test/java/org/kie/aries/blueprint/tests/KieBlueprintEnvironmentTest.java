@@ -20,7 +20,6 @@ import org.drools.core.base.CalendarsImpl;
 import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
-import org.drools.core.type.DateFormatsImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
 import org.jbpm.marshalling.impl.ProcessInstanceResolverStrategy;
 import org.junit.AfterClass;
@@ -89,15 +88,6 @@ public class KieBlueprintEnvironmentTest {
 
         assertNotNull(environment.get(EnvironmentName.GLOBALS));
         assertTrue(environment.get(EnvironmentName.GLOBALS) instanceof MapGlobalResolver);
-    }
-
-    @Test
-    public void testEnvRefDateFormats() throws Exception {
-        Environment environment = (Environment) container.getComponentInstance("drools-env");
-        assertNotNull(environment);
-
-        assertNotNull(environment.get(EnvironmentName.DATE_FORMATS));
-        assertTrue(environment.get(EnvironmentName.DATE_FORMATS) instanceof DateFormatsImpl);
     }
 
     @Test

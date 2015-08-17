@@ -15,8 +15,6 @@
  */
 package org.kie.aries.blueprint.namespace;
 
-import java.util.ArrayList;
-
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
@@ -34,6 +32,8 @@ import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
 
 public class KieEnvironmentElementParser extends AbstractElementParser {
 
@@ -87,7 +87,6 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_ENTITY_MANAGER_FACTORY, EnvironmentName.ENTITY_MANAGER_FACTORY, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_TRANSACTION_MANAGER, EnvironmentName.TRANSACTION_MANAGER, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_GLOBALS, EnvironmentName.GLOBALS, ATTRIBUTE_REF);
-        checkAndSetReference(context, element, envParamMetadata, ELEMENT_DATE_FORMATS, EnvironmentName.DATE_FORMATS, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_CALENDARS, EnvironmentName.CALENDARS, ATTRIBUTE_REF);
 
         MutableCollectionMetadata strategiesCollectionMetadata = context.createMetadata(MutableCollectionMetadata.class);
