@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -66,11 +65,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
         File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
-    }
-
-    @AfterClass
-    public static void closeResources() throws Exception {
-        kjarClassLoader.close();
     }
 
     @Override
