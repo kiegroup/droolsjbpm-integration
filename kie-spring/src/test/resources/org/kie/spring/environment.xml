@@ -30,7 +30,6 @@
   </bean>
 
   <bean id="my-globals" class="org.drools.core.base.MapGlobalResolver"/>
-  <bean id="my-date-formats" class="org.drools.core.type.DateFormatsImpl"/>
   <bean id="my-calendars" class="org.drools.core.base.CalendarsImpl"/>
 
   <bean id="mock-custom-strategy" class="org.kie.spring.mocks.MockObjectMarshallingStrategy"/>
@@ -40,7 +39,6 @@
     <kie:entity-manager-factory ref="myEmf"/>
     <kie:transaction-manager ref="txManager"/>
     <kie:globals ref="my-globals"/>
-    <kie:date-formats ref="my-date-formats"/>
     <kie:calendars ref="my-calendars"/>
 
     <kie:object-marshalling-strategies>
@@ -69,10 +67,6 @@
     <kie:globals>
       <bean class="org.drools.core.base.MapGlobalResolver"/>
     </kie:globals>
-
-    <kie:date-formats>
-      <bean class="org.drools.core.type.DateFormatsImpl"/>
-    </kie:date-formats>
 
     <kie:calendars>
       <bean class="org.drools.core.base.CalendarsImpl"/>
