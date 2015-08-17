@@ -228,15 +228,19 @@ public abstract class AbstractRemoteCommandObject {
 
     void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
         if( inputObject != null ) {
-            if( inputObject instanceof List )  { 
-                objectList.addAll((List) inputObject);
+            if( inputObject instanceof List )  {
+                for( Object obj : (List<?>)inputObject ) {
+                    addPossiblyNullObject(obj, objectList);
+                }
             } else if( inputObject instanceof JaxbStringObjectPairArray ) { 
                 for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
-                    objectList.add(stringObjectPair.getValue());
+                    if( stringObjectPair != null ) {
+                        addPossiblyNullObject(stringObjectPair.getValue(), objectList);
+                    }
                 }
             } else if( inputObject instanceof StringKeyObjectValueMap ) { 
                 for( Object obj : ((StringKeyObjectValueMap) inputObject).values() ) {
-                    objectList.add(obj);
+                    addPossiblyNullObject(obj, objectList);
                 } 
             } else {  
                 objectList.add(inputObject);
