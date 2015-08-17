@@ -15,6 +15,7 @@
 
 package org.kie.services.client.api.command;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -64,6 +65,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.jbpm.services.task.commands.AddTaskCommand;
 import org.junit.Test;
+import org.kie.internal.jaxb.StringKeyObjectValueMap;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
 import org.kie.remote.client.jaxb.AcceptedClientCommands;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
@@ -71,6 +73,7 @@ import org.kie.remote.jaxb.gen.DeleteCommand;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.QueryCriteria;
 import org.kie.remote.jaxb.gen.TaskCommand;
+import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.mockito.Mockito;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -404,4 +407,54 @@ public class RemoteCommandObjectTest {
         }
     }
 
+    @Test
+    public void addPossiblyNullObjectTest() throws Throwable {
+        // mock setup
+        RemoteConfiguration config = new RemoteConfiguration(RemoteConfiguration.Type.CONSTRUCTOR);
+        TaskServiceClientCommandObject taskServiceClient = new TaskServiceClientCommandObject(config);
+        List<Object> objectList = new ArrayList<Object>();
+
+        // Verify adding object
+        Object inputObject = new Object();
+        taskServiceClient.addPossiblyNullObject(inputObject, objectList);
+        assertEquals(1, objectList.size());
+        assertEquals(inputObject, objectList.get(0));
+
+        // Verify adding null object
+        inputObject = null;
+        objectList = new ArrayList<Object>();
+        taskServiceClient.addPossiblyNullObject(inputObject, objectList);
+        assertEquals(0, objectList.size());
+
+        // Verify adding list containing null object
+        inputObject = new Object();
+        List<Object> inputObjectList = new ArrayList<Object>();
+        inputObjectList.add(null);
+        inputObjectList.add(inputObject);
+        objectList = new ArrayList<Object>();
+        taskServiceClient.addPossiblyNullObject(inputObjectList, objectList);
+        assertEquals(1, objectList.size());
+        assertEquals(inputObject, objectList.get(0));
+
+        // Verify adding JaxbStringObjectPairArray containing null object
+        inputObject = new Object();
+        JaxbStringObjectPair inputObjectPair = new JaxbStringObjectPair("one", inputObject);
+        JaxbStringObjectPair inputObjectNullPair = new JaxbStringObjectPair("two", null);
+        JaxbStringObjectPairArray inputObjectArray = new JaxbStringObjectPairArray();
+        inputObjectArray.getItems().add(null);
+        inputObjectArray.getItems().add(inputObjectPair);
+        inputObjectArray.getItems().add(inputObjectNullPair);
+        objectList = new ArrayList<Object>();
+        taskServiceClient.addPossiblyNullObject(inputObjectArray, objectList);
+        assertEquals(1, objectList.size());
+        assertEquals(inputObject, objectList.get(0));
+
+        // Verify adding StringKeyObjectValueMap containing null object
+        inputObject = new Object();
+        StringKeyObjectValueMap inputObjectValueMap = new StringKeyObjectValueMap();
+        inputObjectValueMap.put("one", null);
+        objectList = new ArrayList<Object>();
+        taskServiceClient.addPossiblyNullObject(inputObjectValueMap, objectList);
+        assertEquals(0, objectList.size());
+    }
 }
