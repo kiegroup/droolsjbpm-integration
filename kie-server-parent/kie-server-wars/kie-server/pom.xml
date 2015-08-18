@@ -140,6 +140,10 @@
           </descriptors>
           <archive>
             <addMavenDescriptor>false</addMavenDescriptor>
+            <!-- special manifest entries to allow usage of CXF on WebSphere -->
+            <manifestEntries>
+              <Ignore-Scanning-Archives>cxf-api-${version.org.apache.cxf}.jar,cxf-rt-bindings-soap-${version.org.apache.cxf}.jar,cxf-rt-bindings-xml-${version.org.apache.cxf}.jar,cxf-rt-core-${version.org.apache.cxf}.jar,cxf-rt-databinding-jaxb-${version.org.apache.cxf}.jar,cxf-rt-frontend-jaxws-${version.org.apache.cxf}.jar,cxf-rt-frontend-simple-${version.org.apache.cxf}.jar,cxf-rt-transports-http-${version.org.apache.cxf}.jar,cxf-rt-ws-addr-${version.org.apache.cxf}.jar,cxf-rt-ws-policy-${version.org.apache.cxf}.jar</Ignore-Scanning-Archives>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>

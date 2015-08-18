@@ -31,7 +31,7 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Path("/server")
+@Path("server/config")
 public class KieServerResource {
 
     private KieContainerCommandService delegate;

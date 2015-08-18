@@ -39,7 +39,7 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Path("/server")
+@Path("server")
 public class KieServerRestImpl {
 
     private KieServerImpl server;

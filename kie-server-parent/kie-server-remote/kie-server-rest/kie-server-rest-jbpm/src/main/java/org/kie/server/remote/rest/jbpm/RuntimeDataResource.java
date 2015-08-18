@@ -47,7 +47,7 @@ import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
-@Path("/server")
+@Path("server/" + QUERY_URI)
 public class RuntimeDataResource {
 
     public static final Logger logger = LoggerFactory.getLogger(RuntimeDataResource.class);
