@@ -92,13 +92,13 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
         ClientResponse<JaxbLong> response = null;
         try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getHttpUrl(), START_PROCESS_POST_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            ClientRequest clientRequest = newRequest(build(TestConfig.getHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.post();
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
             valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
-            clientRequest = newRequest(build(TestConfig.getHttpUrl(), ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            clientRequest = newRequest(build(TestConfig.getHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info( "[DELETE] " + clientRequest.getUri());
             response = clientRequest.delete();
             Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());

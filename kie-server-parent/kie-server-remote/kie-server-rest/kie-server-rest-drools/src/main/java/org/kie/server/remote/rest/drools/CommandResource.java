@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Path("/server")
+@Path("server/containers/instance/{id}")
 public class CommandResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
@@ -53,7 +53,6 @@ public class CommandResource {
     }
 
     @POST
-    @Path("containers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response manageContainer(@Context HttpHeaders headers, @PathParam("id") String id, String cmdPayload) {

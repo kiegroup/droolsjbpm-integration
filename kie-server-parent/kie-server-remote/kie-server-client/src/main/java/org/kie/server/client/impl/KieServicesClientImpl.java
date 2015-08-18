@@ -173,7 +173,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     @Override
     public ServiceResponsesList executeScript(CommandScript script) {
         if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateCustomResponse( baseURI, script, ServiceResponsesList.class );
+            return makeHttpPostRequestAndCreateCustomResponse( baseURI + "/config", script, ServiceResponsesList.class );
         } else {
             return executeJmsCommand( script );
         }

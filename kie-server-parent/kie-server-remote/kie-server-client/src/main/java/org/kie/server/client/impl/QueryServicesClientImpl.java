@@ -59,7 +59,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(PROCESS_ID, processId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEFINITIONS_BY_ID_GET_URI, valuesMap), ProcessDefinitionList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_ID_GET_URI, valuesMap), ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -87,7 +87,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(PROCESS_ID, processId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI, valuesMap), ProcessDefinition.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_CONTAINER_ID_DEF_ID_GET_URI, valuesMap), ProcessDefinition.class);
 
 
 
@@ -113,7 +113,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -141,7 +141,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("?filter=" + filter, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -170,7 +170,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
 
         } else {
@@ -199,7 +199,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -229,7 +229,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -259,7 +259,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -289,7 +289,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -320,7 +320,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -350,7 +350,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), "", "", page, pageSize}) ) );
@@ -379,7 +379,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
 
         } else {
@@ -411,7 +411,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
 
         } else {
@@ -442,7 +442,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
 
 
@@ -471,7 +471,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI, valuesMap), ProcessInstance.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI, valuesMap), ProcessInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -494,7 +494,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstance.class);
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI, valuesMap), ProcessInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -518,7 +518,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(WORK_ITEM_ID, workItemId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI, valuesMap), NodeInstance.class);
+                    build(baseURI, QUERY_URI + "/" + NODE_INSTANCES_BY_WORK_ITEM_ID_GET_URI, valuesMap), NodeInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -544,7 +544,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("?activeOnly=true", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -574,7 +574,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("?completedOnly=true", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -605,7 +605,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -634,7 +634,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, VAR_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap), VariableInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + VAR_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap), VariableInstanceList.class);
 
 
 
@@ -667,7 +667,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
+                    build(baseURI, QUERY_URI + "/" + VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
 
 
         } else {
