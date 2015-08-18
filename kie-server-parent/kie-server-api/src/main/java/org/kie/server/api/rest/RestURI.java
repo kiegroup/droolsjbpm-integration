@@ -38,37 +38,43 @@ public class RestURI {
     public static final String JOB_CMD_NAME = "cmd";
     public static final String JOB_KEY = "key";
 
+    public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/process";
+    public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/process/definition";
+    public static final String JOB_URI = "jobs";
+    public static final String TASK_URI = "containers/{" + CONTAINER_ID + "}/tasks";
+    public static final String QUERY_URI = "queries";
+
     // uris
-    // process related
-    public static final String START_PROCESS_POST_URI = "containers/{" + CONTAINER_ID + "}/process/{" + PROCESS_ID +"}/instances";
-    public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "containers/{" + CONTAINER_ID + "}/process/{" + PROCESS_ID +"}/instances/correlation/{" + CORRELATION_KEY + "}";
-    public static final String ABORT_PROCESS_INST_DEL_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID +"}";
-    public static final String ABORT_PROCESS_INSTANCES_DEL_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
-    public static final String SIGNAL_PROCESS_INST_POST_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID +"}/signal/{" + SIGNAL_NAME + "}";
-    public static final String SIGNAL_PROCESS_INSTANCES_PORT_URI = "containers/{" + CONTAINER_ID + "}/process/instances/signal/{" + SIGNAL_NAME + "}";
-    public static final String PROCESS_INSTANCE_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}";
-    public static final String PROCESS_INSTANCE_VAR_PUT_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
-    public static final String PROCESS_INSTANCE_VARS_POST_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/variables";
-    public static final String PROCESS_INSTANCE_VAR_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
-    public static final String PROCESS_INSTANCE_VARS_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/variables";
-    public static final String PROCESS_INSTANCE_SIGNALS_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/signals";
+    // process related prefixed by PROCESS_URI
+    public static final String START_PROCESS_POST_URI = "{" + PROCESS_ID +"}/instances";
+    public static final String START_PROCESS_WITH_CORRELATION_KEY_POST_URI = "{" + PROCESS_ID +"}/instances/correlation/{" + CORRELATION_KEY + "}";
+    public static final String ABORT_PROCESS_INST_DEL_URI = "instance/{" + PROCESS_INST_ID +"}";
+    public static final String ABORT_PROCESS_INSTANCES_DEL_URI = "instances";
+    public static final String SIGNAL_PROCESS_INST_POST_URI = "instance/{" + PROCESS_INST_ID +"}/signal/{" + SIGNAL_NAME + "}";
+    public static final String SIGNAL_PROCESS_INSTANCES_PORT_URI = "instances/signal/{" + SIGNAL_NAME + "}";
+    public static final String PROCESS_INSTANCE_GET_URI = "instance/{" + PROCESS_INST_ID + "}";
+    public static final String PROCESS_INSTANCE_VAR_PUT_URI = "instance/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
+    public static final String PROCESS_INSTANCE_VARS_POST_URI = "instance/{" + PROCESS_INST_ID + "}/variables";
+    public static final String PROCESS_INSTANCE_VAR_GET_URI = "instance/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
+    public static final String PROCESS_INSTANCE_VARS_GET_URI = "instance/{" + PROCESS_INST_ID + "}/variables";
+    public static final String PROCESS_INSTANCE_SIGNALS_GET_URI = "instance/{" + PROCESS_INST_ID + "}/signals";
 
-    public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/completed";
-    public static final String PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/aborted";
-    public static final String PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}";
-    public static final String PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instance/{" + PROCESS_INST_ID + "}/workitems";
+    public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI = "instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/completed";
+    public static final String PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI = "instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/aborted";
+    public static final String PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI = "instance/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}";
+    public static final String PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI = "instance/{" + PROCESS_INST_ID + "}/workitems";
 
-    // process definition related
-    public static final String PROCESS_DEF_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}";
-    public static final String PROCESS_DEF_SUBPROCESS_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/subprocesses";
-    public static final String PROCESS_DEF_VARIABLES_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/variables";
-    public static final String PROCESS_DEF_SERVICE_TASKS_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/tasks/service";
-    public static final String PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/entities";
-    public static final String PROCESS_DEF_USER_TASKS_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/tasks/user";
-    public static final String PROCESS_DEF_USER_TASK_INPUT_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/tasks/user/{" + TASK_NAME + "}/inputs";
-    public static final String PROCESS_DEF_USER_TASK_OUTPUT_GET_URI = "containers/{" + CONTAINER_ID + "}/process/definition/{" + PROCESS_ID +"}/tasks/user/{" + TASK_NAME + "}/outputs";
+    // process definition related prefixed by PROCESS_DEF_URI
+    public static final String PROCESS_DEF_GET_URI = "{" + PROCESS_ID +"}";
+    public static final String PROCESS_DEF_SUBPROCESS_GET_URI = "{" + PROCESS_ID +"}/subprocesses";
+    public static final String PROCESS_DEF_VARIABLES_GET_URI = "{" + PROCESS_ID +"}/variables";
+    public static final String PROCESS_DEF_SERVICE_TASKS_GET_URI = "{" + PROCESS_ID +"}/tasks/service";
+    public static final String PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI = "{" + PROCESS_ID +"}/entities";
+    public static final String PROCESS_DEF_USER_TASKS_GET_URI = "{" + PROCESS_ID +"}/tasks/user";
+    public static final String PROCESS_DEF_USER_TASK_INPUT_GET_URI = "{" + PROCESS_ID +"}/tasks/user/{" + TASK_NAME + "}/inputs";
+    public static final String PROCESS_DEF_USER_TASK_OUTPUT_GET_URI = "{" + PROCESS_ID +"}/tasks/user/{" + TASK_NAME + "}/outputs";
 
-    // runtime data related
+    // runtime data related prefixed by QUERY_URI
     public static final String PROCESS_INSTANCES_GET_URI = "process/instances";
     public static final String PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI = "process/{" + PROCESS_ID +"}/instances";
     public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
@@ -88,49 +94,7 @@ public class RestURI {
     public static final String VAR_INSTANCES_BY_INSTANCE_ID_GET_URI = "process/instances/{" + PROCESS_INST_ID + "}/variables/instances";
     public static final String VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI = "process/instances/{" + PROCESS_INST_ID + "}/variables/instances/{" + VAR_NAME +"}";
 
-    // task related
-    public static final String TASK_INSTANCE_ACTIVATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/activated";
-    public static final String TASK_INSTANCE_CLAIM_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/claimed";
-    public static final String TASK_INSTANCE_START_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/started";
-    public static final String TASK_INSTANCE_STOP_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/stopped";
-    public static final String TASK_INSTANCE_COMPLETE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/completed";
-    public static final String TASK_INSTANCE_DELEGATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/delegated";
-    public static final String TASK_INSTANCE_EXIT_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/exited";
-    public static final String TASK_INSTANCE_FAIL_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/failed";
-    public static final String TASK_INSTANCE_FORWARD_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/forwarded";
-    public static final String TASK_INSTANCE_RELEASE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/released";
-    public static final String TASK_INSTANCE_RESUME_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/resumed";
-    public static final String TASK_INSTANCE_SKIP_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/skipped";
-    public static final String TASK_INSTANCE_SUSPEND_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/suspended";
-    public static final String TASK_INSTANCE_NOMINATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/states/nominated";
-
-    public static final String TASK_INSTANCE_PRIORITY_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/priority";
-    public static final String TASK_INSTANCE_DESCRIPTION_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/description";
-    public static final String TASK_INSTANCE_NAME_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/name";
-    public static final String TASK_INSTANCE_EXPIRATION_DATE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/expiration";
-    public static final String TASK_INSTANCE_SKIPABLE_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/skipable";
-
-    public static final String TASK_INSTANCE_OUTPUT_DATA_PUT_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/output";
-    public static final String TASK_INSTANCE_OUTPUT_DATA_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/output";
-    public static final String TASK_INSTANCE_INPUT_DATA_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/input";
-
-    public static final String TASK_INSTANCE_CONTENT_DATA_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/content/{" + CONTENT_ID +"}";
-
-    public static final String TASK_INSTANCE_COMMENT_ADD_POST_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments";
-    public static final String TASK_INSTANCE_COMMENTS_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments";
-    public static final String TASK_INSTANCE_COMMENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
-    public static final String TASK_INSTANCE_COMMENT_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
-
-    public static final String TASK_INSTANCE_ATTACHMENT_ADD_POST_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments";
-    public static final String TASK_INSTANCE_ATTACHMENTS_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments";
-    public static final String TASK_INSTANCE_ATTACHMENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
-    public static final String TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}/content";
-    public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
-
-    public static final String TASK_INSTANCE_GET_URI = "containers/{" + CONTAINER_ID + "}/tasks/{" + TASK_INSTANCE_ID + "}";
-
-
-    // task search related
+    // task search related prefixed by QUERY_URI
     public static final String TASKS_ASSIGN_POT_OWNERS_GET_URI = "task/instances/pot-owners";
     public static final String TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI = "task/instances/admins";
     public static final String TASKS_OWNED_GET_URI = "task/instances/owners";
@@ -140,14 +104,53 @@ public class RestURI {
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "task/instances/workitem/{" + WORK_ITEM_ID + "}";
     public static final String TASK_BY_PROCESS_INST_ID_GET_URI = "task/instances/process/{" + PROCESS_INST_ID + "}";
 
-    // job executor
-    public static final String SCHEDULE_JOB_POST_URI = "jobs";
-    public static final String CANCEL_JOB_DEL_URI = "jobs/{" + JOB_ID + "}";
-    public static final String REQUEUE_JOB_PUT_URI = "jobs/{" + JOB_ID + "}";
-    public static final String JOB_INSTANCES_GET_URI = "jobs";
-    public static final String JOB_INSTANCES_BY_KEY_GET_URI = "jobs/key/{" + JOB_KEY + "}";
-    public static final String JOB_INSTANCES_BY_CMD_GET_URI = "jobs/command/{" + JOB_CMD_NAME + "}";
-    public static final String JOB_INSTANCE_GET_URI = "jobs/{" + JOB_ID + "}";
+    // task related prefixed by TASK_URI
+    public static final String TASK_INSTANCE_ACTIVATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/activated";
+    public static final String TASK_INSTANCE_CLAIM_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/claimed";
+    public static final String TASK_INSTANCE_START_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/started";
+    public static final String TASK_INSTANCE_STOP_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/stopped";
+    public static final String TASK_INSTANCE_COMPLETE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/completed";
+    public static final String TASK_INSTANCE_DELEGATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/delegated";
+    public static final String TASK_INSTANCE_EXIT_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/exited";
+    public static final String TASK_INSTANCE_FAIL_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/failed";
+    public static final String TASK_INSTANCE_FORWARD_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/forwarded";
+    public static final String TASK_INSTANCE_RELEASE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/released";
+    public static final String TASK_INSTANCE_RESUME_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/resumed";
+    public static final String TASK_INSTANCE_SKIP_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/skipped";
+    public static final String TASK_INSTANCE_SUSPEND_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/suspended";
+    public static final String TASK_INSTANCE_NOMINATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/nominated";
+
+    public static final String TASK_INSTANCE_PRIORITY_PUT_URI = "{" + TASK_INSTANCE_ID + "}/priority";
+    public static final String TASK_INSTANCE_DESCRIPTION_PUT_URI = "{" + TASK_INSTANCE_ID + "}/description";
+    public static final String TASK_INSTANCE_NAME_PUT_URI = "{" + TASK_INSTANCE_ID + "}/name";
+    public static final String TASK_INSTANCE_EXPIRATION_DATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/expiration";
+    public static final String TASK_INSTANCE_SKIPABLE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/skipable";
+
+    public static final String TASK_INSTANCE_OUTPUT_DATA_PUT_URI = "{" + TASK_INSTANCE_ID + "}/content/output";
+    public static final String TASK_INSTANCE_OUTPUT_DATA_GET_URI = "{" + TASK_INSTANCE_ID + "}/content/output";
+    public static final String TASK_INSTANCE_INPUT_DATA_GET_URI = "{" + TASK_INSTANCE_ID + "}/content/input";
+
+    public static final String TASK_INSTANCE_CONTENT_DATA_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/content/{" + CONTENT_ID +"}";
+
+    public static final String TASK_INSTANCE_COMMENT_ADD_POST_URI = "{" + TASK_INSTANCE_ID + "}/comments";
+    public static final String TASK_INSTANCE_COMMENTS_GET_URI = "{" + TASK_INSTANCE_ID + "}/comments";
+    public static final String TASK_INSTANCE_COMMENT_GET_URI = "{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
+    public static final String TASK_INSTANCE_COMMENT_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/comments/{" + COMMENT_ID + "}";
+
+    public static final String TASK_INSTANCE_ATTACHMENT_ADD_POST_URI = "{" + TASK_INSTANCE_ID + "}/attachments";
+    public static final String TASK_INSTANCE_ATTACHMENTS_GET_URI = "{" + TASK_INSTANCE_ID + "}/attachments";
+    public static final String TASK_INSTANCE_ATTACHMENT_GET_URI = "{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
+    public static final String TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI = "{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}/content";
+    public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
+
+    public static final String TASK_INSTANCE_GET_URI = "{" + TASK_INSTANCE_ID + "}";
+
+    // job executor prefixed by JOB_URI
+    public static final String CANCEL_JOB_DEL_URI = "{" + JOB_ID + "}";
+    public static final String REQUEUE_JOB_PUT_URI = "{" + JOB_ID + "}";
+    public static final String JOB_INSTANCES_BY_KEY_GET_URI = "key/{" + JOB_KEY + "}";
+    public static final String JOB_INSTANCES_BY_CMD_GET_URI = "command/{" + JOB_CMD_NAME + "}";
+    public static final String JOB_INSTANCE_GET_URI = "{" + JOB_ID + "}";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

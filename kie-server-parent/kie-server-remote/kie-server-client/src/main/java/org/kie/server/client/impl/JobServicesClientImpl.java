@@ -58,7 +58,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             valuesMap.put(CONTAINER_ID, containerId);
 
             result = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, SCHEDULE_JOB_POST_URI, valuesMap) + "?containerId="+containerId, jobRequest,
+                    build(baseURI, JOB_URI, valuesMap) + "?containerId="+containerId, jobRequest,
                     Object.class);
 
         } else {
@@ -84,7 +84,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             valuesMap.put(JOB_ID, requestId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, CANCEL_JOB_DEL_URI, valuesMap),
+                    build(baseURI, JOB_URI + "/" + CANCEL_JOB_DEL_URI, valuesMap),
                     null);
 
         } else {
@@ -102,7 +102,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             valuesMap.put(JOB_ID, requestId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, REQUEUE_JOB_PUT_URI, valuesMap), "", String.class, new HashMap<String, String>());
+                    build(baseURI, JOB_URI + "/" + REQUEUE_JOB_PUT_URI, valuesMap), "", String.class, new HashMap<String, String>());
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "JobService", "requeueRequest", new Object[]{requestId})));
@@ -120,7 +120,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+                    build(baseURI, JOB_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
 
 
@@ -150,7 +150,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             String queryString = getPagingQueryString("", page, pageSize);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_BY_KEY_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+                    build(baseURI, JOB_URI + "/" + JOB_INSTANCES_BY_KEY_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -179,7 +179,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             String queryString = getPagingQueryString("", page, pageSize);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCES_BY_CMD_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+                    build(baseURI, JOB_URI + "/" + JOB_INSTANCES_BY_CMD_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -205,7 +205,7 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             valuesMap.put(JOB_ID, requestId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, JOB_INSTANCE_GET_URI, valuesMap) + "?withErrors=" + withErrors + "&withData=" + withData , RequestInfoInstance.class);
+                    build(baseURI, JOB_URI + "/" + JOB_INSTANCE_GET_URI, valuesMap) + "?withErrors=" + withErrors + "&withData=" + withData , RequestInfoInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(

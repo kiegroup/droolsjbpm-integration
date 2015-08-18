@@ -42,7 +42,7 @@ import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
-@Path("/server")
+@Path("server/" + JOB_URI)
 public class ExecutorResource {
 
     public static final Logger logger = LoggerFactory.getLogger(ExecutorResource.class);
@@ -55,7 +55,6 @@ public class ExecutorResource {
 
     // operations
     @POST
-    @Path(SCHEDULE_JOB_POST_URI)
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response scheduleRequest(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("containerId") String containerId, String payload) {
@@ -109,7 +108,6 @@ public class ExecutorResource {
 
     // queries
     @GET
-    @Path(JOB_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getRequestsByStatus(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("status") List<String> statuses,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {

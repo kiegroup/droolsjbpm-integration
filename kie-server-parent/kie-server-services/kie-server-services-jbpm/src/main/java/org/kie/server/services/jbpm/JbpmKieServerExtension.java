@@ -15,6 +15,8 @@
 
 package org.kie.server.services.jbpm;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,8 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
+import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.spi.PersistenceProviderResolverHolder;
+import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.jbpm.executor.ExecutorServiceFactory;
@@ -52,10 +57,10 @@ import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
-import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.task.UserGroupCallback;
 import org.kie.api.executor.ExecutorService;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.query.QueryContext;
+import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
@@ -68,6 +73,8 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
+import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
 import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +82,7 @@ import org.slf4j.LoggerFactory;
 public class JbpmKieServerExtension implements KieServerExtension {
 
     public static final String EXTENSION_NAME = "jBPM";
+    private static final String PERSISTENCE_XML_LOCATION = "/jpa/META-INF/persistence.xml";
 
     private static final Logger logger = LoggerFactory.getLogger(JbpmKieServerExtension.class);
 
@@ -105,6 +113,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
+
         KieServerConfig config = registry.getConfig();
 
         KieServerConfigItem callbackConfig = config.getConfigItem(KieServerConstants.CFG_HT_CALLBACK);
@@ -119,7 +128,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         this.kieServer = kieServer;
         this.context = registry;
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName, getPersistenceProperties(config));
+
+
+        EntityManagerFactory emf = build(getPersistenceProperties(config));
         EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
 
         // build definition service
@@ -127,11 +138,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         // build deployment service
         deploymentService = new KModuleDeploymentService();
-        ((KModuleDeploymentService)deploymentService).setBpmn2Service(definitionService);
-        ((KModuleDeploymentService)deploymentService).setEmf(emf);
-        ((KModuleDeploymentService)deploymentService).setIdentityProvider(registry.getIdentityProvider());
-        ((KModuleDeploymentService)deploymentService).setManagerFactory(new RuntimeManagerFactoryImpl());
-        ((KModuleDeploymentService)deploymentService).setFormManagerService(new FormManagerServiceImpl());
+        ((KModuleDeploymentService) deploymentService).setBpmn2Service(definitionService);
+        ((KModuleDeploymentService) deploymentService).setEmf(emf);
+        ((KModuleDeploymentService) deploymentService).setIdentityProvider(registry.getIdentityProvider());
+        ((KModuleDeploymentService) deploymentService).setManagerFactory(new RuntimeManagerFactoryImpl());
+        ((KModuleDeploymentService) deploymentService).setFormManagerService(new FormManagerServiceImpl());
 
         // configure user group callback
         UserGroupCallback userGroupCallback = UserDataServiceProvider.getUserGroupCallback();
@@ -144,11 +155,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 .entityManagerFactory(emf)
                 .userGroupCallback(userGroupCallback)
                 .getTaskService());
-        ((KModuleDeploymentService)deploymentService).setRuntimeDataService(runtimeDataService);
+        ((KModuleDeploymentService) deploymentService).setRuntimeDataService(runtimeDataService);
 
         // set runtime data service as listener on deployment service
-        ((KModuleDeploymentService)deploymentService).addListener(((RuntimeDataServiceImpl) runtimeDataService));
-        ((KModuleDeploymentService)deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
+        ((KModuleDeploymentService) deploymentService).addListener(((RuntimeDataServiceImpl) runtimeDataService));
+        ((KModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
 
         // build process service
         processService = new ProcessServiceImpl();
@@ -159,8 +170,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
         userTaskService = new UserTaskServiceImpl();
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
-
-
 
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
             // build executor service
@@ -175,6 +184,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context));
+
     }
 
     @Override
@@ -358,5 +368,32 @@ public class JbpmKieServerExtension implements KieServerExtension {
         persistenceProperties.put("javax.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
 
         return persistenceProperties;
+    }
+
+    protected EntityManagerFactory build(Map<String, String> properties) {
+        try {
+            InitialContext ctx = new InitialContext();
+            InputStream inputStream = PersistenceUnitInfoLoader.class.getResourceAsStream(PERSISTENCE_XML_LOCATION);
+            PersistenceUnitInfo info = PersistenceUnitInfoLoader.load(inputStream, ctx, this.getClass().getClassLoader());
+            // prepare persistence unit root location
+            URL root = PersistenceUnitInfoLoader.class.getResource(PERSISTENCE_XML_LOCATION);
+            String jarLocation = root.toExternalForm().split("!")[0].replace(PERSISTENCE_XML_LOCATION, "");
+            ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(new URL(jarLocation));
+
+            List<PersistenceProvider> persistenceProviders = PersistenceProviderResolverHolder.getPersistenceProviderResolver().getPersistenceProviders();
+            PersistenceProvider selectedProvider = null;
+            if (persistenceProviders != null) {
+                for (PersistenceProvider provider : persistenceProviders) {
+                    if (provider.getClass().getName().equals(info.getPersistenceProviderClassName())) {
+                        selectedProvider = provider;
+                        break;
+                    }
+                }
+            }
+
+            return selectedProvider.createContainerEntityManagerFactory(info, properties);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
+        }
     }
 }
