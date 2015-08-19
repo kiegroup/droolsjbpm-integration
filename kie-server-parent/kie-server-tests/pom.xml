@@ -29,6 +29,9 @@
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
     <!-- This property can be overriden when some other remote repo location should be used -->
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
+    <!-- Custom settings.xml used when building the testing kjars. By default there is no additional configuration needed,
+         but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
+    <kie.server.testing.kjars.build.settings.xml/>
 
     <tomcat7x.download.url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</tomcat7x.download.url>
     <tomcat8x.download.url>https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.12/bin/apache-tomcat-8.0.12.zip</tomcat8x.download.url>

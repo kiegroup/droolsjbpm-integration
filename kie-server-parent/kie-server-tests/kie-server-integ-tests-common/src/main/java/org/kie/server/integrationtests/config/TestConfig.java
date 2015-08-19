@@ -55,6 +55,8 @@ public class TestConfig {
     private static final StringTestParameter REQUEST_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.request.queue", "jms/queue/KIE.SERVER.REQUEST");
     private static final StringTestParameter RESPONSE_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
 
+    private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
+
     /**
      * Get URL for HTTP services - like REST.
      *
@@ -202,6 +204,13 @@ public class TestConfig {
             throw new RuntimeException("Failed to create initial context!", e);
         }
         return context;
+    }
+
+    /**
+     * @return location of the settings.xml file that should be used when building testing kjars
+     */
+    public static String getKjarsBuildSettingsXml() {
+        return TestConfig.KJARS_BUILD_SETTINGS_XML.getParameterValue();
     }
 
     // Used for printing all configuration values at the beginning of first test run.
