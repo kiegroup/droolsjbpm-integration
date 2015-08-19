@@ -178,6 +178,7 @@
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
         </plugin>

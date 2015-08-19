@@ -22,6 +22,8 @@ import java.io.FilenameFilter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -195,15 +197,24 @@ public abstract class KieServerBaseIntegrationTest {
         logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
         ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
         MavenCli cli = new MavenCli();
-        String[] mvnArgs;
+        List<String> mvnArgs;
         if (TestConfig.isLocalServer()) {
             // just install into local repository when running the local server. Deploying to remote repo will fail
             // if the repo does not exist.
-            mvnArgs = new String[]{"-B", "clean", "install"};
+
+            // wrapping explicitly in ArrayList as we may need to update the list later (and Arrays.toList() returns
+            // just read-only list)
+            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "install"));
         } else {
-            mvnArgs = new String[]{"-B", "clean", "deploy"};
+            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "deploy"));
         }
-        int mvnRunResult = cli.doMain(mvnArgs, basedir, System.out, System.out);
+        // use custom settings.xml file, if one specified
+        String kjarsBuildSettingsXml = TestConfig.getKjarsBuildSettingsXml();
+        if (kjarsBuildSettingsXml != null && !kjarsBuildSettingsXml.isEmpty()) {
+            mvnArgs.add("-s");
+            mvnArgs.add(kjarsBuildSettingsXml);
+        }
+        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.out);
         if (mvnRunResult != 0) {
             throw new RuntimeException("Error while building Maven project from basedir " + basedir +
                     ". Return code=" + mvnRunResult);
