@@ -31,27 +31,26 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 @RunWith(Parameterized.class)
-public class UserManagedSharedTaskServiceSpringTest extends AbstractJbpmSpringTest {
+public class UserManagedSharedTaskServiceSpringTest extends AbstractJbpmSpringParameterizedTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
-                { "jbpm/shared-taskservice/jta-em-singleton.xml" },
-                { "jbpm/shared-taskservice/jta-emf-singleton.xml" }
+                { SHARED_TASKSERVICE_JTA_EM_SINGLETON_PATH, null },
+                { SHARED_TASKSERVICE_JTA_EMF_SINGLETON_PATH, null }
         };
         return Arrays.asList(data);
     };
 
-    @Parameterized.Parameter(0)
-    public String contextPath;
+    public UserManagedSharedTaskServiceSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
 
 	/* The purpose of the shared entity manager is to allow the application domain
 	 * and JBPM domain to be persisted by a single entity manager and transaction. 
@@ -59,41 +58,34 @@ public class UserManagedSharedTaskServiceSpringTest extends AbstractJbpmSpringTe
     @Test
     public void testSpringWithJTAAndSharedEMFAndUserManagedTx() throws Exception {
 
-        context = new ClassPathXmlApplicationContext(contextPath);
-
         UserTransaction ut = (UserTransaction) new InitialContext().lookup(JtaTransactionManager.DEFAULT_USER_TRANSACTION_NAME);
         ut.begin();
 
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-
-        RuntimeEngine engine = manager.getRuntimeEngine(null);
-        KieSession ksession = engine.getKieSession();
-
-        TaskService taskService = (TaskService) context.getBean("taskService");
-
-        ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
+        KieSession ksession = getKieSession();
+        TaskService taskService = getTaskService();
+        ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
 
         System.out.println("Process started");
 
-        AuditLogService logService = (AuditLogService) context.getBean("logService");
+        AuditLogService logService = getLogService();
         ProcessInstanceLog log = logService.findProcessInstance(processInstance.getId());
         assertNotNull(log);
 
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'john'");
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner(USER_JOHN, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+ USER_JOHN + "'");
         assertEquals(1, tasks.size());
 
         long taskId = tasks.get(0).getId();
-        taskService.start(taskId, "john");
-        taskService.complete(taskId, "john", null);
+        taskService.start(taskId, USER_JOHN);
+        taskService.complete(taskId, USER_JOHN, null);
 
-        tasks = taskService.getTasksAssignedAsPotentialOwner("mary", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'mary'");
+        tasks = taskService.getTasksAssignedAsPotentialOwner(USER_MARY, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+ USER_MARY + "'");
         assertEquals(1, tasks.size());
 
         taskId = tasks.get(0).getId();
-        taskService.start(taskId, "mary");
-        taskService.complete(taskId, "mary", null);
+        taskService.start(taskId, USER_MARY);
+        taskService.complete(taskId, USER_MARY, null);
 
         processInstance = ksession.getProcessInstance(processInstance.getId());
         assertNull(processInstance);

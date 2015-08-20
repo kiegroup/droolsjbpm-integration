@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="jbpmEMF" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" depends-on="poolingDataSource">
+    <property name="persistenceUnitName" value="org.jbpm.persistence.spring.local" />
+    <property name="persistenceXmlLocation" value="classpath:jbpm/persistence-local.xml" />
+    <property name="dataSource" ref="poolingDataSource" />
+  </bean>
+
+  <bean id="jbpmTxManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="jbpmEMF" />
+  </bean>
+</beans>

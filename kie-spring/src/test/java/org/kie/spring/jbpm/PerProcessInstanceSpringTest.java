@@ -15,43 +15,60 @@
 
 package org.kie.spring.jbpm;
 
+import java.util.Arrays;
+import java.util.Collection;
 import static org.junit.Assert.*;
 
 import java.util.List;
-
 import javax.persistence.EntityManager;
 
-import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Tests verifying per process instance configuration.
  */
-public class PerProcessInstanceSpringTest extends AbstractJbpmSpringTest {
+@RunWith(Parameterized.class)
+public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterizedTest {
+
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> contextPath() {
+        Object[][] data = new Object[][] {
+                { LOCAL_EM_PER_PROCESS_INSTANCE_PATH, ProcessInstanceIdContext.get() },
+                { LOCAL_EMF_PER_PROCESS_INSTANCE_PATH, ProcessInstanceIdContext.get() },
+                { JTA_EM_PER_PROCESS_INSTANCE_PATH, ProcessInstanceIdContext.get() },
+                { JTA_EMF_PER_PROCESS_INSTANCE_PATH, ProcessInstanceIdContext.get() }
+        };
+        return Arrays.asList(data);
+    };
+
+    public PerProcessInstanceSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
 
     @Test
     public void testNoSessionInDbAfterInit() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-em/per-process-instance.xml");
-        EntityManager em = (EntityManager) context.getBean("jbpmEM");
+        EntityManager entityManager = getEntityManager();
         // check that there is no sessions in db
-        List<?> sessions = em.createQuery("from SessionInfo").getResultList();
+        List<?> sessions = entityManager.createQuery("from SessionInfo").getResultList();
         assertNotNull(sessions);
         assertEquals(0, sessions.size());
 
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
+        getManager();
 
         // after creating per process instance manager init creates temp session that shall be directly destroyed
-        sessions = em.createQuery("from SessionInfo").getResultList();
+        sessions = entityManager.createQuery("from SessionInfo").getResultList();
         assertNotNull(sessions);
         assertEquals(0, sessions.size());
     }
@@ -64,16 +81,12 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringTest {
     @Test
     public void testRecoveringKieSessionByProcessInstanceIdContext() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/local-emf/per-process-instance.xml");
-
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-
-        // Creating new runtime engine with new kie session
-        RuntimeEngine engine = manager.getRuntimeEngine(ProcessInstanceIdContext.get());
-        KieSession ksession = engine.getKieSession();
+        RuntimeManager manager = getManager();
+        RuntimeEngine engine = getEngine();
+        KieSession ksession = getKieSession();
         long ksessionId = ksession.getIdentifier();
 
-        ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
+        ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
 
         System.out.println("Process started");
 
@@ -87,25 +100,24 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringTest {
         assertEquals(ksessionId, ksession.getIdentifier());
 
         // Process can continue with new task service
-        AuditLogService logService = (AuditLogService) context.getBean("logService");
-        ProcessInstanceLog log = logService.findProcessInstance(processInstance.getId());
+        ProcessInstanceLog log = getLogService().findProcessInstance(processInstance.getId());
         assertNotNull(log);
 
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner("john", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'john'");
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwner(USER_JOHN, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+USER_JOHN+"'");
         assertEquals(1, tasks.size());
 
         long taskId = tasks.get(0).getId();
-        taskService.start(taskId, "john");
-        taskService.complete(taskId, "john", null);
+        taskService.start(taskId, USER_JOHN);
+        taskService.complete(taskId, USER_JOHN, null);
 
-        tasks = taskService.getTasksAssignedAsPotentialOwner("mary", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'mary'");
+        tasks = taskService.getTasksAssignedAsPotentialOwner(USER_MARY, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+USER_MARY+"'");
         assertEquals(1, tasks.size());
 
         taskId = tasks.get(0).getId();
-        taskService.start(taskId, "mary");
-        taskService.complete(taskId, "mary", null);
+        taskService.start(taskId, USER_MARY);
+        taskService.complete(taskId, USER_MARY, null);
 
         processInstance = ksession.getProcessInstance(processInstance.getId());
         assertNull(processInstance);

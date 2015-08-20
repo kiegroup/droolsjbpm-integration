@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="poolingDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
+    <property name="className" value="bitronix.tm.resource.jdbc.lrc.LrcXADataSource" />
+    <!-- unique name consists of thread name and creation time in miliseconds -->
+    <property name="uniqueName" value="jdbc/jbpm-ds-#{T(java.lang.Thread).currentThread().getName()}-#{T(java.util.Calendar).getInstance().getTimeInMillis()}" />
+    <property name="maxPoolSize" value="5" />
+    <property name="allowLocalTransactions" value="true" />
+    <property name="driverProperties">
+      <props>
+        <prop key="user">sa</prop>
+        <prop key="password"></prop>
+        <prop key="url">jdbc:h2:mem:jbpm-db;MVCC=true</prop>
+        <prop key="driverClassName">org.h2.Driver</prop>
+      </props>
+    </property>
+  </bean>
+</beans>

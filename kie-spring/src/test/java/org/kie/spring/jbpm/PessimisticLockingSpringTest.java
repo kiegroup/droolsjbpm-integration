@@ -29,8 +29,8 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.persistence.LockTimeoutException;
 import javax.persistence.PessimisticLockException;
-
 import org.jbpm.process.audit.AuditLogService;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
@@ -39,6 +39,7 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
@@ -46,13 +47,12 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @RunWith(Parameterized.class)
-public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
+public class PessimisticLockingSpringTest extends AbstractJbpmSpringParameterizedTest  {
 
 
     private static final Logger log = LoggerFactory.getLogger(PessimisticLockingSpringTest.class);
@@ -60,14 +60,11 @@ public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
-                { "classpath:jbpm/pessimistic-lock/pessimistic-locking-local-em-factory-beans.xml" },
-                { "classpath:jbpm/pessimistic-lock/pessimistic-locking-local-emf-factory-beans.xml" },
+                { PESSIMISTIC_LOCK_LOCAL_EM_PATH, EmptyContext.get() },
+                { PESSIMISTIC_LOCK_LOCAL_EMF_PATH, EmptyContext.get() },
         };
         return Arrays.asList(data);
     };
-
-    @Parameterized.Parameter(0)
-    public String contextPath;
 
     @Rule
     public TestRule watcher = new TestWatcher() {
@@ -80,39 +77,40 @@ public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
         };
     };
 
+    public PessimisticLockingSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
+
     @Test
     public void testPessimisticLock() throws Exception {
 
-        context = new ClassPathXmlApplicationContext(contextPath);
-
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-        final AbstractPlatformTransactionManager tm = (AbstractPlatformTransactionManager) context.getBean("jbpmTxManager");
-        AuditLogService logService = (AuditLogService) context.getBean("logService");
-
+        RuntimeManager manager = getManager();
+        final AbstractPlatformTransactionManager transactionManager = getTransactionManager();
+        AuditLogService logService = getLogService();
         final DefaultTransactionDefinition defTransDefinition = new DefaultTransactionDefinition();
         final List<Exception> exceptions = new ArrayList<Exception>();
-        RuntimeEngine engine = manager.getRuntimeEngine(EmptyContext.get());
+        RuntimeEngine engine = getEngine();
 
-        final KieSession ksession = engine.getKieSession();
+        final KieSession ksession = getKieSession();
 
-        final ProcessInstance processInstance = ksession.startProcess("org.jboss.qa.bpms.HumanTask");
+        final ProcessInstance processInstance = ksession.startProcess(HUMAN_TASK_PROCESS_ID);
         final ProcessInstanceStatus abortedProcessInstanceStatus = new ProcessInstanceStatus();
 
         final CountDownLatch txAcquiredSignal = new CountDownLatch(1);
         final CountDownLatch pessLockExceptionSignal = new CountDownLatch(1);
         final CountDownLatch threadsAreDoneLatch = new CountDownLatch(2);
-        
+
         Thread t1 = new Thread() {
             @Override
             public void run() {
-                TransactionStatus status = tm.getTransaction(defTransDefinition);
+                TransactionStatus status = transactionManager.getTransaction(defTransDefinition);
                 log.debug("Attempting to abort to lock process instance for 3 secs ");
                 // getProcessInstance does not lock reliably so let's make a change that actually does something to the entity
                 ksession.abortProcessInstance(processInstance.getId());
                 
                 // let thread 2 start once we have the transaction
                 txAcquiredSignal.countDown();
-                
+
 
                 try {
                     // keep the lock until thread 2 let's us know it's done
@@ -121,7 +119,7 @@ public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
                     // do nothing
                 }
                 log.debug("Commited process instance aborting after 3 secs");
-                tm.commit(status);
+                transactionManager.commit(status);
                 
                 // let main test thread know we're done
                 threadsAreDoneLatch.countDown();
@@ -179,9 +177,9 @@ public class PessimisticLockingSpringTest extends AbstractJbpmSpringTest  {
             assertThat(exceptions.get(0).getClass().getName(), anyOf(equalTo(PessimisticLockException.class.getName()), equalTo(LockTimeoutException.class.getName())));
         }
 
-        TransactionStatus status = tm.getTransaction(defTransDefinition);
+        TransactionStatus status = transactionManager.getTransaction(defTransDefinition);
         ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
-        tm.commit(status);
+        transactionManager.commit(status);
         assertNotNull(instanceLog);
         assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
 

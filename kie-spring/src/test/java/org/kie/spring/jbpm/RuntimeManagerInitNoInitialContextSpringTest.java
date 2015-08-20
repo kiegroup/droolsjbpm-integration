@@ -19,8 +19,8 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.jbpm.process.audit.AuditLogService;
+
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,34 +34,27 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Test used to verify correct initialization of runtime manager without initial context factory configured for local transactions.
  */
 @RunWith(Parameterized.class)
-public class RuntimeManagerInitNoInitialContextSpringTest extends AbstractJbpmSpringTest {
+public class RuntimeManagerInitNoInitialContextSpringTest extends AbstractJbpmSpringParameterizedTest {
 
     private static String CONTEXT_FACTORY;
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
-                { "jbpm/local-emf/singleton.xml", EmptyContext.get() },
-                { "jbpm/local-emf/per-process-instance.xml", ProcessInstanceIdContext.get() },
-                { "jbpm/local-emf/per-request.xml", EmptyContext.get() },
+                { NO_INITIAL_CONTEXT_LOCAL_EMF_SINGLETON_PATH, EmptyContext.get() },
+                { NO_INITIAL_CONTEXT_LOCAL_EMF_PER_PROCESS_PATH, ProcessInstanceIdContext.get() },
+                { NO_INITIAL_CONTEXT_LOCAL_EMF_PER_REQUEST_PATH, EmptyContext.get() }
         };
         return Arrays.asList(data);
     };
 
-    @Parameterized.Parameter(0)
-    public String contextPath;
-
-    @Parameterized.Parameter(1)
-    public Context<?> runtimeManagerContext;
-
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUpProperty() throws Exception {
         CONTEXT_FACTORY = System.getProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
 
         // setting some text as INITIAL_CONTEXT_FACTORY to overwrite test configuration
@@ -77,25 +70,26 @@ public class RuntimeManagerInitNoInitialContextSpringTest extends AbstractJbpmSp
         }
     }
 
+    public RuntimeManagerInitNoInitialContextSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
+
     /**
      * Simple test to verify that application is operational even without context factory defined.
      */
     @Test
-    public void testSimpleTaskInvocation() throws Exception{
+    public void testSimpleTaskInvocation() throws Exception {
 
-        context = new ClassPathXmlApplicationContext(contextPath);
+        RuntimeManager manager = getManager();
+        AuditLogService logService = getLogService();
 
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-        AuditLogService auditLogService = (AuditLogService) context.getBean("logService");
-
-        RuntimeEngine engine = manager.getRuntimeEngine(runtimeManagerContext);
-        KieSession ksession = engine.getKieSession();
-
-        ProcessInstance processInstance = ksession.startProcess("com.sample.bpmn.hello");
+        RuntimeEngine engine = getEngine();
+        KieSession ksession = getKieSession();
+        ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
 
         System.out.println("Process started");
 
-        ProcessInstanceLog instanceLog = auditLogService.findProcessInstance(processInstance.getId());
+        ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
         assertNotNull(instanceLog);
         assertEquals(ProcessInstance.STATE_ACTIVE, instanceLog.getStatus().intValue());
 
@@ -103,7 +97,7 @@ public class RuntimeManagerInitNoInitialContextSpringTest extends AbstractJbpmSp
 
         System.out.println("Process instance aborted");
 
-        instanceLog = auditLogService.findProcessInstance(processInstance.getId());
+        instanceLog = logService.findProcessInstance(processInstance.getId());
         assertNotNull(instanceLog);
         assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
 
