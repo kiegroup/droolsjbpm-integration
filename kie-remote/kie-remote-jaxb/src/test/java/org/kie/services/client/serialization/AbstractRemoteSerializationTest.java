@@ -15,6 +15,9 @@
 
 package org.kie.services.client.serialization;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,51 +26,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.drools.core.SessionConfiguration;
-import org.drools.core.base.evaluators.SetEvaluatorsDefinition;
-import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.drools.core.common.DisconnectedFactHandle;
-import org.drools.core.impl.EnvironmentFactory;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
-import org.jbpm.process.instance.event.DefaultSignalManagerFactory;
-import org.jbpm.process.instance.impl.DefaultProcessInstanceManagerFactory;
 import org.jbpm.services.task.jaxb.ComparePair;
-import org.jbpm.test.JbpmJUnitBaseTestCase;
-import org.junit.After;
 import org.junit.Assume;
 import org.junit.Test;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
-import org.kie.api.builder.KieBuilder;
-import org.kie.api.builder.KieFileSystem;
-import org.kie.api.builder.KieRepository;
-import org.kie.api.builder.Message.Level;
 import org.kie.api.definition.KieDefinition.KnowledgeType;
-import org.kie.api.io.Resource;
-import org.kie.api.runtime.Environment;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.audit.NodeInstanceLog;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
-import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.runtime.rule.FactHandle;
-import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.process.CorrelationProperty;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.runtime.conf.AuditMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
-import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
 import org.kie.services.client.serialization.jaxb.impl.JaxbVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.audit.JaxbHistoryLogList;
@@ -80,9 +55,6 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
-import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationKey;
 import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationProperty;
@@ -90,17 +62,13 @@ import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
-
-public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestCase {
+public abstract class AbstractRemoteSerializationTest {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteSerializationTest.class);
 
@@ -225,43 +193,6 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         resp.getHistoryLogList().add(new JaxbNodeInstanceLog(nLog));
 
         testRoundTrip(resp);
-    }
-
-    @Test
-    public void processInstanceWithVariablesTest() throws Exception {
-
-        this.setupDataSource = true;
-        this.sessionPersistence = true;
-        super.setUp();
-
-        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
-        KieSession ksession = runtimeEngine.getKieSession();
-
-        Map<String, Object> params = new HashMap<String, Object>();
-        String val = "initial-val";
-        params.put("test", val);
-        ProcessInstance processInstance = ksession.startProcess("StructureRef");
-        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
-
-        Map<String, Object> res = new HashMap<String, Object>();
-        res.put("testHT", "test value");
-        // ksession.getWorkItemManager().completeWorkItem(workItemHandler.getWorkItem().getId(), res);
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("test", "initial-val");
-
-        JaxbProcessInstanceWithVariablesResponse jpiwvr = new JaxbProcessInstanceWithVariablesResponse(processInstance, map);
-        testRoundTrip(jpiwvr);
-
-        JaxbProcessInstanceListResponse jpilp = new JaxbProcessInstanceListResponse();
-        List<ProcessInstance> procInstList = new ArrayList<ProcessInstance>();
-        procInstList.add(new JaxbProcessInstanceResponse(processInstance));
-        jpilp.setResult(procInstList);
-        testRoundTrip(jpilp);
-
-        super.tearDown();
-        this.setupDataSource = false;
-        this.sessionPersistence = false;
     }
 
     @Test

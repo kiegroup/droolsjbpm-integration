@@ -15,7 +15,11 @@
 
 package org.kie.services.client.serialization;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
+
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +35,6 @@ import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
@@ -44,8 +47,6 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
-
-import static org.kie.services.client.serialization.JaxbSerializationProvider.*;
 
 public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest {
 
