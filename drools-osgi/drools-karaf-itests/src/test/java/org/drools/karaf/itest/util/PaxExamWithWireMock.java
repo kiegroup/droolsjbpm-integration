@@ -127,7 +127,7 @@ public class PaxExamWithWireMock extends PaxExam {
                                 "    </kie-containers>\n" +
                                 "</response>")));
 
-        stubFor(get(urlPathEqualTo("/process/definitions"))
+        stubFor(get(urlPathEqualTo("/queries/process/definitions"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -203,7 +203,7 @@ public class PaxExamWithWireMock extends PaxExam {
                                 "    <value>2</value>\n" +
                                 "</long-type>")));
 
-        stubFor(get(urlPathEqualTo("/task/instances"))
+        stubFor(get(urlPathEqualTo("/queries/task/instances"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -242,7 +242,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/xml")
                         .withBody("")));
 
-            stubFor(post(urlEqualTo("/containers/evaluationproject"))
+            stubFor(post(urlEqualTo("/containers/instance/evaluationproject"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -271,7 +271,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/xml")
                         .withBody("")));
 
-        stubFor(get(urlEqualTo("/process/instances/2"))
+        stubFor(get(urlEqualTo("/queries/process/instances/2"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -348,7 +348,7 @@ public class PaxExamWithWireMock extends PaxExam {
                                 "  }\n" +
                                 "}")));
 
-        stubFor(get(urlPathEqualTo("/process/definitions"))
+        stubFor(get(urlPathEqualTo("/queries/process/definitions"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/json"))
@@ -400,7 +400,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/json")
                         .withBody("2")));
 
-        stubFor(get(urlPathEqualTo("/task/instances"))
+        stubFor(get(urlPathEqualTo("/queries/task/instances"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/json"))
@@ -441,7 +441,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/json")
                         .withBody("")));
 
-        stubFor(post(urlEqualTo("/containers/evaluationproject"))
+        stubFor(post(urlEqualTo("/containers/instance/evaluationproject"))
                 .withHeader("Accept", equalTo("application/json"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -459,7 +459,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/json")
                         .withBody("")));
 
-        stubFor(get(urlEqualTo("/process/instances/2"))
+        stubFor(get(urlEqualTo("/queries/process/instances/2"))
                 .withHeader("Accept", equalTo("application/json"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -528,7 +528,7 @@ public class PaxExamWithWireMock extends PaxExam {
                                 "  </result>\n" +
                                 "</org.kie.server.api.model.ServiceResponse>")));
 
-        stubFor(get(urlPathEqualTo("/process/definitions"))
+        stubFor(get(urlPathEqualTo("/queries/process/definitions"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -604,7 +604,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/xml")
                         .withBody("<long>2</long>")));
 
-        stubFor(get(urlPathEqualTo("/task/instances"))
+        stubFor(get(urlPathEqualTo("/queries/task/instances"))
                 .withQueryParam("page", equalTo("0"))
                 .withQueryParam("pageSize", equalTo("10"))
                 .withHeader("Accept", equalTo("application/xml"))
@@ -645,7 +645,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/xml")
                         .withBody("")));
 
-        stubFor(post(urlEqualTo("/containers/evaluationproject"))
+        stubFor(post(urlEqualTo("/containers/instance/evaluationproject"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -668,7 +668,7 @@ public class PaxExamWithWireMock extends PaxExam {
                         .withHeader("Content-Type", "application/xml")
                         .withBody("")));
 
-        stubFor(get(urlEqualTo("/process/instances/2"))
+        stubFor(get(urlEqualTo("/queries/process/instances/2"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
                         .withStatus(200)
