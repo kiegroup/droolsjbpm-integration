@@ -1,9 +1,10 @@
 /*
- * Copyright 2015 JBoss Inc
+ * Copyright 2015 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ * You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,16 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.spring.jbpm;
-
-import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.jbpm.process.audit.AuditLogService;
+import javax.naming.InitialContext;
+import javax.transaction.UserTransaction;
+
+import static org.junit.Assert.*;
+
+import org.drools.persistence.jta.JtaTransactionManager;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,41 +36,39 @@ import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 
+/**
+ * BZ 1123703 - Testing audit log service with user managed transactions.
+ */
 @RunWith(Parameterized.class)
-public class AuditLogSpringTest extends AbstractJbpmSpringParameterizedTest {
+public class UserManagedTransactionAuditLogSpringTest extends AbstractJbpmSpringParameterizedTest {
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> contextPath() {
         Object[][] data = new Object[][] {
-                { JTA_EM_SINGLETON_PATH, EmptyContext.get() },
-                { LOCAL_EM_SINGLETON_PATH, EmptyContext.get() },
                 { JTA_EMF_SINGLETON_PATH, EmptyContext.get() },
-                { LOCAL_EMF_SINGLETON_PATH, EmptyContext.get() }
-             };
+                { JTA_EM_SINGLETON_PATH, EmptyContext.get() }
+        };
         return Arrays.asList(data);
     };
 
-    public AuditLogSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+    public UserManagedTransactionAuditLogSpringTest(String contextPath, Context<?> runtimeManagerContext) {
         super(contextPath, runtimeManagerContext);
     }
 
     @Test
-    public void testAuditLog() throws Exception {
-        KieSession ksession = getKieSession();
-        final ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
-
+    public void testUserTransaction() throws Exception {
+        UserTransaction ut = (UserTransaction) new InitialContext().lookup( JtaTransactionManager.DEFAULT_USER_TRANSACTION_NAME );
+        ut.begin();
         RuntimeManager manager = getManager();
         RuntimeEngine engine = getEngine();
-        AuditLogService logService = getLogService();
-        ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
-        assertNotNull(instanceLog);
-        assertEquals(ProcessInstance.STATE_ACTIVE, instanceLog.getStatus().intValue());
+        KieSession ksession = getKieSession();
+        ProcessInstance processInstance = ksession.startProcess(SCRIPT_TASK_PROCESS_ID);
 
-        ksession.abortProcessInstance(processInstance.getId());
-
-        instanceLog = logService.findProcessInstance(processInstance.getId());
+        ProcessInstanceLog instanceLog = getLogService().findProcessInstance(processInstance.getId());
         assertNotNull(instanceLog);
-        assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
+        assertEquals(ProcessInstance.STATE_COMPLETED, instanceLog.getStatus().intValue());
+
+        ut.commit();
 
         manager.disposeRuntimeEngine(engine);
     }

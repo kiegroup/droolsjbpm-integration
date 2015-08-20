@@ -15,59 +15,66 @@
 
 package org.kie.spring.jbpm;
 
+import java.util.Arrays;
+import java.util.Collection;
 import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jbpm.process.audit.AuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SwimlaneSpringTest extends AbstractJbpmSpringTest {
+@RunWith(Parameterized.class)
+public class SwimlaneSpringTest extends AbstractJbpmSpringParameterizedTest {
+
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> contextPath() {
+        Object[][] data = new Object[][] {
+                { USERGROUP_CALLBACK_LOCAL_EMF_SINGLETON_PATH, EmptyContext.get() }
+             };
+        return Arrays.asList(data);
+    };
+
+    public SwimlaneSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
 
     @Test
     public void testCompleteTaskInSwimlane() throws Exception{
 
-        context = new ClassPathXmlApplicationContext("jbpm/usergroup-callback/local-emf-singleton.xml");
-
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-        RuntimeEngine engine = manager.getRuntimeEngine(EmptyContext.get());
-
-        KieSession ksession = engine.getKieSession();
-        TaskService taskService = engine.getTaskService();
-
+        KieSession ksession = getKieSession();
+        TaskService taskService = getTaskService();
         Map<String,Object> params = new HashMap<String,Object>();
-        params.put("userid", "max");
-        ProcessInstance processInstance = ksession.startProcess("agu.samples.sample1", params);
+        params.put("userid", USER_MAX);
+        ProcessInstance processInstance = ksession.startProcess(AGU_SAMPLE_PROCESS_ID, params);
 
-        AuditLogService logService = (AuditLogService) context.getBean("logService");
-        ProcessInstanceLog log = logService.findProcessInstance(processInstance.getId());
+        ProcessInstanceLog log = getLogService().findProcessInstance(processInstance.getId());
         assertNotNull(log);
 
-        List<TaskSummary> tasks = taskService.getTasksOwned("max", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'max'");
+        List<TaskSummary> tasks = taskService.getTasksOwned(USER_MAX, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+USER_MAX+"'");
 
         long taskId = tasks.get(0).getId();
-        taskService.start(taskId, "max");
-        taskService.complete(taskId, "max", null);
+        taskService.start(taskId, USER_MAX);
+        taskService.complete(taskId, USER_MAX, null);
 
 
-        tasks = taskService.getTasksAssignedAsPotentialOwner("max", "en-UK");
-        System.out.println("Found " + tasks.size() + " task(s) for user 'max'");
+        tasks = taskService.getTasksAssignedAsPotentialOwner(USER_MAX, "en-UK");
+        System.out.println("Found " + tasks.size() + " task(s) for user '"+USER_MAX+"'");
 
         taskId = tasks.get(0).getId();
-        taskService.start(taskId, "max");
-        taskService.complete(taskId, "max", null);
+        taskService.start(taskId, USER_MAX);
+        taskService.complete(taskId, USER_MAX, null);
 
 
         processInstance = ksession.getProcessInstance(processInstance.getId());

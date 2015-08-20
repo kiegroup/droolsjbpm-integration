@@ -15,6 +15,7 @@
 
 package org.kie.spring.jbpm;
 
+import org.kie.spring.jbpm.tools.IntegrationSpringBase;
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -26,7 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
-public abstract class AbstractJbpmSpringTest {
+public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
 
     protected static PoolingDataSource pds;
     protected ClassPathXmlApplicationContext context;
@@ -34,21 +35,20 @@ public abstract class AbstractJbpmSpringTest {
     @BeforeClass
     public static void generalSetup() {
         pds = setupPoolingDataSource();
+        System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
     }
 
     @Before
     public void setup() {
         cleanupSingletonSessionId();
-        System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
     }
-    
+
     @After
     public void cleanup() {
         if (context != null) {
             context.close();
             context = null;
         }
-        System.clearProperty("java.naming.factory.initial");
     }
 
     @AfterClass
@@ -56,6 +56,7 @@ public abstract class AbstractJbpmSpringTest {
         if (pds != null) {
             pds.close();
         }
+        System.clearProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY);
     }
 
     protected static PoolingDataSource setupPoolingDataSource() {
