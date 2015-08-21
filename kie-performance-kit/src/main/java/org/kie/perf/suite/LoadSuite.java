@@ -12,7 +12,7 @@ import com.codahale.metrics.Timer;
 public class LoadSuite implements ITestSuite {
 
     protected int iterations;
-    
+
     @Override
     public String getTestPackage() {
         return "org.kie.perf.scenario.load";
@@ -22,7 +22,7 @@ public class LoadSuite implements ITestSuite {
     public void initScenario(final IPerfTest scenario) throws Exception {
         TestConfig tc = TestConfig.getInstance();
         iterations = tc.getIterations();
-        
+
         scenario.init();
     }
 
@@ -33,13 +33,13 @@ public class LoadSuite implements ITestSuite {
 
         Timer duration = metrics.timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
         Timer.Context contextDuration = duration.time();
-        
+
         KPKLimit limit = scenario.getClass().getAnnotation(KPKLimit.class);
         int max = Integer.MAX_VALUE;
         if (limit != null) {
             max = limit.value();
         }
-        
+
         Timer scenarioDuration = metrics.timer(MetricRegistry.name(scenario.getClass(), "scenario.single.duration"));
         run.start(max);
         while (!run.isEnd()) {

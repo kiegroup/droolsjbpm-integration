@@ -7,11 +7,11 @@ public class SharedMetricRegistry {
     private static MetricRegistry instance;
     private static boolean isWarmUp = false;
     private static MetricRegistry warmUpInstance;
-    
+
     private SharedMetricRegistry() {
-        
+
     }
-    
+
     public static void setWarmUp(boolean isWarmUp) {
         SharedMetricRegistry.isWarmUp = isWarmUp;
     }
