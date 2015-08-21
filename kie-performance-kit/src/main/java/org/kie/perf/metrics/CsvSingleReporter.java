@@ -191,9 +191,10 @@ public class CsvSingleReporter extends ScheduledReporter {
     private void reportHistogram(String name, Histogram histogram) {
         final Snapshot snapshot = histogram.getSnapshot();
 
-        report(name, getMeterName(name), histogram.getCount(), 0.0f, snapshot.getMin(), snapshot.getMean(), snapshot.getMax(), snapshot.getStdDev(),
-                snapshot.getMedian(), snapshot.get75thPercentile(), snapshot.get95thPercentile(), snapshot.get98thPercentile(),
-                snapshot.get99thPercentile(), snapshot.get999thPercentile());
+        report(name, getMeterName(name), histogram.getCount(), 0.0f, (double) snapshot.getMin(), (double) snapshot.getMean(),
+                (double) snapshot.getMax(), (double) snapshot.getStdDev(), (double) snapshot.getMedian(), (double) snapshot.get75thPercentile(),
+                (double) snapshot.get95thPercentile(), (double) snapshot.get98thPercentile(), (double) snapshot.get99thPercentile(),
+                (double) snapshot.get999thPercentile());
     }
 
     private void reportCounter(String name, Counter counter) {
@@ -212,8 +213,8 @@ public class CsvSingleReporter extends ScheduledReporter {
                 final PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file, true), UTF_8));
                 try {
                     if (!fileAlreadyExists) {
-                        out.println("Metric,Count/Value,Mean Rate [events/" + getRateUnit() + "],Min [" + getDurationUnit() + "],Mean [" + getDurationUnit()
-                                + "],Max [" + getDurationUnit() + "],Standard Deviation,Median,p75,p95,p98,p99,p99.9");
+                        out.println("Metric,Count/Value,Mean Rate [events/" + getRateUnit() + "],Min [" + getDurationUnit() + "],Mean ["
+                                + getDurationUnit() + "],Max [" + getDurationUnit() + "],Standard Deviation,Median,p75,p95,p98,p99,p99.9");
                     }
                     out.printf(locale, String.format(locale, "%s%n", "%s,%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f"), values);
                 } finally {

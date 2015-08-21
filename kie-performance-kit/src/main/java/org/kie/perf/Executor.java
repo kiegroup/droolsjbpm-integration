@@ -17,9 +17,11 @@ import org.kie.perf.annotation.KPKConstraint;
 import org.kie.perf.metrics.CPUUsageHistogramSet;
 import org.kie.perf.metrics.CsvSingleReporter;
 import org.kie.perf.metrics.MemoryUsageGaugeSet;
+import org.kie.perf.metrics.PerfRepoReporter;
 import org.kie.perf.metrics.ThreadStatesGaugeSet;
 import org.kie.perf.scenario.IPerfTest;
 import org.kie.perf.suite.ITestSuite;
+import org.perfrepo.client.PerfRepoClient;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +71,9 @@ public class Executor {
             }
             reporter = CsvSingleReporter.forRegistry(metrics).formatFor(Locale.US).convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS).build(reportDataLocation);
+        } else if (reporterType == ReporterType.PERFREPO) {
+            PerfRepoClient client = new PerfRepoClient(tc.getPerfRepoHost(), tc.getPerfRepoUrlPath(), tc.getPerfRepoUsername(), tc.getPerfRepoPassword());
+            reporter = PerfRepoReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build(client);
         }
 
         for (Measure m : tc.getMeasure()) {

@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 public @interface KPKConstraint {
 
     /**
-     * List of constraints in the form propertyName=expectedValue.
-     * E.g. @KPKConstraint(["jbpm.runtimeManagerStrategy=PerProcessInstance"])
+     * List of constraints in the form propertyName=expectedValue. E.g.
+     * @KPKConstraint(["jbpm.runtimeManagerStrategy=PerProcessInstance"])
      */
     String[] value();
-    
+
 }
