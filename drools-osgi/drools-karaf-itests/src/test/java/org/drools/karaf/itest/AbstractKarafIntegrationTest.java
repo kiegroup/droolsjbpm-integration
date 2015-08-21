@@ -28,12 +28,19 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 abstract public class AbstractKarafIntegrationTest {
+
+    /**
+     * path to file containing container binary archive
+     */
+    public static final String PROP_KARAF_DISTRIBUTION_FILE = "karaf.dist.file";
 
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
@@ -77,8 +84,16 @@ abstract public class AbstractKarafIntegrationTest {
     public static Option getKarafDistributionOption() {
         String karafVersion = getKarafVersion();
         logger.info("*** The karaf version is " + karafVersion + " ***");
-        return new DefaultCompositeOption(karafDistributionConfiguration()
-                .frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject())
+
+        KarafDistributionBaseConfigurationOption karafConfiguration = karafDistributionConfiguration();
+        if (System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) == null) {
+            karafConfiguration.frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject());
+        } else {
+            File fuseDistributionFile = new File(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE));
+            karafConfiguration.frameworkUrl("file:" + fuseDistributionFile.getAbsolutePath());
+        }
+
+        return new DefaultCompositeOption(karafConfiguration
                 .karafVersion(karafVersion)
                 .name("Apache Karaf")
                 .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/")),
