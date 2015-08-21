@@ -196,13 +196,13 @@ public class KieServerMDB
             // 3. deserialize request
             CommandScript script = unmarshallRequest(message, msgCorrId, marshaller, format);
 
-            logger.info("Target capability is {}", targetCapability);
+            logger.debug("Target capability is {}", targetCapability);
             for (KieServerExtension extension : kieServer.getServerExtensions()) {
                 KieContainerCommandService tmp = extension.getAppComponents(KieContainerCommandService.class);
 
                 if (tmp != null && extension.getImplementedCapability().equalsIgnoreCase(targetCapability)) {
                     executor = tmp;
-                    logger.info("Extension {} returned command executor {} with capability {}", extension, executor, extension.getImplementedCapability());
+                    logger.debug("Extension {} returned command executor {} with capability {}", extension, executor, extension.getImplementedCapability());
                     break;
                 }
             }
@@ -230,7 +230,7 @@ public class KieServerMDB
         CommandScript cmdMsg = null;
         try {
             String msgStrContent = ((TextMessage) message).getText();
-            logger.info("About to unmarshal content '{}'", msgStrContent);
+            logger.debug("About to unmarshal content '{}'", msgStrContent);
             cmdMsg = serializationProvider.unmarshall( msgStrContent, CommandScript.class );
         } catch (JMSException jmse) {
             String errMsg = "Unable to read information from message " + msgId + ".";

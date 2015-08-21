@@ -389,7 +389,7 @@ public abstract class AbstractKieServicesClientImpl {
             assert response != null: "Response is empty.";
             try {
                 String responseStr = ((TextMessage) response).getText();
-                logger.info("Received response from server '{}'", responseStr);
+                logger.debug("Received response from server '{}'", responseStr);
                 cmdResponse = marshaller.unmarshall(responseStr, ServiceResponsesList.class);
                 return cmdResponse;
             } catch( JMSException jmse ) {
