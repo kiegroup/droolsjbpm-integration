@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.kie.perf.run.Duration;
 import org.kie.perf.run.IRunType;
 import org.kie.perf.run.Iteration;
+import org.kie.perf.suite.ConcurrentLoadSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +17,15 @@ public class TestConfig {
 
     protected static TestConfig tc;
 
+    protected Properties properties;
+
+    protected String projectName;
     protected String suite;
     protected String scenario;
     protected String startScriptLocation;
+
+    protected String databaseName;
+    protected String version = TestConfig.class.getPackage().getImplementationVersion();
 
     protected RunType runType;
     protected int duration;
@@ -29,72 +36,107 @@ public class TestConfig {
     protected String reportDataLocation;
 
     protected int threads;
-    
+
     protected boolean warmUp;
     protected int warmUpCount;
-    
+
+    protected String perfRepoHost;
+    protected String perfRepoUrlPath;
+    protected String perfRepoUsername;
+    protected String perfRepoPassword;
+
     protected List<Measure> measure;
+    protected List<String> tags = new ArrayList<String>();
 
     protected TestConfig() {
 
     }
 
     public Properties loadProperties() throws Exception {
-        Properties props = new Properties();
+        properties = new Properties();
+        
+        projectName = System.getProperty("projectName");
+        if (projectName == null || projectName.isEmpty()) {
+            projectName = "Project";
+        }
 
         suite = System.getProperty("suite");
-        props.put("suite", suite);
+        properties.put("suite", suite);
 
         scenario = System.getProperty("scenario");
         if (scenario == null || scenario.isEmpty() || scenario.equals("${scenario}")) {
             scenario = null;
+        } else {
+            properties.put("scenario", scenario);
         }
-        props.put("scenario", scenario);
 
         startScriptLocation = System.getProperty("startScriptLocation");
         if (startScriptLocation == null) {
             startScriptLocation = "./run.sh";
         }
-        props.put("startScriptLocation", startScriptLocation);
+        properties.put("startScriptLocation", startScriptLocation);
 
         runType = RunType.valueOf(System.getProperty("runType").toUpperCase());
         duration = Integer.valueOf(System.getProperty("duration"));
         iterations = Integer.valueOf(System.getProperty("iterations"));
-        
-        props.put("runType", runType);
-        props.put("duration", duration);
-        props.put("iterations", iterations);
+
+        properties.put("runType", runType);
+        properties.put("duration", duration);
+        properties.put("iterations", iterations);
 
         reporterType = ReporterType.valueOf(System.getProperty("reporterType").toUpperCase());
         periodicity = Integer.valueOf(System.getProperty("periodicity"));
         reportDataLocation = System.getProperty("reportDataLocation");
-        
-        props.put("reporterType", reporterType);
-        props.put("periodicity", periodicity);
-        props.put("reportDataLocation", reportDataLocation);
+
+        properties.put("reporterType", reporterType);
+        properties.put("periodicity", periodicity);
+        properties.put("reportDataLocation", reportDataLocation);
 
         threads = Integer.valueOf(System.getProperty("threads"));
-        props.put("threads", threads);
-        
+        properties.put("threads", threads);
+        if (suite.equals(ConcurrentLoadSuite.class.getName())) {
+            addTag("thread-" + threads);
+        }
+
         warmUp = Boolean.valueOf(System.getProperty("warmUp"));
         warmUpCount = Integer.valueOf(System.getProperty("warmUpCount"));
-        
-        props.put("warmUp", warmUp);
-        props.put("warmUpCount", warmUpCount);
-        
+
+        properties.put("warmUp", warmUp);
+        properties.put("warmUpCount", warmUpCount);
+
         measure = new ArrayList<TestConfig.Measure>();
         String mprop = System.getProperty("measure");
-        String[] mlist = (mprop != null)?mprop.toUpperCase().split(","):new String[0];
+        String[] mlist = (mprop != null) ? mprop.toUpperCase().split(",") : new String[0];
         for (String m : mlist) {
             try {
                 measure.add(Measure.valueOf(m));
             } catch (Exception ex) {
-                
+
             }
         }
-        props.put("measure", measure);
+        properties.put("measure", measure);
 
-        return props;
+        perfRepoHost = System.getProperty("perfRepo.host");
+        if (perfRepoHost != null) {
+            properties.put("perfRepo.host", perfRepoHost);
+        }
+        perfRepoUrlPath = System.getProperty("perfRepo.urlPath");
+        if (perfRepoUrlPath != null) {
+            properties.put("perfRepo.urlPath", perfRepoUrlPath);
+        }
+        perfRepoUsername = System.getProperty("perfRepo.username");
+        if (perfRepoUsername != null) {
+            properties.put("perfRepo.username", perfRepoUsername);
+        }
+        perfRepoPassword = System.getProperty("perfRepo.password");
+        if (perfRepoPassword != null) {
+            properties.put("perfRepo.password", perfRepoPassword);
+        }
+
+        properties.put("suite.version", version);
+        addTag(version);
+
+        return properties;
     }
 
     public static TestConfig getInstance() {
@@ -109,6 +151,20 @@ public class TestConfig {
         return tc;
     }
 
+    protected void addTag(String tag) {
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+        }
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+    
+    public String getProjectName() {
+        return projectName;
+    }
+
     public String getSuite() {
         return suite;
     }
@@ -119,6 +175,10 @@ public class TestConfig {
 
     public String getStartScriptLocation() {
         return startScriptLocation;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
     }
 
     public RunType getRunType() {
@@ -148,23 +208,43 @@ public class TestConfig {
     public int getThreads() {
         return threads;
     }
-    
+
     public boolean isWarmUp() {
         return warmUp;
     }
-    
+
     public int getWarmUpCount() {
         return warmUpCount;
     }
-    
+
     public List<Measure> getMeasure() {
         return measure;
     }
 
-    public static enum ReporterType {
-        CONSOLE, CSV, CSVSINGLE
+    public List<String> getTags() {
+        return tags;
     }
-    
+
+    public String getPerfRepoHost() {
+        return perfRepoHost;
+    }
+
+    public String getPerfRepoUrlPath() {
+        return perfRepoUrlPath;
+    }
+
+    public String getPerfRepoUsername() {
+        return perfRepoUsername;
+    }
+
+    public String getPerfRepoPassword() {
+        return perfRepoPassword;
+    }
+
+    public static enum ReporterType {
+        CONSOLE, CSV, CSVSINGLE, PERFREPO
+    }
+
     public static enum Measure {
         MEMORYUSAGE, FILEDESCRIPTORS, THREADSTATES, CPUUSAGE
     }

@@ -46,8 +46,10 @@ public class CPUUsageHistogramSet implements MetricSet {
     private void update() {
         Double value = null;
         try {
-            value = (Double) getProcessCpuLoad.invoke(operatingSystemMXBean);
-            value *= 100;
+            if (getProcessCpuLoad != null && operatingSystemMXBean != null) {
+                value = (Double) getProcessCpuLoad.invoke(operatingSystemMXBean);
+                value *= 100;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,7 +58,7 @@ public class CPUUsageHistogramSet implements MetricSet {
             cpuUsageHistogram.update(cpu);
         }
     }
-    
+
     public void start() {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -65,7 +67,7 @@ public class CPUUsageHistogramSet implements MetricSet {
             }
         }, 100, 200);
     }
-    
+
     public void stop() {
         timer.cancel();
     }
@@ -74,7 +76,9 @@ public class CPUUsageHistogramSet implements MetricSet {
     public Map<String, Metric> getMetrics() {
         final Map<String, Metric> metrics = new HashMap<String, Metric>();
 
-        metrics.put(MetricRegistry.name(scenario, "cpu.usage"), cpuUsageHistogram);
+        if (getProcessCpuLoad != null && operatingSystemMXBean != null) {
+            metrics.put(MetricRegistry.name(scenario, "cpu.usage"), cpuUsageHistogram);
+        }
 
         return metrics;
     }

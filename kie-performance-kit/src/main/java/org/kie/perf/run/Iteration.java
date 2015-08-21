@@ -6,7 +6,7 @@ public class Iteration implements IRunType {
 
     private int i;
     private int limit;
-    
+
     @Override
     public void start(int limit) {
         i = 0;
