@@ -280,6 +280,16 @@
   </dependencyManagement>
   
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <reuseForks>false</reuseForks>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <!--  generated: 0. delete all generated unpacked files because they are generated code and could change -->
       <!--  WSDL: 0. delete all generated files because only the WSDL determines code, no code in VCS -->
