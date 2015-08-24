@@ -117,10 +117,10 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     arguments.add(descriptorCommand.getMarshallerFormat());
                 }
 
-                logger.info("About to execute {} operation on {} with args {}", descriptorCommand.getMethod(), handler, arguments);
+                logger.debug("About to execute {} operation on {} with args {}", descriptorCommand.getMethod(), handler, arguments);
                 // process command via reflection and handler
                 result = MethodUtils.invokeMethod(handler, descriptorCommand.getMethod(), arguments.toArray());
-                logger.info("Handler {} returned response {}", handler, result);
+                logger.debug("Handler {} returned response {}", handler, result);
                 // return successful result
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "", result));
             } catch (InvocationTargetException e){
