@@ -378,8 +378,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // prepare persistence unit root location
             URL root = PersistenceUnitInfoLoader.class.getResource(PERSISTENCE_XML_LOCATION);
             String jarLocation = root.toExternalForm().split("!")[0].replace(PERSISTENCE_XML_LOCATION, "");
-            ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(new URL(jarLocation));
-
+            try {
+                ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(new URL(jarLocation));
+            } catch (Exception e) {
+                // in case setting URL to jar file location only fails, fallback to complete URL
+                ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(root);
+            }
             List<PersistenceProvider> persistenceProviders = PersistenceProviderResolverHolder.getPersistenceProviderResolver().getPersistenceProviders();
             PersistenceProvider selectedProvider = null;
             if (persistenceProviders != null) {
