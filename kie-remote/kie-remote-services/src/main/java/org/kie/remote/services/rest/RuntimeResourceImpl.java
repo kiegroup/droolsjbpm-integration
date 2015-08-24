@@ -15,6 +15,7 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -100,6 +102,7 @@ public class RuntimeResourceImpl extends ResourceBase {
  
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessDefinitionInfo(@PathParam("processDefId") String processId) {
         ProcessDefinition processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId);
         JaxbProcessDefinition jaxbProcDef = convertProcAssetDescToJaxbProcDef(processAssetDescList);
@@ -110,6 +113,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     
     @POST
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response startProcessInstance(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
         String oper = getRelativePath();
@@ -124,6 +128,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @GET
     @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/startform")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceStartForm(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
@@ -153,6 +158,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstance(@PathParam("procInstId") Long procInstId) {
         ProcessInstance procInst = getProcessInstance(procInstId, true);
         JaxbProcessInstanceResponse response = new JaxbProcessInstanceResponse(procInst); 
@@ -164,6 +170,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/abort")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response abortProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
@@ -189,6 +196,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @POST
     @Path("/process/instance/{procInstId: [0-9]+}/signal")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response signalProcessInstance(@PathParam("procInstId") Long procInstId) {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
@@ -206,6 +214,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceVariableByProcInstIdByVarName(@PathParam("procInstId") Long procInstId, @PathParam("varName") String varName) {
         Object procVar;
         try {
@@ -226,6 +235,7 @@ public class RuntimeResourceImpl extends ResourceBase {
   
     @POST
     @Path("/signal")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response signalProcessInstances() {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
@@ -244,6 +254,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @GET
     @Path("/workitem/{workItemId: [0-9-]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getWorkItem(@PathParam("workItemId") Long workItemId) { 
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
@@ -264,6 +275,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response doWorkItemOperation(@PathParam("workItemId") Long workItemId, @PathParam("oper") String operation) {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
@@ -296,6 +308,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @POST
     @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response withVarsStartProcessInstance(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
         String oper = getRelativePath();
@@ -312,6 +325,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @GET
     @Path("/withvars/process/instance/{procInstId: [0-9]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response withVarsGetProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> corrKeyProps = getCorrelationKeyProperties(requestParams);
@@ -326,6 +340,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
     @POST
     @Path("/withvars/process/instance/{procInstId: [0-9]+}/signal")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response withVarsSignalProcessInstance(@PathParam("procInstId") Long procInstId) {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();

@@ -15,7 +15,9 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.remote.services.rest.query.data.QueryResourceData.*;
+import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.isNameValueParam;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.isSpecialParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -70,6 +73,7 @@ public class QueryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/runtime/task")
+    @RolesAllowed({REST_ROLE, REST_QUERY_ROLE})
     public Response queryTasks() {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
@@ -87,6 +91,7 @@ public class QueryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/runtime/process")
+    @RolesAllowed({REST_ROLE, REST_QUERY_ROLE})
     public Response queryProcessInstances() {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
@@ -117,6 +122,7 @@ public class QueryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/task")
+    @RolesAllowed({REST_ROLE, REST_QUERY_ROLE})
     public Response taskSummaryQuery() {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();

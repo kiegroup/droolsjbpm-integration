@@ -15,8 +15,10 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -50,6 +52,7 @@ public class DeploymentsResourceImpl extends ResourceBase {
      * @return A {@link JaxbDeploymentUnitList} instance
      */
     @GET
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response listDeployments() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
@@ -68,6 +71,7 @@ public class DeploymentsResourceImpl extends ResourceBase {
      */
     @GET
     @Path("/processes")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();

@@ -15,9 +15,13 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
+
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -39,7 +43,6 @@ import org.jbpm.services.task.commands.ExitTaskCommand;
 import org.jbpm.services.task.commands.FailTaskCommand;
 import org.jbpm.services.task.commands.ForwardTaskCommand;
 import org.jbpm.services.task.commands.GetContentByIdCommand;
-import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ReleaseTaskCommand;
@@ -107,6 +110,7 @@ public class TaskResourceImpl extends ResourceBase {
 
     @GET
     @Path("/query")
+    @RolesAllowed({REST_ROLE, REST_QUERY_ROLE})
     @Deprecated
     public Response query() {
         return queryResource.taskSummaryQuery();
@@ -114,6 +118,7 @@ public class TaskResourceImpl extends ResourceBase {
    
     @GET
     @Path("/{taskId: [0-9-]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTask(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         JaxbTask task = (JaxbTask) doRestTaskOperationWithTaskId(taskId, cmd);
@@ -125,6 +130,7 @@ public class TaskResourceImpl extends ResourceBase {
 
     @POST
     @Path("/{taskId: [0-9-]+}/{oper: [a-zA-Z]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_ROLE})
     public Response doTaskOperation(@PathParam("taskId") long taskId, @PathParam("oper") String operation) { 
         Map<String, String[]> params = getRequestParams();
         operation = checkThatOperationExists(operation, allowedOperations);
@@ -189,6 +195,7 @@ public class TaskResourceImpl extends ResourceBase {
     // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/{taskId: [0-9-]+}/content")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskContentByTaskId(@PathParam("taskId") long taskId) { 
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -210,6 +217,7 @@ public class TaskResourceImpl extends ResourceBase {
     
     @GET
     @Path("/{taskId: [0-9-]+}/showTaskForm")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskFormByTaskId(@PathParam("taskId") long taskId) {
         TaskCommand<?> cmd = new GetTaskCommand(taskId);
         Object result = doRestTaskOperationWithTaskId(taskId, cmd);
@@ -233,6 +241,7 @@ public class TaskResourceImpl extends ResourceBase {
     // TODO: in 7, make sure to use GetContentByIdForUserCommand
     @GET
     @Path("/content/{contentId: [0-9-]+}")
+    @RolesAllowed({REST_ROLE, REST_TASK_RO_ROLE, REST_TASK_ROLE})
     public Response getTaskContentByContentId(@PathParam("contentId") long contentId) { 
         TaskCommand<?> cmd = new GetContentByIdCommand(contentId);
         cmd.setUserId(identityProvider.getName());
@@ -245,6 +254,7 @@ public class TaskResourceImpl extends ResourceBase {
     
     @POST
     @Path("/history/bam/clear")
+    @RolesAllowed({REST_ROLE, REST_TASK_ROLE})
     public Response clearTaskBamHistory() { 
         doRestTaskOperation(new DeleteBAMTaskSummariesCommand());
         return createCorrectVariant(new JaxbGenericResponse(getRelativePath()), headers);
