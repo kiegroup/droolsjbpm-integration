@@ -89,6 +89,7 @@ public class ResourceBase {
 
     private UserGroupCallback userGroupCallback;
 
+
     // for use in tests
     
     public void setProcessRequestBean( ProcessRequestBean processRequestBean ) {

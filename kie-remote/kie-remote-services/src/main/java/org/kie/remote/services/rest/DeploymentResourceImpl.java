@@ -15,8 +15,10 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -68,6 +70,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response getConfig() { 
         JaxbDeploymentUnit jaxbDepUnit = deployResourceBase.determineStatus(deploymentId, true);
         logger.debug("Returning deployment unit information for " + deploymentId);
@@ -84,6 +87,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @POST
     @Path("/deploy")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
         // parse request/options 
         Map<String, String []> params = getRequestParams();
@@ -103,6 +107,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @POST
     @Path("/undeploy")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response undeploy() { 
         JaxbDeploymentJobResult jobResult = deployResourceBase.submitUndeployJob(deploymentId);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
@@ -115,6 +120,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @GET
     @Path("/processes")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response listProcessDefinitions() { 
         String oper = getRelativePath();
         Map<String, String[]> params = getRequestParams();
@@ -130,6 +136,7 @@ public class DeploymentResourceImpl extends ResourceBase {
 
     @POST
     @Path("/activate")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response activate() {
         deployResourceBase.activate(deploymentId);
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
@@ -138,6 +145,7 @@ public class DeploymentResourceImpl extends ResourceBase {
 
     @POST
     @Path("/deactivate")
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deactivate() {
         deployResourceBase.deactivate(deploymentId);
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
