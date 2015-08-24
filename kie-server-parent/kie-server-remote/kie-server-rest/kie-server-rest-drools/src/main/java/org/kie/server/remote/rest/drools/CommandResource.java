@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
-@Path("server/containers/instance/{id}")
+@Path("server/containers/instances/{id}")
 public class CommandResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
