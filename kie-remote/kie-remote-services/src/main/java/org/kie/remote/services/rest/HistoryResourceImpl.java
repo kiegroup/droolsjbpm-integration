@@ -15,12 +15,14 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,6 +60,7 @@ public class HistoryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/instances")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceLogs() {
         String oper = getRelativePath();
         Map<String, String []> params = getRequestParams();
@@ -80,6 +83,7 @@ public class HistoryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/instance/{procInstId: [0-9]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceLog(@PathParam("procInstId") long procInstId ) {
         ProcessInstanceLog procInstLog = getAuditLogService().findProcessInstance(procInstId);
         JaxbProcessInstanceLog jaxbProcLog = new JaxbProcessInstanceLog(procInstLog);
@@ -89,6 +93,7 @@ public class HistoryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{type: [a-zA-Z]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getInstanceLogsByProcInstId( @PathParam("procInstId") long instId, @PathParam("type") String logType)  {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -117,6 +122,7 @@ public class HistoryResourceImpl extends ResourceBase {
     
     @GET
     @Path("/instance/{procInstId: [0-9]+}/{type: [a-zA-Z]+}/{logId: [a-zA-Z0-9-:\\._]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getInstanceLogsByProcInstIdByLogId(@PathParam("procInstId") long procInstId, @PathParam("type") String operation, @PathParam("logId") String logId) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -141,6 +147,7 @@ public class HistoryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceLogsByProcessId(@PathParam("processDefId") String processId) {
         Map<String, String []> params = getRequestParams();
         Number statusParam = getNumberParam("status", false, params, getRelativePath(), false);
@@ -181,6 +188,7 @@ public class HistoryResourceImpl extends ResourceBase {
 
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getVariableInstanceLogsByVariableId(@PathParam("varId") String variableId) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -196,6 +204,7 @@ public class HistoryResourceImpl extends ResourceBase {
     
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getVariableInstanceLogsByVariableIdByVariableValue(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String []> params = getRequestParams();
         String oper = getRelativePath();
@@ -210,6 +219,7 @@ public class HistoryResourceImpl extends ResourceBase {
    
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/instances")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceLogsByVariableId(@PathParam("varId") String variableId) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
@@ -231,6 +241,7 @@ public class HistoryResourceImpl extends ResourceBase {
     
     @GET
     @Path("/variable/{varId: [a-zA-Z0-9-:\\.]+}/value/{value: [a-zA-Z0-9-:\\._]+}/instances")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceLogsByVariableIdByVariableValue(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
@@ -250,6 +261,7 @@ public class HistoryResourceImpl extends ResourceBase {
    
     @POST
     @Path("/clear")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response clear() {
         getAuditLogService().clear();
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);

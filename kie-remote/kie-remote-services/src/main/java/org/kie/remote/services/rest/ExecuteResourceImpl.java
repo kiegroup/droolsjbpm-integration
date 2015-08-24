@@ -15,6 +15,8 @@
 
 package org.kie.remote.services.rest;
 
+import static org.kie.internal.remote.PermissionConstants.*;
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -51,6 +53,7 @@ public class ExecuteResourceImpl {
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
+    @RolesAllowed({REST_CLIENT_ROLE})
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
         return ExecuteCommandUtil.restProcessJaxbCommandsRequest(
                 cmdsRequest, 
