@@ -110,10 +110,14 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/1.4.1_5</bundle>
   </feature>
 
-  <feature name="jbpm-executor" version="${project.version}" description="jBPM Executor">
+  <feature name="jbpm-workitems" version="${project.version}" description="jBPM Work Items">
     <feature version="${project.version}">jbpm</feature>
-    <bundle>wrap:mvn:org.jbpm/jbpm-executor/${version.org.jbpm}$DynamicImport-Package=org.hibernate.*,javassist.*</bundle>
     <bundle>wrap:mvn:org.jbpm/jbpm-workitems/${version.org.jbpm}</bundle>
+  </feature>
+
+  <feature name="jbpm-executor" version="${project.version}" description="jBPM Executor">
+    <feature version="${project.version}">jbpm-workitems</feature>
+    <bundle>wrap:mvn:org.jbpm/jbpm-executor/${version.org.jbpm}$DynamicImport-Package=org.hibernate.*,javassist.*</bundle>
   </feature>
 
   <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
