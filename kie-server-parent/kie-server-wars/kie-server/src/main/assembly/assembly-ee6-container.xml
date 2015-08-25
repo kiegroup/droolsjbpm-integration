@@ -59,6 +59,8 @@
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>
 
+        <include>org.jbpm:jbpm-services-ejb-timer</include>
+
         <include>org.hibernate.common:hibernate-commons-annotations</include>
         <include>org.hibernate:hibernate-entitymanager</include>
         <include>org.hibernate:hibernate-core</include>
