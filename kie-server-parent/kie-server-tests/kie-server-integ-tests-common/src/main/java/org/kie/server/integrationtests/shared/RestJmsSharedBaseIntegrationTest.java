@@ -75,7 +75,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         addExtraCustomClasses(extraClasses);
         if (TestConfig.isLocalServer()) {
             configuration =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
+                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
             kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         } else {

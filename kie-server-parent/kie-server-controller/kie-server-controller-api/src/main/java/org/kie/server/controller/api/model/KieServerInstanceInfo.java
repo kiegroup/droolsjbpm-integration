@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "kie-server-instance")
+@XmlRootElement(name = "kie-server-instance-info")
 public class KieServerInstanceInfo {
 
     @XmlElement(name = "location")
