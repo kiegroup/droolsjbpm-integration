@@ -43,9 +43,9 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
     protected KieServicesClient createDefaultClient() {
         KieServicesConfiguration config;
         if (TestConfig.isLocalServer()) {
-            config = KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), null, null);
+            config = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
         } else {
-            config = KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+            config = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
         }
         config.setMarshallingFormat(marshallingFormat);
         return KieServicesFactory.newKieServicesClient(config);
