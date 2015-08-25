@@ -18,6 +18,7 @@
     <module>kie-server-controller-api</module>
     <module>kie-server-controller-impl</module>
     <module>kie-server-controller-rest</module>
+    <module>kie-server-controller-test-war</module>
   </modules>
 
 </project>

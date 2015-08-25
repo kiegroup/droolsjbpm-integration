@@ -44,7 +44,12 @@ public class TestConfig {
      * Property holding port number of embedded REST server.
      */
     private static Integer ALLOCATED_PORT;
+    /**
+     * Property holding port number of embedded REST server controller.
+     */
+    private static Integer CONTROLLER_ALLOCATED_PORT;
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
+    private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
 
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
     private static final StringTestParameter PASSWORD = new StringTestParameter("password", "usetheforce123@");
@@ -58,11 +63,11 @@ public class TestConfig {
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
 
     /**
-     * Get URL for HTTP services - like REST.
+     * Get kie-server URL for HTTP services - like REST.
      *
      * @return HTTP URL.
      */
-    public static String getHttpUrl() {
+    public static String getKieServerHttpUrl() {
         String httpUrl = "";
 
         if(PROVIDED_HTTP_URL.isParameterConfigured()) {
@@ -70,10 +75,41 @@ public class TestConfig {
             httpUrl = PROVIDED_HTTP_URL.getParameterValue();
         } else {
             // If HTTP URL is not provided by system property then we run tests locally on embedded server and URL is generated.
-            httpUrl = "http://localhost:" + getAllocatedPort() + "/server";
+            httpUrl = "http://localhost:" + getKieServerAllocatedPort() + "/server";
         }
 
         return httpUrl;
+    }
+
+    /**
+     * Get kie-servers controller URL for HTTP services - like REST.
+     *
+     * @return controller HTTP URL.
+     */
+    public static String getControllerHttpUrl() {
+        String httpUrl = "";
+
+        if(PROVIDED_CONTROLLER_HTTP_URL.isParameterConfigured()) {
+            // If HTTP URL is provided by system property then it is returned.
+            httpUrl = PROVIDED_CONTROLLER_HTTP_URL.getParameterValue();
+        } else {
+            // If HTTP URL is not provided by system property then we run tests locally on embedded server and URL is generated.
+            httpUrl = "http://localhost:" + getControllerAllocatedPort() + "/controller";
+        }
+
+        return httpUrl;
+    }
+
+    /**
+     * Check if controller should be present.
+     *
+     * @return controller HTTP URL.
+     */
+    public static boolean isControllerProvided() {
+        if(PROVIDED_CONTROLLER_HTTP_URL.isParameterConfigured()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -81,7 +117,7 @@ public class TestConfig {
      *
      * @return HTTP port number.
      */
-    public static Integer getAllocatedPort() {
+    public static Integer getKieServerAllocatedPort() {
         if(ALLOCATED_PORT == null) {
             try {
                 ServerSocket server = new ServerSocket(0);
@@ -95,6 +131,27 @@ public class TestConfig {
         }
 
         return ALLOCATED_PORT;
+    }
+
+    /**
+     * Get allocated port of embedded REST server.
+     *
+     * @return HTTP port number.
+     */
+    public static Integer getControllerAllocatedPort() {
+        if(CONTROLLER_ALLOCATED_PORT == null) {
+            try {
+                ServerSocket server = new ServerSocket(0);
+                CONTROLLER_ALLOCATED_PORT = server.getLocalPort();
+                server.close();
+            } catch (IOException e) {
+                // failed to dynamically allocate port, try to use hard coded one
+                CONTROLLER_ALLOCATED_PORT = 9689;
+            }
+            LOGGER.debug("Allocating port {}.", +CONTROLLER_ALLOCATED_PORT);
+        }
+
+        return CONTROLLER_ALLOCATED_PORT;
     }
 
     /**
@@ -118,7 +175,7 @@ public class TestConfig {
         boolean isLocalServer = true;
 
         // If there is configured HTTP URL or remoting URL then tests are run against it, otherwise local embedded server is used.
-        if(PROVIDED_HTTP_URL.isParameterConfigured() || REMOTING_URL.isParameterConfigured()) {
+        if(PROVIDED_HTTP_URL.isParameterConfigured() || REMOTING_URL.isParameterConfigured() || PROVIDED_CONTROLLER_HTTP_URL.isParameterConfigured()) {
             isLocalServer = false;
         }
 

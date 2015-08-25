@@ -178,7 +178,7 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
             String response = marshal(contentType, containerResource);
 
             logger.debug("Returning response for create container with id {} server instances: {}", containerId, response);
-            return createCorrectVariant(response, headers, Response.Status.CREATED);
+            return createCorrectVariant(response, headers, Response.Status.OK);
         } catch (KieServerControllerException e){
             return createCorrectVariant("Request failed to be processed due to" + e.getMessage(), headers, Response.Status.BAD_REQUEST);
         } catch (Exception e) {
@@ -233,7 +233,7 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
                     logger.debug("Server at {} is in online, sending notification to create container...", instanceInfo.getLocation());
                     try {
                         String uri = instanceInfo.getLocation() + "/containers/" + containerId;
-                        makeHttpDeleteRequestAndCreateCustomResponse(uri, null, null, getUser(), getPassword());
+                        makeHttpDeleteRequestAndCreateCustomResponse(uri, null, getUser(), getPassword());
                     } catch (Throwable e) {
                         logger.error("Unable to notify kie server instance at {} about deleted container {} due to {}"
                                 , instanceInfo.getLocation(), containerId, e.getMessage(), e );
@@ -260,9 +260,9 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password) {
+    protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = newRequest( uri, user, password ).body(body).delete();
+        KieRemoteHttpRequest request = newRequest( uri, user, password ).delete();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
