@@ -129,7 +129,6 @@ public class KieServerMDB
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void onMessage(Message message) {
         try {
             String username = null;

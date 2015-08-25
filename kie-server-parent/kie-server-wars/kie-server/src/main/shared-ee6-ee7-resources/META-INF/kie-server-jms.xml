@@ -15,6 +15,11 @@
         <entry name="java:jboss/exported/jms/queue/KIE.SERVER.RESPONSE" />
       </jms-queue>
 
+      <!-- Kie Server EXECUTOR queue -->
+      <jms-queue name="KIE.EXECUTOR">
+        <entry name="queue/KIE.EXECUTOR" />
+      </jms-queue>
+
     </jms-destinations>
   </hornetq-server>
 </messaging-deployment>

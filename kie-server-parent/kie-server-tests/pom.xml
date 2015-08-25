@@ -180,6 +180,10 @@
                   <zipUrlInstaller>
                     <url>${wildfly81x.download.url}</url>
                   </zipUrlInstaller>
+                  <systemProperties>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
                 </container>
                 <configuration>
                   <properties>
@@ -216,6 +220,10 @@
                   <zipUrlInstaller>
                     <url>${wildfly82x.download.url}</url>
                   </zipUrlInstaller>
+                  <systemProperties>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
                 </container>
                 <configuration>
                   <properties>
@@ -564,6 +572,10 @@
                   <zipUrlInstaller>
                     <url>${eap64x.download.url}</url>
                   </zipUrlInstaller>
+                  <systemProperties>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
                 </container>
                 <configuration>
                   <properties>

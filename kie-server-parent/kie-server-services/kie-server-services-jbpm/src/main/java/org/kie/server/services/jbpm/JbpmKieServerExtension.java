@@ -307,6 +307,22 @@ public class JbpmKieServerExtension implements KieServerExtension {
             return (T) kieContainerCommandService;
         }
 
+        Object [] services = {
+                deploymentService,
+                definitionService,
+                processService,
+                userTaskService,
+                runtimeDataService,
+                executorService,
+                context
+        };
+
+        for (Object service : services) {
+            if (serviceType.isAssignableFrom(service.getClass())) {
+                return (T) service;
+            }
+        }
+
         return null;
     }
 
