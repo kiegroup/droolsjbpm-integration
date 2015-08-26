@@ -94,8 +94,6 @@ public class JaxbRestRequestException {
         return writer.toString();
     }
     
-    // GETTER/SETTTERS ------------------------------------------------------------------------------------------------------------
-    
     public String getResult() {
         return message;
     }
@@ -104,14 +102,8 @@ public class JaxbRestRequestException {
         this.message = result;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
+    // GETTER/SETTTERS ------------------------------------------------------------------------------------------------------------
+    
     public Exception getCause() {
         return cause;
     }
@@ -121,6 +113,30 @@ public class JaxbRestRequestException {
         if( cause != null ) { 
             this.stackTrace = convertStackTraceToString(cause);
         }
+    }
+
+    public JaxbRequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus( JaxbRequestStatus status ) {
+        this.status = status;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl( String url ) {
+        this.url = url;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getStackTrace() {

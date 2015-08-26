@@ -129,12 +129,16 @@ public class JaxbTaskSummary implements TaskSummary {
         this.priority = taskSum.getPriority();
         this.skipable = taskSum.isSkipable();
         User actual = taskSum.getActualOwner();
-        if( actual != null ) { 
+        if( actual != null ) {
             this.actualOwnerId = actual.getId();
+        } else {
+            this.actualOwnerId = taskSum.getActualOwnerId();
         }
         User created = taskSum.getCreatedBy();
-        if( created != null ) { 
+        if( created != null ) {
            this.createdById = created.getId(); 
+        } else {
+            this.createdById = taskSum.getCreatedById();
         }
         this.createdOn = taskSum.getCreatedOn();
         this.activationTime = taskSum.getActivationTime();
