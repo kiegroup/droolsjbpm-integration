@@ -12,3 +12,7 @@
 # Repository wide ignore mac DS_Store files
 .DS_Store
 
+# These modules do not exist on the 6.2.x branch
+/kie-server-integ-tests-common/
+/kie-server-integ-tests-drools/
+/kie-server-integ-tests-jbpm/

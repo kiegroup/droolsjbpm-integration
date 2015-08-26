@@ -26,6 +26,6 @@ bitronix-default-config.properties
 # modules that don't exist in this branch
 /jbpm-human-task-war/
 
-# files used for external db testing
-jdbc_driver.jar
-db-settings.xml
+# These modules do not exist on the 6.2.x branch
+/kie-server-remote/
+/kie-server-wars/
