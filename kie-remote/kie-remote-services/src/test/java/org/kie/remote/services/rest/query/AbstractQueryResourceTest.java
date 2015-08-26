@@ -1,5 +1,6 @@
 package org.kie.remote.services.rest.query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +41,13 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
     protected static ObjectMapper jsonMapper = new ObjectMapper();
     protected static JaxbSerializationProvider jaxbClientMapper = ServerJaxbSerializationProvider.newInstance();
     protected static JaxbSerializationProvider jaxbServerMapper = ClientJaxbSerializationProvider.newInstance();
-   
+
     protected KieSession ksession;
     protected TaskService taskService;
     protected RuntimeManager runtimeManager;
     protected RuntimeEngine engine;
+
+    protected List<Long> procInstIds = new ArrayList<Long>();
 
     public AbstractQueryResourceTest() {
         super(true, true, "org.jbpm.domain");
@@ -93,6 +96,7 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
         ProcessInstance processInstance = ksession.startProcess(PROCESS_STRING_VAR_ID, params);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
+        procInstIds.add(procInstId);
         
         List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
         assertFalse( "No tasks found!", taskIds.isEmpty() );

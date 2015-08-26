@@ -304,6 +304,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Task getTaskByWorkItemId( long workItemId ) {
         GetTaskByWorkItemIdCommand cmd = new GetTaskByWorkItemIdCommand();
         cmd.setWorkItemId(workItemId);
+        cmd.setUserId(config.getUserName());
         return (Task) executeCommand(cmd);
     }
 
