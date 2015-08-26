@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -38,9 +39,21 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
 abstract public class AbstractKarafIntegrationTest {
 
     /**
-     * path to file containing container binary archive
+     * Path to file containing container binary archive.
      */
     public static final String PROP_KARAF_DISTRIBUTION_FILE = "karaf.dist.file";
+    
+    /**
+     * Maximal size of perm gen memory. For example "512M". This property
+     * is useful only in Java 7.
+     */
+    public static final String PROP_KARAF_MAXPERMSIZE = "karaf.maxpermsize";
+    
+    /**
+     * Whether to keep pax-exam runtime folder after the test execution is completed.
+     * It can be very useful for debugging to keep the content of runtime folder.
+     */
+    public static final String PROP_KEEP_RUNTIME_FOLDER = "karaf.keep.runtime.folder";
 
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
@@ -82,27 +95,45 @@ abstract public class AbstractKarafIntegrationTest {
     }
 
     public static Option getKarafDistributionOption() {
+        
+        List<Option> options = new ArrayList<Option>();
+        
         String karafVersion = getKarafVersion();
         logger.info("*** The karaf version is " + karafVersion + " ***");
 
         KarafDistributionBaseConfigurationOption karafConfiguration = karafDistributionConfiguration();
+        
+        /* Use default or custom container */
         if (System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) == null) {
             karafConfiguration.frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject());
         } else {
             File fuseDistributionFile = new File(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE));
             karafConfiguration.frameworkUrl("file:" + fuseDistributionFile.getAbsolutePath());
         }
-
-        return new DefaultCompositeOption(karafConfiguration
-                .karafVersion(karafVersion)
-                .name("Apache Karaf")
-                .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/")),
-                localMavenRepoOption(),
-                editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
+        
+        karafConfiguration
+            .karafVersion(karafVersion)
+            .name("Apache Karaf")
+            .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/"));
+        options.add(karafConfiguration);
+        
+        /* Set maximal perm space size */
+        if (System.getProperty(PROP_KARAF_MAXPERMSIZE) != null) {
+            options.add(vmOption("-XX:MaxPermSize=" + System.getProperty(PROP_KARAF_MAXPERMSIZE)));
+        }
+        
+        /* Keep pax exam runtime folder after the test execution is completed */
+        if (System.getProperty(PROP_KEEP_RUNTIME_FOLDER) != null) {
+            options.add(keepRuntimeFolder());
+        }
+        
+        options.add(localMavenRepoOption());
+        options.add(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
                         "http://repo1.maven.org/maven2@id=central," +
                         "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public"
                 ));
-
+        
+        return new DefaultCompositeOption(options.toArray(new Option[1]));
     }
 
     public static Option localMavenRepoOption() {
