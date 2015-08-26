@@ -16,13 +16,19 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.kie.remote.services.rest.jaxb.JavaCompilerTest.getClassFromSource;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -340,7 +346,7 @@ public class JaxbContextResolverTest {
     }
     
     @Test
-    public void requestDeploymentIdParsingTest() { 
+    public void requestDeploymentIdParsingTest() throws IOException { 
         // setup
        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
     
@@ -365,10 +371,23 @@ public class JaxbContextResolverTest {
        parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
        assertEquals( "runtime operation URL: deployment id", deploymentId, parsedDepId);
        
-       requestUri = "/rest/task/execute?deploymentId=" + deploymentId;
+       requestUri = "/rest/execute?deploymentId=" + deploymentId;
        doReturn(requestUri).when(mockRequest).getRequestURI();
        doReturn(deploymentId).when(mockRequest).getParameter("deploymentId");
        parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
        assertEquals( "task operation URL (with parameter): deployment id", deploymentId, parsedDepId);
+       
+       mockRequest = mock(HttpServletRequest.class);
+       requestUri = "/rest/execute" + deploymentId;
+       doReturn(requestUri).when(mockRequest).getRequestURI();
+       String xmlRequestFile = "/command-request.xml";
+       InputStream xmlIn = getClass().getResourceAsStream(xmlRequestFile);
+       assertNotNull( "Unable to open or find [" + xmlRequestFile + "]", xmlIn);
+       BufferedReader reader = new BufferedReader(new InputStreamReader(xmlIn));
+       when(mockRequest.getReader()).thenReturn(reader);
+       
+       parsedDepId = DynamicJaxbContextFilter.getDeploymentId(mockRequest);
+       assertEquals( "rest execute with command-request xml", deploymentId, parsedDepId);
+       
     }
 }
