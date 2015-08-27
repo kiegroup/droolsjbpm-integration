@@ -41,12 +41,13 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/" + resource.getContainerId());
+            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/" + resource.getContainerId());
             response = clientRequest.body(
                     getMediaType(), resource).accept(getMediaType()).put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
@@ -58,12 +59,13 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     public void testCreateContainerEmptyBody() throws Exception {
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
-            ClientRequest clientRequest = newRequest(TestConfig.getHttpUrl() + "/containers/empty-body-container");
+            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/empty-body-container");
             response = clientRequest.body(
                     getMediaType(), "").accept(getMediaType()).put(
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
         }

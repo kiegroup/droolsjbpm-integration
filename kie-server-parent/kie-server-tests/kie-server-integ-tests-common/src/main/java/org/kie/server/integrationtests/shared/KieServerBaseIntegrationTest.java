@@ -31,17 +31,22 @@ import java.util.regex.Pattern;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
+import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.AfterClass;
@@ -61,13 +66,16 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.controller.api.model.KieServerInstance;
+import org.kie.server.controller.api.model.KieServerInstanceList;
+import org.kie.server.controller.rest.RestKieServerControllerAdminImpl;
+import org.kie.server.controller.rest.RestKieServerControllerImpl;
 import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +84,12 @@ public abstract class KieServerBaseIntegrationTest {
     protected static Logger logger = LoggerFactory.getLogger(KieServerBaseIntegrationTest.class);
 
     protected static TJWSEmbeddedJaxrsServer server;
+    protected static TJWSEmbeddedJaxrsServer controller;
     protected static MavenRepository repository;
+
+    // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
+    // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
+    private static KieServerImpl kieServer;
 
     protected KieServicesClient client;
     /*
@@ -92,8 +105,9 @@ public abstract class KieServerBaseIntegrationTest {
     @BeforeClass
     public static void setupClass() throws Exception {
         if (TestConfig.isLocalServer()) {
-
-            startServer();
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
+            startKieController();
+            startKieServer();
         }
         setupCustomSettingsXml();
         warmUpServer();
@@ -132,13 +146,15 @@ public abstract class KieServerBaseIntegrationTest {
     public void setup() throws Exception {
         startClient();
         disposeAllContainers();
+        disposeAllServerInstances();
     }
 
     @AfterClass
     public static void tearDown() {
         if (TestConfig.isLocalServer()) {
-            server.stop();
-            System.clearProperty("java.naming.factory.initial");
+            stopKieServer();
+            stopKieController();
+            System.clearProperty(Context.INITIAL_CONTEXT_FACTORY);
         }
     }
 
@@ -153,6 +169,26 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
+    protected void disposeAllServerInstances() throws Exception {
+        // Is done just if we run local server (controller always on) or controller is deployed.
+        if (TestConfig.isLocalServer() || TestConfig.isControllerProvided()) {
+            ClientRequest clientRequest = newRequest(TestConfig.getControllerHttpUrl() + "/admin/servers");
+            ClientResponse<KieServerInstanceList> responseList = clientRequest.accept(MediaType.APPLICATION_XML_TYPE).get(KieServerInstanceList.class);
+
+            assertEquals(Response.Status.OK.getStatusCode(), responseList.getStatus());
+            KieServerInstance[] instanceList = responseList.getEntity().getKieServerInstances();
+
+            if (instanceList != null && instanceList.length > 0) {
+                for (KieServerInstance kieServerInstance : instanceList) {
+                    clientRequest = newRequest(TestConfig.getControllerHttpUrl() + "/admin/server/" + kieServerInstance.getIdentifier());
+                    ClientResponse<KieServerInstanceList> responseDelete = clientRequest.accept(MediaType.APPLICATION_XML_TYPE).delete(KieServerInstanceList.class);
+                    assertEquals(Response.Status.NO_CONTENT.getStatusCode(), responseDelete.getStatus());
+                    responseDelete.releaseConnection();
+                }
+            }
+        }
+    }
+
     private void startClient() throws Exception {
         client = createDefaultClient();
     }
@@ -161,21 +197,57 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static SimpleDateFormat serverIdSuffixDateFormat = new SimpleDateFormat("yyyy-MM-DD-HHmmss_SSS");
 
-    private static void startServer() throws Exception {
-        System.setProperty("java.naming.factory.initial", "bitronix.tm.jndi.BitronixInitialContextFactory");
+    protected static void startKieController() {
+        if (controller != null) {
+            throw new RuntimeException("Kie execution controller is already created!");
+        }
+
+        controller = new TJWSEmbeddedJaxrsServer();
+        controller.setPort(TestConfig.getControllerAllocatedPort());
+        controller.start();
+        controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerImpl());
+        controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerAdminImpl());
+        controller.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
+    }
+
+    protected static void stopKieController() {
+        if (controller == null) {
+            throw new RuntimeException("Kie execution controller is already stopped!");
+        }
+        controller.stop();
+        controller = null;
+    }
+
+    protected static void startKieServer() {
+        if (server != null) {
+            throw new RuntimeException("Kie execution server is already created!");
+        }
+
         System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm-ds");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
-        server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(TestConfig.getAllocatedPort());
-        server.start();
-        KieServerEnvironment.setServerId("target/" + KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));
-        KieServerEnvironment.setServerName("KieServer");
-        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
+        // URL logic unification - controller URL with resource path?
+        System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, TestConfig.getControllerHttpUrl().replace("/controller", ""));
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER, TestConfig.getUsername());
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
+        System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getKieServerHttpUrl());
+        System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
 
-        KieServerImpl kieServer = KieServerLocator.getInstance();
+        // Register server id if wasn't done yet
+        if (KieServerEnvironment.getServerId() == null) {
+            KieServerEnvironment.setServerId(KieServerBaseIntegrationTest.class.getSimpleName() + "@" + serverIdSuffixDateFormat.format(new Date()));
+            KieServerEnvironment.setServerName("KieServer");
+        }
+
+        server = new TJWSEmbeddedJaxrsServer();
+        server.setPort(TestConfig.getKieServerAllocatedPort());
+        server.start();
+
+        kieServer = new KieServerImpl();
+        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl(kieServer));
+
         List<KieServerExtension> extensions = kieServer.getServerExtensions();
 
         for (KieServerExtension extension : extensions) {
@@ -183,10 +255,18 @@ public abstract class KieServerBaseIntegrationTest {
             for (Object component : components) {
                 server.getDeployment().getRegistry().addSingletonResource(component);
             }
-
         }
 
         server.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
+    }
+
+    protected static void stopKieServer() {
+        if (server == null) {
+            throw new RuntimeException("Kie execution server is already stopped!");
+        }
+        kieServer.destroy();
+        server.stop();
+        server = null;
     }
 
     protected static void buildAndDeployMavenProject(String basedir) {
@@ -206,7 +286,7 @@ public abstract class KieServerBaseIntegrationTest {
             // just read-only list)
             mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "install"));
         } else {
-            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "clean", "deploy"));
+            mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
         }
         // use custom settings.xml file, if one specified
         String kjarsBuildSettingsXml = TestConfig.getKjarsBuildSettingsXml();
@@ -303,6 +383,12 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
+    protected static void assertNullOrEmpty(String errorMessage, Object[] result ) {
+        if (result != null) {
+            assertTrue(errorMessage, result.length == 0);
+        }
+    }
+
     protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
         try {
             InitialContext context = TestConfig.getInitialRemoteContext();
@@ -322,9 +408,11 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     protected static KieServicesConfiguration createKieServicesRestConfiguration() {
-        return KieServicesFactory.newRestConfiguration(TestConfig.getHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+        return KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
     }
 
+    private static HttpClient httpClient;
+    
     protected ClientRequest newRequest(String uriString) {
         URI uri;
         try {
@@ -332,18 +420,25 @@ public abstract class KieServerBaseIntegrationTest {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Malformed request URI was specified: '" + uriString + "'!", e);
         }
-        if (TestConfig.isLocalServer()) {
-            return new ClientRequest(uriString);
-        } else {
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(
-                    new AuthScope(uri.getHost(), uri.getPort()),
-                    new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
-            );
-            HttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
-            ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(client);
-            return new ClientRequest(uriString, executor);
+        if (httpClient == null) {
+            if (TestConfig.isLocalServer()) {
+                RequestConfig requestConfig = RequestConfig.custom()
+                                                .setConnectionRequestTimeout(1000)
+                                                .setConnectTimeout(1000)
+                                                .setSocketTimeout(1000)
+                                                .build();
+                httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+            } else {
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(
+                        new AuthScope(uri.getHost(), uri.getPort()),
+                        new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
+                );
+                httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+            }
         }
+        ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(httpClient);
+        return new ClientRequest(uriString, executor);
     }
 
     public static void cleanupSingletonSessionId() {

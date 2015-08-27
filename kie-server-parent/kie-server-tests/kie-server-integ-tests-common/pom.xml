@@ -51,6 +51,14 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-rest</artifactId>
+    </dependency>
 
     <!-- Logging -->
     <dependency>
