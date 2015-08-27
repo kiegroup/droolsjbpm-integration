@@ -94,6 +94,11 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             throw new KieServerControllerException("KieServerInstance not found with id: " + id);
         }
 
+        KieContainerResource kieContainerResource = findKieContainer(kieServerInstance, containerId);
+        if (kieContainerResource != null) {
+            throw new KieServerControllerException("KieContainer already exists with id: " + id);
+        }
+
         Set<KieContainerResource> containers = kieServerInstance.getKieServerSetup().getContainers();
         if (containers == null) {
             containers = new HashSet<KieContainerResource>();
@@ -163,9 +168,13 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             // delete if found
             if (containerResourceToDel != null) {
                 containers.remove(containerResourceToDel);
+
+                notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+            } else {
+                throw new KieServerControllerException("KieContainer not found with id: " + id);
             }
         }
-        notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+
     }
 
     @Override

@@ -157,15 +157,14 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         controllerClient.createKieServerInstance(kieServerInfo.getResult());
 
         KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
-        // TODO Do we need to set kie container status here?
-        containerToDeploy.setStatus(KieContainerStatus.STARTED);
         KieContainerResource deployedContainer = controllerClient.createContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID, containerToDeploy);
 
         assertNotNull(deployedContainer);
         assertEquals(CONTAINER_ID, deployedContainer.getContainerId());
         assertEquals(containerToDeploy.getReleaseId(), deployedContainer.getReleaseId());
-        // TODO what container status should be returned?
-        assertEquals(KieContainerStatus.STARTED, deployedContainer.getStatus());
+        assertEquals(KieContainerStatus.STOPPED, deployedContainer.getStatus());
+
+        controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         startKieServer();
 
@@ -190,8 +189,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         // Create container.
         controllerClient.createKieServerInstance(kieServerInfo.getResult());
         KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
-        // TODO Do we need to set kie container status here?
-        containerToDeploy.setStatus(KieContainerStatus.STARTED);
         controllerClient.createContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID, containerToDeploy);
 
         // Check that there is one container deployed.
