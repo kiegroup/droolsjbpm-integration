@@ -44,6 +44,7 @@ import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.KieServerRuntimeException;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -93,12 +94,17 @@ public class KieServerImpl {
         KieServerController kieController = getController();
         // try to load container information from available controllers if any...
         KieServerInfo kieServerInfo = getInfoInternal();
-        KieServerSetup kieServerSetup = kieController.connect(kieServerInfo);
+        Set<KieContainerResource> containers = null;
+        KieServerSetup kieServerSetup = null;
+        try {
+            kieServerSetup = kieController.connect(kieServerInfo);
 
-        Set<KieContainerResource> containers = kieServerSetup.getContainers();
-        if (containers == null || containers.isEmpty()) {
+            containers = kieServerSetup.getContainers();
+
+        } catch (KieServerRuntimeException e) {
             // if no containers from controller use local storage
             containers = currentState.getContainers();
+            kieServerSetup = new KieServerSetup();
         }
         for (KieContainerResource containerResource : containers) {
             if (containerResource.getStatus().equals(KieContainerStatus.STARTED)) {

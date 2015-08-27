@@ -38,6 +38,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.KieServerRuntimeException;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +130,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         for (String controllerUrl : controllers ) {
 
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                String connectAndSyncUrl = controllerUrl + "/" + KieServerEnvironment.getServerId();
+                String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
 
                 String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
                 String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
@@ -153,7 +154,7 @@ public class DefaultRestControllerImpl implements KieServerController {
             }
         }
 
-        return new KieServerSetup();
+        throw new KieServerRuntimeException("Unable to connect to any controller");
     }
 
     @Override
@@ -168,7 +169,7 @@ public class DefaultRestControllerImpl implements KieServerController {
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
                 String connectAndSyncUrl = null;
                 try {
-                    connectAndSyncUrl = controllerUrl + "/controller/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
+                    connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
 
                     String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
                     String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
