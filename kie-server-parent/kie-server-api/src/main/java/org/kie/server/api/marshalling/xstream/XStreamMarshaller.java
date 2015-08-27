@@ -15,6 +15,8 @@
 
 package org.kie.server.api.marshalling.xstream;
 
+import java.util.Set;
+
 import com.thoughtworks.xstream.XStream;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -44,7 +46,7 @@ public class XStreamMarshaller
     private XStream xstream;
     private final ClassLoader classLoader;
 
-    public XStreamMarshaller( final ClassLoader classLoader ) {
+    public XStreamMarshaller( final Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.classLoader = classLoader;
         this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) );
         this.xstream.setClassLoader( classLoader );
@@ -67,6 +69,12 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( KieContainerStatus.class );
         this.xstream.processAnnotations( KieScannerResource.class );
         this.xstream.processAnnotations( KieServerInfo.class );
+
+        if (classes != null) {
+            for (Class<?> clazz : classes) {
+                this.xstream.processAnnotations( clazz );
+            }
+        }
     }
 
     @Override

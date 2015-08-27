@@ -34,7 +34,7 @@ public class MarshallerFactory {
     public static Marshaller getMarshaller(Set<Class<?>> classes, MarshallingFormat format, ClassLoader classLoader) {
         switch ( format ) {
             case XSTREAM:
-                return new XStreamMarshaller( classLoader );
+                return new XStreamMarshaller( classes, classLoader );
             case JAXB:
                 return new JaxbMarshaller(classes, classLoader); // has to be implemented
             case JSON:
