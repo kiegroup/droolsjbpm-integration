@@ -129,7 +129,7 @@ public class DefaultRestControllerImpl implements KieServerController {
         for (String controllerUrl : controllers ) {
 
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                String connectAndSyncUrl = controllerUrl + "/controller/server/" + KieServerEnvironment.getServerId();
+                String connectAndSyncUrl = controllerUrl + "/" + KieServerEnvironment.getServerId();
 
                 String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
                 String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
@@ -146,6 +146,7 @@ public class DefaultRestControllerImpl implements KieServerController {
                     break;
                 } catch (Exception e) {
                     // let's check all other controllers in case of running in cluster of controllers
+                    logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage());
                     logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                 }
 

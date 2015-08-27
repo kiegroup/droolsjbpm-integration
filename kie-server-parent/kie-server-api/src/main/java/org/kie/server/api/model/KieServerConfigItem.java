@@ -51,7 +51,8 @@ public class KieServerConfigItem {
     }
 
     public String getValue() {
-        return value;
+
+        return System.getProperty(name, value);
     }
 
     public void setValue(String value) {
