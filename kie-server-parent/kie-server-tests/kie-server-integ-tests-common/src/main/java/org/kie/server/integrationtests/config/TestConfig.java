@@ -75,10 +75,19 @@ public class TestConfig {
             httpUrl = PROVIDED_HTTP_URL.getParameterValue();
         } else {
             // If HTTP URL is not provided by system property then we run tests locally on embedded server and URL is generated.
-            httpUrl = "http://localhost:" + getKieServerAllocatedPort() + "/server";
+            httpUrl = getEmbeddedKieServerHttpUrl();
         }
 
         return httpUrl;
+    }
+
+    /**
+     * Get embedded kie-server URL for HTTP services - like REST.
+     *
+     * @return HTTP URL.
+     */
+    public static String getEmbeddedKieServerHttpUrl() {
+        return "http://localhost:" + getKieServerAllocatedPort() + "/server";
     }
 
     /**
