@@ -2,6 +2,9 @@ package org.kie.server.controller.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -16,11 +19,18 @@ import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerInstance;
+import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
+import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.controller.api.model.KieServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +42,9 @@ public class KieServerControllerClient {
     private String controllerBaseUrl;
     private MarshallingFormat format = MarshallingFormat.JAXB;
     private CloseableHttpClient httpClient;
+    protected Marshaller marshaller;
 
-    public KieServerControllerClient( String controllerBaseUrl, String login, String password ) {
+    public KieServerControllerClient( String controllerBaseUrl, String login, String password) {
         URL url;
         try {
             url = new URL(controllerBaseUrl);
@@ -52,6 +63,8 @@ public class KieServerControllerClient {
         }
         this.httpClient = httpClientBuilder.build();
         this.executor = new ApacheHttpClient4Executor(httpClient);
+
+
     }
 
     public KieServerInstance getKieServerInstance(String kieServerInstanceId) {
@@ -82,6 +95,14 @@ public class KieServerControllerClient {
         makeDeleteRequest(controllerBaseUrl + "/admin/server/" + kieServerInstanceId + "/containers/" + containerId);
     }
 
+    public void startContainer(String kieServerInstanceId, String containerId) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + "/admin/server/" + kieServerInstanceId + "/containers/" + containerId + "/status/started", "", null);
+    }
+
+    public void stopContainer(String kieServerInstanceId, String containerId) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + "/admin/server/" + kieServerInstanceId + "/containers/" + containerId + "/status/stopped", "", null);
+    }
+
     private <T> T makeGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         ClientRequest clientRequest = new ClientRequest(uri, executor);
         ClientResponse<T> response;
@@ -90,7 +111,7 @@ public class KieServerControllerClient {
             response = clientRequest.accept(getMediaType(format)).get(resultType);
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return response.getEntity();
+                return deserialize(response, resultType);
             } else {
                 response.releaseConnection();
                 throw createExceptionForUnexpectedResponseCode( clientRequest, response );
@@ -127,7 +148,28 @@ public class KieServerControllerClient {
                     .body(getMediaType(format), bodyObject).put(resultType);
 
             if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
-                return response.getEntity();
+                return deserialize(response, resultType);
+            } else {
+                response.releaseConnection();
+                throw createExceptionForUnexpectedResponseCode( clientRequest, response );
+            }
+
+        } catch (Exception e) {
+            throw createExceptionForUnexpectedFailure(clientRequest, e);
+        }
+    }
+
+    private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
+        ClientRequest clientRequest = new ClientRequest(uri, executor);
+        ClientResponse<T> response;
+
+        try {
+            response = clientRequest.accept(getMediaType(format))
+                    .body(getMediaType(format), bodyObject).post(resultType);
+
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() || response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
+
+                return deserialize(response, resultType);
             } else {
                 response.releaseConnection();
                 throw createExceptionForUnexpectedResponseCode( clientRequest, response );
@@ -179,6 +221,14 @@ public class KieServerControllerClient {
 
     public void setMarshallingFormat(MarshallingFormat format) {
         this.format = format;
+        Set<Class<?>> controllerClasses = new HashSet<Class<?>>();
+        controllerClasses.add(KieServerInstance.class);
+        controllerClasses.add(KieServerInstanceList.class);
+        controllerClasses.add(KieServerInstanceInfo.class);
+        controllerClasses.add(KieServerSetup.class);
+        controllerClasses.add(KieServerStatus.class);
+
+        this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerControllerClient.class.getClassLoader());
     }
 
     private String getMediaType( MarshallingFormat format ) {
@@ -186,6 +236,25 @@ public class KieServerControllerClient {
             case JAXB: return MediaType.APPLICATION_XML;
             case JSON: return MediaType.APPLICATION_JSON;
             default: return MediaType.APPLICATION_XML;
+        }
+    }
+
+    protected <T> T deserialize(ClientResponse<T> response, Class<T> type) {
+        try {
+            if(type == null) {
+                return null;
+            }
+            String content = response.getEntity(String.class);
+            logger.debug("About to deserialize content: \n '{}' \n into type: '{}'", content, type);
+            if (content == null || content.isEmpty()) {
+                return null;
+            }
+
+            return marshaller.unmarshall( content, type );
+        } catch ( MarshallingException e ) {
+            throw new RuntimeException( "Error while deserializing data received from server!", e );
+        } finally {
+            response.releaseConnection();
         }
     }
 }

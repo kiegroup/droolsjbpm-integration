@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.KieServerControllerAdmin;
@@ -99,10 +100,47 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             kieServerInstance.getKieServerSetup().setContainers(containers);
         }
         containers.add(container);
+        container.setStatus(KieContainerStatus.STOPPED);
 
         notifyKieServersOnCreateContainer(kieServerInstance, container);
 
         return container;
+    }
+
+    @Override
+    public void startContainer(String id, String containerId) {
+
+        KieServerInstance kieServerInstance = this.storage.load(id);
+        if (kieServerInstance == null) {
+            throw new KieServerControllerException("KieServerInstance not found with id: " + id);
+        }
+
+        KieContainerResource kieContainerResource = findKieContainer(kieServerInstance, containerId);
+        if (kieContainerResource != null) {
+            kieContainerResource.setStatus(KieContainerStatus.STARTED);
+
+            this.storage.update(kieServerInstance);
+
+            notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+        }
+    }
+
+    @Override
+    public void stopContainer(String id, String containerId) {
+        KieServerInstance kieServerInstance = this.storage.load(id);
+        if (kieServerInstance == null) {
+            throw new KieServerControllerException("KieServerInstance not found with id: " + id);
+        }
+
+        KieContainerResource kieContainerResource = findKieContainer(kieServerInstance, containerId);
+        if (kieContainerResource != null) {
+            kieContainerResource.setStatus(KieContainerStatus.STOPPED);
+
+            this.storage.update(kieServerInstance);
+
+            notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+        }
+
     }
 
     @Override
@@ -163,4 +201,21 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
     public abstract void notifyKieServersOnCreateContainer(KieServerInstance kieServerInstance, KieContainerResource container);
 
     public abstract void notifyKieServersOnDeleteContainer(KieServerInstance kieServerInstance, String containerId);
+
+    protected KieContainerResource findKieContainer(KieServerInstance kieServerInstance, String containerId) {
+
+
+        Set<KieContainerResource> containers = kieServerInstance.getKieServerSetup().getContainers();
+        if (containers != null) {
+
+            for (KieContainerResource containerResource : containers) {
+                if (containerResource.getContainerId().equals(containerId)) {
+
+                    return containerResource;
+                }
+            }
+        }
+
+        return null;
+    }
 }

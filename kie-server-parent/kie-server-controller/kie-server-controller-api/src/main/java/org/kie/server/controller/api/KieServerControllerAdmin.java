@@ -82,4 +82,20 @@ public interface KieServerControllerAdmin {
      * @param containerId container identifier
      */
     KieContainerResource getContainer(String id, String containerId);
+
+    /**
+     * Starts container within given kie server(s)
+     * @param id kie server identifier
+     * @param containerId container identifier
+     * @return
+     */
+    void startContainer(String id, String containerId);
+
+    /**
+     * Starts container within given kie server(s)
+     * @param id kie server identifier
+     * @param containerId container identifier
+     * @return
+     */
+    void stopContainer(String id, String containerId);
 }

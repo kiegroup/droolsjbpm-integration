@@ -197,7 +197,40 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertNotNull(containerResponseEntity);
         assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
         assertEquals(releaseId, containerResponseEntity.getReleaseId());
-        // Should be good if status was returned?
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+    }
+
+
+    @Test
+    public void testStartAndStopContainer() throws Exception {
+        // Create kie server instance connection in controller.
+        controllerClient.createKieServerInstance(kieServerInfo);
+
+        // Deploy container for kie server instance.
+        KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
+        controllerClient.createContainer(kieServerInfo.getServerId(), CONTAINER_ID, containerToDeploy);
+
+        // Get container using kie controller.
+        KieContainerResource containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertNotNull(containerResponseEntity);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
+        assertEquals(releaseId, containerResponseEntity.getReleaseId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+
+        controllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertNotNull(containerResponseEntity);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
+        assertEquals(releaseId, containerResponseEntity.getReleaseId());
         assertEquals(KieContainerStatus.STARTED, containerResponseEntity.getStatus());
+
+        controllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+
+        containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertNotNull(containerResponseEntity);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
+        assertEquals(releaseId, containerResponseEntity.getReleaseId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
     }
 }

@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -158,6 +159,47 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
 
             logger.debug("Returning response for create container with id {} server instances: {}", containerId, response);
             return createCorrectVariant(response, headers, Response.Status.CREATED);
+        } catch (KieServerControllerException e){
+            return createCorrectVariant("Request failed to be processed due to" + e.getMessage(), headers, Response.Status.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Create container failed due to {}", e.getMessage(), e);
+            return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @POST
+    @Path("server/{id}/containers/{containerId}/status/started")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response startContainer( @Context HttpHeaders headers, @PathParam("id") String id, @PathParam("containerId") String containerId) {
+        String contentType = getContentType(headers);
+        try {
+
+            startContainer(id, containerId);
+
+            logger.debug("Returning response for start container with id {} server instances: {}", containerId, id);
+            return createCorrectVariant("", headers, Response.Status.OK);
+        } catch (KieServerControllerException e){
+            return createCorrectVariant("Request failed to be processed due to" + e.getMessage(), headers, Response.Status.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Create container failed due to {}", e.getMessage(), e);
+            return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @POST
+    @Path("server/{id}/containers/{containerId}/status/stopped")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response stopContainer( @Context HttpHeaders headers, @PathParam("id") String id, @PathParam("containerId") String containerId) {
+        String contentType = getContentType(headers);
+        try {
+
+            stopContainer(id, containerId);
+
+            logger.debug("Returning response for stop container with id {} server instances: {}", containerId, id);
+            return createCorrectVariant("", headers, Response.Status.OK);
         } catch (KieServerControllerException e){
             return createCorrectVariant("Request failed to be processed due to" + e.getMessage(), headers, Response.Status.BAD_REQUEST);
         } catch (Exception e) {

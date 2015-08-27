@@ -33,7 +33,7 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB}, {MarshallingFormat.JSON}, {MarshallingFormat.XSTREAM}});
+        return Arrays.asList(new Object[][]{{MarshallingFormat.JAXB}, {MarshallingFormat.JSON}});
     }
 
     @Parameterized.Parameter
