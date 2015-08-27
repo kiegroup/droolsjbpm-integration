@@ -31,6 +31,8 @@ import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
+
+import org.kie.server.controller.client.exception.UnexpectedResponseCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,16 +111,15 @@ public class KieServerControllerClient {
 
         try {
             response = clientRequest.accept(getMediaType(format)).get(resultType);
-
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
-                return deserialize(response, resultType);
-            } else {
-                response.releaseConnection();
-                throw createExceptionForUnexpectedResponseCode( clientRequest, response );
-            }
-
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
+        }
+
+        if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
+            return deserialize(response, resultType);
+        } else {
+            response.releaseConnection();
+            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
         }
     }
 
@@ -129,13 +130,12 @@ public class KieServerControllerClient {
         try {
             response = clientRequest.accept(getMediaType(format)).delete();
             response.releaseConnection();
-
-            if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() ) {
-                throw createExceptionForUnexpectedResponseCode( clientRequest, response );
-            }
-
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
+        }
+
+        if ( response.getStatus() != Response.Status.NO_CONTENT.getStatusCode() ) {
+            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
         }
     }
 
@@ -146,16 +146,15 @@ public class KieServerControllerClient {
         try {
             response = clientRequest.accept(getMediaType(format))
                     .body(getMediaType(format), bodyObject).put(resultType);
-
-            if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
-                return deserialize(response, resultType);
-            } else {
-                response.releaseConnection();
-                throw createExceptionForUnexpectedResponseCode( clientRequest, response );
-            }
-
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
+        }
+
+        if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
+            return deserialize(response, resultType);
+        } else {
+            response.releaseConnection();
+            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
         }
     }
 
@@ -167,16 +166,16 @@ public class KieServerControllerClient {
             response = clientRequest.accept(getMediaType(format))
                     .body(getMediaType(format), bodyObject).post(resultType);
 
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() || response.getStatus() == Response.Status.CREATED.getStatusCode() ) {
-
-                return deserialize(response, resultType);
-            } else {
-                response.releaseConnection();
-                throw createExceptionForUnexpectedResponseCode( clientRequest, response );
-            }
-
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
+        }
+
+        if ( response.getStatus() == Response.Status.CREATED.getStatusCode() ||
+              response.getStatus() == Response.Status.OK.getStatusCode() ) {
+            return deserialize(response, resultType);
+        } else {
+            response.releaseConnection();
+            throw createExceptionForUnexpectedResponseCode( clientRequest, response );
         }
     }
 
@@ -186,7 +185,7 @@ public class KieServerControllerClient {
         String summaryMessage = "Unexpected HTTP response code when requesting URI '" + getClientRequestUri(request) + "'! Response code: " +
                 response.getStatus();
         logger.debug( summaryMessage);
-        return new RuntimeException(summaryMessage);
+        return new UnexpectedResponseCodeException(response.getStatus(), summaryMessage);
     }
 
     private RuntimeException createExceptionForUnexpectedFailure(

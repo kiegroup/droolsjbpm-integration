@@ -76,7 +76,6 @@ import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +86,10 @@ public abstract class KieServerBaseIntegrationTest {
     protected static TJWSEmbeddedJaxrsServer server;
     protected static TJWSEmbeddedJaxrsServer controller;
     protected static MavenRepository repository;
+
+    // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
+    // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
+    private static KieServerImpl kieServer;
 
     protected KieServicesClient client;
     /*
@@ -227,6 +230,8 @@ public abstract class KieServerBaseIntegrationTest {
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
         // URL logic unification - controller URL with resource path?
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, TestConfig.getControllerHttpUrl().replace("/controller", ""));
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER, TestConfig.getUsername());
+        System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
 
@@ -239,9 +244,10 @@ public abstract class KieServerBaseIntegrationTest {
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(TestConfig.getKieServerAllocatedPort());
         server.start();
-        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl());
 
-        KieServerImpl kieServer = KieServerLocator.getInstance();
+        kieServer = new KieServerImpl();
+        server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl(kieServer));
+
         List<KieServerExtension> extensions = kieServer.getServerExtensions();
 
         for (KieServerExtension extension : extensions) {
@@ -249,7 +255,6 @@ public abstract class KieServerBaseIntegrationTest {
             for (Object component : components) {
                 server.getDeployment().getRegistry().addSingletonResource(component);
             }
-
         }
 
         server.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
@@ -259,6 +264,7 @@ public abstract class KieServerBaseIntegrationTest {
         if (server == null) {
             throw new RuntimeException("Kie execution server is already stopped!");
         }
+        kieServer.destroy();
         server.stop();
         server = null;
     }

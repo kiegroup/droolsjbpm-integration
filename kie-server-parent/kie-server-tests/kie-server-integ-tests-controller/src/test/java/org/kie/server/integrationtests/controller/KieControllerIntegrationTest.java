@@ -31,6 +31,7 @@ import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.api.model.KieServerStatus;
+import org.kie.server.controller.client.exception.UnexpectedResponseCodeException;
 
 public class KieControllerIntegrationTest extends KieControllerBaseTest {
 
@@ -75,7 +76,22 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
-    public void testDeleteKieServerInstance() throws Exception {
+    public void testCreateDuplicitKieServerInstance() {
+        // Create kie server instance in controller.
+        KieServerInstance serverInstance = controllerClient.createKieServerInstance(kieServerInfo);
+        assertNotNull(serverInstance);
+
+        try {
+            // Try to create same kie server instance.
+            controllerClient.createKieServerInstance(kieServerInfo);
+            fail("Should throw exception about kie server instance already created.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testDeleteKieServerInstance() {
         // Create kie server instance in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
 
@@ -96,7 +112,18 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
-    public void testGetKieServerInstance() throws Exception {
+    public void testDeleteNotExistingKieServerInstance() {
+        try {
+            // Try to delete not existing kie server instance.
+            controllerClient.deleteKieServerInstance(kieServerInfo.getServerId());
+            fail("Should throw exception about kie server instance not existing.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testGetKieServerInstance() {
         // Create kie server instance in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
 
@@ -120,7 +147,18 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
-    public void testListKieServerInstances() throws Exception {
+    public void testGetNotExistingKieServerInstance() {
+        try {
+            // Try to get not existing kie server instance.
+            controllerClient.getKieServerInstance(kieServerInfo.getServerId());
+            fail("Should throw exception about kie server instance not existing.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testListKieServerInstances() {
         // Create kie server instance in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
 
@@ -155,7 +193,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
-    public void testContainerHandling() throws Exception {
+    public void testContainerHandling() {
         // Create kie server instance connection in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
 
@@ -184,7 +222,61 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
-    public void testGetContainer() throws Exception {
+    public void testCreateContainerOnNotExistingKieServerInstance() {
+        // Try to create container using kie controller without created kie server instance.
+        KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
+        try {
+            controllerClient.createContainer(kieServerInfo.getServerId(), CONTAINER_ID, containerToDeploy);
+            fail("Should throw exception about kie server instance not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testCreateDuplicitContainer() {
+        // Create kie server instance connection in controller.
+        controllerClient.createKieServerInstance(kieServerInfo);
+
+        // Create container using kie controller.
+        KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
+        KieContainerResource deployedContainer = controllerClient.createContainer(kieServerInfo.getServerId(), CONTAINER_ID, containerToDeploy);
+
+        assertNotNull(deployedContainer);
+        assertEquals(CONTAINER_ID, deployedContainer.getContainerId());
+        assertEquals(containerToDeploy.getReleaseId(), deployedContainer.getReleaseId());
+
+        try {
+            // Try to create same container.
+            controllerClient.createContainer(kieServerInfo.getServerId(), CONTAINER_ID, containerToDeploy);
+            fail("Should throw exception about container being created already.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testDeleteNotExistingContainer() {
+        // Try to dispose not existing container using kie controller without created kie server instance.
+        try {
+            controllerClient.disposeContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about kie server instance not exists.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+
+        controllerClient.createKieServerInstance(kieServerInfo);
+        // Try to dispose not existing container using kie controller with created kie server instance.
+        try {
+            controllerClient.disposeContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container not exists.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testGetContainer() {
         // Create kie server instance connection in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
 
@@ -232,5 +324,25 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
         assertEquals(releaseId, containerResponseEntity.getReleaseId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+    }
+
+    @Test
+    public void testGetNotExistingContainer() {
+        // Try to get not existing container using kie controller without created kie server instance.
+        try {
+            controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container info not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+
+        controllerClient.createKieServerInstance(kieServerInfo);
+        // Try to get not existing container using kie controller with created kie server instance.
+        try {
+            controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container info not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
     }
 }
