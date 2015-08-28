@@ -106,12 +106,6 @@ public class QueryResourceImpl extends ResourceBase {
         Map<String, String[]> params = getRequestParams();
         String oper = getRelativePath();
 
-        JaxbTaskSummaryListResponse resultList = doTaskSummaryQuery(params, oper);
-
-        return createCorrectVariant(resultList, headers);
-    }
-
-    public JaxbTaskSummaryListResponse doTaskSummaryQuery(Map<String, String[]> params, String relativePath) {
         checkIfParametersAreAllowed(params, Arrays.asList(allowedQueryParams), "task query");
 
         List<Long> workItemIds = getLongListParam(allowedQueryParams[0], false, params, "query", true);
@@ -128,7 +122,7 @@ public class QueryResourceImpl extends ResourceBase {
         List<String> statusStrList = getStringListParamAsList(allowedQueryParams[4], false, params, "query");
         List<Status> statuses = convertStringListToStatusList(statusStrList);
 
-        int[] pageInfo = getPageNumAndPageSize(params, relativePath);
+        int[] pageInfo = getPageNumAndPageSize(params, oper);
         int maxResults = getMaxNumResultsNeeded(pageInfo);
         GetTasksByVariousFieldsCommand queryCmd = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, busAdmins,
                 potOwners, taskOwners, statuses, language, union, maxResults);
@@ -140,7 +134,7 @@ public class QueryResourceImpl extends ResourceBase {
         JaxbTaskSummaryListResponse resultList = paginateAndCreateResult(pageInfo, results, new JaxbTaskSummaryListResponse());
         logger.debug("Returning {} results after pagination.", resultList.getList().size());
 
-        return resultList;
+        return createCorrectVariant(resultList, headers);
     }
    
     // helper methods -------------------------------------------------------------------------------------------------------------

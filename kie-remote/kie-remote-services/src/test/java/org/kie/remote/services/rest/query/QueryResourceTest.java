@@ -9,10 +9,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.hibernate.internal.jaxb.mapping.hbm.JaxbQueryElement;
@@ -24,13 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.kie.api.task.model.Status;
-import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
 import org.kie.remote.services.cdi.ProcessRequestBean;
-import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
 import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
@@ -373,45 +368,5 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         assertEquals( "Incorrect num results", 1, result.getProcessInstanceInfoList().size() );
         
     }
-  
-    @Test
-    public void testTaskSummary() {
-        Map<String, Object> processParams = new HashMap<String, Object>();
-        String initValue = UUID.randomUUID().toString();
-        processParams.put("inputStr", "proc-" + numTestProcesses + "-" + initValue );
-        processParams.put("otherStr", "proc-" + numTestProcesses + "-" + initValue );
-        processParams.put("secondStr", numTestProcesses + "-second-" + random.nextInt(Integer.MAX_VALUE));
-        org.kie.api.runtime.process.ProcessInstance processInstance = ksession.startProcess(PROCESS_STRING_VAR_ID, processParams);
-        assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
-        long procInstId = processInstance.getId();
-
-        List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
-        assertFalse( "No tasks found!", taskIds.isEmpty() );
-        long taskId = taskIds.get(0);
-        taskService.start(taskId, USER_ID);
-
-        Map<String, String[]> queryParams  = new HashMap<String, String[]>();
-        addParams(queryParams, "processInstanceId", String.valueOf(procInstId));
-        JaxbTaskSummaryListResponse resp = queryResource.doTaskSummaryQuery(queryParams, "/rest/task/query");
-
-        List<TaskSummary> taskSumList = resp.getResult();
-        assertNotNull( "Null task summary list", taskSumList );
-        assertFalse( "Empty task summary list", taskSumList.isEmpty() );
-        assertEquals( "Only expected to find 1 task", 1, taskSumList.size() );
-
-        Task task = taskService.getTaskById(taskSumList.get(0).getId());
-        assertNotNull( "Null task returned", task );
-        assertNotNull( "Null actual owner on task " + task.getId() + " [status: " + task.getTaskData().getStatus().toString() + "]",
-                task.getTaskData().getActualOwner() );
-        String actualOwnerId = task.getTaskData().getActualOwner().getId();
-        assertEquals( "Incorrect status for task " + task.getId(), Status.InProgress, task.getTaskData().getStatus() );
-
-        for( TaskSummary taskSum : taskSumList ) {
-            assertNotNull( "Null actual owner in task summary " + taskSum.getId() + " [status: " + taskSum.getStatus() + "]" ,
-                    taskSum.getActualOwner() );
-            assertNotNull( "Null actual owner id in task summary " + taskSum.getId() + " [status: " + taskSum.getStatus() + "]",
-                    taskSum.getActualOwner().getId() );
-            assertEquals( "Incorrect actual owner on task summary" , actualOwnerId, taskSum.getActualOwnerId() );
-        }
-    }
+   
 }

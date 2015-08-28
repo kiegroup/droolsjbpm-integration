@@ -51,7 +51,6 @@ import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 import org.kie.services.client.serialization.SerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
-import org.kie.services.client.serialization.jaxb.impl.JaxbRestRequestException;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,12 +197,6 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             req = new JaxbCommandsRequest(deploymentId, command);
         }
-        if( command instanceof TaskCommand ) { 
-           TaskCommand taskCmd = (TaskCommand) command; 
-           if( taskCmd.getUserId() == null ) { 
-               taskCmd.setUserId(userName);
-           }
-        }
 
         if( processInstanceId == null && command instanceof ProcessInstanceIdCommand) {
             processInstanceId = ((ProcessInstanceIdCommand) command).getProcessInstanceId();
@@ -260,8 +253,6 @@ public abstract class AbstractRemoteCommandObject {
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeRestCommand( Command command ) {
-        String cmdName = command.getClass().getSimpleName();
-        
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(
                 command, 
                 config.getUserName(), 
@@ -311,19 +302,7 @@ public abstract class AbstractRemoteCommandObject {
             } else {
                 String contentType = httpResponse.contentType();
                 if( contentType.equals(MediaType.APPLICATION_XML) ) { 
-                    Object response = deserializeResponseContent(content, JaxbExceptionResponse.class);
-                    if( response instanceof JaxbRestRequestException ) { 
-                        JaxbRestRequestException exception = (JaxbRestRequestException) response;
-                        exceptionResponse = new JaxbExceptionResponse(
-                                exception.getUrl(),
-                                exception.getCause(),
-                                exception.getStatus());
-                        exceptionResponse.setCommandName(cmdName);
-                        exceptionResponse.setIndex(0);
-                        exceptionResponse.setMessage(exception.getMessage());
-                    } else if( response instanceof JaxbExceptionResponse ) {
-                        exceptionResponse = (JaxbExceptionResponse) response;
-                    }
+                    exceptionResponse = deserializeResponseContent(content, JaxbExceptionResponse.class);
                 } else if( contentType.startsWith(MediaType.TEXT_HTML) ) { 
                     htmlException = true;
                     exceptionResponse = new JaxbExceptionResponse();
