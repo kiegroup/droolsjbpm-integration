@@ -14,4 +14,12 @@
     </resource-description>
   </weblogic-enterprise-bean>
 
+  <weblogic-enterprise-bean>
+    <ejb-name>KieExecutorMDB</ejb-name>
+    <message-driven-descriptor>
+      <destination-jndi-name>jms/KIE.EXECUTOR</destination-jndi-name>
+      <connection-factory-jndi-name>jms/cf/KIE.EXECUTOR</connection-factory-jndi-name>
+    </message-driven-descriptor>
+  </weblogic-enterprise-bean>
+
 </weblogic-ejb-jar>
