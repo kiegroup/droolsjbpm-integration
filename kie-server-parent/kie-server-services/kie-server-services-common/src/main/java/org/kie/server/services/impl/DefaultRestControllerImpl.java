@@ -147,7 +147,7 @@ public class DefaultRestControllerImpl implements KieServerController {
                     break;
                 } catch (Exception e) {
                     // let's check all other controllers in case of running in cluster of controllers
-                    logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage());
+                    logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
                     logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                 }
 
