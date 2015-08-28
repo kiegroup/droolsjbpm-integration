@@ -18,8 +18,12 @@ package org.kie.server.services.impl.storage.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.thoughtworks.xstream.XStream;
@@ -76,6 +80,16 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
             if (serverStateFile.exists()) {
                 kieServerState = (KieServerState) xs.fromXML(serverStateFile);
+                // override controllers if given as system property
+                String defaultController = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
+                if (defaultController != null) {
+                    String[] controllerList = defaultController.split(",");
+                    Set<String> controllers = new HashSet<String>();
+                    for (String controller : controllerList) {
+                        controllers.add(controller.trim());
+                    }
+                    kieServerState.setControllers(controllers);
+                }
             } else {
                 KieServerConfig config = new KieServerConfig();
                 // populate the config state with system properties that are valid to kie server
