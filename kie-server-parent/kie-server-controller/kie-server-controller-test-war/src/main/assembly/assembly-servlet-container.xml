@@ -43,6 +43,9 @@
         <include>org.kie.server:kie-server-controller-api</include>
         <include>org.kie.server:kie-server-controller-impl</include>
         <include>org.kie.server:kie-server-controller-rest</include>
+
+        <include>com.sun.xml.bind:jaxb-core</include>
+        <include>com.sun.xml.bind:jaxb-impl</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
