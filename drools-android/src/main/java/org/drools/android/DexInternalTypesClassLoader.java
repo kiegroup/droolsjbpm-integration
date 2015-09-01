@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.drools.core.common;
+package org.drools.android;
 
-import org.drools.android.MultiDexClassLoader;
+import org.drools.core.common.ProjectClassLoader;
 
 public class DexInternalTypesClassLoader extends MultiDexClassLoader {
 
