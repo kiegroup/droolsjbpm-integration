@@ -328,6 +328,11 @@
             <artifactId>aether-transport-http</artifactId>
             <version>${version.org.eclipse.aether}</version>
           </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${version.com.sun.xml.bind}</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
