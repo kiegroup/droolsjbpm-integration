@@ -16,8 +16,8 @@
       </jms-queue>
 
       <!-- Kie Server EXECUTOR queue -->
-      <jms-queue name="KIE.EXECUTOR">
-        <entry name="queue/KIE.EXECUTOR" />
+      <jms-queue name="KIE.SERVER.EXECUTOR">
+        <entry name="queue/KIE.SERVER.EXECUTOR" />
       </jms-queue>
 
     </jms-destinations>

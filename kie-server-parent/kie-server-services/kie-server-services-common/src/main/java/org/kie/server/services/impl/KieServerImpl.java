@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.naming.InitialContext;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
@@ -42,9 +45,12 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.services.api.KieControllerNotConnectedException;
+import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.api.KieServerRuntimeException;
+import org.kie.server.services.impl.controller.ControllerConnectRunnable;
+import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -63,9 +69,10 @@ public class KieServerImpl {
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
 
     private final KieServerRegistry context;
+    private final ContainerManager containerManager;
 
     private final KieServerStateRepository repository;
-
+    private volatile AtomicBoolean kieServerActive = new AtomicBoolean(false);
 
     public KieServerImpl() {
         this.repository = new KieServerStateFileRepository();
@@ -73,6 +80,8 @@ public class KieServerImpl {
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
+
+        this.containerManager = getContainerManager();
 
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
@@ -90,7 +99,8 @@ public class KieServerImpl {
                 logger.error("Error when initializing server extension of type {}", extension, e);
             }
         }
-
+        kieServerActive.set(true);
+        boolean readyToRun = false;
         KieServerController kieController = getController();
         // try to load container information from available controllers if any...
         KieServerInfo kieServerInfo = getInfoInternal();
@@ -100,24 +110,32 @@ public class KieServerImpl {
             kieServerSetup = kieController.connect(kieServerInfo);
 
             containers = kieServerSetup.getContainers();
-
-        } catch (KieServerRuntimeException e) {
-            // if no containers from controller use local storage
+            readyToRun = true;
+        } catch (KieControllerNotDefinedException e) {
+            // if no controllers use local storage
             containers = currentState.getContainers();
             kieServerSetup = new KieServerSetup();
-        }
-        for (KieContainerResource containerResource : containers) {
-            if (containerResource.getStatus().equals(KieContainerStatus.STARTED)) {
-                createContainer(containerResource.getContainerId(), containerResource);
-            }
-        }
-        currentState.setContainers(containers);
-        if (kieServerSetup.getServerConfig() != null) {
-            currentState.setConfiguration(kieServerSetup.getServerConfig());
-        }
-        repository.store(KieServerEnvironment.getServerId(), currentState);
+            readyToRun = true;
+        } catch (KieControllerNotConnectedException e) {
+            // if controllers are defined but cannot be reached schedule connection and disable until it gets connection to one of them
+            readyToRun = false;
+            logger.warn("Unable to connect to any controllers, delaying container installation until connection can be established");
+            Thread connectToControllerThread = new Thread(new ControllerConnectRunnable(kieServerActive,
+                                                                                        kieController,
+                                                                                        kieServerInfo,
+                                                                                        currentState,
+                                                                                        containerManager,
+                                                                                        this), "KieServer-ControllerConnect");
+            connectToControllerThread.start();
 
+        }
+
+        if (readyToRun) {
+            containerManager.installContainers(this, containers, currentState, kieServerSetup);
+        }
     }
+
+
 
     public KieServerRegistry getServerRegistry() { 
         return context;
@@ -125,6 +143,7 @@ public class KieServerImpl {
 
 
     public void destroy() {
+        kieServerActive.set(false);
         // disconnect from controller
         KieServerController kieController = getController();
         kieController.disconnect(getInfoInternal());
@@ -567,4 +586,22 @@ public class KieServerImpl {
         return controller;
     }
 
+    protected ContainerManager getContainerManager() {
+        try {
+            return InitialContext.doLookup("java:module/ContainerManagerEJB");
+        } catch (Exception e) {
+            logger.debug("Unable to find JEE version of ContainerManager suing default one");
+            return new ContainerManager();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "KieServer{" +
+                "id='" + KieServerEnvironment.getServerId() + '\'' +
+                "name='" + KieServerEnvironment.getServerName() + '\'' +
+                "version='" + KieServerEnvironment.getVersion() + '\'' +
+                "location='" + kieServerLocation + '\'' +
+                '}';
+    }
 }
