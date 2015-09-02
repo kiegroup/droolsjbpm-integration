@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
@@ -206,19 +207,27 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(containerToDeploy.getReleaseId(), deployedContainer.getReleaseId());
 
         // Check that container is deployed.
-        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
-        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
-        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
-        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
-        assertEquals(releaseId, containerInfo.getResult().getReleaseId());
+        KieContainerResource containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertNotNull(containerResponseEntity);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
+        assertEquals(releaseId, containerResponseEntity.getReleaseId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+
+        // Container is in stopped state, so there are no containers deployed in kie server.
+        ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
+        assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
 
         // Undeploy container for kie server instance.
         controllerClient.disposeContainer(kieServerInfo.getServerId(), CONTAINER_ID);
 
-        // Check that container is not deployed.
-        containerInfo = client.getContainerInfo(CONTAINER_ID);
-        assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
-        assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
+        // Check that container is disposed.
+        try {
+            controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container info not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
     }
 
     @Test
@@ -309,6 +318,11 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(releaseId, containerResponseEntity.getReleaseId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
 
+        // Check that container is not deployed in kie server (as container is in STOPPED state).
+        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
+        assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
+
         controllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
 
         containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
@@ -317,6 +331,13 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(releaseId, containerResponseEntity.getReleaseId());
         assertEquals(KieContainerStatus.STARTED, containerResponseEntity.getStatus());
 
+        // Check that container is deployed in kie server.
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        assertEquals(releaseId, containerInfo.getResult().getReleaseId());
+
         controllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
 
         containerResponseEntity = controllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
@@ -324,6 +345,51 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(CONTAINER_ID, containerResponseEntity.getContainerId());
         assertEquals(releaseId, containerResponseEntity.getReleaseId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+
+        // Check that container is not deployed in kie server (as container is in STOPPED state).
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
+        assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
+    }
+
+    @Test
+    public void testStartNotExistingContainer() throws Exception {
+        // Try to start not existing container using kie controller without created kie server instance.
+        try {
+            controllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+
+        controllerClient.createKieServerInstance(kieServerInfo);
+        // Try to start not existing container using kie controller with created kie server instance.
+        try {
+            controllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+    }
+
+    @Test
+    public void testStopNotExistingContainer() throws Exception {
+        // Try to stop not existing container using kie controller without created kie server instance.
+        try {
+            controllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
+
+        controllerClient.createKieServerInstance(kieServerInfo);
+        // Try to stop not existing container using kie controller with created kie server instance.
+        try {
+            controllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+            fail("Should throw exception about container not found.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+        }
     }
 
     @Test
