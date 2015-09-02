@@ -33,6 +33,8 @@ import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.jbpm.executor.ExecutorServiceFactory;
+import org.jbpm.executor.impl.ExecutorImpl;
+import org.jbpm.executor.impl.ExecutorServiceImpl;
 import org.jbpm.kie.services.impl.AbstractDeploymentService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
@@ -172,12 +174,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
+            String executorQueueName = System.getProperty("org.kie.executor.jms.queue", "queue/KIE.SERVER.EXECUTOR");
+
             // build executor service
             executorService = ExecutorServiceFactory.newExecutorService(emf);
             executorService.setInterval(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_INTERVAL, "3")));
             executorService.setRetries(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_RETRIES, "3")));
             executorService.setThreadPoolSize(Integer.parseInt(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_POOL, "1")));
             executorService.setTimeunit(TimeUnit.valueOf(config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_TIME_UNIT, "SECONDS")));
+
+            ((ExecutorImpl) ((ExecutorServiceImpl) executorService).getExecutor()).setQueueName(executorQueueName);
+
             executorService.init();
         }
 

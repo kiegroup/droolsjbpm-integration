@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.kie.api.remote.Remotable;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieContainerCommandService;
@@ -43,6 +46,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
     public static final String EXTENSION_NAME = "Drools";
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean filterRemoteable = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_FILTER_REMOTEABLE_CLASSES, "false"));
 
     private KieContainerCommandService batchCommandService;
     private KieServerRegistry registry;
@@ -83,11 +87,25 @@ public class DroolsKieServerExtension implements KieServerExtension {
             for (String c : classes) {
                 String type = p + "." + c;
                 try {
-                    extraClasses.add(Class.forName(type, true, kieContainerInstance.getKieContainer().getClassLoader()));
-                    logger.debug("Added {} type into extra jaxb classes set", type);
+                    logger.debug("Adding {} type into extra jaxb classes set", type);
+                    Class<?> clazz = Class.forName(type, true, kieContainerInstance.getKieContainer().getClassLoader());
+
+                    if (filterRemoteable) {
+                        // add only these classes that are valid for being used as remoteable
+                        if (clazz.isAnnotationPresent(XmlRootElement.class) || clazz.isAnnotationPresent(Remotable.class)) {
+                            extraClasses.add(clazz);
+                            logger.debug("Added {} type into extra jaxb classes set", type);
+                        }
+                    } else {
+                        extraClasses.add(clazz);
+                        logger.debug("Added {} type into extra jaxb classes set", type);
+                    }
                 } catch (ClassNotFoundException e) {
                     logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
                     logger.debug("Complete stack trace for exception while creating type {}", type, e);
+                }  catch (Throwable e) {
+                    logger.warn("Unexpected error while create instance of type {} due to {}", type, e.getMessage());
+                    logger.debug("Complete stack trace for unknown error while creating type {}", type, e);
                 }
             }
         }

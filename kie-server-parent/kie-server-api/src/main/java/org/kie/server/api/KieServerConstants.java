@@ -26,6 +26,8 @@ public class KieServerConstants {
     public static final String KIE_DROOLS_SERVER_EXT_DISABLED = "org.drools.server.ext.disabled";
     public static final String KIE_JBPM_SERVER_EXT_DISABLED = "org.jbpm.server.ext.disabled";
 
+    public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
+
     // kie server dedicated parameters
     public static final String KIE_SERVER_ID = "org.kie.server.id";
     public static final String KIE_SERVER_LOCATION = "org.kie.server.location";
