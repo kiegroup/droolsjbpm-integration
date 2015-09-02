@@ -16,6 +16,7 @@
 package org.kie.server.controller.impl;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -107,8 +108,6 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
         containers.add(container);
         container.setStatus(KieContainerStatus.STOPPED);
 
-        notifyKieServersOnCreateContainer(kieServerInstance, container);
-
         return container;
     }
 
@@ -126,7 +125,9 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
 
             this.storage.update(kieServerInstance);
 
-            notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+            notifyKieServersOnCreateContainer(kieServerInstance, kieContainerResource);
+        } else {
+            throw new KieServerControllerException("KieContainer not found with id: " + id);
         }
     }
 
@@ -144,6 +145,8 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             this.storage.update(kieServerInstance);
 
             notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
+        } else {
+            throw new KieServerControllerException("KieContainer not found with id: " + id);
         }
 
     }
@@ -157,17 +160,20 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
 
         Set<KieContainerResource> containers = kieServerInstance.getKieServerSetup().getContainers();
         if (containers != null) {
-            KieContainerResource containerResourceToDel = null;
-            for (KieContainerResource containerResource : containers) {
-                 if (containerResource.getContainerId().equals(containerId)) {
-                     containerResourceToDel = containerResource;
-                     break;
-                 }
+            boolean removed = false;
+            Iterator<KieContainerResource> iterator = containers.iterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getContainerId().equals(containerId)) {
+                    iterator.remove();
+                    removed = true;
+                    break;
+                }
             }
 
             // delete if found
-            if (containerResourceToDel != null) {
-                containers.remove(containerResourceToDel);
+            if (removed) {
+                kieServerInstance.getKieServerSetup().setContainers(containers);
+                this.storage.update(kieServerInstance);
 
                 notifyKieServersOnDeleteContainer(kieServerInstance, containerId);
             } else {
