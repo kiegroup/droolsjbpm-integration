@@ -456,5 +456,16 @@ public class RemoteCommandObjectTest {
         objectList = new ArrayList<Object>();
         taskServiceClient.addPossiblyNullObject(inputObjectValueMap, objectList);
         assertEquals(0, objectList.size());
+        
+        // Verify recursive list does not cause stack overflow
+        inputObject = new Object();
+        inputObjectList = new ArrayList<Object>();
+        inputObjectList.add(null);
+        inputObjectList.add(inputObject);
+        inputObjectList.add(inputObjectList);
+        objectList = new ArrayList<Object>();
+        taskServiceClient.addPossiblyNullObject(inputObjectList, objectList);
+        assertEquals(1, objectList.size());
+        assertEquals(inputObject, objectList.get(0));
     }
 }

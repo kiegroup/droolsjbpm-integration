@@ -25,9 +25,10 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.Queue;
@@ -51,6 +52,7 @@ import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.remote.jaxb.gen.AddContentCommand;
+import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.AuditCommand;
 import org.kie.remote.jaxb.gen.CompleteTaskCommand;
@@ -69,7 +71,6 @@ import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
 import org.kie.remote.jaxb.gen.UpdateCommand;
-import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
 import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
@@ -228,20 +229,29 @@ public abstract class AbstractRemoteCommandObject {
     }
 
     void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
+        internalAddPossiblyNullObject(inputObject, objectList, new IdentityHashMap<Object, Object>());
+    }
+   
+    private static final Object PRESENT = new Object();
+    
+    void internalAddPossiblyNullObject( Object inputObject, List<Object> objectList, Map<Object, Object> seenObjectsMap ) {
         if( inputObject != null ) {
+            if( seenObjectsMap.put(inputObject, PRESENT) != null ) { 
+                return; 
+            }
             if( inputObject instanceof List )  {
                 for( Object obj : (List<?>)inputObject ) {
-                    addPossiblyNullObject(obj, objectList);
+                    internalAddPossiblyNullObject(obj, objectList, seenObjectsMap);
                 }
             } else if( inputObject instanceof JaxbStringObjectPairArray ) { 
                 for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
                     if( stringObjectPair != null ) {
-                        addPossiblyNullObject(stringObjectPair.getValue(), objectList);
+                        internalAddPossiblyNullObject(stringObjectPair.getValue(), objectList, seenObjectsMap);
                     }
                 }
             } else if( inputObject instanceof StringKeyObjectValueMap ) { 
                 for( Object obj : ((StringKeyObjectValueMap) inputObject).values() ) {
-                    addPossiblyNullObject(obj, objectList);
+                    internalAddPossiblyNullObject(obj, objectList, seenObjectsMap);
                 } 
             } else {  
                 objectList.add(inputObject);
