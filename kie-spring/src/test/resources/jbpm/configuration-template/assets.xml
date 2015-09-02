@@ -31,6 +31,12 @@
     </constructor-arg>
   </bean>
 
+  <bean id="scriptTask" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
+    <constructor-arg>
+      <value>jbpm/processes/ScriptTask.bpmn2</value>
+    </constructor-arg>
+  </bean>
+
   <!-- Map contains list of all assets used in tests. -->
   <util:map id="assets" key-type="org.kie.api.io.Resource" value-type="org.kie.api.io.ResourceType">
     <entry key-ref="sample">
@@ -43,6 +49,9 @@
       <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
     </entry>
     <entry key-ref="humanTask">
+      <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
+    </entry>
+    <entry key-ref="scriptTask">
       <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
     </entry>
   </util:map>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+  <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+    <property name="identifier" value="spring-rm" />
+    <property name="runtimeEnvironment" ref="runtimeEnvironment" />
+    <property name="type" value="PER_PROCESS_INSTANCE" />
+  </bean>
+
+</beans>

@@ -15,25 +15,52 @@
 
 package org.kie.spring.jbpm;
 
+import org.kie.spring.jbpm.tools.RuntimeManagerHolder;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kie.api.runtime.manager.RuntimeManager;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test verifying that multiple beans created by RuntimeManagerFactoryBean with same identifier
  * reference to same runtime manager instance.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:jbpm/multiple-runtime-managers/local-emf-singleton.xml")
+@DirtiesContext
 public class MultipleRuntimeManagersTest extends AbstractJbpmSpringTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Autowired
+    @Qualifier("holderOne")
+    private RuntimeManagerHolder holderOne;
+
+    @Autowired
+    @Qualifier("holderTwo")
+    private RuntimeManagerHolder holderTwo;
+
+    private static final String RUNTIME_MANAGER_ONE = "runtimeManager";
+    private static final String RUNTIME_MANAGER_TWO = "runtimeManagerTwo";
+
+    @Test
+    public void testGettingMultipleRuntimeManagersByInjection() throws Exception {
+        assertNotEquals(holderOne, holderTwo);
+        assertEquals(holderOne.getRuntimeManager(), holderTwo.getRuntimeManager());
+    }
 
     @Test
     public void testGettingMultipleRuntimeManagersByContextRetrieve() throws Exception {
-
-        context = new ClassPathXmlApplicationContext("jbpm/multiple-runtime-managers/local-emf-singleton.xml");
-
-        RuntimeManager managerOne = (RuntimeManager) context.getBean("runtimeManager");
-        RuntimeManager managerTwo = (RuntimeManager) context.getBean("runtimeManagerTwo");
+        RuntimeManager managerOne = context.getBean(RUNTIME_MANAGER_ONE, RuntimeManager.class);
+        RuntimeManager managerTwo = context.getBean(RUNTIME_MANAGER_TWO, RuntimeManager.class);
 
         assertEquals(managerOne, managerTwo);
     }

@@ -16,4 +16,11 @@
     <property name="identifier" value="spring-rm"/>
     <property name="runtimeEnvironment" ref="runtimeEnvironment"/>
   </bean>
+  <bean id="holderOne" class="org.kie.spring.jbpm.tools.RuntimeManagerHolder">
+    <constructor-arg ref="runtimeManager" />
+  </bean>
+
+  <bean id="holderTwo" class="org.kie.spring.jbpm.tools.RuntimeManagerHolder">
+    <constructor-arg ref="runtimeManager" />
+  </bean>
 </beans>

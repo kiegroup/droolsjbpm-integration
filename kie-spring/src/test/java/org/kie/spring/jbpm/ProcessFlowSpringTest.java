@@ -18,38 +18,47 @@ package org.kie.spring.jbpm;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-public class ProcessFlowSpringTest extends AbstractJbpmSpringTest {
+@RunWith(Parameterized.class)
+public class ProcessFlowSpringTest extends AbstractJbpmSpringParameterizedTest {
+
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> contextPath() {
+        Object[][] data = new Object[][] {
+                { JTA_EMF_SINGLETON_PATH, null},
+                { JTA_EM_SINGLETON_PATH, null}
+        };
+        return Arrays.asList(data);
+    };
+
+    public ProcessFlowSpringTest(String contextPath, Context<?> runtimeManagerContext) {
+        super(contextPath, runtimeManagerContext);
+    }
 
     @Test
-    public void testEventBasedGatewayWithUserTransaction() throws Exception{
+    public void testEventBasedGatewayWithUserTransaction() throws Exception {
 
-        context = new ClassPathXmlApplicationContext("jbpm/jta-emf/singleton.xml");
-
-        RuntimeManager manager = (RuntimeManager) context.getBean("runtimeManager");
-
-        RuntimeEngine engine = manager.getRuntimeEngine(null);
-        KieSession ksession = engine.getKieSession();
-        TaskService taskService = engine.getTaskService();
-
+        KieSession ksession = getKieSession();
+        TaskService taskService = getTaskService();
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("owner", "john");
+        parameters.put("owner", USER_JOHN);
         JtaTransactionManager jtaTxm = (JtaTransactionManager) context.getBean("jbpmTxManager");
         TransactionStatus ut = null;
 
@@ -103,7 +112,7 @@ public class ProcessFlowSpringTest extends AbstractJbpmSpringTest {
 
     private void executeTasksByProcessByTaskName(long processId, String taskName, TaskService taskService) {
         List<Status> status = Arrays.asList(Status.Ready, Status.Created, Status.Reserved);
-        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwnerByStatus("john", status, "en-UK");
+        List<TaskSummary> tasks = taskService.getTasksAssignedAsPotentialOwnerByStatus(USER_JOHN, status, "en-UK");
 
         TaskSummary task = null;
         for (TaskSummary t : tasks) {
@@ -115,7 +124,7 @@ public class ProcessFlowSpringTest extends AbstractJbpmSpringTest {
 
         assertNotNull(task);
 
-        taskService.start(task.getId(), "john");
-        taskService.complete(task.getId(), "john", null);
+        taskService.start(task.getId(), USER_JOHN);
+        taskService.complete(task.getId(), USER_JOHN, null);
     }
 }
