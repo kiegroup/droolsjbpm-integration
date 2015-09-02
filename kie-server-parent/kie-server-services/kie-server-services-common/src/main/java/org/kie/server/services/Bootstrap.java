@@ -47,6 +47,8 @@ public class Bootstrap implements ServletContextListener {
         KieServerEnvironment.setServerId(serverId.toString());
         KieServerEnvironment.setServerName(serverName);
         logger.info("KieServer (id {} (name {})) started initialization process", KieServerEnvironment.getServerId(), serverName);
+        KieServerLocator.getInstance();
+        logger.info("KieServer (id {}) started successfully", KieServerEnvironment.getServerId());
     }
 
     @Override

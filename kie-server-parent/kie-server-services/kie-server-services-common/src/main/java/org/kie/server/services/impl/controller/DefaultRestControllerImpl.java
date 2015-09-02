@@ -13,32 +13,27 @@
  * limitations under the License.
 */
 
-package org.kie.server.services.impl;
+package org.kie.server.services.impl.controller;
 
 import java.net.URLEncoder;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
-import org.kie.server.api.KieController;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.services.api.KieControllerNotConnectedException;
+import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.api.KieServerRuntimeException;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,35 +121,38 @@ public class DefaultRestControllerImpl implements KieServerController {
         Set<String> controllers = currentState.getControllers();
 
         KieServerConfig config = currentState.getConfiguration();
+        if (controllers != null && !controllers.isEmpty()) {
+            for (String controllerUrl : controllers) {
 
-        for (String controllerUrl : controllers ) {
+                if (controllerUrl != null && !controllerUrl.isEmpty()) {
+                    String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
 
-            if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
+                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
 
-                String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    try {
+                        KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password);
 
-                try {
-                    KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password);
+                        if (kieServerSetup != null) {
+                            // once there is non null list let's return it
+                            return kieServerSetup;
 
-                    if (kieServerSetup != null) {
-                        // once there is non null list let's return it
-                        return kieServerSetup;
+                        }
 
+                        break;
+                    } catch (Exception e) {
+                        // let's check all other controllers in case of running in cluster of controllers
+                        logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                        logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                     }
 
-                    break;
-                } catch (Exception e) {
-                    // let's check all other controllers in case of running in cluster of controllers
-                    logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
-                    logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                 }
-
             }
-        }
 
-        throw new KieServerRuntimeException("Unable to connect to any controller");
+            throw new KieControllerNotConnectedException("Unable to connect to any controller");
+        } else {
+            throw new KieControllerNotDefinedException("Unable to connect to any controller");
+        }
     }
 
     @Override

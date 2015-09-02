@@ -110,9 +110,6 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     @Override
     public Set<String> getControllers() {
-        if (controllers.isEmpty()) {
-            controllers.add("http://localhost:8080/kie-wb/rest");
-        }
 
         return new HashSet<String>(controllers);
     }

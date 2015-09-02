@@ -83,11 +83,15 @@ public class DroolsKieServerExtension implements KieServerExtension {
             for (String c : classes) {
                 String type = p + "." + c;
                 try {
+                    logger.debug("Adding {} type into extra jaxb classes set", type);
                     extraClasses.add(Class.forName(type, true, kieContainerInstance.getKieContainer().getClassLoader()));
                     logger.debug("Added {} type into extra jaxb classes set", type);
                 } catch (ClassNotFoundException e) {
                     logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
                     logger.debug("Complete stack trace for exception while creating type {}", type, e);
+                }  catch (Throwable e) {
+                    logger.warn("Unexpected error while create instance of type {} due to {}", type, e.getMessage());
+                    logger.debug("Complete stack trace for unknown error while creating type {}", type, e);
                 }
             }
         }
