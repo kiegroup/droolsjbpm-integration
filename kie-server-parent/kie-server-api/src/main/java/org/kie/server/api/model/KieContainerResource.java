@@ -114,7 +114,6 @@ public class KieContainerResource {
         result = prime * result + ((containerId == null) ? 0 : containerId.hashCode());
         result = prime * result + ((releaseId == null) ? 0 : releaseId.hashCode());
         result = prime * result + ((resolvedReleaseId == null) ? 0 : resolvedReleaseId.hashCode());
-        result = prime * result + ((status == null) ? 0 : status.hashCode());
         return result;
     }
 
@@ -141,8 +140,6 @@ public class KieContainerResource {
             if (other.resolvedReleaseId != null)
                 return false;
         } else if (!resolvedReleaseId.equals(other.resolvedReleaseId))
-            return false;
-        if (status != other.status)
             return false;
         return true;
     }
