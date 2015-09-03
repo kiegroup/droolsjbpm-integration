@@ -354,5 +354,11 @@ public final class KieServicesConfigurationImpl
         return new KieServicesConfigurationImpl( this );
     }
 
-
+    @Override
+    public String toString() {
+        return "KieServicesConfiguration{" +
+                "transport=" + transport +
+                ", serverUrl='" + serverUrl + '\'' +
+                '}';
+    }
 }
