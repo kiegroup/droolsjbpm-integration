@@ -101,7 +101,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     // Rest methods --------------------------------------------------------------------------------------------------------------
  
     @GET
-    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}/")
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessDefinitionInfo(@PathParam("processDefId") String processId) {
         ProcessDefinition processAssetDescList = runtimeDataService.getProcessesByDeploymentIdProcessId(deploymentId, processId);
@@ -112,7 +112,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     }
     
     @POST
-    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}/start")
     @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response startProcessInstance(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
@@ -127,7 +127,7 @@ public class RuntimeResourceImpl extends ResourceBase {
     }
 
     @GET
-    @Path("/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/startform")
+    @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}/startform")
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstanceStartForm(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
@@ -307,7 +307,7 @@ public class RuntimeResourceImpl extends ResourceBase {
      */
 
     @POST
-    @Path("/withvars/process/{processDefId: [_a-zA-Z0-9-:\\.]+}/start")
+    @Path("/withvars/process/{processDefId: [a-zA-Z0-9-:\\._]+}/start")
     @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
     public Response withVarsStartProcessInstance(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
