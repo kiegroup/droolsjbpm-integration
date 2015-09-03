@@ -173,7 +173,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     }
 
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
-        if (configFileURL.toString().startsWith("bundle:")) {
+        if (configFileURL.toString().startsWith("bundle:") || configFileURL.toString().startsWith("bundleresource:")) {
             return createOsgiKModule(kieProject);
         }
 
