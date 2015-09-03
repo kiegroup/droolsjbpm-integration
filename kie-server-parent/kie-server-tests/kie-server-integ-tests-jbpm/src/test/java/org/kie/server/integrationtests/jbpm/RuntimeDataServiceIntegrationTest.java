@@ -599,10 +599,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance("john"));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        for (Long processInstanceId : processInstanceIds) {
+            processClient.setProcessVariable("definition-project", processInstanceId, "stringData", "waiting for signal");
+        }
 
         try {
             List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10);
@@ -744,25 +747,31 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(currentState);
             assertEquals(2, currentState.size());
 
-            VariableInstance variableInstance = currentState.get(0);
-            assertNotNull(variableInstance);
-            assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("", variableInstance.getOldValue());
-            assertEquals("Person{name='john'}", variableInstance.getValue());
-            assertEquals("personData", variableInstance.getVariableName());
+            for (VariableInstance variableInstance : currentState) {
 
-            variableInstance = currentState.get(1);
-            assertNotNull(variableInstance);
-            assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("", variableInstance.getOldValue());
-            assertEquals("waiting for signal", variableInstance.getValue());
-            assertEquals("stringData", variableInstance.getVariableName());
+                if ("personData".equals(variableInstance.getVariableName())) {
+                    assertNotNull(variableInstance);
+                    assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
+                    assertEquals("", variableInstance.getOldValue());
+                    assertEquals("Person{name='john'}", variableInstance.getValue());
+                    assertEquals("personData", variableInstance.getVariableName());
+                } else if ("stringData".equals(variableInstance.getVariableName())) {
+
+                    assertNotNull(variableInstance);
+                    assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
+                    assertEquals("", variableInstance.getOldValue());
+                    assertEquals("waiting for signal", variableInstance.getValue());
+                    assertEquals("stringData", variableInstance.getVariableName());
+                } else {
+                    fail("Got unexpected variable " + variableInstance.getVariableName());
+                }
+            }
 
             List<VariableInstance> varHistory = queryClient.findVariableHistory(processInstanceId, "stringData", 0, 10);
             assertNotNull(varHistory);
             assertEquals(1, varHistory.size());
 
-            variableInstance = varHistory.get(0);
+            VariableInstance variableInstance = varHistory.get(0);
             assertNotNull(variableInstance);
             assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
             assertEquals("", variableInstance.getOldValue());
