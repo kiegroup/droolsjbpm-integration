@@ -125,7 +125,14 @@ public class OsgiKieModule extends AbstractKieModule {
 
     private static Bundle getBundle(String url) {
         String urlString = url.toString();
-        String id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
+        String id = null;
+        if (urlString.startsWith("bundle://")) {
+            id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
+        } else if (urlString.startsWith("bundleresource://")) {
+            id = urlString.substring("bundleresource://".length(), urlString.indexOf('.'));
+        } else {
+            return null;
+        }
         long bundleId = Long.parseLong(id);
         return FrameworkUtil.getBundle(OsgiKieModule.class).getBundleContext().getBundle(bundleId);
     }
