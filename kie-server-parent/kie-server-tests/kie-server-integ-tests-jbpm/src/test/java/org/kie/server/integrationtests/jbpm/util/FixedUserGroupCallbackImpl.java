@@ -36,6 +36,11 @@ public class FixedUserGroupCallbackImpl implements UserGroupCallback {
     public List<String> getGroupsForUser(String s, List<String> list, List<String> list1) {
         ArrayList<String> groups = new ArrayList<String>();
 
+        // User john is assigned in group engineering
+        if (s.equals("john")) {
+            groups.add("engineering");
+        }
+
         return groups;
     }
 }
