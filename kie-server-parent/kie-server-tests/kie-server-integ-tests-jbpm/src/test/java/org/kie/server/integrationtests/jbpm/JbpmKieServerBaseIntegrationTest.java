@@ -16,11 +16,14 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -93,5 +96,19 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         }
         configuration.setUserName(username);
         client = createDefaultClient();
+    }
+
+    @Override
+    protected void disposeAllContainers() {
+        List<Integer> status = new ArrayList<Integer>();
+        status.add(ProcessInstance.STATE_ACTIVE);
+        List<org.kie.server.api.model.instance.ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
+        if (activeInstances != null) {
+            for (org.kie.server.api.model.instance.ProcessInstance instance : activeInstances) {
+                processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
+            }
+        }
+
+        super.disposeAllContainers();
     }
 }

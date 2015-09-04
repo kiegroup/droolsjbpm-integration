@@ -53,7 +53,6 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
-import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
@@ -61,7 +60,6 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.NamedObjectModel;
@@ -276,12 +274,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
         states.add(ProcessInstance.STATE_ACTIVE);
         states.add(ProcessInstance.STATE_PENDING);
         states.add(ProcessInstance.STATE_SUSPENDED);
-
-        // force all active instances to be aborted to properly dispose container
-        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByDeploymentId(id, states, new QueryContext(0, 100));
-        for (ProcessInstanceDesc instanceDesc : instances) {
-            processService.abortProcessInstance(instanceDesc.getId());
-        }
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
         deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));

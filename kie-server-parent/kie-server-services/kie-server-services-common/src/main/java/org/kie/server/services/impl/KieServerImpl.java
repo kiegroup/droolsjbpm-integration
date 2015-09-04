@@ -292,24 +292,36 @@ public class KieServerImpl {
                 synchronized (kci) {
                     kci.setStatus(KieContainerStatus.DISPOSING); // just in case
                     if (kci.getKieContainer() != null) {
-                        InternalKieContainer kieContainer = kci.getKieContainer();
-                        kci.setKieContainer(null); // helps reduce concurrent access issues
+                        List<KieServerExtension> disposedExtensions = new ArrayList<KieServerExtension>();
                         try {
-                            // this may fail, but we already removed the container from the registry
-                            kieContainer.dispose();
-
-                            logger.debug("Container {} (for release id {}) general shutdown: DONE", containerId, kci.getResource().getReleaseId());
+                            // first attempt to dispose container on all extensions
+                            logger.debug("Container {} (for release id {}) shutdown: In Progress", containerId, kci.getResource().getReleaseId());
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
                                 extension.disposeContainer(containerId, new HashMap<String, Object>());
                                 logger.debug("Container {} (for release id {}) {} shutdown: DONE", containerId, kci.getResource().getReleaseId(), extension);
+                                disposedExtensions.add(extension);
                             }
+
                         } catch (Exception e) {
-//                            logger.warn("Container '" + containerId + "' disposed, but an unexpected exception was raised", e);
-                            return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId +
-                                    " disposed, but exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
+                            logger.warn("Dispose of container {} failed, putting it back to started state by recreating container on {}", containerId, disposedExtensions);
+                            // since the dispose fail rollback must take place to put it back to running state
+                            for (KieServerExtension extension : disposedExtensions) {
+                                extension.createContainer(containerId, kci, new HashMap<String, Object>());
+                                logger.debug("Container {} (for release id {}) {} restart: DONE", containerId, kci.getResource().getReleaseId(), extension);
+                            }
+
+                            kci.setStatus(KieContainerStatus.STARTED);
+                            context.registerContainer(containerId, kci);
+                            logger.info("Container {} (for release id {}) STARTED after failed dispose", containerId, kci.getResource().getReleaseId());
+                            return new ServiceResponse<Void>(ResponseType.FAILURE, "Container " + containerId +
+                                    " failed to dispose, exception was raised: " + e.getClass().getName() + ": " + e.getMessage());
                         }
+                        InternalKieContainer kieContainer = kci.getKieContainer();
+                        kci.setKieContainer(null); // helps reduce concurrent access issues
+                        // this may fail, but we already removed the container from the registry
+                        kieContainer.dispose();
                         logger.info("Container {} (for release id {}) successfully stopped", containerId, kci.getResource().getReleaseId());
 
                         // store the current state of the server
