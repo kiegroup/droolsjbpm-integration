@@ -102,10 +102,11 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(4, definitions.size());
+        assertEquals(5, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
         assertTrue(processIds.contains("definition-project.signalprocess"));
         assertTrue(processIds.contains("definition-project.usertask"));
 
@@ -117,13 +118,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
-        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
 
         definitions = queryClient.findProcesses(1, 3);
         assertNotNull(definitions);
 
-        assertEquals(1, definitions.size());
+        assertEquals(2, definitions.size());
         processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("definition-project.signalprocess"));
         assertTrue(processIds.contains("definition-project.usertask"));
 
     }
@@ -164,10 +166,11 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId("definition-project", 0, 20);
         assertNotNull(definitions);
 
-        assertEquals(4, definitions.size());
+        assertEquals(5, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
         assertTrue(processIds.contains("definition-project.signalprocess"));
         assertTrue(processIds.contains("definition-project.usertask"));
 
@@ -179,13 +182,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
-        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
 
         definitions = queryClient.findProcessesByContainerId("definition-project", 1, 3);
         assertNotNull(definitions);
 
-        assertEquals(1, definitions.size());
+        assertEquals(2, definitions.size());
         processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("definition-project.signalprocess"));
         assertTrue(processIds.contains("definition-project.usertask"));
 
         // last check if there are process def for not existing project

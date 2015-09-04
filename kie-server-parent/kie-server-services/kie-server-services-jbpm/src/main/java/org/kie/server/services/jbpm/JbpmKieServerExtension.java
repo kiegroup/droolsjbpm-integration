@@ -116,10 +116,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         KieServerConfig config = registry.getConfig();
 
-        KieServerConfigItem callbackConfig = config.getConfigItem(KieServerConstants.CFG_HT_CALLBACK);
+        // loaded from system property as callback info isn't stored as configuration in kie server repository
+        String callbackConfig = System.getProperty(KieServerConstants.CFG_HT_CALLBACK);
 
         // if no other callback set, use jaas by default
-        if (callbackConfig == null) {
+        if (callbackConfig == null || callbackConfig.isEmpty()) {
             System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "jaas");
             JAASUserGroupCallbackImpl.addExternalUserGroupAdapter(new JMSUserGroupAdapter());
         }

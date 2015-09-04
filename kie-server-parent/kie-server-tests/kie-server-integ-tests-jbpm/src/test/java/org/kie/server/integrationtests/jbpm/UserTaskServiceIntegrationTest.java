@@ -35,6 +35,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 
@@ -864,6 +865,59 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(Status.Exited.toString(), task.getStatus());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            changeUser(TestConfig.getUsername());
+        }
+    }
+
+    @Test
+    public void testGroupUserTask() throws Exception {
+        String taskName = "Group task";
+
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_GROUPTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals(taskName, taskSummary.getName());
+            assertEquals(Status.Ready.toString(), taskSummary.getStatus());
+
+            // User yoda isn't in group "engineering", can't claim task.
+            try {
+                taskClient.claimTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+                fail("User yoda shouldn't be able to claim task as he doesn't belong to group which task is assigned to.");
+            } catch (KieServicesException e) {
+                // expected
+            }
+
+            // User john is in group "engineering", can work with task.
+            changeUser(USER_JOHN);
+            taskClient.claimTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN);
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN);
+
+            taskList = taskClient.findTasksOwned(USER_JOHN, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals(taskName, taskSummary.getName());
+            assertEquals(Status.InProgress.toString(), taskSummary.getStatus());
+
+            // complete task
+            Map<String, Object> taskOutcomeComplete = new HashMap<String, Object>();
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN, taskOutcomeComplete);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_JOHN, 0, 10);
+            assertNullOrEmpty("Found task to be processed!", taskList);
+
+        } catch (Exception e){
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            throw e;
+        } finally {
             changeUser(TestConfig.getUsername());
         }
     }

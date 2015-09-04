@@ -231,7 +231,7 @@ public abstract class KieServerBaseIntegrationTest {
         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, TestConfig.getControllerHttpUrl());
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_USER, TestConfig.getUsername());
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
-        System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getKieServerHttpUrl());
+        System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
 
         // Register server id if wasn't done yet
