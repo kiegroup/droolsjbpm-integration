@@ -16,7 +16,6 @@
 package org.kie.server.integrationtests.controller;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -134,9 +133,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
 
     @Test
     public void testContainerCreatedAfterStartup() throws Exception {
-        // Systep property issues, test work just for embedded executions.
-        assumeTrue(TestConfig.isLocalServer());
-
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, kieServerInfo.getType());
@@ -178,9 +174,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
 
     @Test
     public void testContainerDisposedAfterStartup() throws Exception {
-        // Systep property issues, test work just for embedded executions.
-        assumeTrue(TestConfig.isLocalServer());
-
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> kieServerInfo = client.getServerInfo();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, kieServerInfo.getType());
@@ -190,6 +183,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         controllerClient.createKieServerInstance(kieServerInfo.getResult());
         KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
         controllerClient.createContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID, containerToDeploy);
+        controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         // Check that there is one container deployed.
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
@@ -199,10 +193,12 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
 
         KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
         assertEquals(1, instanceList.getKieServerInstances().length);
+        assertEquals(KieServerStatus.UP, instanceList.getKieServerInstances()[0].getStatus());
 
         // Turn kie server off, dispose container and start kie server again.
         stopKieServer();
 
+        controllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
         controllerClient.disposeContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         startKieServer();
