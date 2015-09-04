@@ -167,12 +167,6 @@
     <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
   </feature>
 
-  <feature name="kie-remote-client" version="${project.version}" description="KIE Remote Client">
-    <bundle>wrap:mvn:org.kie.remote/kie-remote-client/${version.org.kie}</bundle>
-    <bundle>wrap:mvn:org.kie.remote/kie-remote-common/${version.org.kie}</bundle>
-    <bundle>wrap:mvn:org.kie.remote/kie-remote-jaxb/${version.org.kie}</bundle>
-  </feature>
-
   <feature name="kie-server-client" version="${project.version}" description="KIE Server Client">
     <feature version="${project.version}">drools-module</feature>
     <bundle>mvn:org.kie.server/kie-server-api/${version.org.drools.droolsjbpm-integration}</bundle>
