@@ -16,6 +16,8 @@
 package org.drools.karaf.itest;
 
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
+import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.Bundle;
@@ -54,6 +56,11 @@ abstract public class AbstractKarafIntegrationTest {
      * It can be very useful for debugging to keep the content of runtime folder.
      */
     public static final String PROP_KEEP_RUNTIME_FOLDER = "karaf.keep.runtime.folder";
+
+    /**
+     * Base OSGi framework used by Karaf. Default is Felix.
+     */
+    public static final String PROP_KARAF_FRAMEWORK = "karaf.osgi.framework";
 
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
@@ -132,7 +139,10 @@ abstract public class AbstractKarafIntegrationTest {
                         "http://repo1.maven.org/maven2@id=central," +
                         "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public"
                 ));
-        
+
+        if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
+            options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
+        }
         return new DefaultCompositeOption(options.toArray(new Option[1]));
     }
 
