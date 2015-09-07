@@ -68,7 +68,7 @@ public class TomcatSecurityAdapter implements SecurityAdapter {
             if (request != null && request.getUserPrincipal() != null) {
 
                 Principal principal = request.getUserPrincipal();
-                if (principal.getClass().isAssignableFrom(abstractUserClass)) {
+                if (abstractUserClass.isAssignableFrom(principal.getClass())) {
                     Iterator<?> it = (Iterator<?>) invoke(principal, "getRoles");
 
                     while (it.hasNext()) {
@@ -76,7 +76,7 @@ public class TomcatSecurityAdapter implements SecurityAdapter {
                         proles.add(user.getName());
 
                     }
-                } else if (principal.getClass().isAssignableFrom(genericPrincipalClass)) {
+                } else if (genericPrincipalClass.isAssignableFrom(principal.getClass())) {
                     String[] roles = (String[]) invoke(principal, "getRoles");
                     proles.addAll(Arrays.asList(roles));
                 }
