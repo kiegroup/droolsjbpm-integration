@@ -30,7 +30,7 @@ public interface KieServerExtension {
 
     void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 
-    void disposeContainer(String id, Map<String, Object> parameters);
+    void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 
     List<Object> getAppComponents(SupportedTransports type);
 

@@ -115,8 +115,8 @@ public class DroolsKieServerExtension implements KieServerExtension {
     }
 
     @Override
-    public void disposeContainer(String id, Map<String, Object> parameters) {
-        // no-op?
+    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        kieContainerInstance.removeService(batchCommandService.getClass());
     }
 
     @Override

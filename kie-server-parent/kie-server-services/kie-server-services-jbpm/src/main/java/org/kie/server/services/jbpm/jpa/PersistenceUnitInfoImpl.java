@@ -78,6 +78,9 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 
     @Override
     public DataSource getJtaDataSource() {
+        if (jtaDataSource == null) {
+            return null;
+        }
         try {
             return (DataSource) initialContext.lookup(jtaDataSource);
         } catch (NamingException e) {
@@ -87,6 +90,9 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 
     @Override
     public DataSource getNonJtaDataSource() {
+        if (nonJtaDataSource == null) {
+            return null;
+        }
         try {
             return (DataSource) initialContext.lookup(nonJtaDataSource);
         } catch (NamingException e) {

@@ -53,7 +53,7 @@ public class KieServerContainerExtension implements KieServerExtension {
     }
 
     @Override
-    public void disposeContainer(String id, Map<String, Object> parameters) {
+    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         // no-op
     }
 

@@ -299,7 +299,7 @@ public class KieServerImpl {
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
-                                extension.disposeContainer(containerId, new HashMap<String, Object>());
+                                extension.disposeContainer(containerId, kci, new HashMap<String, Object>());
                                 logger.debug("Container {} (for release id {}) {} shutdown: DONE", containerId, kci.getResource().getReleaseId(), extension);
                                 disposedExtensions.add(extension);
                             }

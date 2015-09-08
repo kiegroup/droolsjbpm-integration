@@ -149,7 +149,7 @@
               <systemProperties>
                 <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
                 <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
-                <org.kie.server.controller>${kie.server.controller.context.http.url}</org.kie.server.controller>
+                <org.kie.server.controller>${kie.server.controller.base.http.url}</org.kie.server.controller>
                 <org.kie.server.location>${kie.server.base.http.url}</org.kie.server.location>
                 <org.kie.server.controller.user>yoda</org.kie.server.controller.user>
                 <org.kie.server.controller.pwd>usetheforce123@</org.kie.server.controller.pwd>
