@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,7 +15,9 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.internal.remote.PermissionConstants.REST_CLIENT_ROLE;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
+
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -38,28 +40,28 @@ public class ExecuteResourceImpl {
 
     @Inject
     protected ProcessRequestBean processRequestBean;
-    
+
     @Inject
     protected IdentityProvider identityProvider;
-    
+
     /**
      * The "/execute" method is an "internal" method that is used by the kie-remote-client classes
      * </p>
      * It is not meant to be used "externally".
-     *  
+     *
      * @param cmdsRequest The {@link JaxbCommandsRequest} containing the {@link Command} and other necessary info.
      * @return A {@link JaxbCommandsResponse} with the result from the {@link Command}
      */
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Produces(MediaType.APPLICATION_XML)
-    @RolesAllowed({REST_CLIENT_ROLE})
+    @RolesAllowed({REST_CLIENT_ROLE, REST_ROLE})
     public JaxbCommandsResponse execute(JaxbCommandsRequest cmdsRequest) {
         return ExecuteCommandUtil.restProcessJaxbCommandsRequest(
-                cmdsRequest, 
-                identityProvider, 
+                cmdsRequest,
+                identityProvider,
                 processRequestBean);
-    } 
-    
+    }
+
 
 }
