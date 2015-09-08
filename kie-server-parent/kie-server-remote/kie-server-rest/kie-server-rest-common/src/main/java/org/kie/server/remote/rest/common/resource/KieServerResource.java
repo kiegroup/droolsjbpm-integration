@@ -37,6 +37,10 @@ public class KieServerResource {
     private KieContainerCommandService delegate;
     private MarshallerHelper marshallerHelper = new MarshallerHelper(null);
 
+    public KieServerResource() {
+
+    }
+
     public KieServerResource(KieContainerCommandService delegate) {
         this.delegate = delegate;
     }
