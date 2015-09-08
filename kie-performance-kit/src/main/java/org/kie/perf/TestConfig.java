@@ -25,7 +25,6 @@ public class TestConfig {
     protected String startScriptLocation;
 
     protected String databaseName;
-    protected String version = TestConfig.class.getPackage().getImplementationVersion();
 
     protected RunType runType;
     protected int duration;
@@ -132,9 +131,6 @@ public class TestConfig {
         if (perfRepoPassword != null) {
             properties.put("perfRepo.password", perfRepoPassword);
         }
-
-        properties.put("suite.version", version);
-        addTag(version);
 
         return properties;
     }
