@@ -387,8 +387,8 @@ public abstract class AbstractRemoteCommandObject {
         int responseStatus;
         try {
             responseStatus = httpResponse.code();
-            String content = httpResponse.body();
             if( responseStatus < 300 ) {
+                String content = httpResponse.body();
                 cmdResponse = deserializeResponseContent(content, JaxbCommandsResponse.class);
 
                 // check version
@@ -403,6 +403,7 @@ public abstract class AbstractRemoteCommandObject {
             } else {
                 String contentType = httpResponse.contentType();
                 if( contentType.equals(MediaType.APPLICATION_XML) ) { 
+                    String content = httpResponse.body();
                     Object response = deserializeResponseContent(content, JaxbExceptionResponse.class);
                     if( response instanceof JaxbRestRequestException ) { 
                         JaxbRestRequestException exception = (JaxbRestRequestException) response;
@@ -417,6 +418,7 @@ public abstract class AbstractRemoteCommandObject {
                         exceptionResponse = (JaxbExceptionResponse) response;
                     }
                 } else if( contentType.startsWith(MediaType.TEXT_HTML) ) { 
+                    String content = httpResponse.body();
                     htmlException = true;
                     exceptionResponse = new JaxbExceptionResponse();
                     Document doc = Jsoup.parse(content);
@@ -424,8 +426,11 @@ public abstract class AbstractRemoteCommandObject {
                     exceptionResponse.setMessage(body);
                     exceptionResponse.setUrl(httpRequest.getUri().toString());
                     exceptionResponse.setStackTrace("");
-                }
-                else { 
+                } else { 
+                    if( responseStatus == 401 ) { 
+                        String user = config.getUserName();
+                        throw new RemoteApiException("User '" + user + "'is not authorized for the /rest/execute operation: does '" + user + "' have the 'rest-client' or 'rest-all' role?");
+                    }
                     throw new RemoteCommunicationException("Unable to deserialize response with content type '" + contentType + "'");
                 }
             }
