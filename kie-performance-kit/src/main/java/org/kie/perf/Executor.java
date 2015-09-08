@@ -137,7 +137,12 @@ public class Executor {
             }
         } else {
             try {
-                instance = selectedScenario.newInstance();
+                KPKConstraint constraint = checkScenarioConstraints(selectedScenario);
+                if (constraint != null) {
+                    log.info("Scenario '" + tc.getScenario() + "' skipped due to constraints " + Arrays.toString(constraint.value()));
+                } else {
+                    instance = selectedScenario.newInstance();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -146,8 +151,8 @@ public class Executor {
         return instance;
     }
 
-    public KPKConstraint checkScenarioConstraints(IPerfTest scenario) {
-        KPKConstraint constraint = scenario.getClass().getAnnotation(KPKConstraint.class);
+    public KPKConstraint checkScenarioConstraints(Class<? extends IPerfTest> scenario) {
+        KPKConstraint constraint = scenario.getAnnotation(KPKConstraint.class);
         if (constraint == null) {
             return null;
         }
@@ -177,7 +182,6 @@ public class Executor {
         try {
             TestConfig tc = TestConfig.getInstance();
             ITestSuite testSuite = exec.findTestSuite();
-            IPerfTest scenario = exec.selectNextTestFromSuite(testSuite);
 
             String msg = "======== SUITE: " + tc.getSuite();
             String scenarioName = tc.getScenario();
@@ -186,19 +190,19 @@ public class Executor {
             }
             msg += " ========";
             log.info(msg);
+            
+            IPerfTest scenario = exec.selectNextTestFromSuite(testSuite);
 
             if (scenario != null) {
                 // this is a child process for this scenario with own JVM
-                KPKConstraint constraint = exec.checkScenarioConstraints(scenario);
-                if (constraint != null) {
-                    log.info("Scenario '" + scenarioName + "' skipped due to constraints " + Arrays.toString(constraint.value()));
-                } else {
+                
                     exec.initMetrics(scenario);
                     testSuite.initScenario(scenario);
                     if (tc.isWarmUp()) {
                         SharedMetricRegistry.setWarmUp(true);
                         scenario.initMetrics();
-                        for (int i = 0; i < tc.getWarmUpCount(); ++i) {
+                        long endWarmUpTime = System.currentTimeMillis() + 5000;
+                        for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
                             scenario.execute();
                         }
                         SharedMetricRegistry.setWarmUp(false);
@@ -217,7 +221,7 @@ public class Executor {
                     }
 
                     exec.report();
-                }
+                
             }
         } catch (Exception ex) {
             ex.printStackTrace();
