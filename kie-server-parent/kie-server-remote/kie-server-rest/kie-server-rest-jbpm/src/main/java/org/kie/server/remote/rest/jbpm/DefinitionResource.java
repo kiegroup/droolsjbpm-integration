@@ -44,6 +44,10 @@ public class DefinitionResource {
 
     private DefinitionServiceBase definitionServiceBase;
 
+    public DefinitionResource() {
+
+    }
+
     public DefinitionResource(DefinitionServiceBase definitionServiceBase) {
         this.definitionServiceBase = definitionServiceBase;
     }

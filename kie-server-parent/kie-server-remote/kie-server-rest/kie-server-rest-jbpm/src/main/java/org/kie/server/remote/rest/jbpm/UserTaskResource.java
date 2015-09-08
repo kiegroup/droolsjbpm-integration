@@ -47,6 +47,9 @@ public class UserTaskResource {
 
     private UserTaskServiceBase userTaskServiceBase;
 
+    public UserTaskResource() {
+
+    }
 
     public UserTaskResource(UserTaskServiceBase userTaskServiceBase) {
         this.userTaskServiceBase = userTaskServiceBase;

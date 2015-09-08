@@ -47,6 +47,10 @@ public class CommandResource {
 
     private MarshallerHelper marshallerHelper;
 
+    public CommandResource() {
+
+    }
+
     public CommandResource(KieContainerCommandService delegate, KieServerRegistry registry) {
         this.delegate = delegate;
         this.marshallerHelper = new MarshallerHelper(registry);

@@ -32,6 +32,10 @@
       <directory>${project.basedir}/src/main/shared-ee6-ee7-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/main/docs</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
