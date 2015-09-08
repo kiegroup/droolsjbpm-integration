@@ -26,7 +26,6 @@
     <kie.server.context>kie-server-services</kie.server.context>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
-    <kie.server.controller.context.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}</kie.server.controller.context.http.url>
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>

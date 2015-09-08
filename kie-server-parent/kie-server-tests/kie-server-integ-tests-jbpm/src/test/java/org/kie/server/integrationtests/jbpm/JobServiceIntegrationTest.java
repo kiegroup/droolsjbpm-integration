@@ -115,8 +115,9 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobServicesClient.cancelRequest(jobId);
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
 
-        // If job finished before we canceled it then create new job and cancel it.
-        if(STATUS.DONE.toString().equals(jobRequest.getStatus())) {
+        // If job finished before we canceled it or already running then create new job and cancel it.
+        if(STATUS.DONE.toString().equals(jobRequest.getStatus()) ||
+                STATUS.RUNNING.toString().equals(jobRequest.getStatus())) {
             jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
 
             jobServicesClient.cancelRequest(jobId);

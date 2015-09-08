@@ -266,7 +266,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     }
 
     @Override
-    public void disposeContainer(String id, Map<String, Object> parameters) {
+    public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         if (!deploymentService.isDeployed(id)) {
             logger.warn("No container with id {} found", id);
             return;
@@ -278,6 +278,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
         deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
+
+        kieContainerInstance.removeService(deploymentService.getClass());
+        kieContainerInstance.removeService(definitionService.getClass());
+        kieContainerInstance.removeService(processService.getClass());
+        kieContainerInstance.removeService(userTaskService.getClass());
+        kieContainerInstance.removeService(runtimeDataService.getClass());
+        kieContainerInstance.removeService(executorService.getClass());
+
         logger.info("Container {} disposed successfully", id);
     }
 
@@ -400,6 +408,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 // in case setting URL to jar file location only fails, fallback to complete URL
                 ((PersistenceUnitInfoImpl) info).setPersistenceUnitRootUrl(root);
             }
+            // Need to explicitly set jtaDataSource here, its value is fetched in Hibernate logger before configuration
+            ((PersistenceUnitInfoImpl) info).setJtaDataSource(properties.get("javax.persistence.jtaDataSource"));
             List<PersistenceProvider> persistenceProviders = PersistenceProviderResolverHolder.getPersistenceProviderResolver().getPersistenceProviders();
             PersistenceProvider selectedProvider = null;
             if (persistenceProviders != null) {
