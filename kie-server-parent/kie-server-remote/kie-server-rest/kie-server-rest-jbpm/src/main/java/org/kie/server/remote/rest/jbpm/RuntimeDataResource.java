@@ -54,6 +54,10 @@ public class RuntimeDataResource {
 
     private RuntimeDataServiceBase runtimeDataServiceBase;
 
+    public RuntimeDataResource() {
+
+    }
+
     public RuntimeDataResource(RuntimeDataServiceBase delegate) {
         this.runtimeDataServiceBase = delegate;
     }

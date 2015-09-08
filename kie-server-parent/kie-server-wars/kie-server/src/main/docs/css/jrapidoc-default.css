@@ -1,0 +1,233 @@
+#page {
+    min-height: 600px;
+}
+
+.package {
+    margin-left: 10px;
+    padding: 10px 0px 0px 10px;
+    /*border-radius: 2px;*/
+    margin-top: 2px;
+}
+
+.header {
+    cursor: pointer;
+}
+
+.name {
+    color: #333;
+    font-family: "Open Sans", sans-serif;
+}
+
+.value {
+    font-size: 10pt;
+}
+
+.array {
+    background-color: #FFFFFF;
+    border: thin solid #FFB780;
+}
+
+.object {
+    /*background-color: #E7F1FE;*/
+    /*border: thin solid #7DA2CE;*/
+}
+
+.string {
+    color: red;
+}
+
+.number {
+    color: blue;
+}
+
+.function {
+    color: green;
+}
+
+.open .children {
+    display: block;
+}
+
+.closed > .children {
+    display: none;
+    /*display: block;*/
+}
+
+.arrow {
+    background-image: url("../img/d.png");
+    background-repeat: no-repeat;
+    background-color: transparent;
+    height: 15px;
+    width: 15px;
+    display: inline-block;
+}
+
+.open .arrow {
+    background-position: -20px 0;
+    /*background-position: 0 0;*/
+}
+
+.closed .arrow {
+    background-position: 0 0;
+    /*background-position: -20px 0;*/
+}
+
+.type {
+    color: gray;
+    font-size: 8pt;
+    float: right;
+}
+
+.hide {
+    display: none;
+}
+
+#main {
+    width: 100%;
+    height: 500px;
+    overflow-y: scroll;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+.footer {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.inline {
+    display: inline;
+}
+
+.info {
+    background-color: #f8f8f8;
+}
+
+.serviceGroups {
+    background-color: #f8f8f8;
+}
+
+.types {
+    background-color: #f8f8f8;
+}
+
+.info > .header > .name,
+.serviceGroups > .header > .name,
+.services > .header > .name,
+.methods > .header > .name,
+.types > .header > .name {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.httpParameters > .children > div > .header > .name,
+.attributes > .children > div > .header > .name {
+    font-weight: bold;
+}
+
+.serviceGroups > .children > .package.open.object:nth-child(even) {
+    background: #e5e3e3;
+}
+
+.serviceGroups > .children > .package.open.object:nth-child(odd) {
+    background: #dddbdb;
+}
+
+.services > .children > .package.open.object:nth-child(even) {
+    background: #e7e5e5;
+}
+
+.services > .children > .package.open.object:nth-child(odd) {
+    background: #edebeb;
+}
+
+.methods > .children > .package.open.object:nth-child(even) {
+    background: #DDDBDB;
+}
+
+.methods > .children > .package.open.object:nth-child(odd) {
+    background: #e6e4e4;
+}
+
+.httpParameters > .children > .package.open.object:nth-child(even) {
+    background: #e6ebeb;
+}
+
+.httpParameters > .children > .package.open.object:nth-child(odd) {
+    background: #f0f5f5;
+}
+
+.parameters > .children > .package.open.object:nth-child(even) {
+    background: #e6ebeb;
+}
+
+.parameters > .children > .package.open.object:nth-child(odd) {
+    background: #f0f5f5
+}
+
+.soapInputHeaders > .children > .package.open.object:nth-child(even) {
+    background: #e6ebeb;
+}
+
+.soapInputHeaders > .children > .package.open.object:nth-child(odd) {
+    background: #f0f5f5
+}
+
+.soapOutputHeaders > .children > .package.open.object:nth-child(even) {
+    background: #e6ebeb;
+}
+
+.soapOutputHeaders > .children > .package.open.object:nth-child(odd) {
+    background: #f0f5f5
+}
+
+.returnOptions > .children > .package.open.object:nth-child(even) {
+    background: #eceaea;
+}
+
+.returnOptions > .children > .package.open.object:nth-child(odd) {
+    background: #e5e3e3;
+}
+
+.returnOptions > .children > div > .header,
+.returnTypes > .children > div > .header,
+.parameters > .children > div > .header,
+.soapInputHeaders > .children > div > .header,
+.soapOutputHeaders > .children > div > .header{
+    visibility: hidden;
+}
+
+.types > .children > .package.open.object:nth-child(even) {
+    background: #DDDBDB;
+}
+
+.types > .children > .package.open.object:nth-child(odd) {
+    background: #f0eeee
+}
+
+.types > .children > div > .header{
+    font-style: italic;
+}
+
+h1 {
+    font-family: Verdana,Geneva,Tahoma,Arial,Helvetica,sans-serif;
+    color: black;
+}
+
+.align-right {
+    text-align: right;
+}
+
+#modelUrl {
+    width: 60%;
+}
+
+.button-same-width{
+    width: 10%;
+}

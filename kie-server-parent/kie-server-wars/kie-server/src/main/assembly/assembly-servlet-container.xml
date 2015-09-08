@@ -32,6 +32,14 @@
       <directory>${project.basedir}/src/main/webc-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/main/docs</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/rest-api-doc</directory>
+      <outputDirectory>docs</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <dependencySets>

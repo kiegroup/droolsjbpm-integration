@@ -49,6 +49,10 @@ public class ExecutorResource {
 
     private ExecutorServiceBase executorServiceBase;
 
+    public ExecutorResource() {
+
+    }
+
     public ExecutorResource(ExecutorServiceBase executorServiceBase) {
         this.executorServiceBase = executorServiceBase;
     }
