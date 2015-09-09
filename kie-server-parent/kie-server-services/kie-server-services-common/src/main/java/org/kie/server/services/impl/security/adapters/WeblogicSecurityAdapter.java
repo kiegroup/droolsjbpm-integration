@@ -43,12 +43,11 @@ public class WeblogicSecurityAdapter implements SecurityAdapter {
 
 
     @Override
-    public String getUser() {
+    public String getUser(Object ... params) {
         if (active) {
 
             try {
-                Method method = webLogicSecurity.getMethod("getCurrentSubject", new Class[]{});
-                Subject wlsSubject = (Subject) method.invoke(null, new Object[]{});
+                Subject wlsSubject = getSubject(params);
 
                 if ( wlsSubject != null ) {
                     for ( java.security.Principal p : wlsSubject.getPrincipals() ) {
@@ -65,14 +64,13 @@ public class WeblogicSecurityAdapter implements SecurityAdapter {
     }
 
     @Override
-    public List<String> getRoles() {
+    public List<String> getRoles(Object ... params) {
         List<String> proles = new ArrayList<String>();
 
         if (active) {
 
             try {
-                Method method = webLogicSecurity.getMethod("getCurrentSubject", new Class[]{});
-                Subject wlsSubject = (Subject) method.invoke(null, new Object[]{});
+                Subject wlsSubject = getSubject(params);
 
                 if ( wlsSubject != null ) {
                     for ( java.security.Principal p : wlsSubject.getPrincipals() ) {
@@ -95,5 +93,21 @@ public class WeblogicSecurityAdapter implements SecurityAdapter {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    protected Subject getSubject(Object[] params) throws Exception{
+
+        if (params != null && params.length > 0) {
+            for (Object p : params) {
+                if (p instanceof Subject) {
+                    return (Subject) p;
+                }
+            }
+        }
+
+        Method method = webLogicSecurity.getMethod("getCurrentSubject", new Class[]{});
+        Subject wlsSubject = (Subject) method.invoke(null, new Object[]{});
+
+        return wlsSubject;
     }
 }

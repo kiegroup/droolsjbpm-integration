@@ -23,12 +23,12 @@ import org.kie.server.api.security.SecurityAdapter;
 public class FixedUserSecurityAdapter implements SecurityAdapter {
 
     @Override
-    public String getUser() {
+    public String getUser(Object ... params) {
         return "yoda";
     }
 
     @Override
-    public List<String> getRoles() {
+    public List<String> getRoles(Object ... params) {
         List<String> roles = new ArrayList<String>();
 
         return roles;
