@@ -18,7 +18,7 @@
     <module>kie-server-client</module>
     <module>kie-server-jms</module>
     <module>kie-server-rest</module>
-    <module>kie-server-ws</module>
+    <!--module>kie-server-ws</module-->
   </modules>
 
 </project>
