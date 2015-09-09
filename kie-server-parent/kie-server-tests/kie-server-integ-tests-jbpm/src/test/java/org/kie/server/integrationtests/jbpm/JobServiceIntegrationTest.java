@@ -19,10 +19,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.BeforeClass;
@@ -33,10 +31,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
-import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.core.AnyOf.*;
@@ -49,6 +43,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     private static final long SERVICE_TIMEOUT = 5000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
+    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -59,30 +54,10 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
 
-    protected KieServicesClient createDefaultClient() {
-        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
-        try {
-            extraClasses.add(Class.forName("org.jbpm.data.Person", true, kieContainer.getClassLoader()));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        KieServicesClient kieServicesClient = null;
-        if (TestConfig.isLocalServer()) {
-            KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            localServerConfig.addJaxbClasses(extraClasses);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
-        } else {
-            configuration.setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(extraClasses);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        }
-        configuration.setTimeout(5000);
-        setupClients(kieServicesClient);
-
-        return kieServicesClient;
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
-
 
     @Test
     public void testScheduleViewAndCancelJob() {

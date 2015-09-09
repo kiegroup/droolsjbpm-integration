@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
@@ -26,6 +27,8 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
@@ -63,6 +66,28 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
         this.queryClient = client.getServicesClient(QueryServicesClient.class);
         this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
+    }
+
+    @Override
+    protected KieServicesClient createDefaultClient() throws Exception {
+
+        KieServicesClient kieServicesClient = null;
+        // Add all extra custom classes defined in tests.
+        addExtraCustomClasses(extraClasses);
+        if (TestConfig.isLocalServer()) {
+            KieServicesConfiguration localServerConfig =
+                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
+            localServerConfig.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
+        } else {
+            configuration.setMarshallingFormat(marshallingFormat);
+            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
+        }
+        configuration.setTimeout(5000);
+        setupClients(kieServicesClient);
+
+        return kieServicesClient;
     }
 
     protected Object createPersonInstance(String name) {
