@@ -17,10 +17,8 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,9 +27,6 @@ import org.kie.api.task.model.Status;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
@@ -42,6 +37,7 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
 
     @BeforeClass
@@ -53,36 +49,14 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
 
-    protected KieServicesClient createDefaultClient() {
-        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
-        try {
-            extraClasses.add(Class.forName("org.jbpm.data.Person", true, kieContainer.getClassLoader()));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        KieServicesClient kieServicesClient = null;
-        if (TestConfig.isLocalServer()) {
-            KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-
-            localServerConfig.addJaxbClasses(extraClasses);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
-        } else {
-            configuration.setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(extraClasses);
-            configuration.setUserName("Administrator");
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        }
-        configuration.setTimeout(5000);
-        setupClients(kieServicesClient);
-
-        return kieServicesClient;
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
-
-
 
     @Test
     public void testFindTaskAssignedAsBusinessAdmin() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -120,6 +94,7 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
+            changeUser(TestConfig.getUsername());
         }
     }
 }

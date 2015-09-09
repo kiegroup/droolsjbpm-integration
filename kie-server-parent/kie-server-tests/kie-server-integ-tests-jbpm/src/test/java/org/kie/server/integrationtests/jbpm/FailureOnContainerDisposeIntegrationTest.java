@@ -16,9 +16,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,10 +25,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
-import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
@@ -42,6 +36,8 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
     private static final String DISPOSE_FAILURE_MSG = "Container definition-project failed to dispose, exception was raised: java.lang.IllegalStateException:" +
             " Undeploy forbidden - there are active processes instances for deployment definition-project";
 
+    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -51,32 +47,10 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
 
-    protected KieServicesClient createDefaultClient() {
-        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
-        try {
-            extraClasses.add(Class.forName("org.jbpm.data.Person", true, kieContainer.getClassLoader()));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        KieServicesClient kieServicesClient = null;
-        if (TestConfig.isLocalServer()) {
-            KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-
-            localServerConfig.addJaxbClasses(extraClasses);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
-        } else {
-            configuration.setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(extraClasses);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        }
-        configuration.setTimeout(5000);
-        setupClients(kieServicesClient);
-
-        return kieServicesClient;
+    @Override
+    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
+        extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
-
-
 
     @Test
     public void testNotAllowedDisposeContainerDueToActiveProcessInstances() throws Exception {
