@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,7 @@ public class ExecutorResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
 
@@ -86,7 +85,7 @@ public class ExecutorResource {
             return null;
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -102,7 +101,7 @@ public class ExecutorResource {
             return createResponse("", v, Response.Status.CREATED);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -118,7 +117,7 @@ public class ExecutorResource {
             return createCorrectVariant(result, headers, Response.Status.OK);
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -136,7 +135,7 @@ public class ExecutorResource {
             return createCorrectVariant(result, headers, Response.Status.OK);
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -152,7 +151,7 @@ public class ExecutorResource {
             return createCorrectVariant(result, headers, Response.Status.OK);
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -172,7 +171,7 @@ public class ExecutorResource {
             return createResponse(response, v, Response.Status.OK);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 }

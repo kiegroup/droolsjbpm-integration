@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
@@ -38,7 +39,6 @@ import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,9 +104,12 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceByCorrelationKey(@Context HttpHeaders headers, @PathParam("correlationKey") String correlationKey) {
-
+        Variant v = getVariant(headers);
         ProcessInstance processInstance = runtimeDataServiceBase.getProcessInstanceByCorrelationKey(correlationKey);
+        if (processInstance == null) {
 
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, correlationKey), v);
+        }
         return createCorrectVariant(processInstance, headers, Response.Status.OK);
 
     }
@@ -140,10 +143,13 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceById(@Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId) {
         Variant v = getVariant(headers);
-        org.kie.server.api.model.instance.ProcessInstance processInstanceDesc = runtimeDataServiceBase.getProcessInstanceById(processInstanceId);
-        if (processInstanceDesc == null) {
+        org.kie.server.api.model.instance.ProcessInstance processInstanceDesc = null;
+        try{
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            processInstanceDesc = runtimeDataServiceBase.getProcessInstanceById(processInstanceId);
+        } catch(ProcessInstanceNotFoundException e) {
+
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         }
         return createCorrectVariant(processInstanceDesc, headers, Response.Status.OK);
     }
@@ -153,10 +159,12 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getNodeInstanceForWorkItem(@Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId, @PathParam("workItemId") long workItemId) {
         Variant v = getVariant(headers);
-        NodeInstance nodeInstanceDesc = runtimeDataServiceBase.getNodeInstanceForWorkItem(processInstanceId, workItemId);
-        if (nodeInstanceDesc == null) {
+        NodeInstance nodeInstanceDesc = null;
+        try {
+            nodeInstanceDesc = runtimeDataServiceBase.getNodeInstanceForWorkItem(processInstanceId, workItemId);
+        } catch (IllegalArgumentException e) {
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(NODE_INSTANCE_NOT_FOUND, workItemId, processInstanceId), v);
+            return notFound(MessageFormat.format(NODE_INSTANCE_NOT_FOUND, workItemId, processInstanceId), v);
         }
         return createCorrectVariant(nodeInstanceDesc, headers, Response.Status.OK);
     }
@@ -239,10 +247,12 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByDeploymentIdProcessId(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pId") String processId) {
         Variant v = getVariant(headers);
-        org.kie.server.api.model.definition.ProcessDefinition processDesc = runtimeDataServiceBase.getProcessesByDeploymentIdProcessId(containerId, processId);
-        if (processDesc == null) {
+        org.kie.server.api.model.definition.ProcessDefinition processDesc = null;
+        try {
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
+            processDesc = runtimeDataServiceBase.getProcessesByDeploymentIdProcessId(containerId, processId);
+        } catch (IllegalArgumentException e) {
+            return notFound(MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         }
         return createCorrectVariant(processDesc, headers, Response.Status.OK);
     }
@@ -255,7 +265,7 @@ public class RuntimeDataResource {
         TaskInstance userTaskDesc = runtimeDataServiceBase.getTaskByWorkItemId(workItemId);
         if (userTaskDesc == null) {
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM, workItemId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM, workItemId), v);
         }
         return createCorrectVariant(userTaskDesc, headers, Response.Status.OK);
     }
@@ -268,7 +278,7 @@ public class RuntimeDataResource {
         TaskInstance userTaskDesc = runtimeDataServiceBase.getTaskById(taskId);
         if (userTaskDesc == null) {
 
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         }
         return createCorrectVariant(userTaskDesc, headers, Response.Status.OK);
     }
@@ -289,7 +299,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -311,7 +321,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -332,7 +342,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -352,7 +362,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -371,7 +381,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -390,7 +400,7 @@ public class RuntimeDataResource {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 }

@@ -16,7 +16,6 @@
 package org.kie.server.remote.rest.common.util;
 
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -90,4 +89,11 @@ public class RestUtils {
         return contentType;
     }
 
+    public static Response notFound(String message, Variant v) {
+        return createResponse(message, v, Response.Status.NOT_FOUND);
+    }
+
+    public static Response internalServerError(String message, Variant v) {
+        return createResponse(message, v, Response.Status.INTERNAL_SERVER_ERROR);
+    }
 }
