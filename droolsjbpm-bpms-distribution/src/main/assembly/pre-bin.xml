@@ -33,6 +33,7 @@
         <include>org.jbpm:jbpm-human-task-workitems</include>
         <include>org.jbpm:jbpm-human-task-audit</include>
         <include>org.jbpm:jbpm-human-task-jpa</include>
+        <include>org.jbpm:jbpm-query-jpa</include>
         <include>org.jbpm:jbpm-shared-services</include>
         <include>org.jbpm:jbpm-test</include>
         <include>org.jbpm:jbpm-runtime-manager</include>
@@ -50,11 +51,13 @@
         <include>org.kie.remote:kie-remote-client</include>
         <include>org.kie.remote:kie-remote-jaxb</include>
         <include>org.kie.remote:kie-remote-common</include>
+        <include>org.kie.remote.ws:kie-remote-ws-common</include>
         <include>org.kie:kie-spring</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
+        <include>org.drools:drools-karaf-features</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-reteoo</include>
         <include>org.drools:drools-rhq-plugin</include>
@@ -83,6 +86,7 @@
         <exclude>org.jbpm:jbpm-human-task-audit</exclude>
         <exclude>org.jbpm:jbpm-human-task-jpa</exclude>
         <exclude>org.jbpm:jbpm-human-task-workitems</exclude>
+        <exclude>org.jbpm:jbpm-query-jpa</exclude>
         <exclude>org.jbpm:jbpm-shared-services</exclude>
         <exclude>org.jbpm:jbpm-test</exclude>
         <exclude>org.jbpm:jbpm-runtime-manager</exclude>
@@ -100,11 +104,13 @@
         <exclude>org.kie.remote:kie-remote-client</exclude>
         <exclude>org.kie.remote:kie-remote-jaxb</exclude>
         <exclude>org.kie.remote:kie-remote-common</exclude>
+        <exclude>org.kie.remote.ws:kie-remote-ws-common</exclude>
         <exclude>org.kie:kie-spring</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
+        <exclude>org.drools:drools-karaf-features</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-reteoo</exclude>
         <exclude>org.drools:drools-rhq-plugin</exclude>
