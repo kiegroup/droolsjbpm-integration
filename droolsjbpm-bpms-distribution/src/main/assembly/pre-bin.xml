@@ -48,11 +48,13 @@
         <include>org.kie:kie-maven-plugin</include>
         <include>org.kie:kie-ci</include>
         <include>org.kie:kie-ci-osgi</include>
+        <include>org.kie:kie-spring</include>
         <include>org.kie.remote:kie-remote-client</include>
         <include>org.kie.remote:kie-remote-jaxb</include>
         <include>org.kie.remote:kie-remote-common</include>
         <include>org.kie.remote.ws:kie-remote-ws-common</include>
-        <include>org.kie:kie-spring</include>
+        <include>org.kie.server:kie-server-api</include>
+        <include>org.kie.server:kie-server-client</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
@@ -101,11 +103,13 @@
         <exclude>org.kie:kie-maven-plugin</exclude>
         <exclude>org.kie:kie-ci</exclude>
         <exclude>org.kie:kie-ci-osgi</exclude>
+        <exclude>org.kie:kie-spring</exclude>
         <exclude>org.kie.remote:kie-remote-client</exclude>
         <exclude>org.kie.remote:kie-remote-jaxb</exclude>
         <exclude>org.kie.remote:kie-remote-common</exclude>
         <exclude>org.kie.remote.ws:kie-remote-ws-common</exclude>
-        <exclude>org.kie:kie-spring</exclude>
+        <exclude>org.kie.server:kie-server-api</exclude>
+        <exclude>org.kie.server:kie-server-client</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
