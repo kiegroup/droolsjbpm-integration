@@ -851,6 +851,19 @@ public class KieRemoteHttpRequest {
             } else {
                 connection = CONNECTION_FACTORY.create(getRequestInfo().getRequestUrl());
             }
+            // support for localhost and https
+            if (getRequestInfo().getRequestUrl().getProtocol().equalsIgnoreCase("https") && getRequestInfo().getRequestUrl().getHost().equalsIgnoreCase("localhost")) {
+                ((HttpsURLConnection) connection).setHostnameVerifier(new HostnameVerifier(){
+
+                    public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession) {
+                        if (hostname.equalsIgnoreCase("localhost")) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+            }
+
             connection.setRequestMethod(getRequestInfo().requestMethod);
             return connection;
         } catch( IOException ioe ) {
