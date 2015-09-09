@@ -250,11 +250,11 @@ public class PerfRepoReporter extends ScheduledReporter {
         boolean end = false;
         for (int i = 0; i < value.length(); ++i) {
             String c = String.valueOf(value.charAt(i));
-            if (!end && c.matches("[0-9\\.]+")) {
-                filteredValue += c;
+            if (end || !(c.matches("[0-9]") || c.equals("."))) {
+                paramValue += c;
                 end = true;
             } else {
-                paramValue += c;
+                filteredValue += c;
             }
         }
         if (!filteredValue.isEmpty()) {
