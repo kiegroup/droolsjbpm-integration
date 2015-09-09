@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.kie.perf.SharedMetricRegistry;
 import org.kie.perf.TestConfig;
+import org.kie.perf.TestConfig.RunType;
 import org.kie.perf.annotation.KPKLimit;
 import org.kie.perf.run.IRunType;
 import org.kie.perf.scenario.IPerfTest;
@@ -38,8 +39,14 @@ public class ConcurrentLoadSuite implements ITestSuite {
         KPKLimit limit = scenario.getClass().getAnnotation(KPKLimit.class);
         final int max = (limit != null) ? limit.value() : Integer.MAX_VALUE;
 
-        Timer duration = SharedMetricRegistry.getInstance().timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
-        Timer.Context context = duration.time();
+        TestConfig tc = TestConfig.getInstance();
+
+        Timer.Context contextDuration = null;
+        if (tc.getRunType() != RunType.DURATION) {
+            Timer duration = SharedMetricRegistry.getInstance().timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
+            contextDuration = duration.time();
+        }
+        
         for (int i = 0; i < threads; ++i) {
             Thread t = new Thread(new Runnable() {
                 @Override
@@ -69,7 +76,9 @@ public class ConcurrentLoadSuite implements ITestSuite {
                 ex.printStackTrace();
             }
         }
-        context.stop();
+        if (contextDuration != null) {
+            contextDuration.stop();
+        }
 
         scenario.close();
         threadsList.clear();
