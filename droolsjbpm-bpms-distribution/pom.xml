@@ -137,6 +137,10 @@
       <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-client</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>knowledge-api</artifactId>
     </dependency>
