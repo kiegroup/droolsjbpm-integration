@@ -234,12 +234,17 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     }
 
-    @Test(expected = KieServicesException.class)
+    @Test
     public void testGetProcessDefinitionByContainerAndNonExistingId() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
-        queryClient.findProcessByContainerIdProcessId("definition-project", "non-existing");
+        try {
+            queryClient.findProcessByContainerIdProcessId("definition-project", "non-existing");
+            fail("KieServicesException should be thrown complaining about process definition not found.");
 
+        } catch (KieServicesException e) {
+            assertResultContainsString(e.getMessage(), "Could not find process definition \"non-existing\" in container \"definition-project\"");
+        }
     }
 
     @Test
@@ -484,12 +489,17 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         }
     }
 
-    @Test(expected = KieServicesException.class)
+    @Test
     public void testGetProcessInstanceByNonExistingId() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
-        queryClient.findProcessInstanceById(-9999l);
+        try {
+            queryClient.findProcessInstanceById(-9999l);
+            fail("KieServicesException should be thrown complaining about process instance not found.");
 
+        } catch (KieServicesException e) {
+            assertResultContainsString(e.getMessage(), "Could not find process instance with id");
+        }
     }
 
     @Test

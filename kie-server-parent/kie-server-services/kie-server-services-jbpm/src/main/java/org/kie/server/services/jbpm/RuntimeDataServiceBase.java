@@ -505,6 +505,10 @@ public class RuntimeDataServiceBase {
     }
 
     protected org.kie.server.api.model.instance.ProcessInstance convertToProcessInstance(ProcessInstanceDesc pi) {
+        if (pi == null) {
+            return null;
+        }
+
         org.kie.server.api.model.instance.ProcessInstance instance = org.kie.server.api.model.instance.ProcessInstance.builder()
                 .id(pi.getId())
                 .processId(pi.getProcessId())
@@ -561,6 +565,9 @@ public class RuntimeDataServiceBase {
     }
 
     protected org.kie.server.api.model.definition.ProcessDefinition convertToProcess(ProcessDefinition processDesc) {
+        if (processDesc == null) {
+            return null;
+        }
 
         org.kie.server.api.model.definition.ProcessDefinition processDefinition = org.kie.server.api.model.definition.ProcessDefinition.builder()
                 .id(processDesc.getId())
