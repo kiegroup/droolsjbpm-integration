@@ -19,7 +19,7 @@ import java.util.List;
 
 public interface SecurityAdapter {
 
-    String getUser();
+    String getUser(Object ... params);
 
-    List<String> getRoles();
+    List<String> getRoles(Object ... params);
 }

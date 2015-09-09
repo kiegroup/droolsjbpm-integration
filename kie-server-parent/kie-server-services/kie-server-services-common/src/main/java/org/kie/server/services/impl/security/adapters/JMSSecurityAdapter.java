@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -40,10 +41,12 @@ import org.slf4j.LoggerFactory;
 public class JMSSecurityAdapter implements SecurityAdapter {
     private static final Logger logger = LoggerFactory.getLogger(JMSSecurityAdapter.class);
 
+    private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
+
     private static ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
 
     @Override
-    public String getUser() {
+    public String getUser(Object ... params) {
         if (currentUser.get() != null) {
             logger.debug("Returning name from JMS Adapter - {}", currentUser.get().getName());
             return currentUser.get().getName();
@@ -53,7 +56,7 @@ public class JMSSecurityAdapter implements SecurityAdapter {
     }
 
     @Override
-    public List<String> getRoles() {
+    public List<String> getRoles(Object ... params) {
 
         if (currentUser.get() != null) {
             logger.debug("Returning name from JMS Adapter - {}", currentUser.get().getName());
@@ -97,8 +100,10 @@ public class JMSSecurityAdapter implements SecurityAdapter {
                         }
                     }
                 }
-
+                roles.addAll(getRolesFromAdapter(subject));
             }
+
+
             userDetails.setRoles(roles);
             logger.debug("setting user details as {}", userDetails);
             currentUser.set(userDetails);
@@ -169,5 +174,18 @@ public class JMSSecurityAdapter implements SecurityAdapter {
             }
 
         }
+    }
+
+    protected static List<String> getRolesFromAdapter(Subject subject) {
+        List<String> roles = new ArrayList<String>();
+
+        for (SecurityAdapter adapter : securityAdapters) {
+            List<String> adapterRoles = adapter.getRoles(subject);
+            if (adapterRoles != null && !adapterRoles.isEmpty()) {
+                roles.addAll(adapterRoles);
+            }
+        }
+
+        return roles;
     }
 }

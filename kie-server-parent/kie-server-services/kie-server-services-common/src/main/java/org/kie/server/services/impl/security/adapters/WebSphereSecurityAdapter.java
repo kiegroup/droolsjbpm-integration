@@ -45,7 +45,7 @@ public class WebSphereSecurityAdapter implements SecurityAdapter {
 
 
     @Override
-    public String getUser() {
+    public String getUser(Object ... params) {
         if (active) {
             try {
                 Method method = subject.getMethod("getCallerPrincipal", new Class[]{});
@@ -60,7 +60,7 @@ public class WebSphereSecurityAdapter implements SecurityAdapter {
     }
 
     @Override
-    public List<String> getRoles() {
+    public List<String> getRoles(Object ... params) {
         List<String> proles = new ArrayList<String>();
 
         if (active) {
