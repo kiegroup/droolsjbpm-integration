@@ -35,10 +35,8 @@ import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
-import org.jbpm.services.api.RuntimeDataService;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
@@ -91,7 +89,7 @@ public class ProcessResource  {
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
@@ -112,7 +110,7 @@ public class ProcessResource  {
             return createResponse(response, v, Response.Status.CREATED);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(CREATE_RESPONSE_ERROR, e.getMessage()), v);
         }
     }
@@ -128,14 +126,14 @@ public class ProcessResource  {
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -150,14 +148,14 @@ public class ProcessResource  {
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -177,12 +175,12 @@ public class ProcessResource  {
             return createResponse(null, v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -201,12 +199,12 @@ public class ProcessResource  {
             return createResponse("", v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -226,7 +224,7 @@ public class ProcessResource  {
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -247,12 +245,12 @@ public class ProcessResource  {
             return createResponse("", v, Response.Status.CREATED);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -271,12 +269,12 @@ public class ProcessResource  {
             return createResponse("", v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -295,14 +293,14 @@ public class ProcessResource  {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -321,14 +319,14 @@ public class ProcessResource  {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -348,12 +346,12 @@ public class ProcessResource  {
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
         }  catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -375,12 +373,12 @@ public class ProcessResource  {
             return createResponse("", v, Response.Status.CREATED);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -399,12 +397,12 @@ public class ProcessResource  {
             return createResponse("", v, Response.Status.CREATED);
 
         } catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -423,12 +421,12 @@ public class ProcessResource  {
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
         }  catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -448,12 +446,12 @@ public class ProcessResource  {
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, v, Response.Status.OK);
         }  catch (ProcessInstanceNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
         } catch (DeploymentNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 

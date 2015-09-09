@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.TaskNotFoundException;
-import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,10 +66,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -87,10 +86,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -107,10 +106,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -127,10 +126,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
 
     }
@@ -148,10 +147,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -168,10 +167,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -188,10 +187,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -206,10 +205,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -225,10 +224,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -244,10 +243,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
     @PUT
@@ -262,10 +261,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -282,10 +281,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -300,10 +299,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -320,10 +319,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -341,10 +340,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -362,10 +361,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -383,10 +382,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -402,10 +401,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -422,10 +421,10 @@ public class UserTaskResource {
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -443,10 +442,10 @@ public class UserTaskResource {
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -464,10 +463,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -485,10 +484,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -505,10 +504,10 @@ public class UserTaskResource {
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -525,10 +524,10 @@ public class UserTaskResource {
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -545,10 +544,10 @@ public class UserTaskResource {
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -566,10 +565,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -587,10 +586,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -608,10 +607,10 @@ public class UserTaskResource {
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -628,10 +627,10 @@ public class UserTaskResource {
             // return null to produce 204 NO_CONTENT response code
             return null;
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -649,10 +648,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -670,10 +669,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
     @GET
@@ -691,10 +690,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e){
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 
@@ -713,10 +712,10 @@ public class UserTaskResource {
             return createResponse(response, v, Response.Status.OK);
 
         } catch (TaskNotFoundException e) {
-            throw ExecutionServerRestOperationException.notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            throw ExecutionServerRestOperationException.internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
 }

@@ -15,11 +15,13 @@
 
 package org.kie.server.services.jbpm;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -192,7 +194,9 @@ public class RuntimeDataServiceBase {
     public org.kie.server.api.model.instance.ProcessInstance getProcessInstanceById(long processInstanceId) {
 
         ProcessInstanceDesc processInstanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
-
+        if (processInstanceDesc == null) {
+            throw new ProcessInstanceNotFoundException("Could not find process instance with id " + processInstanceId);
+        }
         return convertToProcessInstance(processInstanceDesc);
     }
 
@@ -200,7 +204,9 @@ public class RuntimeDataServiceBase {
     public NodeInstance getNodeInstanceForWorkItem(long processInstanceId, long workItemId) {
 
         NodeInstanceDesc nodeInstanceDesc = runtimeDataService.getNodeInstanceForWorkItem(workItemId);
-
+        if (nodeInstanceDesc == null) {
+            throw new IllegalArgumentException("Could not find node instance with id \""+workItemId+"\" within process instance with id \""+processInstanceId +"\"");
+        }
         return convertToNodeInstance(nodeInstanceDesc);
     }
 
@@ -300,7 +306,9 @@ public class RuntimeDataServiceBase {
 
     public org.kie.server.api.model.definition.ProcessDefinition getProcessesByDeploymentIdProcessId(String containerId, String processId) {
         ProcessDefinition processDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(containerId, processId);
-
+        if (processDesc == null) {
+            throw new IllegalArgumentException("Could not find process definition \""+processId+"\" in container \""+containerId +"\"");
+        }
         return convertToProcess(processDesc);
     }
 

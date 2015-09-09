@@ -33,7 +33,6 @@ import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
-import org.kie.server.remote.rest.common.exception.ExecutionServerRestOperationException;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
 
 import static org.kie.server.api.rest.RestURI.*;
@@ -61,10 +60,10 @@ public class DefinitionResource {
 
             return createCorrectVariant(responseObject, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -79,10 +78,10 @@ public class DefinitionResource {
 
             return createCorrectVariant(definition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -97,10 +96,10 @@ public class DefinitionResource {
 
             return createCorrectVariant(variablesDefinition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -114,10 +113,10 @@ public class DefinitionResource {
             ServiceTasksDefinition serviceTasksDefinition = definitionServiceBase.getServiceTasks(containerId, processId);
             return createCorrectVariant(serviceTasksDefinition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -131,10 +130,10 @@ public class DefinitionResource {
             AssociatedEntitiesDefinition associatedEntitiesDefinition = definitionServiceBase.getAssociatedEntities(containerId, processId);
             return createCorrectVariant(associatedEntitiesDefinition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -148,10 +147,10 @@ public class DefinitionResource {
             UserTaskDefinitionList userTaskDefinitions = definitionServiceBase.getTasksDefinitions(containerId, processId);
             return createCorrectVariant(userTaskDefinitions, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -165,10 +164,10 @@ public class DefinitionResource {
             TaskInputsDefinition taskInputsDefinition = definitionServiceBase.getTaskInputMappings(containerId, processId, taskName);
             return createCorrectVariant(taskInputsDefinition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
@@ -182,10 +181,10 @@ public class DefinitionResource {
             TaskOutputsDefinition taskOutputsDefinition = definitionServiceBase.getTaskOutputMappings(containerId, processId, taskName);
             return createCorrectVariant(taskOutputsDefinition, headers, Response.Status.OK);
         } catch (IllegalStateException e) {
-            throw ExecutionServerRestOperationException.notFound(
+            return notFound(
                     MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch( Exception e ) {
-            throw ExecutionServerRestOperationException.internalServerError(
+            return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }

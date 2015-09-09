@@ -462,9 +462,21 @@ public abstract class AbstractKieServicesClientImpl {
             KieRemoteHttpRequest request,
             KieRemoteHttpResponse response) {
         String summaryMessage = "Unexpected HTTP response code when requesting URI '" + request.getUri() + "'! Error code: " +
-                response.code() + ", message: " + response.message();
-        logger.debug( summaryMessage + ", response body: " + response.body() );
+                response.code() + ", message: " + response.body();
+        logger.debug( summaryMessage + ", response body: " + getMessage(response) );
         return new KieServicesException( summaryMessage );
+    }
+
+    protected String getMessage(KieRemoteHttpResponse response) {
+        try {
+            String body = response.body();
+            if (body != null && !body.isEmpty()) {
+                return body;
+            }
+        } catch (Exception e) {
+            logger.debug("Error when getting both of the response {}", e.getMessage());
+        }
+        return response.message();
     }
 
     protected String buildQueryString(String paramName, List<?> items) {
