@@ -2,6 +2,7 @@ package org.kie.perf.suite;
 
 import org.kie.perf.SharedMetricRegistry;
 import org.kie.perf.TestConfig;
+import org.kie.perf.TestConfig.RunType;
 import org.kie.perf.annotation.KPKLimit;
 import org.kie.perf.run.IRunType;
 import org.kie.perf.scenario.IPerfTest;
@@ -29,10 +30,14 @@ public class LoadSuite implements ITestSuite {
     @Override
     public void startScenario(final IPerfTest scenario) {
         MetricRegistry metrics = SharedMetricRegistry.getInstance();
-        IRunType run = TestConfig.getInstance().getRunType().newInstance();
+        TestConfig tc = TestConfig.getInstance();
+        IRunType run = tc.getRunType().newInstance();
 
-        Timer duration = metrics.timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
-        Timer.Context contextDuration = duration.time();
+        Timer.Context contextDuration = null;
+        if (tc.getRunType() != RunType.DURATION) {
+            Timer duration = metrics.timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
+            contextDuration = duration.time();
+        }
 
         KPKLimit limit = scenario.getClass().getAnnotation(KPKLimit.class);
         int max = Integer.MAX_VALUE;
@@ -51,7 +56,9 @@ public class LoadSuite implements ITestSuite {
             }
             context.stop();
         }
-        contextDuration.stop();
+        if (contextDuration != null) {
+            contextDuration.stop();
+        }
         scenario.close();
     }
 
