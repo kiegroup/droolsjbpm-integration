@@ -46,6 +46,10 @@
 
   <modules>
     <module>kie-identity-session-provider</module>
+    <module>kie-maven-plugin</module>
+    <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
+         that is about to be build in the same Maven reactor build -->
+    <!--<module>kie-maven-plugin-example</module>-->
     <module>drools-benchmark</module>
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
