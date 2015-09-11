@@ -12,7 +12,7 @@
   <artifactId>kie-remote-ws</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE Remote WebServices multiproject</name>
+  <name>KIE Remote WebServices</name>
   <description>Web services for various kie projects</description>
 
   <modules>
@@ -44,7 +44,7 @@
             <artifactId>kie-remote-ws-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <dependency>
           <groupId>javax.xml.ws</groupId>
           <artifactId>jaxws-api</artifactId>

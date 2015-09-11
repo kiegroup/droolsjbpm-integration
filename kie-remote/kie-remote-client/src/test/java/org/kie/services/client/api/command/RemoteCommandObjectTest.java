@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -63,7 +62,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.jbpm.services.task.commands.AddTaskCommand;
 import org.junit.Test;
 import org.kie.internal.jaxb.StringKeyObjectValueMap;
 import org.kie.internal.jaxb.StringKeyObjectValueMapXmlAdapter;
@@ -97,19 +95,19 @@ public class RemoteCommandObjectTest {
             new FieldAnnotationsScanner(), new SubTypesScanner());
 
     private DatatypeFactory datatypeFactory;
-    
+
     public RemoteCommandObjectTest() throws Exception {
         datatypeFactory = DatatypeFactory.newInstance();
     }
-    
+
     @Test
     public void isAcceptableCommandTest() throws Exception {
-       assertTrue( "The .isAcceptedCommandClass method is not functioning correctly: generated classes", 
+       assertTrue( "The .isAcceptedCommandClass method is not functioning correctly: generated classes",
                AcceptedClientCommands.isAcceptedCommandClass(org.kie.remote.jaxb.gen.AddTaskCommand.class));
-       assertFalse( "The .isAcceptedCommandClass method is not functioning correctly: original command classes", 
+       assertFalse( "The .isAcceptedCommandClass method is not functioning correctly: original command classes",
                AcceptedClientCommands.isAcceptedCommandClass(org.jbpm.services.task.commands.AddTaskCommand.class));
     }
-    
+
     @Test
     public void reflectionMappingTest() throws Exception {
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(XmlAccessorType.class);
@@ -117,22 +115,23 @@ public class RemoteCommandObjectTest {
 
         List<Class<?>> classList = new LinkedList<Class<?>>(classes);
         Collections.sort(classList, new Comparator<Class<?>>() {
+            @Override
             public int compare( Class<?> o1, Class<?> o2 ) {
                 return o1.getSimpleName().compareTo(o2.getSimpleName());
             }
         });
         classes = new LinkedHashSet<Class<?>>(classList);
-        
+
         Map<Class, Class> kieCmdGenCmdClassMap = new LinkedHashMap<Class, Class>();
         for( Class<?> cmdClass : classes ) {
-            if( ! cmdClass.getSimpleName().endsWith("Command") ) { 
-               continue; 
+            if( ! cmdClass.getSimpleName().endsWith("Command") ) {
+               continue;
             }
-            if( ! AcceptedClientCommands.isAcceptedCommandClass(cmdClass) ) {  
+            if( ! AcceptedClientCommands.isAcceptedCommandClass(cmdClass) ) {
                 continue;
             }
             Class genCmdClass = Class.forName("org.kie.remote.jaxb.gen." + cmdClass.getSimpleName());
-            assertTrue( genCmdClass.getSimpleName() + " is not an accepted command?", 
+            assertTrue( genCmdClass.getSimpleName() + " is not an accepted command?",
                     AcceptedClientCommands.isAcceptedCommandClass(genCmdClass) );
             kieCmdGenCmdClassMap.put(cmdClass, genCmdClass);
         }
@@ -145,20 +144,20 @@ public class RemoteCommandObjectTest {
 
     private void compareKieClassInstanceToGenClassInstance( Class kieCmdClass, Class genCmdClass ) throws Exception {
         Object genCmd = fillCommand(genCmdClass);
-        if( DeleteCommand.class.equals(genCmdClass) ) { 
+        if( DeleteCommand.class.equals(genCmdClass) ) {
             ((DeleteCommand) genCmd).setFactHandle( ":1:2:3:4:5:TRAIT" );
         }
         Object copyKieCmd = roundTripFromFlatToOrigCmd(genCmd, genCmdClass, kieCmdClass);
-        
-        for( Field field : kieCmdClass.getDeclaredFields() ) { 
-            if( field.getAnnotation(XmlTransient.class) != null) { 
-               continue; 
+
+        for( Field field : kieCmdClass.getDeclaredFields() ) {
+            if( field.getAnnotation(XmlTransient.class) != null) {
+               continue;
             }
             field.setAccessible(true);
             Object kieCmdFieldVal = field.get(copyKieCmd);
             assertNotNull( kieCmdClass.getSimpleName() + "."  + field.getName(), kieCmdFieldVal );
         }
-        
+
     }
 
     private static Random random = new Random();
@@ -172,7 +171,7 @@ public class RemoteCommandObjectTest {
             }
             fillField(field, cmdObj);
         }
-        if( cmdClass.getSuperclass() != null ) { 
+        if( cmdClass.getSuperclass() != null ) {
             for( Field taskField : cmdClass.getSuperclass().getDeclaredFields() ) {
                 if( Modifier.isStatic(taskField.getModifiers()) ) {
                     continue;
@@ -185,23 +184,23 @@ public class RemoteCommandObjectTest {
     }
 
     private static DatatypeFactory factory;
-    static { 
+    static {
         try {
             factory = DatatypeFactory.newInstance();
         } catch( DatatypeConfigurationException e ) {
             // do nothing
         }
     }
-    
+
     private void fillField( Field field, Object obj ) throws Exception {
         field.setAccessible(true);
         String fieldTypeName = field.getType().getName();
         Class fieldType = field.getType();
         if( fieldTypeName.startsWith("java") || !fieldTypeName.contains(".") ) {
             if( fieldType.equals(String.class) ) {
-                if( "className".equals(field.getName()) ) { 
+                if( "className".equals(field.getName()) ) {
                     field.set(obj, String.class.getName() );
-                } else { 
+                } else {
                     field.set(obj, UUID.randomUUID().toString());
                 }
             } else if( fieldType.equals(Integer.class) || fieldType.equals(int.class) ) {
@@ -240,15 +239,15 @@ public class RemoteCommandObjectTest {
                         } else {
                             fail("Please add logic to deal with the " + listItemClass.getName());
                         }
-                    } else if( listItemClass.equals(QueryCriteria.class) ) { 
+                    } else if( listItemClass.equals(QueryCriteria.class) ) {
                             // do nothing
                     } else {
                         if( TaskCommand.class.equals(listItemClass) ) {
                             ActivateTaskCommand cmd = new ActivateTaskCommand();
                             cmd.setTaskId(random.nextLong());
-                            cmd.setUserId(UUID.randomUUID().toString());    
+                            cmd.setUserId(UUID.randomUUID().toString());
                             listItem = cmd;
-                        } else { 
+                        } else {
                             listItem = listItemClass.getConstructor().newInstance();
                             for( Field listItemField : listItemClass.getDeclaredFields() ) {
                                 fillField(listItemField, listItem);
@@ -258,30 +257,30 @@ public class RemoteCommandObjectTest {
                     list.add(listItem);
                 }
                 field.set(obj, list);
-            } else if( fieldType.equals(XMLGregorianCalendar.class) ) { 
+            } else if( fieldType.equals(XMLGregorianCalendar.class) ) {
                 XMLGregorianCalendar date = datatypeFactory.newXMLGregorianCalendar(new GregorianCalendar());
                 field.set(obj, date);
-            } else if( fieldType.equals(BigInteger.class) ) { 
+            } else if( fieldType.equals(BigInteger.class) ) {
                 field.set(obj, new BigInteger("23"));
-            } else if( fieldType.equals(Object.class) ) { 
+            } else if( fieldType.equals(Object.class) ) {
                 field.set(obj, "Object");
-            } else if( fieldType.equals(byte[].class) ) { 
+            } else if( fieldType.equals(byte[].class) ) {
                 byte [] value = StringKeyObjectValueMapXmlAdapter.serializeObject("Object", "test");
                 field.set(obj, value);
-            } else { 
+            } else {
                 fail("> " + obj.getClass().getSimpleName() + "." + field.getName() + ": " + fieldType.getName());
             }
-        } else if( fieldType.isEnum() ) { 
+        } else if( fieldType.isEnum() ) {
             Object [] enumConstants = fieldType.getEnumConstants();
             field.set(obj, enumConstants[random.nextInt(enumConstants.length)]);
-        } else { 
+        } else {
             if( fieldType.equals(org.kie.remote.jaxb.gen.TaskCommand.class) ) {
                 ActivateTaskCommand cmd = new ActivateTaskCommand();
                 cmd.setTaskId(2l);
                 cmd.setUserId(UUID.randomUUID().toString());
                 field.set(obj, cmd);
-            } else { 
-                if( field.getAnnotation(XmlTransient.class) != null ) { 
+            } else {
+                if( field.getAnnotation(XmlTransient.class) != null ) {
                     return;
                 }
                  Object subObj = fieldType.getConstructor().newInstance();
@@ -306,15 +305,16 @@ public class RemoteCommandObjectTest {
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         marshaller.setProperty(CharacterEscapeHandler.class.getName(), new CharacterEscapeHandler() {
+            @Override
             public void escape( char[] ac, int i, int j, boolean flag, Writer writer ) throws IOException {
                 writer.write(ac, i, j);
             }
         });
 
         StringWriter stringWriter = new StringWriter();
-        try { 
+        try {
             marshaller.marshal(object, stringWriter);
-        } catch( Exception e ) { 
+        } catch( Exception e ) {
             e.printStackTrace();
             fail( "Could not marshal " + cmdClass.getSimpleName() );
         }
@@ -336,72 +336,72 @@ public class RemoteCommandObjectTest {
     }
 
     @Test
-    public void preprocessTest() throws Throwable { 
+    public void preprocessTest() throws Throwable {
        Set<Class<?>> xmlClasses = reflections.getTypesAnnotatedWith(XmlAccessorType.class);
-    
+
        // get all command classes
        Set<Class> cmdClasses = new HashSet<Class>(xmlClasses.size());
-       for( Class<?> clazz : xmlClasses ) { 
-           if( clazz.getName().endsWith("Command") && clazz.getPackage().getName().startsWith("org.kie.remote.jaxb.gen")) { 
+       for( Class<?> clazz : xmlClasses ) {
+           if( clazz.getName().endsWith("Command") && clazz.getPackage().getName().startsWith("org.kie.remote.jaxb.gen")) {
              XmlRootElement xmlRootElemAnno = clazz.getAnnotation(XmlRootElement.class);
-             if( ! Modifier.isAbstract(clazz.getModifiers()) ) { 
-                 assertNotNull( clazz.getSimpleName() + " is missing @" + XmlRootElement.class.getSimpleName(), 
+             if( ! Modifier.isAbstract(clazz.getModifiers()) ) {
+                 assertNotNull( clazz.getSimpleName() + " is missing @" + XmlRootElement.class.getSimpleName(),
                          xmlRootElemAnno );
                  cmdClasses.add(clazz);
              }
            }
        }
-      
+
        // get all command classes that have parameters
        Set<Class<?>> paramCmdClasses = new HashSet<Class<?>>(cmdClasses.size());
-       for( Class cmdClass : cmdClasses ) { 
+       for( Class cmdClass : cmdClasses ) {
            Field [] cmdFields = cmdClass.getDeclaredFields();
-           for( Field field : cmdFields ) { 
+           for( Field field : cmdFields ) {
                field.setAccessible(true);
-              if( field.getType().equals(List.class) )  { 
-                  if( field.getGenericType() instanceof ParameterizedType ) { 
+              if( field.getType().equals(List.class) )  {
+                  if( field.getGenericType() instanceof ParameterizedType ) {
                       ParameterizedType pType = (ParameterizedType) field.getGenericType();
                       Type [] listTypes = pType.getActualTypeArguments();
                       if( listTypes.length > 0 && ! ((Class) listTypes[0]).equals(Object.class) ) {
-                         continue; 
+                         continue;
                       }
                   }
                   paramCmdClasses.add(cmdClass);
-              } else if( field.getType().equals(JaxbStringObjectPairArray.class) ) { 
+              } else if( field.getType().equals(JaxbStringObjectPairArray.class) ) {
                   paramCmdClasses.add(cmdClass);
-              } else if( field.getType().equals(Object.class) ) { 
+              } else if( field.getType().equals(Object.class) ) {
                   paramCmdClasses.add(cmdClass);
               }
            }
        }
-    
+
         RemoteConfiguration config = new RemoteConfiguration("adsf", new URL("http://localhost:80808"), "user", "pwd" );
 
-        
+
         List<Object> objList = new ArrayList<Object>();
         String fieldName = "sendObjectParameterCommandClasses";
         Field paramClassesField = AcceptedClientCommands.class.getDeclaredField(fieldName);
         paramClassesField.setAccessible(true);
         Set<Class> sendObjectParameterClasses = (Set<Class>) paramClassesField.get(null);
-       
+
         // verify that the found classes are in the AcceptedClientCommands.sendObjectParameterCommandClasses field
-        if( sendObjectParameterClasses.size() != paramCmdClasses.size() ) { 
-           for( Class foundParamCmdClass : paramCmdClasses ) { 
+        if( sendObjectParameterClasses.size() != paramCmdClasses.size() ) {
+           for( Class foundParamCmdClass : paramCmdClasses ) {
               assertTrue( "The " + AcceptedClientCommands.class.getSimpleName() + "." + fieldName
                       + " does not contain the " + foundParamCmdClass.getSimpleName(),
                       sendObjectParameterClasses.contains(foundParamCmdClass));
            }
         }
-        
-        // verify that the parameter command classes are handled in the 
-        for( Class clientClass : sendObjectParameterClasses ) { 
+
+        // verify that the parameter command classes are handled in the
+        for( Class clientClass : sendObjectParameterClasses ) {
             KieSessionClientCommandObject spyCmdObj = Mockito.spy(new KieSessionClientCommandObject(config));
             Object inst = clientClass.getConstructor(new Class[0]).newInstance(new Object[0]);
             spyCmdObj.preprocessParameterCommand(inst, objList);
             logger.debug( "Are {} instances checked for user-defined classes?", clientClass.getSimpleName() );
-            try { 
+            try {
                 verify(spyCmdObj, atLeastOnce()).addPossiblyNullObject(any(), any(List.class));
-            } catch( Throwable t ) { 
+            } catch( Throwable t ) {
                 throw new AssertionError( clientClass.getSimpleName() );
             }
         }

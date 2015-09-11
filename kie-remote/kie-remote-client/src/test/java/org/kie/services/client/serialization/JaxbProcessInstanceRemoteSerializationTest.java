@@ -15,14 +15,25 @@
 
 package org.kie.services.client.serialization;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.drools.core.command.runtime.rule.HaltCommand;
+import org.junit.Test;
+import org.kie.api.command.Command;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
+import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.services.client.serialization.AbstractRemoteSerializationTest.TestType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JaxbProcessInstanceRemoteSerializationTest extends AbstractProcessInstancesRemoteSerializationTest {
 
+    @Override
     public TestType getType() {
         return TestType.JAXB;
     }
+    protected static final Logger logger = LoggerFactory.getLogger(JaxbProcessInstanceRemoteSerializationTest.class);
 
     protected JaxbSerializationProvider jaxbProvider = ClientJaxbSerializationProvider.newInstance();
     {
@@ -41,4 +52,28 @@ public class JaxbProcessInstanceRemoteSerializationTest extends AbstractProcessI
         return (T) jaxbProvider.deserialize(xmlObject);
     }
 
+    @Test
+    public void unsupportedCommandsTest() {
+        try {
+            new JaxbCommandsRequest(new HaltCommand());
+            fail("An exception should have been thrown");
+        } catch( Exception e ) {
+            assertTrue(e instanceof UnsupportedOperationException);
+        }
+        Command[] cmdArrs = { new HaltCommand() };
+        List<Command> cmds = Arrays.asList(cmdArrs);
+        try {
+            new JaxbCommandsRequest(cmds);
+            fail("An exception should have been thrown");
+        } catch( Exception e ) {
+            assertTrue(e instanceof UnsupportedOperationException);
+        }
+        JaxbCommandsRequest req = new JaxbCommandsRequest();
+        try {
+            req.setCommands(cmds);
+            fail("An exception should have been thrown");
+        } catch( Exception e ) {
+            assertTrue(e instanceof UnsupportedOperationException);
+        }
+    }
 }

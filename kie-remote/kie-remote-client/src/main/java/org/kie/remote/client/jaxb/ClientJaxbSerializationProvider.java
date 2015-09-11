@@ -42,6 +42,8 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
                 JaxbTaskResponse.class,
                 JaxbTaskSummaryListResponse.class,
                 JaxbTaskCommentListResponse.class,
+
+                // webservice classes should not be added!
                 
                 // used with gnerated classes
                 JaxbListWrapper.class

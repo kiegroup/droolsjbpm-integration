@@ -21,7 +21,7 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
-    
+
     <!-- jaxb -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -44,18 +44,18 @@
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-    </dependency> 
+    </dependency>
 
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
+
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>
@@ -104,6 +104,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -131,7 +136,7 @@
             <phase>generate-sources</phase>
             <goals>
               <goal>replace</goal>
-            </goals>                    
+            </goals>
           </execution>
         </executions>
         <configuration>
@@ -149,6 +154,6 @@
         </configuration>
       </plugin>
     </plugins>
-  </build>  
-  
+  </build>
+
 </project>

@@ -60,6 +60,11 @@
       <artifactId>jackson-core-asl</artifactId>
       <optional>true</optional>
     </dependency> 
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-jaxb</artifactId>
+      <optional>true</optional>
+    </dependency>
 
     <!-- test -->
     <dependency>
@@ -228,7 +233,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>
-        <version>1.0</version>
         <executions>
           <execution>
             <id>modify-xsd-schema</id>

@@ -1,11 +1,11 @@
 /*
  * Copyright 2015 JBoss Inc
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,17 +15,17 @@
 
 package org.kie.services.client.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,12 +33,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.services.task.jaxb.ComparePair;
+import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.Assume;
 import org.junit.Test;
 import org.kie.api.definition.KieDefinition.KnowledgeType;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.audit.NodeInstanceLog;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.process.CorrelationProperty;
 import org.kie.internal.runtime.conf.AuditMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
@@ -55,10 +59,26 @@ import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnit.JaxbDeploymentStatus;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentUnitList;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessDefinition;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceListResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceResponse;
+import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstanceWithVariablesResponse;
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationKey;
 import org.kie.services.client.serialization.jaxb.impl.runtime.JaxbCorrelationProperty;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbArray;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbBoolean;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbByte;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbCharacter;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbDouble;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbFloat;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbInteger;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbList;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbLong;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbMap;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbSet;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbShort;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbType;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 import org.reflections.Reflections;
@@ -68,7 +88,7 @@ import org.reflections.util.ClasspathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractRemoteSerializationTest {
+public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractRemoteSerializationTest.class);
 
@@ -82,8 +102,10 @@ public abstract class AbstractRemoteSerializationTest {
 
     public abstract <T> T testRoundTrip( T in ) throws Exception;
 
-    private static Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.kie.services.client"),
-            ClasspathHelper.forPackage("org.kie.remote"), new TypeAnnotationsScanner(), new SubTypesScanner());
+    private static Reflections reflections = new Reflections(
+                                                             ClasspathHelper.forPackage("org.kie.services.client"),
+                                                             ClasspathHelper.forPackage("org.kie.remote"),
+                                                             new TypeAnnotationsScanner(), new SubTypesScanner());
 
     // TESTS
 
@@ -93,16 +115,27 @@ public abstract class AbstractRemoteSerializationTest {
 
     @Test
     public void jaxbClassesTest() throws Exception {
-        Assume.assumeFalse(TestType.YAML.equals(getType()));
+        Assume.assumeTrue(TestType.JAXB.equals(getType()));
 
-        int i = 0;
-        for( Class<?> jaxbClass : reflections.getTypesAnnotatedWith(XmlRootElement.class) ) {
-            ++i;
-            Constructor<?> construct = jaxbClass.getConstructor(new Class[] {});
-            Object jaxbInst = construct.newInstance(new Object[] {});
-            testRoundTrip(jaxbInst);
+        Set<Class<?>> jaxbClasses = reflections.getTypesAnnotatedWith(XmlRootElement.class);
+
+        assertTrue("Not enough classes found! [" + jaxbClasses.size() + "]", jaxbClasses.size() > 20);
+
+        String className = null;
+        try {
+            for( Class<?> jaxbClass : jaxbClasses ) {
+                if( jaxbClass.getDeclaringClass() != null && jaxbClass.getDeclaringClass().getSimpleName().endsWith("Test") ) {
+                    continue;
+                }
+                className = jaxbClass.getName();
+                Constructor<?> construct = jaxbClass.getConstructor(new Class[] {});
+                Object jaxbInst = construct.newInstance(new Object[] {});
+                testRoundTrip(jaxbInst);
+            }
+        } catch( Exception e ) {
+            e.printStackTrace();
+            fail(className + ": " + e.getClass().getSimpleName() + " [" + e.getMessage() + "]");
         }
-        assertTrue(i > 20);
     }
 
     @Test
@@ -150,8 +183,9 @@ public abstract class AbstractRemoteSerializationTest {
         testRoundTrip(resp);
 
         // vLog
-        org.jbpm.process.audit.VariableInstanceLog vLog = new org.jbpm.process.audit.VariableInstanceLog(23, "process", "varInst",
-                "var", "two", "one");
+        org.jbpm.process.audit.VariableInstanceLog vLog = new org.jbpm.process.audit.VariableInstanceLog(
+                                                                                                         23, "process", "varInst",
+                                                                                                         "var", "two", "one");
         vLog.setExternalId("domain");
         Field dateField = org.jbpm.process.audit.VariableInstanceLog.class.getDeclaredField("date");
         dateField.setAccessible(true);
@@ -178,8 +212,9 @@ public abstract class AbstractRemoteSerializationTest {
         resp.getHistoryLogList().add(new JaxbProcessInstanceLog(pLog));
 
         // nLog
-        org.jbpm.process.audit.NodeInstanceLog nLog = new org.jbpm.process.audit.NodeInstanceLog(0, 23, "process", "nodeInst",
-                "node", "wally");
+        org.jbpm.process.audit.NodeInstanceLog nLog = new org.jbpm.process.audit.NodeInstanceLog(
+                                                                                                 0, 23, "process", "nodeInst",
+                                                                                                 "node", "wally");
         idField = org.jbpm.process.audit.NodeInstanceLog.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(nLog, 32l);
@@ -193,6 +228,44 @@ public abstract class AbstractRemoteSerializationTest {
         resp.getHistoryLogList().add(new JaxbNodeInstanceLog(nLog));
 
         testRoundTrip(resp);
+    }
+
+    @Test
+    public void processInstanceWithVariablesTest() throws Exception {
+
+        this.setupDataSource = true;
+        this.sessionPersistence = true;
+        super.setUp();
+
+        RuntimeEngine runtimeEngine = createRuntimeManager("BPMN2-StringStructureRef.bpmn2").getRuntimeEngine(null);
+        KieSession ksession = runtimeEngine.getKieSession();
+
+        Map<String, Object> params = new HashMap<String, Object>();
+        String val = "initial-val";
+        params.put("test", val);
+        ProcessInstance processInstance = ksession.startProcess("StructureRef");
+        assertTrue(processInstance.getState() == ProcessInstance.STATE_ACTIVE);
+
+        Map<String, Object> res = new HashMap<String, Object>();
+        res.put("testHT", "test value");
+        // ksession.getWorkItemManager().completeWorkItem(workItemHandler.getWorkItem().getId(),
+        // res);
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("test", "initial-val");
+
+        JaxbProcessInstanceWithVariablesResponse jpiwvr = new JaxbProcessInstanceWithVariablesResponse(processInstance, map);
+        testRoundTrip(jpiwvr);
+
+        JaxbProcessInstanceListResponse jpilp = new JaxbProcessInstanceListResponse();
+        List<ProcessInstance> procInstList = new ArrayList<ProcessInstance>();
+        procInstList.add(new JaxbProcessInstanceResponse(processInstance));
+        jpilp.setResult(procInstList);
+        testRoundTrip(jpilp);
+
+        super.tearDown();
+        this.setupDataSource = false;
+        this.sessionPersistence = false;
     }
 
     @Test
@@ -214,7 +287,8 @@ public abstract class AbstractRemoteSerializationTest {
 
     @Test
     // JBPM-4170
-    public void nodeInstanceLogNpeTest() throws Exception {
+            public
+            void nodeInstanceLogNpeTest() throws Exception {
         org.jbpm.process.audit.NodeInstanceLog nodeLog = new org.jbpm.process.audit.NodeInstanceLog();
         JaxbNodeInstanceLog jaxbNodeLog = new JaxbNodeInstanceLog(nodeLog);
         testRoundTrip(jaxbNodeLog);
@@ -235,8 +309,9 @@ public abstract class AbstractRemoteSerializationTest {
         KModuleDeploymentUnit kDepUnit = new KModuleDeploymentUnit("org", "jar", "1.0", "kbase", "ksession");
         kDepUnit.setStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
 
-        JaxbDeploymentUnit depUnit = new JaxbDeploymentUnit(kDepUnit.getGroupId(), kDepUnit.getArtifactId(),
-                kDepUnit.getArtifactId());
+        JaxbDeploymentUnit depUnit = new JaxbDeploymentUnit(
+                                                            kDepUnit.getGroupId(), kDepUnit.getArtifactId(),
+                                                            kDepUnit.getArtifactId());
         depUnit.setKbaseName(kDepUnit.getKbaseName());
         depUnit.setKsessionName(kDepUnit.getKsessionName());
         depUnit.setStrategy(kDepUnit.getStrategy());
@@ -267,16 +342,17 @@ public abstract class AbstractRemoteSerializationTest {
         ComparePair.compareObjectsViaFields(copyDepJob, depJob, "jobId", "identifier");
 
         JaxbDeploymentUnitList roundTripUnitList = testRoundTrip(depUnitList);
-        ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0), roundTripUnitList.getDeploymentUnitList()
-                .get(0), "jobId", "identifier");
+        ComparePair.compareObjectsViaFields(depUnitList.getDeploymentUnitList().get(0),
+                                            roundTripUnitList.getDeploymentUnitList().get(0), "jobId", "identifier");
     }
 
     @Test
     public void processInstanceLogTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
 
-        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(54,
-                "org.hospital.patient.triage");
+        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(
+                                                                                                          54,
+                                                                                                          "org.hospital.patient.triage");
         origLog.setDuration(65l);
         origLog.setDuration(234l);
         origLog.setEnd(new Date((new Date()).getTime() + 1000));
@@ -299,7 +375,7 @@ public abstract class AbstractRemoteSerializationTest {
         ComparePair.compareObjectsViaFields(xmlLog, newXmlLog, "id");
 
         ProcessInstanceLog newLog = newXmlLog.getResult();
-        ProcessInstanceLog origCmpLog = (ProcessInstanceLog) origLog;
+        ProcessInstanceLog origCmpLog = origLog;
         assertEquals(origLog.getExternalId(), newLog.getExternalId());
         assertEquals(origCmpLog.getIdentity(), newLog.getIdentity());
         assertEquals(origCmpLog.getOutcome(), newLog.getOutcome());
@@ -318,8 +394,9 @@ public abstract class AbstractRemoteSerializationTest {
     public void processInstanceLogNillable() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
 
-        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(54,
-                "org.hospital.patient.triage");
+        org.jbpm.process.audit.ProcessInstanceLog origLog = new org.jbpm.process.audit.ProcessInstanceLog(
+                                                                                                          54,
+                                                                                                          "org.hospital.patient.triage");
         origLog.setDuration(65l);
         origLog.setEnd(new Date((new Date()).getTime() + 1000));
         origLog.setExternalId("testDomainId");
@@ -363,8 +440,10 @@ public abstract class AbstractRemoteSerializationTest {
         String nodeId = "1";
         String nodeName = "notification";
 
-        org.jbpm.process.audit.NodeInstanceLog origLog = new org.jbpm.process.audit.NodeInstanceLog(type, processInstanceId,
-                processId, nodeInstanceId, nodeId, nodeName);
+        org.jbpm.process.audit.NodeInstanceLog origLog = new org.jbpm.process.audit.NodeInstanceLog(
+                                                                                                    type, processInstanceId,
+                                                                                                    processId, nodeInstanceId,
+                                                                                                    nodeId, nodeName);
 
         origLog.setWorkItemId(78l);
         origLog.setConnection("link");
@@ -379,7 +458,7 @@ public abstract class AbstractRemoteSerializationTest {
         ComparePair.compareOrig(xmlLog, newXmlLog, JaxbNodeInstanceLog.class);
 
         NodeInstanceLog newLog = newXmlLog.getResult();
-        ComparePair.compareOrig((NodeInstanceLog) origLog, newLog, NodeInstanceLog.class);
+        ComparePair.compareOrig(origLog, newLog, NodeInstanceLog.class);
     }
 
     @Test
@@ -393,8 +472,12 @@ public abstract class AbstractRemoteSerializationTest {
         String value = "33";
         String oldValue = "32";
 
-        org.jbpm.process.audit.VariableInstanceLog origLog = new org.jbpm.process.audit.VariableInstanceLog(processInstanceId,
-                processId, variableInstanceId, variableId, value, oldValue);
+        org.jbpm.process.audit.VariableInstanceLog origLog = new org.jbpm.process.audit.VariableInstanceLog(
+                                                                                                            processInstanceId,
+                                                                                                            processId,
+                                                                                                            variableInstanceId,
+                                                                                                            variableId, value,
+                                                                                                            oldValue);
 
         origLog.setExternalId("outside-identity-representation");
         origLog.setOldValue("previous-data-that-this-variable-contains");
@@ -409,14 +492,16 @@ public abstract class AbstractRemoteSerializationTest {
         ComparePair.compareObjectsViaFields(xmlLog, newXmlLog, "id");
 
         VariableInstanceLog newLog = newXmlLog.getResult();
-        ComparePair.compareOrig((VariableInstanceLog) origLog, newLog, VariableInstanceLog.class);
+        ComparePair.compareOrig(origLog, newLog, VariableInstanceLog.class);
     }
 
     @Test
     public void processIdAndProcessDefinitionTest() throws Exception {
         // JaxbProcessDefinition
-        ProcessAssetDesc assetDesc = new ProcessAssetDesc("org.test.proc.id", "The Name Of The Process", "1.999.23.Final",
-                "org.test.proc", "RuleFlow", KnowledgeType.PROCESS.toString(), "org.test.proc", "org.test.proc:procs:1.999.Final");
+        ProcessAssetDesc assetDesc = new ProcessAssetDesc(
+                                                          "org.test.proc.id", "The Name Of The Process", "1.999.23.Final",
+                                                          "org.test.proc", "RuleFlow", KnowledgeType.PROCESS.toString(),
+                                                          "org.test.proc", "org.test.proc:procs:1.999.Final");
 
         JaxbProcessDefinition jaxbProcDef = new JaxbProcessDefinition();
         jaxbProcDef.setDeploymentId(assetDesc.getDeploymentId());
@@ -475,7 +560,7 @@ public abstract class AbstractRemoteSerializationTest {
     @Test
     public void correlationKeyTest() throws Exception {
         Assume.assumeFalse(getType().equals(TestType.YAML));
-        
+
         JaxbCorrelationKey corrKey = new JaxbCorrelationKey();
         corrKey.setName("anton");
         List<JaxbCorrelationProperty> properties = new ArrayList<JaxbCorrelationProperty>(3);
@@ -485,7 +570,7 @@ public abstract class AbstractRemoteSerializationTest {
         properties.add(new JaxbCorrelationProperty("ngalan", "bili"));
 
         JaxbCorrelationKey copyCorrKey = testRoundTrip(corrKey);
-        
+
         assertEquals("name", corrKey.getName(), copyCorrKey.getName());
         assertEquals("prop list size", corrKey.getProperties().size(), copyCorrKey.getProperties().size());
         List<CorrelationProperty<?>> propList = corrKey.getProperties();
@@ -498,4 +583,113 @@ public abstract class AbstractRemoteSerializationTest {
             assertEquals(i + ": value", prop.getValue(), copyProp.getValue());
         }
     }
+
+    @Test
+    public void wrapperTypesTest() throws Exception {
+
+        Object [] inputs = {
+               true,
+               new Byte("1").byteValue(),
+               new Character('a').charValue(),
+               new Double(23.01).doubleValue(),
+               new Float(46.02).floatValue(),
+               1011,
+               1012,
+               new Short("10").shortValue(),
+               "string",
+        };
+
+        for( Object input : inputs ) {
+            logger.debug("Testing round trip serialization in wrapper for " + input.getClass().getName());
+            Object copyInput = wrapperRoundTrip(input);
+            assertEquals(input.getClass().getSimpleName() + " wrapped round trip failed!", input, copyInput );
+        }
+
+        Integer [] integerArr = { 1039, 3858, 239502 };
+        int [] intArr = { 1039, 3858, 239502 };
+        double [] doubleArr = { 2.01, 3.02, 4.03 };
+        String [] stringArr = { "all", "about", "that", "base" };
+
+        // check that constructor works
+        new JaxbArray(doubleArr);
+
+        Object [] arrInputs = {
+            intArr,
+            integerArr,
+            doubleArr,
+            stringArr
+        };
+
+        for( Object input : arrInputs ) {
+           logger.debug("Testing round trip serialization in wrapper for " + input.getClass().getName());
+           int length = Array.getLength(input);
+           Object copyInput = wrapperRoundTrip(input);
+           assertNotNull( "Null copy for "+ input.getClass().getName(), copyInput);
+           assertEquals( "Array length", Array.getLength(input), Array.getLength(copyInput) );
+           for( int i = 0; i < length; ++i ) {
+              assertEquals( "Element "+ i + " inequal in "+ input.getClass().getSimpleName() + " instance",
+                           Array.get(input, i),
+                           Array.get(copyInput, i));
+
+           }
+        }
+
+
+        {
+            List<String> list = new ArrayList<String>();
+            list.add("one");
+            List<String> copyList = wrapperRoundTrip(list);
+            assertEquals(list.getClass().getSimpleName() + "round trip failed!", list.iterator().next(), copyList.iterator().next());
+        }
+
+        {
+            Set<String> set = new HashSet<String>();
+            set.add("one");
+            Set<String> copySet = wrapperRoundTrip(set);
+            assertEquals(set.getClass().getSimpleName() + "round trip failed!", set.iterator().next(), copySet.iterator().next());
+        }
+
+        {
+            Map<String, Object> map = new HashMap<String, Object>(1);
+            map.put("one", "two");
+            Map<String, Object> copyMap = wrapperRoundTrip(map);
+            assertEquals(copyMap.getClass().getSimpleName() + " round trip failed!", map.get("one"), copyMap.get("one"));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T wrapperRoundTrip( T value ) throws Exception {
+        JaxbType<T> wrapper = null;
+        if( value instanceof Boolean ) {
+           wrapper = (JaxbType<T>) new JaxbBoolean((Boolean) value);
+        } else if( value instanceof Byte ) {
+           wrapper = (JaxbType<T>) new JaxbByte((Byte) value);
+        } else if( value instanceof Character ) {
+           wrapper = (JaxbType<T>) new JaxbCharacter((Character) value);
+        } else if( value instanceof Double ) {
+           wrapper = (JaxbType<T>) new JaxbDouble((Double) value);
+        } else if( value instanceof Float ) {
+           wrapper = (JaxbType<T>) new JaxbFloat((Float) value);
+        } else if( value instanceof Integer ) {
+           wrapper = (JaxbType<T>) new JaxbInteger((Integer) value);
+        } else if( value instanceof Long ) {
+           wrapper = (JaxbType<T>) new JaxbLong((Long) value);
+        } else if( value instanceof Short ) {
+           wrapper = (JaxbType<T>) new JaxbShort((Short) value);
+        } else if( value instanceof String ) {
+           wrapper = (JaxbType<T>) new JaxbString((String) value);
+        } else if( value.getClass().isArray() ) {
+            wrapper = (JaxbType<T>) new JaxbArray(value);
+        } else if( value instanceof List ) {
+           wrapper = (JaxbType<T>) new JaxbList((List) value);
+        } else if( value instanceof Set ) {
+           wrapper = (JaxbType<T>) new JaxbSet((Set) value);
+        } else if( value instanceof Map ) {
+           wrapper = (JaxbType<T>) new JaxbMap((Map) value);
+        } else {
+            fail( "Modify the " + Thread.currentThread().getStackTrace()[1].getMethodName() + " to also round trip " + value.getClass().getSimpleName() + " instances!");
+        }
+        return testRoundTrip(wrapper).getValue();
+    }
+
 }
