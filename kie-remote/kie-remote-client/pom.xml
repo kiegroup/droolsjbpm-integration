@@ -10,6 +10,7 @@
 
   <artifactId>kie-remote-client</artifactId>
   <name>KIE Remote Services :: Client</name>
+  <packaging>bundle</packaging><!-- bundle = jar + OSGi metadata -->
 
   <properties>
     <maven.jdbc.url>jdbc:h2:file:test;MVCC=true</maven.jdbc.url>
@@ -270,6 +271,25 @@
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.kie.remote.client</Bundle-SymbolicName>
+            <Export-Package>
+              org.kie.remote.client.api.*,
+            </Export-Package>
+            <Import-Package>
+              org.apache.cxf.*;resolution:=optional,
+              org.codehaus.jackson.annotate;resolution:=optional,
+              org.hornetq.*;resolution:=optional,
+              org.jsoup.*;resolution:=optional,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
       <!--  generated: 0. delete all generated unpacked files because they are generated code and could change -->
       <!--  WSDL: 0. delete all generated files because only the WSDL determines code, no code in VCS -->
       <plugin>

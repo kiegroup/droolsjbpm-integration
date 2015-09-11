@@ -56,8 +56,8 @@
               org.kie.remote.common.rest.*
             </Export-Package>
             <Import-Package>
-              javax.ws.rs.core,
-              javax.ws.rs,
+              javax.ws.rs.core;resolution:=optional,
+              javax.ws.rs;resolution:=optional,
               *
             </Import-Package>
           </instructions>
