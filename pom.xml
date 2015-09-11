@@ -46,6 +46,10 @@
 
   <modules>
     <module>kie-identity-session-provider</module>
+    <module>kie-maven-plugin</module>
+    <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
+         that is about to be build in the same Maven reactor build -->
+    <!--<module>kie-maven-plugin-example</module>-->
     <module>drools-benchmark</module>
     <module>drools-simulator</module>
     <module>drools-rhq-plugin</module>
@@ -57,7 +61,6 @@
     <module>kie-infinispan</module>
     <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
-    <module>kie-examples-api</module>
     <module>jbpm-process-svg</module>
     <module>drools-osgi</module>
     <module>kie-performance-kit</module>
