@@ -200,6 +200,7 @@ public class KieServerImpl {
             logger.error("Error creating container. Release Id is null: " + container);
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + ". Release Id is null: " + container + ".");
         }
+        container.setContainerId(containerId);
         ReleaseId releaseId = container.getReleaseId();
         try {
             KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING);

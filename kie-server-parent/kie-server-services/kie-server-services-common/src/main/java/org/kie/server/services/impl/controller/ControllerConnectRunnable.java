@@ -56,7 +56,7 @@ public class ControllerConnectRunnable implements Runnable {
     @Override
     public void run() {
 
-        while (kieServerActive.get())
+        while (kieServerActive.get()) {
             try {
                 logger.debug("Attempting to connect to one of the controllers...");
                 KieServerSetup kieServerSetup = kieController.connect(kieServerInfo);
@@ -65,7 +65,7 @@ public class ControllerConnectRunnable implements Runnable {
 
                 containerManager.installContainers(kieServer, containers, currentState, kieServerSetup);
 
-                return;
+                break;
 
             } catch (KieControllerNotConnectedException e) {
                 long waitTime = Long.parseLong(System.getProperty("org.kie.server.controller.connect", "10000"));
@@ -76,5 +76,7 @@ public class ControllerConnectRunnable implements Runnable {
                     logger.warn("Controller connect thread got interrupted");
                 }
             }
+        }
+        logger.info("Connected to controller, quiting connector thread");
     }
 }
