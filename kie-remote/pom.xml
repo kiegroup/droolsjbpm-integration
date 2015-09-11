@@ -12,7 +12,7 @@
   <artifactId>kie-remote</artifactId>
   <packaging>pom</packaging>
 
-  <name>KIE Remote Services multiproject</name>
+  <name>KIE Remote Services</name>
   <description>
     Remote services (REST, JMS, etc.) for various kie projects
   </description>
@@ -29,8 +29,8 @@
 
   <properties>
     <bugfix.version>1</bugfix.version>
-    
-  <!-- the deps below have been submitted in 
+
+  <!-- the deps below have been submitted in
        https://github.com/jboss-integration/jboss-integration-platform-bom/pull/145 -->
     <!-- Jboss WS -->
     <version.org.jboss.ws.api>1.0.2.Final</version.org.jboss.ws.api>
@@ -39,8 +39,8 @@
 
     <!-- apache -->
     <version.org.apache.ws.security.wss4j>1.6.17</version.org.apache.ws.security.wss4j>
-  </properties> 
- 
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <!-- CXF -->
@@ -244,7 +244,7 @@
         <artifactId>wss4j</artifactId>
         <version>${version.org.apache.ws.security.wss4j}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>javax.jws</groupId>
         <artifactId>jsr181-api</artifactId>
@@ -252,5 +252,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-   
+
 </project>

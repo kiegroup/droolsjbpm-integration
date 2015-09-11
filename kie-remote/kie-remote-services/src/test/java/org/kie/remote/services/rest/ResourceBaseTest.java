@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,21 +15,29 @@
 
 package org.kie.remote.services.rest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.jbpm.services.task.impl.model.xml.JaxbI18NText;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
+import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 
 public class ResourceBaseTest extends ResourceBase {
 
     @Test
-    public void statusEnumTest() { 
-       for( Status testStatus : Status.values())  { 
+    public void statusEnumTest() {
+       for( Status testStatus : Status.values())  {
           Status roundTripStatus = getEnum(testStatus.toString().toLowerCase());
           assertEquals( testStatus + " incorrectly processed!", testStatus, roundTripStatus);
        }
@@ -62,7 +70,7 @@ public class ResourceBaseTest extends ResourceBase {
         assertTrue(value instanceof Number);
         assertEquals(10L, value);
     }
-    
+
     @Test
     public void testFloatRegex() {
         String regex = FLOAT_REGEX;
@@ -74,7 +82,7 @@ public class ResourceBaseTest extends ResourceBase {
         assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
         floot = String.valueOf(new Float(103030303.0202030504502101f));
         assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
-        
+
         floot = "1.00f";
         float flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
         assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
@@ -91,12 +99,71 @@ public class ResourceBaseTest extends ResourceBase {
         flootVal = Float.parseFloat(floot.substring(0, floot.length()-1));
         assertTrue( "Incorrect value: [" + floot + "]", flootVal > 0 );
         assertTrue( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
-    
+
         floot = ".00f"; // .\d
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
         floot = "1.1234567891f"; // \d.\d{10,}
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
         floot = "1.123E-293"; // E-\d{3}
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+    }
+
+    @Test
+    public void testWrapperLogic() {
+        wrapperPrimitives.put(String.class, JaxbString.class);
+
+        for( Class wrapperClass : wrapperPrimitives.values() ) {
+            Constructor [] cntrs = wrapperClass.getConstructors();
+            assertEquals( "Too many constructors for "+ wrapperClass.getSimpleName(),
+                          2, cntrs.length);
+            boolean noArgCntrFound = true;
+            for( Constructor cntr : cntrs ) {
+                if( cntr.getParameterTypes().length == 0 ) {
+                    noArgCntrFound = true;
+                }
+                assertTrue( cntr.getParameterTypes().length < 2 );
+            }
+            assertTrue( "No-Arg constructor not found for "+ wrapperClass.getSimpleName(),
+                        noArgCntrFound);
+        }
+
+        // should NOT be wrapped
+        Object wrappee = new JaxbI18NText();
+        Object wrapped = ResourceBase.wrapObjectIfNeeded(wrappee);
+        assertTrue( wrappee.getClass().getSimpleName() + " was wrapped!",
+                    wrappee == wrapped );
+
+        // SHOULD be wrapped
+        Map<String, Object> map = new HashMap<String, Object>(0);
+        List<String> list = new ArrayList<String>(0);
+        Set<String> set = new HashSet<String>(0);
+
+        int [] intArr = { 1, 2, 3 };
+        String [] strArr = { "a", "b", "c" };
+        Float [] flArr = { new Float(1.01), new Float(1.001), new Float(1.0001) };
+
+        Object [] wrappees = {
+                true,
+                new Byte("1").byteValue(),
+                new Character('a').charValue(),
+                new Double(23.01).doubleValue(),
+                new Float(46.02).floatValue(),
+                1011,
+                1012,
+                new Short("10").shortValue(),
+                "string",
+                list,
+                set,
+                map,
+                intArr,
+                strArr,
+                flArr
+        };
+
+        for( Object input : wrappees ) {
+            wrapped = ResourceBase.wrapObjectIfNeeded(input);
+            assertFalse( input.getClass().getSimpleName() + " was not wrapped!",
+                         input == wrapped );
+        }
     }
 }

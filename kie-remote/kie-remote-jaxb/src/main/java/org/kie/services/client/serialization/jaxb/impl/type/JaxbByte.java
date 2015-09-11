@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -23,29 +23,27 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 @XmlRootElement(name = "byte-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbByte {
+public class JaxbByte implements JaxbType<Byte> {
 
     @XmlElement
     @XmlSchemaType(name = "byte")
-    private byte value;
+    private Byte value;
 
     public JaxbByte() {
 
     }
 
     public JaxbByte(Byte value) {
-        if (value != null) {
-            this.value = value;
-        }
+        this.value = value;
     }
 
-    public byte getValue() {
+    @Override
+    public Byte getValue() {
         return value;
     }
 
+    @Override
     public void setValue(Byte value) {
-        if (value != null) {
-            this.value = value;
-        }
+        this.value = value;
     }
 }

@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 
 @XmlRootElement(name = "string-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbString {
+public class JaxbString implements JaxbType<String> {
 
     @XmlElement
     @XmlSchemaType(name="string")
@@ -37,10 +37,12 @@ public class JaxbString {
         this.value = value;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
     }

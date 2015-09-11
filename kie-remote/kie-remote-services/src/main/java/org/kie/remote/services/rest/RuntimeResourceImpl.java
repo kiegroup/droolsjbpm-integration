@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,11 +15,13 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.internal.remote.PermissionConstants.REST_PROCESS_ROLE;
+import static org.kie.internal.remote.PermissionConstants.REST_PROCESS_RO_ROLE;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +35,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
@@ -58,9 +61,8 @@ import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.KieInternalServices;
-import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
 import org.kie.internal.process.CorrelationKey;
-import org.kie.internal.process.CorrelationProperty;
+import org.kie.remote.common.rest.RestEasy960Util;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.util.FormURLGenerator;
 import org.kie.services.client.serialization.jaxb.impl.JaxbRequestStatus;
@@ -72,25 +74,25 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemRespo
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
 
 /**
- * This resource is responsible for providin operations to manage process instances. 
+ * This resource is responsible for providin operations to manage process instances.
  */
 @Path("/runtime/{deploymentId: [\\w\\.-]+(:[\\w\\.-]+){2,2}(:[\\w\\.-]*){0,2}}")
 @RequestScoped
 public class RuntimeResourceImpl extends ResourceBase {
 
     /* REST information */
-    
+
     @Context
     protected HttpHeaders headers;
-    
+
     @PathParam("deploymentId")
     protected String deploymentId;
-    
+
     /* KIE information and processing */
-    
+
     @Inject
     private RuntimeDataService runtimeDataService;
-   
+
     @Inject
     private DefinitionService bpmn2DataService;
 
@@ -99,7 +101,7 @@ public class RuntimeResourceImpl extends ResourceBase {
 
 
     // Rest methods --------------------------------------------------------------------------------------------------------------
- 
+
     @GET
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}/")
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
@@ -110,7 +112,7 @@ public class RuntimeResourceImpl extends ResourceBase {
         jaxbProcDef.setVariables(variables);
         return createCorrectVariant(jaxbProcDef, headers);
     }
-    
+
     @POST
     @Path("/process/{processDefId: [a-zA-Z0-9-:\\._]+}/start")
     @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
@@ -132,10 +134,10 @@ public class RuntimeResourceImpl extends ResourceBase {
     public Response getProcessInstanceStartForm(@PathParam("processDefId") String processId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
-        List<String> result = (List<String>) processRequestBean.doKieSessionOperation(
-                new GetProcessIdsCommand(), 
-                deploymentId, 
+
+        List<String> result = processRequestBean.doKieSessionOperation(
+                new GetProcessIdsCommand(),
+                deploymentId,
                 correlationKeyProps,
                 null);
 
@@ -161,8 +163,8 @@ public class RuntimeResourceImpl extends ResourceBase {
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getProcessInstance(@PathParam("procInstId") Long procInstId) {
         ProcessInstance procInst = getProcessInstance(procInstId, true);
-        JaxbProcessInstanceResponse response = new JaxbProcessInstanceResponse(procInst); 
-        if( procInst == null ) { 
+        JaxbProcessInstanceResponse response = new JaxbProcessInstanceResponse(procInst);
+        if( procInst == null ) {
             response.setStatus(JaxbRequestStatus.NOT_FOUND);
         }
         return createCorrectVariant(response, headers);
@@ -174,23 +176,23 @@ public class RuntimeResourceImpl extends ResourceBase {
     public Response abortProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
+
         Command<?> cmd = new AbortProcessInstanceCommand();
         ((AbortProcessInstanceCommand) cmd).setProcessInstanceId(procInstId);
-       
-        try { 
+
+        try {
             processRequestBean.doKieSessionOperation(
-                cmd, 
-                deploymentId, 
+                cmd,
+                deploymentId,
                 correlationKeyProps,
                 procInstId);
-        } catch( IllegalArgumentException iae ) { 
+        } catch( IllegalArgumentException iae ) {
             if( iae.getMessage().startsWith("Could not find process instance") ) {
                 throw KieRemoteRestOperationException.notFound("Process instance " + procInstId + " is not available.");
             }
             throw KieRemoteRestOperationException.internalServerError("Unable to abort process instance '"  + procInstId + "'", iae );
         }
-                
+
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
@@ -203,14 +205,16 @@ public class RuntimeResourceImpl extends ResourceBase {
         String eventType = getStringParam("signal", true, requestParams, oper);
         Object event = getObjectParam("event", false, requestParams, oper);
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
+
         Command<?> cmd = new SignalEventCommand(procInstId, eventType, event);
-        
+
         processRequestBean.doKieSessionOperation(cmd, deploymentId, correlationKeyProps, procInstId);
-        
+
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
 
     }
+
+    private static final boolean wrapJsonValues = Boolean.getBoolean("org.kie.remote.wrap.json");
 
     @GET
     @Path("/process/instance/{procInstId: [0-9]+}/variable/{varName: [\\w\\.-]+}")
@@ -219,20 +223,21 @@ public class RuntimeResourceImpl extends ResourceBase {
         Object procVar;
         try {
             procVar =  processRequestBean.getVariableObjectInstanceFromRuntime(deploymentId, procInstId, varName);
-        } catch( ProcessInstanceNotFoundException pinfe ) { 
+        } catch( ProcessInstanceNotFoundException pinfe ) {
             throw KieRemoteRestOperationException.notFound(pinfe.getMessage(), pinfe);
-        } catch( DeploymentNotFoundException dnfe ) { 
+        } catch( DeploymentNotFoundException dnfe ) {
             throw new DeploymentNotFoundException(dnfe.getMessage());
         }
-        // handle primitives and their wrappers
-        if (procVar != null && isPrimitiveOrWrapper(procVar.getClass())) {
-            procVar = wrapPrimitive(procVar);
+
+        // only wrap if json property set or JAXB/XML
+        if( wrapJsonValues || RestEasy960Util.getVariant(headers).getMediaType().equals(MediaType.APPLICATION_XML_TYPE) ) {
+            procVar = wrapObjectIfNeeded(procVar);
         }
 
         // return
         return createCorrectVariant(procVar, headers);
     }
-  
+
     @POST
     @Path("/signal")
     @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
@@ -242,37 +247,37 @@ public class RuntimeResourceImpl extends ResourceBase {
         String eventType = getStringParam("signal", true, requestParams, oper);
         Object event = getObjectParam("event", false, requestParams, oper);
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
+
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(eventType, event),
-                deploymentId, 
+                deploymentId,
                 correlationKeyProps,
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
-        
+
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
     @GET
     @Path("/workitem/{workItemId: [0-9-]+}")
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
-    public Response getWorkItem(@PathParam("workItemId") Long workItemId) { 
+    public Response getWorkItem(@PathParam("workItemId") Long workItemId) {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
-        WorkItem workItem = (WorkItem) processRequestBean.doKieSessionOperation(
+
+        WorkItem workItem = processRequestBean.doKieSessionOperation(
                 new GetWorkItemCommand(workItemId),
-                deploymentId, 
+                deploymentId,
                 correlationKeyProps,
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(), oper, true));
-               
-        if( workItem == null ) { 
+
+        if( workItem == null ) {
             throw KieRemoteRestOperationException.notFound("WorkItem " + workItemId + " does not exist.");
         }
-        
+
         return createCorrectVariant(new JaxbWorkItemResponse(workItem), headers);
     }
-    
+
     @POST
     @Path("/workitem/{workItemId: [0-9-]+}/{oper: [a-zA-Z]+}")
     @RolesAllowed({REST_ROLE, REST_PROCESS_ROLE})
@@ -280,7 +285,7 @@ public class RuntimeResourceImpl extends ResourceBase {
         String oper = getRelativePath();
         Map<String, String[]> requestParams = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
-        
+
         Command<?> cmd = null;
         if ("complete".equalsIgnoreCase((operation.trim()))) {
             Map<String, Object> results = extractMapFromParams(requestParams, operation);
@@ -290,14 +295,14 @@ public class RuntimeResourceImpl extends ResourceBase {
         } else {
             throw KieRemoteRestOperationException.badRequest("Unsupported operation: " + oper);
         }
-      
+
         // Will NOT throw an exception if the work item does not exist!!
         processRequestBean.doKieSessionOperation(
-                cmd, 
-                deploymentId, 
+                cmd,
+                deploymentId,
                 correlationKeyProps,
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
-                
+
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
     }
 
@@ -316,10 +321,10 @@ public class RuntimeResourceImpl extends ResourceBase {
         List<String> corrKeyProps = getCorrelationKeyProperties(requestParams);
 
         ProcessInstance procInst = startProcessInstance(processId, params, corrKeyProps);
-        
+
         Map<String, String> vars = getVariables(procInst.getId(), corrKeyProps);
         JaxbProcessInstanceWithVariablesResponse resp = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
-        
+
         return createCorrectVariant(resp, headers);
     }
 
@@ -329,12 +334,12 @@ public class RuntimeResourceImpl extends ResourceBase {
     public Response withVarsGetProcessInstance(@PathParam("procInstId") Long procInstId) {
         Map<String, String[]> requestParams = getRequestParams();
         List<String> corrKeyProps = getCorrelationKeyProperties(requestParams);
-        
+
         ProcessInstance procInst = getProcessInstance(procInstId, true);
         Map<String, String> vars = getVariables(procInstId, corrKeyProps);
-        JaxbProcessInstanceWithVariablesResponse responseObj 
+        JaxbProcessInstanceWithVariablesResponse responseObj
             = new JaxbProcessInstanceWithVariablesResponse(procInst, vars, getRequestUri());
-        
+
         return createCorrectVariant(responseObj, headers);
     }
 
@@ -350,86 +355,86 @@ public class RuntimeResourceImpl extends ResourceBase {
 
         processRequestBean.doKieSessionOperation(
                 new SignalEventCommand(procInstId, eventType, event),
-                deploymentId, 
+                deploymentId,
                 correlationKeyProps,
                 procInstId);
-        
+
         ProcessInstance processInstance = getProcessInstance(procInstId, false);
         Map<String, String> vars = getVariables(procInstId, correlationKeyProps);
-        
+
         return createCorrectVariant(new JaxbProcessInstanceWithVariablesResponse(processInstance, vars), headers);
     }
 
     // Helper methods --------------------------------------------------------------------------------------------------------------
-    
-    private ProcessInstance getProcessInstance(long procInstId, boolean throwEx ) { 
+
+    private ProcessInstance getProcessInstance(long procInstId, boolean throwEx ) {
         Map<String, String[]> params = getRequestParams();
         List<String> correlationKeyProps = getCorrelationKeyProperties(params);
-        
+
         Command<?> cmd = new GetProcessInstanceCommand(procInstId);
         ((GetProcessInstanceCommand) cmd).setReadOnly(true);
         Object procInstResult = processRequestBean.doKieSessionOperation(
                 cmd,
-                deploymentId, 
+                deploymentId,
                 correlationKeyProps,
                 procInstId);
-        
+
         if (procInstResult != null) {
             return (ProcessInstance) procInstResult;
         } else if( throwEx ) {
             throw KieRemoteRestOperationException.notFound("Unable to retrieve process instance " + procInstId
                     + " which may have been completed. Please see the history operations.");
-        } else { 
+        } else {
             return null;
         }
     }
-    
+
     private Map<String, String> getVariables(long processInstanceId, List<String> corrKeyProps) {
         List<VariableInstanceLog> varInstLogList = processRequestBean.doKieSessionOperation(
                 new FindVariableInstancesCommand(processInstanceId),
-                deploymentId, 
+                deploymentId,
                 corrKeyProps,
                 processInstanceId);
-        
+
         Map<String, String> vars = new HashMap<String, String>();
-        if( varInstLogList.isEmpty() ) { 
+        if( varInstLogList.isEmpty() ) {
             return vars;
         }
         Map<String, VariableInstanceLog> varLogMap = new HashMap<String, VariableInstanceLog>();
         for( VariableInstanceLog varLog: varInstLogList ) {
             String varId = varLog.getVariableId();
             VariableInstanceLog prevVarLog = varLogMap.put(varId, varLog);
-            if( prevVarLog != null ) { 
-                if( prevVarLog.getDate().after(varLog.getDate()) ) { 
+            if( prevVarLog != null ) {
+                if( prevVarLog.getDate().after(varLog.getDate()) ) {
                   varLogMap.put(varId, prevVarLog);
-                } 
+                }
             }
         }
-        
-        for( Entry<String, VariableInstanceLog> varEntry : varLogMap.entrySet() ) { 
+
+        for( Entry<String, VariableInstanceLog> varEntry : varLogMap.entrySet() ) {
             vars.put(varEntry.getKey(), varEntry.getValue().getValue());
         }
-            
+
         return vars;
     }
-    
-    private ProcessInstance startProcessInstance(String processId, Map<String, Object> params, List<String> corrKeyProps) { 
+
+    private ProcessInstance startProcessInstance(String processId, Map<String, Object> params, List<String> corrKeyProps) {
         ProcessInstance result = null;
         Command<ProcessInstance> cmd = null;
-        if( corrKeyProps != null && ! corrKeyProps.isEmpty() ) { 
+        if( corrKeyProps != null && ! corrKeyProps.isEmpty() ) {
             CorrelationKey key =  KieInternalServices.Factory.get().newCorrelationKeyFactory().newCorrelationKey(corrKeyProps);
             cmd = new StartCorrelatedProcessCommand(processId, key);
-        } else { 
+        } else {
             cmd = new StartProcessCommand(processId, params);
         }
-        try { 
+        try {
             result = processRequestBean.doKieSessionOperation(
                 cmd,
-                deploymentId, 
+                deploymentId,
                 corrKeyProps,
                 null);
-        } catch( IllegalArgumentException iae ) { 
-            if( iae.getMessage().startsWith("Unknown process ID")) { 
+        } catch( IllegalArgumentException iae ) {
+            if( iae.getMessage().startsWith("Unknown process ID")) {
                 throw KieRemoteRestOperationException.notFound("Process '" + processId + "' is not known to this deployment.");
             }
             throw KieRemoteRestOperationException.internalServerError("Unable to start process instance '" + processId + "'", iae);
@@ -437,40 +442,40 @@ public class RuntimeResourceImpl extends ResourceBase {
         return result;
     }
 
-    protected QName getRootElementName(Object object) { 
+    protected QName getRootElementName(Object object) {
         boolean xmlRootElemAnnoFound = false;
         Class<?> objClass = object.getClass();
-        
+
         // This usually doesn't work in the kie-wb/bpms environment, see comment below
         XmlRootElement xmlRootElemAnno = objClass.getAnnotation(XmlRootElement.class);
         logger.debug("Getting XML root element annotation for " + object.getClass().getName());
-        if( xmlRootElemAnno != null ) { 
+        if( xmlRootElemAnno != null ) {
             xmlRootElemAnnoFound = true;
             return new QName(xmlRootElemAnno.name());
-        } else { 
+        } else {
             /**
              * There seem to be weird classpath issues going on here, probably related
              * to the fact that kjar's have their own classloader..
              * (The XmlRootElement class can't be found in the same classpath as the
              * class from the Kjar)
              */
-            for( Annotation anno : objClass.getAnnotations() ) { 
+            for( Annotation anno : objClass.getAnnotations() ) {
                 Class<?> annoClass = anno.annotationType();
                 // we deliberately compare *names* and not classes because it's on a different classpath!
-                if( XmlRootElement.class.getName().equals(annoClass.getName()) ) { 
+                if( XmlRootElement.class.getName().equals(annoClass.getName()) ) {
                     xmlRootElemAnnoFound = true;
                     try {
                         Method nameMethod = annoClass.getMethod("name");
                         Object nameVal = nameMethod.invoke(anno);
-                        if( nameVal instanceof String ) { 
-                            return new QName((String) nameVal); 
+                        if( nameVal instanceof String ) {
+                            return new QName((String) nameVal);
                         }
                     } catch (Exception e) {
                         throw KieRemoteRestOperationException.internalServerError("Unable to retrieve XmlRootElement info via reflection", e);
-                    } 
+                    }
                 }
             }
-            if( ! xmlRootElemAnnoFound ) { 
+            if( ! xmlRootElemAnnoFound ) {
                 String errorMsg = "Unable to serialize " + object.getClass().getName() + " instance "
                         + "because it is missing a " + XmlRootElement.class.getName() + " annotation with a name value.";
                 throw KieRemoteRestOperationException.internalServerError(errorMsg);

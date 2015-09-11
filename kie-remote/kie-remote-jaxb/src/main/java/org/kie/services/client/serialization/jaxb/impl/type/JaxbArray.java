@@ -15,34 +15,43 @@
 
 package org.kie.services.client.serialization.jaxb.impl.type;
 
+import java.lang.reflect.Array;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 
-@XmlRootElement(name = "short-type")
+@XmlRootElement(name = "array-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbShort implements JaxbType<Short> {
+public class JaxbArray implements JaxbType<Object[]> {
 
     @XmlElement
-    @XmlSchemaType(name = "short")
-    private Short value;
+    private Object [] value;
 
-    public JaxbShort() {
+    public JaxbArray() {
+
     }
 
-    public JaxbShort(Short value) {
-        this.value = value;
+    public JaxbArray(Object objValue) {
+        Class objClass = objValue.getClass();
+        if( ! objClass.isArray() ) {
+           throw new IllegalArgumentException("This wrapper can only wrap arrays, not instances of "+ objClass.getName() );
+        }
+        int length = Array.getLength(objValue);
+        this.value = new Object[length];
+        for( int i = 0; i < length; ++i ) {
+           Array.set(this.value, i, Array.get(objValue, i));
+        }
     }
 
     @Override
-    public Short getValue() {
-        return value;
+    public Object [] getValue() {
+        return  value;
     }
 
     @Override
-    public void setValue( Short value ) {
+    public void setValue( Object [] value ) {
         this.value = value;
     }
 }
