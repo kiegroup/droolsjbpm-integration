@@ -37,6 +37,11 @@
       <artifactId>kie-server-client</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-client</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Features XML Dependencies used by pax-exam to resolve features to be deployed during test -->
     <dependency>
