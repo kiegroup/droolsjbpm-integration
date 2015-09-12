@@ -13,7 +13,7 @@
   <artifactId>roboguice-serialized-kbase</artifactId>
   <packaging>apk</packaging>
 
-  <name>Drools Android examples - Roboguice Serialized KnowledgeBase</name>
+  <name>Drools Android Examples :: Roboguice Serialized KnowledgeBase</name>
 
   <dependencies>
     <dependency>
@@ -90,6 +90,12 @@
         <artifactId>kie-maven-plugin</artifactId>
         <version>${project.version}</version>
         <configuration>
+          <systemProperties>
+            <property>
+              <name>drools.dialect.java.compiler.lnglevel</name>
+              <value>1.6</value>
+            </property>
+          </systemProperties>
           <kiebases>
             <kiebase>HelloKB</kiebase>
           </kiebases>

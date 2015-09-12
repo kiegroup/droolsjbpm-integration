@@ -11,7 +11,7 @@
 
   <artifactId>roboguice-kiecontainer-test</artifactId>
   <packaging>apk</packaging>
-  <name>Drools Android examples - Roboguice KieContainer - Instrumentation Test</name>
+  <name>Drools Android Examples :: Roboguice KieContainer - Instrumentation Test</name>
 
   <dependencyManagement>
     <dependencies>
@@ -104,7 +104,6 @@
   </dependencies>
 
   <build>
-
     <plugins>
       <plugin>
         <groupId>com.simpligility.maven.plugins</groupId>
