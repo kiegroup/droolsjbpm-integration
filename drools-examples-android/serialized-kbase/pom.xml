@@ -13,7 +13,7 @@
   <artifactId>serialized-kbase</artifactId>
   <packaging>apk</packaging>
 
-  <name>Drools Android examples - Serialized KnowledgeBase</name>
+  <name>Drools Android Examples :: Serialized KnowledgeBase</name>
 
   <dependencies>
     <dependency>
@@ -79,6 +79,12 @@
             <kiebase>HelloKB</kiebase>
           </kiebases>
           <resDirectory>${basedir}/src/main/res/raw</resDirectory>
+          <systemProperties>
+            <property>
+              <name>drools.dialect.java.compiler.lnglevel</name>
+              <value>1.6</value>
+            </property>
+          </systemProperties>
         </configuration>
         <executions>
           <execution>

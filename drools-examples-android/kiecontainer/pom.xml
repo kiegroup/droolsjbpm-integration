@@ -13,7 +13,7 @@
   <artifactId>kiecontainer</artifactId>
   <packaging>apk</packaging>
 
-  <name>Drools Android examples - KieContainer</name>
+  <name>Drools Android Examples :: KieContainer</name>
 
   <dependencies>
     <dependency>
@@ -51,15 +51,7 @@
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.eclipse.jdt.core.compiler</groupId>
-          <artifactId>ecj</artifactId>
-        </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -112,6 +104,14 @@
               <goal>build</goal>
             </goals>
             <phase>compile</phase>
+            <configuration>
+              <systemProperties>
+                <property>
+                  <name>drools.dialect.java.compiler.lnglevel</name>
+                  <value>1.6</value>
+                </property>
+              </systemProperties>
+            </configuration>
           </execution>
         </executions>
       </plugin>

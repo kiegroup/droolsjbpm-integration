@@ -47,10 +47,6 @@ import javax.inject.Inject;
 public class DroolsActivity extends RoboActivity {
     private static final Logger logger = LoggerFactory.getLogger(DroolsActivity.class);
 
-    static {
-        System.setProperty("drools.dialect.java.compiler", "JANINO");
-    }
-
     @InjectView(R.id.fireRules)
     private Button fireRulesButton;
     @InjectView(R.id.log)

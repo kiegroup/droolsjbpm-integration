@@ -27,7 +27,7 @@ import dalvik.system.BaseDexClassLoader;
 import dalvik.system.DexClassLoader;
 import org.drools.core.util.ByteArrayClassLoader;
 import org.mvel2.util.MVELClassLoader;
-import org.robolectric.internal.Instrument;
+import org.robolectric.annotation.internal.Instrument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
