@@ -81,10 +81,10 @@
             <artifactId>kie-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.squareup</groupId>-->
-            <!--<artifactId>fest-android</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>fest-android</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -112,7 +112,7 @@
             <plugin>
                 <groupId>com.simpligility.maven.plugins</groupId>
                 <artifactId>android-maven-plugin</artifactId>
-                <version>4.1.2-SNAPSHOT</version>
+                <version>4.3.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <extractDuplicates>true</extractDuplicates>
@@ -120,6 +120,7 @@
                     <test>
                         <createReport>true</createReport>
                         <instrumentationRunner>com.android.test.runner.MultiDexTestRunner</instrumentationRunner>
+                        <instrumentationPackage>org.drools.examples.android.roboguice.kiecontainer</instrumentationPackage>
                         <packages>
                             <package>org.drools.examples.android</package>
                         </packages>

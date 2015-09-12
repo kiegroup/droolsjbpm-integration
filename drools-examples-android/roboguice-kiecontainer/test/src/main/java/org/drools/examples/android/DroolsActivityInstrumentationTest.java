@@ -11,25 +11,7 @@ import org.drools.examples.android.roboguice.kiecontainer.R;
 
 import static org.junit.Assert.assertNotNull;
 
-/**
- * An example of an {@link ActivityInstrumentationTestCase2} of a specific activity {@link DroolsActivity}.
- * By virtue of extending {@link ActivityInstrumentationTestCase2}, the target activity is automatically
- * launched and finished before and after each test.  This also extends
- * {@link android.test.InstrumentationTestCase}, which provides
- * access to methods for sending events to the target activity, such as key and
- * touch events.  See {@link #sendKeys}.
- *
- * In general, {@link android.test.InstrumentationTestCase}s and {@link ActivityInstrumentationTestCase2}s
- * are heavier weight functional tests available for end to end testing of your
- * user interface.  When run via a {@link android.test.InstrumentationTestRunner},
- * the necessary {@link android.app.Instrumentation} will be injected for you to
- * user via {@link #getInstrumentation} in your tests.
- *
- * See {@link DroolsActivityActivityTest} for an example of an Activity unit test.
- *
- * See {@link AllTests} for documentation on running
- * all tests and individual tests in this application.
- */
+
 public class DroolsActivityInstrumentationTest extends ActivityInstrumentationTestCase2<DroolsActivity>  {
 
 
@@ -59,5 +41,6 @@ public class DroolsActivityInstrumentationTest extends ActivityInstrumentationTe
                 fireRulesButton.performClick();
             }
         });
+        getInstrumentation().waitForIdleSync();
     }
 }
