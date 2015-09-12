@@ -15,8 +15,8 @@
 
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>All web resources</web-resource-name>
-      <url-pattern>/*</url-pattern>
+      <web-resource-name>REST web resources</web-resource-name>
+      <url-pattern>/services/rest/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>

@@ -61,6 +61,10 @@ public class ProcessResource  {
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
+    public ProcessResource() {
+
+    }
+
     public ProcessResource(ProcessServiceBase processServiceBase, DefinitionServiceBase definitionService, RuntimeDataServiceBase runtimeDataServiceBase, KieServerRegistry context) {
         this.processServiceBase = processServiceBase;
         this.definitionServiceBase = definitionServiceBase;
