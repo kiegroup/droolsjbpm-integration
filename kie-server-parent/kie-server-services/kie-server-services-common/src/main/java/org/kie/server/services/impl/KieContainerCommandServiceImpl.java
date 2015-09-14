@@ -80,17 +80,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 // find the session
                 CommandExecutor ks = null;
                 if( sessionId != null ) {
-                    KieSessionModel ksm = kci.getKieContainer().getKieSessionModel(sessionId);
-                    if( ksm != null ) {
-                        switch (ksm.getType() ) {
-                            case STATEFUL:
-                                ks = kci.getKieContainer().getKieSession(sessionId);
-                                break;
-                            case STATELESS:
-                                ks = kci.getKieContainer().getStatelessKieSession(sessionId);
-                                break;
-                        }
-                    }
+                    ks = context.getKieSessionLookupManager().lookup(sessionId, kci, context);
                 } else {
                     // if no session ID is defined, then the default is a stateful session
                     ks = kci.getKieContainer().getKieSession();

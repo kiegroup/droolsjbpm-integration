@@ -60,6 +60,9 @@ public class DroolsKieServerExtension implements KieServerExtension {
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.batchCommandService = new KieContainerCommandServiceImpl(kieServer, registry);
         this.registry = registry;
+        if (registry.getKieSessionLookupManager() != null) {
+            registry.getKieSessionLookupManager().addHandler(new DroolsKieSessionLookupHandler());
+        }
     }
 
     @Override

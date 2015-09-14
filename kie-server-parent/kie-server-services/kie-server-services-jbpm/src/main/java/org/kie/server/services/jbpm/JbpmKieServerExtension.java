@@ -191,6 +191,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context));
 
+        if (registry.getKieSessionLookupManager() != null) {
+            registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
+        }
     }
 
     @Override
