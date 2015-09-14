@@ -42,6 +42,8 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     private KieServerStateRepository repository;
 
+    private KieSessionLookupManager kieSessionLookupManager = new KieSessionLookupManager();
+
     @Override
     public KieContainerInstanceImpl registerContainer(String id, KieContainerInstanceImpl kieContainerInstance) {
         synchronized ( containers ) {
@@ -122,6 +124,11 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     @Override
     public KieServerStateRepository getStateRepository() {
         return this.repository;
+    }
+
+    @Override
+    public KieSessionLookupManager getKieSessionLookupManager() {
+        return kieSessionLookupManager;
     }
 
     @Override
