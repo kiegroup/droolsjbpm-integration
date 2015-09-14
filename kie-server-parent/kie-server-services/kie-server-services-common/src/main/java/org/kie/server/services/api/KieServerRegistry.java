@@ -21,6 +21,7 @@ import java.util.Set;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.KieSessionLookupManager;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 
 public interface KieServerRegistry {
@@ -54,4 +55,6 @@ public interface KieServerRegistry {
     void registerStateRepository(KieServerStateRepository repository);
 
     KieServerStateRepository getStateRepository();
+
+    KieSessionLookupManager getKieSessionLookupManager();
 }

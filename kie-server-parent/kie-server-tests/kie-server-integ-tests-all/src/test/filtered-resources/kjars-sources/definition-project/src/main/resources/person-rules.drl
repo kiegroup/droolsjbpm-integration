@@ -1,0 +1,23 @@
+package defaultPackge
+
+
+import org.jbpm.data.Person;
+
+global java.util.List people;
+
+rule "Person exists" ruleflow-group "person-rules"
+    when
+        $p : Person()
+    then
+        System.out.println("Person found, adding to global list");
+        people.add($p);
+end
+
+
+rule "Cleanup"
+    when
+        $p : Person()
+    then
+        System.out.println("Cleaning up person " + $p);
+        delete($p);
+end
