@@ -93,7 +93,7 @@ public class TestConfig {
 
         threads = Integer.valueOf(System.getProperty("threads"));
         properties.put("threads", threads);
-        if (suite.equals(ConcurrentLoadSuite.class.getCanonicalName())) {
+        if (suite.equals(ConcurrentLoadSuite.class.getSimpleName())) {
             addTag("thread-" + threads);
         }
 
