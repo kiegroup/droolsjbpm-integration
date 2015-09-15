@@ -226,16 +226,16 @@ public class PerfRepoReporter extends ScheduledReporter {
         final Snapshot snapshot = histogram.getSnapshot();
 
         testExecution.value(getMeterName(name) + ".count", (double) histogram.getCount());
-        testExecution.value(getMeterName(name) + ".min", convertDuration(snapshot.getMin()));
-        testExecution.value(getMeterName(name) + ".mean", convertDuration(snapshot.getMean()));
-        testExecution.value(getMeterName(name) + ".max", convertDuration(snapshot.getMax()));
-        testExecution.value(getMeterName(name) + ".stddev", convertDuration(snapshot.getStdDev()));
-        testExecution.value(getMeterName(name) + ".median", convertDuration(snapshot.getMedian()));
-        testExecution.value(getMeterName(name) + ".p75", convertDuration(snapshot.get75thPercentile()));
-        testExecution.value(getMeterName(name) + ".p95", convertDuration(snapshot.get95thPercentile()));
-        testExecution.value(getMeterName(name) + ".p98", convertDuration(snapshot.get98thPercentile()));
-        testExecution.value(getMeterName(name) + ".p99", convertDuration(snapshot.get99thPercentile()));
-        testExecution.value(getMeterName(name) + ".p999", convertDuration(snapshot.get999thPercentile()));
+        testExecution.value(getMeterName(name) + ".min", (double) snapshot.getMin());
+        testExecution.value(getMeterName(name) + ".mean", snapshot.getMean());
+        testExecution.value(getMeterName(name) + ".max", (double) snapshot.getMax());
+        testExecution.value(getMeterName(name) + ".stddev", snapshot.getStdDev());
+        testExecution.value(getMeterName(name) + ".median", snapshot.getMedian());
+        testExecution.value(getMeterName(name) + ".p75", snapshot.get75thPercentile());
+        testExecution.value(getMeterName(name) + ".p95", snapshot.get95thPercentile());
+        testExecution.value(getMeterName(name) + ".p98", snapshot.get98thPercentile());
+        testExecution.value(getMeterName(name) + ".p99", snapshot.get99thPercentile());
+        testExecution.value(getMeterName(name) + ".p999", snapshot.get999thPercentile());
     }
 
     private void reportCounter(TestExecutionBuilder testExecution, String name, Counter counter) {
