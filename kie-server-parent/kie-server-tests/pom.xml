@@ -522,6 +522,12 @@
                 </deployables>
               </configuration>
             </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
+              </configuration>
+            </plugin>
           </plugins>
         </pluginManagement>
       </build>
