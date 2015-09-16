@@ -213,6 +213,8 @@
             <systemProperties>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
+              <!-- For JMS executor tests. -->
+              <org.kie.executor.jms>true</org.kie.executor.jms>
             </systemProperties>
           </container>
         </configuration>
