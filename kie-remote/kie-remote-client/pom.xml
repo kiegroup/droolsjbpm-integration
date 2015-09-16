@@ -279,6 +279,9 @@
             <Bundle-SymbolicName>org.kie.remote.client</Bundle-SymbolicName>
             <Export-Package>
               org.kie.remote.client.api.*,
+              org.kie.remote.client.jaxb.*,
+              org.kie.services.client.api.*,
+              org.kie.remote.jaxb.gen.*
             </Export-Package>
             <Import-Package>
               org.apache.cxf.*;resolution:=optional,
