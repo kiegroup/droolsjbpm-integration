@@ -191,7 +191,14 @@ public class ResourceBase {
     // Request Params -------------------------------------------------------------------------------------------------------------
 
     protected Map<String, String[]> getRequestParams() {
-        return httpRequest.getParameterMap();
+         Map<String, String[]> params = httpRequest.getParameterMap();
+         if( params == null ) {
+            params = new HashMap<String, String[]>(0);
+         }
+         else {
+             params = new HashMap<String, String[]>(params);
+         }
+         return params;
     }
 
     protected static String getStringParam(String paramName, boolean required, Map<String, String[]> params, String operation) {
