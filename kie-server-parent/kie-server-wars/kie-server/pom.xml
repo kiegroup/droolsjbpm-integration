@@ -31,8 +31,8 @@
           <artifactId>javax.servlet-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>javax.security.jacc</groupId>
-          <artifactId>javax.security.jacc-api</artifactId>
+          <groupId>org.jboss.spec.javax.security.jacc</groupId>
+          <artifactId>jboss-jacc-api_1.4_spec</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.slf4j</groupId>
