@@ -63,8 +63,8 @@
 
     <!-- security -->
     <dependency>
-      <groupId>javax.security.jacc</groupId>
-      <artifactId>javax.security.jacc-api</artifactId>
+      <groupId>org.jboss.spec.javax.security.jacc</groupId>
+      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
     </dependency>
 
     <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->
