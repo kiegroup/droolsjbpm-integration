@@ -186,6 +186,7 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         // Check that there is one container deployed.
+        waitForKieServerSynchronization(1);
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
         assertNotNull(containersList.getResult().getContainers());
