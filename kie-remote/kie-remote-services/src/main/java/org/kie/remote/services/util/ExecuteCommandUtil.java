@@ -17,42 +17,46 @@ import org.slf4j.LoggerFactory;
 public class ExecuteCommandUtil {
 
     protected static final Logger logger = LoggerFactory.getLogger(ExecuteResourceImpl.class);
-    
-    private ExecuteCommandUtil() { 
+
+    private ExecuteCommandUtil() {
         // util class
     }
-    
-    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request, 
+
+    private static Boolean allowAllUsersAccessToAllTasks = Boolean.getBoolean("org.kie.task.insecure");
+
+    public static JaxbCommandsResponse restProcessJaxbCommandsRequest(JaxbCommandsRequest request,
             IdentityProvider identityProvider, ProcessRequestBean processRequestBean) {
         // If exceptions are happening here, then there is something REALLY wrong and they should be thrown.
         JaxbCommandsResponse jaxbResponse = new JaxbCommandsResponse(request);
         List<Command> commands = request.getCommands();
 
         if (commands != null) {
-            int cmdListSize = commands.size(); 
-           
+            int cmdListSize = commands.size();
+
             // First check to make sure that all commands will be processed
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
                 if (!AcceptedServerCommands.isAcceptedCommandClass(cmd.getClass()) ) {
                     throw KieRemoteRestOperationException.forbidden("The execute REST operation does not accept " + cmd.getClass().getName() + " instances.");
                 }
-                if( cmd instanceof TaskCommand ) { 
+                if( cmd instanceof TaskCommand ) {
                     String cmdName = cmd.getClass().getSimpleName();
-                    if( cmdName.startsWith("GetTask") ) { 
-                       String cmdUserId = ((TaskCommand) cmd).getUserId();
-                       if( cmdUserId == null ) { 
-                           throw KieRemoteRestOperationException.badRequest("A null user id for a '" + cmdName + "' is not allowed!");
-                       }
-                       String authUserId = identityProvider.getName();
-                       if( ! cmdUserId.equals(authUserId) ) { 
-                           throw KieRemoteRestOperationException.conflict("The user id used when retrieving task information (" + cmdUserId + ")"
-                                   + " must match the authenticating user (" + authUserId + ")!");
-                       }
+                    if( cmdName.startsWith("GetTask") ) {
+                        if( ! allowAllUsersAccessToAllTasks ) {
+                            String cmdUserId = ((TaskCommand) cmd).getUserId();
+                            if( cmdUserId == null ) {
+                                throw KieRemoteRestOperationException.badRequest("A null user id for a '" + cmdName + "' is not allowed!");
+                            }
+                            String authUserId = identityProvider.getName();
+                            if( ! cmdUserId.equals(authUserId) ) {
+                                throw KieRemoteRestOperationException.conflict("The user id used when retrieving task information (" + cmdUserId + ")"
+                                        + " must match the authenticating user (" + authUserId + ")!");
+                            }
+                        }
                     }
                 }
             }
-           
+
             // Execute commands
             for (int i = 0; i < cmdListSize; ++i) {
                 Command<?> cmd = commands.get(i);
@@ -66,6 +70,6 @@ public class ExecuteCommandUtil {
 
         return jaxbResponse;
     }
-    
-    
+
+
 }
