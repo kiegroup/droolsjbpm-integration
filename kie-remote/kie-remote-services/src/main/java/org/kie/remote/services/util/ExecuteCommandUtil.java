@@ -41,8 +41,8 @@ public class ExecuteCommandUtil {
                 }
                 if( cmd instanceof TaskCommand ) {
                     String cmdName = cmd.getClass().getSimpleName();
-                    if( cmdName.startsWith("GetTask") ) {
-                        if( ! allowAllUsersAccessToAllTasks ) {
+                    if( ! allowAllUsersAccessToAllTasks ) {
+                        if( cmdName.startsWith("GetTask") ) {
                             String cmdUserId = ((TaskCommand) cmd).getUserId();
                             if( cmdUserId == null ) {
                                 throw KieRemoteRestOperationException.badRequest("A null user id for a '" + cmdName + "' is not allowed!");
