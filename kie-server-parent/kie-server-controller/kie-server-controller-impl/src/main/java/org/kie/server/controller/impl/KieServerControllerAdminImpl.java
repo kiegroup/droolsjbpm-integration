@@ -108,6 +108,8 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
         containers.add(container);
         container.setStatus(KieContainerStatus.STOPPED);
 
+        this.storage.update(kieServerInstance);
+
         return container;
     }
 
