@@ -332,6 +332,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(KieContainerStatus.STARTED, containerResponseEntity.getStatus());
 
         // Check that container is deployed in kie server.
+        waitForKieServerSynchronization(1);
         containerInfo = client.getContainerInfo(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
         assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
@@ -347,6 +348,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
 
         // Check that container is not deployed in kie server (as container is in STOPPED state).
+        waitForKieServerSynchronization(0);
         containerInfo = client.getContainerInfo(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
         assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
