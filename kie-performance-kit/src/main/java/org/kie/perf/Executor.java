@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
@@ -72,7 +73,8 @@ public class Executor {
             reporter = CsvSingleReporter.forRegistry(metrics).formatFor(Locale.US).convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS).build(reportDataLocation);
         } else if (reporterType == ReporterType.PERFREPO) {
-            PerfRepoClient client = new PerfRepoClient(tc.getPerfRepoHost(), tc.getPerfRepoUrlPath(), tc.getPerfRepoUsername(), tc.getPerfRepoPassword());
+            PerfRepoClient client = new PerfRepoClient(tc.getPerfRepoHost(), tc.getPerfRepoUrlPath(), tc.getPerfRepoUsername(),
+                    tc.getPerfRepoPassword());
             reporter = PerfRepoReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build(client);
         }
 
@@ -119,20 +121,20 @@ public class Executor {
             // parent process going through all scenarios to start new child
             // processes for each scenario
             for (Class<? extends IPerfTest> c : scenarios) {
-                if (selectedScenario == null) {
-                    ProcessBuilder processBuilder = new ProcessBuilder(tc.getStartScriptLocation(), c.getSimpleName());
-                    try {
-                        Process process = processBuilder.start();
-                        InputStreamReader isr = new InputStreamReader(process.getInputStream());
-                        BufferedReader br = new BufferedReader(isr);
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            System.out.println(line);
-                        }
-                        process.waitFor();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                if (Modifier.isAbstract(c.getModifiers())) {
+                    continue;
+                }
+                ProcessBuilder processBuilder = new ProcessBuilder(tc.getStartScriptLocation(), c.getSimpleName());
+                try {
+                    Process process = processBuilder.start();
+                    InputStreamReader isr = new InputStreamReader(process.getInputStream());
+                    BufferedReader br = new BufferedReader(isr);
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         } else {
@@ -190,43 +192,42 @@ public class Executor {
             }
             msg += " ========";
             log.info(msg);
-            
+
             IPerfTest scenario = exec.selectNextTestFromSuite(testSuite);
 
             if (scenario != null) {
                 // this is a child process for this scenario with own JVM
-                
-                    exec.initMetrics(scenario);
-                    testSuite.initScenario(scenario);
-                    if (tc.isWarmUp()) {
-                        SharedMetricRegistry.setWarmUp(true);
-                        scenario.initMetrics();
-                        long endWarmUpTime = System.currentTimeMillis() + 5000;
-                        for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
-                            scenario.execute();
-                        }
-                        SharedMetricRegistry.setWarmUp(false);
-                    }
+
+                exec.initMetrics(scenario);
+                testSuite.initScenario(scenario);
+                if (tc.isWarmUp()) {
+                    SharedMetricRegistry.setWarmUp(true);
                     scenario.initMetrics();
-
-                    CPUUsageHistogramSet cpuusage = null;
-                    boolean cpuusageEnabled = tc.getMeasure().contains(Measure.CPUUSAGE);
-                    if (cpuusageEnabled) {
-                        cpuusage = CPUUsageHistogramSet.getInstance(scenario.getClass());
-                        cpuusage.start();
+                    long endWarmUpTime = System.currentTimeMillis() + 5000;
+                    for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
+                        scenario.execute();
                     }
-                    testSuite.startScenario(scenario);
-                    if (cpuusageEnabled) {
-                        cpuusage.stop();
-                    }
+                    SharedMetricRegistry.setWarmUp(false);
+                }
+                scenario.initMetrics();
 
-                    exec.report();
-                
+                CPUUsageHistogramSet cpuusage = null;
+                boolean cpuusageEnabled = tc.getMeasure().contains(Measure.CPUUSAGE);
+                if (cpuusageEnabled) {
+                    cpuusage = CPUUsageHistogramSet.getInstance(scenario.getClass());
+                    cpuusage.start();
+                }
+                testSuite.startScenario(scenario);
+                if (cpuusageEnabled) {
+                    cpuusage.stop();
+                }
+
+                exec.report();
+
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        System.exit(0);
     }
 
 }
