@@ -46,22 +46,21 @@ public class ConcurrentLoadSuite implements ITestSuite {
             Timer duration = SharedMetricRegistry.getInstance().timer(MetricRegistry.name(scenario.getClass(), "scenario.total.duration"));
             contextDuration = duration.time();
         }
-        
+        List<IPerfTest> tests = new ArrayList<IPerfTest>();
         for (int i = 0; i < threads; ++i) {
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Timer duration = SharedMetricRegistry.getInstance().timer(MetricRegistry.name(scenario.getClass(), "scenario.single.duration"));
-                    IRunType run = TestConfig.getInstance().getRunType().newInstance();
+            IPerfTest test;
+            try {
+                test = scenario.getClass().newInstance();
+                test.init();
+                test.initMetrics();
+                tests.add(test);
+            } catch (Exception e) {
 
-                    run.start(max);
-                    while (!run.isEnd()) {
-                        Timer.Context context = duration.time();
-                        scenario.execute();
-                        context.stop();
-                    }
-                }
-            });
+            }
+        }
+
+        for (IPerfTest test : tests) {
+            Thread t = new ThreadScenario(test, max);
             threadsList.add(t);
         }
 
@@ -71,17 +70,51 @@ public class ConcurrentLoadSuite implements ITestSuite {
 
         for (Thread t : threadsList) {
             try {
-                t.join();
+                if (t.isAlive()) {
+                    t.join();
+                }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                
             }
         }
         if (contextDuration != null) {
             contextDuration.stop();
         }
 
+        for (IPerfTest t : tests) {
+            t.close();
+        }
         scenario.close();
         threadsList.clear();
+    }
+
+    private static class ThreadScenario extends Thread {
+        
+        private static int id = 0;
+
+        private int instanceId;
+        private IPerfTest scenario;
+        private int max;
+        
+        public ThreadScenario(IPerfTest scenario, int max) {
+            this.scenario = scenario;
+            this.max = max;
+            id++;
+            instanceId = id;
+        }
+        
+        @Override
+        public void run() {
+            Timer duration = SharedMetricRegistry.getInstance().timer(MetricRegistry.name(scenario.getClass(), "scenario.single.duration"));
+            IRunType run = TestConfig.getInstance().getRunType().newInstance();
+
+            run.start(max);
+            while (!run.isEnd()) {
+                Timer.Context context = duration.time();
+                scenario.execute();
+                context.stop();
+            }
+        }
     }
 
 }
