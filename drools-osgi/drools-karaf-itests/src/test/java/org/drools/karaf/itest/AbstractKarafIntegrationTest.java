@@ -51,7 +51,7 @@ abstract public class AbstractKarafIntegrationTest {
      * Karaf distribution file is specified (for example Jboss Fuse 6.2.
      * uses Karaf container version 2.4.0).
      */
-    public static final String PROP_KARAF_VERSION = "karafVersion";
+    public static final String PROP_KARAF_VERSION = "karaf.version";
     
     /**
      * Maximal size of perm gen memory. For example "512M". This property
@@ -115,7 +115,7 @@ abstract public class AbstractKarafIntegrationTest {
         if (karafVersion == null) {
             if(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) != null) {
                 throw new RuntimeException("When you are running against custom container "
-                        + "it is necessary to define Karaf version by defining system property karafVersion.");
+                        + "it is necessary to define Karaf version by defining system property karaf.version.");
             }
             
             // set the Karaf version defined by Maven
