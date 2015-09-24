@@ -16,7 +16,6 @@
 package org.drools.karaf.itest;
 
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.configs.CustomProperties;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
@@ -34,9 +33,11 @@ import java.util.Properties;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.CoreOptions.*;
+import org.ops4j.pax.exam.MavenUtils;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import org.ops4j.pax.exam.options.MavenUrlReference.VersionResolver;
 
 abstract public class AbstractKarafIntegrationTest {
 
@@ -44,6 +45,13 @@ abstract public class AbstractKarafIntegrationTest {
      * Path to file containing container binary archive.
      */
     public static final String PROP_KARAF_DISTRIBUTION_FILE = "karaf.dist.file";
+    
+    /**
+     * Defines version of Karaf. This parameter is mandatory when a custom
+     * Karaf distribution file is specified (for example Jboss Fuse 6.2.
+     * uses Karaf container version 2.4.0).
+     */
+    public static final String PROP_KARAF_VERSION = "karafVersion";
     
     /**
      * Maximal size of perm gen memory. For example "512M". This property
@@ -58,10 +66,20 @@ abstract public class AbstractKarafIntegrationTest {
     public static final String PROP_KEEP_RUNTIME_FOLDER = "karaf.keep.runtime.folder";
 
     /**
+     * Karaf group id.
+     */
+    private static final String KARAF_GROUP_ID = "org.apache.karaf";
+    
+    /**
+     * Karaf artifact id.
+     */
+    private static final String KARAF_ARTIFACT_ID = "apache-karaf";
+    
+    /**
      * Base OSGi framework used by Karaf. Default is Felix.
      */
     public static final String PROP_KARAF_FRAMEWORK = "karaf.osgi.framework";
-
+    
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
     protected static final String DROOLS_VERSION;
@@ -93,10 +111,16 @@ abstract public class AbstractKarafIntegrationTest {
     }
 
     private static String getKarafVersion() {
-        String karafVersion = System.getProperty("karafVersion");
+        String karafVersion = System.getProperty(PROP_KARAF_VERSION);
         if (karafVersion == null) {
-            // setup the default version of it
-            karafVersion = "2.4.2";
+            if(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) != null) {
+                throw new RuntimeException("When you are running against custom container "
+                        + "it is necessary to define Karaf version by defining system property karafVersion.");
+            }
+            
+            // set the Karaf version defined by Maven
+            VersionResolver versionResolver = MavenUtils.asInProject();
+            karafVersion = versionResolver.getVersion(KARAF_GROUP_ID, KARAF_ARTIFACT_ID);
         }
         return karafVersion;
     }
@@ -112,7 +136,7 @@ abstract public class AbstractKarafIntegrationTest {
         
         /* Use default or custom container */
         if (System.getProperty(PROP_KARAF_DISTRIBUTION_FILE) == null) {
-            karafConfiguration.frameworkUrl(maven().groupId("org.apache.karaf").artifactId("apache-karaf").type("tar.gz").versionAsInProject());
+            karafConfiguration.frameworkUrl(maven().groupId(KARAF_GROUP_ID).artifactId(KARAF_ARTIFACT_ID).type("tar.gz").versionAsInProject());
         } else {
             File fuseDistributionFile = new File(System.getProperty(PROP_KARAF_DISTRIBUTION_FILE));
             karafConfiguration.frameworkUrl("file:" + fuseDistributionFile.getAbsolutePath());
