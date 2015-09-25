@@ -45,8 +45,6 @@ import java.util.Properties;
 
 /**
  * Compiles and serializes knowledge packages.
- * @author kedzie
- *
  */
 @Mojo(name = "touch",
       requiresProject = true,
