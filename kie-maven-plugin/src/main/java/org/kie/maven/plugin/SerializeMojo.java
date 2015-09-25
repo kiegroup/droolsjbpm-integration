@@ -32,6 +32,7 @@ import org.kie.api.runtime.KieContainer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Compiles and serializes knowledge packages.
@@ -55,12 +56,22 @@ public class SerializeMojo extends AbstractMojo {
     @Parameter(property = "kie.resDirectory", defaultValue = "${project.basedir}/src/main/res/raw" )
     private String resDirectory;
 
+    @Parameter
+    private Map<String, String> properties;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             File outputFolder = new File(resDirectory);
             outputFolder.mkdirs();
+
+            if (properties != null) {
+                getLog().debug("Additional system properties: " + properties);
+                for (Map.Entry<String, String> property : properties.entrySet()) {
+                    System.setProperty(property.getKey(), property.getValue());
+                }
+                getLog().debug("Configured system properties were successfully set.");
+            }
 
             KieServices ks = KieServices.Factory.get();
             KieContainer kc = ks.newKieClasspathContainer();
