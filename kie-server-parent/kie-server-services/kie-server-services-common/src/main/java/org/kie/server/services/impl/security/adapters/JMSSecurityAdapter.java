@@ -168,8 +168,6 @@ public class JMSSecurityAdapter implements SecurityAdapter {
                 } else if (current instanceof RealmCallback) {
                     RealmCallback realmCallback = (RealmCallback) current;
                     realmCallback.setText(realmCallback.getDefaultText());
-                } else {
-                    throw new UnsupportedCallbackException(current);
                 }
             }
 
