@@ -421,9 +421,28 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         }
        
         result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertTrue( "Empty result ('COMPLETE' + var1 + var2)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
-        assertEquals( "Incorrect num results", 1, result.getProcessInstanceInfoList().size() );
-        
+        assertFalse( "Null result ('COMPLETE' + var1 + var2)", result == null || result.getProcessInstanceInfoList() == null );
+        assertFalse( "Empty result ('COMPLETE' + var1 + var2)", result.getProcessInstanceInfoList().isEmpty() );
+        assertEquals( "Incorrect num results", origNumResults + 1, result.getProcessInstanceInfoList().size() );
+    }
+
+    @Test
+    public void duplicateTaskSummaryResultsTest() {
+        int [] pageInfo = { 0, 0 };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+
+        JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
+        assertNotNull( "Null result", result );
+        assertFalse( "Empty result (all)", result.getTaskInfoList().isEmpty() );
+
+        long processInstanceId = 0;
+        for( JaxbQueryTaskInfo queryInfo : result.getTaskInfoList() ) {
+           assertNotNull( "Null task summaries info!", queryInfo.getTaskSummaries() );
+           assertFalse( "No task summaries info!", queryInfo.getTaskSummaries().isEmpty() );
+           processInstanceId = queryInfo.getTaskSummaries().get(0).getProcessInstanceId();
+        }
+
+        addParams(queryParams, "processInstanceId", "" + processInstanceId);
     }
   
     @Test
