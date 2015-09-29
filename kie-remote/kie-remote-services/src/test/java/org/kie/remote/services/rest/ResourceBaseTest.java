@@ -32,6 +32,7 @@ import org.jbpm.services.task.impl.model.xml.JaxbI18NText;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
+import org.mockito.cglib.transform.impl.AddPropertyTransformer;
 
 public class ResourceBaseTest extends ResourceBase {
 
@@ -106,6 +107,56 @@ public class ResourceBaseTest extends ResourceBase {
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
         floot = "1.123E-293"; // E-\d{3}
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
+    }
+
+    @Test
+    public void testGetObjectParam() {
+        // integer
+        String paramName = "int";
+        testParam(paramName, Integer.class, "0i");
+        testParam(paramName, Integer.class, "1i");
+        testParam(paramName, Integer.class, "10000i");
+
+        // long
+        paramName = "long";
+        testParam(paramName, Long.class, "10000l");
+        testParam(paramName, Long.class, "0l");
+        testParam(paramName, Long.class, "1");
+
+        // float
+        paramName = "float";
+        testParam(paramName, Float.class, "1.00f");
+        testParam(paramName, Float.class, "2043f");
+        testParam(paramName, Float.class, "4.00E3f");
+        testParam(paramName, Float.class, "8.00E-3f");
+        testParam(paramName, Float.class, "16.00");
+        testParam(paramName, Float.class, "32.32E9");
+        testParam(paramName, Float.class, "64.00E-1");
+
+        // boolean
+        paramName = "bool";
+        testParam(paramName, Boolean.class, "TRUE");
+        testParam(paramName, Boolean.class, "FALSE");
+
+        // string
+        paramName = "other";
+        testParam(paramName, String.class, "true");
+        testParam(paramName, String.class, "false");
+
+        testParam(paramName, String.class, "1.00i");
+        testParam(paramName, String.class, "1.00l");
+        testParam(paramName, String.class, "1.00li");
+        testParam(paramName, String.class, "1.00if");
+        testParam(paramName, String.class, "1.00Ef");
+
+    }
+
+    private static void testParam(String paramName, Class clazz, String... param) {
+        Map<String, String[]> params = new HashMap<String, String[]>();
+       params.put(paramName, param);
+       Object result = getObjectParam(paramName, false, params, "/test/get-object-param/" + paramName);
+        assertTrue( "[" + param[0] + "]: expected a " + clazz.getSimpleName() + " not a " + result.getClass().getSimpleName(),
+                    clazz.isAssignableFrom(result.getClass()) );
     }
 
     @Test

@@ -9,7 +9,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.hibernate" level="debug" />
+  <logger name="org.hibernate" level="warn" />
   <logger name="org.hibernate.tool.hbm2ddl.DatabaseMetadata" level="off" />
   <logger name="bitronix.tm.twopc.Preparer" level="off" />
 

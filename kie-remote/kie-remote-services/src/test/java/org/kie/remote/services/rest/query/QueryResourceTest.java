@@ -420,7 +420,10 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         }
 
         result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertTrue( "Empty result ('COMPLETE' + var1 + var2)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
+        assertTrue( "Empty result ('COMPLETE' + var1 + var2)", 
+                    result != null 
+                    && result.getProcessInstanceInfoList() != null 
+                    && ! result.getProcessInstanceInfoList().isEmpty() );
         assertEquals( "Incorrect num results", origNumResults + 1, result.getProcessInstanceInfoList().size() );
 
     }
