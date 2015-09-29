@@ -273,10 +273,12 @@ public class ResourceBase {
     private static Object getObjectFromString(String key, String mapVal) {
         if (mapVal.matches("^\".*\"$")) {
             return mapVal.substring(1, mapVal.length()-1);
-        } else if (!mapVal.matches("^\\d+[li]?$")) {
-            return mapVal;
-        } else {
+        } else if (mapVal.matches(LONG_INTEGER_REGEX) || mapVal.matches(FLOAT_REGEX) ) {
             return getNumberFromString(key, mapVal, false);
+        } else if (mapVal.matches(BOOLEAN_REGEX) ) {
+            return Boolean.parseBoolean(mapVal);
+        } else {
+            return mapVal;
         }
     }
 
@@ -284,6 +286,7 @@ public class ResourceBase {
     private final static int MAX_LENGTH_LONG = 18;
     private final static int MAX_LENGTH_FLOAT = 10;
 
+    public static String BOOLEAN_REGEX ="^(TRUE|FALSE)";
     public static String LONG_INTEGER_REGEX ="^\\d+[li]?$";
     public static String FLOAT_REGEX = "^\\d[\\d\\.]{1,9}(E-?\\d{1,2})?f?$";
 
@@ -293,6 +296,7 @@ public class ResourceBase {
      * <ul>
      * <li>i : returns an Integer</li>
      * <li>l : returns an Long</li>
+     * <li>f : returns an Float</li>
      * </ul>
      *
      * @param paramName
@@ -326,7 +330,12 @@ public class ResourceBase {
         } else if(paramVal.matches(FLOAT_REGEX)) {
             if (mustBeLong) {
                 throw KieRemoteRestOperationException.badRequest( paramName
-                        + " parameter is numerical but contains the \"Integer\" suffix 'i' and must have no suffix or \"Long\" suffix 'l' ("
+                        + " parameter is numerical but contains the \"Float\" suffix 'f' (or a '.') and must have no suffix or \"Long\" suffix 'l' ("
+                        + paramVal + ")");
+            }
+            int length = paramVal.replace("f", "").length();
+            if (length > MAX_LENGTH_FLOAT) {
+                throw KieRemoteRestOperationException.badRequest(paramName + " parameter is a float but longer than " + MAX_LENGTH_FLOAT + "("
                         + paramVal + ")");
             }
             if (paramVal.matches(".*f$")) {

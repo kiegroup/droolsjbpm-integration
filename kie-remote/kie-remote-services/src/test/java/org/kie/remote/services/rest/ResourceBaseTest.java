@@ -32,6 +32,7 @@ import org.jbpm.services.task.impl.model.xml.JaxbI18NText;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
+import org.mockito.cglib.transform.impl.AddPropertyTransformer;
 
 public class ResourceBaseTest extends ResourceBase {
 
@@ -108,6 +109,53 @@ public class ResourceBaseTest extends ResourceBase {
         assertFalse( "[" + floot + "] | [" + regex + "]", floot.matches(regex));
     }
 
+    @Test
+    public void testGetObjectParam() { 
+        Map<String, String[]> params = new HashMap<String, String[]>();
+        // integer
+        String paramName = "int";
+        Class clazz = Integer.class;
+        testParam(paramName, Integer.class, params, "0i");
+        testParam(paramName, Integer.class, params, "1i");
+        testParam(paramName, Integer.class, params, "10000i");
+        
+        // long
+        testParam(paramName, Long.class, params, "10000l");
+        testParam(paramName, Long.class, params, "0l");
+        testParam(paramName, Long.class, params, "1");
+       
+        // float
+        testParam(paramName, Float.class, params, "1.00f");
+        testParam(paramName, Float.class, params, "2043f");
+        testParam(paramName, Float.class, params, "4.00E3f");
+        testParam(paramName, Float.class, params, "8.00E-3f");
+        testParam(paramName, Float.class, params, "16.00");
+        testParam(paramName, Float.class, params, "32.32E9");
+        testParam(paramName, Float.class, params, "64.00E-1");
+        
+        // boolean
+        testParam(paramName, Boolean.class, params, "TRUE");
+        testParam(paramName, Boolean.class, params, "FALSE");
+        
+        // string
+        testParam(paramName, String.class, params, "true");
+        testParam(paramName, String.class, params, "false");
+        
+        testParam(paramName, String.class, params, "1.00i");
+        testParam(paramName, String.class, params, "1.00l");
+        testParam(paramName, String.class, params, "1.00li");
+        testParam(paramName, String.class, params, "1.00if");
+        testParam(paramName, String.class, params, "1.00Ef");
+        
+    }
+    
+    private static void testParam(String paramName, Class clazz, Map<String, String[]> params, String... param) { 
+       params.put(paramName, param);
+       Object result = getObjectParam(paramName, false, params, "/test/get-object-param/" + paramName);
+        assertTrue( "[" + param[0] + "]: expected a " + clazz.getSimpleName() + " not a " + result.getClass().getSimpleName(), 
+                    clazz.isAssignableFrom(result.getClass()) );
+    }
+    
     @Test
     public void testWrapperLogic() {
         wrapperPrimitives.put(String.class, JaxbString.class);
