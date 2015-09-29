@@ -115,7 +115,12 @@ public class JaxbTaskSummary implements TaskSummary {
     @XmlElement(name="parent-id")
     @XmlSchemaType(name="long")
     private Long parentId;
-    
+   
+    /**
+     * This field is never filled on the server side, 
+     * even though it may have values. 
+     */
+    @Deprecated // remove in 7.0 
     @XmlElement(name="potential-owner")
     private List<String> potentialOwners;
 
@@ -316,10 +321,22 @@ public class JaxbTaskSummary implements TaskSummary {
         this.processSessionId = processSessionId;
     }
 
+    /**
+     * This field is never filled on the server side, 
+     * even though it may have values. 
+     * @param potentialOwners
+     */
+    @Deprecated // remove in 7.0 
     public List<String> getPotentialOwners() {
         return potentialOwners;
     }
 
+    /**
+     * This field is never filled on the server side, 
+     * even though it may have values. 
+     * @param potentialOwners
+     */
+    @Deprecated // remove in 7.0 
     public void setPotentialOwners(List<String> potentialOwners) {
         this.potentialOwners = potentialOwners;
     }
