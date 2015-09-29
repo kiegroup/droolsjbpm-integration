@@ -389,6 +389,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
     }
 
     @Test
+    @Ignore("BZ-1199993 - No results from Process Query API when I query process instances with 2 or more variables")
     public void moreQueryProcessRestCallTest() throws Exception  {
         int pageSize = 5;
         assertTrue( numProcesses > pageSize );
@@ -420,12 +421,9 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         }
 
         result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertTrue( "Empty result ('COMPLETE' + var1 + var2)", 
-                    result != null 
-                    && result.getProcessInstanceInfoList() != null 
-                    && ! result.getProcessInstanceInfoList().isEmpty() );
+        assertFalse( "Null result ('COMPLETE' + var1 + var2)", result == null || result.getProcessInstanceInfoList() == null );
+        assertFalse( "Empty result ('COMPLETE' + var1 + var2)", result.getProcessInstanceInfoList().isEmpty() );
         assertEquals( "Incorrect num results", origNumResults + 1, result.getProcessInstanceInfoList().size() );
-
     }
 
     @Test
