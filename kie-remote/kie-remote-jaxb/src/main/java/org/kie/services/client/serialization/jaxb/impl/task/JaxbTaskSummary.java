@@ -115,7 +115,8 @@ public class JaxbTaskSummary implements TaskSummary {
     @XmlElement(name="parent-id")
     @XmlSchemaType(name="long")
     private Long parentId;
-    
+   
+    @Deprecated // remove in 7.0 
     @XmlElement(name="potential-owner")
     private List<String> potentialOwners;
 
@@ -316,10 +317,12 @@ public class JaxbTaskSummary implements TaskSummary {
         this.processSessionId = processSessionId;
     }
 
+    @Deprecated // remove in 7.0 
     public List<String> getPotentialOwners() {
         return potentialOwners;
     }
 
+    @Deprecated // remove in 7.0 
     public void setPotentialOwners(List<String> potentialOwners) {
         this.potentialOwners = potentialOwners;
     }
