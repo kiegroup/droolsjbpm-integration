@@ -15,9 +15,6 @@ import com.codahale.metrics.Timer;
 
 public class ConcurrentLoadSuite implements ITestSuite {
 
-    protected int iterations = 1; // default
-    protected int threads = 1; // default
-
     @Override
     public String getTestPackage() {
         return "org.kie.perf.scenario.load";
@@ -25,10 +22,6 @@ public class ConcurrentLoadSuite implements ITestSuite {
 
     @Override
     public void initScenario(final IPerfTest scenario) throws Exception {
-        TestConfig tc = TestConfig.getInstance();
-        iterations = tc.getIterations();
-        threads = tc.getThreads();
-
         scenario.init();
     }
 
@@ -47,6 +40,7 @@ public class ConcurrentLoadSuite implements ITestSuite {
             contextDuration = duration.time();
         }
         List<IPerfTest> tests = new ArrayList<IPerfTest>();
+        int threads = tc.getThreads();
         for (int i = 0; i < threads; ++i) {
             IPerfTest test;
             try {
@@ -55,7 +49,7 @@ public class ConcurrentLoadSuite implements ITestSuite {
                 test.initMetrics();
                 tests.add(test);
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
 
@@ -89,18 +83,13 @@ public class ConcurrentLoadSuite implements ITestSuite {
     }
 
     private static class ThreadScenario extends Thread {
-        
-        private static int id = 0;
 
-        private int instanceId;
         private IPerfTest scenario;
         private int max;
         
         public ThreadScenario(IPerfTest scenario, int max) {
             this.scenario = scenario;
             this.max = max;
-            id++;
-            instanceId = id;
         }
         
         @Override
