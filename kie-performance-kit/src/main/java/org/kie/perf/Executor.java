@@ -160,10 +160,16 @@ public class Executor {
         }
 
         for (String c : constraint.value()) {
-            String[] entry = c.split("=");
+            String[] entry = null;
+            boolean noteq = c.contains("!=");
+            if (noteq) {
+                entry = c.split("!=");
+            } else {
+                entry = c.split("=");
+            }
             if (entry.length == 2) {
                 String val = System.getProperty(entry[0]);
-                if (val == null || !val.equals(entry[1])) {
+                if (val == null || ( !noteq && !val.equals(entry[1])) || (noteq && val.equals(entry[1]))) {
                     return constraint;
                 }
             } else {
