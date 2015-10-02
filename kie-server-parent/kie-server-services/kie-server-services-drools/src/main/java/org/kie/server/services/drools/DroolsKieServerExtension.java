@@ -38,6 +38,7 @@ import org.kie.server.services.impl.KieContainerCommandServiceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.drools.compiler.kproject.xml.DependencyFilter;
 
 public class DroolsKieServerExtension implements KieServerExtension {
 
@@ -81,7 +82,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
             kieContainerInstance.getKieContainer().getKieBase(kbase);
         }
 
-        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(kieContainerInstance.getKieContainer().getReleaseId());
+        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(kieContainerInstance.getKieContainer().getReleaseId(), DependencyFilter.COMPILE_FILTER);
         Collection<String> packages = metaData.getPackages();
 
         for (String p : packages) {
