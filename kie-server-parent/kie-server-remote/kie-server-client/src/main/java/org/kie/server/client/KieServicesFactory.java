@@ -41,10 +41,10 @@ public class KieServicesFactory {
      * @param serverUrl the URL to the server (e.g.: "http://localhost:8080")
      * @param login user login
      * @param password user password
-     * @param timeout the maximum timeout in seconds
+     * @param timeout the maximum timeout in milliseconds
      * @return configuration instance
      */
-    public static KieServicesConfiguration newRestConfiguration( String serverUrl, String login, String password, int timeout ) {
+    public static KieServicesConfiguration newRestConfiguration( String serverUrl, String login, String password, long timeout ) {
         return new KieServicesConfigurationImpl( serverUrl, login, password, timeout );
     }
 
