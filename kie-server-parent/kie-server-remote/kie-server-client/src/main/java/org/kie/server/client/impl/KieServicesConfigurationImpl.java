@@ -81,7 +81,7 @@ public final class KieServicesConfigurationImpl
      * @param url
      * @param username
      * @param password
-     * @param timeoutInSecs
+     * @param timeout the maximum timeout in milliseconds
      */
     public KieServicesConfigurationImpl(String url, String username, String password, long timeout) {
         this.transport = Transport.REST;
