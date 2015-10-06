@@ -388,6 +388,12 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
+    protected static void assertNullOrEmpty(String result ) {
+        if (result != null) {
+            assertTrue("String is not empty.", result.isEmpty());
+        }
+    }
+
     protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
         try {
             InitialContext context = TestConfig.getInitialRemoteContext();

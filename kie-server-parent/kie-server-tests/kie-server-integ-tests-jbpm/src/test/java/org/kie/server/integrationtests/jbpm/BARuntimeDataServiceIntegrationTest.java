@@ -74,7 +74,7 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
