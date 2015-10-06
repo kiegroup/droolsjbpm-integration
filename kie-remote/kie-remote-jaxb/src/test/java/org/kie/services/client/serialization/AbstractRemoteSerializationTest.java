@@ -524,7 +524,7 @@ public abstract class AbstractRemoteSerializationTest extends JbpmJUnitBaseTestC
         depDescriptor.setAuditMode(AuditMode.JMS);
         depDescriptor.setAuditPersistenceUnit("myDatabasePersistenceUnit");
         String[] classes = { "org.test.First", "org.more.test.Second" };
-        depDescriptor.setClasses(Arrays.asList(classes));
+        depDescriptor.setRemoteableClasses(Arrays.asList(classes));
 
         depDescriptor.setConfiguration(getNamedObjectModeList("conf"));
         depDescriptor.setEnvironmentEntries(getNamedObjectModeList("envEnt"));

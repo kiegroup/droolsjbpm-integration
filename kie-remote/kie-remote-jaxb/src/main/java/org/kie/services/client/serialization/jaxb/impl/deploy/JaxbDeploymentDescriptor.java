@@ -38,59 +38,63 @@ public class JaxbDeploymentDescriptor {
 	@XmlElement(name="persistence-unit")
 	@XmlSchemaType(name="string")
 	private String persistenceUnit;
-	
+
 	@XmlElement(name="audit-persistence-unit")
 	@XmlSchemaType(name="string")
 	private String auditPersistenceUnit;
-	
+
 	@XmlElement(name="audit-mode")
 	private AuditMode auditMode = AuditMode.JPA;
-	
+
 	@XmlElement(name="persistence-mode")
 	private PersistenceMode persistenceMode = PersistenceMode.JPA;
-	
+
 	@XmlElement(name="runtime-strategy")
 	private RuntimeStrategy runtimeStrategy = RuntimeStrategy.SINGLETON;
-	
+
 	@XmlElement(name="marshalling-strategy")
 	@XmlElementWrapper(name="marshalling-strategies")
 	private List<ObjectModel> marshallingStrategies;
-	
+
 	@XmlElement(name="event-listener")
 	@XmlElementWrapper(name="event-listeners")
 	private List<ObjectModel> eventListeners;
-	
+
 	@XmlElement(name="task-event-listener")
 	@XmlElementWrapper(name="task-event-listeners")
 	private List<ObjectModel> taskEventListeners;
-	
+
 	@XmlElement(name="global")
 	@XmlElementWrapper(name="globals")
 	private List<NamedObjectModel> globals;
-	
+
 	@XmlElement(name="work-item-handler")
 	@XmlElementWrapper(name="work-item-handlers")
 	private List<NamedObjectModel> workItemHandlers;
-	
+
 	@XmlElement(name="environment-entry")
 	@XmlElementWrapper(name="environment-entries")
 	private List<NamedObjectModel> environmentEntries;
-	
+
 	@XmlElement(name="configuration")
 	@XmlElementWrapper(name="configurations")
 	private List<NamedObjectModel> configuration;
-	
+
 	@XmlElement(name="required-role")
 	@XmlElementWrapper(name="required-roles")
 	private List<String> requiredRoles;
-	
-	@XmlElement(name="class")
+
+	@XmlElement(name="remoteable-class")
+	@XmlElementWrapper(name="remoteable-classes")
 	private List<String> classes;
-	
+
+	@XmlElement(name="limit-serialization-classes")
+	private Boolean limitSerializationClasses = false;
+
 	public JaxbDeploymentDescriptor() {
 		// fox jaxb only
 	}
-	
+
 	public JaxbDeploymentDescriptor(String defaultPU) {
 		this.persistenceUnit = defaultPU;
 		this.auditPersistenceUnit = defaultPU;
@@ -200,12 +204,20 @@ public class JaxbDeploymentDescriptor {
         this.requiredRoles = requiredRoles;
     }
 
-    public List<String> getClasses() {
+    public List<String> getRemoteableClasses() {
         return classes;
     }
 
-    public void setClasses( List<String> classes ) {
+    public void setRemoteableClasses( List<String> classes ) {
         this.classes = classes;
+    }
+
+    public Boolean getLimitSerializationClasses() {
+        return limitSerializationClasses;
+    }
+
+    public void getLimitSerializationClasses( Boolean limit ) {
+        this.limitSerializationClasses = limit;
     }
 
 }

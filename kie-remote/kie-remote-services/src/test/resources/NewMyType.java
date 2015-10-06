@@ -35,6 +35,9 @@ public class MyType implements Serializable {
     @XmlSchemaType(name="string")
     private String notText;
 
+    @XmlElement
+    private Object child;
+    
     public MyType() {
        // default constructor
     }
@@ -49,6 +52,14 @@ public class MyType implements Serializable {
 
     public void setNotText(String text) {
         this.notText = text;
+    }
+
+    public Object getChild() {
+        return child;
+    }
+
+    public void setChild(Object child) {
+        this.child = child;
     }
 
 }

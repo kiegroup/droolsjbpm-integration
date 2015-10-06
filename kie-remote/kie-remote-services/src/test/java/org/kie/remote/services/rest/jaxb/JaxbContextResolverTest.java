@@ -16,19 +16,14 @@
 package org.kie.remote.services.rest.jaxb;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.kie.remote.services.rest.jaxb.JavaCompilerTest.getClassFromSource;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -40,7 +35,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
@@ -49,11 +43,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+import org.jbpm.services.api.DeploymentEvent;
+import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
-import org.kie.remote.services.cdi.DeploymentProcessedEvent;
 import org.kie.services.client.serialization.SerializationException;
 
 /**
@@ -68,9 +63,11 @@ public class JaxbContextResolverTest {
     private JaxbContextResolver resolver;
     private DynamicJaxbContext dynamicJaxbContext = new DynamicJaxbContext();
 
-    private DeploymentInfoBean mockDepInfoBean;
-    private Map<String, Collection<Class<?>>> deploymentIdClassesMap = new HashMap<String, Collection<Class<?>>>();
+    private Map<String, Collection<Class<?>>> deploymentClassesMap;
     private MultivaluedMap<String, String> pathParams = new MultivaluedMapImpl<String, String>();
+
+    private static final String DEPLOYMENT_ID = "org.kie.remote:test:1.0";
+    private static final String OTHER_DEPLOYMENT_ID = "org.kie.remote:other-test:1.0";
 
     @Before
     public void before() throws URISyntaxException {
@@ -78,8 +75,7 @@ public class JaxbContextResolverTest {
 
        // Only created once to simulate Application scope
        resolver.dynamicContext = dynamicJaxbContext;
-       mockDepInfoBean = mock(DeploymentInfoBean.class);
-       dynamicJaxbContext.deploymentInfoBean = mockDepInfoBean;
+       deploymentClassesMap = dynamicJaxbContext.deploymentClassesMap;
     }
 
     @After
@@ -89,30 +85,24 @@ public class JaxbContextResolverTest {
 
     // Helper methods -------------------------------------------------------------------------------------------------------------
 
-    private void undeploy(String deploymentid) {
-        dynamicJaxbContext.cleanUpOnUndeploy(new DeploymentProcessedEvent(deploymentid));
-        deploymentIdClassesMap.remove(deploymentid);
+    private void undeploy(String deploymentId) {
+        DeploymentEvent event = new DeploymentEvent(deploymentId, null);
+        dynamicJaxbContext.removeOnUnDeploy(event);
     }
 
-    private void addClassesToDeploymentAndInitializeDeploymentJaxbContext(String deploymentId, Class<?>... clazz) {
-       Collection<Class<?>> depClasses = deploymentIdClassesMap.get(deploymentId);
-       boolean initialize = false;
-       if( depClasses == null ) {
-           initialize = true;
-           depClasses = new HashSet<Class<?>>();
-           deploymentIdClassesMap.put(deploymentId, depClasses);
-       }
-       depClasses.addAll(Arrays.asList(clazz));
-       if( initialize ) {
-           doReturn(depClasses).when(mockDepInfoBean).getDeploymentClasses(deploymentId);
-       }
-       // setup jaxb context instance for deployment
-       dynamicJaxbContext.setupDeploymentJaxbContext(new DeploymentProcessedEvent(deploymentId));
-    }
-
-    private void setDeploymentId(String deploymentId) {
+    private void deploy(String deploymentId, Class<?>... clazz) {
+        // path
        pathParams.putSingle("deploymentId", deploymentId);
-       dynamicJaxbContext.setupDeploymentJaxbContext(new DeploymentProcessedEvent(deploymentId));
+
+        // classes
+       Collection<Class<?>> depClasses = new HashSet<Class<?>>();
+       depClasses.addAll(Arrays.asList(clazz));
+
+       // deploy
+       DeployedUnit deployedUnit = mock(DeployedUnit.class);
+       when(deployedUnit.getDeployedClasses()).thenReturn(depClasses);
+       DeploymentEvent event = new DeploymentEvent(deploymentId, deployedUnit);
+       resolver.dynamicContext.addOnDeploy(event);
     }
 
     public String serialize(JAXBContext jaxbContext, Object object) {
@@ -177,13 +167,11 @@ public class JaxbContextResolverTest {
 
     @Test
     public void simpleJaxbDeserializeTest() throws Exception {
-        String depId = "org.kie.remote:test:1.0";
-        setDeploymentId(depId);
-        Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
+        Class<?> myTypeClass = getClassFromSource("MyType.java", "MyType", "MyTypeChild.java", "MyTypeChild");
+        deploy(DEPLOYMENT_ID, myTypeClass);
 
         // after request
-        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        DynamicJaxbContext.setDeploymentJaxbContext(DEPLOYMENT_ID);
 
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
 
@@ -202,39 +190,46 @@ public class JaxbContextResolverTest {
     @Test
     public void cacheJaxbContextTest() throws Exception {
         // setup
-        String depId = "org.kie.remote:test:1.0";
-        setDeploymentId(depId);
-        Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
+        Class<?> myTypeClass = getClassFromSource("MyType.java", "MyType", "MyTypeChild.java", "MyTypeChild");
+        deploy(DEPLOYMENT_ID, myTypeClass);
 
         // before request
-        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        DynamicJaxbContext.setDeploymentJaxbContext(DEPLOYMENT_ID);
 
+        // setup request
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
 
         Constructor<?> myTypeCstr = myTypeClass.getConstructor(String.class, int.class);
         Object myTypeObj = myTypeCstr.newInstance("og", 23);
 
+        // "do" request
         String xmlStr = serialize(jaxbContext, myTypeObj);
         Object roundTripTypeObj = deserialize(jaxbContext, xmlStr, myTypeClass);
 
+        // verify deserialized objects are correct
         verifyMyTypeInstance(myTypeClass, myTypeObj, roundTripTypeObj);
 
         JAXBContext cachedJaxbContext = resolver.getContext(myTypeClass);
         assertTrue( "JAXBContext was not cached!", jaxbContext == cachedJaxbContext);
     }
 
+    /**
+     * This test tests whether or not whether requests to different deployment-based resources
+     * succeed, when 2 deployments contain identically named classes that are structured differently.
+     *
+     * In other words, do we make sure that the classpath for serialization is isolated per deployment?
+     * @throws Exception
+     */
     @Test
     public void multipleDeploymentsTest() throws Exception {
         // setup deployment
-        String depId = "org.kie.remote:test:1.0";
-        setDeploymentId(depId);
-        Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
+        Class<?> myTypeClass = getClassFromSource("MyType.java", "MyType",
+                                                  "MyTypeChild.java", "MyTypeChild");
+        deploy(DEPLOYMENT_ID, myTypeClass);
 
         {
         // before request
-        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        DynamicJaxbContext.setDeploymentJaxbContext(DEPLOYMENT_ID);
 
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
@@ -255,14 +250,13 @@ public class JaxbContextResolverTest {
         }
 
         // setup OTHER deployment
-        String otherDepId = "org.kie.remote:other-test:1.0";
-        setDeploymentId(otherDepId);
-        Class<?> newMyTypeClass = getClassFromSource("NewMyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(otherDepId, newMyTypeClass);
+        Class<?> newMyTypeClass = getClassFromSource("NewMyType.java", "MyType",
+                                                     "NewMyTypeChild.java", "MyTypeChild");
+        deploy(OTHER_DEPLOYMENT_ID, newMyTypeClass);
 
         {
         // before request
-        DynamicJaxbContext.setDeploymentJaxbContext(otherDepId);
+        DynamicJaxbContext.setDeploymentJaxbContext(OTHER_DEPLOYMENT_ID);
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(newMyTypeClass);
 
@@ -286,12 +280,11 @@ public class JaxbContextResolverTest {
 
         {
         // setup deployment
-        setDeploymentId(depId);
-        Class<?> myTypeClass = getClassFromSource("MyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, myTypeClass);
+        Class<?> myTypeClass = getClassFromSource("MyType.java", "MyType", "MyTypeChild.java", "MyTypeChild");
+        deploy(DEPLOYMENT_ID, myTypeClass);
 
         // before request
-        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        DynamicJaxbContext.setDeploymentJaxbContext(DEPLOYMENT_ID);
 
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(myTypeClass);
@@ -311,16 +304,15 @@ public class JaxbContextResolverTest {
         }
 
         // undeploy!
-        undeploy(depId);
+        undeploy(DEPLOYMENT_ID);
 
         {
         // new deployment of same deployment -- with a different class definition
-        setDeploymentId(depId);
-        Class<?> newMyTypeClass = getClassFromSource("NewMyType.java");
-        addClassesToDeploymentAndInitializeDeploymentJaxbContext(depId, newMyTypeClass);
+        Class<?> newMyTypeClass = getClassFromSource("NewMyType.java", "MyType", "NewMyTypeChild.java", "MyTypeChild");
+        deploy(DEPLOYMENT_ID, newMyTypeClass);
 
         // before request
-        DynamicJaxbContext.setDeploymentJaxbContext(depId);
+        DynamicJaxbContext.setDeploymentJaxbContext(DEPLOYMENT_ID);
         // get jaxb context
         JAXBContext jaxbContext = resolver.getContext(newMyTypeClass);
 
