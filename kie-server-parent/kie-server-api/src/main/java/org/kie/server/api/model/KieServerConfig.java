@@ -48,6 +48,10 @@ public class KieServerConfig {
     }
 
     public void addConfigItem(KieServerConfigItem configItem) {
+        KieServerConfigItem existing = getConfigItem(configItem.getName());
+        if (existing != null) {
+            removeConfigItem(existing);
+        }
         this.configItems.add(configItem);
     }
 
