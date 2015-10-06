@@ -44,7 +44,7 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
             "1.0.0.Final");
 
     private static final long NUMBER_OF_JOBS = 10;
-    private static final long MAXIMUM_PROCESSING_TIME = 5000;
+    private static final long MAXIMUM_PROCESSING_TIME = 10000;
     private static final String CONTAINER_ID = "definition-project";
     private static final long SERVICE_TIMEOUT = 2000;
     private static final long TIMEOUT_BETWEEN_CALLS = 100;
@@ -98,7 +98,7 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
         }
         long durationTime = Calendar.getInstance().getTimeInMillis() - startTime;
 
-        // All jobs should be processed and done in less than 1 s.
+        // All jobs should be processed and done in less than 10 s.
         assertTrue("Job processing exceeded expected time!", durationTime < MAXIMUM_PROCESSING_TIME);
     }
 

@@ -388,8 +388,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             TaskInstance taskInstance = taskClient.getTaskInstance("definition-project", taskSummary.getId());
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
-            assertEquals("", taskInstance.getSubject());
+            assertNullOrEmpty(taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getSubject());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -437,8 +437,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             TaskInstance taskInstance = taskClient.getTaskInstance("definition-project", taskSummary.getId(), true, true, true);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
-            assertEquals("", taskInstance.getSubject());
+            assertNullOrEmpty(taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getSubject());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -635,7 +635,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertNull(taskSummary.getExpirationTime());
             assertTrue(taskSummary.getSkipable().booleanValue());
             assertEquals("First task", taskSummary.getName());
-            assertTrue(taskSummary.getDescription().isEmpty());
+            assertNullOrEmpty(taskSummary.getDescription());
 
             // set task properties
             Calendar currentTime = Calendar.getInstance();
@@ -701,7 +701,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // Verifying second comment returned by getTaskCommentsByTaskId().
             List<TaskComment> taskComments = taskClient.getTaskCommentsByTaskId(CONTAINER_ID, taskSummary.getId());
             assertEquals(2, taskComments.size());
-            TaskComment secondTaskComment = taskComments.get(1);
+
+            TaskComment secondTaskComment = null;
+            if (secondCommentId.equals(taskComments.get(0).getId())) {
+                secondTaskComment = taskComments.get(0);
+            } else {
+                secondTaskComment = taskComments.get(1);
+            }
             assertEquals(secondCommentTime.getTime(), secondTaskComment.getAddedAt());
             assertEquals(USER_JOHN, secondTaskComment.getAddedBy());
             assertEquals(secondCommentId, secondTaskComment.getId());
@@ -761,7 +767,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // Verifying second attachment returned by getTaskAttachmentsByTaskId().
             List<TaskAttachment> taskAttachments = taskClient.getTaskAttachmentsByTaskId(CONTAINER_ID, taskSummary.getId());
             assertEquals(2, taskAttachments.size());
-            TaskAttachment secondTaskAttachment = taskAttachments.get(1);
+
+            TaskAttachment secondTaskAttachment = null;
+            if (secondAttachmentId.equals(taskAttachments.get(0).getId())) {
+                secondTaskAttachment = taskAttachments.get(0);
+            } else {
+                secondTaskAttachment = taskAttachments.get(1);
+            }
             assertNotNull(secondTaskAttachment.getAddedAt());
             assertEquals(USER_JOHN, secondTaskAttachment.getAddedBy());
             assertNotNull(secondTaskAttachment.getAttachmentContentId());

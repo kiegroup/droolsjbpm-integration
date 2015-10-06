@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.KieServices;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
@@ -46,6 +47,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         buildAndDeployCommonMavenParent();
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+
+        kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
 
 
