@@ -42,9 +42,6 @@ public class DynamicJaxbContextFilter implements Filter {
     // "**" not accepted in URL's..
     public static final String DEFAULT_JAXB_CONTEXT_ID = "**DEFAULT";
 
-    @Inject
-    private DeploymentInfoBean deploymentInfoBean;
-
     public void init( FilterConfig filterConfig ) throws ServletException {
         // do nothing
     }
@@ -57,10 +54,6 @@ public class DynamicJaxbContextFilter implements Filter {
             ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String deploymentId = getDeploymentId(httpRequest);
-        if( !emptyDeploymentId(deploymentId) && !deploymentId.equals(DEFAULT_JAXB_CONTEXT_ID) ) {
-            // resolve in case a latest version is to be used
-            deploymentId = DeploymentIdResolver.matchAndReturnLatest(deploymentId, deploymentInfoBean.getDeploymentIds());
-        }
 
         DynamicJaxbContext.setDeploymentJaxbContext(deploymentId);
         logger.debug("JAXBContext retrieved and set for for '{}'", deploymentId);

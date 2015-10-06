@@ -53,7 +53,7 @@ public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest
        depDesc.setAuditMode(AuditMode.JMS);
        depDesc.setAuditPersistenceUnit("per-unit");
        String [] classes = { "class" };
-       depDesc.setClasses(Arrays.asList(classes));
+       depDesc.setRemoteableClasses(Arrays.asList(classes));
        NamedObjectModel [] nomArr = { new NamedObjectModel("resol", "name", "class", "param-1") };
        List<NamedObjectModel> noms = Arrays.asList(nomArr);
        depDesc.setConfiguration(noms);

@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -37,65 +37,75 @@ import org.junit.Test;
 public class JavaCompilerTest {
 
     @Test
-    public void testMoreCompliation() throws Exception { 
-        // compile class 
-        Class<?> cls = getClassFromSource("NewMyType.java");
-       
+    public void testMoreCompliation() throws Exception {
+        // compile class
+        Class<?> cls = getClassFromSource("NewMyType.java", "MyType",
+                                          "NewMyTypeChild.java", "MyTypeChild");
+
         // verify definition
         cls.getMethod("getNotText");
-        
+
         // compile class with same name
-        cls = getClassFromSource("MyType.java");
-        
+        cls = getClassFromSource("MyType.java", "MyType",
+                                 "MyTypeChild.java", "MyTypeChild");
+
         // verify definition
-        try { 
+        try {
             cls.getMethod("getNotText");
             fail( "The getNotText method should NOT exist here!");
-        } catch(Exception e ) { 
+        } catch(Exception e ) {
             // ignore
         }
         cls.getMethod("getText");
     }
-   
+
     /**
      * (runtime) Compilation of a source file (see the *.java files in src/test/resources)
-     * @param fileName The name of the file
+     * @param fileAndTypeNames The names of the file to be compiled
      * @return A {@link Class} instance from the source in the file
      * @throws Exception
      */
-    public static Class getClassFromSource(String fileName) throws Exception { 
-        String source = getSource(fileName);
-    
-        // Save source in .java file.
+    public static Class getClassFromSource(String... fileAndTypeNames) throws Exception {
         String tmpDir = System.getProperty("java.io.tmpdir");
         File root = new File(tmpDir, "kie-services-remote-tests");
-        File sourceFile = new File(root, "org/kie/remote/services/rest/jaxb/MyType.java");
-        if( sourceFile.exists() ) { 
-            sourceFile.delete();
-        }
-        sourceFile.getParentFile().mkdirs();
-        FileWriter fileWriter = null;
-        try { 
-            fileWriter = new FileWriter(sourceFile);
-            fileWriter.append(source);
-        } finally { 
-            if( fileWriter != null ) { 
-                fileWriter.close();
+        String [] paths = new String[fileAndTypeNames.length/2];
+
+        for( int i = 0;  i < fileAndTypeNames.length; i += 2 ) {
+            String fileName = fileAndTypeNames[i];
+            String typeName = fileAndTypeNames[i+1];
+
+            String source = getSource(fileName);
+
+            // Save source in .java file.
+            File sourceFile = new File(root, "org/kie/remote/services/rest/jaxb/" + typeName + ".java");
+            if( sourceFile.exists() ) {
+                sourceFile.delete();
             }
+            sourceFile.getParentFile().mkdirs();
+            FileWriter fileWriter = null;
+            try {
+                fileWriter = new FileWriter(sourceFile);
+                fileWriter.append(source);
+            } finally {
+                if( fileWriter != null ) {
+                    fileWriter.close();
+                }
+            }
+            paths[i/2] = sourceFile.getPath();
+            sourceFile.deleteOnExit();
         }
-    
+
         // Compile source file.
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, sourceFile.getPath());
-    
+        compiler.run(null, null, null, paths);
+
         // Load and instantiate compiled class.
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { root.toURI().toURL() });
-        Class<?> cls = Class.forName("org.kie.remote.services.rest.jaxb.MyType", true, classLoader); 
-        
+        Class<?> cls = Class.forName("org.kie.remote.services.rest.jaxb.MyType", true, classLoader);
+
         // cleanup
-        sourceFile.deleteOnExit();
         root.deleteOnExit();
-        
+
         return cls;
     }
 
@@ -110,10 +120,10 @@ public class JavaCompilerTest {
         assertNotNull(fileUrl);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStreamReader input = null;
-        try { 
+        try {
             URI fileUri = fileUrl.toURI();
             input = new InputStreamReader(new FileInputStream(new File(fileUri)));
-    
+
         OutputStreamWriter output = new OutputStreamWriter(baos);
         char[] buffer = new char[4096];
         int n = 0;
@@ -125,8 +135,8 @@ public class JavaCompilerTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        } finally { 
-            if( input != null ) { 
+        } finally {
+            if( input != null ) {
                 input.close();
             }
         }

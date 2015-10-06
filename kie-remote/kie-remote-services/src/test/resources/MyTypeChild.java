@@ -13,27 +13,36 @@
  * limitations under the License.
 */
 
-package org.kie.remote.services.cdi;
+package org.kie.remote.services.rest.jaxb;
 
+public class MyTypeChild {
 
-/**
- * This event is fired when 
- * 
- *
- */
-public class DeploymentProcessedEvent {
-
-    private String deploymentId;
-
-    public DeploymentProcessedEvent(String deploymentId) {
-        this.deploymentId = deploymentId;
+    private Long id;
+    
+    private String orig = "GANGSTER";
+    
+    public MyTypeChild() {
+       // default constructor 
+    }
+    
+    public MyTypeChild(long id) {
+        this.id = id;
+    }
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getDeploymentId() {
-        return deploymentId;
+    public String getOrig() {
+        return orig;
+    }
+    
+    public void setOrig(String orig) {
+        this.orig = orig;
     }
 
-    public void setDeploymentId(String deploymentId) {
-        this.deploymentId = deploymentId;
-    }
 }

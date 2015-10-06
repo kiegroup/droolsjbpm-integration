@@ -37,6 +37,9 @@ public class MyType implements Externalizable {
     @XmlElement
     @XmlSchemaType(name="int") 
     private Integer data;
+   
+    @XmlElement
+    private MyTypeChild child;
     
     public MyType() {
        // default constructor 
@@ -45,6 +48,7 @@ public class MyType implements Externalizable {
     public MyType(String text, int data) {
         this.text = text;
         this.data = data;
+        this.child = new MyTypeChild((long) data);
     }
     
     public String getText() {
@@ -65,27 +69,40 @@ public class MyType implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        if( this.text != null ) { 
+        if( this.text != null ) {
             out.writeBoolean(true);
             out.writeUTF(this.text);
-        } else { 
+        } else {
             out.writeBoolean(false);
         }
-        if( this.data != null) { 
+        if( this.data != null) {
             out.writeBoolean(true);
             out.write(this.data);
-        } else { 
+        } else {
             out.writeBoolean(false);
+        }
+        out.writeBoolean(this.child != null);
+        if( this.child != null && this.child.getId() != null ) {
+            out.writeBoolean(true);
+            out.writeLong(this.child.getId());
+        } else {
+            out.writeBoolean(true);
         }
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        if( in.readBoolean() ) { 
+        if( in.readBoolean() ) {
             this.text = in.readUTF();
         }
-        if( in.readBoolean() ) { 
+        if( in.readBoolean() ) {
             this.data = in.read();
+        }
+        if( in.readBoolean() ) {
+           this.child = new MyTypeChild();
+           if( in.readBoolean() ) {
+               this.child.setId(in.readLong());
+           }
         }
     }
     
