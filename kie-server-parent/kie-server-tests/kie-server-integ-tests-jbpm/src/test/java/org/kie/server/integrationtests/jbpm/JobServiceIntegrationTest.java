@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -52,6 +53,19 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+    }
+
+    @After
+    public void finishAllJobs() throws Exception {
+        List<String> status = new ArrayList<String>();
+        status.add(STATUS.QUEUED.toString());
+        status.add(STATUS.RUNNING.toString());
+        status.add(STATUS.RETRYING.toString());
+        List<RequestInfoInstance> requests = jobServicesClient.getRequestsByStatus(status, 0, 100);
+        for (RequestInfoInstance instance : requests) {
+            jobServicesClient.cancelRequest(instance.getId());
+            waitForJobToFinish(instance.getId());
+        }
     }
 
     @Override

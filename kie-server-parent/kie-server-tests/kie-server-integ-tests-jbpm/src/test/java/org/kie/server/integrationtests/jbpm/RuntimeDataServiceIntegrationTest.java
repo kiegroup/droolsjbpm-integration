@@ -453,7 +453,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals("1.0", instance.getProcessVersion());
             assertEquals("yoda", instance.getInitiator());
             assertEquals("definition-project", instance.getContainerId());
-            assertEquals("", instance.getCorrelationKey());
+            assertNullOrEmpty(instance.getCorrelationKey());
             assertEquals("evaluation", instance.getProcessInstanceDescription());
             assertEquals(-1, instance.getParentId().longValue());
         } finally {
@@ -738,14 +738,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                 if ("personData".equals(variableInstance.getVariableName())) {
                     assertNotNull(variableInstance);
                     assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-                    assertEquals("", variableInstance.getOldValue());
+                    assertNullOrEmpty(variableInstance.getOldValue());
                     assertEquals("Person{name='john'}", variableInstance.getValue());
                     assertEquals("personData", variableInstance.getVariableName());
                 } else if ("stringData".equals(variableInstance.getVariableName())) {
 
                     assertNotNull(variableInstance);
                     assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-                    assertEquals("", variableInstance.getOldValue());
+                    assertNullOrEmpty(variableInstance.getOldValue());
                     assertEquals("waiting for signal", variableInstance.getValue());
                     assertEquals("stringData", variableInstance.getVariableName());
                 } else {
@@ -760,7 +760,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             VariableInstance variableInstance = varHistory.get(0);
             assertNotNull(variableInstance);
             assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("", variableInstance.getOldValue());
+            assertNullOrEmpty(variableInstance.getOldValue());
             assertEquals("waiting for signal", variableInstance.getValue());
             assertEquals("stringData", variableInstance.getVariableName());
 
@@ -773,7 +773,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             variableInstance = currentState.get(0);
             assertNotNull(variableInstance);
             assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("", variableInstance.getOldValue());
+            assertNullOrEmpty(variableInstance.getOldValue());
             assertEquals("Person{name='john'}", variableInstance.getValue());
             assertEquals("personData", variableInstance.getVariableName());
 
@@ -799,7 +799,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             variableInstance = varHistory.get(1);
             assertNotNull(variableInstance);
             assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("", variableInstance.getOldValue());
+            assertNullOrEmpty(variableInstance.getOldValue());
             assertEquals("waiting for signal", variableInstance.getValue());
             assertEquals("stringData", variableInstance.getVariableName());
 
@@ -827,7 +827,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -840,7 +840,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             TaskInstance taskById = taskClient.findTaskById(taskInstance.getId());
             assertNotNull(taskById);
             assertEquals("First task", taskById.getName());
-            assertEquals("", taskById.getDescription());
+            assertNullOrEmpty(taskById.getDescription());
             assertEquals("Reserved", taskById.getStatus());
             assertEquals(0, taskById.getPriority().intValue());
             assertEquals("yoda", taskById.getActualOwner());
@@ -856,7 +856,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskById = taskClient.findTaskByWorkItemId(workItems.get(0).getId());
             assertNotNull(taskById);
             assertEquals("First task", taskById.getName());
-            assertEquals("", taskById.getDescription());
+            assertNullOrEmpty(taskById.getDescription());
             assertEquals("Reserved", taskById.getStatus());
             assertEquals(0, taskById.getPriority().intValue());
             assertEquals("yoda", taskById.getActualOwner());
@@ -971,7 +971,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -996,7 +996,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("InProgress", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -1030,7 +1030,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -1055,7 +1055,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("InProgress", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -1092,7 +1092,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
@@ -1117,7 +1117,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertEquals("", taskInstance.getDescription());
+            assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("InProgress", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
             assertEquals("yoda", taskInstance.getActualOwner());
