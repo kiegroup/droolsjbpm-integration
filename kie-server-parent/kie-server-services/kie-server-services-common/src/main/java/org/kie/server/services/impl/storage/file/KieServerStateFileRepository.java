@@ -90,22 +90,28 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
                     }
                     kieServerState.setControllers(controllers);
                 }
+
+                populateWithSystemProperties(kieServerState.getConfiguration());
             } else {
                 KieServerConfig config = new KieServerConfig();
-                // populate the config state with system properties that are valid to kie server
-                Properties systemProperties = System.getProperties();
-                for (String property : systemProperties.stringPropertyNames()) {
-
-                    if (property.startsWith("org.kie.server")) {
-                        KieServerConfigItem configItem = new KieServerConfigItem(property, systemProperties.getProperty(property), String.class.getName());
-                        config.addConfigItem(configItem);
-                    }
-                }
+                populateWithSystemProperties(config);
                 kieServerState.setConfiguration(config);
             }
             knownStates.put(serverId, kieServerState);
 
             return kieServerState;
+        }
+    }
+
+    protected void populateWithSystemProperties(KieServerConfig config) {
+        // populate the config state with system properties that are valid to kie server
+        Properties systemProperties = System.getProperties();
+        for (String property : systemProperties.stringPropertyNames()) {
+
+            if (property.startsWith("org.kie.server")) {
+                KieServerConfigItem configItem = new KieServerConfigItem(property, systemProperties.getProperty(property), String.class.getName());
+                config.addConfigItem(configItem);
+            }
         }
     }
 }
