@@ -390,7 +390,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected static void assertNullOrEmpty(String result ) {
         if (result != null) {
-            assertTrue("String is not empty.", result.isEmpty());
+            assertTrue("String is not empty.", result.trim().isEmpty());
         }
     }
 
