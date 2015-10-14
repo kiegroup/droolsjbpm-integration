@@ -26,7 +26,7 @@
     <kie.server.context>kie-server-services</kie.server.context>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
-    <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/controller</kie.server.controller.base.http.url>
+    <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
     <!-- This property can be overriden when some other remote repo location should be used -->
@@ -644,6 +644,139 @@
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-jms-client-bom</artifactId>
           <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+      <properties>
+        <kie.server.remoting.url>t3://${container.hostname}:${container.port}</kie.server.remoting.url>
+        <kie.server.context.factory>weblogic.jndi.WLInitialContextFactory</kie.server.context.factory>
+        <kie.server.jndi.request.queue>jms/KIE.SERVER.REQUEST</kie.server.jndi.request.queue>
+        <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
+        <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
+        <kie.server.context>kie-server-${project.version}-ee6</kie.server.context>
+        <kie.server.controller.context>kie-server-controller-${project.version}-ee6</kie.server.controller.context>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <containerId>weblogic121x</containerId>
+                  <type>installed</type>
+                  <home>${weblogic.home}/wlserver</home>
+                  <systemProperties>
+                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
+                    <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
+                    <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
+                    <org.kie.server.controller.connect>50000</org.kie.server.controller.connect>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>com.h2database</groupId>
+                      <artifactId>h2</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+                <deployables>
+                  <deployable>
+                    <groupId>org.kie.server</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <type>war</type>
+                    <classifier>ee6</classifier>
+                  </deployable>
+                </deployables>
+                <configuration>
+                  <type>standalone</type>
+                  <properties>
+                    <cargo.jvmargs>-Xmx1024m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
+                    <!-- CFs -->
+                    <cargo.resource.resource.jms.cf.request>
+                      cargo.resource.name=jms/cf/KIE.SERVER.REQUEST|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.REQUEST
+                    </cargo.resource.resource.jms.cf.request>
+                    <cargo.resource.resource.jms.cf.response>
+                      cargo.resource.name=jms/cf/KIE.SERVER.RESPONSE|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.RESPONSE
+                    </cargo.resource.resource.jms.cf.response>
+                    <cargo.resource.resource.jms.executor.cf.request>
+                      cargo.resource.name=jms/cf/KIE.SERVER.EXECUTOR|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.EXECUTOR
+                    </cargo.resource.resource.jms.executor.cf.request>
+                    <!-- Qs -->
+                    <cargo.resource.resource.jms.queue.request>
+                      cargo.resource.name=jms/KIE.SERVER.REQUEST|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.REQUEST
+                    </cargo.resource.resource.jms.queue.request>
+                    <cargo.resource.resource.jms.queue.response>
+                      cargo.resource.name=jms/KIE.SERVER.RESPONSE|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.RESPONSE
+                    </cargo.resource.resource.jms.queue.response>
+                    <cargo.resource.resource.jms.executor.queue.request>
+                      cargo.resource.name=jms/KIE.SERVER.EXECUTOR|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.EXECUTOR
+                    </cargo.resource.resource.jms.executor.queue.request>
+                    <!-- Datasource -->
+                    <cargo.datasource.datasource.h2>
+                      cargo.datasource.driver=org.h2.Driver|
+                      cargo.datasource.url=jdbc:h2:mem:test-db|
+                      cargo.datasource.jndi=jdbc/jbpm|
+                      cargo.datasource.username=sa|
+                      cargo.datasource.password=|
+                      cargo.datasource.transactionsupport=XA_TRANSACTION
+                    </cargo.datasource.datasource.h2>
+                  </properties>
+                </configuration>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>com.oracle.wls</groupId>
+            <artifactId>weblogic-classes</artifactId>
+            <version>12.1.3</version>
+            <scope>system</scope>
+            <systemPath>${weblogic.home}/wlserver/server/lib/weblogic-classes.jar</systemPath>
+          </dependency>
+          <dependency>
+            <groupId>com.oracle.wls</groupId>
+            <artifactId>weblogic</artifactId>
+            <version>12.1.3</version>
+            <scope>system</scope>
+            <systemPath>${weblogic.home}/wlserver/server/lib/weblogic.jar</systemPath>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.wls</groupId>
+          <artifactId>weblogic-classes</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.oracle.wls</groupId>
+          <artifactId>weblogic</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

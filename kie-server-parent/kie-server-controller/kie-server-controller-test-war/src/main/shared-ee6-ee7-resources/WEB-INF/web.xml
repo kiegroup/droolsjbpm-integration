@@ -5,9 +5,13 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
   <display-name>KieServerController</display-name>
 
+  <servlet>
+    <servlet-name>org.kie.server.controller.common.KieServerControllerApplication</servlet-name>
+  </servlet>
+
   <servlet-mapping>
-    <servlet-name>javax.ws.rs.core.Application</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <servlet-name>org.kie.server.controller.common.KieServerControllerApplication</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
   <security-constraint>
