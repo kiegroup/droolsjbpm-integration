@@ -42,7 +42,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
-    private static final long SERVICE_TIMEOUT = 5000;
+    private static final long SERVICE_TIMEOUT = 10000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
     private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
