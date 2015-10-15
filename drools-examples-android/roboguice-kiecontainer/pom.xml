@@ -29,6 +29,10 @@
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -123,6 +127,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.robolectric</groupId>
+      <artifactId>shadows-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
@@ -146,6 +155,14 @@
         <groupId>org.kie</groupId>
         <artifactId>kie-maven-plugin</artifactId>
         <version>${project.version}</version>
+        <configuration>
+          <systemProperties>
+            <property>
+              <name>drools.dialect.java.compiler.lnglevel</name>
+              <value>1.6</value>
+            </property>
+          </systemProperties>
+        </configuration>
         <executions>
           <execution>
             <id>compile-kbase</id>

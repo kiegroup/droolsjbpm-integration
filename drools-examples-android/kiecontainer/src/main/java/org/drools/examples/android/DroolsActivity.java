@@ -62,6 +62,7 @@ public class DroolsActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        System.setProperty("drools.dialect.java.compiler", "JANINO");
         BasicLogcatConfigurator.configureDefaultContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -91,8 +92,11 @@ public class DroolsActivity extends Activity {
         @Override
         protected KieContainer doInBackground(Void... params) {
             try {
+
                 logger.debug("Loading Classpath container");
-                return KieServices.Factory.get().getKieClasspathContainer();
+                mContainer = KieServices.Factory.get().getKieClasspathContainer();
+                final KieBase cBase = mContainer.getKieBase("HelloKB");
+                return mContainer;
             }catch(Exception e) {
                 logger.error("Drools exception", e);
                 return null;
@@ -119,7 +123,6 @@ public class DroolsActivity extends Activity {
         protected Void doInBackground(Void... params) {
             logger.debug("Firing rules");
             try{
-                final KieBase cBase = mContainer.getKieBase("HelloKB");
                 final Message message = new Message();
                 message.setMessage("Hello World");
                 message.setStatus(Message.HELLO);

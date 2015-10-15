@@ -54,6 +54,28 @@
       <artifactId>dx</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.sun.xml.parsers</groupId>
+      <artifactId>jaxp-ri</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.harmony</groupId>
+      <artifactId>beans-android</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.naming</groupId>
+      <artifactId>jndi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.roboguice</groupId>
       <artifactId>roboguice</artifactId>
       <optional>true</optional>
@@ -75,5 +97,44 @@
       <optional>true</optional>
     </dependency>
   </dependencies>
+
+  <dependencyManagement>
+
+    <dependencies>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>robolectric</artifactId>
+        <version>3.0</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>robolectric-annotations</artifactId>
+        <version>3.0</version>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.parsers</groupId>
+        <artifactId>jaxp-ri</artifactId>
+        <version>1.4.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.harmony</groupId>
+        <artifactId>beans-android</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>1.0-SP4</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.naming</groupId>
+        <artifactId>jndi</artifactId>
+        <version>1.3</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
 </project>

@@ -8,10 +8,10 @@
     <artifactId>droolsjbpm-integration</artifactId>
     <version>6.4.0-SNAPSHOT</version>
   </parent>
-
+  <groupId>org.drools</groupId>
   <artifactId>drools-examples-android</artifactId>
   <name>Drools Android examples</name>
-
+  <version>6.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -70,15 +70,43 @@
         <artifactId>fest-android</artifactId>
         <version>1.0.5</version>
       </dependency>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>robolectric</artifactId>
+        <version>3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>robolectric-annotations</artifactId>
+        <version>3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>robolectric-shadows</artifactId>
+        <version>3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.robolectric</groupId>
+        <artifactId>shadows-core</artifactId>
+        <version>3.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.harmony</groupId>
+      <artifactId>beans-android</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <groupId>com.simpligility.maven.plugins</groupId>
         <artifactId>android-maven-plugin</artifactId>
-        <version>4.2.1</version>
+        <version>4.3.0</version>
         <extensions>true</extensions>
         <configuration>
           <sdk>

@@ -105,13 +105,14 @@ class KnowledgeBaseListener implements TypeListener {
             try {
                 final int id = resources.getIdentifier(annotation.value().toLowerCase(),
                         "raw", application.getPackageName());
-
+                logger.debug("Injecting kbase from : " + id);
                 if (id != 0) { //Inject serialized knowledgebase
                     if (!kbases.containsKey(annotation.value())) {
-                        logger.trace("Deserializing knowledge base {}", annotation.value());
+                        logger.debug("Deserializing knowledge base {}", annotation.value());
                         knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
                         ((KnowledgeBase) knowledgeBase).addKnowledgePackages(
                                 (List<KnowledgePackage>) DroolsStreamUtils.streamIn(resources.openRawResource(id)));
+                        kbases.put(annotation.value(), knowledgeBase);
                     }
                     knowledgeBase = kbases.get(annotation.value());
                 } else { //inject knowledge base from classpath container

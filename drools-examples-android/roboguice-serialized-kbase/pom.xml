@@ -90,6 +90,12 @@
         <artifactId>kie-maven-plugin</artifactId>
         <version>${project.version}</version>
         <configuration>
+          <systemProperties>
+            <property>
+              <name>drools.dialect.java.compiler.lnglevel</name>
+              <value>1.6</value>
+            </property>
+          </systemProperties>
           <kiebases>
             <kiebase>HelloKB</kiebase>
           </kiebases>
