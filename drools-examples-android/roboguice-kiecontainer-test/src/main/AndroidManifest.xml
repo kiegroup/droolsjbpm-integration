@@ -2,8 +2,7 @@
 <manifest
     package="org.drools.examples.android.roboguice.kiecontainer.test"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="6003000"
-    android:versionName="6.4.0-SNAPSHOT">
+    android:versionName="${project.version}">
 
     <uses-sdk
         android:minSdkVersion="14"
