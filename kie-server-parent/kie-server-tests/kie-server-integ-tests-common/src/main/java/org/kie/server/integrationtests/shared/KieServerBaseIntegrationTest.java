@@ -175,14 +175,23 @@ public abstract class KieServerBaseIntegrationTest {
             ClientRequest clientRequest = newRequest(TestConfig.getControllerHttpUrl() + "/admin/servers");
             ClientResponse<KieServerInstanceList> responseList = clientRequest.accept(MediaType.APPLICATION_XML_TYPE).get(KieServerInstanceList.class);
 
-            assertEquals(Response.Status.OK.getStatusCode(), responseList.getStatus());
-            KieServerInstance[] instanceList = responseList.getEntity().getKieServerInstances();
+            int responseListStatus = responseList.getStatus();
+            if (Response.Status.OK.getStatusCode() != responseListStatus) {
+                responseList.releaseConnection();
+                throw new RuntimeException("Failure when trying to list kie server instances! Response code " + responseListStatus);
+            }
 
+            KieServerInstance[] instanceList = responseList.getEntity().getKieServerInstances();
             if (instanceList != null && instanceList.length > 0) {
                 for (KieServerInstance kieServerInstance : instanceList) {
                     clientRequest = newRequest(TestConfig.getControllerHttpUrl() + "/admin/server/" + kieServerInstance.getIdentifier());
                     ClientResponse<KieServerInstanceList> responseDelete = clientRequest.accept(MediaType.APPLICATION_XML_TYPE).delete(KieServerInstanceList.class);
-                    assertEquals(Response.Status.NO_CONTENT.getStatusCode(), responseDelete.getStatus());
+
+                    int responseDeleteStatus = responseDelete.getStatus();
+                    if (Response.Status.NO_CONTENT.getStatusCode() != responseDeleteStatus) {
+                        responseDelete.releaseConnection();
+                        throw new RuntimeException("Failure when trying to delete kie server instance! Response code " + responseDeleteStatus);
+                    }
                     responseDelete.releaseConnection();
                 }
             }
@@ -434,12 +443,17 @@ public abstract class KieServerBaseIntegrationTest {
                                                 .build();
                 httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
             } else {
+                RequestConfig requestConfig = RequestConfig.custom()
+                        .setConnectionRequestTimeout(2000)
+                        .setConnectTimeout(2000)
+                        .setSocketTimeout(2000)
+                        .build();
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider.setCredentials(
                         new AuthScope(uri.getHost(), uri.getPort()),
                         new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
                 );
-                httpClient = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+                httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setDefaultCredentialsProvider(credentialsProvider).build();
             }
         }
         ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(httpClient);
