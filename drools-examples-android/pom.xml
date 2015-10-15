@@ -19,6 +19,7 @@
     <module>kiecontainer</module>
     <module>roboguice-serialized-kbase</module>
     <module>roboguice-kiecontainer</module>
+    <module>roboguice-kiecontainer-test</module>
   </modules>
 
   <dependencyManagement>
