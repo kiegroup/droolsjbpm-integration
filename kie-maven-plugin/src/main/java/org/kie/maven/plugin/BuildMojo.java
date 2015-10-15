@@ -18,7 +18,6 @@ package org.kie.maven.plugin;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -28,6 +27,9 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.drools.compiler.compiler.BPMN2ProcessFactory;
 import org.drools.compiler.compiler.DecisionTableFactory;
+import org.drools.compiler.compiler.GuidedDecisionTableFactory;
+import org.drools.compiler.compiler.GuidedRuleTemplateFactory;
+import org.drools.compiler.compiler.GuidedScoreCardFactory;
 import org.drools.compiler.compiler.PMMLCompilerFactory;
 import org.drools.compiler.compiler.ProcessBuilderFactory;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -67,7 +69,7 @@ import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsfor
         requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
         requiresProject = true,
         defaultPhase = LifecyclePhase.COMPILE)
-public class BuildMojo extends AbstractMojo {
+public class BuildMojo extends AbstractKieMojo {
 
     /**
      * Directory containing the generated JAR.
@@ -121,6 +123,9 @@ public class BuildMojo extends AbstractMojo {
             DecisionTableFactory.loadProvider(projectClassLoader);
             ProcessBuilderFactory.loadProvider(projectClassLoader);
             PMMLCompilerFactory.loadProvider(projectClassLoader);
+            GuidedDecisionTableFactory.loadProvider(projectClassLoader);
+            GuidedRuleTemplateFactory.loadProvider(projectClassLoader);
+            GuidedScoreCardFactory.loadProvider(projectClassLoader);
 
         } catch (DependencyResolutionRequiredException e) {
             throw new RuntimeException(e);
@@ -131,13 +136,7 @@ public class BuildMojo extends AbstractMojo {
         KieServices ks = KieServices.Factory.get();
 
         try {
-            if (properties != null) {
-                getLog().debug("Additional system properties: " + properties);
-                for (Map.Entry<String, String> property : properties.entrySet()) {
-                    System.setProperty(property.getKey(), property.getValue());
-                }
-                getLog().debug("Configured system properties were successfully set.");
-            }
+            setSystemProperties(properties);
             KieRepository kr = ks.getRepository();
             InternalKieModule kModule = (InternalKieModule)kr.addKieModule(ks.getResources().newFileSystemResource(sourceFolder));
             for (InternalKieModule kmoduleDep : kmoduleDeps) {

@@ -15,33 +15,15 @@
  */
 package org.kie.maven.plugin;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.drools.core.util.DroolsStreamUtils;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
-import org.kie.api.builder.Message;
-import org.kie.api.builder.Results;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.KieContainer;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderConfiguration;
-import org.kie.internal.builder.KnowledgeBuilderError;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.definition.KnowledgePackage;
-import org.kie.internal.io.ResourceFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Compiles and serializes knowledge packages.
@@ -49,7 +31,7 @@ import java.util.Properties;
 @Mojo(name = "touch",
       requiresProject = true,
       defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class TouchResourcesMojo extends AbstractMojo {
+public class TouchResourcesMojo extends AbstractKieMojo {
 
     /**
      * DRL rule package
