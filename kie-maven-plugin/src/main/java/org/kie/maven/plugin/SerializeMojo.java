@@ -15,7 +15,6 @@
  */
 package org.kie.maven.plugin;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -35,25 +34,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Compiles and serializes knowledge packages.
+ * Compiles and serializes knowledge bases.
  */
 @Mojo(name = "serialize",
-      requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
-      requiresProject = true,
-      defaultPhase = LifecyclePhase.COMPILE,
-      configurator = "include-project-dependencies")
-public class SerializeMojo extends AbstractMojo {
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        requiresProject = true,
+        defaultPhase = LifecyclePhase.COMPILE,
+        configurator = "include-project-dependencies")
+public class SerializeMojo extends AbstractKieMojo {
 
     /**
      * KnowledgeBases to serialize
      */
-    @Parameter(property = "kie.kiebases",required = true)
+    @Parameter(property = "kie.kiebases", required = true)
     private List<String> kiebases;
 
     /**
      * Output folder
      */
-    @Parameter(property = "kie.resDirectory", defaultValue = "${project.basedir}/src/main/res/raw" )
+    @Parameter(property = "kie.resDirectory", defaultValue = "${project.basedir}/src/main/res/raw")
     private String resDirectory;
 
     @Parameter
@@ -65,13 +64,7 @@ public class SerializeMojo extends AbstractMojo {
             File outputFolder = new File(resDirectory);
             outputFolder.mkdirs();
 
-            if (properties != null) {
-                getLog().debug("Additional system properties: " + properties);
-                for (Map.Entry<String, String> property : properties.entrySet()) {
-                    System.setProperty(property.getKey(), property.getValue());
-                }
-                getLog().debug("Configured system properties were successfully set.");
-            }
+            setSystemProperties(properties);
 
             KieServices ks = KieServices.Factory.get();
             KieContainer kc = ks.newKieClasspathContainer();
@@ -89,7 +82,7 @@ public class SerializeMojo extends AbstractMojo {
                 throw new MojoFailureException("Build failed!");
             }
 
-            for(String kbase : kiebases) {
+            for (String kbase : kiebases) {
                 KieBase kb = kc.getKieBase(kbase);
                 getLog().info("Writing KBase: " + kbase);
                 File file = new File(outputFolder, kbase.replace('.', '_').toLowerCase());
