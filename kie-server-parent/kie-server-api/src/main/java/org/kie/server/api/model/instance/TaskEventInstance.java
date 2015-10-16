@@ -161,7 +161,7 @@ public class TaskEventInstance {
         }
 
         public Builder date(Date date) {
-            taskEventInstance.setLogTime(date);
+            taskEventInstance.setLogTime(date == null ? date : new Date(date.getTime()));
             return this;
         }
     }

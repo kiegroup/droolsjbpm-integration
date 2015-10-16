@@ -21,6 +21,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-summary")
 public class TaskSummary {
@@ -43,8 +45,10 @@ public class TaskSummary {
     private String actualOwner;
     @XmlElement(name="task-created-by")
     private String createdBy;
+    @XStreamAlias("date")
     @XmlElement(name="task-created-on")
     private Date createdOn;
+    @XStreamAlias("date")
     @XmlElement(name="task-activation-time")
     private Date activationTime;
     @XmlElement(name="task-expiration-time")
@@ -270,19 +274,19 @@ public class TaskSummary {
         }
 
         public Builder createdOn(Date createdOn) {
-            taskSummary.setCreatedOn(createdOn);
+            taskSummary.setCreatedOn(createdOn == null ? createdOn : new Date(createdOn.getTime()));
 
             return this;
         }
 
         public Builder activationTime(Date activationTime) {
-            taskSummary.setActivationTime(activationTime);
+            taskSummary.setActivationTime(activationTime == null ? activationTime : new Date(activationTime.getTime()));
 
             return this;
         }
 
         public Builder expirationTime(Date expirationTime) {
-            taskSummary.setExpirationTime(expirationTime);
+            taskSummary.setExpirationTime(expirationTime == null ? expirationTime : new Date(expirationTime.getTime()));
 
             return this;
         }

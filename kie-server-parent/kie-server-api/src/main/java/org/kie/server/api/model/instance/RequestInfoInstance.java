@@ -201,7 +201,7 @@ public class RequestInfoInstance {
         }
 
         public Builder scheduledDate(Date date) {
-            requestInfoInstance.setScheduledDate(date);
+            requestInfoInstance.setScheduledDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
 

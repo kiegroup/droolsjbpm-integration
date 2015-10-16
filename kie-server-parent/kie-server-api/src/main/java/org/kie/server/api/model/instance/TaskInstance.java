@@ -357,17 +357,17 @@ public class TaskInstance {
         }
 
         public Builder createdOn(Date createdOn) {
-            taskInstance.setCreatedOn(createdOn);
+            taskInstance.setCreatedOn(createdOn == null ? createdOn : new Date(createdOn.getTime()));
             return this;
         }
 
         public Builder activationTime(Date activationTime) {
-            taskInstance.setActivationTime(activationTime);
+            taskInstance.setActivationTime(activationTime == null ? activationTime : new Date(activationTime.getTime()));
             return this;
         }
 
         public Builder expirationTime(Date expirationTime) {
-            taskInstance.setExpirationDate(expirationTime);
+            taskInstance.setExpirationDate(expirationTime == null ? expirationTime : new Date(expirationTime.getTime()));
             return this;
         }
 
