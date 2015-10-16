@@ -127,7 +127,7 @@ public class VariableInstance {
         }
 
         public Builder date(Date date) {
-            variableInstance.setDate(date);
+            variableInstance.setDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
     }

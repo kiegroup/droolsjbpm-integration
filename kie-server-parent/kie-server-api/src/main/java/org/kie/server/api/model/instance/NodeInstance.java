@@ -191,7 +191,7 @@ public class NodeInstance {
         }
 
         public Builder date(Date date) {
-            processInstance.setDate(date);
+            processInstance.setDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
 

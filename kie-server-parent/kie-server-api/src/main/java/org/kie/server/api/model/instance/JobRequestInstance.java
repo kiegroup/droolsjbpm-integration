@@ -90,7 +90,7 @@ public class JobRequestInstance {
         }
 
         public Builder scheduledDate(Date date) {
-            jobRequestInstance.setScheduledDate(date);
+            jobRequestInstance.setScheduledDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
 

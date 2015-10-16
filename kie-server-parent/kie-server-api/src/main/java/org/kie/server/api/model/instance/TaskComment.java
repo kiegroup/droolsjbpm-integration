@@ -109,7 +109,7 @@ public class TaskComment {
         }
 
         public Builder addedAt(Date addedAt) {
-            comment.setAddedAt(addedAt);
+            comment.setAddedAt(addedAt == null ? addedAt : new Date(addedAt.getTime()));
             return this;
         }
     }

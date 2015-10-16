@@ -120,7 +120,7 @@ public class ErrorInfoInstance {
         }
 
         public Builder errorDate(Date date) {
-            errorInfoInstance.setErrorDate(date);
+            errorInfoInstance.setErrorDate(date == null ? date : new Date(date.getTime()));
             return this;
         }
 
