@@ -15,6 +15,7 @@
 
 package org.kie.services.client.serialization.jaxb.impl.deploy;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,7 +29,7 @@ import org.kie.internal.runtime.conf.RuntimeStrategy;
 @XmlRootElement(name="deployment-unit")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonIgnoreProperties({"identifier"})
-public class JaxbDeploymentUnit {
+public class JaxbDeploymentUnit implements Serializable {
 
     @XmlElement
     @XmlSchemaType(name="string")

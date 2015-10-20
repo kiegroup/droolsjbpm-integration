@@ -264,9 +264,8 @@ public class DeployResourceBase extends ResourceBase {
         CommandContext ctx = new CommandContext();
         ctx.setData(DEPLOYMENT_UNIT,  deploymentUnit);
         ctx.setData(JOB_TYPE, jobType);
-        ctx.setData("businessKey", deploymentId);
         ctx.setData("retries", 0);
-	ctx.setData("owner", ExecutorService.EXECUTOR_ID);
+	    ctx.setData("owner", ExecutorService.EXECUTOR_ID);
        
         String jobTypeLower = jobType.toString().toLowerCase();
        
@@ -281,7 +280,10 @@ public class DeployResourceBase extends ResourceBase {
         logger.debug( "{} job [{}] for deployment '{}' created.", jobType.toString(), jobId, deploymentUnit.getIdentifier());
         jobResultMgr.putJob(jobResult.getJobId(), jobResult, jobType);
         Long executorJobId;
-        try { 
+        try {
+            ctx.setData("businessKey", jobId);
+            ctx.setData("jobResult", jobResult);
+
             executorJobId = jobExecutor.scheduleRequest(DeploymentCmd.class.getName(), ctx);
             jobResult.setIdentifier(executorJobId);
             jobResult.setSuccess(true);
