@@ -57,10 +57,6 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.spec.javax.xml.bind</groupId>
       <artifactId>jboss-jaxb-api_2.2_spec</artifactId>
     </dependency>
