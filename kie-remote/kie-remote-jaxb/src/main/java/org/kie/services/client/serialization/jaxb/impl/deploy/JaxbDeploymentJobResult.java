@@ -15,6 +15,7 @@
 
 package org.kie.services.client.serialization.jaxb.impl.deploy;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,7 +28,7 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 @XmlRootElement(name="deployment-job-result")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonIgnoreProperties({"jobId"})
-public class JaxbDeploymentJobResult {
+public class JaxbDeploymentJobResult implements Serializable {
 
     /**
      * An internal field used to track the job on the server side

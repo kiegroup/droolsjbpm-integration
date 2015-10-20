@@ -94,6 +94,7 @@ public class DeploymentCmd implements Command {
         }
         ExecutionResults results = new ExecutionResults();
         results.setData("Result", success);
+        results.setData("JobResult", jobResult);
         return results;
     }
 
