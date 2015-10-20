@@ -15,14 +15,23 @@
 
 package org.kie.remote.services.rest.async;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
 
+import org.kie.api.executor.ExecutionResults;
+import org.kie.api.executor.ExecutorService;
+import org.kie.api.executor.RequestInfo;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.remote.services.exception.KieRemoteServicesInternalError;
 import org.kie.remote.services.rest.async.cmd.JobType;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentJobResult;
@@ -62,6 +71,9 @@ public class JobResultManager {
     private Map<String, String> deploymentIdMostRecentJobIdMap = null;
 
     private int maxCacheSize = 10000;
+
+    @Inject
+    private Instance<ExecutorService> jobExecutor;
 
     /**
      * Initialization method to initialize the 2 caches that hold the job result information.
@@ -111,7 +123,44 @@ public class JobResultManager {
      */
     public JaxbDeploymentJobResult getJob(String jobId) {
         logger.debug( "Getting job [{}]");
-       return jobs.get(jobId); 
+        JaxbDeploymentJobResult job = jobs.get(jobId);
+
+        if (job != null && !JaxbDeploymentStatus.ACCEPTED.equals(job.getDeploymentUnit().getStatus())) {
+            return job;
+        }
+        if (!jobExecutor.isUnsatisfied()) {
+
+            List<RequestInfo> jobsFound = jobExecutor.get().getRequestsByBusinessKey(jobId, new QueryContext());
+
+            if (jobsFound != null && !jobsFound.isEmpty()) {
+                RequestInfo executorJob = jobsFound.get(0);
+                ExecutionResults execResults = null;
+                byte[] responseData = executorJob.getResponseData();
+                if (responseData != null) {
+                    ObjectInputStream in = null;
+                    try {
+                        in = new ObjectInputStream(new ByteArrayInputStream(responseData));
+                        execResults = (ExecutionResults) in.readObject();
+                    } catch (Exception e) {
+                        logger.warn("Exception while deserializing context data of job with id {}", jobId, e);
+                    } finally {
+                        if (in != null) {
+                            try {
+                                in.close();
+                            } catch (IOException e) {
+
+                            }
+                        }
+                    }
+                }
+                if (execResults != null && execResults.getData("JobResult") != null) {
+                    job = (JaxbDeploymentJobResult) execResults.getData("JobResult");
+                    jobs.put(jobId, job);
+                }
+            }
+        }
+
+        return job;
     }
    
     /**
@@ -123,7 +172,7 @@ public class JobResultManager {
         logger.debug( "Getting most recent job for '{}'", deploymentId);
         String jobId = deploymentIdMostRecentJobIdMap.get(deploymentId);
         if( jobId != null ) { 
-            return jobs.get(jobId);
+            return getJob(jobId);
         }
         return null;
     }
