@@ -82,7 +82,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            configuration.setTimeout(15000);
+            configuration.setTimeout(30000);
             kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
         }
         setupClients(kieServicesClient);

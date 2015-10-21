@@ -17,6 +17,8 @@ package org.kie.server.integrationtests.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.TimeoutException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -186,7 +188,14 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         // Check that there is one container deployed.
-        waitForKieServerSynchronization(1);
+        try {
+            waitForKieServerSynchronization(1);
+        } catch (TimeoutException e) {
+            // Sometimes creating container fails in embedded server (unknown Socket timeout error, tends to happen here).
+            // Retrigger container creation. These tests should be refactored to use more reliable container instead of embedded TJWSEmbeddedJaxrsServer.
+            controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+            waitForKieServerSynchronization(1);
+        }
         ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
         assertNotNull(containersList.getResult().getContainers());
