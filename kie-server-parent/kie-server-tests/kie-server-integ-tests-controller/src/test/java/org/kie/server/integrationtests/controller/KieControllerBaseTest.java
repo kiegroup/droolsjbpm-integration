@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.controller;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,5 +76,6 @@ public abstract class KieControllerBaseTest extends RestOnlyBaseIntegrationTest 
 
             Thread.sleep(TIMEOUT_BETWEEN_CALLS);
         }
+        throw new TimeoutException("Timeout while waiting for kie server synchronization.");
     }
 }

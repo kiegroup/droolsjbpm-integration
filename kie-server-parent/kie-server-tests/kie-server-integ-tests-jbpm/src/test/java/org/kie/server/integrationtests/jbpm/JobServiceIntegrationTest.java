@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -42,7 +42,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
-    private static final long SERVICE_TIMEOUT = 10000;
+    private static final long SERVICE_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
     private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
@@ -55,7 +55,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
 
-    @After
+    @Before
     public void finishAllJobs() throws Exception {
         List<String> status = new ArrayList<String>();
         status.add(STATUS.QUEUED.toString());
@@ -83,9 +83,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
 
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(command);
         jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
 
         Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
         assertNotNull(jobId);
@@ -95,30 +99,18 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertThat(jobRequest.getStatus(),anyOf(
-            equalTo(STATUS.QUEUED.toString()),
-            equalTo(STATUS.RUNNING.toString()),
-            equalTo(STATUS.DONE.toString())));
+        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
         assertEquals(command, jobRequest.getCommandName());
+        assertNotNull(jobRequest.getScheduledDate());
 
         jobServicesClient.cancelRequest(jobId);
+
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
-
-        // If job finished before we canceled it or already running then create new job and cancel it.
-        if(STATUS.DONE.toString().equals(jobRequest.getStatus()) ||
-                STATUS.RUNNING.toString().equals(jobRequest.getStatus())) {
-            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
-
-            jobServicesClient.cancelRequest(jobId);
-            jobRequest = jobServicesClient.getRequestById(jobId, false, false);
-        }
-
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
         assertEquals(STATUS.CANCELLED.toString(), jobRequest.getStatus());
         assertEquals(command, jobRequest.getCommandName());
-
     }
 
     @Test
@@ -234,9 +226,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
 
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(command);
         jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
 
         Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
         assertNotNull(jobId);
@@ -244,16 +240,8 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         List<String> status = new ArrayList<String>();
         status.add(STATUS.QUEUED.toString());
-        status.add(STATUS.RUNNING.toString());
 
         List<RequestInfoInstance> result = jobServicesClient.getRequestsByStatus(status, 0, 100);
-
-        // If job isn't found using status QUEUED or RUNNING it means that job was triggered and finished.
-        // So will start another job, this one will be processed after 3 seconds - default executor interval.
-        if(result == null || result.size() == 0) {
-            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
-            result = jobServicesClient.getRequestsByStatus(status, 0, 100);
-        }
         assertNotNull(result);
         assertEquals(1, result.size());
 
@@ -261,19 +249,11 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertThat(jobRequest.getStatus(),anyOf(
-            equalTo(STATUS.QUEUED.toString()),
-            equalTo(STATUS.RUNNING.toString())));
+        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
         assertEquals(command, jobRequest.getCommandName());
+        assertNotNull(jobRequest.getScheduledDate());
 
         jobServicesClient.cancelRequest(jobId);
-
-        // If job finished before we canceled it then create new job and cancel it.
-        jobRequest = jobServicesClient.getRequestById(jobId, false, false);
-        if(STATUS.DONE.toString().equals(jobRequest.getStatus())) {
-            jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
-            jobServicesClient.cancelRequest(jobId);
-        }
 
         result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
@@ -286,11 +266,10 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         result = jobServicesClient.getRequestsByStatus(status, 0, 100);
         assertNotNull(result);
         assertEquals(1 + currentNumberOfCancelled, result.size());
-
     }
 
     @Test
-    public void testScheduleCancelAndRequeueJob() throws Exception {
+    public void testScheduleAndRequeueJob() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         String businessKey = "test key";
@@ -336,12 +315,11 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
         assertEquals(command, jobRequest.getCommandName());
 
-        jobServicesClient.cancelRequest(jobId);
-
+        waitForJobToFinish(jobId);
     }
 
     @Test
-    public void testScheduleSearchByKeyAndCancelJob() {
+    public void testScheduleSearchByKeyJob() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         String businessKey = "testkey";
@@ -352,9 +330,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
 
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(command);
         jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
 
         Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
         assertNotNull(jobId);
@@ -368,14 +350,10 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertNotNull(jobRequest);
         assertEquals(jobId, jobRequest.getId());
         assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertThat(jobRequest.getStatus(),anyOf(
-            equalTo(STATUS.QUEUED.toString()),
-            equalTo(STATUS.RUNNING.toString()),
-            equalTo(STATUS.DONE.toString())));
+        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
         assertEquals(command, jobRequest.getCommandName());
 
         jobServicesClient.cancelRequest(jobId);
-
     }
 
     @Test
@@ -389,9 +367,13 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
 
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(firstCommand);
         jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
 
         // Executing fist command.
         Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
@@ -407,6 +389,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobRequestInstance = new JobRequestInstance();
         jobRequestInstance.setCommand(secondCommand);
         jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
 
         // Executing second command.
         jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
