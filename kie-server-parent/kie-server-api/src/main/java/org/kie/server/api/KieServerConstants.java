@@ -39,6 +39,7 @@ public class KieServerConstants {
     public static final String CFG_PERSISTANCE_DS = "org.kie.server.persistence.ds";
     public static final String CFG_PERSISTANCE_TM = "org.kie.server.persistence.tm";
     public static final String CFG_PERSISTANCE_DIALECT = "org.kie.server.persistence.dialect";
+    public static final String CFG_PERSISTANCE_DEFAULT_SCHEMA = "org.kie.server.persistence.schema";
 
     public static final String CFG_BYPASS_AUTH_USER = "org.kie.server.bypass.auth.user";
 
