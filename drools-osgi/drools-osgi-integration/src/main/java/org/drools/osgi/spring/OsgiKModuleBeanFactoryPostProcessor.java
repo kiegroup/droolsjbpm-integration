@@ -40,7 +40,7 @@ public class OsgiKModuleBeanFactoryPostProcessor extends KModuleBeanFactoryPostP
 
     @Override
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
-        if (!configFileURL.toString().startsWith("bundle:") && !configFileURL.toString().startsWith("bundleresource:")) {
+        if (!OsgiKieModule.isOsgiBundleUrl(configFileURL.toString())) {
             return super.createKieModule(kieProject);
         }
         return OsgiKieModule.create(configFileURL, releaseId, kieProject);

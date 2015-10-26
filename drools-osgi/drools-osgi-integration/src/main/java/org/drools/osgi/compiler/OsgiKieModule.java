@@ -115,6 +115,35 @@ public class OsgiKieModule extends AbstractKieModule {
         }
     }
 
+    /**
+     * Parses OSGi bundle ID from the provided URL. The URL may not be coming from OSGi,
+     * in which case "null" is returned
+     *
+     * @param url URL
+     * @return parsed bundle ID, or null if the url is not OSGi bundle URL
+     */
+    public static String parseBundleId(String url) {
+        if (isOsgiBundleUrl(url)) {
+            int slashesIdx = url.indexOf("://");
+            return url.substring(slashesIdx + "://".length(), url.indexOf('.'));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Determines if the provided string is OSGi bundle URL or not.
+     *
+     * @param str string to check
+     * @return true if the string is OSGi bundle URL, otherwise false
+     */
+    public static boolean isOsgiBundleUrl(String str) {
+        if (str == null) {
+            throw new NullPointerException("Specified string can not be null!");
+        }
+        return str.startsWith("bundle") && str.contains("://");
+    }
+
     private static String getPomProperties(Bundle bundle) {
         Enumeration<URL> e = bundle.findEntries("META-INF/maven", "pom.properties", true);
         if (e == null || !e.hasMoreElements()) {
@@ -124,13 +153,8 @@ public class OsgiKieModule extends AbstractKieModule {
     }
 
     private static Bundle getBundle(String url) {
-        String urlString = url.toString();
-        String id = null;
-        if (urlString.startsWith("bundle://")) {
-            id = urlString.substring("bundle://".length(), urlString.indexOf('.'));
-        } else if (urlString.startsWith("bundleresource://")) {
-            id = urlString.substring("bundleresource://".length(), urlString.indexOf('.'));
-        } else {
+        String id = parseBundleId(url);
+        if (id == null) {
             return null;
         }
         long bundleId = Long.parseLong(id);
