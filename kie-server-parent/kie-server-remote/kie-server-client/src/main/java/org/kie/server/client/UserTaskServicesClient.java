@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskEventInstance;
@@ -120,4 +121,8 @@ public interface UserTaskServicesClient {
     List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize);
 
     List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize);
+
+    List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize);
+
+    List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize);
 }

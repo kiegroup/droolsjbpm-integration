@@ -55,12 +55,14 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.task.HumanTaskServiceFactory;
+import org.jbpm.services.task.audit.TaskAuditServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
 import org.jbpm.shared.services.impl.TransactionalCommandService;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.task.TaskService;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
@@ -152,14 +154,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         // configure user group callback
         UserGroupCallback userGroupCallback = UserDataServiceProvider.getUserGroupCallback();
 
+        TaskService taskService = HumanTaskServiceFactory.newTaskServiceConfigurator()
+                .entityManagerFactory(emf)
+                .userGroupCallback(userGroupCallback)
+                .getTaskService();
+
         // build runtime data service
         runtimeDataService = new RuntimeDataServiceImpl();
         ((RuntimeDataServiceImpl) runtimeDataService).setCommandService(new TransactionalCommandService(emf));
         ((RuntimeDataServiceImpl) runtimeDataService).setIdentityProvider(registry.getIdentityProvider());
-        ((RuntimeDataServiceImpl) runtimeDataService).setTaskService(HumanTaskServiceFactory.newTaskServiceConfigurator()
-                .entityManagerFactory(emf)
-                .userGroupCallback(userGroupCallback)
-                .getTaskService());
+        ((RuntimeDataServiceImpl) runtimeDataService).setTaskService(taskService);
+        ((RuntimeDataServiceImpl) runtimeDataService).setTaskAuditService(TaskAuditServiceFactory.newTaskAuditServiceConfigurator()
+                .setTaskService(taskService)
+                .getTaskAuditService());
         ((KModuleDeploymentService) deploymentService).setRuntimeDataService(runtimeDataService);
 
         // set runtime data service as listener on deployment service

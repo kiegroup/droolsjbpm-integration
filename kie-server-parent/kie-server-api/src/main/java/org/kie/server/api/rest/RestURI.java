@@ -103,6 +103,7 @@ public class RestURI {
     public static final String TASK_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}";
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "tasks/instances/workitem/{" + WORK_ITEM_ID + "}";
     public static final String TASK_BY_PROCESS_INST_ID_GET_URI = "tasks/instances/process/{" + PROCESS_INST_ID + "}";
+    public static final String TASKS_BY_VAR_NAME_GET_URI = "tasks/instances/variables/{" + VAR_NAME + "}";
 
     // task related prefixed by TASK_URI
     public static final String TASK_INSTANCE_ACTIVATE_PUT_URI = "{" + TASK_INSTANCE_ID + "}/states/activated";
