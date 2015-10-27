@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -908,6 +909,119 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             changeUser(TestConfig.getUsername());
         }
     }
+
+    @Test
+    public void testFindTasksByVariable() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "john is working on it");
+        parameters.put("personData", createPersonInstance("john"));
+
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            taskList = taskClient.findTasksByVariable("yoda", "_string", null, 0, 10);
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            // start task
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
+
+            // complete task
+            Map<String, Object> taskOutcomeComplete = new HashMap<String, Object>();
+            taskOutcomeComplete.put("string_", "my custom data 2");
+            taskOutcomeComplete.put("person_", createPersonInstance("peter"));
+
+            taskClient.saveTaskContent("definition-project", taskSummary.getId(), taskOutcomeComplete);
+
+            List<String> inprogressTasks = new ArrayList<String>();
+            inprogressTasks.add(Status.InProgress.toString());
+
+            taskList = taskClient.findTasksByVariable("yoda", "string_", inprogressTasks, 0, 10);
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            taskClient.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcomeComplete);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    @Test
+    public void testFindTasksByVariableAndValue() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "john is working on it");
+        parameters.put("personData", createPersonInstance("john"));
+
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            taskList = taskClient.findTasksByVariableAndValue("yoda", "_string", "john is working on it", null, 0, 10);
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            // start task
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
+
+            // complete task
+            Map<String, Object> taskOutcomeComplete = new HashMap<String, Object>();
+            taskOutcomeComplete.put("string_", "my custom data 2");
+            taskOutcomeComplete.put("person_", createPersonInstance("peter"));
+
+            taskClient.saveTaskContent("definition-project", taskSummary.getId(), taskOutcomeComplete);
+
+            List<String> inprogressTasks = new ArrayList<String>();
+            inprogressTasks.add(Status.InProgress.toString());
+
+            taskList = taskClient.findTasksByVariableAndValue("yoda", "string_", "my%", inprogressTasks, 0, 10);
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            taskClient.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcomeComplete);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
 
     private void checkTaskStatusAndOwners(String containerId, Long taskId, Status status, String actualOwner, String potentialOwner) {
         TaskInstance task = taskClient.getTaskInstance(containerId, taskId, false, false, true);
