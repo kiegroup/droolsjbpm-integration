@@ -497,6 +497,36 @@ public class RuntimeDataServiceBase {
 
     }
 
+    public TaskSummaryList getTasksByVariables(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize) {
+
+        userId = getUser(userId);
+        List<Status> taskStatuses = buildTaskStatuses(status);
+        if (taskStatuses == null) {
+            taskStatuses = new ArrayList<Status>();
+            taskStatuses.add(Status.Ready);
+            taskStatuses.add(Status.Reserved);
+            taskStatuses.add(Status.InProgress);
+        }
+
+        List<TaskSummary> instances = null;
+        if (variableValue != null && !variableValue.isEmpty()) {
+            logger.debug("About to search for tasks that has variable '{}' with value '{}' with page {} and page size {}", variableName, variableValue, page, pageSize);
+
+            instances = runtimeDataService.getTasksByVariableAndValue(userId, variableName, variableValue, taskStatuses, buildQueryFilter(page, pageSize));
+            logger.debug("Found {} tasks with variable {} and variable value {}", instances.size(), variableName, variableValue);
+        } else {
+            logger.debug("About to search for tasks that has variable '{}' with page {} and page size {}", variableName, page, pageSize);
+
+            instances = runtimeDataService.getTasksByVariable(userId, variableName, taskStatuses, buildQueryFilter(page, pageSize));
+            logger.debug("Found {} tasks with variable {} ", instances.size(), variableName);
+        }
+
+        TaskSummaryList taskSummaryList = convertToTaskSummaryList(instances);
+        logger.debug("Returning result of task by variable search: {}", taskSummaryList);
+
+        return taskSummaryList;
+    }
+
     protected ProcessInstanceList convertToProcessInstanceList(Collection<ProcessInstanceDesc> instances) {
         if (instances == null) {
             return new ProcessInstanceList(new org.kie.server.api.model.instance.ProcessInstance[0]);

@@ -407,4 +407,24 @@ public class RuntimeDataResource {
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
         }
     }
+
+    @GET
+    @Path(TASKS_BY_VAR_NAME_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getTasksByVariables(@Context HttpHeaders headers, @PathParam("varName") String variableName, @QueryParam("varValue") String variableValue,
+            @QueryParam("status")List<String> status, @QueryParam("user") String userId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        Variant v = getVariant(headers);
+
+        try {
+
+            TaskSummaryList result = runtimeDataServiceBase.getTasksByVariables(userId, variableName, variableValue, status, page, pageSize);
+
+            return createCorrectVariant(result, headers, Response.Status.OK);
+
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+        }
+    }
 }

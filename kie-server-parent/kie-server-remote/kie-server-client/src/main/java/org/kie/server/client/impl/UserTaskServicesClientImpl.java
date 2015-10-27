@@ -29,6 +29,8 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -1084,4 +1086,68 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         return Collections.emptyList();
     }
 
+    @Override
+    public List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList result = null;
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(VAR_NAME, variableName);
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, "", safeList(status), page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+        if (result != null && result.getTasks() != null) {
+            return Arrays.asList(result.getTasks());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize) {
+        TaskSummaryList result = null;
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(VAR_NAME, variableName);
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + variableValue, TaskSummaryList.class);
+
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, variableValue, safeList(status), page, pageSize}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+        if (result != null && result.getTasks() != null) {
+            return Arrays.asList(result.getTasks());
+        }
+
+        return Collections.emptyList();
+    }
 }

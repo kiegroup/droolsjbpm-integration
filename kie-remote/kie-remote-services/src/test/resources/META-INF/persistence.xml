@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<persistence 
+<persistence
   version="2.0"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd 
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd
                       http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd"
-  xmlns="http://java.sun.com/xml/ns/persistence" 
-  xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" 
+  xmlns="http://java.sun.com/xml/ns/persistence"
+  xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <persistence-unit name="org.jbpm.domain" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>jdbc/jbpm-ds</jta-data-source>              
+        <jta-data-source>jdbc/jbpm-ds</jta-data-source>
         <mapping-file>META-INF/JBPMorm.xml</mapping-file>
         <mapping-file>META-INF/Taskorm.xml</mapping-file>
         <mapping-file>META-INF/TaskAuditorm.xml</mapping-file>
-        
+
         <class>org.drools.persistence.info.SessionInfo</class>
         <class>org.jbpm.persistence.processinstance.ProcessInstanceInfo</class>
         <class>org.drools.persistence.info.WorkItemInfo</class>
         <class>org.jbpm.persistence.correlation.CorrelationKeyInfo</class>
         <class>org.jbpm.persistence.correlation.CorrelationPropertyInfo</class>
-        
+
         <class>org.jbpm.process.audit.ProcessInstanceLog</class>
         <class>org.jbpm.process.audit.NodeInstanceLog</class>
         <class>org.jbpm.process.audit.VariableInstanceLog</class>
-        
+
         <!-- manager -->
         <class>org.jbpm.runtime.manager.impl.jpa.ContextMappingInfo</class>
 
@@ -41,20 +41,21 @@
         <class>org.jbpm.services.task.impl.model.EmailNotificationHeaderImpl</class>
         <class>org.jbpm.services.task.impl.model.PeopleAssignmentsImpl</class>
         <class>org.jbpm.services.task.impl.model.ReassignmentImpl</class>
-    
+
         <class>org.jbpm.services.task.impl.model.TaskImpl</class>
         <class>org.jbpm.services.task.impl.model.TaskDataImpl</class>
         <class>org.jbpm.services.task.impl.model.UserImpl</class>
-    
+
         <!--BAM for task service -->
         <class>org.jbpm.services.task.audit.impl.model.BAMTaskSummaryImpl</class>
 
         <!-- Event Classes -->
         <class>org.jbpm.services.task.audit.impl.model.TaskEventImpl</class>
 
-        <!-- Task Audit Classes --> 
+        <!-- Task Audit Classes -->
         <class>org.jbpm.services.task.audit.impl.model.AuditTaskImpl</class>
-       
+        <class>org.jbpm.services.task.audit.impl.model.TaskVariableImpl</class>
+     
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
@@ -63,19 +64,19 @@
           <property name="hibernate.show_sql" value="false" />
           <property name="hibernate.dialect" value="${maven.hibernate.dialect}" />
 
-          <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->      
-          <property name="hibernate.id.new_generator_mappings" value="false" />            
+          <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->
+          <property name="hibernate.id.new_generator_mappings" value="false" />
           <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.BitronixJtaPlatform" />
         </properties>
     </persistence-unit>
-    
+
     <persistence-unit name="org.objects.query" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>jdbc/object-ds</jta-data-source>              
-      
-        <class>org.kie.remote.services.rest.query.objects.Box</class> 
-        <class>org.kie.remote.services.rest.query.objects.Screw</class> 
-        
+        <jta-data-source>jdbc/object-ds</jta-data-source>
+
+        <class>org.kie.remote.services.rest.query.objects.Box</class>
+        <class>org.kie.remote.services.rest.query.objects.Screw</class>
+
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
@@ -84,10 +85,10 @@
           <property name="hibernate.show_sql" value="false" />
           <property name="hibernate.dialect" value="${maven.hibernate.dialect}" />
 
-          <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->      
-          <property name="hibernate.id.new_generator_mappings" value="false" />            
+          <!-- BZ 841786: AS7/EAP 6/Hib 4 uses new (sequence) generators which seem to cause problems -->
+          <property name="hibernate.id.new_generator_mappings" value="false" />
           <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.BitronixJtaPlatform" />
         </properties>
     </persistence-unit>
-    
-</persistence>    
+
+</persistence>
