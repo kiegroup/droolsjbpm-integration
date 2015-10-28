@@ -20,7 +20,7 @@ public class RemoteServicesQueryJPAService extends JPAService {
     public RemoteServicesQueryJPAService(EntityManagerFactory emf) {
         super(emf);
     }
-    
+
     protected EntityManager getEntityManager() {
         return persistenceStrategy.getEntityManager();
     }
@@ -32,37 +32,37 @@ public class RemoteServicesQueryJPAService extends JPAService {
     protected void closeEntityManager(EntityManager em, Object transaction) {
        persistenceStrategy.leaveTransaction(em, transaction);
     }
-   
+
     // Query specific logic -------------------------------------------------------------------------------------------------------
-    
+
     private final RemoteServicesAuditQueryCriteriaUtil auditQueryUtil = new RemoteServicesAuditQueryCriteriaUtil(this);
     private final RemoteServicesTaskQueryCriteriaUtil taskQueryUtil = new RemoteServicesTaskQueryCriteriaUtil(this);
-    
-    protected QueryCriteriaUtil getQueryCriteriaUtil(Class queryType) { 
-        if( queryType.equals(TaskSummaryImpl.class) ) { 
+
+    protected QueryCriteriaUtil getQueryCriteriaUtil(Class queryType) {
+        if( queryType.equals(TaskSummaryImpl.class) ) {
             return taskQueryUtil;
-        } else if( queryType.equals(ProcessInstanceLog.class) 
-                || queryType.equals(VariableInstanceLog.class) 
+        } else if( queryType.equals(ProcessInstanceLog.class)
+                || queryType.equals(VariableInstanceLog.class)
                 || queryType.equals(NodeInstanceLog.class) ) {
             return auditQueryUtil;
-        } else { 
+        } else {
             throw new IllegalArgumentException("Unsupported query type: " + queryType.getName());
         }
     }
-    
+
     /**
      *
      * @param queryWhere
      * @param queryType
      * @return The result of the query, a list of type T
      */
-    public <T> List<T> doQuery(QueryWhere queryWhere, Class<T> queryType) { 
+    public <T> List<T> doQuery(QueryWhere queryWhere, Class<T> queryType) {
        return auditQueryUtil.doCriteriaQuery(queryWhere, queryType);
     }
-   
-    public List<TaskSummaryImpl> doTaskSummaryQuery(String userId, UserGroupCallback userGroupCallback, QueryWhere queryWhere) { 
+
+    public List<TaskSummary> doTaskSummaryQuery(String userId, UserGroupCallback userGroupCallback, QueryWhere queryWhere) {
         assert userGroupCallback != null : "The " + UserGroupCallback.class.getSimpleName() + " instance is null!";
         return taskQueryUtil.doCriteriaQuery(userId, userGroupCallback, queryWhere);
     }
-   
+
 }

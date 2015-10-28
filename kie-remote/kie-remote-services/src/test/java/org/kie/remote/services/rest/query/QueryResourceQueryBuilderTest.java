@@ -85,7 +85,7 @@ public class QueryResourceQueryBuilderTest extends AbstractQueryResourceTest {
     public void generalQueryBuilderTest() throws Exception {
         RemoteServicesQueryCommandBuilder taskQueryBuilder = new RemoteServicesQueryCommandBuilder(USER_ID);
 
-        List<TaskSummaryImpl> taskResult = jpaService.doTaskSummaryQuery(
+        List<TaskSummary> taskResult = jpaService.doTaskSummaryQuery(
                 taskQueryBuilder.getTaskUserId(),
                 userGroupCallback,
                 taskQueryBuilder.getQueryWhere());
