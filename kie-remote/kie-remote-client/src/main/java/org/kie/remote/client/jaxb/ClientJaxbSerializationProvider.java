@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -26,15 +26,14 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.kie.remote.jaxb.gen.util.JaxbListWrapper;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationException;
 
 public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
 
     private static Set<Class<?>> CLIENT_SIDE_JAXB_CLASS_SET;
-    static { 
-        Class [] serviceSideClasses = { 
+    static {
+        Class [] serviceSideClasses = {
                 JaxbCommandsRequest.class,
                 JaxbCommandsResponse.class,
                 JaxbContentResponse.class,
@@ -44,25 +43,25 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
                 JaxbTaskCommentListResponse.class,
 
                 // webservice classes should not be added!
-                
+
                 // used with gnerated classes
-                JaxbListWrapper.class
+                org.kie.remote.jaxb.gen.List.class
         };
         List<Class<?>> serverSideJaxbClassList = new ArrayList<Class<?>>();
-        for( Class clazz : serviceSideClasses ) { 
+        for( Class clazz : serviceSideClasses ) {
             serverSideJaxbClassList.add(clazz);
-        } 
+        }
         CLIENT_SIDE_JAXB_CLASS_SET = Collections.unmodifiableSet(new HashSet<Class<?>>(serverSideJaxbClassList));
     }
-    
+
     public static Set<Class<?>> getModuleClasses() {
         return CLIENT_SIDE_JAXB_CLASS_SET;
     }
-    
+
   // General methods -------------------------------------------------------------------------------------------------------------------
-    
+
     private static Class<?> [] ALL_BASE_JAXB_CLASSES = null;
-    static { 
+    static {
         int kieJaxbClassSetLength = KIE_JAXB_CLASS_SET.size();
         Class<?> [] types = new Class<?> [kieJaxbClassSetLength + PRIMITIVE_ARRAY_CLASS_SET.size()];
         System.arraycopy(KIE_JAXB_CLASS_SET.toArray(new Class<?>[kieJaxbClassSetLength]), 0, types, 0, kieJaxbClassSetLength);
@@ -71,48 +70,48 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
         ALL_BASE_JAXB_CLASSES = types;
     }
 
-    private Class<?> [] getAllJaxbClasses() { 
+    private Class<?> [] getAllJaxbClasses() {
         Class<?> [] allBaseJaxbClassArr = getAllBaseJaxbClasses();
-        if( extraJaxbClasses.isEmpty() ) { 
+        if( extraJaxbClasses.isEmpty() ) {
             return allBaseJaxbClassArr;
         }
         Class<?> [] extraJaxbClassArr = extraJaxbClasses.toArray(new Class<?>[extraJaxbClasses.size()]);
         return addClassArrToClassArr(allBaseJaxbClassArr, extraJaxbClassArr);
     }
-    
-    public static Class<?> [] getAllBaseJaxbClasses() { 
+
+    public static Class<?> [] getAllBaseJaxbClasses() {
         Set<Class<?>> sideJaxbClassSet = getModuleClasses();
         Class<?> [] sideJaxbClasses = new Class<?>[sideJaxbClassSet.size()];
         sideJaxbClasses = sideJaxbClassSet.toArray(sideJaxbClasses);
         return addClassArrToClassArr(ALL_BASE_JAXB_CLASSES, sideJaxbClasses);
     }
 
-    private static Class<?> [] addClassArrToClassArr(Class<?> [] baseArr, Class<?> [] addArr) { 
+    private static Class<?> [] addClassArrToClassArr(Class<?> [] baseArr, Class<?> [] addArr) {
         Class<?> [] copy = new Class<?>[baseArr.length + addArr.length];
         System.arraycopy(baseArr, 0, copy, 0, baseArr.length);
         System.arraycopy(addArr, 0, copy, baseArr.length, addArr.length);
         return copy;
     }
-    
+
     private JAXBContext jaxbContext = null;
     protected Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
-    public JAXBContext getJaxbContext() { 
+    public JAXBContext getJaxbContext() {
         return jaxbContext;
     }
-    
-    public static JaxbSerializationProvider newInstance() { 
+
+    public static JaxbSerializationProvider newInstance() {
         ClientJaxbSerializationProvider jaxbSerProvider = new ClientJaxbSerializationProvider();
         jaxbSerProvider.initialize();
         return jaxbSerProvider;
     }
-    
-    public static JaxbSerializationProvider newInstance(Collection<Class<?>> extraJaxbClassList) { 
+
+    public static JaxbSerializationProvider newInstance(Collection<Class<?>> extraJaxbClassList) {
         ClientJaxbSerializationProvider jaxbSerProvider = new ClientJaxbSerializationProvider(extraJaxbClassList);
         jaxbSerProvider.initialize();
         return jaxbSerProvider;
     }
-   
+
     private void initialize() {
         initialize(getAllJaxbClasses());
     }
@@ -124,21 +123,21 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
             throw new SerializationException("Unsupported JAXB Class encountered during initialization: " + jaxbe.getMessage(), jaxbe);
         }
     }
-   
+
     /* (non-Javadoc)
      * @see org.kie.services.client.serialization.JaxbSerializationProvider#dispose()
      */
     @Override
-    public void dispose() { 
-       if( this.extraJaxbClasses != null ) { 
+    public void dispose() {
+       if( this.extraJaxbClasses != null ) {
            this.extraJaxbClasses.clear();
            this.extraJaxbClasses = null;
        }
-       if( this.jaxbContext != null ) { 
+       if( this.jaxbContext != null ) {
            this.jaxbContext = null;
        }
     }
-  
+
     //  Functional methods -------------------------------------------------------------------------------------------------------
 
     /* (non-Javadoc)
@@ -164,21 +163,21 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
      * @see org.kie.services.client.serialization.JaxbSerializationProvider#getExtraJaxbClasses()
      */
     @Override
-    public Collection<Class<?>> getExtraJaxbClasses() { 
+    public Collection<Class<?>> getExtraJaxbClasses() {
         return new HashSet<Class<?>>(extraJaxbClasses);
     }
-  
+
     // Constructors ---------------------------------------------------------------------------------------------------------------
 
-    private ClientJaxbSerializationProvider() { 
-        // default 
+    private ClientJaxbSerializationProvider() {
+        // default
     }
-    
-    private ClientJaxbSerializationProvider(Collection<Class<?>> extraJaxbClassArr) { 
+
+    private ClientJaxbSerializationProvider(Collection<Class<?>> extraJaxbClassArr) {
         this.extraJaxbClasses.addAll(extraJaxbClassArr);
     }
-    
-    private ClientJaxbSerializationProvider(Class<?> [] extraJaxbClassArr) { 
+
+    private ClientJaxbSerializationProvider(Class<?> [] extraJaxbClassArr) {
         this.extraJaxbClasses.addAll(Arrays.asList(extraJaxbClassArr));
     }
 

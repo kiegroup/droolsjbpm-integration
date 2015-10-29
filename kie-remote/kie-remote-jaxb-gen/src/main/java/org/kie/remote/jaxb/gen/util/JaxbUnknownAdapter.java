@@ -16,6 +16,7 @@
 
 package org.kie.remote.jaxb.gen.util;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,7 +33,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.kie.remote.jaxb.gen.util.JaxbListWrapper.JaxbWrapperType;
+import org.kie.remote.jaxb.gen.JaxbWrapperType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,26 +56,37 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
 
     @Override
     public Object marshal( Object o ) throws Exception {
+        try {
         return recursiveMarshal(o, new IdentityHashMap<Object, Object>());
+        } catch( Exception e ) {
+            // because exceptions are always swallowed by JAXB
+            logger.error("Unable to marshal " + o.getClass().getName() + " instance: " + e.getMessage(), e);
+            throw e;
+        }
     }
 
     private Object recursiveMarshal( Object o, Map<Object, Object> seenObjectsMap ) {
+        if( o == null ) {
+            return o;
+        }
         if( seenObjectsMap.put(o, PRESENT) != null ) {
             throw new UnsupportedOperationException("Serialization of recursive data structures is not supported!");
         }
         try {
-            if( o instanceof Queue ) {
-                Queue queue = (Queue) o;
-                Object[] serializedArr = convertCollectionToSerializedArray(queue, seenObjectsMap);
-                return new JaxbListWrapper(serializedArr, JaxbWrapperType.QUEUE);
-            } else if( o instanceof List ) {
+            if( o instanceof List ) {
                 List list = (List) o;
-                Object[] serializedArr = convertCollectionToSerializedArray(list, seenObjectsMap);
-                return new JaxbListWrapper(serializedArr, JaxbWrapperType.LIST);
+                List<Object> serializedList = convertCollectionToSerializedList(list, seenObjectsMap);
+                org.kie.remote.jaxb.gen.List listWrapper = new org.kie.remote.jaxb.gen.List();
+                listWrapper.getElements().addAll(serializedList);
+                listWrapper.setType(org.kie.remote.jaxb.gen.JaxbWrapperType.LIST);
+                return listWrapper;
             } else if( o instanceof Set ) {
                 Set set = (Set) o;
-                Object[] serializedArr = convertCollectionToSerializedArray(set, seenObjectsMap);
-                return new JaxbListWrapper(serializedArr, JaxbWrapperType.SET);
+                List<Object> serializedList = convertCollectionToSerializedList(set, seenObjectsMap);
+                org.kie.remote.jaxb.gen.List listWrapper = new org.kie.remote.jaxb.gen.List();
+                listWrapper.getElements().addAll(serializedList);
+                listWrapper.setType(org.kie.remote.jaxb.gen.JaxbWrapperType.SET);
+                return listWrapper;
             } else if( o instanceof Map ) {
                 Map<Object, Object> map = (Map<Object, Object>) o;
                 List<JaxbStringObjectPair> pairList = new ArrayList<JaxbStringObjectPair>(map.size());
@@ -88,11 +100,34 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
                         throw new UnsupportedOperationException("Only String keys for Map structures are supported [key was a "
                                 + key.getClass().getName() + "]");
                     }
-                    Object value = convertObjectToSerializableVariant(entry.getValue(), seenObjectsMap);
-                    pairList.add(new JaxbStringObjectPair((String) key, value));
+                    // There's already a @XmlJavaTypeAdapter(JaxbUnknownAdapter.class) anno on the JaxbStringObjectPair.value field
+                    pairList.add(new JaxbStringObjectPair((String) key, entry.getValue()));
                 }
 
-                return new JaxbListWrapper(pairList.toArray(new JaxbStringObjectPair[pairList.size()]), JaxbWrapperType.MAP);
+                org.kie.remote.jaxb.gen.List listWrapper = new org.kie.remote.jaxb.gen.List();
+                listWrapper.getElements().addAll(pairList);
+                listWrapper.setType(org.kie.remote.jaxb.gen.JaxbWrapperType.MAP);
+                return listWrapper;
+            } else if( o.getClass().isArray() ) {
+                // convert to serializable types
+                int length = Array.getLength(o);
+                List<Object> serializedList = new ArrayList<Object>(length);
+                for( int i = 0; i < length; ++i ) {
+                    Object elem = convertObjectToSerializableVariant(Array.get(o, i), seenObjectsMap);
+                    serializedList.add(elem);
+                }
+
+                // convert to JaxbListWrapper
+                org.kie.remote.jaxb.gen.List listWrapper = new org.kie.remote.jaxb.gen.List();
+                listWrapper.getElements().addAll(serializedList);
+                listWrapper.setType(JaxbWrapperType.ARRAY);
+                Class componentType = o.getClass().getComponentType();
+                String componentTypeName = o.getClass().getComponentType().getCanonicalName();
+                if( componentTypeName == null ) {
+                   throw new UnsupportedOperationException("Local or anonymous classes are not supported for serialization: " + componentType.getName() );
+                }
+                listWrapper.setComponentType(componentTypeName);
+                return listWrapper;
             } else {
                 return o;
             }
@@ -101,19 +136,19 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
         }
     }
 
-    private Object[] convertCollectionToSerializedArray( Collection collection, Map<Object, Object> seenObjectsMap ) {
+    private List<Object> convertCollectionToSerializedList( Collection collection, Map<Object, Object> seenObjectsMap ) {
         List<Object> serializedList = new ArrayList<Object>(collection.size());
         for( Object elem : collection ) {
             elem = convertObjectToSerializableVariant(elem, seenObjectsMap);
             serializedList.add(elem);
         }
-        return serializedList.toArray(new Object[serializedList.size()]);
+        return serializedList;
     }
 
     private Object convertObjectToSerializableVariant( Object obj, Map<Object, Object> seenObjectsMap ) {
         if( obj == null ) {
             return null;
-        } else if( !(obj instanceof JaxbListWrapper) && (obj instanceof Collection || obj instanceof Map) ) {
+        } else if( !(obj instanceof org.kie.remote.jaxb.gen.List) && (obj instanceof Collection || obj instanceof Map) ) {
             obj = recursiveMarshal(obj, seenObjectsMap);
         }
         return obj;
@@ -121,12 +156,22 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
 
     @Override
     public Object unmarshal( Object o ) throws Exception {
-        if( o instanceof JaxbListWrapper ) {
-            JaxbListWrapper wrapper = (JaxbListWrapper) o;
-            Object[] elements = wrapper.getElements();
+        try {
+            return recursiveUnmarhsal(o);
+        } catch( Exception e ) {
+            // because exceptions are always swallowed by JAXB
+            logger.error("Unable to *un*marshal " + o.getClass().getName() + " instance: " + e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    public Object recursiveUnmarhsal( Object o ) throws Exception {
+        if( o instanceof org.kie.remote.jaxb.gen.List ) {
+            org.kie.remote.jaxb.gen.List wrapper = (org.kie.remote.jaxb.gen.List) o;
+            List<Object> elements = wrapper.getElements();
             int size = 0;
             if( elements != null ) {
-                size = elements.length;
+                size = elements.size();
             }
             if( wrapper.getType() == null ) {
                 List<Object> list = new ArrayList<Object>(size);
@@ -139,9 +184,6 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
                 case SET:
                     Set<Object> set = new HashSet<Object>(size);
                     return convertSerializedElementsToCollection(elements, set);
-                case QUEUE:
-                    Queue<Object> queue = new LinkedList<Object>();
-                    return convertSerializedElementsToCollection(elements, queue);
                 case MAP:
                     Map<String, Object> map = new HashMap<String, Object>(size);
                     if( size > 0 ) {
@@ -153,6 +195,19 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
                         }
                     }
                     return map;
+                case ARRAY:
+                    List<Object> objList = wrapper.getElements();
+                    int length = objList.size();
+                    String componentTypeName = wrapper.getComponentType();
+                    Class realArrComponentType = null;
+                    realArrComponentType = getClass(componentTypeName);
+
+                    // create and fill array
+                    Object realArr = Array.newInstance(realArrComponentType, objList.size());
+                    for( int i = 0; i < length; ++i ) {
+                        Array.set(realArr, i, objList.get(i));
+                    }
+                    return realArr;
                 default:
                     throw new IllegalArgumentException("Unknown JAXB collection wrapper type: " + wrapper.getType().toString());
                 }
@@ -162,8 +217,8 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
             JaxbStringObjectPair[] value = (JaxbStringObjectPair[]) o;
             Map<Object, Object> r = new HashMap<Object, Object>();
             for( JaxbStringObjectPair p : value ) {
-                if( p.getValue() instanceof JaxbListWrapper ) {
-                    r.put(p.getKey(), new ArrayList(Arrays.asList(((JaxbListWrapper) p.getValue()).getElements())));
+                if( p.getValue() instanceof org.kie.remote.jaxb.gen.List ) {
+                    r.put(p.getKey(), new ArrayList(Arrays.asList(((org.kie.remote.jaxb.gen.List) p.getValue()).getElements())));
                 } else {
                     r.put(p.getKey(), p.getValue());
                 }
@@ -174,12 +229,47 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
         }
     }
 
-    private Collection convertSerializedElementsToCollection( Object[] elements, Collection collection ) throws Exception {
+    // idea stolen from org.apache.commons.lang3.ClassUtils
+    private static final Map<String, String> classToArrayTypeMap = new HashMap<String, String>();
+    static {
+        classToArrayTypeMap.put("int", "I");
+        classToArrayTypeMap.put("boolean", "Z");
+        classToArrayTypeMap.put("float", "F");
+        classToArrayTypeMap.put("long", "J");
+        classToArrayTypeMap.put("short", "S");
+        classToArrayTypeMap.put("byte", "B");
+        classToArrayTypeMap.put("double", "D");
+        classToArrayTypeMap.put("char", "C");
+    }
+
+    private static Class getClass(String className) throws Exception {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = tccl == null ? JaxbUnknownAdapter.class.getClassLoader() : tccl;
+
+        try {
+            // String.contains() will be cheaper/faster than Map.contains()
+            if( className.contains(".") ) {
+                return Class.forName(className,true, loader);
+            } else {
+                // Thanks, org.apache.commons.lang3.ClassUtils!
+                String arrClassName = classToArrayTypeMap.get(className);
+                if( arrClassName == null ) {
+                    throw new IllegalStateException("Unexpected class type encountered during deserialization: " + arrClassName );
+                }
+                arrClassName = "[" + arrClassName;
+                return Class.forName(arrClassName, true, loader).getComponentType();
+            }
+        } catch( ClassNotFoundException cnfe ) {
+            throw new IllegalStateException("Class '" + className + "' could not be found during deserialization: " + cnfe.getMessage(), cnfe );
+        }
+    }
+
+    private Collection convertSerializedElementsToCollection( List<Object> elements, Collection collection ) throws Exception {
         List<Object> list;
-        if( elements == null ) {
+        if( elements == null || elements.isEmpty() ) {
             list = Collections.EMPTY_LIST;
         } else {
-            list = new ArrayList<Object>(elements.length);
+            list = new ArrayList<Object>(elements.size());
             for( Object elem : elements ) {
                 elem = convertSerializedObjectToObject(elem);
                 list.add(elem);
@@ -193,7 +283,7 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
         if( element == null ) {
             return element;
         }
-        if( element instanceof JaxbListWrapper ) {
+        if( element instanceof org.kie.remote.jaxb.gen.List ) {
             element = unmarshal(element);
         }
         return element;
