@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -117,17 +117,17 @@ public class JaxbCommandsRequest {
     @XmlElement
     @XmlSchemaType(name = "string")
     private String user;
-    
+
     @XmlElement
     @XmlSchemaType(name = "string")
     private String correlationKeyString;
-   
+
     // This list should match the list in AcceptedCommands
     @XmlElements({
             @XmlElement(name = "complete-work-item", type = CompleteWorkItemCommand.class),
             @XmlElement(name = "abort-work-item", type = AbortWorkItemCommand.class),
             @XmlElement(name = "get-workitem", type = GetWorkItemCommand.class),
-            
+
             @XmlElement(name = "abort-process-instance", type = AbortProcessInstanceCommand.class),
             @XmlElement(name = "get-process-ids", type = GetProcessIdsCommand.class),
             @XmlElement(name = "get-process-instance-by-correlation-key", type = GetProcessInstanceByCorrelationKeyCommand.class),
@@ -137,18 +137,18 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "signal-event", type = SignalEventCommand.class),
             @XmlElement(name = "start-correlated-process", type = StartCorrelatedProcessCommand.class),
             @XmlElement(name = "start-process", type = StartProcessCommand.class),
-            
+
             @XmlElement(name = "get-variable", type = GetVariableCommand.class),
             @XmlElement(name = "get-fact-count", type = GetFactCountCommand.class),
             @XmlElement(name = "get-global", type = GetGlobalCommand.class),
             @XmlElement(name = "get-id", type = GetIdCommand.class),
             @XmlElement(name = "set-global", type = SetGlobalCommand.class),
-            
+
             @XmlElement(name = "delete", type = DeleteCommand.class),
             @XmlElement(name = "fire-all-rules", type = FireAllRulesCommand.class),
             @XmlElement(name = "insert-object", type = InsertObjectCommand.class),
             @XmlElement(name = "update", type = UpdateCommand.class),
-           
+
             // task
             @XmlElement(name = "activate-task", type = ActivateTaskCommand.class),
             @XmlElement(name = "add-task", type = AddTaskCommand.class),
@@ -173,7 +173,8 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "add-content-from-user", type = AddContentFromUserCommand.class),
             @XmlElement(name = "get-content-by-id", type = GetContentByIdForUserCommand.class),
             @XmlElement(name = "get-content-map-for-user", type = GetContentMapForUserCommand.class),
-            
+
+            @XmlElement(name = "get-task-as-business-admin", type = GetTaskAssignedAsBusinessAdminCommand.class),
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
@@ -182,7 +183,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
             @XmlElement(name = "task-query-where", type = TaskQueryWhereCommand.class),
-            
+
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
             @XmlElement(name = "resume-task", type = ResumeTaskCommand.class),
@@ -193,7 +194,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "process-sub-tasks", type = ProcessSubTaskCommand.class),
             @XmlElement(name = "execute-task-rules", type = ExecuteTaskRulesCommand.class),
             @XmlElement(name = "cancel-deadline", type = CancelDeadlineCommand.class),
-            
+
             // audit
             @XmlElement(name = "clear-history-logs", type = ClearHistoryLogsCommand.class),
             @XmlElement(name = "find-active-process-instances", type = FindActiveProcessInstancesCommand.class),
@@ -216,17 +217,17 @@ public class JaxbCommandsRequest {
         this.commands.add(command);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
-    
+
     public JaxbCommandsRequest(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = new ArrayList<Command>();
         this.commands.addAll(commands);
         checkThatCommandsContainDeploymentIdIfNeeded(this.commands);
     }
-    
+
     private void checkThatCommandsContainDeploymentIdIfNeeded(List<Command> checkCommands) {
-        for( Object command : checkCommands ) { 
-            if( ! (command instanceof TaskCommand) && ! (command instanceof AuditCommand) ) { 
+        for( Object command : checkCommands ) {
+            if( ! (command instanceof TaskCommand) && ! (command instanceof AuditCommand) ) {
                 throw new UnsupportedOperationException( "A " + command.getClass().getSimpleName() + " requires that the deployment id has been set!" );
             }
         }
@@ -246,18 +247,18 @@ public class JaxbCommandsRequest {
         this.commands.addAll(commands);
     }
 
-    private void checkThatCommandsAreAccepted(Collection<Command> cmds) { 
-        for( Object cmd : cmds ) { 
-          checkThatCommandIsAccepted(cmd); 
+    private void checkThatCommandsAreAccepted(Collection<Command> cmds) {
+        for( Object cmd : cmds ) {
+          checkThatCommandIsAccepted(cmd);
        }
     }
-    
-    private void checkThatCommandIsAccepted(Object cmd) { 
+
+    private void checkThatCommandIsAccepted(Object cmd) {
         if( ! AcceptedClientCommands.isAcceptedCommandClass(cmd.getClass()) ) {
-           throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." ); 
+           throw new UnsupportedOperationException(cmd.getClass().getName() + " is not an accepted command." );
         }
     }
-    
+
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -297,19 +298,19 @@ public class JaxbCommandsRequest {
     public void setCorrelationKeyString(String correlationKeyString) {
         this.correlationKeyString = correlationKeyString;
     }
-    
+
     public void setCommands(List<Command> commands) {
         checkThatCommandsAreAccepted(commands);
         this.commands = commands;
     }
 
     public List<Command> getCommands() {
-        if( this.commands == null ) { 
+        if( this.commands == null ) {
             this.commands = new ArrayList<Command>();
         }
         return this.commands;
     }
-   
+
     public String toString() {
     	StringBuffer result = new StringBuffer("JaxbCommandsRequest " + deploymentId + "\n");
     	if (commands != null) {

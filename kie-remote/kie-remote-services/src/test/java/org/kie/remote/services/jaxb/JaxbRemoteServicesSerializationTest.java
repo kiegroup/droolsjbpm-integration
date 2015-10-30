@@ -15,19 +15,24 @@
 
 package org.kie.remote.services.jaxb;
 
+import static org.junit.Assert.*;
 import static org.jbpm.query.QueryBuilderCoverageTestUtil.hackTheDatabaseMetadataLoggerBecauseTheresALogbackXmlInTheClasspath;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
@@ -183,29 +188,65 @@ public class JaxbRemoteServicesSerializationTest extends JbpmJUnitBaseTestCase {
         return new HashSet<Class>((Set<Class>) commandSetField.get(null));
     }
 
-    private void checkIfClassShouldBeInCmdListTypes( Class origClass, ParameterizedType genericSuperClassOrInterface,
-            Map<Class, Class> cmdListTypesMap, Set<Class> classesChecked ) {
-        Type returnType = genericSuperClassOrInterface.getActualTypeArguments()[0];
-        // check that (generic) superclass has a parameterized type parameter
-        // i.e. OrigClass extends ThatCommand<ParamTypeParam<InnerType>>
-        if( !(returnType instanceof ParameterizedType) ) {
-            // No parameterized type for generica super class
-            // i.e. OrigClass extends ThatCommand<TypeParam>
-            classesChecked.remove(origClass);
-            return;
+    @Test
+    public void requestObjectsHaveIdenticalCommandLists() throws Exception {
+        XmlElements [] xmlElemsAnno = null;
+        {
+            Field field  = JaxbCommandsRequest.class.getDeclaredField("commands");
+            XmlElements serverXmlElementsAnno = field.getAnnotation(XmlElements.class);
+            field  = org.kie.remote.client.jaxb.JaxbCommandsRequest.class.getDeclaredField("commands");
+            XmlElements clientXmlElementsAnno = field.getAnnotation(XmlElements.class);
+
+            XmlElements [] tempXmlElemsAnnoArr = { serverXmlElementsAnno, clientXmlElementsAnno };
+            xmlElemsAnno = tempXmlElemsAnnoArr;
         }
-        // If type parameter is a list, then do the checks on the cmdListType
-        // map
-        Type listType = ((ParameterizedType) returnType).getRawType();
-        if( List.class.isAssignableFrom((Class) listType) || Collection.class.isAssignableFrom((Class) listType) ) {
-            assertTrue("Cmd list type set should include " + origClass.getSimpleName(), cmdListTypesMap.containsKey(origClass));
-            Type listTypeType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
-            Class cmdListTypesKeyType = cmdListTypesMap.get(origClass);
-            assertEquals("Expected cmd list type for " + origClass.getSimpleName(), cmdListTypesKeyType, listTypeType);
-            classesChecked.remove(origClass);
-        } else {
-            fail(origClass.getSimpleName() + "/" + ((Class) ((ParameterizedType) returnType).getRawType()).getSimpleName());
-            classesChecked.remove(origClass);
+
+        Comparator<XmlElement> xmlElemAlphaCmptr = new Comparator<XmlElement>() {
+
+            @Override
+            public int compare( XmlElement o1, XmlElement o2 ) {
+                if( o1 == o2 ) { return 0; }
+                else if ( o1 == null || o1.name() == null) { return -1; }
+                else if ( o2 == null || o2.name() == null) { return 1; }
+                else {
+                    return o1.name().compareTo(o2.name());
+                }
+            }
+        };
+
+        Set<XmlElement> [] xmlElemSet = new Set[2];
+        Map<String, XmlElement> [] xmlElemMap = new Map[2];
+
+        for( int i = 0; i < xmlElemsAnno.length; ++i ) {
+            String type = i == 0 ? "server" : "client";
+            xmlElemSet[i] = new TreeSet<XmlElement>(xmlElemAlphaCmptr);
+            xmlElemSet[i].addAll(Arrays.asList(xmlElemsAnno[i].value()));
+            xmlElemMap[i] = new TreeMap<String, XmlElement>();
+            for( XmlElement xmlElemAnno : xmlElemSet[i] ) {
+               XmlElement prevValue = xmlElemMap[i].put(xmlElemAnno.name(), xmlElemAnno);
+               String name = prevValue == null ? "" : prevValue.name();
+               assertNull( type + " commands request contains duplicate @XmlElemnt for :" + name, prevValue );
+            }
+
+        }
+
+        assertEquals( "Server @XmlElements size is not equal with client", xmlElemSet[0].size(), xmlElemSet[1].size() );
+
+        for( int i = 0; i < xmlElemSet.length; ++i ) {
+            String type = i == 0 ? "server" : "client";
+            int other = ( i + 1 ) % 2;
+            String otherType = other == 0 ? "server" : "client";
+
+            for( XmlElement xmlElemAnno : xmlElemSet[i] ) {
+                assertTrue( otherType + " " + JaxbCommandsRequest.class.getSimpleName() + " does not contain "  + xmlElemAnno.name()
+                    + " @" + XmlElement.class.getSimpleName() + "(\"" + xmlElemAnno.name() + "\")",
+                    xmlElemMap[other].containsKey(xmlElemAnno.name()) );
+                String className = xmlElemAnno.type().getSimpleName();
+                XmlElement otherXmlElemAnno = xmlElemMap[other].get(xmlElemAnno.name());
+                String otherClassName = otherXmlElemAnno.type().getSimpleName();
+                assertEquals( "Dissimilar class values for @XmlElemen(\"" + xmlElemAnno.name() + "\")",
+                        className, otherClassName);
+            }
         }
     }
 
