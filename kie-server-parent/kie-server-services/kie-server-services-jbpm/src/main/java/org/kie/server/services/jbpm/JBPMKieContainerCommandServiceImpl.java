@@ -131,7 +131,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, e.getMessage()));
             }
         }
-        logger.info("About to return responses '{}'", responses);
+        logger.debug("About to return responses '{}'", responses);
         return new ServiceResponsesList(responses);
     }
 }
