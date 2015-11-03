@@ -43,6 +43,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -134,6 +135,8 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 if (mavenFolder != null) {
                     // remove /META-INF/maven since drools pom.properties lookup adds it back
                     configFilePath = mavenFolder.getParentFile().getParent();
+                } else {
+                    configFilePath = contextFile.getAbsolutePath();
                 }
             }
         }
@@ -322,6 +325,17 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                         configFileURL = url;
                         break;
                     }
+                }
+            } else if (applicationContext instanceof AbstractRefreshableConfigApplicationContext ) {
+                try {
+                    // The getConfigLocations is protected in spring version currently in use, but
+                    // will be public in newer versions. Try to use it via reflection for now
+                    Method m = AbstractRefreshableConfigApplicationContext.class.getDeclaredMethod( "getConfigLocations" );
+                    m.setAccessible( true );
+                    String[] locations = (String[])m.invoke( applicationContext );
+                    configFileURL = applicationContext.getResource(locations[0]).getURL();
+                } catch (Exception e) {
+                    configFileURL = applicationContext.getResource("classpath:/").getURL();
                 }
             } else {
                 configFileURL = applicationContext.getResource("classpath:/").getURL();
