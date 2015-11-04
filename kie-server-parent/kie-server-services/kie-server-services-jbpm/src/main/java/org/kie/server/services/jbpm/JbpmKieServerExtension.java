@@ -36,6 +36,7 @@ import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.ExecutorImpl;
 import org.jbpm.executor.impl.ExecutorServiceImpl;
 import org.jbpm.kie.services.impl.AbstractDeploymentService;
+import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
 import org.jbpm.kie.services.impl.KModuleDeploymentService;
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
@@ -106,6 +107,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private RuntimeDataService runtimeDataService;
 
     private ExecutorService executorService;
+    
+    private FormManagerService formManagerService;
 
     private KieContainerCommandService kieContainerCommandService;
 
@@ -140,6 +143,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
         EntityManagerFactory emf = build(getPersistenceProperties(config));
         EntityManagerFactoryManager.get().addEntityManagerFactory(persistenceUnitName, emf);
 
+        // build form manager service
+        formManagerService = new FormManagerServiceImpl();
+        
         // build definition service
         definitionService = new BPMN2DataServiceImpl();
 
@@ -149,7 +155,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((KModuleDeploymentService) deploymentService).setEmf(emf);
         ((KModuleDeploymentService) deploymentService).setIdentityProvider(registry.getIdentityProvider());
         ((KModuleDeploymentService) deploymentService).setManagerFactory(new RuntimeManagerFactoryImpl());
-        ((KModuleDeploymentService) deploymentService).setFormManagerService(new FormManagerServiceImpl());
+        ((KModuleDeploymentService) deploymentService).setFormManagerService(formManagerService);
 
         // configure user group callback
         UserGroupCallback userGroupCallback = UserDataServiceProvider.getUserGroupCallback();
@@ -272,6 +278,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             kieContainerInstance.addService(userTaskService);
             kieContainerInstance.addService(runtimeDataService);
             kieContainerInstance.addService(executorService);
+            kieContainerInstance.addService(formManagerService);
 
             logger.info("Container {} created successfully", id);
         } catch (Exception e) {
@@ -299,6 +306,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         kieContainerInstance.removeService(userTaskService.getClass());
         kieContainerInstance.removeService(runtimeDataService.getClass());
         kieContainerInstance.removeService(executorService.getClass());
+        kieContainerInstance.removeService(formManagerService.getClass());
 
         logger.info("Container {} disposed successfully", id);
     }
@@ -315,6 +323,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 userTaskService,
                 runtimeDataService,
                 executorService,
+                formManagerService,
                 context
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
@@ -336,6 +345,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 userTaskService,
                 runtimeDataService,
                 executorService,
+                formManagerService,
                 context
         };
 

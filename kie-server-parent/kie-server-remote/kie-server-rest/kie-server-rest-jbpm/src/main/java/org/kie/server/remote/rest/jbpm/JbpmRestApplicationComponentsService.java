@@ -18,9 +18,17 @@ package org.kie.server.remote.rest.jbpm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.jbpm.kie.services.impl.FormManagerService;
+import org.jbpm.kie.services.impl.form.FormProvider;
+import org.jbpm.kie.services.impl.form.provider.ClasspathFormProvider;
+import org.jbpm.kie.services.impl.form.provider.InMemoryFormProvider;
+import org.jbpm.kie.services.impl.form.provider.InMemoryFormSkeletonProvider;
 import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
@@ -30,6 +38,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
 import org.kie.server.services.jbpm.ExecutorServiceBase;
+import org.kie.server.services.jbpm.FormServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.jbpm.ProcessServiceBase;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
@@ -51,6 +60,8 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         DefinitionService definitionService = null;
         UserTaskService userTaskService = null;
         ExecutorService executorService = null;
+        DeploymentService deploymentService = null;
+        FormManagerService formManagerService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -73,6 +84,12 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( ExecutorService.class.isAssignableFrom(object.getClass()) ) {
                 executorService = (ExecutorService) object;
                 continue;
+            } else if( DeploymentService.class.isAssignableFrom(object.getClass()) ) {
+                deploymentService = (DeploymentService) object;
+                continue;
+            } else if( FormManagerService.class.isAssignableFrom(object.getClass()) ) {
+                formManagerService = (FormManagerService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
@@ -85,12 +102,22 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
         RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
         ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
+        
+        FormServiceBase formServiceBase = new FormServiceBase(definitionService, deploymentService, runtimeDataService, userTaskService, context);
+        Set<FormProvider> formProviders = new HashSet<FormProvider>();
+        
+        InMemoryFormSkeletonProvider iprovider = new InMemoryFormSkeletonProvider();
+        iprovider.setFormManagerService(formManagerService);
+        formProviders.add(iprovider);
+        
+        formServiceBase.setProviders(formProviders);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase));
         components.add(new DefinitionResource(definitionServiceBase));
         components.add(new UserTaskResource(userTaskServiceBase));
         components.add(new ExecutorResource(executorServiceBase));
+        components.add(new FormResource(formServiceBase));
 
         return components;
     }

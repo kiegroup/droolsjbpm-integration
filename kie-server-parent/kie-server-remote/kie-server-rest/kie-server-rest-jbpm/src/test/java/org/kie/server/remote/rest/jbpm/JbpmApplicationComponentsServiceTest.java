@@ -17,7 +17,7 @@ package org.kie.server.remote.rest.jbpm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +30,10 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.junit.Test;
 import org.kie.internal.executor.api.ExecutorService;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
-import org.mockito.Answers;
 import org.mockito.Mockito;
 
 public class JbpmApplicationComponentsServiceTest {
@@ -60,7 +58,7 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 5;
+        int numComponents = 6;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
@@ -69,6 +67,7 @@ public class JbpmApplicationComponentsServiceTest {
                     || appComponent instanceof DefinitionResource
                     || appComponent instanceof UserTaskResource
                     || appComponent instanceof ExecutorResource
+                    || appComponent instanceof FormResource
                     );
         }
     }
