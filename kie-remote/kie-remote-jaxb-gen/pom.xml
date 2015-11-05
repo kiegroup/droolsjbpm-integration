@@ -209,7 +209,7 @@
                     org/jbpm/services/task/impl/model/xml/JaxbContent.java,
                     org/jbpm/services/task/commands/*Comment*Command.java,
                     org/jbpm/services/task/commands/SetTaskPropertyCommand.java,
-                    org/jbpm/services/task/commands/TaskQueryWhereCommand.java</includes>
+                    org/jbpm/services/task/commands/TaskSummaryQueryCommand.java</includes>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.jbpm</groupId>
