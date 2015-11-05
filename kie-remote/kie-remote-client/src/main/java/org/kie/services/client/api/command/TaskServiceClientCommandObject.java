@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -90,13 +90,13 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     public TaskServiceClientCommandObject(RemoteConfiguration config) {
         super(config);
-        if( config.isJms() && config.getTaskQueue() == null ) { 
+        if( config.isJms() && config.getTaskQueue() == null ) {
             throw new MissingRequiredInfoException("A Task queue is necessary in order to create a Remote JMS Client TaskService instance.");
         }
     }
 
     // helper methods -------------------------------------------------------------------------------------------------------------
-    
+
     private QueryFilter addLanguageFilter( String language ) {
         QueryFilter filter = new QueryFilter();
         if( language != null ) {
@@ -141,13 +141,13 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         genTask.setPriority(task.getPriority());
         genTask.setSubject(task.getSubject());
         genTextList = convertKieTextListToGenTextList(task.getSubjects());
-        if( genTextList != null ) { 
+        if( genTextList != null ) {
             genTask.getSubjects().addAll(genTextList);
         }
         genTask.setTaskType(task.getTaskType());
         TaskData kieTaskData = task.getTaskData();
         genTask.setTaskData(convertKieTaskDataToGenTaskData(kieTaskData));
-    
+
         return genTask;
     }
 
@@ -193,11 +193,11 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         return null;
     }
 
-    private static org.kie.remote.jaxb.gen.TaskData convertKieTaskDataToGenTaskData(TaskData kieTaskData ) { 
+    private static org.kie.remote.jaxb.gen.TaskData convertKieTaskDataToGenTaskData(TaskData kieTaskData ) {
         org.kie.remote.jaxb.gen.TaskData genTaskData = null;
-        if( kieTaskData != null ) { 
+        if( kieTaskData != null ) {
             genTaskData = new org.kie.remote.jaxb.gen.TaskData();
-            
+
             genTaskData.setStatus(kieTaskData.getStatus());
             genTaskData.setPreviousStatus(kieTaskData.getPreviousStatus());
             User user = kieTaskData.getActualOwner();
@@ -221,9 +221,9 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             genTaskData.setFaultName(kieTaskData.getFaultName());
             genTaskData.setFaultType(kieTaskData.getFaultType());
             genTaskData.setFaultContentId(kieTaskData.getFaultContentId());
-            List<Attachment> attachs = kieTaskData.getAttachments(); 
-            if( attachs != null ) { 
-               for( Attachment attach : attachs ) { 
+            List<Attachment> attachs = kieTaskData.getAttachments();
+            if( attachs != null ) {
+               for( Attachment attach : attachs ) {
                   org.kie.remote.jaxb.gen.Attachment genAttach = new org.kie.remote.jaxb.gen.Attachment();
                   genAttach.setId(attach.getId());
                   genAttach.setName(attach.getName());
@@ -236,8 +236,8 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
                }
             }
             List<Comment> comments = kieTaskData.getComments();
-            if( comments != null ) { 
-                for( Comment comment : comments ) { 
+            if( comments != null ) {
+                for( Comment comment : comments ) {
                     org.kie.remote.jaxb.gen.Comment genComment = new org.kie.remote.jaxb.gen.Comment();
                     genComment.setId(comment.getId());
                     genComment.setText(comment.getText());
@@ -249,16 +249,16 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         return genTaskData;
     }
 
-    private static String convertKieUserToStringId(User user ) { 
+    private static String convertKieUserToStringId(User user ) {
         String userId = null;
-        if( user != null ) { 
+        if( user != null ) {
            userId = user.getId();
         }
         return userId;
     }
 
     // TaskService methods --------------------------------------------------------------------------------------------------------
-    
+
     @Override
     public <T> T execute( Command<T> command ) {
         return (T) unsupported(TaskService.class, Object.class);
@@ -285,7 +285,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         claimNextAvailable(userId);
     }
 
-    public void claimNextAvailable( String userId ) { 
+    public void claimNextAvailable( String userId ) {
         ClaimNextAvailableTaskCommand cmd = new ClaimNextAvailableTaskCommand();
         cmd.setUserId(userId);
         executeCommand(cmd);
@@ -419,10 +419,10 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         org.kie.remote.jaxb.gen.Content jaxbContent = new org.kie.remote.jaxb.gen.Content();
         jaxbContent.setContent(content.getContent());
         cmd.setTaskId(taskId);
-        
+
         return executeCommand(cmd);
     }
-    
+
     public Long addContent(long taskId, Map<String, Object> params) {
         AddContentCommand cmd = new AddContentCommand();
         cmd.setTaskId(taskId);
@@ -433,27 +433,27 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
         return executeCommand(cmd);
     }
-   
-    public void deleteContent(long taskId, long contentId) { 
+
+    public void deleteContent(long taskId, long contentId) {
        DeleteContentCommand cmd = new DeleteContentCommand();
        cmd.setContentId(contentId);
        cmd.setTaskId(taskId);
-       
+
        executeCommand(cmd);
     }
 
-    public List<Content> getAllContentByTaskId(long taskId) { 
+    public List<Content> getAllContentByTaskId(long taskId) {
        GetAllContentCommand cmd = new GetAllContentCommand();
        cmd.setTaskId(taskId);
-       
+
        return executeCommand(cmd);
     }
-    
+
     @Override
     public Map<String, Object> getTaskContent( long taskId ) {
         GetTaskContentCommand cmd = new GetTaskContentCommand();
         cmd.setTaskId(taskId);
-        
+
         return executeCommand(cmd);
     }
 
@@ -469,22 +469,22 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         // fill jaxbComment
         org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
         Date addedAt = comment.getAddedAt();
-        if( addedAt != null ) { 
+        if( addedAt != null ) {
             XMLGregorianCalendar jaxbAddedAt = convertDateToXmlGregorianCalendar(addedAt);
             jaxbComment.setAddedAt(jaxbAddedAt);
         }
         User addedBy = comment.getAddedBy();
-        if( addedBy != null ) { 
+        if( addedBy != null ) {
             jaxbComment.setAddedBy(addedBy.getId());
         }
         jaxbComment.setText(comment.getText());
         jaxbComment.setId(comment.getId());
-    
+
         //  create command
         AddCommentCommand cmd = new AddCommentCommand();
         cmd.setTaskId(taskId);
         cmd.setJaxbComment(jaxbComment);
-        
+
         return executeCommand(cmd);
     }
 
@@ -492,14 +492,14 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Long addComment( long taskId, String addedByUserId, String commentText ) {
         AddCommentCommand cmd = new AddCommentCommand();
         cmd.setTaskId(taskId);
-        
+
         org.kie.remote.jaxb.gen.Comment jaxbComment = new org.kie.remote.jaxb.gen.Comment();
         jaxbComment.setAddedBy(addedByUserId);
         jaxbComment.setAddedAt(convertDateToXmlGregorianCalendar(new Date()));
         jaxbComment.setText(commentText);
-        
+
         cmd.setJaxbComment(jaxbComment);
-        
+
         return executeCommand(cmd);
     }
 
@@ -515,7 +515,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public List<Comment> getAllCommentsByTaskId(long taskId) {
         GetAllCommentsCommand cmd = new GetAllCommentsCommand();
         cmd.setTaskId(taskId);
-    
+
         return executeCommand(cmd);
     }
 
@@ -523,7 +523,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
     public Comment getCommentById(long commentId) {
         GetCommentCommand cmd = new GetCommentCommand();
         cmd.setCommentId(commentId);
-        
+
         return executeCommand(cmd);
     }
 
@@ -532,7 +532,7 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         SetTaskPropertyCommand cmd = new SetTaskPropertyCommand();
         cmd.setExpirationDate(convertDateToXmlGregorianCalendar(date));
         cmd.setProperty(BigInteger.valueOf(5l));
-        
+
         executeCommand(cmd);
     }
 
@@ -568,9 +568,9 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public List<TaskSummary> getTasksAssignedAsPotentialOwner( String userId, List<String> groupIds, String language, int firstResult, int maxResults ) {
-        GetTaskAssignedAsPotentialOwnerCommand cmd 
+        GetTaskAssignedAsPotentialOwnerCommand cmd
             = new GetTaskAssignedAsPotentialOwnerCommand();
-        cmd.setUserId(userId); 
+        cmd.setUserId(userId);
         cmd.getGroupIds().addAll(groupIds);
         QueryFilter filter = new QueryFilter();
         filter.setOffset(firstResult);
@@ -582,25 +582,25 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
 
     @Override
     public List<TaskSummary> getTasksAssignedAsPotentialOwnerByProcessId( String userId, String processId ) {
-        org.kie.remote.jaxb.gen.TaskQueryWhereCommand cmd = new org.kie.remote.jaxb.gen.TaskQueryWhereCommand();
+        org.kie.remote.jaxb.gen.TaskSummaryQueryCommand cmd = new org.kie.remote.jaxb.gen.TaskSummaryQueryCommand();
         cmd.setUserId(userId);
-        
+
         QueryWhere queryWhere = new QueryWhere();
         cmd.setQueryWhere(queryWhere);
-        
+
         QueryCriteria criteria = new QueryCriteria();
         criteria.setUnion(false);
         criteria.setFirst(true);
         criteria.setListId(QueryParameterIdentifiers.POTENTIAL_OWNER_ID_LIST);
         criteria.getParameters().add(userId);
         queryWhere.getQueryCriterias().add(criteria);
-        
+
         criteria = new QueryCriteria();
         criteria.setUnion(false);
         criteria.setListId(QueryParameterIdentifiers.PROCESS_ID_LIST);
         criteria.getParameters().add(processId);
         queryWhere.getQueryCriterias().add(criteria);
-        
+
         return executeCommand(cmd);
     }
 
@@ -640,28 +640,28 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
             boolean union ) {
         GetTasksByVariousFieldsCommand cmd = new GetTasksByVariousFieldsCommand();
         cmd.setUserId(userId);
-        if( workItemIds != null ) { 
+        if( workItemIds != null ) {
             cmd.getWorkItemIds().addAll(workItemIds);
         }
-        if( taskIds != null ) { 
+        if( taskIds != null ) {
             cmd.getTaskIds().addAll(taskIds);
         }
-        if( procInstIds != null ) { 
+        if( procInstIds != null ) {
             cmd.getProcessInstanceIds().addAll(procInstIds);
         }
-        if( busAdmins != null ) { 
+        if( busAdmins != null ) {
             cmd.getBusinessAdmins().addAll(busAdmins);
         }
-        if( potOwners != null ) { 
+        if( potOwners != null ) {
             cmd.getPotentialOwners().addAll(potOwners);
         }
-        if( taskOwners != null ) { 
+        if( taskOwners != null ) {
             cmd.getTaskOwners().addAll(taskOwners);
         }
-        if( status != null ) { 
+        if( status != null ) {
             cmd.getStatuses().addAll(status);
         }
-        if( languages != null ) { 
+        if( languages != null ) {
             cmd.getLanguages().addAll(languages);
         }
         cmd.setUnion(union);
