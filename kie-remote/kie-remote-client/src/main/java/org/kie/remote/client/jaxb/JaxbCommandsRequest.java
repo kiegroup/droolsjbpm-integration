@@ -27,10 +27,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import org.kie.api.command.Command;
-import org.kie.remote.jaxb.gen.*;
+import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
 import org.kie.remote.jaxb.gen.ActivateTaskCommand;
 import org.kie.remote.jaxb.gen.AddCommentCommand;
+import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
 import org.kie.remote.jaxb.gen.AddTaskCommand;
 import org.kie.remote.jaxb.gen.AuditCommand;
 import org.kie.remote.jaxb.gen.CancelDeadlineCommand;
@@ -59,6 +60,7 @@ import org.kie.remote.jaxb.gen.GetAttachmentCommand;
 import org.kie.remote.jaxb.gen.GetCommentCommand;
 import org.kie.remote.jaxb.gen.GetContentByIdCommand;
 import org.kie.remote.jaxb.gen.GetContentByIdForUserCommand;
+import org.kie.remote.jaxb.gen.GetContentMapForUserCommand;
 import org.kie.remote.jaxb.gen.GetFactCountCommand;
 import org.kie.remote.jaxb.gen.GetGlobalCommand;
 import org.kie.remote.jaxb.gen.GetIdCommand;
@@ -93,7 +95,7 @@ import org.kie.remote.jaxb.gen.StartTaskCommand;
 import org.kie.remote.jaxb.gen.StopTaskCommand;
 import org.kie.remote.jaxb.gen.SuspendTaskCommand;
 import org.kie.remote.jaxb.gen.TaskCommand;
-import org.kie.remote.jaxb.gen.TaskQueryWhereCommand;
+import org.kie.remote.jaxb.gen.TaskSummaryQueryCommand;
 import org.kie.remote.jaxb.gen.UpdateCommand;
 import org.kie.services.shared.ServicesVersion;
 
@@ -182,7 +184,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
-            @XmlElement(name = "task-query-where", type = TaskQueryWhereCommand.class),
+            @XmlElement(name = "task-query-where", type = TaskSummaryQueryCommand.class),
 
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),

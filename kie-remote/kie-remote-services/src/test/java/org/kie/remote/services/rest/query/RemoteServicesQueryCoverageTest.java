@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.process.CorrelationKey;
-import org.kie.internal.task.query.TaskQueryBuilder;
+import org.kie.internal.task.query.TaskSummaryQueryBuilder;
 import org.kie.remote.services.rest.query.RemoteServicesQueryCommandBuilder.OrderBy;
 
 public class RemoteServicesQueryCoverageTest extends AbstractQueryResourceTest {
