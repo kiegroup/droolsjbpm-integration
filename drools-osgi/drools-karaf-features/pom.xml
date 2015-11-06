@@ -39,6 +39,9 @@
     <karaf.version.org.apache.geronimo.specs.jpa>1.1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
 
+    <!-- used by optaplanner -->
+    <karaf.version.org.apache.servicemix.bundles.reflections>0.9.10_2</karaf.version.org.apache.servicemix.bundles.reflections>
+
     <!-- used by droolsjbpm-hibernate -->
     <karaf.version.org.apache.servicemix.bundles.antlr>2.7.7_5</karaf.version.org.apache.servicemix.bundles.antlr>
     <karaf.version.org.apache.servicemix.bundles.ant>1.8.2_2</karaf.version.org.apache.servicemix.bundles.ant>
