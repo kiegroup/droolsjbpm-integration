@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -24,17 +24,22 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.RealmCallback;
 
+import org.jbpm.process.audit.jms.AsyncAuditLogProducer;
 import org.kie.remote.services.jms.RequestMessageBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the basic, default implementation of a User/Pass callback handler
- * for a JAAS login. 
+ * for a JAAS login.
  * </p>
  * This class is used by the JMS {@link RequestMessageBean} in order to retrieve
  * the subject for the user/pass info stored in a message (the Bean itself runs as
  * an anonymous user).
  */
 public class UserPassCallbackHandler implements CallbackHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserPassCallbackHandler.class);
 
     private final String[] credentials;
 
@@ -55,7 +60,7 @@ public class UserPassCallbackHandler implements CallbackHandler {
                 RealmCallback realmCallback = (RealmCallback) current;
                 realmCallback.setText(realmCallback.getDefaultText());
             } else {
-                throw new UnsupportedCallbackException(current);
+                logger.debug("Unsupported callback handler encountered: " + current.getClass().getName());
             }
         }
 
