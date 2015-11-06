@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -57,47 +57,47 @@ import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult
 abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethods {
 
     protected ResourceBase resourceBase;
-    
-    public AbstractInternalQueryHelper(ResourceBase resourceBase) { 
+
+    public AbstractInternalQueryHelper(ResourceBase resourceBase) {
        this.resourceBase = resourceBase;
     }
 
-    public void dispose() { 
+    public void dispose() {
         this.resourceBase = null;
     }
 
     /**
-     * Create the {@link RemoteServicesQueryCommandBuilder} instances used by the particular Query Helper implementation. 
+     * Create the {@link RemoteServicesQueryCommandBuilder} instances used by the particular Query Helper implementation.
      * @param identity The identity of the user doing the REST call, needed when querying Tasks
      */
     protected abstract void createAndSetQueryBuilders(String identity);
-  
+
     /**
      * Calculates and returns the offset and max results information to be used in the query.
      * @param pageInfo Pagination information ([0] is page number, [1] is page size)
      * @return a int array with the calculated offset and maximum number of results
      */
-    protected static int getOffset(int [] pageInfo) { 
+    protected static int getOffset(int [] pageInfo) {
         int offset = 0;
-        if( pageInfo[0] == 0 && pageInfo[1] > 0 ) { 
+        if( pageInfo[0] == 0 && pageInfo[1] > 0 ) {
             pageInfo[0] = 1;
-        } 
+        }
         if( pageInfo[0] > 1 && pageInfo[1] > 0 ) {
             offset = (pageInfo[0]-1)*pageInfo[1];
-        } 
+        }
         return offset;
     }
-    
+
     /**
      * <ol>
      * <li>Use the created {@link RemoteServicesQueryCommandBuilder} instances to execute the query via the backend.</li>
      * <li>Create and fill a result instance (a {@link JaxbQueryProcessInstanceResult} or {@link JaxbQueryTaskResult}) with the
      * information from the results of the queries
-     * 
-     * @param onlyRetrieveLastVarLogs Whether to 
-     * @param workFlowInstanceVariables (UNFINISHED FEATURE) whether to use the information from variable instance logs 
+     *
+     * @param onlyRetrieveLastVarLogs Whether to
+     * @param workFlowInstanceVariables (UNFINISHED FEATURE) whether to use the information from variable instance logs
      *        or from the process instance variables themselves.
-     * @param pageInfo pagination information 
+     * @param pageInfo pagination information
      * @return
      */
     protected abstract R doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo);
@@ -115,46 +115,46 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * to the actual {@link QueryData}, instead of directly translating REST query parameters to {@link QueryData} information. This
      * effectively decouples the REST query parameters from the query builders, giving us more flexibility/maintainability in the code.</li>
      * </ol>
-     *  
-     * @param identity The identity of the caller, needed when doing task queries 
+     *
+     * @param identity The identity of the caller, needed when doing task queries
      * @param queryParams The query parameters map returned by the JAX-RS logic
      * @param pageInfo The pagination information
      * @param maxResults The maximum number of results to be returned, determined by the pagination information
-     * @return A {@link JaxbQueryTaskResult} or {@link JaxbQueryProcessInstanceResult} containing a list of entities containing task 
+     * @return A {@link JaxbQueryTaskResult} or {@link JaxbQueryProcessInstanceResult} containing a list of entities containing task
      *         and process variable information
      */
     public R queryTaskOrProcInstAndAssociatedVariables( String identity, Map<String, String[]> queryParams, int[] pageInfo) {
-    
+
         // UNFINISHED FEATURE: use in-memory/process instance variables
-        // 1. meta (in-memory or history variable values?) 
+        // 1. meta (in-memory or history variable values?)
         boolean workFlowInstanceVariables = determineWorkFlowInstanceVariableUse(queryParams);
-    
+
         // UNFINISHED FEATURE: use in-memory/process instance variables
         Map<String, String> procVarValues;
         if( workFlowInstanceVariables ) {
             procVarValues = new HashMap<String, String>();
         }
-    
-        // 0. Retrieve *all* variable log values, or just the most recent? 
+
+        // 0. Retrieve *all* variable log values, or just the most recent?
         boolean onlyRetrieveLastVarLogs = true;
         String [] paramVals = queryParams.remove("all");
-        if( paramVals != null ) { 
+        if( paramVals != null ) {
            onlyRetrieveLastVarLogs = false;
         }
 
         // Hold the information for parameters like "var_myVar=myVal" or "varregex_myVar=my*"
         Map<String, String> varValueMap = new HashMap<String, String>();
         Map<String, String> varRegexMap = new HashMap<String, String>();
-    
+
         // 1. Create the query action queue, that is then processed to fill the query
         Queue<QueryAction> queryActionQueue = fillQueryActionQueueFromQueryParams(queryParams, varValueMap, varRegexMap);
-    
+
         // 2. Setup query builders
         createAndSetQueryBuilders(identity);
-    
-        // 3. process the query action queue, thus creating the {@link QueryData} instance for the query builders 
+
+        // 3. process the query action queue, thus creating the {@link QueryData} instance for the query builders
         processQueryActionQueue(queryActionQueue, varValueMap, varRegexMap, workFlowInstanceVariables);
-    
+
         // 4. execute the query via the backend, which uses the creatd {@link QueryData} instance
         return doQueryAndCreateResultObjects(onlyRetrieveLastVarLogs, workFlowInstanceVariables, pageInfo);
     }
@@ -162,14 +162,14 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
     public R queryTasksOrProcInstsAndVariables( Map<String, String[]> queryParams, int[] pageInfo) {
        return queryTaskOrProcInstAndAssociatedVariables(null, queryParams, pageInfo);
     }
-    
+
     /**
      * Figure out whether or not we're getting audit variable logs or workflow instance variables.
-     * 
+     *
      * @param queryParams The map of (REST operation) query parameters
      * @return Whether or not to use workflow instance variables
      */
-    protected boolean determineWorkFlowInstanceVariableUse(Map<String, String[]> queryParams) { 
+    protected boolean determineWorkFlowInstanceVariableUse(Map<String, String[]> queryParams) {
         Boolean workFlowInstanceVariables = null;
         if( queryParams.containsKey(metaRuntimeParams[0]) || queryParams.containsKey(metaRuntimeParamsShort[0]) ) {
             workFlowInstanceVariables = true;
@@ -192,23 +192,23 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
     }
 
     /**
-     * Parse the given query parameters to create an {@link ArrayDeque} of {@link QueryAction}.  
+     * Parse the given query parameters to create an {@link ArrayDeque} of {@link QueryAction}.
      * </p>
      * The {@link Queue} of {@link QueryAction} is then acted upon by the {{@link #processQueryActionQueue(ArrayDeque, Map, Map, boolean)}
-     * method, which applies the different query actions to build the query requested via the query builder instances. 
-     * 
+     * method, which applies the different query actions to build the query requested via the query builder instances.
+     *
      * @param queryParams a {@link Map} of the received query parameters
      * @param varValueMap a {@link Map} that maps query variable names to the passed values
      * @param varRegexMap a {@link Map} that maps query variable names to the passed regexs for the specified variable
      * @return A {@link Queue} of {@link QueryAction} instances
      */
-    protected Queue<QueryAction> fillQueryActionQueueFromQueryParams( 
+    protected Queue<QueryAction> fillQueryActionQueueFromQueryParams(
             Map<String, String[]> queryParams,
-            Map<String, String> varValueMap, 
-            Map<String, String> varRegexMap) { 
-        
+            Map<String, String> varValueMap,
+            Map<String, String> varRegexMap) {
+
         ArrayDeque<QueryAction> queryActionQueue = new ArrayDeque<QueryAction>();
-        
+
         // Go through all parameters and build a queue of {@link QueryAction) instances to be executed in the following loop
         for( Entry<String, String[]> entry : queryParams.entrySet() ) {
             String orig_param = entry.getKey();
@@ -218,9 +218,9 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
             String[] paramParts = orig_param.split("_");
             String param = paramParts[0];
             if( paramParts.length >= 2 ) {
-               
-                if( varInstQueryParams[2].equals(paramParts[0]) 
-                    || varInstQueryParams[3].equals(paramParts[0]) 
+
+                if( varInstQueryParams[2].equals(paramParts[0])
+                    || varInstQueryParams[3].equals(paramParts[0])
                     || varInstQueryParamsShort[3].equals(paramParts[0]) ) {
                     // check that variable parameter has only been submitted once as query parameter
                     String[] values = queryParams.get(orig_param);
@@ -242,8 +242,8 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                     String [] data = { varName };
                     QueryAction queryAction = new QueryAction(orig_param, queryActionInt, data);
                     queryActionQueue.add(queryAction);
-                    
-                    // IF: 
+
+                    // IF:
                     // - the query parameter starts with 'var', then it's an 'equals' operation ("var_partid=23a")
                     // - the query parameter starts with 'varregex' or 'vr', then it's an regex operation ( "vr_partid=23*" )
                     if( varInstQueryParams[2].equals(paramParts[0]) ) {
@@ -286,16 +286,16 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
 
         return queryActionQueue;
     }
-  
+
     /**
-     * If the {@link QueryAction} instance is a regex instance, this prepares the query builder instance 
-     * to process the next parameter is as a regular expression, a.k.a. regex. The method must be called 
-     * a second time to "de-activate" the regex interpretation by the query builder instance. 
-     * 
+     * If the {@link QueryAction} instance is a regex instance, this prepares the query builder instance
+     * to process the next parameter is as a regular expression, a.k.a. regex. The method must be called
+     * a second time to "de-activate" the regex interpretation by the query builder instance.
+     *
      * @param queryAction The {@link QueryAction} instance with the actual parameter
      * @param on Whether regular expressions should be turned on or off for the query builders
      */
-    private void setRegexOnOff( QueryAction queryAction, boolean on ) { 
+    private void setRegexOnOff( QueryAction queryAction, boolean on ) {
         if( queryAction.regex ) {
             if( on ) {
                 for( RemoteServicesQueryCommandBuilder queryCmdBuilder : getQueryBuilders() ) {
@@ -311,56 +311,56 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
     }
 
     private static Set<String> VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS = new HashSet<String>();
-    static { 
+    static {
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(VARIABLE_ID_LIST);
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(VARIABLE_INSTANCE_ID_LIST);
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(VALUE_LIST);
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(OLD_VALUE_LIST);
        VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.add(VAR_VALUE_ID_LIST);
     }
-    
-    protected boolean variableCriteriaInQuery(List<QueryCriteria> criteriaList) { 
-        for( QueryCriteria criteria : criteriaList ) { 
-            if( criteria.isUnion() ) { 
+
+    protected boolean variableCriteriaInQuery(List<QueryCriteria> criteriaList) {
+        for( QueryCriteria criteria : criteriaList ) {
+            if( criteria.isUnion() ) {
                 return false;
             }
-            if( criteria.isGroupCriteria() ) { 
+            if( criteria.isGroupCriteria() ) {
                if( variableCriteriaInQuery(criteria.getCriteria()) )  {
                    return true;
                }
                continue;
             }
             if( VAR_QUERY_SPECIFIC_PARAMETER_LIST_IDS.contains(criteria.getListId()) ) {
-                 return true; 
+                 return true;
            }
         }
         return false;
      }
-    
+
     /**
-     * This is the main core of logic for the query helper classes. 
+     * This is the main core of logic for the query helper classes.
      * </p>
-     * Initially, in methods called before this method, we converted the (REST operation) query methods to a {@link Deque} 
-     * of {@link QueryAction} instances. 
+     * Initially, in methods called before this method, we converted the (REST operation) query methods to a {@link Deque}
+     * of {@link QueryAction} instances.
      * </p>
      * We're using a {@link Queue} instead of a {@link List} because I may eventually want to add new {@link QueryAction} elements
-     * to the queue during processing: once I'm sure that I won't be doing that, I'll move this back to a {@link List} which is 
+     * to the queue during processing: once I'm sure that I won't be doing that, I'll move this back to a {@link List} which is
      * more efficient and performant.
      * </p>
-     * In this method, we go through each element (in the order that it was added) and translate the REST query parameter to a 
-     * action on the query builder(s) so that the requested query can be built an executed. 
-     * 
+     * In this method, we go through each element (in the order that it was added) and translate the REST query parameter to a
+     * action on the query builder(s) so that the requested query can be built an executed.
+     *
      * @param queryActionQueue An ordered collection of {@link QueryAction} instances
      * @param varValueMap A {@link Map} mapping the variable name to the variable's value
      * @param varRegexMap A {@link Map} mapping the variable name to a regex for the variable's value
      * @param workFlowInstanceVariables Whether or not variable values should be retrieved from the audit logs or the process instance
      */
-    protected void processQueryActionQueue( 
+    protected void processQueryActionQueue(
             Queue<QueryAction> queryActionQueue,
             Map<String, String> varValueMap,
             Map<String, String> varRegexMap,
             boolean workFlowInstanceVariables
-            ) { 
+            ) {
         int[] intData;
         long[] longData;
         Date[] dateData;
@@ -401,7 +401,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 deploymentId(data);
                 setRegexOnOff(queryAction, false);
                 break;
-    
+
             // task
             case 3: // task id
                 assert "taskid".equals(actionParamNameMap.get(action)): action + " : taskid";
@@ -412,10 +412,10 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                                 + "' parameter is accepted");
                     }
                     if( queryAction.min ) {
-                        taskIdMax(longData[0]);
+                        taskIdMin(longData[0]);
                         queryAction.min = false;
                     } else if( queryAction.max ) {
-                        taskIdMin(longData[0]);
+                        taskIdMax(longData[0]);
                         queryAction.max = false;
                     }
                 } else {
@@ -457,7 +457,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 Status[] statuses = getTaskStatuses(data);
                 taskStatus(statuses);
                 break;
-    
+
             // process instance
             case 10: // process instance status
                 assert "processinstancestatus".equals(actionParamNameMap.get(action)): action + " : processinstancestatus";
@@ -508,7 +508,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                     endDate(dateData);
                 }
                 break;
-    
+
             // variable instance
             case 14: // var id
                 assert "varid".equals(actionParamNameMap.get(action)): action + " : varid";
@@ -542,7 +542,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 variableValue(data[0], varRegexMap.get(data[0]));
                 setRegexOnOff(queryAction, false);
                 break;
-    
+
             default:
                 throw KieRemoteRestOperationException.internalServerError("Please contact the developers: state [" + action + "] should not be possible.");
             }
@@ -551,5 +551,5 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
             }
         }
     }
-   
+
 }
