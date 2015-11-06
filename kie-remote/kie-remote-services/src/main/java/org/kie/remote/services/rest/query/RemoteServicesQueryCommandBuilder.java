@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -51,33 +51,33 @@ import org.kie.internal.query.data.QueryData;
 
 /**
  * This is the {@link AbstractQueryBuilderImpl} implementation used by the REST query operations
- * to create the queries (the {@link QueryData} instances) needed. 
+ * to create the queries (the {@link QueryData} instances) needed.
  */
-public class RemoteServicesQueryCommandBuilder 
-    extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder> 
+public class RemoteServicesQueryCommandBuilder
+    extends AbstractQueryBuilderImpl<RemoteServicesQueryCommandBuilder>
     implements ExtendedParametrizedQueryBuilder<RemoteServicesQueryCommandBuilder, VariableInstanceLog>{
 
     private final String taskUserId;
     private RemoteServicesQueryJPAService jpaService = null;
-    
+
     public RemoteServicesQueryCommandBuilder() {
         this.taskUserId = null;
         intersect();
     }
-    
-    public RemoteServicesQueryCommandBuilder(String userId) { 
+
+    public RemoteServicesQueryCommandBuilder(String userId) {
         this.taskUserId = userId;
         intersect();
     }
 
-    public RemoteServicesQueryCommandBuilder(String userId, RemoteServicesQueryJPAService jpaService) { 
+    public RemoteServicesQueryCommandBuilder(String userId, RemoteServicesQueryJPAService jpaService) {
         this.taskUserId = userId;
         this.jpaService = jpaService;
         intersect();
     }
-    
+
     // process related criteria
-   
+
     /**
      * Add one or more deployment ids as a criteria to the query
      * @param deploymentId
@@ -137,13 +137,13 @@ public class RemoteServicesQueryCommandBuilder
         addRangeParameter(PROCESS_INSTANCE_ID_LIST, "process instance id range, end", processInstanceId, false);
         return this;
     }
-    
+
     /**
      * Specify one more statuses (in the form of an int) as criteria.
      * @param status one or more int statuses
      * @return The current instance of this query builder
      */
-    public RemoteServicesQueryCommandBuilder processInstanceStatus(int... status) { 
+    public RemoteServicesQueryCommandBuilder processInstanceStatus(int... status) {
         addIntParameter(PROCESS_INSTANCE_STATUS_LIST, "process instance status", status);
         return this;
     }
@@ -179,7 +179,7 @@ public class RemoteServicesQueryCommandBuilder
     }
 
     // task related criteria
-    
+
     public RemoteServicesQueryCommandBuilder workItemId( long... workItemId ) {
         addLongParameter(WORK_ITEM_ID_LIST, "work item id", workItemId);
         return this;
@@ -204,17 +204,17 @@ public class RemoteServicesQueryCommandBuilder
         addRangeParameter(TASK_ID_LIST, "task instance id range, start", taskId, true);
         return this;
     }
-    
+
     /**
      * Add the end of a range of task ids as a criteria to the query
      * @param taskId the upper end of the range, inclusive
      * @return the current instance
      */
     public RemoteServicesQueryCommandBuilder taskIdMax( long taskId ) {
-        addRangeParameter(TASK_ID_LIST, "task instance id range, start", taskId, false);
+        addRangeParameter(TASK_ID_LIST, "task instance id range, end", taskId, false);
         return this;
     }
-    
+
     /**
      * Add one or more statuses as a criteria to the query
      * @param status
@@ -225,7 +225,7 @@ public class RemoteServicesQueryCommandBuilder
         return this;
     }
 
-    
+
 
     /**
      * Add one or more initiator ids as a criteria to the query
@@ -246,7 +246,7 @@ public class RemoteServicesQueryCommandBuilder
         addObjectParameter(STAKEHOLDER_ID_LIST, "stakeholder", stakeHolderId);
         return this;
     }
-    
+
     /**
      * Add one or more potential owner ids as a criteria to the query
      * @param stakeHolderId
@@ -281,9 +281,9 @@ public class RemoteServicesQueryCommandBuilder
         addObjectParameter(VARIABLE_ID_LIST, "variable id", variableId );
         return this;
     }
-   
+
     // variable related critera
-    
+
     public RemoteServicesQueryCommandBuilder value( String... value ) {
         addObjectParameter(VALUE_LIST, "variable value", value );
         return this;
@@ -293,13 +293,13 @@ public class RemoteServicesQueryCommandBuilder
         addObjectParameter(OLD_VALUE_LIST, "old variable value", oldVvalue );
         return this;
     }
-    
+
     public RemoteServicesQueryCommandBuilder variableValue(String variableId, String value) {
         String varValStr = variableId.length() + VAR_VAL_SEPARATOR + variableId + VAR_VAL_SEPARATOR + value;
         addObjectParameter(VAR_VALUE_ID_LIST, "value for variable", varValStr);
         return this;
     }
-    
+
     public RemoteServicesQueryCommandBuilder last() {
         addObjectParameter(LAST_VARIABLE_LIST, "last variable value", Boolean.TRUE.booleanValue() );
         return this;
@@ -310,36 +310,36 @@ public class RemoteServicesQueryCommandBuilder
         this.queryWhere.setAscending(listId);
         return this;
     }
-   
+
     public RemoteServicesQueryCommandBuilder descending( RemoteServicesQueryCommandBuilder.OrderBy field ) {
         String listId = convertOrderByToListId(field);
         this.queryWhere.setDescending(listId);
         return this;
     }
-   
-    private String convertOrderByToListId(RemoteServicesQueryCommandBuilder.OrderBy field) { 
+
+    private String convertOrderByToListId(RemoteServicesQueryCommandBuilder.OrderBy field) {
         String listId;
-        switch( field ) { 
+        switch( field ) {
         case processInstanceId:
             listId = QueryParameterIdentifiers.PROCESS_INSTANCE_ID_LIST;
             break;
         default:
             throw new IllegalArgumentException("Unknown 'order-by' field: " + field.toString() );
-        } 
+        }
         return listId;
     }
-   
-    public static enum OrderBy { 
+
+    public static enum OrderBy {
         // order by id
-        processInstanceId, 
-    } 
-    
-    public String getTaskUserId() { 
+        processInstanceId,
+    }
+
+    public String getTaskUserId() {
         return taskUserId;
     }
-    
+
     @Override
-    public RemoteServicesQueryCommandBuilder clear() { 
+    public RemoteServicesQueryCommandBuilder clear() {
       super.clear();
       intersect();
       return this;
@@ -348,12 +348,12 @@ public class RemoteServicesQueryCommandBuilder
     @Override
     public ParametrizedQuery<VariableInstanceLog> build() {
         return new ParametrizedQuery<VariableInstanceLog>() {
-            private QueryWhere queryWhere = new QueryWhere(getQueryWhere()); 
+            private QueryWhere queryWhere = new QueryWhere(getQueryWhere());
             @Override
             public List<VariableInstanceLog> getResultList() {
                 return jpaService.doQuery(queryWhere, VariableInstanceLog.class);
             }
         };
     }
-    
+
 }
