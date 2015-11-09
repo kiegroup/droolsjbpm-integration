@@ -375,8 +375,8 @@ public class RemoteCommandObjectTest {
            }
        }
 
-        RemoteConfiguration config = new RemoteConfiguration("adsf", new URL("http://localhost:80808"), "user", "pwd" );
-
+        RemoteConfiguration config = new RemoteConfiguration("adsf", "user", "pwd" );
+        config.setServerBaseRestUrl(new URL("http://localhost:80808"));
 
         List<Object> objList = new ArrayList<Object>();
         String fieldName = "sendObjectParameterCommandClasses";
@@ -456,7 +456,7 @@ public class RemoteCommandObjectTest {
         objectList = new ArrayList<Object>();
         taskServiceClient.addPossiblyNullObject(inputObjectValueMap, objectList);
         assertEquals(0, objectList.size());
-        
+
         // Verify recursive list does not cause stack overflow
         inputObject = new Object();
         inputObjectList = new ArrayList<Object>();
