@@ -69,7 +69,6 @@ public class JobResultManager {
     }
 
     private Map<String, JaxbDeploymentJobResult> jobs = null;
-    private Map<String, String> deploymentIdMostRecentJobIdMap = null;
 
     private int maxCacheSize = 10000;
 
@@ -87,8 +86,6 @@ public class JobResultManager {
         }
         Cache<JaxbDeploymentJobResult> cache = new Cache<JaxbDeploymentJobResult>(maxCacheSize);
         jobs = Collections.synchronizedMap(cache);
-        Cache<String> idCache = new Cache<String>(maxCacheSize);
-        deploymentIdMostRecentJobIdMap = Collections.synchronizedMap(idCache);
     }
 
     /**
@@ -100,21 +97,6 @@ public class JobResultManager {
     public void putJob(String jobId, JaxbDeploymentJobResult job, JobType jobType) {
         logger.debug( "Adding job [{}] to cache");
         jobs.put(jobId, job);
-       
-        String deploymentId = job.getDeploymentUnit().getIdentifier();
-        logger.debug( "Adding job id [{}] to \"most recent job\" cache");
-        String oldJobId = deploymentIdMostRecentJobIdMap.put(deploymentId, jobId);
-        if( oldJobId != null ) { 
-            JaxbDeploymentJobResult oldJobResult = jobs.get(oldJobId);
-            if( ! JaxbDeploymentStatus.DEPLOYED.equals(oldJobResult.getDeploymentUnit().getStatus()) 
-                    && ! JaxbDeploymentStatus.UNDEPLOYED.equals(oldJobResult.getDeploymentUnit().getStatus()) )
-            logger.info( "New {} job [{}] for '{}' requested while old job [{}] has status {}",
-                    jobType.toString().toLowerCase(), 
-                    jobId, 
-                    oldJobResult.getDeploymentUnit().getIdentifier(),
-                    oldJobId, 
-                    oldJobResult.getDeploymentUnit().getStatus());
-        }
     }
 
     /**
@@ -148,20 +130,6 @@ public class JobResultManager {
         }
 
         return job;
-    }
-   
-    /**
-     * Get the most recent job requested for a given deployment
-     * @param deploymentId The id of the deployment
-     * @return The {@link JaxbDeploymentJobResult} with the job information
-     */
-    public JaxbDeploymentJobResult getMostRecentJob(String deploymentId) {
-        logger.debug( "Getting most recent job for '{}'", deploymentId);
-        String jobId = deploymentIdMostRecentJobIdMap.get(deploymentId);
-        if( jobId != null ) { 
-            return getJob(jobId);
-        }
-        return null;
     }
 
     protected Object getItemFromRequestInput(String itemName, RequestInfo requestInfo) {
