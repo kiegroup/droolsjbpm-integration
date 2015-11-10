@@ -28,6 +28,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.kie.api.executor.CommandContext;
 import org.kie.api.executor.ExecutionResults;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.executor.RequestInfo;
@@ -68,7 +69,6 @@ public class JobResultManager {
     }
 
     private Map<String, JaxbDeploymentJobResult> jobs = null;
-    private Map<String, String> deploymentIdMostRecentJobIdMap = null;
 
     private int maxCacheSize = 10000;
 
@@ -86,8 +86,6 @@ public class JobResultManager {
         }
         Cache<JaxbDeploymentJobResult> cache = new Cache<JaxbDeploymentJobResult>(maxCacheSize);
         jobs = Collections.synchronizedMap(cache);
-        Cache<String> idCache = new Cache<String>(maxCacheSize);
-        deploymentIdMostRecentJobIdMap = Collections.synchronizedMap(idCache);
     }
 
     /**
@@ -99,21 +97,6 @@ public class JobResultManager {
     public void putJob(String jobId, JaxbDeploymentJobResult job, JobType jobType) {
         logger.debug( "Adding job [{}] to cache");
         jobs.put(jobId, job);
-       
-        String deploymentId = job.getDeploymentUnit().getIdentifier();
-        logger.debug( "Adding job id [{}] to \"most recent job\" cache");
-        String oldJobId = deploymentIdMostRecentJobIdMap.put(deploymentId, jobId);
-        if( oldJobId != null ) { 
-            JaxbDeploymentJobResult oldJobResult = jobs.get(oldJobId);
-            if( ! JaxbDeploymentStatus.DEPLOYED.equals(oldJobResult.getDeploymentUnit().getStatus()) 
-                    && ! JaxbDeploymentStatus.UNDEPLOYED.equals(oldJobResult.getDeploymentUnit().getStatus()) )
-            logger.info( "New {} job [{}] for '{}' requested while old job [{}] has status {}",
-                    jobType.toString().toLowerCase(), 
-                    jobId, 
-                    oldJobResult.getDeploymentUnit().getIdentifier(),
-                    oldJobId, 
-                    oldJobResult.getDeploymentUnit().getStatus());
-        }
     }
 
     /**
@@ -134,27 +117,13 @@ public class JobResultManager {
 
             if (jobsFound != null && !jobsFound.isEmpty()) {
                 RequestInfo executorJob = jobsFound.get(0);
-                ExecutionResults execResults = null;
-                byte[] responseData = executorJob.getResponseData();
-                if (responseData != null) {
-                    ObjectInputStream in = null;
-                    try {
-                        in = new ObjectInputStream(new ByteArrayInputStream(responseData));
-                        execResults = (ExecutionResults) in.readObject();
-                    } catch (Exception e) {
-                        logger.warn("Exception while deserializing context data of job with id {}", jobId, e);
-                    } finally {
-                        if (in != null) {
-                            try {
-                                in.close();
-                            } catch (IOException e) {
-
-                            }
-                        }
-                    }
+                JaxbDeploymentJobResult jobFromRequest = (JaxbDeploymentJobResult) getItemFromRequestOutput("JobResult", executorJob);
+                if (jobFromRequest == null) {
+                    jobFromRequest = (JaxbDeploymentJobResult) getItemFromRequestInput("jobResult", executorJob);
                 }
-                if (execResults != null && execResults.getData("JobResult") != null) {
-                    job = (JaxbDeploymentJobResult) execResults.getData("JobResult");
+
+                if (jobFromRequest != null) {
+                    job = jobFromRequest;
                     jobs.put(jobId, job);
                 }
             }
@@ -162,19 +131,60 @@ public class JobResultManager {
 
         return job;
     }
-   
-    /**
-     * Get the most recent job requested for a given deployment
-     * @param deploymentId The id of the deployment
-     * @return The {@link JaxbDeploymentJobResult} with the job information
-     */
-    public JaxbDeploymentJobResult getMostRecentJob(String deploymentId) {
-        logger.debug( "Getting most recent job for '{}'", deploymentId);
-        String jobId = deploymentIdMostRecentJobIdMap.get(deploymentId);
-        if( jobId != null ) { 
-            return getJob(jobId);
+
+    protected Object getItemFromRequestInput(String itemName, RequestInfo requestInfo) {
+        CommandContext ctx = null;
+        byte[] requestData = requestInfo.getRequestData();
+        if (requestData != null) {
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new ByteArrayInputStream(requestData));
+                ctx = (CommandContext) in.readObject();
+            } catch (Exception e) {
+                logger.debug("Exception while deserializing context data of job with id {}", requestInfo.getId(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
         }
+
+        if (ctx != null && ctx.getData(itemName) != null) {
+            return ctx.getData(itemName);
+        }
+
         return null;
     }
 
+    protected Object getItemFromRequestOutput(String itemName, RequestInfo requestInfo) {
+        ExecutionResults execResults = null;
+        byte[] responseData = requestInfo.getResponseData();
+        if (responseData != null) {
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new ByteArrayInputStream(responseData));
+                execResults = (ExecutionResults) in.readObject();
+            } catch (Exception e) {
+                logger.debug("Exception while deserializing context data of job with id {}", requestInfo.getId(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        }
+
+        if (execResults != null && execResults.getData(itemName) != null) {
+            return execResults.getData(itemName);
+        }
+
+        return null;
+    }
 }

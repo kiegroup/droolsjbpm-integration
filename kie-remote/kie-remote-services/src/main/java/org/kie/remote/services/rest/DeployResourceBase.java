@@ -184,15 +184,7 @@ public class DeployResourceBase extends ResourceBase {
                 return jaxbDepUnit;
             } 
         }
-        
-        // Most recent job? 
-        JaxbDeploymentJobResult jobResult = jobResultMgr.getMostRecentJob(deploymentId);
-        if( jobResult != null ) { 
-            jaxbDepUnit = jobResult.getDeploymentUnit();
-            return jaxbDepUnit;
-        }
-        
-        // Nonexistent? 
+
         String [] gavKK = deploymentId.split(":");
         switch( gavKK.length ) { 
         case 3:
@@ -207,7 +199,7 @@ public class DeployResourceBase extends ResourceBase {
         default:
             throw KieRemoteRestOperationException.notFound("Invalid deployment id: " + deploymentId);
         }
-        jaxbDepUnit.setStatus(JaxbDeploymentStatus.NONEXISTENT);
+        jaxbDepUnit.setStatus(JaxbDeploymentStatus.UNDEPLOYED);
         return jaxbDepUnit;
     }
 
