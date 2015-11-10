@@ -45,6 +45,7 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.remote.services.RandomUtil;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.QueryResourceImpl;
@@ -451,7 +452,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         String initValue = UUID.randomUUID().toString();
         processParams.put("inputStr", "proc-" + numTestProcesses + "-" + initValue );
         processParams.put("otherStr", "proc-" + numTestProcesses + "-" + initValue );
-        processParams.put("secondStr", numTestProcesses + "-second-" + random.nextInt(Integer.MAX_VALUE));
+        processParams.put("secondStr", numTestProcesses + "-second-" + RandomUtil.nextInt(Integer.MAX_VALUE));
         org.kie.api.runtime.process.ProcessInstance processInstance = ksession.startProcess(PROCESS_STRING_VAR_ID, processParams);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
@@ -468,6 +469,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         List<TaskSummary> taskSumList = resp.getResult();
         assertNotNull( "Null task summary list", taskSumList );
         assertFalse( "Empty task summary list", taskSumList.isEmpty() );
+
         Set<Long> uniqueTaskIds = new HashSet<Long>();
         for( TaskSummary taskSum : taskSumList ) {
             assertEquals( "Incorrect process instance id on task summary", procInstId, taskSum.getProcessInstanceId().longValue() );

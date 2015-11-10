@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 import org.kie.api.command.Command;
 import org.kie.remote.jaxb.gen.*;
@@ -100,6 +101,7 @@ import org.kie.services.shared.ServicesVersion;
 @XmlRootElement(name = "command-request")
 @XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("rawtypes")
+@XmlSeeAlso({org.kie.remote.jaxb.gen.List.class})
 public class JaxbCommandsRequest {
 
     @XmlElement(name = "deployment-id")
