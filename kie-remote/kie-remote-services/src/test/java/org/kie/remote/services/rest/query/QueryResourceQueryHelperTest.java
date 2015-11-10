@@ -36,6 +36,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
+import org.kie.remote.services.RandomUtil;
 import org.kie.remote.services.cdi.ProcessRequestBean;
 import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;

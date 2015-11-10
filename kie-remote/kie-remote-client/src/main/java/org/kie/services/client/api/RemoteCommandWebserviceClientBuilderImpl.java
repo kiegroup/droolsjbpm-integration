@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -55,33 +55,33 @@ import org.kie.services.shared.ServicesVersion;
 /**
  * This is the internal implementation of the {@link RemoteWebserviceClientBuilder} class.
  * </p>
- * It takes care of implementing the methods specified as well as managing the 
+ * It takes care of implementing the methods specified as well as managing the
  * state of the internal {@link RemoteConfiguration} instance.
  */
 class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBuilderImpl<CommandWebService> {
 
     private final static String commandServiceNamespace = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
     private final static QName commandServiceQName = new QName(commandServiceNamespace, "CommandServiceBasicAuth");
-  
+
     @Override
     public CommandWebService buildBasicAuthClient() {
         checkAndFinalizeConfig();
-        
+
         // wsdl authentication
         KieRemoteWsAuthenticator auth = new KieRemoteWsAuthenticator();
-        auth.setUserAndPassword(config.getUserName(), config.getPassword()); 
-   
+        auth.setUserAndPassword(config.getUserName(), config.getPassword());
+
         String wsdlLocationRelativePath = config.getWsdlLocationRelativePath();
 
         URL wsdlUrl;
-        try { 
+        try {
             wsdlUrl = new URL(config.getServerBaseUrl(), wsdlLocationRelativePath);
-        } catch( MalformedURLException murle ) { 
+        } catch( MalformedURLException murle ) {
             throw new IllegalStateException("WSDL URL is not correct: [" + config.getServerBaseUrl().toExternalForm() + wsdlLocationRelativePath + "]", murle);
         }
-  
+
         wsdlUrl = verifyURLWithRedirect(wsdlUrl);
-        
+
         // initial client proxy setup
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(CommandWebService.class);
@@ -94,13 +94,13 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
         allClasses.add(JaxbCommandsResponse.class);
         allClasses.add(Execute.class);
         allClasses.add(ExecuteResponse.class);
-        
-        // JAXB: extra classes 
+
+        // JAXB: extra classes
         Set<Class<?>> extraClasses = config.getExtraJaxbClasses();
-        if( extraClasses != null && ! extraClasses.isEmpty() ) { 
+        if( extraClasses != null && ! extraClasses.isEmpty() ) {
            allClasses.addAll(extraClasses);
-        } 
-       
+        }
+
         // JAXB: setup
         JAXBDataBinding jaxbDataBinding;
         try {
@@ -109,53 +109,53 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
             throw new RemoteApiException("Unable to initialize JAXB context for webservice client", jaxbe);
         }
         factory.getClientFactoryBean().setDataBinding(jaxbDataBinding);
-       
+
         // setup auth
         // - for webservice calls
         String pwd = config.getPassword();
         String user = config.getUserName();
         factory.setUsername(user);
         factory.setPassword(pwd);
-       
+
         CommandWebService commandService = (CommandWebService) factory.create();
         Client proxyClient = ClientProxy.getClient(commandService);
-        HTTPConduit conduit = (HTTPConduit) proxyClient.getConduit(); 
+        HTTPConduit conduit = (HTTPConduit) proxyClient.getConduit();
 
         // setup timeout
         HTTPClientPolicy httpClientPolicy = conduit.getClient();
         httpClientPolicy.setConnectionTimeout(config.getTimeout());
         httpClientPolicy.setReceiveTimeout(config.getTimeout());
         httpClientPolicy.setAutoRedirect(config.getHttpRedirect());
-        
+
         // if present, add deployment id for JAXB context
         String deploymentId = config.getDeploymentId();
-        if( ! emptyDeploymentId(deploymentId) ) { 
+        if( ! emptyDeploymentId(deploymentId) ) {
             Map<String, List<String>> headers = new HashMap<String, List<String>>(1);
             String [] depIdHeader = { deploymentId };
             headers.put(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, Arrays.asList(depIdHeader));
             proxyClient.getRequestContext().put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
         }
-       
+
         return commandService;
     }
 
     /**
-     * Verify that the given URL points to a valid URL by connecting to the URL and checking the response status. 
-     * </p> 
-     * If HTTP redirect has been enabled, return the 
-     * 
+     * Verify that the given URL points to a valid URL by connecting to the URL and checking the response status.
+     * </p>
+     * If HTTP redirect has been enabled, return the
+     *
      * @param wsdlUrl
      * @return
      */
-    private URL verifyURLWithRedirect(URL wsdlUrl) { 
+    private URL verifyURLWithRedirect(URL wsdlUrl) {
         int redirectTries = 0;
         URL newWsdlUrl = wsdlUrl;
         int connStatus = -1;
-        do { 
+        do {
             wsdlUrl = newWsdlUrl;
 
             HttpURLConnection conn;
-            try { 
+            try {
                 conn = (HttpURLConnection) wsdlUrl.openConnection();
                 conn.setInstanceFollowRedirects(false);
                 String encoded = Base64Utility.encode((config.getUserName() + ":" + config.getPassword()).getBytes("UTF-8"));
@@ -165,18 +165,18 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
                 throw new IllegalStateException("Could not verify WSDL URL: [" + wsdlUrl.toExternalForm() + "]", e);
             }
 
-            switch( connStatus ) { 
+            switch( connStatus ) {
             case HttpURLConnection.HTTP_OK:
                 break;
             case HttpURLConnection.HTTP_MOVED_TEMP:
             case HttpURLConnection.HTTP_MOVED_PERM:
             case HttpURLConnection.HTTP_SEE_OTHER:
                 String newWsdlLoc = conn.getHeaderField(HttpHeaders.LOCATION);
-                if( config.getHttpRedirect() ) { 
-                    if( newWsdlLoc.startsWith("/") ) { 
+                if( config.getHttpRedirect() ) {
+                    if( newWsdlLoc.startsWith("/") ) {
                         URL baseUrl = config.getServerBaseUrl();
                         newWsdlLoc = baseUrl.getProtocol() + "://" + baseUrl.getAuthority() + newWsdlLoc;
-                    } else if( ! newWsdlLoc.startsWith("http") ) { 
+                    } else if( ! newWsdlLoc.startsWith("http") ) {
                         throw new RemoteCommunicationException("Could not parse redirect URL: [" + newWsdlLoc + "]");
                     }
                     try {
@@ -184,28 +184,28 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
                     } catch( MalformedURLException murle ) {
                         throw new RemoteCommunicationException("Redirect URL returned by server is invalid: [" + newWsdlLoc + "]", murle);
                     }
-                } else { 
+                } else {
                     throw new RemoteCommunicationException("HTTP Redirect is not set but server redirected client to [" + newWsdlLoc + "]" );
                 }
                 break;
             default:
                 throw new RemoteCommunicationException("Status " + connStatus + " received when verifying WSDL URL: [" + wsdlUrl.toExternalForm() + "]");
-            } 
+            }
             ++redirectTries;
         } while( redirectTries < 3 && ! wsdlUrl.equals(newWsdlUrl) && connStatus != 200 );
 
-        if( connStatus != 200 ) { 
-            if( newWsdlUrl.equals(wsdlUrl) && connStatus >= 300 && connStatus < 400 ) { 
+        if( connStatus != 200 ) {
+            if( newWsdlUrl.equals(wsdlUrl) && connStatus >= 300 && connStatus < 400 ) {
                 throw new RemoteCommunicationException("Unable to verify WSDL URL: request returned a redirect to the same URL [" + newWsdlUrl + "]");
-            } else { 
+            } else {
                 throw new RemoteCommunicationException("Unable to verify WSDL URL: request returned status " + connStatus + " after " + redirectTries + " redirects [" + newWsdlUrl + "]");
             }
         }
-        
+
         if( ! wsdlUrl.equals(newWsdlUrl) ) {
             throw new RemoteCommunicationException("Server redirected (WSDL) request 3 times in a row. The last request URL was [" + newWsdlUrl + "]");
         }
-        
+
         return wsdlUrl;
     }
 }
