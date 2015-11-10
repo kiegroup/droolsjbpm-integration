@@ -186,11 +186,11 @@ public class DeployResourceBase extends ResourceBase {
         }
         
         // Most recent job? 
-        JaxbDeploymentJobResult jobResult = jobResultMgr.getMostRecentJob(deploymentId);
-        if( jobResult != null ) { 
-            jaxbDepUnit = jobResult.getDeploymentUnit();
-            return jaxbDepUnit;
-        }
+//        JaxbDeploymentJobResult jobResult = jobResultMgr.getMostRecentJob(deploymentId);
+//        if( jobResult != null ) {
+//            jaxbDepUnit = jobResult.getDeploymentUnit();
+//            return jaxbDepUnit;
+//        }
         
         // Nonexistent? 
         String [] gavKK = deploymentId.split(":");

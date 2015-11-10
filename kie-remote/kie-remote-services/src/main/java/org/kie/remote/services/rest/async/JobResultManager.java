@@ -28,6 +28,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.kie.api.executor.CommandContext;
 import org.kie.api.executor.ExecutionResults;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.executor.RequestInfo;
@@ -134,27 +135,13 @@ public class JobResultManager {
 
             if (jobsFound != null && !jobsFound.isEmpty()) {
                 RequestInfo executorJob = jobsFound.get(0);
-                ExecutionResults execResults = null;
-                byte[] responseData = executorJob.getResponseData();
-                if (responseData != null) {
-                    ObjectInputStream in = null;
-                    try {
-                        in = new ObjectInputStream(new ByteArrayInputStream(responseData));
-                        execResults = (ExecutionResults) in.readObject();
-                    } catch (Exception e) {
-                        logger.warn("Exception while deserializing context data of job with id {}", jobId, e);
-                    } finally {
-                        if (in != null) {
-                            try {
-                                in.close();
-                            } catch (IOException e) {
-
-                            }
-                        }
-                    }
+                JaxbDeploymentJobResult jobFromRequest = (JaxbDeploymentJobResult) getItemFromRequestOutput("JobResult", executorJob);
+                if (jobFromRequest == null) {
+                    jobFromRequest = (JaxbDeploymentJobResult) getItemFromRequestInput("jobResult", executorJob);
                 }
-                if (execResults != null && execResults.getData("JobResult") != null) {
-                    job = (JaxbDeploymentJobResult) execResults.getData("JobResult");
+
+                if (jobFromRequest != null) {
+                    job = jobFromRequest;
                     jobs.put(jobId, job);
                 }
             }
@@ -177,4 +164,59 @@ public class JobResultManager {
         return null;
     }
 
+    protected Object getItemFromRequestInput(String itemName, RequestInfo requestInfo) {
+        CommandContext ctx = null;
+        byte[] requestData = requestInfo.getRequestData();
+        if (requestData != null) {
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new ByteArrayInputStream(requestData));
+                ctx = (CommandContext) in.readObject();
+            } catch (Exception e) {
+                logger.debug("Exception while deserializing context data of job with id {}", requestInfo.getId(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        }
+
+        if (ctx != null && ctx.getData(itemName) != null) {
+            return ctx.getData(itemName);
+        }
+
+        return null;
+    }
+
+    protected Object getItemFromRequestOutput(String itemName, RequestInfo requestInfo) {
+        ExecutionResults execResults = null;
+        byte[] responseData = requestInfo.getResponseData();
+        if (responseData != null) {
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new ByteArrayInputStream(responseData));
+                execResults = (ExecutionResults) in.readObject();
+            } catch (Exception e) {
+                logger.debug("Exception while deserializing context data of job with id {}", requestInfo.getId(), e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+
+                    }
+                }
+            }
+        }
+
+        if (execResults != null && execResults.getData(itemName) != null) {
+            return execResults.getData(itemName);
+        }
+
+        return null;
+    }
 }
