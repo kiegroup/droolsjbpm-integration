@@ -270,6 +270,7 @@
               org.jsoup.*;resolution:=optional,
               *
             </Import-Package>
+            <Include-Resource>wsdl/=target/classes/wsdl</Include-Resource>
           </instructions>
         </configuration>
       </plugin>
