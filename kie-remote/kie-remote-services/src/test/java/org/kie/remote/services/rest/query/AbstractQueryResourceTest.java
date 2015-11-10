@@ -36,6 +36,7 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.Task;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
+import org.kie.remote.services.RandomUtil;
 import org.kie.remote.services.jaxb.ServerJaxbSerializationProvider;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.test.MyType;
@@ -146,8 +147,8 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
     protected void runObjectProcess(KieSession ksession, int i) {
         Map<String, Object> params = new HashMap<String, Object>();
         String initValue = "start-" + i;
-        params.put("inputStr", new MyType(initValue, random.nextInt()));
-        params.put("otherStr", new MyType(initValue, random.nextInt()));
+        params.put("inputStr", new MyType(initValue, RandomUtil.nextInt()));
+        params.put("otherStr", new MyType(initValue, RandomUtil.nextInt()));
         ProcessInstance processInstance = ksession.startProcess(PROCESS_OBJ_VAR_ID, params);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
@@ -158,7 +159,7 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
         taskService.start(taskId, USER_ID);
 
         Map<String, Object> taskResults = new HashMap<String, Object>();
-        taskResults.put("taskOutputStr", new MyType("task-" + procInstId, random.nextInt()));
+        taskResults.put("taskOutputStr", new MyType("task-" + procInstId, RandomUtil.nextInt()));
         taskService.complete(taskId, USER_ID, taskResults);
 
         assertNull("Process instance has not been finished.", ksession.getProcessInstance(procInstId) );
