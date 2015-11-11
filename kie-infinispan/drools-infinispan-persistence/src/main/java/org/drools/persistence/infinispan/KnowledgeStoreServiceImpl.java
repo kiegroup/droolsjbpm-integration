@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2015 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.process.instance.WorkItemManagerFactory;
 import org.drools.core.time.TimerService;
 import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.TransactionManagerFactory;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
-import org.drools.persistence.jta.JtaTransactionManager;
 import org.kie.api.KieBase;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.CommandExecutor;
@@ -202,13 +202,12 @@ public class KnowledgeStoreServiceImpl
     		}
     	}
     	Object tm = env.get(EnvironmentName.TRANSACTION_MANAGER);
-    	if (tm != null && tm instanceof javax.transaction.TransactionManager) {
+    	if (tm instanceof javax.transaction.TransactionManager) {
     		Object ut = env.get(EnvironmentName.TRANSACTION);
-    		if (ut == null && tm instanceof javax.transaction.Transaction) {
-    			ut = tm;
+    		if (ut == null && tm instanceof javax.transaction.UserTransaction) {
+    		    env.set(EnvironmentName.TRANSACTION, tm);
     		}
-    		Object tsr = env.get(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY);
-    		env.set(EnvironmentName.TRANSACTION_MANAGER, new JtaTransactionManager(ut, tsr, tm));
+            env.set(EnvironmentName.TRANSACTION_MANAGER, TransactionManagerFactory.get().newTransactionManager(env));
     	}
     	return env;
     }
