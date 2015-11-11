@@ -96,7 +96,7 @@ import org.jbpm.services.task.commands.StartTaskCommand;
 import org.jbpm.services.task.commands.StopTaskCommand;
 import org.jbpm.services.task.commands.SuspendTaskCommand;
 import org.jbpm.services.task.commands.TaskCommand;
-import org.jbpm.services.task.commands.TaskQueryWhereCommand;
+import org.jbpm.services.task.commands.TaskSummaryQueryCommand;
 import org.kie.api.command.Command;
 import org.kie.internal.jaxb.CorrelationKeyXmlAdapter;
 import org.kie.internal.process.CorrelationKey;
@@ -191,7 +191,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
-            @XmlElement(name = "task-query-where", type = TaskQueryWhereCommand.class),
+            @XmlElement(name = "task-query-where", type = TaskSummaryQueryCommand.class),
             
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
