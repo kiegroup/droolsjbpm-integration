@@ -27,18 +27,20 @@
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-client</artifactId>
       <type>jar</type>
-      <exclusions>
-        <exclusion>
-          <groupId>org.kie.remote</groupId>
-          <artifactId>kie-remote-common</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.kie.remote.ws</groupId>
-          <artifactId>kie-remote-ws-common</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
-
+    <!-- contains the kie remote http request classes needed by kie-remote-client -->
+    <dependency>
+      <groupId>org.kie.remote</groupId>
+      <artifactId>kie-remote-common</artifactId>
+      <type>jar</type>
+    </dependency>
+    <!-- contains the (shared) kie remote webservice basic classes needed by kie-remote-client -->
+    <dependency>
+      <groupId>org.kie.remote.ws</groupId>
+      <artifactId>kie-remote-ws-common</artifactId>
+      <type>jar</type>
+    </dependency>
+    <!-- contains the (shared) kie remote JAXB/XML classes needed by kie-remote-client -->
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb</artifactId>
