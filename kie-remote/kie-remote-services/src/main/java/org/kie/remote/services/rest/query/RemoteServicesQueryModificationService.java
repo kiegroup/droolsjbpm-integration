@@ -15,6 +15,13 @@
 
 package org.kie.remote.services.rest.query;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+
+import org.jbpm.query.jpa.data.QueryCriteria;
+import org.jbpm.query.jpa.data.QueryWhere;
+import org.jbpm.query.jpa.service.QueryModificationService;
 
 /**
  * This is the {@link QueryModificationService} implementation for the REST remote services, 
@@ -23,12 +30,26 @@ package org.kie.remote.services.rest.query;
  * <li>Or the task tables to the variable instance log tables</li>
  * </ul>
  */
-public class RemoteServicesQueryModificationService {
+public class RemoteServicesQueryModificationService implements QueryModificationService {
 
     public RemoteServicesQueryModificationService() {
         // default constructor
     }
 
+    @Override
+    public boolean accepts(String listId) {
+        return false;
+    }
+
+    @Override
+    public void optimizeCriteria(QueryWhere queryWhere) {
+
+    }
+
+    @Override
+    public <R> Predicate createPredicate(QueryCriteria criteria, CriteriaQuery<R> query, CriteriaBuilder builder) {
+        return null;
+    }
 
 //    private static Map<String, Class<?>> taskCriteriaFieldClasses = TaskQueryServiceImpl.criteriaFieldClasses;
 //    private static Map<String, String> taskCriteriaFields = TaskQueryServiceImpl.criteriaFields;

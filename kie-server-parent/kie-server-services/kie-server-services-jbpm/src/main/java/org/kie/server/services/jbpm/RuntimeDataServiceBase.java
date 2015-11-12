@@ -512,12 +512,12 @@ public class RuntimeDataServiceBase {
         if (variableValue != null && !variableValue.isEmpty()) {
             logger.debug("About to search for tasks that has variable '{}' with value '{}' with page {} and page size {}", variableName, variableValue, page, pageSize);
 
-            instances = runtimeDataService.getTasksByVariableAndValue(userId, variableName, variableValue, taskStatuses, buildQueryFilter(page, pageSize));
+            instances = runtimeDataService.getTasksByVariableAndValue(userId, variableName, variableValue, taskStatuses, buildQueryContext(page, pageSize));
             logger.debug("Found {} tasks with variable {} and variable value {}", instances.size(), variableName, variableValue);
         } else {
             logger.debug("About to search for tasks that has variable '{}' with page {} and page size {}", variableName, page, pageSize);
 
-            instances = runtimeDataService.getTasksByVariable(userId, variableName, taskStatuses, buildQueryFilter(page, pageSize));
+            instances = runtimeDataService.getTasksByVariable(userId, variableName, taskStatuses, buildQueryContext(page, pageSize));
             logger.debug("Found {} tasks with variable {} ", instances.size(), variableName);
         }
 
