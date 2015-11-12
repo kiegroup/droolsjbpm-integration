@@ -1003,7 +1003,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             List<String> inprogressTasks = new ArrayList<String>();
             inprogressTasks.add(Status.InProgress.toString());
 
-            taskList = taskClient.findTasksByVariableAndValue("yoda", "string_", "my%", inprogressTasks, 0, 10);
+            taskList = taskClient.findTasksByVariableAndValue("yoda", "string_", "my*", inprogressTasks, 0, 10);
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
