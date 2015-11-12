@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -40,7 +40,7 @@ import org.kie.services.shared.ServicesVersion;
 
 @WebServiceProvider(
         portName="CommandServiceBasicAuthPort",
-        serviceName = "CommandServiceBasicAuth", 
+        serviceName = "CommandServiceBasicAuth",
         wsdlLocation="wsdl/CommandService.wsdl",
         targetNamespace = CommandWebServiceImpl.NAMESPACE
         // endpointInterface = "org.kie.remote.services.ws.command.generated.CommandWebService" // (used with the @WebService anno)
@@ -49,71 +49,70 @@ import org.kie.services.shared.ServicesVersion;
 public class CommandWebServiceImpl extends ResourceBase implements Provider<Source> {
 
     public static final String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
- 
+
     @Inject
     private DynamicJaxbContext dynamicJaxbContext;
-   
+
     @Inject
     private IdentityProvider identityProvider;
-    
+
     @Inject
     private ProcessRequestBean processRequesBean;
-    
+
     // Useful for a number of reasons: among others, user principal is available here
     // @Resource
     // private WebServiceContext context;
-    
+
     @Override
     public Source invoke( Source requestSource ) {
 
         JaxbCommandsRequest request = deserializeAndUnwrapRequest(requestSource);
         JaxbCommandsResponse response = ExecuteCommandUtil.restProcessJaxbCommandsRequest(request, identityProvider, processRequesBean);
-        JAXBSource responseSource = wrapAndSerializeResponse(response); 
-     
-        return responseSource;
-    } 
+        JAXBSource responseSource = wrapAndSerializeResponse(response);
 
-    private JaxbCommandsRequest deserializeAndUnwrapRequest(Source requestSource) { 
+        return responseSource;
+    }
+
+    private JaxbCommandsRequest deserializeAndUnwrapRequest(Source requestSource) {
         Unmarshaller unmarshaller;
         try {
             unmarshaller = dynamicJaxbContext.createUnmarshaller();
         } catch( JAXBException e ) {
-            // DBG Auto-generated catch block
             throw new KieRemoteWebServiceException("Could not create unmarshaller: " + e.getMessage(), e);
         }
-      
+
         JAXBElement<Execute> jaxbWrappedRequest;
         try {
             jaxbWrappedRequest = unmarshaller.unmarshal(requestSource, Execute.class);
         } catch( JAXBException e ) {
             throw new KieRemoteWebServiceException("Could not unmarshall request source: " + e.getMessage(), e);
         }
-      
+
         Execute wrappedRquest = jaxbWrappedRequest.getValue();
-        if( wrappedRquest == null ) { 
+        if( wrappedRquest == null ) {
             throw new KieRemoteWebServiceException("Execute request instance is null!");
         }
-        
+
         JaxbCommandsRequest request = wrappedRquest.getRequest();
-        if( request == null ) { 
+        if( request == null ) {
             throw new KieRemoteWebServiceException("JaxbCommandsRequest instance is null!");
         }
         return request;
     }
-    
-    private JAXBSource wrapAndSerializeResponse(JaxbCommandsResponse response) { 
+
+    private JAXBSource wrapAndSerializeResponse(JaxbCommandsResponse response) {
         ExecuteResponse wrappedResponse = new ExecuteResponse();
         wrappedResponse.setReturn(response);
-        
+
         JAXBElement<ExecuteResponse> jaxbWrappedResponse = new ObjectFactory().createExecuteResponse(wrappedResponse);
-       
+
         JAXBSource responseSource;
-        try { 
+        try {
             responseSource = new JAXBSource(dynamicJaxbContext.createMarshaller(), jaxbWrappedResponse);
-        } catch( JAXBException e ) { 
+        } catch( JAXBException e ) {
             throw new KieRemoteWebServiceException("Could not serialize response to JAXBSource: "  + e.getMessage(), e);
         }
-        
+
         return responseSource;
     }
 }
