@@ -112,6 +112,19 @@ public class ClientJaxbSerializationProvider extends JaxbSerializationProvider {
         return jaxbSerProvider;
     }
 
+    public static JaxbSerializationProvider newInstance(Class... extraJaxbClass) {
+        List<Class<?>> classes = Collections.emptyList();
+        if( extraJaxbClass != null && extraJaxbClass.length > 0 ) {
+            classes = new ArrayList<Class<?>>(extraJaxbClass.length);
+            for( Class jaxbClass : extraJaxbClass ) {
+                classes.add(jaxbClass);
+            }
+        }
+        ClientJaxbSerializationProvider jaxbSerProvider = new ClientJaxbSerializationProvider(classes);
+        jaxbSerProvider.initialize();
+        return jaxbSerProvider;
+    }
+
     private void initialize() {
         initialize(getAllJaxbClasses());
     }
