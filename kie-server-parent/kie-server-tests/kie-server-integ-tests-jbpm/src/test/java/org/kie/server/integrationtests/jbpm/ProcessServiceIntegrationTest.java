@@ -641,4 +641,31 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, secondProcessInstanceId);
         }
     }
+
+    @Test
+    public void testStartProcessWithCustomTask() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("id", "custom id");
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess("definition-project", "customtask");
+
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            ProcessInstance pi = queryClient.findProcessInstanceById(processInstanceId);
+            assertNotNull(pi);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
+
+        } catch(Exception e) {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance("definition-project", processInstanceId);
+            }
+            fail("Exception " + e.getMessage());
+        }
+
+
+
+    }
 }

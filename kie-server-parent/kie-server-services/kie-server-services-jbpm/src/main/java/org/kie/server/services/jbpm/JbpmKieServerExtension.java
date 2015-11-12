@@ -44,7 +44,8 @@ import org.jbpm.kie.services.impl.RuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
-import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManager;
+import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
 import org.jbpm.runtime.manager.impl.identity.UserDataServiceProvider;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.services.api.DefinitionService;
@@ -62,10 +63,10 @@ import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
+import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
-import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -105,6 +106,9 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private ExecutorService executorService;
 
     private KieContainerCommandService kieContainerCommandService;
+
+    private DeploymentDescriptorManager deploymentDescriptorManager = new DeploymentDescriptorManager(persistenceUnitName);
+    private DeploymentDescriptorMerger merger = new DeploymentDescriptorMerger();
 
     @Override
     public boolean isActive() {
@@ -248,7 +252,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // reuse kieContainer to avoid unneeded bootstrap
             unit.setKieContainer(kieContainer);
 
-            addAsyncHandler(unit);
+            addAsyncHandler(unit, kieContainer);
 
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
@@ -362,12 +366,13 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
     }
 
-    protected void addAsyncHandler(KModuleDeploymentUnit unit) {
+    protected void addAsyncHandler(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
         // add async only when the executor component is not disabled
         if (isExecutorAvailable && executorService != null) {
             DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
             if (descriptor == null) {
-                descriptor = new DeploymentDescriptorImpl(persistenceUnitName);
+                List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
+                descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
             }
             descriptor.getBuilder()
                     .addWorkItemHandler(new NamedObjectModel("mvel", "async",
@@ -430,4 +435,5 @@ public class JbpmKieServerExtension implements KieServerExtension {
             throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
         }
     }
+
 }
