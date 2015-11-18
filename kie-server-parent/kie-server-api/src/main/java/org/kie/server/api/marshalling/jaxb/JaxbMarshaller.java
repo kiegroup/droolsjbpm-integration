@@ -25,9 +25,25 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.GetFactCountCommand;
+import org.drools.core.command.runtime.GetGlobalCommand;
+import org.drools.core.command.runtime.GetIdCommand;
+import org.drools.core.command.runtime.SetGlobalCommand;
+import org.drools.core.command.runtime.rule.AgendaGroupSetFocusCommand;
+import org.drools.core.command.runtime.rule.ClearActivationGroupCommand;
+import org.drools.core.command.runtime.rule.ClearAgendaCommand;
+import org.drools.core.command.runtime.rule.ClearAgendaGroupCommand;
+import org.drools.core.command.runtime.rule.ClearRuleFlowGroupCommand;
+import org.drools.core.command.runtime.rule.DeleteCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.drools.core.runtime.rule.impl.FlatQueryResultRow;
+import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.kie.api.task.model.Task;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -110,6 +126,21 @@ public class JaxbMarshaller implements Marshaller {
                 BatchExecutionCommandImpl.class,
                 ExecutionResultImpl.class,
                 DefaultFactHandle.class,
+                DeleteCommand.class,
+                GetVariableCommand.class,
+                GetFactCountCommand.class,
+                SetGlobalCommand.class,
+                UpdateCommand.class,
+                ClearAgendaCommand.class,
+                FireAllRulesCommand.class,
+                GetIdCommand.class,
+                GetGlobalCommand.class,
+                InsertObjectCommand.class,
+                ClearAgendaGroupCommand.class,
+                FlatQueryResults.class,
+                AgendaGroupSetFocusCommand.class,
+                ClearRuleFlowGroupCommand.class,
+                ClearActivationGroupCommand.class,
 
                 KieServerConfig.class,
                 KieServerConfigItem.class,
@@ -220,4 +251,6 @@ public class JaxbMarshaller implements Marshaller {
     protected Unmarshaller getUnmarshaller() throws JAXBException {
         return jaxbContext.createUnmarshaller();
     }
+
+
 }

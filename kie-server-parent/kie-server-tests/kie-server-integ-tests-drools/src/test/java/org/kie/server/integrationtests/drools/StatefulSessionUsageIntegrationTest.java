@@ -15,10 +15,9 @@
 
 package org.kie.server.integrationtests.drools;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +28,16 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.*;
 
 public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -135,5 +139,105 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         // and 'duplicated' flag should stay false, as only one person is in working memory
         assertEquals("The 'duplicated' field should be false! Got response: " + result2, true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
+    }
+
+    @Test
+    public void testInsertFireGetQuery() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+        commands.add(commandsFactory.newQuery("query-result", "get people"));
+
+        ServiceResponse<String> reply1 = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
+        // first call should set the surname for the inserted person
+        String result1 = reply1.getResult();
+        ExecutionResults actualData = marshaller.unmarshall(result1, ExecutionResultImpl.class);
+
+        Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result1, PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        // and 'duplicated' flag should stay false, as only one person is in working memory
+        assertEquals("The 'duplicated' field should be false! Got response: " + result1, false, valueOf(result, PERSON_DUPLICATED_FIELD));
+
+        QueryResults queryResult = (QueryResults) actualData.getValue("query-result");
+        assertNotNull(queryResult);
+        assertEquals(1, queryResult.size());
+
+        Iterator<QueryResultsRow> rowIt = queryResult.iterator();
+
+        while (rowIt.hasNext()) {
+            QueryResultsRow row = rowIt.next();
+            assertNotNull(row);
+
+            Object personResult = row.get("person");
+            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(personResult, PERSON_SURNAME_FIELD));
+
+            FactHandle personFH = row.getFactHandle("person");
+            assertNotNull(personFH);
+
+            personResult = personFH;
+            assertEquals("Expected surname to be null", null, valueOf(personResult, PERSON_SURNAME_FIELD));
+        }
+    }
+
+    @Test
+    public void testInsertFireGetQueryMultipleResults() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        Object person2 = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newInsert(person2, PERSON_2_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+        commands.add(commandsFactory.newQuery("query-result", "get people"));
+
+        ServiceResponse<String> reply1 = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
+        // first call should set the surname for the inserted person
+        String result1 = reply1.getResult();
+        ExecutionResults actualData = marshaller.unmarshall(result1, ExecutionResultImpl.class);
+
+        Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result1, PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        // and 'duplicated' flag should stay false, as only one person is in working memory
+        assertEquals("The 'duplicated' field should be false! Got response: " + result1, true, valueOf(result, PERSON_DUPLICATED_FIELD));
+
+        result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result1, PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        // and 'duplicated' flag should stay false, as only one person is in working memory
+        assertEquals("The 'duplicated' field should be false! Got response: " + result1, true, valueOf(result, PERSON_DUPLICATED_FIELD));
+
+        QueryResults queryResult = (QueryResults) actualData.getValue("query-result");
+        assertNotNull(queryResult);
+        assertEquals(2, queryResult.size());
+
+        Iterator<QueryResultsRow> rowIt = queryResult.iterator();
+
+        while (rowIt.hasNext()) {
+            QueryResultsRow row = rowIt.next();
+            assertNotNull(row);
+
+            Object personResult = row.get("person");
+            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(personResult, PERSON_SURNAME_FIELD));
+
+            FactHandle personFH = row.getFactHandle("person");
+            assertNotNull(personFH);
+
+            personResult = personFH;
+            assertEquals("Expected surname to be null", null, valueOf(personResult, PERSON_SURNAME_FIELD));
+        }
     }
 }
