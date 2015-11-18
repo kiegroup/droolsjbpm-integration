@@ -142,7 +142,7 @@ public class KieServerControllerClient {
 
         try {
             response = clientRequest.accept(getMediaType(format))
-                    .body(getMediaType(format), bodyObject).put(resultType);
+                    .body(getMediaType(format), serialize(bodyObject)).put(resultType);
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
         }
@@ -242,6 +242,18 @@ public class KieServerControllerClient {
             case JAXB: return MediaType.APPLICATION_XML;
             case JSON: return MediaType.APPLICATION_JSON;
             default: return MediaType.APPLICATION_XML;
+        }
+    }
+
+    protected String serialize(Object object) {
+        if (object == null) {
+            return "";
+        }
+
+        try {
+            return marshaller.marshall( object );
+        } catch ( MarshallingException e ) {
+            throw new RuntimeException( "Error while serializing request data!", e );
         }
     }
 
