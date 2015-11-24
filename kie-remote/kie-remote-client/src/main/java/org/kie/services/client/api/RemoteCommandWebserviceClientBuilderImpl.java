@@ -17,7 +17,6 @@ package org.kie.services.client.api;
 
 import static org.kie.services.client.api.command.AbstractRemoteCommandObject.emptyDeploymentId;
 
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,80 +66,77 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
     @Override
     public CommandWebService buildBasicAuthClient() {
         checkAndFinalizeConfig();
+        
+        // wsdl authentication
+        KieRemoteWsAuthenticator auth = new KieRemoteWsAuthenticator();
+        auth.setUserAndPassword(config.getUserName(), config.getPassword());
+
+        String wsdlLocationRelativePath = config.getWsdlLocationRelativePath();
+
+        URL wsdlUrl;
         try {
-            // wsdl authentication
-            KieRemoteWsAuthenticator auth = new KieRemoteWsAuthenticator();
-            auth.setUserAndPassword(config.getUserName(), config.getPassword());
-    
-            String wsdlLocationRelativePath = config.getWsdlLocationRelativePath();
-    
-            URL wsdlUrl;
-            try {
-                wsdlUrl = new URL(config.getServerBaseUrl(), wsdlLocationRelativePath);
-            } catch( MalformedURLException murle ) {
-                throw new IllegalStateException("WSDL URL is not correct: [" + config.getServerBaseUrl().toExternalForm() + wsdlLocationRelativePath + "]", murle);
-            }
-    
-            wsdlUrl = verifyURLWithRedirect(wsdlUrl);
-    
-            // initial client proxy setup
-            JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-            factory.setServiceClass(CommandWebService.class);
-            factory.setWsdlLocation(wsdlUrl.toExternalForm());
-            factory.setServiceName(commandServiceQName);
-    
-            // JAXB: service classes
-            Set<Class<?>> allClasses = new HashSet<Class<?>>();
-            allClasses.add(JaxbCommandsRequest.class);
-            allClasses.add(JaxbCommandsResponse.class);
-            allClasses.add(Execute.class);
-            allClasses.add(ExecuteResponse.class);
-    
-            // JAXB: extra classes
-            Set<Class<?>> extraClasses = config.getExtraJaxbClasses();
-            if( extraClasses != null && ! extraClasses.isEmpty() ) {
-               allClasses.addAll(extraClasses);
-            }
-    
-            // JAXB: setup
-            JAXBDataBinding jaxbDataBinding;
-            try {
-                jaxbDataBinding = new JAXBDataBinding(allClasses.toArray(new Class[allClasses.size()]));
-            } catch( JAXBException jaxbe ) {
-                throw new RemoteApiException("Unable to initialize JAXB context for webservice client", jaxbe);
-            }
-            factory.getClientFactoryBean().setDataBinding(jaxbDataBinding);
-    
-            // setup auth
-            // - for webservice calls
-            String pwd = config.getPassword();
-            String user = config.getUserName();
-            factory.setUsername(user);
-            factory.setPassword(pwd);
-    
-            CommandWebService commandService = (CommandWebService) factory.create();
-            Client proxyClient = ClientProxy.getClient(commandService);
-            HTTPConduit conduit = (HTTPConduit) proxyClient.getConduit();
-    
-            // setup timeout
-            HTTPClientPolicy httpClientPolicy = conduit.getClient();
-            httpClientPolicy.setConnectionTimeout(config.getTimeout());
-            httpClientPolicy.setReceiveTimeout(config.getTimeout());
-            httpClientPolicy.setAutoRedirect(config.getHttpRedirect());
-    
-            // if present, add deployment id for JAXB context
-            String deploymentId = config.getDeploymentId();
-            if( ! emptyDeploymentId(deploymentId) ) {
-                Map<String, List<String>> headers = new HashMap<String, List<String>>(1);
-                String [] depIdHeader = { deploymentId };
-                headers.put(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, Arrays.asList(depIdHeader));
-                proxyClient.getRequestContext().put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
-            }
-    
-            return commandService;
-        } finally {
-            clearHttpUrlConnectionAuthCache();
+            wsdlUrl = new URL(config.getServerBaseUrl(), wsdlLocationRelativePath);
+        } catch( MalformedURLException murle ) {
+            throw new IllegalStateException("WSDL URL is not correct: [" + config.getServerBaseUrl().toExternalForm() + wsdlLocationRelativePath + "]", murle);
         }
+
+        wsdlUrl = verifyURLWithRedirect(wsdlUrl);
+
+        // initial client proxy setup
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(CommandWebService.class);
+        factory.setWsdlLocation(wsdlUrl.toExternalForm());
+        factory.setServiceName(commandServiceQName);
+
+        // JAXB: service classes
+        Set<Class<?>> allClasses = new HashSet<Class<?>>();
+        allClasses.add(JaxbCommandsRequest.class);
+        allClasses.add(JaxbCommandsResponse.class);
+        allClasses.add(Execute.class);
+        allClasses.add(ExecuteResponse.class);
+
+        // JAXB: extra classes
+        Set<Class<?>> extraClasses = config.getExtraJaxbClasses();
+        if( extraClasses != null && ! extraClasses.isEmpty() ) {
+           allClasses.addAll(extraClasses);
+        }
+
+        // JAXB: setup
+        JAXBDataBinding jaxbDataBinding;
+        try {
+            jaxbDataBinding = new JAXBDataBinding(allClasses.toArray(new Class[allClasses.size()]));
+        } catch( JAXBException jaxbe ) {
+            throw new RemoteApiException("Unable to initialize JAXB context for webservice client", jaxbe);
+        }
+        factory.getClientFactoryBean().setDataBinding(jaxbDataBinding);
+
+        // setup auth
+        // - for webservice calls
+        String pwd = config.getPassword();
+        String user = config.getUserName();
+        factory.setUsername(user);
+        factory.setPassword(pwd);
+
+        CommandWebService commandService = (CommandWebService) factory.create();
+        Client proxyClient = ClientProxy.getClient(commandService);
+        HTTPConduit conduit = (HTTPConduit) proxyClient.getConduit();
+
+        // setup timeout
+        HTTPClientPolicy httpClientPolicy = conduit.getClient();
+        httpClientPolicy.setConnectionTimeout(config.getTimeout());
+        httpClientPolicy.setReceiveTimeout(config.getTimeout());
+        httpClientPolicy.setAutoRedirect(config.getHttpRedirect());
+
+        // if present, add deployment id for JAXB context
+        String deploymentId = config.getDeploymentId();
+        if( ! emptyDeploymentId(deploymentId) ) {
+            Map<String, List<String>> headers = new HashMap<String, List<String>>(1);
+            String [] depIdHeader = { deploymentId };
+            headers.put(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, Arrays.asList(depIdHeader));
+            proxyClient.getRequestContext().put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
+        }
+
+        return commandService;
     }
 
     /**
@@ -219,18 +215,5 @@ class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBui
                 }
             }
     }
-    
-    protected void clearHttpUrlConnectionAuthCache() {
-        try {
-            Class<?> c = Class.forName("sun.net.www.protocol.http.AuthCacheValue");   
-            Class<?> cint = Class.forName("sun.net.www.protocol.http.AuthCache");
-            Class<?> cimpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
-            
-            Method m = c.getMethod("setAuthCache", new Class[]{cint});
-            m.invoke(null, new Object[]{cimpl.newInstance()});
-            
-        } catch (Exception e) {
-            // ignore as it might not exists as this is sun specific api/impl
-        }
-    }
+
 }

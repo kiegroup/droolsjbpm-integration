@@ -15,8 +15,10 @@
 
 package org.kie.remote.client.ws;
 
+import java.lang.reflect.Method;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ public class KieRemoteWsAuthenticator extends Authenticator {
     private static ThreadLocal<PasswordAuthentication> threadLocalPasswordAuthentication = new ThreadLocal<PasswordAuthentication>();
     private static AtomicBoolean authenticatorSet = new AtomicBoolean(false);
    
+   
     public void setUserAndPassword(String userName, String password) { 
        if( ! authenticatorSet.get() ) { 
            // here: 2+ threads, Authenticator not yet set
@@ -41,6 +44,7 @@ public class KieRemoteWsAuthenticator extends Authenticator {
                // only 1 thread because of sync block
                if( authenticatorSet.compareAndSet(false, true) ) { 
                    Authenticator.setDefault(this);
+                   disableHttpUrlConnectionAuthCache();
                }
            }
        }
@@ -59,6 +63,34 @@ public class KieRemoteWsAuthenticator extends Authenticator {
     @Override
     protected PasswordAuthentication getPasswordAuthentication() { 
         return threadLocalPasswordAuthentication.get();
+    }
+    
+    @SuppressWarnings({"rawtypes", "serial"})
+    protected static void disableHttpUrlConnectionAuthCache() {
+        try {
+            
+            Class<?> c = Class.forName("sun.net.www.protocol.http.AuthCacheValue");   
+            Class<?> cint = Class.forName("sun.net.www.protocol.http.AuthCache");
+            Class<?> cimpl = Class.forName("sun.net.www.protocol.http.AuthCacheImpl");
+            
+            Object cache = cimpl.newInstance();
+            Method setMap = cache.getClass().getMethod("setMap", new Class[]{HashMap.class});
+            setMap.invoke(cache, new Object[]{new HashMap(){
+
+                @Override
+                public Object put(Object key, Object value) {
+                    // do nothing to avoid caching
+                    return null;
+                }
+                
+            }});
+            
+            Method m = c.getMethod("setAuthCache", new Class[]{cint});
+            m.invoke(null, new Object[]{cache});
+            
+        } catch (Exception e) {
+            // ignore as it might not exists as this is sun specific api/impl
+        }
     }
     
 }
