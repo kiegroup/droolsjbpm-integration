@@ -151,8 +151,9 @@
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb-gen</artifactId>
       <classifier>sources</classifier>
-      <!-- Users of the kie-remote-client don't need the sources jar, so use provided scope. -->
-      <scope>provided</scope>
+      <!-- Users of the kie-remote-client don't need the sources jar, so use 'test' scope
+           (better alternative to 'provided'). -->
+      <scope>test</scope>
     </dependency>
 
     <!-- serialization -->
