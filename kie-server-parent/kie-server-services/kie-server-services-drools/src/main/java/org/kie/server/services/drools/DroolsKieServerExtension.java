@@ -52,6 +52,8 @@ public class DroolsKieServerExtension implements KieServerExtension {
     private KieContainerCommandService batchCommandService;
     private KieServerRegistry registry;
 
+    private List<Object> services = new ArrayList<Object>();
+
     @Override
     public boolean isActive() {
         return disabled == false;
@@ -115,12 +117,12 @@ public class DroolsKieServerExtension implements KieServerExtension {
         }
 
         kieContainerInstance.addJaxbClasses(extraClasses);
-        kieContainerInstance.addService(batchCommandService);
+        services.add(batchCommandService);
     }
 
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
-        kieContainerInstance.removeService(batchCommandService.getClass());
+
     }
 
     @Override
@@ -151,6 +153,21 @@ public class DroolsKieServerExtension implements KieServerExtension {
     @Override
     public String getImplementedCapability() {
         return "BRM";
+    }
+
+    @Override
+    public List<Object> getServices() {
+        return services;
+    }
+
+    @Override
+    public String getExtensionName() {
+        return EXTENSION_NAME;
+    }
+
+    @Override
+    public Integer getStartOrder() {
+        return 0;
     }
 
     @Override

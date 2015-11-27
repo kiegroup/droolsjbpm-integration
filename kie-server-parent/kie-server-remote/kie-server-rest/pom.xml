@@ -18,6 +18,7 @@
     <module>kie-server-rest-common</module>
     <module>kie-server-rest-jbpm</module>
     <module>kie-server-rest-drools</module>
+    <module>kie-server-rest-jbpm-ui</module>
   </modules>
 
 </project>

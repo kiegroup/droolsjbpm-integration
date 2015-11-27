@@ -32,6 +32,8 @@ public class KieServerContainerExtension implements KieServerExtension {
     private static final String EXTENSION_NAME = "KieServer";
     private KieContainerCommandService batchCommandService;
 
+    private List<Object> services = new ArrayList<Object>();
+
     @Override
     public boolean isActive() {
         return true;
@@ -40,6 +42,8 @@ public class KieServerContainerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.batchCommandService = new KieContainerCommandServiceImpl(kieServer, registry);
+
+        services.add(batchCommandService);
     }
 
     @Override
@@ -82,6 +86,21 @@ public class KieServerContainerExtension implements KieServerExtension {
     @Override
     public String getImplementedCapability() {
         return "KieServer";
+    }
+
+    @Override
+    public List<Object> getServices() {
+        return services;
+    }
+
+    @Override
+    public String getExtensionName() {
+        return EXTENSION_NAME;
+    }
+
+    @Override
+    public Integer getStartOrder() {
+        return -1;
     }
 
     @Override

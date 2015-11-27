@@ -48,9 +48,11 @@
         <include>org.kie.server:kie-server-services-common</include>
         <include>org.kie.server:kie-server-services-drools</include>
         <include>org.kie.server:kie-server-services-jbpm</include>
+        <include>org.kie.server:kie-server-services-jbpm-ui</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>
+        <include>org.kie.server:kie-server-rest-jbpm-ui</include>
         <include>org.slf4j:slf4j-jdk14</include>
 
         <include>org.hibernate.common:hibernate-commons-annotations</include>

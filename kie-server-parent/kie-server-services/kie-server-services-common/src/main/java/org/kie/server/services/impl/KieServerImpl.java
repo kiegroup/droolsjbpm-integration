@@ -16,6 +16,8 @@
 package org.kie.server.services.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -85,7 +87,9 @@ public class KieServerImpl {
 
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
-        for (KieServerExtension extension : serverExtensions) {
+        List<KieServerExtension> extensions = sortKnownExtensions();
+
+        for (KieServerExtension extension : extensions) {
             if (!extension.isActive()) {
                 continue;
             }
@@ -606,6 +610,23 @@ public class KieServerImpl {
             logger.debug("Unable to find JEE version of ContainerManager suing default one");
             return new ContainerManager();
         }
+    }
+
+    protected List<KieServerExtension> sortKnownExtensions() {
+        List<KieServerExtension> extensions = new ArrayList<KieServerExtension>();
+
+        for (KieServerExtension extension : serverExtensions) {
+            extensions.add(extension);
+        }
+
+        Collections.sort(extensions, new Comparator<KieServerExtension>() {
+            @Override
+            public int compare(KieServerExtension e1, KieServerExtension e2) {
+                return e1.getStartOrder().compareTo(e2.getStartOrder());
+            }
+        });
+
+        return extensions;
     }
 
     @Override

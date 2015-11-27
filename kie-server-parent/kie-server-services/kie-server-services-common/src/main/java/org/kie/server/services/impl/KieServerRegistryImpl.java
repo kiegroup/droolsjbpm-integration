@@ -36,7 +36,7 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     private final ConcurrentMap<String, KieContainerInstanceImpl> containers = new ConcurrentHashMap<String, KieContainerInstanceImpl>();
     private IdentityProvider identityProvider;
-    private Set<KieServerExtension> serverExtensions = new CopyOnWriteArraySet<KieServerExtension>();
+    private ConcurrentMap<String, KieServerExtension> serverExtensions = new ConcurrentHashMap<String, KieServerExtension>();
 
     private Set<String> controllers = new CopyOnWriteArraySet<String>();
 
@@ -92,7 +92,7 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     @Override
     public void registerServerExtension(KieServerExtension kieServerExtension) {
-        this.serverExtensions.add(kieServerExtension);
+        this.serverExtensions.putIfAbsent(kieServerExtension.getExtensionName(), kieServerExtension);
     }
 
     @Override
@@ -102,7 +102,12 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     @Override
     public List<KieServerExtension> getServerExtensions() {
-        return new ArrayList<KieServerExtension>(serverExtensions);
+        return new ArrayList<KieServerExtension>(serverExtensions.values());
+    }
+
+    @Override
+    public KieServerExtension getServerExtension(String extensionName) {
+        return serverExtensions.get(extensionName);
     }
 
     @Override

@@ -18,6 +18,7 @@
     <module>kie-server-services-common</module>
     <module>kie-server-services-drools</module>
     <module>kie-server-services-jbpm</module>
+    <module>kie-server-services-jbpm-ui</module>
   </modules>
 
 </project>

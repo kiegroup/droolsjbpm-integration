@@ -46,6 +46,8 @@ public interface KieServerRegistry {
 
     List<KieServerExtension> getServerExtensions();
 
+    KieServerExtension getServerExtension(String extensionName);
+
     void registerController(String controllerUrl);
 
     Set<String> getControllers();

@@ -37,4 +37,10 @@ public interface KieServerExtension {
     <T> T getAppComponents(Class<T> serviceType);
 
     String getImplementedCapability();
+
+    List<Object> getServices();
+
+    String getExtensionName();
+
+    Integer getStartOrder();
 }

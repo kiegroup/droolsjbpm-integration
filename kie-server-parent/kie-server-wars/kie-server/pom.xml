@@ -64,6 +64,24 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-jbpm-ui</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jboss.spec.javax.el</groupId>
+          <artifactId>jboss-el-api_2.2_spec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-jms</artifactId>
     </dependency>
     <dependency>
@@ -77,6 +95,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-jbpm-ui</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
