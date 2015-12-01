@@ -53,6 +53,10 @@ public class FormResource {
 
     private FormServiceBase formServiceBase;
 
+    public FormResource() {
+
+    }
+
     public FormResource(FormServiceBase formServiceBase) {
         this.formServiceBase = formServiceBase;
     }

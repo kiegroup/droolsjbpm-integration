@@ -53,6 +53,8 @@
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>
         <include>org.kie.server:kie-server-rest-jbpm-ui</include>
+        <include>org.kie:jbpm-process-svg</include>
+
         <include>org.slf4j:slf4j-jdk14</include>
 
         <include>org.hibernate.common:hibernate-commons-annotations</include>

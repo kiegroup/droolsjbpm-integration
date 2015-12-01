@@ -110,6 +110,12 @@
       <artifactId>jbpm-services-ejb-timer</artifactId>
     </dependency>
 
+    <!-- image -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>jbpm-process-svg</artifactId>
+    </dependency>
+
     <!-- webcontainer dependencies -->
     <dependency>
       <groupId>org.hibernate</groupId>

@@ -157,6 +157,34 @@ public abstract class AbstractKieServicesClientImpl {
         }
     }
 
+    protected String makeHttpGetRequestAndCreateRawResponse(String uri) {
+        logger.debug("About to send GET request to '{}'", uri);
+        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+
+            return response.body();
+
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
+    protected String makeHttpGetRequestAndCreateRawResponse(String uri, Map<String, String> headers) {
+        logger.debug("About to send GET request to '{}'", uri);
+        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).get();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+
+            return response.body();
+
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
     protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(
             String uri, Object bodyObject,
             Class<T> resultType) {

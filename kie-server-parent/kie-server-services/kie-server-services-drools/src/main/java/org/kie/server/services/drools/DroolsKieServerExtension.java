@@ -66,6 +66,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new DroolsKieSessionLookupHandler());
         }
+        services.add(batchCommandService);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
         }
 
         kieContainerInstance.addJaxbClasses(extraClasses);
-        services.add(batchCommandService);
+
     }
 
     @Override

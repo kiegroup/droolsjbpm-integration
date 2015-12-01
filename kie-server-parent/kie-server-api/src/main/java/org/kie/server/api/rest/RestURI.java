@@ -44,6 +44,7 @@ public class RestURI {
     public static final String TASK_URI = "containers/{" + CONTAINER_ID + "}/tasks";
     public static final String QUERY_URI = "queries";
     public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
+    public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -157,6 +158,10 @@ public class RestURI {
     // form prefixed by FORM_URI
     public static final String PROCESS_FORM_GET_URI = "processes/{" + PROCESS_ID + "}";
     public static final String TASK_FORM_GET_URI = "tasks/{" + TASK_INSTANCE_ID + "}";
+
+    // image prefixed by IMAGE_URI
+    public static final String PROCESS_IMG_GET_URI = "processes/{" + PROCESS_ID + "}";
+    public static final String PROCESS_INST_IMG_GET_URI = "processes/instances/{" + PROCESS_INST_ID + "}";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

@@ -18,20 +18,24 @@ package org.kie.server.services.jbpm.ui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,15 +46,21 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
     private static final Logger logger = LoggerFactory.getLogger(JBPMUIKieServerExtension.class);
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_UI_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean jbpmDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
 
+    private ConcurrentMap<String, ImageReference> imageReferences = new ConcurrentHashMap<String, ImageReference>();
+
     private FormServiceBase formServiceBase;
+    private ImageServiceBase imageServiceBase;
+
+    private KieContainerCommandService kieContainerCommandService;
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+        return disabled == false || jbpmDisabled == false;
     }
 
     @Override
@@ -92,8 +102,13 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         }
 
         formServiceBase = new FormServiceBase(definitionService, runtimeDataService, userTaskService, formManagerService);
+        imageServiceBase = new ImageServiceBase(runtimeDataService, imageReferences);
 
         services.add(formServiceBase);
+        services.add(imageServiceBase);
+
+        this.kieContainerCommandService = new JBPMUIKieContainerCommandServiceImpl(null, formServiceBase, imageServiceBase);
+
         initialized = true;
     }
 
@@ -109,6 +124,13 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         if (!initialized) {
             return;
         }
+        try {
+            KieContainer kieContainer = kieContainerInstance.getKieContainer();
+            imageReferences.putIfAbsent(id, new ImageReference(kieContainer));
+        } catch (Exception e) {
+            logger.warn("Unable to create image reference for container {} due to {}", id, e.getMessage());
+        }
+
     }
 
     @Override
@@ -116,6 +138,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         if (!initialized) {
             return;
         }
+
+        imageReferences.remove(id);
     }
 
     @Override
@@ -128,7 +152,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices = ServiceLoader.load(KieServerApplicationComponentsService.class);
 
         Object [] services = {
-                formServiceBase
+                formServiceBase,
+                imageServiceBase
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));
@@ -143,6 +168,10 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         if (!initialized) {
             return null;
         }
+        if (serviceType.isAssignableFrom(kieContainerCommandService.getClass())) {
+            return (T) kieContainerCommandService;
+        }
+
         return null;
     }
 

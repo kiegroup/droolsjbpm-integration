@@ -16,8 +16,8 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.client.ClientRequest;
@@ -33,22 +33,19 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.UIServicesClient;
-import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 
 import static org.junit.Assert.*;
 import static org.kie.server.api.rest.RestURI.*;
 
-public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
+public class ImageServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
@@ -59,7 +56,6 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     private UIServicesClient uiServicesClient;
     private ProcessServicesClient processClient;
-    private UserTaskServicesClient userTaskClient;
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -78,7 +74,6 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
 
         uiServicesClient = servicesClient.getServicesClient(UIServicesClient.class);
         processClient = servicesClient.getServicesClient(ProcessServicesClient.class);
-        userTaskClient = servicesClient.getServicesClient(UserTaskServicesClient.class);
 
         return servicesClient;
     }
@@ -90,7 +85,7 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
     }
 
     @Test
-    public void testGetProcessFormTest() throws Exception {
+    public void testGetProcessImageTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
@@ -101,22 +96,23 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
         ClientResponse<?> response = null;
         try {
 
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
+            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap))
                     .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
+                    .header("Accept", MediaType.APPLICATION_SVG_XML);
             logger.info( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.get();
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
             String result = response.getEntity(String.class);
-            logger.debug("Form content is '{}'", result);
+            logger.debug("Image content is '{}'", result);
             assertNotNull(result);
             assertFalse(result.isEmpty());
 
+
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
-        } finally {
+        }  finally {
             if (response != null) {
                 response.releaseConnection();
             }
@@ -125,7 +121,7 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
     }
 
     @Test
-    public void testGetTaskFormTest() throws Exception {
+    public void testGetProcessInstanceImageTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
@@ -153,40 +149,20 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
             Long result = response.getEntity(JaxbLong.class).unwrap();
             assertNotNull(result);
 
-            // find tasks by process instance id
             valuesMap.put(RestURI.PROCESS_INST_ID, result);
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap))
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap))
                     .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
+                    .header("Accept", MediaType.APPLICATION_SVG_XML);
             logger.info("[GET] " + clientRequest.getUri());
 
             response = clientRequest.get();
             Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            TaskSummaryList taskSummaryList = marshaller.unmarshall(response.getEntity(String.class), TaskSummaryList.class);
-            logger.debug("Form content is '{}'", taskSummaryList);
-
-            assertNotNull(taskSummaryList);
-            TaskSummary[] task = taskSummaryList.getTasks();
-            assertEquals(1, task.length);
-
-            Long taskId = task[0].getId();
-
-            valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
-
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
-
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            String formdata = response.getEntity(String.class);
-            logger.debug("Form content is '{}'", formdata);
-            assertNotNull(formdata);
-            assertFalse(formdata.isEmpty());
+            String image = response.getEntity(String.class);
+            logger.debug("Image content is '{}'", image);
+            assertNotNull(image);
+            assertFalse(image.isEmpty());
 
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info("[DELETE] " + clientRequest.getUri());
@@ -203,39 +179,7 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
     }
 
     @Test
-    public void testGetProcessDoesNotExistFormTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
-        Map<String, Object> valuesMap = new HashMap<String, Object>();
-        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
-        valuesMap.put(RestURI.PROCESS_ID, "not-existing");
-        valuesMap.put(RestURI.TASK_INSTANCE_ID, 99999);
-
-
-
-        ClientResponse<?> response = null;
-        try {
-
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        } finally {
-            if (response != null) {
-                response.releaseConnection();
-            }
-        }
-    }
-
-    @Test
-    public void testGetTaskDoesNotExistFormTest() throws Exception {
+    public void testGetProcessImageNotExistingTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
@@ -246,9 +190,9 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
         ClientResponse<?> response = null;
         try {
 
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
+            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap))
                     .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
+                    .header("Accept", MediaType.APPLICATION_SVG_XML);
             logger.info( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.get();
@@ -256,7 +200,7 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
 
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
-        } finally {
+        }  finally {
             if (response != null) {
                 response.releaseConnection();
             }
@@ -264,54 +208,79 @@ public class FormServiceIntegrationTest extends RestOnlyBaseIntegrationTest {
     }
 
     @Test
-    public void testGetProcessFormViaUIClientTest() throws Exception {
+    public void testGetProcessInstanceImageNotExistingTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-        String result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_PROCESS_ID, "en");
-        logger.debug("Form content is '{}'", result);
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(RestURI.PROCESS_INST_ID, 9999);
+
+        ClientResponse<?> response = null;
+        try {
+
+            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap))
+                    .header("Content-Type", getMediaType().toString())
+                    .header("Accept", MediaType.APPLICATION_SVG_XML);
+            logger.info( "[GET] " + clientRequest.getUri());
+
+            response = clientRequest.get();
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+        } catch (Exception e) {
+            throw new ClientResponseFailure(e, response);
+        }  finally {
+            if (response != null) {
+                response.releaseConnection();
+            }
+        }
+    }
+
+    @Test
+    public void testGetProcessImageViaUIClientTest() throws Exception {
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
+        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
+
+        String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_PROCESS_ID);
+        logger.debug("Image content is '{}'", result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
 
     }
 
     @Test(expected = KieServicesException.class)
-    public void testGetProcessNotExistingFormViaUIClientTest() throws Exception {
+    public void testGetProcessNotExistingImageViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-        uiServicesClient.getProcessForm(CONTAINER_ID, "not-existing", "en");
+
+        uiServicesClient.getProcessImage(CONTAINER_ID, "not-existing");
 
     }
 
     @Test
-    public void testGetTaskFormViaUIClientTest() throws Exception {
+    public void testGetProcessInstanceImageViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
 
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {
-            List<TaskSummary> tasks = userTaskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
-
-            Long taskId = tasks.get(0).getId();
-
-            String result = uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
-            logger.debug("Form content is '{}'", result);
+            String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
+            logger.debug("Image content is '{}'", result);
             assertNotNull(result);
             assertFalse(result.isEmpty());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
-
     }
 
     @Test(expected = KieServicesException.class)
-    public void testGetTaskNotExistingFormViaUIClientTest() throws Exception {
+    public void testGetProcessInstanceNotExistingImageViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-        uiServicesClient.getTaskForm(CONTAINER_ID, 9999l, "en");
+
+        uiServicesClient.getProcessInstanceImage(CONTAINER_ID, 9999l);
 
     }
 }
