@@ -111,7 +111,6 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                 releaseId = new ReleaseIdImpl("org.default", "artifact","1.0.0-SNAPSHOT");
             }
             log.info("Found project with releaseId: " + releaseId);
-            KieSpringUtils.setDefaultReleaseId(releaseId);
         }
 
         for (String beanDef : beanFactory.getBeanDefinitionNames()){
@@ -165,10 +164,6 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             KieServices ks = KieServices.Factory.get();
             log.info("adding KieModule from " + configFileURL.toExternalForm() + " to repository.");
             ks.getRepository().addKieModule(kJar);
-            if (context != null) {
-                KieSpringUtils.setReleaseIdForContext(releaseId, context);
-                KieSpringUtils.setDefaultReleaseId(releaseId);
-            }
         }
     }
 
