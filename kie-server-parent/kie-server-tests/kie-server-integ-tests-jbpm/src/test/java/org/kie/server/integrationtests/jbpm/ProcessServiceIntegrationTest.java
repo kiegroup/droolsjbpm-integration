@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.internal.KieInternalServices;
@@ -35,6 +36,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
@@ -382,6 +384,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     }
 
     @Test
+    @Category(Smoke.class)
     public void testGetProcessInstance() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
         Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");

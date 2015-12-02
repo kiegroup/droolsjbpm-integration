@@ -817,6 +817,22 @@
       </build>
     </profile>
     <profile>
+      <!-- Run just smoke tests to check basic functionality. -->
+      <id>smoke</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <groups>org.kie.server.integrationtests.category.Smoke</groups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
       <!-- Integration tests are skipped by default. They are activated when specific container profile is used. -->
       <id>skipITs-by-default</id>
       <activation>

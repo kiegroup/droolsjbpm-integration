@@ -22,6 +22,7 @@ import static org.junit.Assume.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -33,6 +34,7 @@ import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.api.model.KieServerStatus;
 import org.kie.server.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.integrationtests.category.Smoke;
 
 public class KieControllerIntegrationTest extends KieControllerBaseTest {
 
@@ -56,6 +58,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
+    @Category(Smoke.class)
     public void testCreateKieServerInstance() {
         // Create kie server instance in controller.
         KieServerInstance serverInstance = controllerClient.createKieServerInstance(kieServerInfo);
@@ -124,6 +127,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     }
 
     @Test
+    @Category(Smoke.class)
     public void testGetKieServerInstance() {
         // Create kie server instance in controller.
         controllerClient.createKieServerInstance(kieServerInfo);
