@@ -28,10 +28,10 @@ import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.scanner.MavenRepository;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -43,6 +43,8 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.integrationtests.category.Smoke;
+import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
 public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -63,7 +65,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     public static void initialize() throws Exception {
         createAndDeployKJar(releaseId);
 
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        File jar = KieServerBaseIntegrationTest.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
     }
 
@@ -73,6 +75,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     }
 
     @Test
+    @Category(Smoke.class)
     public void testCallContainer() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
@@ -117,6 +120,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     }
 
     @Test
+    @Category(Smoke.class)
     public void testCommandScript() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         Object message = createInstance(MESSAGE_CLASS_NAME);
