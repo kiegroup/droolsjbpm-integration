@@ -18,7 +18,7 @@
       <artifactId>junit</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
     <!-- core deps -->
     <dependency>
       <groupId>org.kie</groupId>
@@ -32,7 +32,7 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
     </dependency>
-    
+
     <!-- kie server deps -->
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -89,10 +89,14 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>fluent-hc</artifactId>
     </dependency>
-   
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-embedder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
     </dependency>
 
     <!-- JSON/JAXB -->

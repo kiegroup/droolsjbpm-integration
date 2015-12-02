@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.scanner.MavenRepository;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -43,6 +42,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
 public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -63,7 +63,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     public static void initialize() throws Exception {
         createAndDeployKJar(releaseId);
 
-        File jar = MavenRepository.getMavenRepository().resolveArtifact(releaseId).getFile();
+        File jar = KieServerBaseIntegrationTest.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
     }
 
