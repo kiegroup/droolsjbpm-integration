@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.shared;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URI;
@@ -44,6 +45,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.cli.MavenCli;
+import org.apache.maven.project.MavenProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -57,6 +59,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.scanner.MavenRepository;
+import org.kie.scanner.embedder.MavenProjectLoader;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
@@ -85,7 +88,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected static TJWSEmbeddedJaxrsServer server;
     protected static TJWSEmbeddedJaxrsServer controller;
-    protected static MavenRepository repository;
+    private static MavenRepository repository;
 
     // Need to hold kie server instance because we need to manually handle startup/shutdown behavior defined in
     // context listener org.kie.server.services.Bootstrap. Embedded server doesn't support ServletContextListeners.
@@ -361,8 +364,7 @@ public abstract class KieServerBaseIntegrationTest {
         InternalKieModule kieModule = (InternalKieModule) ks.getRepository().getKieModule(releaseId);
         byte[] jar = kieModule.getBytes();
 
-        repository = MavenRepository.getMavenRepository();
-        repository.deployArtifact(releaseId, jar, pom);
+        getRepository().deployArtifact(releaseId, jar, pom);
     }
 
     protected static void assertSuccess(ServiceResponse<?> response) {
@@ -477,5 +479,20 @@ public abstract class KieServerBaseIntegrationTest {
                 new File(tempDir, file).delete();
             }
         }
+    }
+
+    protected static MavenRepository getRepository() {
+        if(repository == null) {
+            // Initialize repository with minimal pom file.
+            KieServices ks = KieServices.Factory.get();
+            ReleaseId initReleaseId = new ReleaseId("org.kie.server.initial", "init-maven-repo", "42");
+            KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(initReleaseId);
+            byte[] pom = kfs.read("pom.xml");
+
+            MavenProject minimalMavenProject = MavenProjectLoader.parseMavenPom(new ByteArrayInputStream(pom));
+            repository = MavenRepository.getMavenRepository(minimalMavenProject);
+        }
+
+        return repository;
     }
 }

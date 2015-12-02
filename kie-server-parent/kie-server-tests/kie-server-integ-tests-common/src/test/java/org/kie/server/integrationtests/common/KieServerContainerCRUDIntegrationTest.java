@@ -20,11 +20,13 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
@@ -39,6 +41,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     }
 
     @Test
+    @Category(Smoke.class)
     public void testCreateContainer() throws Exception {
         ServiceResponse<KieContainerResource> reply = client.createContainer("kie1", new KieContainerResource("kie1",
                                                                                                               releaseId1));
@@ -73,6 +76,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     }
 
     @Test
+    @Category(Smoke.class)
     public void testGetContainerInfo() throws Exception {
         client.createContainer("container-info", new KieContainerResource("container-info", releaseId1));
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo("container-info");

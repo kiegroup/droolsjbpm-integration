@@ -26,12 +26,14 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.core.AnyOf.*;
@@ -114,6 +116,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     }
 
     @Test
+    @Category(Smoke.class)
     public void testScheduleAndRunJob() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
