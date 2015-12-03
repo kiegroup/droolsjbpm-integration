@@ -189,7 +189,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
-        if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "true").equalsIgnoreCase("true")) {
+        if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "false").equalsIgnoreCase("false")) {
             String executorQueueName = System.getProperty("org.kie.executor.jms.queue", "queue/KIE.SERVER.EXECUTOR");
 
             // build executor service
@@ -342,7 +342,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         };
 
         for (Object service : services) {
-            if (serviceType.isAssignableFrom(service.getClass())) {
+            if (service != null && serviceType.isAssignableFrom(service.getClass())) {
                 return (T) service;
             }
         }
