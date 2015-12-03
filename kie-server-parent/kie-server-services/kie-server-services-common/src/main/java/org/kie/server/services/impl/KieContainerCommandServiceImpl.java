@@ -49,11 +49,11 @@ import org.slf4j.LoggerFactory;
 
 public class KieContainerCommandServiceImpl implements KieContainerCommandService {
 
-    private static final Pattern LOOKUP            = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
+    protected static final Pattern LOOKUP            = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
     private static final Logger logger             = LoggerFactory.getLogger(KieContainerCommandServiceImpl.class);
 
-    private KieServerImpl kieServer;
-    private final KieServerRegistry context;
+    protected KieServerImpl kieServer;
+    protected final KieServerRegistry context;
 
     public KieContainerCommandServiceImpl(KieServerImpl kieServer, KieServerRegistry context) {
         this.kieServer = kieServer;

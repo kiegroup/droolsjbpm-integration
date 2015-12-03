@@ -49,6 +49,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
     private static final Boolean filterRemoteable = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_FILTER_REMOTEABLE_CLASSES, "false"));
 
+    private RulesExecutionService rulesExecutionService;
     private KieContainerCommandService batchCommandService;
     private KieServerRegistry registry;
 
@@ -61,12 +62,14 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
-        this.batchCommandService = new KieContainerCommandServiceImpl(kieServer, registry);
+        this.rulesExecutionService = new RulesExecutionService(registry);
+        this.batchCommandService = new DroolsKieContainerCommandServiceImpl(kieServer, registry, this.rulesExecutionService);
         this.registry = registry;
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new DroolsKieSessionLookupHandler());
         }
         services.add(batchCommandService);
+        services.add(rulesExecutionService);
     }
 
     @Override
@@ -133,6 +136,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
         List<Object> appComponentsList =  new ArrayList<Object>();
         Object [] services = { 
                 batchCommandService,
+                rulesExecutionService,
                 registry
 
         };
