@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -18,7 +18,6 @@ package org.kie.services.client.serialization;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jbpm.services.task.jaxb.ComparePair;
 import org.junit.Test;
 import org.kie.internal.runtime.conf.AuditMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
@@ -26,15 +25,16 @@ import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.runtime.conf.PersistenceMode;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.services.client.serialization.jaxb.impl.deploy.JaxbDeploymentDescriptor;
+import org.kie.test.util.compare.ComparePair;
 
 public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest {
 
-    public TestType getType() { 
+    public TestType getType() {
         return TestType.JSON;
     }
-    
+
     protected JsonSerializationProvider jsonProvider = new JsonSerializationProvider();
-    
+
     public <T> T testRoundTrip(T in) throws Exception {
         String jsonStr = jsonProvider.serialize(in);
         logger.debug(jsonStr);
@@ -47,9 +47,9 @@ public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest
     }
 
     @Test
-    public void deploymentDescriptorTest() throws Exception { 
+    public void deploymentDescriptorTest() throws Exception {
        JaxbDeploymentDescriptor depDesc = new JaxbDeploymentDescriptor();
-      
+
        depDesc.setAuditMode(AuditMode.JMS);
        depDesc.setAuditPersistenceUnit("per-unit");
        String [] classes = { "class" };
@@ -70,7 +70,7 @@ public class JsonRemoteSerializationTest extends AbstractRemoteSerializationTest
        depDesc.setRuntimeStrategy(RuntimeStrategy.PER_PROCESS_INSTANCE);
        depDesc.setTaskEventListeners(oms);
        depDesc.setWorkItemHandlers(noms);
-       
+
        JaxbDeploymentDescriptor copyDepDesc = testRoundTrip(depDesc);
        ComparePair.compareObjectsViaFields(depDesc, copyDepDesc);
     }

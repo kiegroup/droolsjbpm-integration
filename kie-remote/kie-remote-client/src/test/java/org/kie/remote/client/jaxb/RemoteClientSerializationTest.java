@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -26,12 +26,10 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.jbpm.services.task.impl.model.TaskImpl;
 import org.jbpm.services.task.impl.model.UserImpl;
 import org.jbpm.services.task.impl.model.xml.JaxbI18NText;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
 import org.jbpm.services.task.impl.model.xml.JaxbTaskData;
-import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.Test;
@@ -47,21 +45,22 @@ import org.kie.internal.task.api.InternalTaskService;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.JsonSerializationProvider;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
+import org.kie.test.util.compare.ComparePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
 
-    protected static final Logger logger = LoggerFactory.getLogger(RemoteClientSerializationTest.class); 
-   
-    public RemoteClientSerializationTest() { 
+    protected static final Logger logger = LoggerFactory.getLogger(RemoteClientSerializationTest.class);
+
+    public RemoteClientSerializationTest() {
         super(true, true, "org.jbpm.persistence.jpa");
     }
-  
+
     protected JsonSerializationProvider jsonProvider = new JsonSerializationProvider();
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected JaxbSerializationProvider jaxbProvider = ClientJaxbSerializationProvider.newInstance();
-    { 
+    {
         jaxbProvider.setPrettyPrint(true);
     }
 
@@ -74,7 +73,7 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         logger.debug(xmlObject);
         return (T) jaxbProvider.deserialize(xmlObject);
     }
-    
+
     public <T> T testJsonRoundTrip(T in) throws Exception {
         String xmlObject = jsonProvider.serialize(in);
         logger.debug(xmlObject);
@@ -82,20 +81,20 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
     }
 
     // TESTS ----------------------------------------------------------------------------------------------------------------------
-    
+
     @Test
     public void taskSummaryListTest() throws Exception {
         RuntimeManager runtimeManager = createRuntimeManager(Strategy.SINGLETON, "test", "BPMN2-HumanTaskWithTaskContent.bpmn2");
         RuntimeEngine runtimeEngine = runtimeManager.getRuntimeEngine(null);
         KieSession ksession = runtimeEngine.getKieSession();
         TaskService taskService = runtimeEngine.getTaskService();
-        
+
         ProcessInstance procInst = ksession.startProcess("org.kie.remote.test.usertask.UserTask");
         long procInstId = procInst.getId();
 
         List<Long> statuses = new ArrayList<Long>();
         statuses.add(procInstId);
-        
+
         List<Long> taskIds = ((InternalTaskService)taskService).getTasksByProcessInstanceId(procInstId);
         assertEquals( "Task list size", 1, taskIds.size());
         Task task = ((InternalTaskService)taskService).getTaskById(taskIds.get(0));
@@ -103,7 +102,7 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         assertNotNull( "No business adminstrators!", task.getPeopleAssignments().getBusinessAdministrators() );
         assertFalse( "Empty business adminstrators!", task.getPeopleAssignments().getBusinessAdministrators().isEmpty() );
         String busAdmin = task.getPeopleAssignments().getBusinessAdministrators().get(0).getId();
-        
+
         Map<String, List<?>> fieldVals = new HashMap<String, List<?>>();
         fieldVals.put(PROCESS_INSTANCE_ID_LIST, statuses);
         List<org.kie.api.task.model.TaskSummary> taskSumList = ((InternalTaskService)taskService).getTasksByVariousFields(busAdmin, fieldVals, true);
@@ -111,10 +110,10 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         TaskSummaryImpl taskSumImpl = (TaskSummaryImpl) taskSumList.get(0);
         taskSumImpl.setActualOwner(new UserImpl("Minnie"));
         taskSumImpl.setCreatedBy(new UserImpl("Mickey"));
-       
+
         List<JaxbTaskSummary> jaxbTaskSumList = new ArrayList<JaxbTaskSummary>();
         Iterator<TaskSummary> iter = taskSumList.iterator();
-        while( iter.hasNext() ) { 
+        while( iter.hasNext() ) {
             jaxbTaskSumList.add(new JaxbTaskSummary(iter.next()));
         }
         JaxbTaskSummaryListResponse jaxbTaskSumListResp = new JaxbTaskSummaryListResponse(jaxbTaskSumList);
@@ -122,15 +121,15 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
         assertEquals( jaxbTaskSumListResp.getList().size(), jaxbTaskSumListRespCopy.getList().size() );
         TaskSummary taskSum = jaxbTaskSumListResp.getList().get(0);
         TaskSummary taskSumCopy = jaxbTaskSumListRespCopy.getList().get(0);
-        ComparePair.compareObjectsViaFields(taskSum, taskSumCopy, 
+        ComparePair.compareObjectsViaFields(taskSum, taskSumCopy,
                 "actualOwner", "createdBy",
                 "potentialOwners", // null
                 "createdOn", "activationTime", "expirationTime",
                 "subTaskStrategy"); // dates
     }
-  
+
     @Test
-    public void jsonTaskStringTest() throws Exception { 
+    public void jsonTaskStringTest() throws Exception {
         objectMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
 
        JaxbTask serverTask = new JaxbTask();
@@ -161,7 +160,7 @@ public class RemoteClientSerializationTest extends JbpmJUnitBaseTestCase {
        taskData.setOutputContentId(3l);
        taskData.setParentId(3l);
        taskData.setProcessSessionId(2l);
-       
+
        String jsonTaskStr = objectMapper.writeValueAsString(serverTask);
        logger.debug( jsonTaskStr );
        assertFalse( "String contains 'realClass' attribute", jsonTaskStr.contains("realClass"));

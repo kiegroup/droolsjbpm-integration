@@ -15,9 +15,6 @@
 
 package org.kie.services.client.serialization;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.kie.services.client.serialization.JaxbSerializationProvider.split;
 
 import java.lang.reflect.Field;
@@ -32,7 +29,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.jbpm.services.task.impl.model.UserImpl;
-import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.services.task.query.TaskSummaryImpl;
 import org.junit.Assume;
 import org.junit.Test;
@@ -41,6 +37,7 @@ import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.services.client.builder.objects.MyType;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
+import org.kie.test.util.compare.ComparePair;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;

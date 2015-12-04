@@ -102,9 +102,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-core</artifactId>
-      <type>test-jar</type>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

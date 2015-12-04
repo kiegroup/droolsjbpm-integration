@@ -32,7 +32,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
-import org.jbpm.services.task.jaxb.ComparePair;
 import org.jbpm.test.JbpmJUnitBaseTestCase;
 import org.junit.Assume;
 import org.junit.Test;
@@ -81,6 +80,7 @@ import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbType;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbGenericResponse;
+import org.kie.test.util.compare.ComparePair;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
