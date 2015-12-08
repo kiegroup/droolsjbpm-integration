@@ -112,6 +112,7 @@ public class JSONMarshaller implements Marshaller {
             }
 
             objectMapper.registerModule(mod);
+            customSerializationMapper.registerModule(mod);
         }
 
         fallbackObjectMapper = new ObjectMapper();
@@ -257,8 +258,8 @@ public class JSONMarshaller implements Marshaller {
             String className = value.getClass().getName();
             String json = customObjectMapper.writeValueAsString(value);
 
-            // don't wrap java and javax classes as they are always available
-            if (!className.startsWith("java.") && !className.startsWith("javax."))  {
+            // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+            if (!className.startsWith("java.") && !className.startsWith("javax.") && !json.contains(className))  {
                 json = "{\""+ className +"\":" + json + "}";
             }
             jgen.writeRawValue(json);
