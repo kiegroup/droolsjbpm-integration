@@ -4,7 +4,7 @@
     <audit-persistence-unit>org.jbpm.domain</audit-persistence-unit>
     <audit-mode>JPA</audit-mode>
     <persistence-mode>JPA</persistence-mode>
-    <runtime-strategy>SINGLETON</runtime-strategy>
+    <runtime-strategy>PER_REQUEST</runtime-strategy>
     <marshalling-strategies/>
     <event-listeners/>
     <task-event-listeners/>
