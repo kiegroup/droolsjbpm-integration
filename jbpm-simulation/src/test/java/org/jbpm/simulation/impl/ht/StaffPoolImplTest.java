@@ -28,9 +28,11 @@ import org.jbpm.simulation.SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.util.SimulationConstants;
 import org.jbpm.workflow.core.node.HumanTaskNode;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.definition.process.Node;
 
+@Ignore("Ignoring as this refers to unfinished work and requires to be revisited - JBPM-4871")
 public class StaffPoolImplTest {
 
     @Test
