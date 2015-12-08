@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
@@ -43,9 +44,9 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
     private static final String CONTAINER_ID = "deployment-descriptor-project";
     private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
-    private static final String PERSON_IDENTIFIER = "person";
     private static final String PERSON_NAME_FIELD = "name";
-    private static final String PERSON_NAME = "Bob";
+    private static final String GLOBAL_PERSON_IDENTIFIER = "person";
+    private static final String GLOBAL_PERSON_NAME = "Bob";
 
 
     @BeforeClass
@@ -71,15 +72,52 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);
 
         // retrieve global variable set in deployment descriptor
-        commands.add(commandsFactory.newGetGlobal(PERSON_IDENTIFIER));
+        commands.add(commandsFactory.newGetGlobal(GLOBAL_PERSON_IDENTIFIER));
 
         ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
         ExecutionResultImpl actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
         assertNotNull(actualData);
-        Object personVar = actualData.getResults().get(PERSON_IDENTIFIER);
+        Object personVar = actualData.getResults().get(GLOBAL_PERSON_IDENTIFIER);
         assertNotNull(personVar);
-        assertEquals(PERSON_NAME, valueOf(personVar, PERSON_NAME_FIELD));
+        assertEquals(GLOBAL_PERSON_NAME, valueOf(personVar, PERSON_NAME_FIELD));
+    }
+
+    @Test
+    public void testPerRequestRuntimeStrategy() throws Exception {
+        String personOutIdentifier = "personOut";
+        String personName = "yoda";
+
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, kieContainer.getClassLoader());
+
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);
+
+        // insert person object to working memory
+        Object createPersonInstance = createPersonInstance(personName);
+        commands.add(commandsFactory.newInsert(createPersonInstance, personOutIdentifier));
+        commands.add(commandsFactory.newGetObjects(personOutIdentifier));
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        ExecutionResults actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        assertNotNull(actualData);
+        ArrayList<Object> personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
+        assertEquals(1, personVar.size());
+        assertEquals(personName, valueOf(personVar.get(0), PERSON_NAME_FIELD));
+
+        // try to retrieve person object by new request
+        commands.clear();
+        commands.add(commandsFactory.newGetObjects(personOutIdentifier));
+        reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        assertNotNull(actualData);
+        personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
+        assertNullOrEmpty("Person object was returned!", personVar);
     }
 }
