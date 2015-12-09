@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -46,14 +46,14 @@ import org.kie.remote.services.rest.query.data.QueryResourceData;
 public class QueryResourceDataTest extends QueryResourceData {
 
     @Test
-    public void testUniqueQueryParameterIdentifiersBeingUsed() throws Exception { 
+    public void testUniqueQueryParameterIdentifiersBeingUsed() throws Exception {
         JbpmJUnitBaseTestCase test = new JbpmJUnitBaseTestCase(true, true, "org.jbpm.domain") { };
-        test.setUp(); 
+        test.setUp();
         boolean initialized = false;
-        try { 
+        try {
             initialized = RemoteServicesQueryData.initializeCriteriaAttributes();
-        } catch( Throwable t ) { 
-           String msg = t.getMessage(); 
+        } catch( Throwable t ) {
+           String msg = t.getMessage();
            int length = "List Id [".length();
            String idStr = msg.substring(length, msg.indexOf(']'));
            int id = Integer.parseInt(idStr);
@@ -64,99 +64,101 @@ public class QueryResourceDataTest extends QueryResourceData {
         assertTrue( "Criteria attributes was not initialized!", initialized);
         test.tearDown();
     }
-    
+
     @Test
-    public void testUniqueParameters() throws Exception { 
-    
-        List<Field> paramFields = 
+    public void testUniqueParameters() throws Exception {
+
+        List<Field> paramFields =
                 new LinkedList<Field>(Arrays.asList(QueryResourceData.class.getDeclaredFields()));
         Iterator<Field> iter = paramFields.iterator();
         List<String[]> allParams = new ArrayList<String[]>(paramFields.size());
-        while( iter.hasNext() ) { 
+        while( iter.hasNext() ) {
            Field field = iter.next();
            if( field.getName().equals("minMaxParams")
-               || field.getName().equals("nameValueParams") ) { 
+               || field.getName().equals("nameValueParams")
+               || field.getName().equals("regexParams") ) {
                continue;
            }
-           if( ! Modifier.isStatic(field.getModifiers()) ) { 
+           if( ! Modifier.isStatic(field.getModifiers()) ) {
               iter.remove();
               continue;
            }
-           if( ! field.getType().equals(String[].class) ) { 
-              continue; 
+           if( ! field.getType().equals(String[].class) ) {
+              continue;
            }
-           if( ! field.getName().contains("Params") ) { 
+           if( ! field.getName().contains("Params") ) {
               continue;
            }
            field.setAccessible(true);
-           allParams.add((String []) field.get(null));
+           String [] fieldParams = (String []) field.get(null);
+           allParams.add(fieldParams);
         }
-    
-        assertFalse( "No params found", allParams.isEmpty() ); 
-        
+
+        assertFalse( "No params found", allParams.isEmpty() );
+
         Set<String> params = new HashSet<String>();
-        for( String [] paramArr : allParams ) { 
-            for( String param : paramArr ) { 
-                if( param == null ) { 
+        for( String [] paramArr : allParams ) {
+            for( String param : paramArr ) {
+                if( param == null ) {
                     continue;
                 }
-                assertTrue( "Param \"" + param + "\" contains uppercase letters", 
+                assertTrue( "Param \"" + param + "\" contains uppercase letters",
                         param.toLowerCase().equals(param) );
-                assertTrue( "Param \"" + param + "\" is used twice", 
+                assertTrue( "Param \"" + param + "\" is used twice",
                         params.add(param) );
             }
         }
 
-        for( String param : ResourceBase.paginationParams ){ 
-            assertTrue( "Param \"" + param + "\" contains uppercase letters", 
+        for( String param : ResourceBase.paginationParams ){
+            assertTrue( "Param \"" + param + "\" contains uppercase letters",
                     param.toLowerCase().equals(param) );
-            assertTrue( "Param \"" + param + "\" is used twice", 
+            assertTrue( "Param \"" + param + "\" is used twice",
                     params.add(param) );
         }
-        assertTrue( "Param \"" +  PROC_INST_ID_PARAM_NAME + "\" is used twice", 
+        assertTrue( "Param \"" +  PROC_INST_ID_PARAM_NAME + "\" is used twice",
                 params.add(PROC_INST_ID_PARAM_NAME) );
     }
-    
+
     @Test
     @Ignore
     // "test" for printing/checking the switch logic in the QueryResourceImpl class
-    public void debugPrintSwitch() throws Exception { 
+    public void debugPrintSwitch() throws Exception {
         TreeMap<Integer, String> sortedActionParamMap = new TreeMap<Integer, String>(actionParamNameMap);
        for( Entry<Integer, String> action : sortedActionParamMap.entrySet() ) {
            int num = action.getKey();
-           switch( num ) { 
-           case 0: 
+           switch( num ) {
+           case 0:
                System.out.println( "\n// general");
                break;
-           case GENERAL_END: 
+           case GENERAL_END:
                System.out.println( "\n// task");
                break;
-           case TASK_END: 
+           case TASK_END:
                System.out.println( "\n// process instance");
                break;
-           case PROCESS_END: 
+           case PROCESS_END:
                System.out.println( "\n// variable instance");
                break;
-           case VARIABLE_END: 
+           case VARIABLE_END:
                System.out.println( "\n// meta");
                break;
            }
            System.out.println( "case " + num + ": // " + action.getValue()  + "\nbreak;");
        }
     }
-    
-       
+
+
     @Test
     @Ignore
-    public void debugPrintQueryParameterIds() throws Exception { 
+    public void debugPrintQueryParameterIds() throws Exception {
         Map<Integer, String> idMap = getQueryParameterIdNameMap();
-        for( Entry<Integer, String> entry : idMap.entrySet() ) { 
+        for( Entry<Integer, String> entry : idMap.entrySet() ) {
             int id = entry.getKey();
             String between = ( id < 10 ? " " : "") + " : ";
             System.out.println( id + between + entry.getValue());
         }
     }
-    
 
-    
+
+
 }

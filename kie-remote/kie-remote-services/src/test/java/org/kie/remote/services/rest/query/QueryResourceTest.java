@@ -19,7 +19,6 @@ import static org.kie.remote.services.rest.query.data.QueryResourceData.QUERY_PA
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -492,4 +491,5 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
             assertEquals( "Incorrect actual owner on task summary" , actualOwnerId, taskSum.getActualOwnerId() );
         }
     }
+
 }
