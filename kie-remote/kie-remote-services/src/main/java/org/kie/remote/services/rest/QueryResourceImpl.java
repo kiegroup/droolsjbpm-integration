@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -17,7 +17,6 @@ package org.kie.remote.services.rest;
 
 import static org.kie.internal.remote.PermissionConstants.*;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.isNameValueParam;
-import static org.kie.remote.services.rest.query.data.QueryResourceData.isSpecialParameter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,14 +77,14 @@ public class QueryResourceImpl extends ResourceBase {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
         checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(true), true, oper);
-        
+
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
         InternalTaskQueryHelper queryHelper = new InternalTaskQueryHelper(this);
-        JaxbQueryTaskResult result 
+        JaxbQueryTaskResult result
             = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityProvider.getName(), params, pageInfo);
         queryHelper.dispose();
-        
+
         return createCorrectVariant(result, headers);
     }
 
@@ -96,19 +95,19 @@ public class QueryResourceImpl extends ResourceBase {
         String oper = getRelativePath();
         Map<String, String[]> params = makeQueryParametersLowerCase(getRequestParams());
         checkIfParametersAreAllowed(params, QueryResourceData.getQueryParameters(false), true, oper);
-        
+
         int[] pageInfo = getPageNumAndPageSize(params, oper);
 
         String identityNotNeeded = null;
         InternalProcInstQueryHelper queryHelper = new InternalProcInstQueryHelper(this);
-        JaxbQueryProcessInstanceResult result 
+        JaxbQueryProcessInstanceResult result
             = queryHelper.queryTaskOrProcInstAndAssociatedVariables(identityNotNeeded, params, pageInfo);
         queryHelper.dispose();
 
         return createCorrectVariant(result, headers);
     }
-  
-    private static final String[] allowedQueryParams = { 
+
+    private static final String[] allowedQueryParams = {
         "workItemId",             // 0
         "taskId",                 // 1
         "businessAdministrator",  // 2
@@ -163,49 +162,50 @@ public class QueryResourceImpl extends ResourceBase {
 
         return resultList;
     }
-   
+
     // helper methods -------------------------------------------------------------------------------------------------------------
-   
-    static Map<String, String[]> makeQueryParametersLowerCase(Map<String, String[]> params) { 
-        if( params == null || params.isEmpty() )  { 
+
+    public static Map<String, String[]> makeQueryParametersLowerCase(Map<String, String[]> params) {
+        if( params == null || params.isEmpty() )  {
             return params;
         }
         Map<String, String[]> lowerCaseParams = new HashMap<String, String[]>(params.size());
-        for( Entry<String, String[]> entry : params.entrySet() ) { 
+        for( Entry<String, String[]> entry : params.entrySet() ) {
             String varName = entry.getKey();
-            if( isNameValueParam(varName) ) { 
+            if( isNameValueParam(varName) ) {
                 int _index = varName.indexOf('_');
                 varName = varName.substring(0, _index).toLowerCase() + varName.substring(_index);
-            } else { 
+            } else {
                 varName = varName.toLowerCase();
             }
             lowerCaseParams.put(varName, entry.getValue()) ;
         }
         return lowerCaseParams;
     }
-    
-    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) { 
+
+    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, String oper) {
         checkIfParametersAreAllowed(params, allowedParams, false, oper);
     }
-    
-    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, boolean checkSpecial, String oper ) { 
-        if( params == null || params.isEmpty() )  { 
+
+    public static void checkIfParametersAreAllowed(Map<String, String[]> params, Collection<String> allowedParams, boolean checkSpecial, String oper ) {
+        if( params == null || params.isEmpty() )  {
             return;
         }
-       
+
         EACHPARAM: for( String queryParam : params.keySet() ) {
-            for( String allowedParam : allowedParams ) {
-                if( allowedParam.equalsIgnoreCase(queryParam) || paginationParams.contains(queryParam) ) {
-                    continue EACHPARAM;
-                }
-                if( checkSpecial && queryParam.contains(allowedParam) && isSpecialParameter(queryParam) ) { 
-                    continue EACHPARAM;
-                }
+            if( paginationParams.contains(queryParam) ) {
+                continue EACHPARAM;
+            }
+            if( allowedParams.contains(queryParam) ) {
+                continue EACHPARAM;
+            }
+            if( checkSpecial && isNameValueParam(queryParam) ) {
+                continue EACHPARAM;
             }
             throw KieRemoteRestOperationException.badRequest(queryParam
                         + " is an unknown and unsupported query param for the " + oper + " operation.");
         }
     }
-    
+
 
 }
