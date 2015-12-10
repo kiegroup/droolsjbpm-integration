@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -33,6 +34,7 @@ import java.util.UUID;
 import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.process.audit.JPAAuditLogService;
+import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.instance.ProcessInstance;
 import org.jbpm.services.api.DeploymentService;
 import org.junit.After;
@@ -490,6 +492,43 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
                     taskSum.getActualOwner().getId() );
             assertEquals( "Incorrect actual owner on task summary" , actualOwnerId, taskSum.getActualOwnerId() );
         }
+    }
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS");
+
+    @Test
+    public void startDateTest() {
+        int [] pageInfo = { 0, 0 };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+
+        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertNotNull( "Null result", result );
+        assertFalse( "Empty result (all)", result.getProcessInstanceInfoList().isEmpty() );
+
+        JaxbQueryProcessInstanceInfo procInfo = result.getProcessInstanceInfoList().get(0);
+        long procInstId = procInfo.getProcessInstance().getId();
+
+        JPAAuditLogService auditService = new JPAAuditLogService(getEmf());
+        ProcessInstanceLog log = auditService.findProcessInstance(procInstId);
+        List<org.kie.api.runtime.manager.audit.ProcessInstanceLog> logs
+            = auditService.processInstanceLogQuery().startDate(log.getStart()).build().getResultList();
+        assertNotNull( "Null List of ProcessInstanceLog", logs );
+        assertFalse( "Empty List of ProcessInstanceLog", logs.isEmpty() );
+        assertEquals( "List of ProcessInstanceLog", 1, logs.size() );
+        assertEquals( "ProcessInstanceLog retrieved by start date", log.getStart(), logs.get(0).getStart() );
+
+        Date startDate = log.getStart();
+
+        String startDateStr = sdf.format(startDate);
+        addParams(queryParams, "startdate", startDateStr);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        assertNotNull( "Null result", result );
+        assertFalse( "Empty result (all)", result.getProcessInstanceInfoList().isEmpty() );
+        assertEquals( "Process instance info list", 1, result.getProcessInstanceInfoList().size() );
+
+        procInfo = result.getProcessInstanceInfoList().get(0);
+        assertEquals( "Process instance id", procInstId, procInfo.getProcessInstance().getId() );
     }
 
 }
