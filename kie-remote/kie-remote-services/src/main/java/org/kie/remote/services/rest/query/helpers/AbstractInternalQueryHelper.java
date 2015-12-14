@@ -364,6 +364,9 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
         int[] intData;
         long[] longData;
         Date[] dateData;
+
+        List<QueryAction> varValueQueryActions = new java.util.LinkedList<QueryAction>();
+
         while( !queryActionQueue.isEmpty() ) {
             QueryAction queryAction = queryActionQueue.poll();
             String[] data = queryAction.paramData;
@@ -533,22 +536,49 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 setRegexOnOff(queryAction, false);
                 break;
             case 16: // var
-                assert "var".equals(actionParamNameMap.get(action)): action + " : var";
-                variableValue(data[0], varValueMap.get(data[0]));
+                varValueQueryActions.add(queryAction);
                 break;
             case 17: // varregex
-                assert "varregex".equals(actionParamNameMap.get(action)): action + " : varregex";
-                setRegexOnOff(queryAction, true);
-                variableValue(data[0], varRegexMap.get(data[0]));
-                setRegexOnOff(queryAction, false);
+                varValueQueryActions.add(queryAction);
                 break;
 
             default:
                 throw KieRemoteRestOperationException.internalServerError("Please contact the developers: state [" + action + "] should not be possible.");
             }
-            if( queryAction.min || queryAction.max || queryAction.regex ) {
+            if( (queryAction.min || queryAction.max || queryAction.regex) && action < 16 ) {
                 throw KieRemoteRestOperationException.notFound("Query parameter '" + queryAction.paramName + "' is not supported.");
             }
+        }
+
+        if( ! varValueQueryActions.isEmpty() ) {
+
+            // start a new criteria group, and make it disjunctive
+            newGroup();
+            or();
+
+            for( QueryAction varQueryAction : varValueQueryActions ) {
+                String[] data = varQueryAction.paramData;
+                int action = varQueryAction.action;
+                switch ( action ) {
+                case 16: // var
+                    assert "var".equals(actionParamNameMap.get(action)): action + " : var";
+                    variableValue(data[0], varValueMap.get(data[0]));
+                    break;
+                case 17: // varregex
+                    assert "varregex".equals(actionParamNameMap.get(action)): action + " : varregex";
+                    setRegexOnOff(varQueryAction, true);
+                    variableValue(data[0], varRegexMap.get(data[0]));
+                    setRegexOnOff(varQueryAction, false);
+                    break;
+
+                default:
+                    throw KieRemoteRestOperationException.internalServerError("Please contact the developers: state [" + action + "] should not be possible.");
+                }
+            }
+
+            // close the criteria group, and reset it to an intersection
+            endGroup();
+            and();
         }
     }
 

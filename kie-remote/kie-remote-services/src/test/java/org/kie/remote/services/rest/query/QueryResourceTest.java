@@ -390,44 +390,6 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
     }
 
     @Test
-    @Ignore("BZ-1199993 - No results from Process Query API when I query process instances with 2 or more variables")
-    public void moreQueryProcessRestCallTest() throws Exception  {
-        int pageSize = 5;
-        assertTrue( numProcesses > pageSize );
-        int [] pageInfo = { 0, pageSize };
-        Map<String, String[]> queryParams = new HashMap<String, String[]>();
-        addParams(queryParams, "processinstancestatus", "" + ProcessInstance.STATE_COMPLETED );
-
-        // simple (everything)
-        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertTrue( "Empty result (status complete)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
-        int origNumResults = result.getProcessInstanceInfoList().size();
-
-        JaxbQueryProcessInstanceInfo foundProcInfo = null;
-        FIND: for( JaxbQueryProcessInstanceInfo queryProcInfo : result.getProcessInstanceInfoList() ) {
-            assertEquals( "Incorrect process instance state!", ProcessInstance.STATE_COMPLETED, queryProcInfo.getProcessInstance().getState() );
-            for( JaxbVariableInfo varInfo : queryProcInfo.getVariables() ) {
-                if( varInfo.getName().equals("secondStr") ) {
-                   foundProcInfo = queryProcInfo;
-                   break FIND;
-                }
-            }
-        }
-        assertNotNull( "Could not find process instance!" , foundProcInfo );
-
-        int i = 0;
-        for( JaxbVariableInfo varInfo : foundProcInfo.getVariables() ) {
-            if( i++ > 1 ) break;
-            addParams(queryParams, "var_" + varInfo.getName(), varInfo.getValue().toString() );
-        }
-
-        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertFalse( "Null result ('COMPLETE' + var1 + var2)", result == null || result.getProcessInstanceInfoList() == null );
-        assertFalse( "Empty result ('COMPLETE' + var1 + var2)", result.getProcessInstanceInfoList().isEmpty() );
-        assertEquals( "Incorrect num results", origNumResults + 1, result.getProcessInstanceInfoList().size() );
-    }
-
-    @Test
     public void duplicateTaskSummaryResultsTest() {
         int [] pageInfo = { 0, 0 };
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
@@ -524,6 +486,68 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
 
         procInfo = result.getProcessInstanceInfoList().get(0);
         assertEquals( "Process instance id", procInstId, procInfo.getProcessInstance().getId() );
+    }
+
+    @Test
+    public void twoVariableTest() throws Exception  {
+        int pageSize = 5;
+        assertTrue( numProcesses > pageSize );
+        int [] pageInfo = { 0, pageSize };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "processinstancestatus", "" + ProcessInstance.STATE_COMPLETED );
+
+        // simple (everything)
+        JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertTrue( "Empty result (status complete)", result != null && result.getProcessInstanceInfoList() != null && ! result.getProcessInstanceInfoList().isEmpty() );
+        int origNumResults = result.getProcessInstanceInfoList().size();
+
+        JaxbQueryProcessInstanceInfo foundProcInfo = null;
+        for( JaxbQueryProcessInstanceInfo queryProcInfo : result.getProcessInstanceInfoList() ) {
+            assertEquals( "Incorrect process instance state!", ProcessInstance.STATE_COMPLETED, queryProcInfo.getProcessInstance().getState() );
+            for( JaxbVariableInfo varInfo : queryProcInfo.getVariables() ) {
+                if( varInfo.getName().equals("secondStr") && foundProcInfo == null) {
+                   foundProcInfo = queryProcInfo;
+                }
+            }
+        }
+        assertNotNull( "Could not find process instance!" , foundProcInfo );
+
+        Map<String, String> varValueMap = new HashMap<String, String>();
+        int numVars = 0;
+        for( JaxbVariableInfo varInfo : foundProcInfo.getVariables() ) {
+            String name = varInfo.getName();
+            String value = varInfo.getValue().toString();
+            varValueMap.put(name, value);
+            addParams(queryParams, "var_" + name, value );
+            ++numVars;
+        }
+
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertFalse( "Null result ('COMPLETE' + var1 OR var2 OR var3)", result == null || result.getProcessInstanceInfoList() == null );
+        assertFalse( "Empty result ('COMPLETE' + var1 OR var2 OR var3)", result.getProcessInstanceInfoList().isEmpty() );
+
+        for( JaxbQueryProcessInstanceInfo procInstInfo : result.getProcessInstanceInfoList() ) {
+            int variablesFound = 0;
+            for( JaxbVariableInfo varInfo : procInstInfo.getVariables() ) {
+                String value = varValueMap.get(varInfo.getName());
+                if( varInfo.getValue().toString().equals(value) ) {
+                    ++variablesFound;
+                }
+            }
+            assertEquals( "Variables found", numVars, variablesFound );
+        }
+        assertEquals( "Incorrect num results", 1, result.getProcessInstanceInfoList().size() );
+
+        // test OR functionality (listing var_ parameters A and B gets results that reference var A OR var B)
+        queryParams.clear();
+        addParams(queryParams, "varregex_inputStr", "*check*");
+        addParams(queryParams, "vr_secondStr", "*-second-*");
+        addParams(queryParams, "processinstancestatus", "" + ProcessInstance.STATE_COMPLETED );
+
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertFalse( "Null result ('COMPLETE' + var1 OR var2)", result == null || result.getProcessInstanceInfoList() == null );
+        assertFalse( "Empty result ('COMPLETE' + var1 OR var2)", result.getProcessInstanceInfoList().isEmpty() );
+        assertEquals( "Num results ('COMPLETE' + var1 OR var2)", origNumResults, result.getProcessInstanceInfoList().size() );
     }
 
 }
