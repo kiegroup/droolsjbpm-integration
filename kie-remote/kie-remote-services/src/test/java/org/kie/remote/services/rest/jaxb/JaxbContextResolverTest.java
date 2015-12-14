@@ -43,12 +43,14 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentEvent;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.DeploymentUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.runtime.KieContainer;
 import org.kie.services.client.serialization.SerializationException;
 
 /**
@@ -101,6 +103,12 @@ public class JaxbContextResolverTest {
        // deploy
        DeployedUnit deployedUnit = mock(DeployedUnit.class);
        when(deployedUnit.getDeployedClasses()).thenReturn(depClasses);
+       KModuleDeploymentUnit  deploymentUnit = mock(KModuleDeploymentUnit.class);
+       when(deployedUnit.getDeploymentUnit()).thenReturn(deploymentUnit);
+       KieContainer kieContainer = mock(KieContainer.class);
+       when(deploymentUnit.getKieContainer()).thenReturn(kieContainer);
+       when(kieContainer.getClassLoader()).thenReturn(this.getClass().getClassLoader());
+
        DeploymentEvent event = new DeploymentEvent(deploymentId, deployedUnit);
        resolver.dynamicContext.addOnDeploy(event);
     }
