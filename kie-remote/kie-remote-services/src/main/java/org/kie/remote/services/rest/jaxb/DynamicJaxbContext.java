@@ -39,7 +39,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Validator;
 
 import org.jbpm.kie.services.api.DeploymentIdResolver;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DeploymentEvent;
+import org.jbpm.services.api.model.DeploymentUnit;
 import org.jbpm.services.cdi.Deploy;
 import org.jbpm.services.cdi.Undeploy;
 import org.kie.remote.services.exception.KieRemoteServicesDeploymentException;
@@ -137,7 +139,10 @@ public class DynamicJaxbContext extends JAXBContext {
     public void addOnDeploy(@Observes @Deploy DeploymentEvent event) {
         String deploymentId = event.getDeploymentId();
         deploymentClassesMap.put(deploymentId, event.getDeployedUnit().getDeployedClasses());
-        setupDeploymentJaxbContext(deploymentId);
+        DeploymentUnit deploymentUnit = event.getDeployedUnit().getDeploymentUnit();
+        ClassLoader projectClassLoader = ((KModuleDeploymentUnit) deploymentUnit).getKieContainer().getClassLoader();
+
+        setupDeploymentJaxbContext(deploymentId, projectClassLoader);
     }
 
     /**
@@ -249,7 +254,7 @@ public class DynamicJaxbContext extends JAXBContext {
      * Package scope to allow testing
      * @param deploymentId The deployment identifier.
      */
-    void setupDeploymentJaxbContext(String deploymentId) {
+    void setupDeploymentJaxbContext(String deploymentId, ClassLoader projectClassLoader) {
         if( contextsCache.containsKey(deploymentId) ) {
             logger.error("JAXB context instance already found when deploying deployment '" + deploymentId + "'!");
             contextsCache.remove(deploymentId);
@@ -278,7 +283,7 @@ public class DynamicJaxbContext extends JAXBContext {
         JAXBContext jaxbContext = null;
         try {
             if( smartJaxbContextInitialization ) {
-                jaxbContext = smartJaxbContextInitialization(allClassesArr, deploymentId);
+                jaxbContext = smartJaxbContextInitialization(allClassesArr, deploymentId, projectClassLoader);
             } else {
                 jaxbContext = JAXBContext.newInstance(allClassesArr);
             }
@@ -308,7 +313,7 @@ public class DynamicJaxbContext extends JAXBContext {
          smartJaxbContextInitialization = smartJaxbContextInitProperty;
     }
 
-    private JAXBContext smartJaxbContextInitialization(Class [] jaxbContextClasses, String deploymentId) throws JAXBException {
+    private JAXBContext smartJaxbContextInitialization(Class [] jaxbContextClasses, String deploymentId, ClassLoader projectClassLoader) throws JAXBException {
 
         List<Class> classList = new ArrayList<Class>(Arrays.asList(jaxbContextClasses));
 
@@ -320,14 +325,14 @@ public class DynamicJaxbContext extends JAXBContext {
                 retryJaxbContextCreation = false;
             } catch( IllegalAnnotationsException iae ) {
                 // throws any exception it can not process
-                removeClassFromJaxbContextClassList(classList, iae, deploymentId);
+                removeClassFromJaxbContextClassList(classList, iae, deploymentId, projectClassLoader);
             }
         }
 
         return jaxbContext;
     }
 
-    private void removeClassFromJaxbContextClassList( List<Class> classList, IllegalAnnotationsException iae, String deploymentId)
+    private void removeClassFromJaxbContextClassList( List<Class> classList, IllegalAnnotationsException iae, String deploymentId, ClassLoader projectClassLoader)
         throws IllegalAnnotationException {
 
         Set<Class> removedClasses = new HashSet<Class>();
@@ -338,7 +343,7 @@ public class DynamicJaxbContext extends JAXBContext {
                String className = classLocs.listIterator(classLocs.size()).previous().toString();
                Class removeClass = null;
                try {
-                   removeClass = Class.forName(className);
+                   removeClass = Class.forName(className, true, projectClassLoader);
                    if( ! removedClasses.add(removeClass) ) {
                        // we've already determined that this class was bad
                        continue;
