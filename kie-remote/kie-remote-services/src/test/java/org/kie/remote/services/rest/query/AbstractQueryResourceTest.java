@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
@@ -46,13 +47,13 @@ import ch.qos.logback.classic.Level;
 abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
 
     protected static final Logger logger = LoggerFactory.getLogger(QueryResourceQueryBuilderTest.class);
-    
+
     protected static final String PROCESS_STRING_VAR_FILE = "BPMN2-HumanTaskWithStringVariables.bpmn2";
     protected static final String PROCESS_STRING_VAR_ID = "org.var.human.task.string";
     protected static final String PROCESS_OBJ_VAR_FILE = "BPMN2-HumanTaskWithObjectVariables.bpmn2";
     protected static final String PROCESS_OBJ_VAR_ID = "org.var.human.task.object";
     protected static final String USER_ID = "john";
-    
+
     protected static ObjectMapper jsonMapper = new ObjectMapper();
     protected static JaxbSerializationProvider jaxbClientMapper = ServerJaxbSerializationProvider.newInstance();
     protected static JaxbSerializationProvider jaxbServerMapper = ClientJaxbSerializationProvider.newInstance();
@@ -67,83 +68,82 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
 
     public AbstractQueryResourceTest() {
         super(true, true, "org.jbpm.domain");
-        
+
         Logger logger = LoggerFactory.getLogger(DatabaseMetadata.class);
-        if( logger instanceof ch.qos.logback.classic.Logger ) { 
+        if( logger instanceof ch.qos.logback.classic.Logger ) {
             ((ch.qos.logback.classic.Logger) logger).setLevel(Level.OFF);
         }
     }
-    
-    protected <T> T roundTripJson(T in) throws Exception { 
+
+    protected <T> T roundTripJson(T in) throws Exception {
         String jsonStr = jsonMapper.writeValueAsString(in);
         logger.debug("\n" + jsonStr);
         return (T) jsonMapper.readValue(jsonStr, in.getClass());
     }
-   
-    protected <T> T roundTripXml(T in) throws Exception { 
+
+    protected <T> T roundTripXml(T in) throws Exception {
         String xmlStr = jaxbServerMapper.serialize(in);
         logger.debug("\n" + xmlStr);
         return (T) jaxbClientMapper.deserialize(xmlStr);
     }
-  
+
     // must be at least 5
     protected static int numTestProcesses = 10;
-    protected boolean testDataInitialized = false;
-    protected boolean addObjectProcessInstances = true;
-    
-    protected void setupTestData() { 
-        if( ! testDataInitialized ) { 
-            for( int i = 0; i < numTestProcesses; ++i ) { 
+    protected AtomicBoolean testDataInitialized = new AtomicBoolean(false);
+    protected volatile boolean addObjectProcessInstances = true;
+
+    protected void setupTestData() {
+        if( testDataInitialized.compareAndSet(false, true) ) {
+            for( int i = 0; i < numTestProcesses; ++i ) {
                 runStringProcess(ksession, i);
-                if( addObjectProcessInstances ) { 
+                if( addObjectProcessInstances ) {
                     runObjectProcess(ksession, i);
                 }
             }
-            testDataInitialized = true;
         }
-    } 
-        
-    protected void runStringProcess(KieSession ksession, int i) { 
+    }
+
+    protected void runStringProcess(KieSession ksession, int i) {
         Map<String, Object> params = new HashMap<String, Object>();
         String initValue = UUID.randomUUID().toString();
         params.put("inputStr", "proc-" + i + "-" + initValue );
-        params.put("otherStr", "proc-" + i + "-" + initValue ); 
+        params.put("otherStr", "proc-" + i + "-" + initValue );
         params.put("secondStr", i + "-second-" + random.nextInt(Integer.MAX_VALUE));
         ProcessInstance processInstance = ksession.startProcess(PROCESS_STRING_VAR_ID, params);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
         procInstIds.add(procInstId);
-        
+
         List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
         assertFalse( "No tasks found!", taskIds.isEmpty() );
-        long taskId = taskIds.get(0); 
+        long taskId = taskIds.get(0);
         taskService.start(taskId, USER_ID);
-        
+
         Map<String, Object> taskResults = new HashMap<String, Object>();
         taskResults.put("taskOutputStr", "task-1-" + procInstId);
         taskService.complete(taskId, USER_ID, taskResults);
-    
+
         AuditLogService logService = new JPAAuditLogService(getEmf());
         List<VariableInstanceLog> vils = logService.findVariableInstances(procInstId);
         assertTrue( "No variable instance logs found", vils != null && ! vils.isEmpty() );
         assertTrue( "Too few variable instance logs found", vils.size() > 3 );
-        
+
         taskIds = taskService.getTasksByProcessInstanceId(procInstId);
         assertFalse( "No tasks found!", taskIds.isEmpty() );
-        taskId = taskIds.get(1); 
+        taskId = taskIds.get(1);
         Task task = taskService.getTaskById(taskId);
         taskService.start(taskId, USER_ID);
-        
+
         taskResults = new HashMap<String, Object>();
         taskResults.put("taskOutputStr", "task-2-" + procInstId);
         taskService.complete(taskId, USER_ID, taskResults);
-        
+
         assertNull("Process instance has not been finished.", ksession.getProcessInstance(procInstId) );
     }
 
     protected static Random random = new Random();
-    
-    protected void runObjectProcess(KieSession ksession, int i) { 
+
+    protected void runObjectProcess(KieSession ksession, int i) {
         Map<String, Object> params = new HashMap<String, Object>();
         String initValue = "start-" + i;
         params.put("inputStr", new MyType(initValue, random.nextInt()));
@@ -151,40 +151,40 @@ abstract class AbstractQueryResourceTest extends JbpmJUnitBaseTestCase {
         ProcessInstance processInstance = ksession.startProcess(PROCESS_OBJ_VAR_ID, params);
         assertTrue( processInstance != null && processInstance.getState() == ProcessInstance.STATE_ACTIVE);
         long procInstId = processInstance.getId();
-        
+
         List<Long> taskIds = taskService.getTasksByProcessInstanceId(procInstId);
         assertFalse( "No tasks found!", taskIds.isEmpty() );
-        long taskId = taskIds.get(0); 
+        long taskId = taskIds.get(0);
         taskService.start(taskId, USER_ID);
-        
+
         Map<String, Object> taskResults = new HashMap<String, Object>();
         taskResults.put("taskOutputStr", new MyType("task-" + procInstId, random.nextInt()));
         taskService.complete(taskId, USER_ID, taskResults);
-    
+
         assertNull("Process instance has not been finished.", ksession.getProcessInstance(procInstId) );
-        
+
         AuditLogService logService = new JPAAuditLogService(getEmf());
         List<VariableInstanceLog> vils = logService.findVariableInstances(procInstId);
         assertTrue( "No variable instance logs found", vils != null && ! vils.isEmpty() );
         assertTrue( "Too few variable instance logs found: " + vils.size(), vils.size() >= 3 );
-        
+
         VariableInstanceLog lastVil = null;
-        for( VariableInstanceLog vil : vils ) { 
-            if( ! vil.getVariableId().equals("inputStr") ) { 
-               continue; 
+        for( VariableInstanceLog vil : vils ) {
+            if( ! vil.getVariableId().equals("inputStr") ) {
+               continue;
             }
-            if( lastVil == null ) { 
+            if( lastVil == null ) {
                 lastVil = vil;
             }
-            if( lastVil.getId() < vil.getId() ) { 
+            if( lastVil.getId() < vil.getId() ) {
                 lastVil = vil;
             }
         }
-        assertTrue( lastVil.getVariableId() + ": " + lastVil.getValue(), 
+        assertTrue( lastVil.getVariableId() + ": " + lastVil.getValue(),
                 lastVil.getValue().contains("check") || lastVil.getVariableId().equals("otherStr") );
     }
 
-    protected static void addParams(Map<String, String[]> params, String name, String... values ) { 
+    protected static void addParams(Map<String, String[]> params, String name, String... values ) {
        params.put(name,  values);
     }
 }
