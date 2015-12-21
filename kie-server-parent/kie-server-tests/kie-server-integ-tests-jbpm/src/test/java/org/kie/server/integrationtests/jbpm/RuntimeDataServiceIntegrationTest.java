@@ -1148,6 +1148,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         processInstanceIds.add(processClient.startProcess("definition-project", "definition-project.usertask", parameters));
         processInstanceIds.add(processClient.startProcess("definition-project", "definition-project.signalprocess", parameters));
 
+        Collections.sort(processInstanceIds);
         return processInstanceIds;
     }
 
