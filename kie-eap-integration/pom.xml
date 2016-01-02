@@ -14,6 +14,9 @@
 
   <properties>
     <version.fuse.patch>1.6.2</version.fuse.patch>
+    <!-- Disabled as this module will likely be removed in near future and it would be just a waste of time to clean it
+     up as there are hundreds of duplicated classes brought in via transitive deps. See https://issues.jboss.org/browse/DROOLS-1427 -->
+    <enforcer.failOnDuplicatedClasses>false</enforcer.failOnDuplicatedClasses>
   </properties>
 
   <modules>

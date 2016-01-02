@@ -28,6 +28,11 @@
           <groupId>javassist</groupId>
           <artifactId>javassist</artifactId>
         </exclusion>
+        <exclusion>
+          <!-- Collides with 'com.google.code.findbugs:annotations'. -->
+          <groupId>net.jcip</groupId>
+          <artifactId>jcip-annotations</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

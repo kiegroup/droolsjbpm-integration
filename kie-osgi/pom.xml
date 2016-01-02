@@ -16,6 +16,12 @@
 
   <name>KIE :: OSGi Integration Parent Project</name>
 
+  <properties>
+    <!-- The OSGi modules depend on both non-osgi and osgi jars (with different GAs. It seems there is no easy way
+         to fix this. -->
+    <enforcer.failOnDuplicatedClasses>false</enforcer.failOnDuplicatedClasses>
+  </properties>
+
   <modules>
     <module>kie-karaf-itests-domain-model</module>
     <module>kie-karaf-itests-kjar</module>

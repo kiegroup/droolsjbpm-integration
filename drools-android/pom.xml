@@ -53,6 +53,14 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xpp3</groupId>
+          <artifactId>xpp3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xmlParserAPIs</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -72,6 +80,12 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.roboguice</groupId>
@@ -101,9 +115,13 @@
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-ant-tasks</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+  <dependency>
       <groupId>org.robolectric</groupId>
       <artifactId>robolectric-annotations</artifactId>
       <optional>true</optional>
