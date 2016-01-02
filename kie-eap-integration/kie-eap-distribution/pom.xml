@@ -41,17 +41,6 @@
     </plugins>
   </build>
 
-  <dependencyManagement>
-    <dependencies>
-      <!-- TODO remove this once we use ip-bom that contains https://github.com/jboss-integration/jboss-integration-platform-bom/pull/314 -->
-      <dependency>
-        <groupId>org.sonatype.sisu.inject</groupId>
-        <artifactId>guice-servlet</artifactId>
-        <version>${version.org.sonatype.sisu.sisu-guice}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>

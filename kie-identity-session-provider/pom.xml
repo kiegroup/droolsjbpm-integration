@@ -38,6 +38,12 @@
     <dependency>
      <groupId>org.jboss.errai</groupId>
       <artifactId>errai-security-server</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
      <groupId>org.uberfire</groupId>

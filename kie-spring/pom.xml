@@ -56,6 +56,13 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-decisiontables</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- Collides with 'xml-apis:xml-apis' -->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -159,6 +166,13 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-ci</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Partially collides with 'org.springframework:spring-aop'. -->
+          <groupId>aopalliance</groupId>
+          <artifactId>aopalliance</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

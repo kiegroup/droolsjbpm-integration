@@ -38,9 +38,7 @@
         <include>org.kie:kie-api</include>
         <include>org.kie:kie-aries-blueprint</include>
         <include>org.kie:kie-internal</include>
-        <include>org.kie:kie-maven-plugin</include>
         <include>org.kie:kie-ci</include>
-        <include>org.kie:kie-ci-osgi</include>
         <include>org.kie:kie-spring</include>
         <include>org.kie.server:kie-server-common</include>
         <include>org.kie.server:kie-server-api</include>
@@ -92,9 +90,7 @@
         <exclude>org.kie:kie-api</exclude>
         <exclude>org.kie:kie-aries-blueprint</exclude>
         <exclude>org.kie:kie-internal</exclude>
-        <exclude>org.kie:kie-maven-plugin</exclude>
         <exclude>org.kie:kie-ci</exclude>
-        <exclude>org.kie:kie-ci-osgi</exclude>
         <exclude>org.kie:kie-spring</exclude>
         <exclude>org.kie.server:kie-server-common</exclude>
         <exclude>org.kie.server:kie-server-api</exclude>

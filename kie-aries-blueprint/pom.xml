@@ -92,6 +92,12 @@
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -168,6 +174,35 @@
         <directory>src/test/filtered-resources</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>ban-duplicated-classes</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <banDuplicateClasses>
+                    <ignoreClasses combine.children="append">
+                      <!-- Duplicated by different blueprint artifacts and the testing uberjar *noosgi -->
+                      <ignoreClass>org.osgi.service.blueprint.*</ignoreClass>
+                      <ignoreClass>org.apache.aries.blueprint.*</ignoreClass>
+                    </ignoreClasses>
+                    <findAllDuplicates>true</findAllDuplicates>
+                  </banDuplicateClasses>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>

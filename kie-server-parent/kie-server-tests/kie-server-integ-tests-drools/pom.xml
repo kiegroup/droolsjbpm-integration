@@ -45,6 +45,13 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- Classes from this dependency already packaged in 'xml-apis:xml-apis'-->
+          <groupId>javax.xml.stream</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -90,6 +97,12 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
    <!--  Stay with httpcomponents: it will save us pain (as opposed to changing from resteasy to cxf to cxf 3.0, etc. --> 
