@@ -35,5 +35,10 @@
       </exclusions>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+    </dependency>
+
   </dependencies>
 </project>
