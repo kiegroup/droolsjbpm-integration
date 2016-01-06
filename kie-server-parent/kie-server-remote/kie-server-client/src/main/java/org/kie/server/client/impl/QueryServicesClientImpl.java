@@ -496,6 +496,29 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
+    public ProcessInstance findProcessInstanceById(Long processInstanceId, boolean withVars) {
+        ProcessInstance result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI, valuesMap) + "?withVars=" + withVars, ProcessInstance.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getProcessInstanceById", new Object[]{processInstanceId, withVars}) ) );
+            ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+        return result;
+    }
+
+    @Override
     public ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey) {
         ProcessInstance result = null;
         if( config.isRest() ) {
