@@ -68,6 +68,8 @@ public interface QueryServicesClient {
 
     ProcessInstance findProcessInstanceById(Long processInstanceId);
 
+    ProcessInstance findProcessInstanceById(Long processInstanceId, boolean withVars);
+
     ProcessInstance findProcessInstanceByCorrelationKey(CorrelationKey correlationKey);
 
     NodeInstance findNodeInstanceByWorkItemId(Long processInstanceId, Long workItemId);
