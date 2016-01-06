@@ -19,7 +19,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
@@ -191,13 +193,25 @@ public class RuntimeDataServiceBase {
         return processInstanceList;
     }
 
-    public org.kie.server.api.model.instance.ProcessInstance getProcessInstanceById(long processInstanceId) {
+    public org.kie.server.api.model.instance.ProcessInstance getProcessInstanceById(long processInstanceId, boolean withVars) {
 
         ProcessInstanceDesc processInstanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId);
         if (processInstanceDesc == null) {
             throw new ProcessInstanceNotFoundException("Could not find process instance with id " + processInstanceId);
         }
-        return convertToProcessInstance(processInstanceDesc);
+        
+        org.kie.server.api.model.instance.ProcessInstance processInstance = convertToProcessInstance(processInstanceDesc);
+        
+        if (Boolean.TRUE.equals(withVars)) {
+            Collection<VariableDesc> variableDescs = runtimeDataService.getVariablesCurrentState(processInstanceId);
+            Map<String, Object> vars = new HashMap<String, Object>();
+            for (VariableDesc var : variableDescs) {
+                vars.put(var.getVariableId(), var.getNewValue());
+            }
+            processInstance.setVariables(vars);
+        }
+        
+        return processInstance;
     }
 
 
