@@ -145,12 +145,11 @@ public class RuntimeDataResource {
     @GET
     @Path(PROCESS_INSTANCE_BY_INSTANCE_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getProcessInstanceById(@Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId) {
+    public Response getProcessInstanceById(@Context HttpHeaders headers, @PathParam("pInstanceId") long processInstanceId, @QueryParam("withVars") boolean withVars) {
         Variant v = getVariant(headers);
         org.kie.server.api.model.instance.ProcessInstance processInstanceDesc = null;
         try{
-
-            processInstanceDesc = runtimeDataServiceBase.getProcessInstanceById(processInstanceId);
+            processInstanceDesc = runtimeDataServiceBase.getProcessInstanceById(processInstanceId, withVars);
         } catch(ProcessInstanceNotFoundException e) {
 
             return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
