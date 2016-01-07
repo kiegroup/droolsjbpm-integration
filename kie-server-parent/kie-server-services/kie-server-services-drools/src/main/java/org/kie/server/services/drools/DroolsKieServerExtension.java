@@ -101,8 +101,10 @@ public class DroolsKieServerExtension implements KieServerExtension {
                             logger.debug("Added {} type into extra jaxb classes set", type);
                         }
                     } else {
-                        extraClasses.add(clazz);
-                        logger.debug("Added {} type into extra jaxb classes set", type);
+                    	if(!clazz.isInterface()) {
+                            extraClasses.add(clazz);
+                            logger.debug("Added {} type into extra jaxb classes set", type);
+                        }                   
                     }
                 } catch (ClassNotFoundException e) {
                     logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
