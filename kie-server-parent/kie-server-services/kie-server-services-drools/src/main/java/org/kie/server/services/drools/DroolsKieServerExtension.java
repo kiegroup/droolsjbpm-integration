@@ -15,6 +15,7 @@
 
 package org.kie.server.services.drools;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.kie.api.remote.Remotable;
 import org.kie.scanner.KieModuleMetaData;
@@ -100,16 +102,9 @@ public class DroolsKieServerExtension implements KieServerExtension {
                     logger.debug("Adding {} type into extra jaxb classes set", type);
                     Class<?> clazz = Class.forName(type, true, kieContainerInstance.getKieContainer().getClassLoader());
 
-                    if (filterRemoteable) {
-                        // add only these classes that are valid for being used as remoteable
-                        if (clazz.isAnnotationPresent(XmlRootElement.class) || clazz.isAnnotationPresent(Remotable.class)) {
-                            extraClasses.add(clazz);
-                            logger.debug("Added {} type into extra jaxb classes set", type);
-                        }
-                    } else {
-                        extraClasses.add(clazz);
-                        logger.debug("Added {} type into extra jaxb classes set", type);
-                    }
+                    addExtraClass(extraClasses, clazz, filterRemoteable);
+                    logger.debug("Added {} type into extra jaxb classes set", type);
+
                 } catch (ClassNotFoundException e) {
                     logger.warn("Unable to create instance of type {} due to {}", type, e.getMessage());
                     logger.debug("Complete stack trace for exception while creating type {}", type, e);
@@ -178,5 +173,44 @@ public class DroolsKieServerExtension implements KieServerExtension {
     @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
+    }
+
+    protected void addExtraClass( Set<Class<?>> extraClasses, Class classToAdd, boolean filtered) {
+
+        if( classToAdd.isInterface()
+                || classToAdd.isAnnotation()
+                || classToAdd.isLocalClass()
+                || classToAdd.isMemberClass() ) {
+            return;
+        }
+
+        if (filtered) {
+            boolean jaxbClass = false;
+            boolean remoteableClass = false;
+            // @XmlRootElement and @XmlType may be used with inheritance
+            for (Annotation anno : classToAdd.getAnnotations()) {
+                if (XmlRootElement.class.equals(anno.annotationType())) {
+                    jaxbClass = true;
+                    break;
+                }
+                if (XmlType.class.equals(anno.annotationType())) {
+                    jaxbClass = true;
+                    break;
+                }
+            }
+            // @Remotable is not inheritable, and may not be used as such
+            for (Annotation anno : classToAdd.getDeclaredAnnotations()) {
+                if (Remotable.class.equals(anno.annotationType())) {
+                    remoteableClass = true;
+                    break;
+                }
+            }
+
+            if (jaxbClass || remoteableClass) {
+                extraClasses.add(classToAdd);
+            }
+        } else {
+            extraClasses.add(classToAdd);
+        }
     }
 }
