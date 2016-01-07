@@ -58,11 +58,12 @@ public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandSer
 
                 Command<?> cmd = kci.getMarshaller( marshallingFormat ).unmarshall(payload, type);
 
-                if (cmd == null) {
-                    return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
-                }
                 if (!(cmd instanceof BatchExecutionCommandImpl)) {
                     cmd = new BatchExecutionCommandImpl(Arrays.asList(new GenericCommand<?>[]{(GenericCommand<?>) cmd}));
+                }
+
+                if (cmd == null || ((BatchExecutionCommandImpl)cmd).getCommands() == null || ((BatchExecutionCommandImpl)cmd).getCommands().isEmpty()) {
+                    return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Bad request, no commands to be executed - either wrong format or no data");
                 }
 
                 ExecutionResults results = rulesExecutionService.call(kci, (BatchExecutionCommandImpl) cmd);
