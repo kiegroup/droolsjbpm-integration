@@ -54,8 +54,8 @@
     <!-- used by hibernate-validator -->
     <karaf.version.org.apache.servicemix.specs.jsr303-api>2.4.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
 
-    <!-- Overwrites with a different Maven version -->
-    <karaf.version.commons-codec>1.7</karaf.version.commons-codec>
+    <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
+    <karaf.version.commons-codec>1.9</karaf.version.commons-codec>
     <karaf.version.javax.inject>${version.org.geronimo.atinject}</karaf.version.javax.inject>
     <karaf.version.org.codehaus.janino>${version.org.codehaus.janino}</karaf.version.org.codehaus.janino>
     <!-- Overwrites with a servicemix version -->
@@ -65,7 +65,10 @@
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.2.0</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
-    <karaf.servicemix.version.org.apache.poi>3.9_2</karaf.servicemix.version.org.apache.poi>
+    <karaf.servicemix.version.org.apache.poi>3.11_1</karaf.servicemix.version.org.apache.poi>
+    <!-- Santurio and xmlresolver needed by POI 3.11+ -->
+    <karaf.version.org.apache.santurio>2.0.6</karaf.version.org.apache.santurio>
+    <karaf.servicemix.version.xmlresolver>1.2_5</karaf.servicemix.version.xmlresolver>
     <karaf.servicemix.version.org.codehaus.woodstox>3.2.9_3</karaf.servicemix.version.org.codehaus.woodstox>
     <karaf.servicemix.version.org.quartz-scheduler>1.8.5_2</karaf.servicemix.version.org.quartz-scheduler>
     <!-- Specs -->
@@ -170,6 +173,16 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.poi</artifactId>
         <version>${karaf.servicemix.version.org.apache.poi}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.xmlresolver</artifactId>
+        <version>${karaf.servicemix.version.xmlresolver}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.santuario</groupId>
+        <artifactId>xmlsec</artifactId>
+        <version>${karaf.version.org.apache.santurio}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
