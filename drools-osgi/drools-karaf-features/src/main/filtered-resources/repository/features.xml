@@ -35,8 +35,10 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
+    <bundle>mvn:org.apache.santuario/xmlsec/${karaf.version.org.apache.santurio}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/${karaf.servicemix.version.xmlresolver}</bundle>
   </feature>
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
