@@ -16,14 +16,26 @@
 package org.kie.server.client;
 
 import java.util.List;
+import java.util.Map;
 
 import org.kie.internal.process.CorrelationKey;
 import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.VariableInstance;
 
 public interface QueryServicesClient {
+
+    public static final String QUERY_MAP_PI = "ProcessInstances";
+    public static final String QUERY_MAP_PI_WITH_VARS = "ProcessInstancesWithVariables";
+    public static final String QUERY_MAP_TASK = "UserTasks";
+    public static final String QUERY_MAP_TASK_WITH_VARS = "UserTasksWithVariables";
+    public static final String QUERY_MAP_RAW = "RawList";
+    public static final String QUERY_MAP_TASK_SUMMARY = "TaskSummaries";
+    public static final String QUERY_MAP_PI_WITH_CUSTOM_VARS = "ProcessInstancesWithCustomVariables";
+    public static final String QUERY_MAP_TASK_WITH_CUSTOM_VARS = "UserTasksWithCustomVariables";
 
     // runtime data searches
     ProcessDefinition findProcessByContainerIdProcessId(String containerId, String processId);
@@ -69,4 +81,23 @@ public interface QueryServicesClient {
     List<VariableInstance> findVariablesCurrentState(Long processInstanceId);
 
     List<VariableInstance> findVariableHistory(Long processInstanceId, String variableName, Integer page, Integer pageSize);
+
+    // QueryDataService related
+    void registerQuery(QueryDefinition queryDefinition);
+
+    void replaceQuery(QueryDefinition queryDefinition);
+
+    void unregisterQuery(String queryName);
+
+    QueryDefinition getQuery(String queryName);
+
+    List<QueryDefinition> getQueries(Integer page, Integer pageSize);
+
+    <T> List<T> query(String queryName, String mapper, Integer page, Integer pageSize, Class<T> resultType);
+
+    <T> List<T> query(String queryName, String mapper, String orderBy, Integer page, Integer pageSize, Class<T> resultType);
+
+    <T> List<T> query(String queryName, String mapper, QueryFilterSpec filterSpec, Integer page, Integer pageSize, Class<T> resultType);
+
+    <T> List<T> query(String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType);
 }

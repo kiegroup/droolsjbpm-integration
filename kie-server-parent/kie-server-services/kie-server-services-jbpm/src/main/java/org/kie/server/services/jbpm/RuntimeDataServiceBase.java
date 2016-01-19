@@ -15,7 +15,6 @@
 
 package org.kie.server.services.jbpm;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,8 +34,6 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.api.runtime.query.QueryContext;
-import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
@@ -48,11 +45,12 @@ import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 public class RuntimeDataServiceBase {
 
@@ -527,252 +525,5 @@ public class RuntimeDataServiceBase {
         return taskSummaryList;
     }
 
-    protected ProcessInstanceList convertToProcessInstanceList(Collection<ProcessInstanceDesc> instances) {
-        if (instances == null) {
-            return new ProcessInstanceList(new org.kie.server.api.model.instance.ProcessInstance[0]);
-        }
 
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = new ArrayList<org.kie.server.api.model.instance.ProcessInstance>(instances.size());
-        for (ProcessInstanceDesc pi : instances) {
-            org.kie.server.api.model.instance.ProcessInstance instance = convertToProcessInstance(pi);
-
-            processInstances.add(instance);
-        }
-
-        return new ProcessInstanceList(processInstances);
-    }
-
-    protected org.kie.server.api.model.instance.ProcessInstance convertToProcessInstance(ProcessInstanceDesc pi) {
-        if (pi == null) {
-            return null;
-        }
-
-        org.kie.server.api.model.instance.ProcessInstance instance = org.kie.server.api.model.instance.ProcessInstance.builder()
-                .id(pi.getId())
-                .processId(pi.getProcessId())
-                .processName(pi.getProcessName())
-                .processVersion(pi.getProcessVersion())
-                .containerId(pi.getDeploymentId())
-                .processInstanceDescription(pi.getProcessInstanceDescription())
-                .correlationKey(pi.getCorrelationKey())
-                .parentInstanceId(pi.getParentId())
-                .date(pi.getDataTimeStamp())
-                .initiator(pi.getInitiator())
-                .state(pi.getState())
-                .build();
-
-        if (pi.getActiveTasks() != null && !pi.getActiveTasks().isEmpty()) {
-            org.kie.server.api.model.instance.TaskSummary[] tasks = new org.kie.server.api.model.instance.TaskSummary[pi.getActiveTasks().size()];
-            int counter = 0;
-            for (UserTaskInstanceDesc taskSummary : pi.getActiveTasks()) {
-                org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
-                        .id(taskSummary.getTaskId())
-                        .name(taskSummary.getName())
-                        .description(taskSummary.getDescription())
-                        .activationTime(taskSummary.getActivationTime())
-                        .actualOwner(taskSummary.getActualOwner())
-                        .containerId(taskSummary.getDeploymentId())
-                        .createdBy(taskSummary.getCreatedBy())
-                        .createdOn(taskSummary.getCreatedOn())
-                        .priority(taskSummary.getPriority())
-                        .processId(taskSummary.getProcessId())
-                        .processInstanceId(taskSummary.getProcessInstanceId())
-                        .build();
-                tasks[counter] = task;
-                counter++;
-            }
-            instance.setActiveUserTasks(new TaskSummaryList(tasks));
-        }
-
-        return instance;
-    }
-
-    protected ProcessDefinitionList convertToProcessList(Collection<ProcessDefinition> definitions) {
-        if (definitions == null) {
-            return new ProcessDefinitionList(new org.kie.server.api.model.definition.ProcessDefinition[0]);
-        }
-
-        List<org.kie.server.api.model.definition.ProcessDefinition> processes = new ArrayList<org.kie.server.api.model.definition.ProcessDefinition>(definitions.size());
-        for (ProcessDefinition pd : definitions) {
-            org.kie.server.api.model.definition.ProcessDefinition definition = convertToProcess(pd);
-
-            processes.add(definition);
-        }
-
-        return new ProcessDefinitionList(processes);
-    }
-
-    protected org.kie.server.api.model.definition.ProcessDefinition convertToProcess(ProcessDefinition processDesc) {
-        if (processDesc == null) {
-            return null;
-        }
-
-        org.kie.server.api.model.definition.ProcessDefinition processDefinition = org.kie.server.api.model.definition.ProcessDefinition.builder()
-                .id(processDesc.getId())
-                .name(processDesc.getName())
-                .packageName(processDesc.getPackageName())
-                .version(processDesc.getVersion())
-                .containerId(processDesc.getDeploymentId())
-                .build();
-
-        return processDefinition;
-    }
-
-    protected QueryContext buildQueryContext(Integer page, Integer pageSize) {
-        return new QueryContext(page * pageSize, pageSize);
-    }
-
-    protected QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
-        return new QueryContext(page * pageSize, pageSize, orderBy, asc);
-    }
-
-    protected QueryFilter buildQueryFilter(Integer page, Integer pageSize) {
-        return new QueryFilter(page * pageSize, pageSize);
-    }
-
-    protected QueryFilter buildQueryFilter(Integer page, Integer pageSize, String orderBy, boolean asc) {
-        return new QueryFilter(page * pageSize, pageSize, orderBy, asc);
-    }
-
-    protected List<Status> buildTaskStatuses(List<String> status) {
-        if (status == null || status.isEmpty()) {
-            return null;
-        }
-
-        List<Status> taskStatuses = new ArrayList<Status>();
-
-        for (String s : status) {
-            taskStatuses.add(Status.valueOf(s));
-        }
-
-        return taskStatuses;
-    }
-
-
-    protected NodeInstance convertToNodeInstance(NodeInstanceDesc nodeInstanceDesc) {
-
-        NodeInstance nodeInstance = NodeInstance.builder()
-                .id(nodeInstanceDesc.getId())
-                .name(nodeInstanceDesc.getName())
-                .nodeId(nodeInstanceDesc.getNodeId())
-                .nodeType(nodeInstanceDesc.getNodeType())
-                .processInstanceId(nodeInstanceDesc.getProcessInstanceId())
-                .containerId(nodeInstanceDesc.getDeploymentId())
-                .workItemId(nodeInstanceDesc.getWorkItemId())
-                .completed(nodeInstanceDesc.isCompleted())
-                .connection(nodeInstanceDesc.getConnection())
-                .date(nodeInstanceDesc.getDataTimeStamp())
-                .build();
-
-        return nodeInstance;
-
-    }
-
-    protected NodeInstanceList convertToNodeInstanceList(Collection<NodeInstanceDesc> definitions) {
-        if (definitions == null) {
-            return new NodeInstanceList(new NodeInstance[0]);
-        }
-
-        List<NodeInstance> processes = new ArrayList<NodeInstance>(definitions.size());
-        for (NodeInstanceDesc ni : definitions) {
-            NodeInstance nodeInstance = convertToNodeInstance(ni);
-
-            processes.add(nodeInstance);
-        }
-
-        return new NodeInstanceList(processes);
-    }
-
-    protected VariableInstance convertToVariable(VariableDesc variableDesc) {
-        VariableInstance instance = VariableInstance.builder()
-                .name(variableDesc.getVariableId())
-                .processInstanceId(variableDesc.getProcessInstanceId())
-                .value(variableDesc.getNewValue())
-                .oldValue(variableDesc.getOldValue())
-                .date(variableDesc.getDataTimeStamp())
-                .build();
-
-        return instance;
-    }
-
-    protected VariableInstanceList convertToVariablesList(Collection<VariableDesc> variables) {
-        if (variables == null) {
-            return new VariableInstanceList(new VariableInstance[0]);
-        }
-
-        List<VariableInstance> processes = new ArrayList<VariableInstance>(variables.size());
-        for (VariableDesc vi : variables) {
-            VariableInstance nodeInstance = convertToVariable(vi);
-
-            processes.add(nodeInstance);
-        }
-
-        return new VariableInstanceList(processes);
-    }
-
-    protected TaskInstance convertToTask(UserTaskInstanceDesc userTask) {
-
-        TaskInstance instance = TaskInstance.builder()
-                .id(userTask.getTaskId())
-                .name(userTask.getName())
-                .processInstanceId(userTask.getProcessInstanceId())
-                .processId(userTask.getProcessId())
-                .activationTime(userTask.getActivationTime())
-                .actualOwner(userTask.getActualOwner())
-                .containerId(userTask.getDeploymentId())
-                .createdBy(userTask.getCreatedBy())
-                .createdOn(userTask.getCreatedOn())
-                .description(userTask.getDescription())
-                .expirationTime(userTask.getDueDate())
-                .status(userTask.getStatus())
-                .priority(userTask.getPriority())
-                .build();
-
-        return instance;
-    }
-
-    protected TaskSummaryList convertToTaskSummaryList(Collection<TaskSummary> tasks) {
-        if (tasks == null) {
-            return new TaskSummaryList(new org.kie.server.api.model.instance.TaskSummary[0]);
-        }
-        org.kie.server.api.model.instance.TaskSummary[] instances = new org.kie.server.api.model.instance.TaskSummary[tasks.size()];
-        int counter = 0;
-        for (TaskSummary taskSummary : tasks) {
-
-            instances[counter] = convertToTaskSummary(taskSummary);
-            counter++;
-        }
-
-        return new TaskSummaryList(instances);
-    }
-
-    protected org.kie.server.api.model.instance.TaskSummary convertToTaskSummary(TaskSummary taskSummary) {
-        org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
-                .id(taskSummary.getId())
-                .name(taskSummary.getName())
-                .description(taskSummary.getDescription())
-                .subject(taskSummary.getSubject())
-                .taskParentId(taskSummary.getParentId())
-                .activationTime(taskSummary.getActivationTime())
-                .actualOwner(taskSummary.getActualOwnerId())
-                .containerId(taskSummary.getDeploymentId())
-                .createdBy(taskSummary.getCreatedById())
-                .createdOn(taskSummary.getCreatedOn())
-                .expirationTime(taskSummary.getExpirationTime())
-                .priority(taskSummary.getPriority())
-                .processId(taskSummary.getProcessId())
-                .processInstanceId(taskSummary.getProcessInstanceId())
-                .status(taskSummary.getStatusId())
-                .skipable(taskSummary.isSkipable())
-                .build();
-        return task;
-    }
-
-    protected String nullEmpty(String value) {
-        if (value != null && value.isEmpty()) {
-            return null;
-        }
-
-        return value;
-    }
 }

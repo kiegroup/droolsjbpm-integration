@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-event-instance-list")
-public class TaskEventInstanceList {
+public class TaskEventInstanceList implements ItemList<TaskEventInstance> {
 
     @XmlElement(name="task-event-instance")
     private TaskEventInstance[] taskEvents;
@@ -45,5 +48,10 @@ public class TaskEventInstanceList {
 
     public void setTaskEvents(TaskEventInstance[] taskEvents) {
         this.taskEvents = taskEvents;
+    }
+
+    @Override
+    public List<TaskEventInstance> getItems() {
+        return Arrays.asList(taskEvents);
     }
 }
