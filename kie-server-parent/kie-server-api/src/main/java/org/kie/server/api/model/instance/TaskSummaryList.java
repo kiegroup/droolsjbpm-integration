@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-summary-list")
-public class TaskSummaryList {
+public class TaskSummaryList implements ItemList<TaskSummary> {
 
     @XmlElement(name="task-summary")
     private TaskSummary[] tasks;
@@ -45,5 +48,10 @@ public class TaskSummaryList {
 
     public void setTasks(TaskSummary[] tasks) {
         this.tasks = tasks;
+    }
+
+    @Override
+    public List<TaskSummary> getItems() {
+        return Arrays.asList(tasks);
     }
 }

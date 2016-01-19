@@ -78,6 +78,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
             KieServicesConfiguration localServerConfig =
                     KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             localServerConfig.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+            localServerConfig.setTimeout(30000);
             kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
         } else {
             configuration.setMarshallingFormat(marshallingFormat);

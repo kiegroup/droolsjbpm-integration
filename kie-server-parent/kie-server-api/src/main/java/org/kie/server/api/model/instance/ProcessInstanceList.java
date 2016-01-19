@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance-list")
-public class ProcessInstanceList {
+public class ProcessInstanceList implements ItemList<ProcessInstance> {
 
     @XmlElement(name="process-instance")
     private ProcessInstance[] processInstances;
@@ -45,5 +48,10 @@ public class ProcessInstanceList {
 
     public void setProcessInstances(ProcessInstance[] processInstances) {
         this.processInstances = processInstances;
+    }
+
+    @Override
+    public List<ProcessInstance> getItems() {
+        return Arrays.asList(processInstances);
     }
 }

@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.definition;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-definitions")
-public class ProcessDefinitionList {
+public class ProcessDefinitionList implements ItemList<ProcessDefinition> {
 
     @XmlElement(name="processes")
     private ProcessDefinition[] processes;
@@ -45,5 +48,10 @@ public class ProcessDefinitionList {
 
     public void setProcesses(ProcessDefinition[] processes) {
         this.processes = processes;
+    }
+
+    @Override
+    public List<ProcessDefinition> getItems() {
+        return Arrays.asList(processes);
     }
 }

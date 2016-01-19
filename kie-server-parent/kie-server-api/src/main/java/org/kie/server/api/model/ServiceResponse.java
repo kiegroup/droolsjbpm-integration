@@ -15,6 +15,7 @@
 
 package org.kie.server.api.model;
 
+import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,6 +26,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.ServiceTasksDefinition;
 import org.kie.server.api.model.definition.SubProcessesDefinition;
 import org.kie.server.api.model.definition.TaskInputsDefinition;
@@ -44,6 +47,7 @@ import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstance;
@@ -87,6 +91,8 @@ public class ServiceResponse<T> {
         @XmlElement(name = "string-type", type = JaxbString.class),
         @XmlElement(name = "map-type", type = JaxbMap.class),
         @XmlElement(name = "list-type", type = JaxbList.class),
+        @XmlElement(name = "array-list", type = ArrayList.class),
+
         //kie server model
         @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
         @XmlElement(name = "kie-container", type = KieContainerResource.class),
@@ -113,6 +119,7 @@ public class ServiceResponse<T> {
         @XmlElement(name = "variable-instance", type = VariableInstance.class),
         @XmlElement(name = "variable-instance-list", type = VariableInstanceList.class),
         @XmlElement(name = "task-instance", type = TaskInstance.class),
+        @XmlElement(name = "task-instance-list", type = TaskInstanceList.class),
         @XmlElement(name = "task-summary", type = TaskSummary.class),
         @XmlElement(name = "task-summary-list", type = TaskSummaryList.class),
         @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
@@ -123,7 +130,9 @@ public class ServiceResponse<T> {
         @XmlElement(name = "request-info-instance-list", type = RequestInfoInstanceList.class),
         @XmlElement(name = "error-info-instance", type = ErrorInfoInstance.class),
         @XmlElement(name = "error-info-instance-list", type = ErrorInfoInstanceList.class),
-        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class)
+        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class),
+        @XmlElement(name = "query-definition", type = QueryDefinition.class),
+        @XmlElement(name = "query-definitions", type = QueryDefinitionList.class)
 
     })
     private T result;

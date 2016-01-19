@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "variable-instance-list")
-public class VariableInstanceList {
+public class VariableInstanceList implements ItemList<VariableInstance> {
 
     @XmlElement(name="variable-instance")
     private VariableInstance[] variableInstances;
@@ -45,5 +48,10 @@ public class VariableInstanceList {
 
     public void setVariableInstances(VariableInstance[] variableInstances) {
         this.variableInstances = variableInstances;
+    }
+
+    @Override
+    public List<VariableInstance> getItems() {
+        return Arrays.asList(variableInstances);
     }
 }

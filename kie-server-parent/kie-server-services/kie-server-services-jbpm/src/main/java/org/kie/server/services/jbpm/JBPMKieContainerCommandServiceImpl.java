@@ -17,18 +17,14 @@ package org.kie.server.services.jbpm;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.jbpm.services.api.DeploymentService;
-import org.jbpm.services.api.ProcessService;
-import org.jbpm.services.api.RuntimeDataService;
-import org.jbpm.services.api.UserTaskService;
-import org.kie.internal.executor.api.ExecutorService;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
@@ -50,11 +46,12 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     private UserTaskServiceBase userTaskServiceBase;
     private RuntimeDataServiceBase runtimeDataServiceBase;
     private ExecutorServiceBase executorServiceBase;
+    private QueryDataServiceBase queryDataServiceBase;
 
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
-            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase) {
+            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase) {
 
         this.context = context;
         this.deploymentService = deploymentService;
@@ -63,6 +60,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
         this.userTaskServiceBase = userTaskServiceBase;
         this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.executorServiceBase = executorServiceBase;
+        this.queryDataServiceBase = queryDataServiceBase;
     }
 
     @Override
@@ -79,6 +77,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                 logger.warn("Unsupported command '{}' given, will not process it", command.getClass().getName());
                 continue;
             }
+
+            boolean wrapResults = false;
             try {
                 Object result = null;
                 Object handler = null;
@@ -95,6 +95,12 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     handler = runtimeDataServiceBase;
                 } else if ("JobService".equals(descriptorCommand.getService())) {
                     handler = executorServiceBase;
+                } else if ("QueryDataService".equals(descriptorCommand.getService())) {
+                    handler = queryDataServiceBase;
+                    // enable wrapping as in case of embedded objects jaxb does not properly parse it due to possible unknown types (List<?> etc)
+                    if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
+                        wrapResults = true;
+                    }
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }
@@ -121,9 +127,15 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                 // process command via reflection and handler
                 result = MethodUtils.invokeMethod(handler, descriptorCommand.getMethod(), arguments.toArray());
                 logger.debug("Handler {} returned response {}", handler, result);
+
+                if (wrapResults) {
+                    result = ModelWrapper.wrap(result);
+                    logger.debug("Wrapped response is {}", result);
+                }
                 // return successful result
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "", result));
             } catch (InvocationTargetException e){
+                logger.error("Error while processing {} command", command, e);
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, e.getTargetException().getMessage()));
             } catch (Throwable e) {
                 logger.error("Error while processing {} command", command, e);

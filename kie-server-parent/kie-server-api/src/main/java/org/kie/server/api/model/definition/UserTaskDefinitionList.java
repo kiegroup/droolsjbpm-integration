@@ -15,14 +15,18 @@
 
 package org.kie.server.api.model.definition;
 
+import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "user-task-definitions")
-public class UserTaskDefinitionList {
+public class UserTaskDefinitionList implements ItemList<UserTaskDefinition> {
 
     @XmlElement(name="task")
     private UserTaskDefinition[] tasks;
@@ -40,5 +44,10 @@ public class UserTaskDefinitionList {
 
     public void setTasks(UserTaskDefinition[] tasks) {
         this.tasks = tasks;
+    }
+
+    @Override
+    public List<UserTaskDefinition> getItems() {
+        return Arrays.asList(tasks);
     }
 }

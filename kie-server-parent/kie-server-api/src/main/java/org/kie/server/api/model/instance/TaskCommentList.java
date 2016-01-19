@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-comment-list")
-public class TaskCommentList {
+public class TaskCommentList implements ItemList<TaskComment> {
 
     @XmlElement(name="task-comment")
     private TaskComment[] taskComments;
@@ -45,5 +48,10 @@ public class TaskCommentList {
 
     public void setTasks(TaskComment[] taskComments) {
         this.taskComments = taskComments;
+    }
+
+    @Override
+    public List<TaskComment> getItems() {
+        return Arrays.asList(taskComments);
     }
 }

@@ -16,6 +16,8 @@
 package org.kie.server.api.marshalling.json;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,14 +63,19 @@ import org.kie.server.api.model.type.JaxbByteArray;
 
 public class JSONMarshaller implements Marshaller {
 
+    private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
+
     private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
     private final ObjectMapper fallbackObjectMapper;
 
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         objectMapper = new ObjectMapper();
+
         ObjectMapper customSerializationMapper = new ObjectMapper();
 
         if (classes == null) {
@@ -116,6 +123,21 @@ public class JSONMarshaller implements Marshaller {
         }
 
         fallbackObjectMapper = new ObjectMapper();
+
+        if (formatDate) {
+
+            objectMapper.setDateFormat(dateFormat);
+            fallbackObjectMapper.setDateFormat(dateFormat);
+            customSerializationMapper.setDateFormat(dateFormat);
+
+            objectMapper.getDeserializationConfig().withDateFormat(dateFormat);
+            fallbackObjectMapper.getDeserializationConfig().withDateFormat(dateFormat);
+            customSerializationMapper.getDeserializationConfig().withDateFormat(dateFormat);
+
+            objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+            fallbackObjectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+            customSerializationMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+        }
 
     }
 

@@ -40,6 +40,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 import static org.junit.Assert.*;
 
 
+
 public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",

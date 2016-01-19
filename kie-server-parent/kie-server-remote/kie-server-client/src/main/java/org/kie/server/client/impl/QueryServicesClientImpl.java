@@ -17,6 +17,7 @@ package org.kie.server.client.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +26,22 @@ import java.util.Map;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.ItemList;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.VariableInstanceList;
@@ -688,5 +697,239 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
         return Collections.emptyList();
     }
 
+    // QueryDataService related
+    @Override
+    public void registerQuery(QueryDefinition queryDefinition) {
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryDefinition.getName());
+
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + CREATE_QUERY_DEF_POST_URI, valuesMap), queryDefinition,
+                    Object.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "QueryDataService", "registerQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void replaceQuery(QueryDefinition queryDefinition) {
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryDefinition.getName());
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + REPLACE_QUERY_DEF_PUT_URI, valuesMap), queryDefinition,
+                    Object.class, new HashMap<String, String>());
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "QueryDataService", "replaceQuery", serialize(queryDefinition), marshaller.getFormat().getType(), new Object[]{queryDefinition.getName()}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void unregisterQuery(String queryName) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + DROP_QUERY_DEF_DELETE_URI, valuesMap),
+                    null);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "QueryDataService", "unregisterQuery", new Object[]{queryName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public QueryDefinition getQuery(String queryName) {
+        QueryDefinition result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + QUERY_DEF_GET_URI, valuesMap), QueryDefinition.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryDataService", "getQuery", new Object[]{queryName}) ) );
+            ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<QueryDefinition> getQueries(Integer page, Integer pageSize) {
+        QueryDefinitionList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI, valuesMap) + queryString, QueryDefinitionList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryDataService", "getQueries", new Object[]{page, pageSize}) ) );
+            ServiceResponse<QueryDefinitionList> response = (ServiceResponse<QueryDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+
+        if (result != null && result.getQueries() != null) {
+            return Arrays.asList(result.getQueries());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public <T> List<T> query(String queryName, String mapper, String orderBy, Integer page, Integer pageSize, Class<T> resultType) {
+        Object result = null;
+        Class<?> resultTypeList = getResultTypeList(resultType);
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+
+            String queryString = getPagingQueryString("?mapper="+mapper+"&orderBy="+orderBy, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + RUN_QUERY_DEF_GET_URI, valuesMap) + queryString, resultTypeList);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryDataService", "query", new Object[]{queryName, mapper, orderBy, page, pageSize}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+
+        if (result != null) {
+
+            if (result instanceof ItemList) {
+                return ((ItemList<T>) result).getItems();
+            } else if (result instanceof List) {
+                return (List) result;
+            } else if (result instanceof Wrapped) {
+                return (List)((Wrapped) result).unwrap();
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public <T> List<T> query(String queryName, String mapper, Integer page, Integer pageSize, Class<T> resultType) {
+
+        return query(queryName, mapper, "", page, pageSize, resultType);
+    }
+
+    @Override
+    public <T> List<T> query(String queryName, String mapper, QueryFilterSpec filterSpec, Integer page, Integer pageSize, Class<T> resultType) {
+        Object result = null;
+        Class<?> resultTypeList = getResultTypeList(resultType);
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+
+            String queryString = getPagingQueryString("?mapper="+mapper, page, pageSize);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString, filterSpec, resultTypeList);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryDataService", "queryFiltered", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{queryName, mapper, page, pageSize}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+
+        if (result != null && result instanceof ItemList) {
+            return ((ItemList<T>) result).getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public <T> List<T> query(String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType) {
+        Object result = null;
+        Class<?> resultTypeList = getResultTypeList(resultType);
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(QUERY_NAME, queryName);
+
+            String queryString = getPagingQueryString("?mapper="+mapper+"&builder="+builder, page, pageSize);
+
+            result = makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, QUERY_DEF_URI + "/" + RUN_FILTERED_QUERY_DEF_POST_URI, valuesMap) + queryString, parameters, resultTypeList);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryDataService", "queryFilteredWithBuilder", serialize(safeMap(parameters)),
+                            marshaller.getFormat().getType(), new Object[]{queryName, mapper, builder, page, pageSize}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+
+            result = response.getResult();
+        }
+
+
+        if (result != null && result instanceof ItemList) {
+            return ((ItemList<T>) result).getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    protected Class<?> getResultTypeList(Class<?> resultType) {
+        if (TaskSummary.class.isAssignableFrom(resultType)) {
+            return TaskSummaryList.class;
+        } else if (ProcessInstance.class.isAssignableFrom(resultType)) {
+            return ProcessInstanceList.class;
+        } else if (TaskInstance.class.isAssignableFrom(resultType)) {
+            return TaskInstanceList.class;
+        } else {
+            return Object.class;
+        }
+    }
 
 }

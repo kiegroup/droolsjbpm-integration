@@ -39,4 +39,7 @@ public class Messages {
     public static final String CREATE_RESPONSE_ERROR = "Unable to create response: {0}";
 
     public static final String UNEXPECTED_ERROR = "Unexpected error during processing: {0}";
+
+    public static final String QUERY_NOT_FOUND = "Could not find query definition with name \"{0}\"";
+    public static final String QUERY_ALREADY_EXISTS = "Query definition with name \"{0}\" already exists";
 }

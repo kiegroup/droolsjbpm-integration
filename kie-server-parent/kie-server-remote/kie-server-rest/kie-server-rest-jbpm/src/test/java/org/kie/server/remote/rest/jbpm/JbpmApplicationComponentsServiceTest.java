@@ -28,6 +28,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.query.QueryService;
 import org.junit.Test;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.server.api.model.KieServerConfig;
@@ -52,6 +53,7 @@ public class JbpmApplicationComponentsServiceTest {
                 mock(UserTaskService.class),
                 mock(RuntimeDataService.class),
                 mock(ExecutorService.class),
+                mock(QueryService.class),
                 mock(KieServerRegistry.class, Mockito.RETURNS_MOCKS)
                 };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
@@ -60,7 +62,7 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 5;
+        int numComponents = 6;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
@@ -69,6 +71,7 @@ public class JbpmApplicationComponentsServiceTest {
                     || appComponent instanceof DefinitionResource
                     || appComponent instanceof UserTaskResource
                     || appComponent instanceof ExecutorResource
+                    || appComponent instanceof QueryDataResource
                     );
         }
     }
