@@ -37,6 +37,7 @@ public class RestURI {
     public static final String JOB_ID = "jobId";
     public static final String JOB_CMD_NAME = "cmd";
     public static final String JOB_KEY = "key";
+    public static final String QUERY_NAME = "queryName";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
@@ -45,6 +46,7 @@ public class RestURI {
     public static final String QUERY_URI = "queries";
     public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
+    public static final String QUERY_DEF_URI = "queries/definitions";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -162,6 +164,14 @@ public class RestURI {
     // image prefixed by IMAGE_URI
     public static final String PROCESS_IMG_GET_URI = "processes/{" + PROCESS_ID + "}";
     public static final String PROCESS_INST_IMG_GET_URI = "processes/instances/{" + PROCESS_INST_ID + "}";
+
+    // query definition related
+    public static final String CREATE_QUERY_DEF_POST_URI = "{" + QUERY_NAME + "}";
+    public static final String REPLACE_QUERY_DEF_PUT_URI = "{" + QUERY_NAME + "}";
+    public static final String DROP_QUERY_DEF_DELETE_URI = "{" + QUERY_NAME + "}";
+    public static final String QUERY_DEF_GET_URI = "{" + QUERY_NAME + "}";
+    public static final String RUN_QUERY_DEF_GET_URI = "{" + QUERY_NAME + "}/data";
+    public static final String RUN_FILTERED_QUERY_DEF_POST_URI = "{" + QUERY_NAME + "}/filtered-data";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

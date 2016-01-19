@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "node-instance-list")
-public class NodeInstanceList {
+public class NodeInstanceList implements ItemList<NodeInstance> {
 
     @XmlElement(name="node-instance")
     private NodeInstance[] nodeInstances;
@@ -45,5 +48,10 @@ public class NodeInstanceList {
 
     public void setNodeInstances(NodeInstance[] nodeInstances) {
         this.nodeInstances = nodeInstances;
+    }
+
+    @Override
+    public List<NodeInstance> getItems() {
+        return Arrays.asList(nodeInstances);
     }
 }

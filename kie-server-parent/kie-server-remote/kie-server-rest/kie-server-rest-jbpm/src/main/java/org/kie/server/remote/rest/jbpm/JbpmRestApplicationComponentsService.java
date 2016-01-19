@@ -24,6 +24,7 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.query.QueryService;
 import org.kie.api.executor.ExecutorService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
@@ -32,6 +33,7 @@ import org.kie.server.services.jbpm.DefinitionServiceBase;
 import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.jbpm.ProcessServiceBase;
+import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
 
@@ -51,6 +53,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         DefinitionService definitionService = null;
         UserTaskService userTaskService = null;
         ExecutorService executorService = null;
+        QueryService queryService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -73,6 +76,9 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( ExecutorService.class.isAssignableFrom(object.getClass()) ) {
                 executorService = (ExecutorService) object;
                 continue;
+            } else if( QueryService.class.isAssignableFrom(object.getClass()) ) {
+                queryService = (QueryService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
@@ -85,12 +91,14 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
         RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
         ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
+        QueryDataServiceBase queryDataServiceBase = new QueryDataServiceBase(queryService, context);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase));
         components.add(new DefinitionResource(definitionServiceBase));
         components.add(new UserTaskResource(userTaskServiceBase));
         components.add(new ExecutorResource(executorServiceBase));
+        components.add(new QueryDataResource(queryDataServiceBase));
 
         return components;
     }

@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "error-info-instance-list")
-public class ErrorInfoInstanceList {
+public class ErrorInfoInstanceList implements ItemList<ErrorInfoInstance> {
 
     @XmlElement(name="error-info-instance")
     private ErrorInfoInstance[] errorInfoInstances;
@@ -45,5 +48,10 @@ public class ErrorInfoInstanceList {
 
     public void setErrorInfoInstances(ErrorInfoInstance[] errorInfoInstances) {
         this.errorInfoInstances = errorInfoInstances;
+    }
+
+    @Override
+    public List<ErrorInfoInstance> getItems() {
+        return Arrays.asList(errorInfoInstances);
     }
 }

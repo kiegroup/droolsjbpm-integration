@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.Wrapped;
 
 @XmlRootElement(name = "list-type")
@@ -37,6 +38,12 @@ public class JaxbList implements Wrapped<List<?>> {
 
     public JaxbList(List<Object> items) {
         this.items = items.toArray();
+        int index = 0;
+        for (Object o : this.items) {
+            this.items[index] = ModelWrapper.wrapSkipPrimitives(o);
+            index++;
+        }
+
     }
 
     public List<Object> getItems() {

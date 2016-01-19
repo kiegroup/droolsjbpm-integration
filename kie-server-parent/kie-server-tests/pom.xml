@@ -167,6 +167,9 @@
   <profiles>
     <profile>
       <id>wildfly81x</id>
+      <properties>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -206,6 +209,7 @@
       <id>wildfly82x</id>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
@@ -346,6 +350,9 @@
     </profile>
     <profile>
       <id>tomcat7x</id>
+      <properties>
+        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -456,6 +463,9 @@
     </profile>
     <profile>
       <id>tomcat8x</id>
+      <properties>
+        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
+      </properties>
       <build>
         <pluginManagement>
           <plugins>
@@ -568,6 +578,7 @@
       <id>eap64x</id>
       <properties>
         <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
@@ -628,6 +639,7 @@
       <id>jbossas71x</id>
       <properties>
         <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
       </properties>
       <dependencyManagement>
         <dependencies>
@@ -658,6 +670,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <kie.server.context>kie-server-${project.version}-ee6</kie.server.context>
         <kie.server.controller.context>kie-server-controller-${project.version}-ee6</kie.server.controller.context>
+        <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
@@ -799,6 +812,7 @@
         <kie.server.jndi.request.queue>jms/KIE.SERVER.REQUEST</kie.server.jndi.request.queue>
         <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
+        <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
