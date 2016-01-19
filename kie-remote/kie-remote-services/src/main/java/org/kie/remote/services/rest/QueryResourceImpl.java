@@ -192,15 +192,15 @@ public class QueryResourceImpl extends ResourceBase {
             return;
         }
 
-        EACHPARAM: for( String queryParam : params.keySet() ) {
+        for( String queryParam : params.keySet() ) {
             if( paginationParams.contains(queryParam) ) {
-                continue EACHPARAM;
+                continue;
             }
             if( allowedParams.contains(queryParam) ) {
-                continue EACHPARAM;
+                continue;
             }
             if( checkSpecial && isNameValueParam(queryParam) ) {
-                continue EACHPARAM;
+                continue;
             }
             throw KieRemoteRestOperationException.badRequest(queryParam
                         + " is an unknown and unsupported query param for the " + oper + " operation.");
