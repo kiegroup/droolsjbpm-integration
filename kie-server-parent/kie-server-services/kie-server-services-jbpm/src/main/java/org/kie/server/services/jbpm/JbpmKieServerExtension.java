@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
@@ -44,6 +45,7 @@ import org.jbpm.kie.services.impl.ProcessServiceImpl;
 import org.jbpm.kie.services.impl.RuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
+import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorManager;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorMerger;
@@ -55,6 +57,8 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.query.QueryMapperRegistry;
+import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.audit.TaskAuditServiceFactory;
 import org.jbpm.services.task.identity.JAASUserGroupCallbackImpl;
@@ -109,12 +113,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private ExecutorService executorService;
 
+    private QueryService queryService;
+
     private KieContainerCommandService kieContainerCommandService;
 
     private DeploymentDescriptorManager deploymentDescriptorManager = new DeploymentDescriptorManager(persistenceUnitName);
     private DeploymentDescriptorMerger merger = new DeploymentDescriptorMerger();
 
     private List<Object> services = new ArrayList<Object>();
+
+    private Map<String, List<String>> containerMappers = new ConcurrentHashMap<String, List<String>>();
 
     @Override
     public boolean isActive() {
@@ -189,6 +197,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((UserTaskServiceImpl) userTaskService).setDataService(runtimeDataService);
         ((UserTaskServiceImpl) userTaskService).setDeploymentService(deploymentService);
 
+        // build query service
+        queryService = new QueryServiceImpl();
+        ((QueryServiceImpl)queryService).setIdentityProvider(registry.getIdentityProvider());
+        ((QueryServiceImpl)queryService).setCommandService(new TransactionalCommandService(emf));
+        ((QueryServiceImpl)queryService).init();
+
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "false").equalsIgnoreCase("false")) {
             String executorQueueName = System.getProperty("org.kie.executor.jms.queue", "queue/KIE.SERVER.EXECUTOR");
 
@@ -206,7 +220,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
-                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context));
+                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context));
 
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
@@ -219,6 +233,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(userTaskService);
         services.add(runtimeDataService);
         services.add(executorService);
+        services.add(queryService);
     }
 
     @Override
@@ -280,6 +295,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
             DeployedUnit deployedUnit = deploymentService.getDeployedUnit(unit.getIdentifier());
             kieContainerInstance.addJaxbClasses(new HashSet<Class<?>>(deployedUnit.getDeployedClasses()));
 
+            // add any query result mappers from kjar
+            List<String> addedMappers = QueryMapperRegistry.get().discoverAndAddMappers(kieContainer.getClassLoader());
+            if (addedMappers != null && !addedMappers.isEmpty()) {
+                containerMappers.put(id, addedMappers);
+            }
+            // add any query param builder factories
+            QueryParamBuilderManager.get().discoverAndAddQueryFactories(id, kieContainer.getClassLoader());
+
             logger.info("Container {} created successfully", id);
         } catch (Exception e) {
             logger.error("Error when creating container {} by extension {}", id, this);
@@ -300,6 +323,16 @@ public class JbpmKieServerExtension implements KieServerExtension {
         KModuleDeploymentUnit unit = (KModuleDeploymentUnit) deploymentService.getDeployedUnit(id).getDeploymentUnit();
         deploymentService.undeploy(new CustomIdKmoduleDeploymentUnit(id, unit.getGroupId(), unit.getArtifactId(), unit.getVersion()));
 
+        // remove any query result mappers for container
+        List<String> addedMappers = containerMappers.get(id);
+        if (addedMappers != null && !addedMappers.isEmpty()) {
+
+            for (String mapper : addedMappers) {
+                QueryMapperRegistry.get().removeMapper(mapper);
+            }
+        }
+        // remove any query param builder factories
+        QueryParamBuilderManager.get().removeQueryFactories(id);
         logger.info("Container {} disposed successfully", id);
     }
 
@@ -316,6 +349,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 runtimeDataService,
                 executorService,
                 formManagerService,
+                queryService,
                 context
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
@@ -338,6 +372,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 runtimeDataService,
                 executorService,
                 formManagerService,
+                queryService,
                 context
         };
 

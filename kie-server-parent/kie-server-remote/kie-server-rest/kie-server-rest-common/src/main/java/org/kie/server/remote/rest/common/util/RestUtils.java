@@ -96,4 +96,8 @@ public class RestUtils {
     public static Response internalServerError(String message, Variant v) {
         return createResponse(message, v, Response.Status.INTERNAL_SERVER_ERROR);
     }
+
+    public static Response alreadyExists(String message, Variant v) {
+        return createResponse(message, v, Response.Status.CONFLICT);
+    }
 }

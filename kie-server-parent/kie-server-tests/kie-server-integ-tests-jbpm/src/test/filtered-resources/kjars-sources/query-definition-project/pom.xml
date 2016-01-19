@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.kie.server.testing</groupId>
+    <artifactId>common-parent</artifactId>
+    <version>1.0.0.Final</version>
+  </parent>
+
+  <artifactId>query-definition-project</artifactId>
+  <version>1.0.0.Final</version>
+  <name>query-definition-project</name>
+
+  <properties>
+    <jbpm.services.api.path>${settings.localRepository}/org/jbpm/jbpm-services-api/${version.org.kie}/jbpm-services-api-${version.org.kie}.jar</jbpm.services.api.path>
+    <jbpm.kie.services.path>${settings.localRepository}/org/jbpm/jbpm-kie-services/${version.org.kie}/jbpm-kie-services-${version.org.kie}.jar</jbpm.kie.services.path>
+    <dashbuilder.dataset.api.path>${settings.localRepository}/org/dashbuilder/dashbuilder-dataset-api/${version.org.dashbuilder}/dashbuilder-dataset-api-${version.org.dashbuilder}.jar</dashbuilder.dataset.api.path>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-services-api</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>system</scope>
+      <systemPath>${jbpm.services.api.path}</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-kie-services</artifactId>
+      <version>${version.org.kie}</version>
+      <scope>system</scope>
+      <systemPath>${jbpm.kie.services.path}</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>org.dashbuilder</groupId>
+      <artifactId>dashbuilder-dataset-api</artifactId>
+      <version>${version.org.dashbuilder}</version>
+      <scope>system</scope>
+      <systemPath>${dashbuilder.dataset.api.path}</systemPath>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
