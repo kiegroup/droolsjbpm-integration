@@ -20,6 +20,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -451,10 +452,22 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         }
     }
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS");
-
     @Test
     public void startDateTest() {
+        startDateTest(new SimpleDateFormat("yy-MM-dd"));
+    }
+
+    @Test
+    public void startDateTimeTest() {
+        startDateTest(new SimpleDateFormat("yy-MM-dd_HH:mm:ss"));
+    }
+
+    @Test
+    public void startDateTimeExactTest() {
+        startDateTest(new SimpleDateFormat("yy-MM-dd_HH:mm:ss.SSS"));
+    }
+
+    private void startDateTest(DateFormat dateFormat) {
         int [] pageInfo = { 0, 0 };
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
 
@@ -468,7 +481,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         JPAAuditLogService auditService = new JPAAuditLogService(getEmf());
         ProcessInstanceLog log = auditService.findProcessInstance(procInstId);
         List<org.kie.api.runtime.manager.audit.ProcessInstanceLog> logs
-            = auditService.processInstanceLogQuery().startDate(log.getStart()).build().getResultList();
+                = auditService.processInstanceLogQuery().startDate(log.getStart()).build().getResultList();
         assertNotNull( "Null List of ProcessInstanceLog", logs );
         assertFalse( "Empty List of ProcessInstanceLog", logs.isEmpty() );
         assertEquals( "List of ProcessInstanceLog", 1, logs.size() );
@@ -476,7 +489,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
 
         Date startDate = log.getStart();
 
-        String startDateStr = sdf.format(startDate);
+        String startDateStr = dateFormat.format(startDate);
         addParams(queryParams, "startdate", startDateStr);
         result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
 
