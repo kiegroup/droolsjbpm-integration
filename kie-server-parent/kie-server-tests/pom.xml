@@ -685,6 +685,10 @@
                       <groupId>com.h2database</groupId>
                       <artifactId>h2</artifactId>
                     </dependency>
+                    <dependency>
+                      <groupId>xerces</groupId>
+                      <artifactId>xercesImpl</artifactId>
+                    </dependency>
                   </dependencies>
                 </container>
                 <deployables>
@@ -698,7 +702,7 @@
                 <configuration>
                   <type>standalone</type>
                   <properties>
-                    <cargo.jvmargs>-Xmx1024m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m -XX:MaxPermSize=256m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
                     <!-- CFs -->
                     <cargo.resource.resource.jms.cf.request>
                       cargo.resource.name=jms/cf/KIE.SERVER.REQUEST|
@@ -778,6 +782,172 @@
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>was85x</id>
+      <properties>
+        <container.port>9080</container.port>
+        <kie.server.remoting.url>iiop://${container.hostname}:2809</kie.server.remoting.url>
+        <kie.server.context.factory>com.ibm.websphere.naming.WsnInitialContextFactory</kie.server.context.factory>
+        <kie.server.jndi.request.queue>jms/KIE.SERVER.REQUEST</kie.server.jndi.request.queue>
+        <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
+        <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <containerId>websphere85x</containerId>
+                  <type>installed</type>
+                  <home>${websphere.home}</home>
+                  <timeout>240000</timeout>
+                  <systemProperties>
+                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WebSphereExtendedJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.kie.server.domain>WSLogin</org.kie.server.domain>
+                    <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
+                    <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
+                    <kie.server.jms.queues.response>jms/KIE.SERVER.RESPONSE</kie.server.jms.queues.response>
+                    <!-- disable JMS support for executor to use same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>com.h2database</groupId>
+                      <artifactId>h2</artifactId>
+                    </dependency>
+                  </dependencies>
+                </container>
+                <deployables>
+                  <deployable>
+                    <groupId>org.kie.server</groupId>
+                    <artifactId>kie-server</artifactId>
+                    <type>war</type>
+                    <classifier>ee6</classifier>
+                  </deployable>
+                </deployables>
+                <configuration>
+                  <type>standalone</type>
+                  <properties>
+                    <cargo.websphere.profile>${project.artifactId}</cargo.websphere.profile>
+                    <cargo.jvmargs>-Xms2g -Xmx2g</cargo.jvmargs>
+                    <cargo.websphere.classloader.mode>PARENT_LAST</cargo.websphere.classloader.mode>
+                    <cargo.websphere.war.classloader.policy>SINGLE</cargo.websphere.war.classloader.policy>
+                    <!-- CFs -->
+                    <cargo.resource.resource.jms.cf.request>
+                      cargo.resource.name=jms/cf/KIE.SERVER.REQUEST|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.REQUEST
+                    </cargo.resource.resource.jms.cf.request>
+                    <cargo.resource.resource.jms.cf.response>
+                      cargo.resource.name=jms/cf/KIE.SERVER.RESPONSE|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.RESPONSE
+                    </cargo.resource.resource.jms.cf.response>
+                    <cargo.resource.resource.jms.executor.cf.request>
+                      cargo.resource.name=jms/cf/KIE.SERVER.EXECUTOR|
+                      cargo.resource.type=javax.jms.ConnectionFactory|
+                      cargo.resource.id=KIE.SERVER.EXECUTOR
+                    </cargo.resource.resource.jms.executor.cf.request>
+                    <!-- Qs -->
+                    <cargo.resource.resource.jms.queue.request>
+                      cargo.resource.name=jms/KIE.SERVER.REQUEST|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.REQUEST
+                    </cargo.resource.resource.jms.queue.request>
+                    <cargo.resource.resource.jms.queue.response>
+                      cargo.resource.name=jms/KIE.SERVER.RESPONSE|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.RESPONSE
+                    </cargo.resource.resource.jms.queue.response>
+                    <cargo.resource.resource.jms.executor.queue.request>
+                      cargo.resource.name=jms/KIE.SERVER.EXECUTOR|
+                      cargo.resource.type=javax.jms.Queue|
+                      cargo.resource.id=KIE.SERVER.EXECUTOR
+                    </cargo.resource.resource.jms.executor.queue.request>
+                    <!-- Datasource -->
+                    <cargo.datasource.datasource.h2>
+                      cargo.datasource.driver=org.h2.jdbcx.JdbcDataSource|
+                      cargo.datasource.url=jdbc:h2:mem:test-db|
+                      cargo.datasource.jndi=jdbc/jbpm|
+                      cargo.datasource.username=sa|
+                      cargo.datasource.password=|
+                      cargo.datasource.transactionsupport=XA_TRANSACTION
+                    </cargo.datasource.datasource.h2>
+                    <!-- Binding -->
+                    <cargo.websphere.ejb.act.binding>
+                      kie-server-services:KieServerMDB:jms/KIE.SERVER.REQUEST|
+                      kie-server-services:KieExecutorMDB:jms/KIE.SERVER.EXECUTOR
+                    </cargo.websphere.ejb.act.binding>
+                    <cargo.websphere.ejb.res.binding>
+                      kie-server-services:KieServerMDB:org.kie.server.jms.KieServerMDB/factory:jms/cf/KIE.SERVER.REQUEST
+                    </cargo.websphere.ejb.res.binding>
+                  </properties>
+                </configuration>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>com.ibm.ws</groupId>
+            <artifactId>ejb-thinclient</artifactId>
+            <version>8.5.0</version>
+            <scope>system</scope>
+            <systemPath>${websphere.home}/runtimes/com.ibm.ws.ejb.thinclient_8.5.0.jar</systemPath>
+          </dependency>
+          <dependency>
+            <groupId>com.ibm.ws</groupId>
+            <artifactId>sib.client.thin.jms</artifactId>
+            <version>8.5.0</version>
+            <scope>system</scope>
+            <systemPath>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_8.5.0.jar</systemPath>
+          </dependency>
+          <dependency>
+            <groupId>com.ibm.ws</groupId>
+            <artifactId>orb</artifactId>
+            <version>8.5.0</version>
+            <scope>system</scope>
+            <systemPath>${websphere.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</systemPath>
+          </dependency>
+          <!-- Need to raise H2 version because of bug in H2 usage for WAS. -->
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+            <version>1.3.176</version>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.ws</groupId>
+          <artifactId>ejb-thinclient</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.ibm.ws</groupId>
+          <artifactId>sib.client.thin.jms</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.ibm.ws</groupId>
+          <artifactId>orb</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
         </dependency>
       </dependencies>
     </profile>
