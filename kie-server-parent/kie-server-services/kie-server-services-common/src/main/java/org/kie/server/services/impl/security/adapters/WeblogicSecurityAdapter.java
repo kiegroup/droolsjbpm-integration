@@ -57,7 +57,7 @@ public class WeblogicSecurityAdapter implements SecurityAdapter {
                     }
                 }
             } catch (Exception e) {
-                logger.error( "Unable to get user from subject due to {}", e.getMessage(), e );
+                logger.debug("Unable to get user from subject due to {}", e.getMessage(), e);
             }
         }
         return null;
@@ -80,7 +80,7 @@ public class WeblogicSecurityAdapter implements SecurityAdapter {
                     }
                 }
             } catch ( Exception e ) {
-                logger.error( "Unable to get groups from subject due to {}", e.getMessage(), e );
+                logger.debug( "Unable to get groups from subject due to {}", e.getMessage(), e );
             }
         }
         return proles;

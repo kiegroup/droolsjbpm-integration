@@ -109,7 +109,7 @@ public class JMSSecurityAdapter implements SecurityAdapter {
             currentUser.set(userDetails);
 
         } catch( Exception e ) {
-            logger.error( "Unable to login via JAAS with message supplied user and password", e);
+            logger.debug( "Unable to login via JAAS with message supplied user and password", e);
         }
     }
 
