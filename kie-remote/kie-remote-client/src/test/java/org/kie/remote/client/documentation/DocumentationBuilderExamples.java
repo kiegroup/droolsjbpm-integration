@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -19,7 +19,6 @@ import java.net.URL;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
-import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
 import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 
 //TODO: changed, add to documentation
@@ -64,9 +63,9 @@ public class DocumentationBuilderExamples {
                 .addPassword(JOHN_PASSWORD)
                 .build();
     }
-   
+
     // TODO
-    public void jmsBuilderExamples() { 
-        
+    public void jmsBuilderExamples() {
+
     }
 }

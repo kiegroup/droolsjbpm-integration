@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,19 +15,19 @@
 
 package org.kie.remote.client.api.exception;
 
-import org.kie.remote.client.internal.RemoteClientException;
+import org.kie.remote.client.internal.command.RemoteClientException;
 
-public class RemoteTaskException extends org.kie.services.client.api.command.exception.RemoteTaskException {
+public class RemoteTaskException extends RemoteClientException {
 
     /** Generated serial versio UID */
     private static final long serialVersionUID = 2853230138916596256L;
 
     private String shortMessage;
-    
+
     public RemoteTaskException(String message, String stackTrace) {
         super(message, message + ":\n" + stackTrace);
     }
-    
+
     public RemoteTaskException(String message) {
         super(message);
     }

@@ -247,6 +247,13 @@
       <artifactId>simple-http</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    
   </dependencies>
 
   <build>
@@ -270,7 +277,6 @@
             <Export-Package>
               org.kie.remote.client.api.*,
               org.kie.remote.client.jaxb.*,
-              org.kie.services.client.api.*,
               org.kie.remote.jaxb.gen.*
             </Export-Package>
             <Import-Package>

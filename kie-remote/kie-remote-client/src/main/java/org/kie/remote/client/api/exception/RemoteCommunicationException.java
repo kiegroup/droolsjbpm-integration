@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,16 +15,17 @@
 
 package org.kie.remote.client.api.exception;
 
+import org.kie.remote.client.internal.command.RemoteClientException;
 
 /**
- * This exception is thrown when communications with a remote REST or JMS service 
- * fail in the client RemoteRuntime* classes. 
+ * This exception is thrown when communications with a remote REST or JMS service
+ * fail in the client RemoteRuntime* classes.
  * </p>
  * In other words, this exception indicates<ul>
  * <li>That the communication has failed</li>
  * </ul>
  */
-public class RemoteCommunicationException extends org.kie.services.client.api.command.exception.RemoteCommunicationException {
+public class RemoteCommunicationException extends RemoteClientException {
 
     /** generated serial version UID **/
     private static final long serialVersionUID = 7230681758239352495L;
@@ -32,12 +33,12 @@ public class RemoteCommunicationException extends org.kie.services.client.api.co
     public RemoteCommunicationException(String message, String stackTrace) {
         super(message, message + ":\n" + stackTrace);
     }
-                
-    public RemoteCommunicationException(String msg, Throwable cause) { 
+
+    public RemoteCommunicationException(String msg, Throwable cause) {
         super(msg, cause);
     }
-    
-    public RemoteCommunicationException(String msg) { 
+
+    public RemoteCommunicationException(String msg) {
         super(msg);
     }
 
