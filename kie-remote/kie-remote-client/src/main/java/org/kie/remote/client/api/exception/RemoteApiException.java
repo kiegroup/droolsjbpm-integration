@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,18 +15,18 @@
 
 package org.kie.remote.client.api.exception;
 
-
+import org.kie.remote.client.internal.command.RemoteClientException;
 
 /**
  * This exception is thrown when the remote API returns a message indicating
- * that the request operation (REST or JMS) has failed. 
+ * that the request operation (REST or JMS) has failed.
  * </p>
  * In other words, this exception indicates<ul>
  * <li>That the communication has succeeded</li>
  * <li>But that the requested operation has failed due to problems on the server side</li>
  * </ul>
  */
-public class RemoteApiException extends org.kie.services.client.api.command.exception.RemoteApiException {
+public class RemoteApiException extends RemoteClientException {
 
     /** Generated serial version UID */
     private static final long serialVersionUID = 9094450426921267633L;
@@ -34,7 +34,7 @@ public class RemoteApiException extends org.kie.services.client.api.command.exce
     public RemoteApiException(String message, String stackTrace) {
         super(message, message + ":\n" + stackTrace);
     }
-    
+
     public RemoteApiException(String s) {
         super(s);
     }

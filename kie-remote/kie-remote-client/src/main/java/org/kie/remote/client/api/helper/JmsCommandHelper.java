@@ -21,8 +21,8 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 
 import org.kie.api.command.Command;
+import org.kie.remote.client.internal.command.InternalJmsCommandHelper;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
-import org.kie.services.client.api.command.InternalJmsCommandHelper;
 import org.kie.services.client.serialization.SerializationProvider;
 
 

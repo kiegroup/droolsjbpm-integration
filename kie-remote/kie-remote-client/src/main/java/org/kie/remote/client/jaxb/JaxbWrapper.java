@@ -15,8 +15,8 @@
 
 package org.kie.remote.client.jaxb;
 
+import static org.kie.remote.client.internal.command.AbstractRemoteCommandObject.unsupported;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertXmlGregCalToDate;
-import static org.kie.services.client.api.command.AbstractRemoteCommandObject.unsupported;
 
 import java.io.IOException;
 import java.io.ObjectInput;

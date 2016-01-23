@@ -43,7 +43,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteJmsRuntimeEngineBuilder} instance
      */
     public static RemoteJmsRuntimeEngineBuilder newJmsBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newJmsBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newJmsBuilder();
     }
     
     /**
@@ -52,7 +52,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteRestRuntimeEngineBuilder} instance
      */
     public static RemoteRestRuntimeEngineBuilder newRestBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newRestBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newRestBuilder();
     }
     
     /**
@@ -61,7 +61,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return A {@link RemoteWebserviceClientBuilder} instance
      */
     public static RemoteWebserviceClientBuilder<RemoteWebserviceClientBuilder, CommandWebService> newCommandWebServiceClientBuilder() { 
-       return org.kie.services.client.api.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
+       return org.kie.remote.client.internal.RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder();
     }
     
     /**

@@ -23,7 +23,9 @@ import org.junit.Test;
 import org.kie.api.command.Command;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
+import org.kie.services.client.serialization.AbstractProcessInstancesRemoteSerializationTest;
 import org.kie.services.client.serialization.AbstractRemoteSerializationTest.TestType;
+import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

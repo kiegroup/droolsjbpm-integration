@@ -15,7 +15,7 @@
 
 package org.kie.remote.client.jaxb;
 
-import static org.kie.services.client.api.command.AbstractRemoteCommandObject.unsupported;
+import static org.kie.remote.client.internal.command.AbstractRemoteCommandObject.unsupported;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
