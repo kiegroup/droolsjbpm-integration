@@ -529,6 +529,17 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
 
         procInfo = result.getProcessInstanceInfoList().get(0);
         assertEquals( "Process instance id", procInstId, procInfo.getProcessInstance().getId() );
+
+        queryParams.clear();
+        // make sure that "yy-MM-dd_HH:mm:ss" does not cause a bad request
+        startDateStr = "14-10-31_23:59:59";
+        addParams(queryParams, "startdate", startDateStr);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        queryParams.clear();
+        startDateStr = "23:59:59";
+        addParams(queryParams, "startdate", startDateStr);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
     }
 
 }

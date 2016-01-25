@@ -281,7 +281,7 @@ public class QueryResourceData {
             if( timeParts.length == 3 && dateParts.length == 1 ) {
                 dateParts = QUERY_PARAM_DATE_FORMAT.format(new Date()).split("_")[0].split("-");
             } else if( dateParts.length == 3 && timeParts.length == 1 ) {
-               String [] newTimeParts = { "0", "0", "0" };
+               String [] newTimeParts = { "0", "0", "0.000" };
                timeParts = newTimeParts;
             } else {
                 badDateString(dateStr);
@@ -290,9 +290,6 @@ public class QueryResourceData {
             badDateString(dateStr);
         }
         // backwards compatibility for when it was just "yy-MM-dd_HH:mm:ss"
-        if( ! timeParts[2].contains(".") ) {
-           timeParts[2] = timeParts[2] + ".000";
-        }
         if( parseDateStr == null ) {
             StringBuilder tmpStr = new StringBuilder(dateParts[0]);
             for( int i = 1; i < 3; ++i ) {
@@ -300,10 +297,15 @@ public class QueryResourceData {
             }
             tmpStr.append("_");
             tmpStr.append(timeParts[0]);
+            if( ! timeParts[2].contains(".") ) {
+               timeParts[2] += ".000";
+            }
             for( int i = 1; i < 3; ++i ) {
                tmpStr.append(":").append(timeParts[i]);
             }
             parseDateStr = tmpStr.toString();
+        } else if( ! timeParts[2].contains(".") ) {
+           parseDateStr += ".000";
         }
 
         try {
