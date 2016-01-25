@@ -18,10 +18,14 @@ package org.kie.remote.services.rest.query.data;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -260,7 +264,7 @@ public class QueryResourceData {
         return result;
     }
 
-    private static Timestamp parseDate(String dateStr) {
+    public static Timestamp parseDate(String dateStr) {
         String [] parts = dateStr.split("_");
         String [] dateParts = null;
         String [] timeParts = null;
@@ -281,7 +285,7 @@ public class QueryResourceData {
             if( timeParts.length == 3 && dateParts.length == 1 ) {
                 dateParts = QUERY_PARAM_DATE_FORMAT.format(new Date()).split("_")[0].split("-");
             } else if( dateParts.length == 3 && timeParts.length == 1 ) {
-               String [] newTimeParts = { "0", "0", "0" };
+               String [] newTimeParts = { "0", "0", "0.000" };
                timeParts = newTimeParts;
             } else {
                 badDateString(dateStr);
@@ -290,9 +294,6 @@ public class QueryResourceData {
             badDateString(dateStr);
         }
         // backwards compatibility for when it was just "yy-MM-dd_HH:mm:ss"
-        if( ! timeParts[2].contains(".") ) {
-           timeParts[2] = timeParts[2] + ".000";
-        }
         if( parseDateStr == null ) {
             StringBuilder tmpStr = new StringBuilder(dateParts[0]);
             for( int i = 1; i < 3; ++i ) {
@@ -300,10 +301,15 @@ public class QueryResourceData {
             }
             tmpStr.append("_");
             tmpStr.append(timeParts[0]);
+            if( ! timeParts[2].contains(".") ) {
+               timeParts[2] += ".000";
+            }
             for( int i = 1; i < 3; ++i ) {
                tmpStr.append(":").append(timeParts[i]);
             }
             parseDateStr = tmpStr.toString();
+        } else if( ! timeParts[2].contains(".") ) {
+           parseDateStr += ".000";
         }
 
         try {
