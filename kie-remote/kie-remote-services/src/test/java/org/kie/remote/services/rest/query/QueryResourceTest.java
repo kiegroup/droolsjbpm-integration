@@ -497,6 +497,25 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         startDateStr = "23:59:59";
         addParams(queryParams, "startdate", startDateStr);
         result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        // without time, all instances for the day should be retrieved
+        queryParams.clear();
+        startDateStr = sdf.format(startDate);
+        startDateStr = startDateStr.split("_")[0];
+        addParams(queryParams, "startdate", startDateStr);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertTrue( result.getProcessInstanceInfoList().size() > 0 );
+
+        // without time, all instances for the day before should be retrieved
+        queryParams.clear();
+        Calendar tomorrow = new GregorianCalendar();
+        tomorrow.setTime(startDate);
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        startDateStr = sdf.format(tomorrow.getTime());
+        startDateStr = startDateStr.split("_")[0];
+        addParams(queryParams, "enddate", startDateStr);
+        result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertTrue( result.getProcessInstanceInfoList().size() > 0 );
     }
 
     @Test

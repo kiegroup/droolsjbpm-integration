@@ -22,7 +22,7 @@ import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VARIABLE_INSTANCE_ID_LIST;
 import static org.kie.internal.query.QueryParameterIdentifiers.VAR_VALUE_ID_LIST;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.actionParamNameMap;
-import static org.kie.remote.services.rest.query.data.QueryResourceData.getDates;
+import static org.kie.remote.services.rest.query.data.QueryResourceData.*;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.getInts;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.getLongs;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.getTaskStatuses;
@@ -32,11 +32,17 @@ import static org.kie.remote.services.rest.query.data.QueryResourceData.paramNam
 import static org.kie.remote.services.rest.query.data.QueryResourceData.varInstQueryParams;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.varInstQueryParamsShort;
 
+import java.sql.Timestamp;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Deque;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -475,40 +481,84 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
                 break;
             case 12: // start date
                 assert "startdate".equals(actionParamNameMap.get(action)): action + " : startdate";
-                dateData = getDates(action, data);
-                if( queryAction.min || queryAction.max ) {
-                    if( dateData.length != 1 ) {
-                        throw KieRemoteRestOperationException.notFound("Only 1 '" + queryAction.paramName
-                                + "' parameter is accepted");
+                List<String> startDataList = new ArrayList<String>(Arrays.asList(data));
+                Iterator<String> startDateIter = startDataList.iterator();
+                while( startDateIter.hasNext() ) {
+                    String dateStr = startDateIter.next();
+                    String [] parts = dateStr.split("_");
+                    boolean singleDateWithoutTime = (parts.length == 1) && parts[0].contains("-");
+                    if( singleDateWithoutTime ) {
+                        Timestamp beginDay = parseDate(dateStr);
+                        // min
+                        startDateMin(beginDay);
+                        GregorianCalendar cal = new GregorianCalendar();
+                        cal.setTime(beginDay);
+                        cal.add(Calendar.DAY_OF_YEAR, 1);
+                        // max
+                        startDateMax(cal.getTime());
+                        startDateIter.remove();
                     }
-                    if( queryAction.min ) {
-                        startDateMin(dateData[0]);
-                        queryAction.min = false;
-                    } else if( queryAction.max ) {
-                        startDateMax(dateData[0]);
-                        queryAction.max = false;
-                    }
-                } else {
-                    startDate(dateData);
                 }
-                break;
+
+                data = startDataList.toArray(new String[startDataList.size()]);
+                dateData = getDates(action, data);
+                if( dateData.length > 0 ) {
+                    if( queryAction.min || queryAction.max ) {
+                        if( dateData.length != 1 ) {
+                            throw KieRemoteRestOperationException.notFound("Only 1 '" + queryAction.paramName
+                                    + "' parameter is accepted");
+                        }
+                        if( queryAction.min ) {
+                            startDateMin(dateData[0]);
+                            queryAction.min = false;
+                        } else if( queryAction.max ) {
+                            startDateMax(dateData[0]);
+                            queryAction.max = false;
+                        }
+                    } else {
+                        startDate(dateData);
+                    }
+                }
+            break;
             case 13: // end date
                 assert "enddate".equals(actionParamNameMap.get(action)): action + " : enddate";
+                List<String> endDataList = new ArrayList<String>(Arrays.asList(data));
+                Iterator<String> endDateIter = endDataList.iterator();
+                while( endDateIter.hasNext() ) {
+                    String dateStr = endDateIter.next();
+                    String [] parts = dateStr.split("_");
+                    boolean singleDateWithoutTime = (parts.length == 1) && parts[0].contains("-");
+                    if( singleDateWithoutTime ) {
+                        Timestamp endDay = parseDate(dateStr);
+                        // min
+                        endDateMax(endDay);
+                        GregorianCalendar cal = new GregorianCalendar();
+                        cal.setTime(endDay);
+                        cal.add(Calendar.DAY_OF_YEAR, -1);
+                        // max
+                        endDateMin(cal.getTime());
+                        endDateIter.remove();
+                    }
+                }
+
+                data = endDataList.toArray(new String[endDataList.size()]);
                 dateData = getDates(action, data);
-                if( queryAction.min || queryAction.max ) {
-                    if( dateData.length > 1 ) {
-                        throw KieRemoteRestOperationException.notFound("Only 1 '" + queryAction.paramName
-                                + "' parameter is accepted");
+                if( dateData.length > 0 ) {
+                    if( queryAction.min || queryAction.max ) {
+                        if( dateData.length > 1 ) {
+                            throw KieRemoteRestOperationException.notFound("Only 1 '" + queryAction.paramName
+                                    + "' parameter is accepted");
+                        }
+                        if( queryAction.min ) {
+                            endDateMin(dateData[0]);
+                            queryAction.min = false;
+                        } else if( queryAction.max ) {
+                            endDateMax(dateData[0]);
+                            queryAction.max = false;
+                        }
+                    } else {
+                        endDate(dateData);
                     }
-                    if( queryAction.min ) {
-                        endDateMin(dateData[0]);
-                        queryAction.min = false;
-                    } else if( queryAction.max ) {
-                        endDateMax(dateData[0]);
-                        queryAction.max = false;
-                    }
-                } else {
-                    endDate(dateData);
                 }
                 break;
 

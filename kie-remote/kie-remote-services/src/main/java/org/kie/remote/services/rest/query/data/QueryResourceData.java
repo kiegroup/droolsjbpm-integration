@@ -18,10 +18,14 @@ package org.kie.remote.services.rest.query.data;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -260,7 +264,7 @@ public class QueryResourceData {
         return result;
     }
 
-    private static Timestamp parseDate(String dateStr) {
+    public static Timestamp parseDate(String dateStr) {
         String [] parts = dateStr.split("_");
         String [] dateParts = null;
         String [] timeParts = null;
