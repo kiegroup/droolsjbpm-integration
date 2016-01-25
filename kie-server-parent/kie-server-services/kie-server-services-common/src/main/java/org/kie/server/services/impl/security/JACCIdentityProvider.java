@@ -37,7 +37,15 @@ public class JACCIdentityProvider implements IdentityProvider {
         Subject subject = getSubjectFromContainer();
 
         if (subject != null) {
-            return subject.getPrincipals().iterator().next().getName();
+            Set<Principal> principals = subject.getPrincipals();
+
+            if (principals != null) {
+                for (Principal principal : principals) {
+                    if (!(principal instanceof Group)) {
+                        return principal.getName();
+                    }
+                }
+            }
         }
         return getNameFromAdapter();
     }
