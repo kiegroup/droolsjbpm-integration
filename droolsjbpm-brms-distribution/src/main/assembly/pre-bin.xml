@@ -34,7 +34,6 @@
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
         <include>org.drools:drools-verifier</include>
-        <include>org.drools:knowledge-api</include>
       </includes>
       <outputDirectory></outputDirectory>
     </dependencySet>
@@ -66,7 +65,6 @@
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
         <exclude>org.drools:drools-verifier</exclude>
-        <exclude>org.drools:knowledge-api</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
     </dependencySet>
