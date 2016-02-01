@@ -900,8 +900,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         try {
 
-            List<TaskSummary> tasks = taskClient.findTasks("yoda", 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
             assertNotNull(tasks);
+            assertEquals(1, tasks.size());
 
             TaskSummary taskInstance = tasks.get(0);
 
