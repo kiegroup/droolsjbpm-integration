@@ -1,34 +1,86 @@
 package org.kie.perf.suite;
 
+import java.util.Arrays;
+import java.util.Set;
+
+import org.kie.perf.Executor;
 import org.kie.perf.SharedMetricRegistry;
 import org.kie.perf.TestConfig;
+import org.kie.perf.TestConfig.Measure;
 import org.kie.perf.TestConfig.RunType;
+import org.kie.perf.annotation.KPKConstraint;
 import org.kie.perf.annotation.KPKLimit;
+import org.kie.perf.metrics.CPUUsageHistogramSet;
 import org.kie.perf.run.IRunType;
 import org.kie.perf.scenario.IPerfTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 
 public class LoadSuite implements ITestSuite {
+    
+    protected static final Logger log = LoggerFactory.getLogger(LoadSuite.class);
+    public static final String TEST_PACKAGE = "org.kie.perf.scenario.load";
 
     protected int iterations;
-
-    @Override
-    public String getTestPackage() {
-        return "org.kie.perf.scenario.load";
-    }
-
-    @Override
-    public void initScenario(final IPerfTest scenario) throws Exception {
+    protected IRunType run;
+    
+    public LoadSuite() {
         TestConfig tc = TestConfig.getInstance();
         iterations = tc.getIterations();
-
-        scenario.init();
+        run = tc.getRunType().newInstance();
     }
-
+    
     @Override
-    public void startScenario(final IPerfTest scenario) {
+    public void start() throws Exception {
+        TestConfig tc = TestConfig.getInstance();
+        Executor exec = Executor.getInstance();
+        Set<Class<? extends IPerfTest>> scenarios = exec.getScenarios(TEST_PACKAGE);
+        if (scenarios.size() == 1) {
+            
+            IPerfTest scenario = scenarios.iterator().next().newInstance();
+
+            exec.initMetrics(scenario);
+            scenario.init();
+            if (tc.isWarmUp()) {
+                SharedMetricRegistry.setWarmUp(true);
+                scenario.initMetrics();
+                long endWarmUpTime = System.currentTimeMillis() + 5000;
+                for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
+                    scenario.execute();
+                }
+                SharedMetricRegistry.setWarmUp(false);
+            }
+            scenario.initMetrics();
+
+            CPUUsageHistogramSet cpuusage = null;
+            boolean cpuusageEnabled = tc.getMeasure().contains(Measure.CPUUSAGE);
+            if (cpuusageEnabled) {
+                cpuusage = CPUUsageHistogramSet.getInstance(scenario.getClass());
+                cpuusage.start();
+            }
+            startScenario(scenario);
+            if (cpuusageEnabled) {
+                cpuusage.stop();
+            }
+
+            exec.getReporter().report();
+        } else {
+            for (Class<? extends IPerfTest> c : scenarios) {
+                KPKConstraint constraint = exec.checkScenarioConstraints(c);
+                if (constraint != null) {
+                    log.info("Scenario '" + tc.getScenario() + "' skipped due to constraints " + Arrays.toString(constraint.value()));
+                } else {
+                    exec.forkScenario(c.getSimpleName());
+                }
+            }
+        }
+    }
+    
+    private void startScenario(IPerfTest scenario) {
+        scenario.init();
         MetricRegistry metrics = SharedMetricRegistry.getInstance();
         TestConfig tc = TestConfig.getInstance();
         IRunType run = tc.getRunType().newInstance();
