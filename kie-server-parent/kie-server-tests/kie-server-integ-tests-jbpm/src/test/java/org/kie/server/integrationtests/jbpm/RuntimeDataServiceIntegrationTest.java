@@ -777,20 +777,23 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(currentState);
             assertEquals(2, currentState.size());
 
-            variableInstance = currentState.get(0);
-            assertNotNull(variableInstance);
-            assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertNullOrEmpty(variableInstance.getOldValue());
-            assertEquals("Person{name='john'}", variableInstance.getValue());
-            assertEquals("personData", variableInstance.getVariableName());
-
-            variableInstance = currentState.get(1);
-            assertNotNull(variableInstance);
-            assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
-            assertEquals("waiting for signal", variableInstance.getOldValue());
-            assertEquals("updated value", variableInstance.getValue());
-            assertEquals("stringData", variableInstance.getVariableName());
-
+            for (VariableInstance variable : currentState) {
+                if ("personData".equals(variable.getVariableName())) {
+                    assertNotNull(variable);
+                    assertEquals(processInstanceId, variable.getProcessInstanceId());
+                    assertNullOrEmpty(variable.getOldValue());
+                    assertEquals("Person{name='john'}", variable.getValue());
+                    assertEquals("personData", variable.getVariableName());
+                } else if ("stringData".equals(variable.getVariableName())) {
+                    assertNotNull(variable);
+                    assertEquals(processInstanceId, variable.getProcessInstanceId());
+                    assertEquals("waiting for signal", variable.getOldValue());
+                    assertEquals("updated value", variable.getValue());
+                    assertEquals("stringData", variable.getVariableName());
+                } else {
+                    fail("Got unexpected variable " + variable.getVariableName());
+                }
+            }
 
             varHistory = queryClient.findVariableHistory(processInstanceId, "stringData", 0, 10);
             assertNotNull(varHistory);
@@ -828,10 +831,17 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         try {
 
-            List<TaskSummary> tasks = taskClient.findTasks("yoda", 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasks("yoda", 0, 50);
             assertNotNull(tasks);
 
-            TaskSummary taskInstance = tasks.get(0);
+            TaskSummary taskInstance = null;
+            for (TaskSummary t : tasks) {
+                if (t.getProcessInstanceId().equals(processInstanceId)) {
+                    taskInstance = t;
+                    break;
+                }
+            }
+
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
             assertNullOrEmpty(taskInstance.getDescription());
@@ -890,8 +900,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         try {
 
-            List<TaskSummary> tasks = taskClient.findTasks("yoda", 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
             assertNotNull(tasks);
+            assertEquals(1, tasks.size());
 
             TaskSummary taskInstance = tasks.get(0);
 
@@ -912,14 +923,14 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(events);
             assertEquals(2, events.size());
 
-            event = events.get(0);
+            event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             assertNotNull(event);
             assertEquals(TaskEvent.TaskEventType.ADDED.toString(), event.getType());
             assertEquals(processInstanceId, event.getProcessInstanceId());
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals("definition-project.usertask", event.getUserId());    // is this really correct to set process id as user for added task
 
-            event = events.get(1);
+            event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.STARTED.toString());
             assertNotNull(event);
             assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
             assertEquals(processInstanceId, event.getProcessInstanceId());
@@ -933,21 +944,21 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(events);
             assertEquals(3, events.size());
 
-            event = events.get(0);
+            event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.ADDED.toString());
             assertNotNull(event);
             assertEquals(TaskEvent.TaskEventType.ADDED.toString(), event.getType());
             assertEquals(processInstanceId, event.getProcessInstanceId());
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals("definition-project.usertask", event.getUserId());    // is this really correct to set process id as user for added task
 
-            event = events.get(1);
+            event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.STARTED.toString());
             assertNotNull(event);
             assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
             assertEquals(processInstanceId, event.getProcessInstanceId());
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals("yoda", event.getUserId());
 
-            event = events.get(2);
+            event = getTaskEventInstanceFromListByType(events, TaskEvent.TaskEventType.STOPPED.toString());
             assertNotNull(event);
             assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
             assertEquals(processInstanceId, event.getProcessInstanceId());
@@ -957,6 +968,15 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
         }
+    }
+
+    private TaskEventInstance getTaskEventInstanceFromListByType(List<TaskEventInstance> events, String type) {
+        for (TaskEventInstance t : events) {
+            if (t.getType().equals(type)) {
+                return t;
+            }
+        }
+        return null;
     }
 
     @Test
@@ -1148,6 +1168,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         processInstanceIds.add(processClient.startProcess("definition-project", "definition-project.usertask", parameters));
         processInstanceIds.add(processClient.startProcess("definition-project", "definition-project.signalprocess", parameters));
 
+        Collections.sort(processInstanceIds);
         return processInstanceIds;
     }
 
