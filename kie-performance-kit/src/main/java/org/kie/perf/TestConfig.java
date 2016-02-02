@@ -29,6 +29,7 @@ public class TestConfig {
     protected RunType runType;
     protected int duration;
     protected int iterations;
+    protected int expectedRate;
 
     protected ReporterType reporterType;
     protected int periodicity;
@@ -43,6 +44,8 @@ public class TestConfig {
     protected String perfRepoUrlPath;
     protected String perfRepoUsername;
     protected String perfRepoPassword;
+    
+    protected String version = Executor.class.getPackage().getImplementationVersion();
 
     protected List<Measure> measure;
     protected List<String> tags = new ArrayList<String>();
@@ -61,6 +64,9 @@ public class TestConfig {
 
         suite = System.getProperty("suite");
         properties.put("suite", suite);
+        
+        properties.put("suite.version", version);
+        addTag(version);
 
         scenario = System.getProperty("scenario");
         if (scenario == null || scenario.isEmpty() || scenario.equals("${scenario}")) {
@@ -78,10 +84,18 @@ public class TestConfig {
         runType = RunType.valueOf(System.getProperty("runType").toUpperCase());
         duration = Integer.valueOf(System.getProperty("duration"));
         iterations = Integer.valueOf(System.getProperty("iterations"));
+        
+        String expectedRateProp = System.getProperty("expectedRate");
+        if (expectedRateProp == null) {
+            expectedRate = 10;
+        } else {
+            expectedRate = Integer.valueOf(expectedRateProp);
+        }
 
         properties.put("runType", runType);
         properties.put("duration", duration);
         properties.put("iterations", iterations);
+        properties.put("expectedRate", expectedRate);
 
         reporterType = ReporterType.valueOf(System.getProperty("reporterType").toUpperCase());
         periodicity = Integer.valueOf(System.getProperty("periodicity"));
@@ -164,6 +178,10 @@ public class TestConfig {
     public String getSuite() {
         return suite;
     }
+    
+    public String getVersion() {
+        return version;
+    }
 
     public String getScenario() {
         return scenario;
@@ -187,6 +205,10 @@ public class TestConfig {
 
     public int getIterations() {
         return iterations;
+    }
+    
+    public int getExpectedRate() {
+        return expectedRate;
     }
 
     public ReporterType getReporterType() {

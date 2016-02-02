@@ -63,16 +63,24 @@ public class PerfRepoReporter extends ScheduledReporter {
         }
 
         public PerfRepoReporter build(PerfRepoClient client) {
-            return new PerfRepoReporter(registry, client, rateUnit, durationUnit, filter);
+            return new PerfRepoReporter(registry, client, rateUnit, durationUnit, filter, false);
+        }
+
+        public PerfRepoReporter build(PerfRepoClient client, boolean scheduled) {
+            return new PerfRepoReporter(registry, client, rateUnit, durationUnit, filter, scheduled);
         }
     }
 
     private final PerfRepoClient client;
     private TestExecution testExecution;
+    private boolean scheduled;
+    private long passedTime;
 
-    private PerfRepoReporter(MetricRegistry registry, PerfRepoClient client, TimeUnit rateUnit, TimeUnit durationUnit, MetricFilter filter) {
+    private PerfRepoReporter(MetricRegistry registry, PerfRepoClient client, TimeUnit rateUnit, TimeUnit durationUnit, MetricFilter filter, boolean scheduled) {
         super(registry, "perf-repo-reporter", filter, rateUnit, durationUnit);
         this.client = client;
+        this.scheduled = scheduled;
+        this.passedTime = 0;
     }
 
     @Override
@@ -81,13 +89,23 @@ public class PerfRepoReporter extends ScheduledReporter {
 
         TestConfig tc = TestConfig.getInstance();
 
-        String testName = tc.getProjectName() + " - " + tc.getSuite() + " - " + tc.getScenario();
+        String testName = tc.getProjectName() + " - " + tc.getSuite();
 
         String testExecutionName = testName;
-        if (tc.getRunType() == RunType.DURATION) {
-            testExecutionName += " - " + tc.getDuration() + " seconds";
+        if (scheduled) {
+            testName += " - " + tc.getVersion();
+            passedTime += tc.getPeriodicity();
+            testExecutionName += " - " + passedTime/60.0 + "m passed";
         } else {
-            testExecutionName += " - " + tc.getIterations() + " iterations";
+            if (tc.getScenario() != null) {
+                testName += " - " + tc.getScenario();
+            }
+            
+            if (tc.getRunType() == RunType.DURATION) {
+                testExecutionName += " - " + tc.getDuration() + " seconds";
+            } else {
+                testExecutionName += " - " + tc.getIterations() + " iterations";
+            }
         }
 
         String testUid = tc.getProjectName().toLowerCase().replaceAll(" ", "_") + "_" + tc.getSuite().toLowerCase() + "_" + tc.getScenario().toLowerCase();
@@ -199,6 +217,10 @@ public class PerfRepoReporter extends ScheduledReporter {
             e.printStackTrace();
         }
     }
+    
+    public void setScheduled(boolean scheduled) {
+        this.scheduled = scheduled;
+    }
 
     private void reportTimer(TestExecutionBuilder testExecution, String name, Timer timer) {
         final Snapshot snapshot = timer.getSnapshot();
@@ -269,6 +291,9 @@ public class PerfRepoReporter extends ScheduledReporter {
     }
 
     protected String getMeterName(String name) {
+        if (scheduled) { // we report more than 1 scenario at once
+            return name;
+        }
         String a = name.substring(name.indexOf(".", "org.kie.perf.scenario".length() + 1) + 1);
         return a.substring(a.indexOf(".") + 1);
     }

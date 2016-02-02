@@ -8,6 +8,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -36,23 +37,24 @@ import com.codahale.metrics.jvm.FileDescriptorRatioGauge;
 
 public class Executor {
 
-    protected static final Logger log = LoggerFactory.getLogger(Executor.class);
+    private static final Logger log = LoggerFactory.getLogger(Executor.class);
+    
+    private static Executor instance;
 
     private ScheduledReporter reporter;
-
-    public Executor() {
-
+    private ITestSuite testSuite;
+    
+    public static Executor getInstance() throws Exception {
+        if (instance == null) {
+            instance = new Executor();
+            instance.initReporter();
+            instance.initTestSuite();
+        }
+        return instance;
     }
-
-    public ITestSuite findTestSuite() throws Exception {
-        Class<?> csuite = Class.forName("org.kie.perf.suite." + TestConfig.getInstance().getSuite());
-        return (ITestSuite) csuite.newInstance();
-    }
-
-    public void initMetrics(IPerfTest scenario) {
-        // including reporter
+    
+    private void initReporter() {
         MetricRegistry metrics = SharedMetricRegistry.getInstance();
-
         TestConfig tc = TestConfig.getInstance();
         ReporterType reporterType = tc.getReporterType();
         if (reporterType == ReporterType.CONSOLE) {
@@ -77,7 +79,24 @@ public class Executor {
                     tc.getPerfRepoPassword());
             reporter = PerfRepoReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build(client);
         }
+    }
+    
+    public ScheduledReporter getReporter() {
+        return reporter;
+    }
 
+    public void initTestSuite() throws Exception {
+        Class<?> csuite = Class.forName("org.kie.perf.suite." + TestConfig.getInstance().getSuite());
+        testSuite = (ITestSuite) csuite.newInstance();
+    }
+    
+    public ITestSuite getTestSuite() {
+        return testSuite;
+    }
+
+    public void initMetrics(IPerfTest scenario) {
+        MetricRegistry metrics = SharedMetricRegistry.getInstance();
+        TestConfig tc = TestConfig.getInstance();
         for (Measure m : tc.getMeasure()) {
             if (m == Measure.MEMORYUSAGE) {
                 metrics.registerAll(new MemoryUsageGaugeSet(scenario.getClass()));
@@ -104,53 +123,42 @@ public class Executor {
             }
         }
     }
-
-    public IPerfTest selectNextTestFromSuite(ITestSuite testSuite) throws Exception {
+    
+    public Set<Class<? extends IPerfTest>> getScenarios(String testPackage) throws Exception {
         TestConfig tc = TestConfig.getInstance();
-        String testPackage = testSuite.getTestPackage();
         Class<? extends IPerfTest> selectedScenario = null;
+        Set<Class<? extends IPerfTest>> scenarios = new HashSet<>();
         if (tc.getScenario() != null) {
             selectedScenario = (Class<? extends IPerfTest>) Class.forName(testPackage + "." + tc.getScenario());
+            scenarios.add(selectedScenario);
+            return scenarios;
         }
 
         Reflections reflections = new Reflections(testPackage);
-        Set<Class<? extends IPerfTest>> scenarios = reflections.getSubTypesOf(IPerfTest.class);
-        IPerfTest instance = null;
-
-        if (selectedScenario == null) {
-            // parent process going through all scenarios to start new child
-            // processes for each scenario
-            for (Class<? extends IPerfTest> c : scenarios) {
-                if (Modifier.isAbstract(c.getModifiers())) {
-                    continue;
-                }
-                ProcessBuilder processBuilder = new ProcessBuilder(tc.getStartScriptLocation(), c.getSimpleName());
-                try {
-                    Process process = processBuilder.start();
-                    InputStreamReader isr = new InputStreamReader(process.getInputStream());
-                    BufferedReader br = new BufferedReader(isr);
-                    String line = null;
-                    while ((line = br.readLine()) != null) {
-                        System.out.println(line);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+        Set<Class<? extends IPerfTest>> allScenarios = reflections.getSubTypesOf(IPerfTest.class);
+        for (Class<? extends IPerfTest> c : allScenarios) {
+            if (Modifier.isAbstract(c.getModifiers())) {
+                continue;
             }
-        } else {
-            try {
-                KPKConstraint constraint = checkScenarioConstraints(selectedScenario);
-                if (constraint != null) {
-                    log.info("Scenario '" + tc.getScenario() + "' skipped due to constraints " + Arrays.toString(constraint.value()));
-                } else {
-                    instance = selectedScenario.newInstance();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            scenarios.add(c);
+            
         }
-
-        return instance;
+        return scenarios;
+    }
+    
+    public void forkScenario(String scenarioName) {
+        ProcessBuilder processBuilder = new ProcessBuilder(TestConfig.getInstance().getStartScriptLocation(), scenarioName);
+        try {
+            Process process = processBuilder.start();
+            InputStreamReader isr = new InputStreamReader(process.getInputStream());
+            BufferedReader br = new BufferedReader(isr);
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public KPKConstraint checkScenarioConstraints(Class<? extends IPerfTest> scenario) {
@@ -181,15 +189,10 @@ public class Executor {
         return null;
     }
 
-    public void report() {
-        reporter.report();
-    }
-
     public static void main(String[] args) {
-        Executor exec = new Executor();
         try {
+            Executor exec = getInstance();
             TestConfig tc = TestConfig.getInstance();
-            ITestSuite testSuite = exec.findTestSuite();
 
             String msg = "======== SUITE: " + tc.getSuite();
             String scenarioName = tc.getScenario();
@@ -199,38 +202,8 @@ public class Executor {
             msg += " ========";
             log.info(msg);
 
-            IPerfTest scenario = exec.selectNextTestFromSuite(testSuite);
-
-            if (scenario != null) {
-                // this is a child process for this scenario with own JVM
-
-                exec.initMetrics(scenario);
-                testSuite.initScenario(scenario);
-                if (tc.isWarmUp()) {
-                    SharedMetricRegistry.setWarmUp(true);
-                    scenario.initMetrics();
-                    long endWarmUpTime = System.currentTimeMillis() + 5000;
-                    for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
-                        scenario.execute();
-                    }
-                    SharedMetricRegistry.setWarmUp(false);
-                }
-                scenario.initMetrics();
-
-                CPUUsageHistogramSet cpuusage = null;
-                boolean cpuusageEnabled = tc.getMeasure().contains(Measure.CPUUSAGE);
-                if (cpuusageEnabled) {
-                    cpuusage = CPUUsageHistogramSet.getInstance(scenario.getClass());
-                    cpuusage.start();
-                }
-                testSuite.startScenario(scenario);
-                if (cpuusageEnabled) {
-                    cpuusage.stop();
-                }
-
-                exec.report();
-
-            }
+            exec.getTestSuite().start();
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
