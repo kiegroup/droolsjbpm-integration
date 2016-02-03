@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "request-info-instance-list")
-public class RequestInfoInstanceList {
+public class RequestInfoInstanceList implements ItemList<RequestInfoInstance> {
 
     @XmlElement(name="request-info-instance")
     private RequestInfoInstance[] requestInfoInstances;
@@ -45,5 +48,10 @@ public class RequestInfoInstanceList {
 
     public void setRequestInfoInstances(RequestInfoInstance[] requestInfoInstances) {
         this.requestInfoInstances = requestInfoInstances;
+    }
+
+    @Override
+    public List<RequestInfoInstance> getItems() {
+        return Arrays.asList(requestInfoInstances);
     }
 }

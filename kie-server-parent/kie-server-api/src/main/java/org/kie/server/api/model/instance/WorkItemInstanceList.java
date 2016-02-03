@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "work-item-instance-list")
-public class WorkItemInstanceList {
+public class WorkItemInstanceList implements ItemList<WorkItemInstance> {
 
     @XmlElement(name="work-item-instance")
     private WorkItemInstance[] workItems;
@@ -45,5 +48,10 @@ public class WorkItemInstanceList {
 
     public void setWorkItems(WorkItemInstance[] workItems) {
         this.workItems = workItems;
+    }
+
+    @Override
+    public List<WorkItemInstance> getItems() {
+        return Arrays.asList(workItems);
     }
 }

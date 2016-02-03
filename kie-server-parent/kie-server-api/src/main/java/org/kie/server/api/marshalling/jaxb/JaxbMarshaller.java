@@ -42,9 +42,7 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
-import org.drools.core.runtime.rule.impl.FlatQueryResultRow;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
-import org.kie.api.task.model.Task;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -71,6 +69,10 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.instance.ErrorInfoInstance;
 import org.kie.server.api.model.instance.ErrorInfoInstanceList;
 import org.kie.server.api.model.instance.JobRequestInstance;
@@ -87,6 +89,7 @@ import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstance;
@@ -165,6 +168,7 @@ public class JaxbMarshaller implements Marshaller {
                 VariableInstanceList.class,
 
                 TaskInstance.class,
+                TaskInstanceList.class,
                 TaskSummary.class,
                 TaskSummaryList.class,
 
@@ -184,6 +188,11 @@ public class JaxbMarshaller implements Marshaller {
                 ErrorInfoInstance.class,
                 ErrorInfoInstanceList.class,
                 JobRequestInstance.class,
+
+                QueryDefinition.class,
+                QueryDefinitionList.class,
+                QueryFilterSpec.class,
+                QueryParam.class,
 
                 ArrayList.class
         };

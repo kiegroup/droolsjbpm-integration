@@ -15,15 +15,18 @@
 
 package org.kie.server.api.model.instance;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.ItemList;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-attachment-list")
-public class TaskAttachmentList {
+public class TaskAttachmentList implements ItemList<TaskAttachment> {
 
     @XmlElement(name="task-attachment")
     private TaskAttachment[] taskAttachments;
@@ -45,5 +48,10 @@ public class TaskAttachmentList {
 
     public void setTasks(TaskAttachment[] taskAttachments) {
         this.taskAttachments = taskAttachments;
+    }
+
+    @Override
+    public List<TaskAttachment> getItems() {
+        return Arrays.asList(taskAttachments);
     }
 }

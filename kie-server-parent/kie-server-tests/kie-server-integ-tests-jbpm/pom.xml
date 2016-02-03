@@ -159,6 +159,17 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-kie-services</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dashbuilder</groupId>
+      <artifactId>dashbuilder-dataset-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -180,6 +191,7 @@
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
+              <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
             </systemPropertyVariables>
           </configuration>
         </plugin>
