@@ -18,6 +18,7 @@ package org.kie.server.client.helper;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.impl.RuleServicesClientImpl;
@@ -26,7 +27,7 @@ public class DroolsServicesClientBuilder implements KieServicesClientBuilder {
 
     @Override
     public String getImplementedCapability() {
-        return "BRM";
+        return KieServerConstants.CAPABILITY_BRM;
     }
 
     @Override

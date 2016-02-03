@@ -177,7 +177,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
     @Override
     public String getImplementedCapability() {
-        return "BPM-UI";
+        return KieServerConstants.CAPABILITY_BPM_UI;
     }
 
     @Override

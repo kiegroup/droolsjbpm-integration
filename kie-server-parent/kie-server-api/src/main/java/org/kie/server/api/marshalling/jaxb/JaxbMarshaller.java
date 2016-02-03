@@ -64,6 +64,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
@@ -206,6 +207,7 @@ public class JaxbMarshaller implements Marshaller {
                 BendableScore.class,
                 BendableLongScore.class,
                 BendableBigDecimalScore.class,
+                Message.class,
         };
     }
 
