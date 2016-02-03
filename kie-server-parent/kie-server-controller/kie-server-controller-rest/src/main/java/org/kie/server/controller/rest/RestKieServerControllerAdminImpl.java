@@ -49,6 +49,12 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.controller.rest.ControllerUtils.*;
 
+/**
+ * This admin api is deprecated from 6.4.x and should not be used, instead
+ * RestSpecManagementServiceImpl should be used
+ * @see org.kie.server.controller.rest.RestSpecManagementServiceImpl
+ */
+@Deprecated
 @Path("/controller/admin")
 public class RestKieServerControllerAdminImpl extends KieServerControllerAdminImpl {
 

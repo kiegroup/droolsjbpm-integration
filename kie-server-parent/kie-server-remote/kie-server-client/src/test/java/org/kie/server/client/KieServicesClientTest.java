@@ -59,6 +59,16 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
 
     @Test
     public void testListContainers() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
@@ -79,6 +89,16 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
 
     @Test
     public void testCreateContainer() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
         stubFor(put(urlEqualTo("/containers/kie1"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()

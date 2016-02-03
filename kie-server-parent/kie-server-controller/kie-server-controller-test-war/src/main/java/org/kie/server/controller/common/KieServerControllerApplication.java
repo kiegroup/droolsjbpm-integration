@@ -23,6 +23,7 @@ import javax.ws.rs.core.Application;
 
 import org.kie.server.controller.rest.RestKieServerControllerAdminImpl;
 import org.kie.server.controller.rest.RestKieServerControllerImpl;
+import org.kie.server.controller.rest.RestSpecManagementServiceImpl;
 
 @ApplicationPath("/")
 public class KieServerControllerApplication extends Application {
@@ -32,6 +33,7 @@ public class KieServerControllerApplication extends Application {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(RestKieServerControllerImpl.class);
         classes.add(RestKieServerControllerAdminImpl.class);
+        classes.add(RestSpecManagementServiceImpl.class);
         return classes;
     }
 }

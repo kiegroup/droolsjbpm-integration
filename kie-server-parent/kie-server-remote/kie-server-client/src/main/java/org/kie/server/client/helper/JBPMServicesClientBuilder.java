@@ -18,6 +18,7 @@ package org.kie.server.client.helper;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
@@ -32,7 +33,7 @@ public class JBPMServicesClientBuilder implements KieServicesClientBuilder {
 
     @Override
     public String getImplementedCapability() {
-        return "BPM";
+        return KieServerConstants.CAPABILITY_BPM;
     }
 
     @Override

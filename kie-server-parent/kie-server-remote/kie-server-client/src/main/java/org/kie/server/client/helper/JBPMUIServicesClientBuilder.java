@@ -18,6 +18,7 @@ package org.kie.server.client.helper;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.impl.UIServicesClientImpl;
@@ -26,7 +27,7 @@ public class JBPMUIServicesClientBuilder implements KieServicesClientBuilder {
 
     @Override
     public String getImplementedCapability() {
-        return "BPM-UI";
+        return KieServerConstants.CAPABILITY_BPM_UI;
     }
 
     @Override
