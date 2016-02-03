@@ -62,6 +62,8 @@ public class ControllerConnectRunnable implements Runnable {
                 KieServerSetup kieServerSetup = kieController.connect(kieServerInfo);
                 logger.debug("Connected to controller and retrieved setup details {}", kieServerSetup);
                 Set<KieContainerResource> containers = kieServerSetup.getContainers();
+                // add status message when connected
+                kieServer.addServerStatusMessage(kieServerInfo);
 
                 containerManager.installContainers(kieServer, containers, currentState, kieServerSetup);
 

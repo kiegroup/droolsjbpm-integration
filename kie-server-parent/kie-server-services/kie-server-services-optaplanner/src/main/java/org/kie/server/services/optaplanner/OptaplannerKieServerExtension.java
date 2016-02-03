@@ -118,7 +118,7 @@ public class OptaplannerKieServerExtension
 
     @Override
     public String getImplementedCapability() {
-        return "OptaPlanner";
+        return KieServerConstants.CAPABILITY_BRP;
     }
 
     @Override

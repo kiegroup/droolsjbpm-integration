@@ -34,6 +34,19 @@ import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
+import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ContainerKey;
+import org.kie.server.controller.api.model.runtime.ServerInstance;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ContainerSpecKey;
+import org.kie.server.controller.api.model.spec.ContainerSpecList;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.model.spec.ServerTemplateList;
 
 public class ControllerUtils {
 
@@ -50,6 +63,20 @@ public class ControllerUtils {
         modelClasses.add(KieServerInstanceInfo.class);
         modelClasses.add(KieServerSetup.class);
         modelClasses.add(KieServerStatus.class);
+
+        modelClasses.add(ServerInstance.class);
+        modelClasses.add(ServerInstanceKey.class);
+        modelClasses.add(ServerTemplate.class);
+        modelClasses.add(ServerTemplateKey.class);
+        modelClasses.add(ServerConfig.class);
+        modelClasses.add(RuleConfig.class);
+        modelClasses.add(ProcessConfig.class);
+        modelClasses.add(ContainerSpec.class);
+        modelClasses.add(ContainerSpecKey.class);
+        modelClasses.add(Container.class);
+        modelClasses.add(ContainerKey.class);
+        modelClasses.add(ServerTemplateList.class);
+        modelClasses.add(ContainerSpecList.class);
 
         return modelClasses;
     }
