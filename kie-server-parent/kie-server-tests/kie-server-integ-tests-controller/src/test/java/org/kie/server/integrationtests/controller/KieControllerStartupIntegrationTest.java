@@ -125,7 +125,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
         assertEquals(1, instanceList.getKieServerInstances().length);
         assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getKieServerInstances()[0].getIdentifier());
-        assertEquals(KieServerStatus.UP, instanceList.getKieServerInstances()[0].getStatus());
 
         // Turn off embedded kie server.
         stopKieServer();
@@ -134,7 +133,6 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         instanceList = controllerClient.listKieServerInstances();
         assertEquals(1, instanceList.getKieServerInstances().length);
         assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getKieServerInstances()[0].getIdentifier());
-        assertEquals(KieServerStatus.DOWN, instanceList.getKieServerInstances()[0].getStatus());
     }
 
     @Test

@@ -16,13 +16,10 @@
 package org.kie.server.api.model;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="kie-server-info")
 @XStreamAlias( "kie-server-info" )
@@ -35,6 +32,8 @@ public class KieServerInfo {
     private String location;
 
     private List<String> capabilities;
+
+    private List<Message> messages;
     
     public KieServerInfo() {
         super();
@@ -99,6 +98,16 @@ public class KieServerInfo {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    @XmlElement(name="messages")
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
     @Override
     public String toString() {
         return "KieServerInfo{" +
