@@ -11,6 +11,14 @@
         <repository>
           <id>remote-testing-repo</id>
           <url>${kie.server.testing.remote.repo.url}</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
         </repository>
       </repositories>
     </profile>

@@ -69,44 +69,41 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     private void init() {
         List<String> serverCapabilities = config.getCapabilities();
 
-        try {
-            if (serverCapabilities == null) {
-                // no explicit capabilities configuration given fetch them from kieServer
-                kieServerInfo = getServerInfo().getResult();
-                logger.info("KieServicesClient connected to: {} version {}", kieServerInfo.getServerId(), kieServerInfo.getVersion());
-                serverCapabilities = kieServerInfo.getCapabilities();
-                logger.info("Supported capabilities by the server: {}", serverCapabilities);
-            }
-            if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
-                // process available client builders
-                Map<String, KieServicesClientBuilder> clientBuildersByCapability = new HashMap<String, KieServicesClientBuilder>();
-                for (KieServicesClientBuilder builder : clientBuilders) {
-                    clientBuildersByCapability.put(builder.getImplementedCapability(), builder);
-                }
-
-                // build client based on server capabilities
-                for (String capability : serverCapabilities) {
-                    logger.debug("Building services client for server capability {}", capability);
-                    KieServicesClientBuilder builder = clientBuildersByCapability.get(capability);
-
-                    if (builder != null) {
-                        try {
-                            logger.debug("Builder '{}' for capability '{}'", builder, capability);
-                            Map<Class<?>, Object> clients = builder.build(config, classLoader);
-
-                            logger.debug("Capability implemented by {}", clients);
-                            servicesClients.putAll(clients);
-                        } catch (Exception e) {
-                            logger.warn("Builder {} throw exception while setting up clients, no {} capabilities will be available", builder, capability);
-                        }
-                    } else {
-                        logger.debug("No builder found for '{}' capability", capability);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.warn("Unable to connect to server to get information about it due to {}", e.getMessage());
+        if (serverCapabilities == null) {
+            // no explicit capabilities configuration given fetch them from kieServer
+            kieServerInfo = getServerInfo().getResult();
+            logger.debug("KieServicesClient connected to: {} version {}", kieServerInfo.getServerId(), kieServerInfo.getVersion());
+            serverCapabilities = kieServerInfo.getCapabilities();
+            logger.debug("Supported capabilities by the server: {}", serverCapabilities);
         }
+        if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
+            // process available client builders
+            Map<String, KieServicesClientBuilder> clientBuildersByCapability = new HashMap<String, KieServicesClientBuilder>();
+            for (KieServicesClientBuilder builder : clientBuilders) {
+                clientBuildersByCapability.put(builder.getImplementedCapability(), builder);
+            }
+
+            // build client based on server capabilities
+            for (String capability : serverCapabilities) {
+                logger.debug("Building services client for server capability {}", capability);
+                KieServicesClientBuilder builder = clientBuildersByCapability.get(capability);
+
+                if (builder != null) {
+                    try {
+                        logger.debug("Builder '{}' for capability '{}'", builder, capability);
+                        Map<Class<?>, Object> clients = builder.build(config, classLoader);
+
+                        logger.debug("Capability implemented by {}", clients);
+                        servicesClients.putAll(clients);
+                    } catch (Exception e) {
+                        logger.warn("Builder {} throw exception while setting up clients, no {} capabilities will be available", builder, capability);
+                    }
+                } else {
+                    logger.debug("No builder found for '{}' capability", capability);
+                }
+            }
+        }
+
     }
 
 

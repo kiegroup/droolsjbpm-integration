@@ -140,7 +140,6 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(kieServerInfo.getServerId(), serverInstance.getIdentifier());
         assertEquals(kieServerInfo.getName(), serverInstance.getName());
         assertEquals(KieServerStatus.UP, serverInstance.getStatus());
-        assertEquals(kieServerInfo.getVersion(), serverInstance.getVersion());
 
         assertNotNull("Kie server instance isn't managed!", serverInstance.getManagedInstances());
         assertEquals(1, serverInstance.getManagedInstances().size());
@@ -179,7 +178,6 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
         assertEquals(kieServerInfo.getServerId(), serverInstance.getIdentifier());
         assertEquals(kieServerInfo.getName(), serverInstance.getName());
         assertEquals(KieServerStatus.UP, serverInstance.getStatus());
-        assertEquals(kieServerInfo.getVersion(), serverInstance.getVersion());
 
         assertNotNull("Kie server instance isn't managed!", serverInstance.getManagedInstances());
         assertEquals(1, serverInstance.getManagedInstances().size());

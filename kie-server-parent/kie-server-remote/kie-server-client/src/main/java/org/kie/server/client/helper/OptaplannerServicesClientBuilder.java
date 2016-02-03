@@ -15,6 +15,7 @@
 
 package org.kie.server.client.helper;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
@@ -29,8 +30,8 @@ public class OptaplannerServicesClientBuilder
 
     @Override
     public String getImplementedCapability() {
-        return "OptaPlanner";
-    } // we should consolidate this into a constant in the kie-server-api jar
+        return KieServerConstants.CAPABILITY_BRP;
+    }
 
     @Override
     public Map<Class<?>, Object> build(KieServicesConfiguration configuration, ClassLoader classLoader) {

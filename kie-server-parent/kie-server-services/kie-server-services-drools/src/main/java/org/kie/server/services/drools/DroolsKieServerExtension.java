@@ -149,7 +149,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
     @Override
     public String getImplementedCapability() {
-        return "BRM";
+        return KieServerConstants.CAPABILITY_BRM;
     }
 
     @Override
