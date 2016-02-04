@@ -254,4 +254,14 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 ", available clients=" + servicesClients +
                 '}';
     }
+
+    @Override
+    public void setClassLoader(ClassLoader classLoader) {
+        this.marshaller.setClassLoader( classLoader );
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return this.marshaller.getClassLoader();
+    }
 }

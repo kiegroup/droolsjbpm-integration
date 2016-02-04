@@ -157,6 +157,7 @@
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
+              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -190,6 +191,8 @@
             <systemProperties>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
+              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
             </systemProperties>
           </container>

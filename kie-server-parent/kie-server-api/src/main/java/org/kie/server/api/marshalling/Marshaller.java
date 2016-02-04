@@ -28,4 +28,8 @@ public interface Marshaller {
 
     public MarshallingFormat getFormat();
 
+    public void setClassLoader( ClassLoader classloader );
+
+    public ClassLoader getClassLoader();
+
 }

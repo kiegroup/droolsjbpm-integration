@@ -42,7 +42,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
                         {
                                 {MarshallingFormat.JAXB, restConfiguration},
                                 {MarshallingFormat.JSON, restConfiguration},
-                                {MarshallingFormat.XSTREAM, restConfiguration},
+                                {MarshallingFormat.XSTREAM, restConfiguration}
                         }
         ));
 

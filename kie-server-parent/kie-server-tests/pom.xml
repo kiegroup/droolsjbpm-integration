@@ -50,6 +50,7 @@
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
+    <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
   </modules>
@@ -191,7 +192,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -232,7 +233,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -409,7 +410,7 @@
                 </container>
                 <configuration>
                   <properties>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -522,7 +523,7 @@
                 </container>
                 <configuration>
                   <properties>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -602,7 +603,7 @@
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
