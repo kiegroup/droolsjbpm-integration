@@ -24,10 +24,15 @@
       <artifactId>kie-api</artifactId>
       <!-- scope>provided</scope -->
     </dependency>
+
+    <!-- we need to find a way to remove the following 2 dependencies from this jar -->
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
-      <!-- scope>provided</scope -->
+    </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-core</artifactId>
     </dependency>
 
     <!-- json -->

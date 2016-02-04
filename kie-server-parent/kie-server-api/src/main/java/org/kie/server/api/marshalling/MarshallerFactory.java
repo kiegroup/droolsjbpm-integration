@@ -36,9 +36,9 @@ public class MarshallerFactory {
             case XSTREAM:
                 return new XStreamMarshaller( classes, classLoader );
             case JAXB:
-                return new JaxbMarshaller(classes, classLoader); // has to be implemented
+                return new JaxbMarshaller(classes, classLoader);
             case JSON:
-                return new JSONMarshaller(classes, classLoader); // has to be implemented
+                return new JSONMarshaller(classes, classLoader);
             default:
                 logger.error( "Unsupported marshalling format: " + format );
         }
