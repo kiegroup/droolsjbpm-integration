@@ -47,6 +47,11 @@
         <artifactId>kie-server-services-jbpm</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-optaplanner</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- kie server remote --> 
       <dependency>
@@ -86,6 +91,11 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-rest-jbpm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-optaplanner</artifactId>
         <version>${project.version}</version>
       </dependency>
 

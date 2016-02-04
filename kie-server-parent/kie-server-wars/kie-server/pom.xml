@@ -82,6 +82,16 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-optaplanner</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-jms</artifactId>
     </dependency>
     <dependency>
@@ -99,6 +109,16 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm-ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-optaplanner</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

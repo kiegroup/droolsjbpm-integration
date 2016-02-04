@@ -22,7 +22,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -35,25 +37,7 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
-import org.kie.server.api.model.instance.ErrorInfoInstance;
-import org.kie.server.api.model.instance.ErrorInfoInstanceList;
-import org.kie.server.api.model.instance.JobRequestInstance;
-import org.kie.server.api.model.instance.NodeInstance;
-import org.kie.server.api.model.instance.NodeInstanceList;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
-import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.api.model.instance.RequestInfoInstanceList;
-import org.kie.server.api.model.instance.TaskEventInstance;
-import org.kie.server.api.model.instance.TaskEventInstanceList;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.TaskSummaryList;
-import org.kie.server.api.model.instance.VariableInstance;
-import org.kie.server.api.model.instance.VariableInstanceList;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.api.model.instance.WorkItemInstanceList;
+import org.kie.server.api.model.instance.*;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
 import org.kie.server.api.model.type.JaxbCharacter;
@@ -65,6 +49,7 @@ import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbShort;
 import org.kie.server.api.model.type.JaxbString;
+import org.optaplanner.core.api.domain.solution.Solution;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -76,67 +61,68 @@ public class ServiceResponse<T> {
     @XmlAttribute
     private ServiceResponse.ResponseType type;
     @XmlAttribute
-    private String msg;
+    private String                       msg;
     @XmlElements({
+            // types model
+            @XmlElement(name = "boolean-type", type = JaxbBoolean.class),
+            @XmlElement(name = "byte-type", type = JaxbByte.class),
+            @XmlElement(name = "char-type", type = JaxbCharacter.class),
+            @XmlElement(name = "double-type", type = JaxbDouble.class),
+            @XmlElement(name = "float-type", type = JaxbFloat.class),
+            @XmlElement(name = "int-type", type = JaxbInteger.class),
+            @XmlElement(name = "long-type", type = JaxbLong.class),
+            @XmlElement(name = "short-type", type = JaxbShort.class),
+            @XmlElement(name = "string-type", type = JaxbString.class),
+            @XmlElement(name = "map-type", type = JaxbMap.class),
+            @XmlElement(name = "list-type", type = JaxbList.class),
+            @XmlElement(name = "array-list", type = ArrayList.class),
 
-        // types model
-        @XmlElement(name = "boolean-type", type = JaxbBoolean.class),
-        @XmlElement(name = "byte-type", type = JaxbByte.class),
-        @XmlElement(name = "char-type", type = JaxbCharacter.class),
-        @XmlElement(name = "double-type", type = JaxbDouble.class),
-        @XmlElement(name = "float-type", type = JaxbFloat.class),
-        @XmlElement(name = "int-type", type = JaxbInteger.class),
-        @XmlElement(name = "long-type", type = JaxbLong.class),
-        @XmlElement(name = "short-type", type = JaxbShort.class),
-        @XmlElement(name = "string-type", type = JaxbString.class),
-        @XmlElement(name = "map-type", type = JaxbMap.class),
-        @XmlElement(name = "list-type", type = JaxbList.class),
-        @XmlElement(name = "array-list", type = ArrayList.class),
+            //kie server model
+            @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
+            @XmlElement(name = "kie-container", type = KieContainerResource.class),
+            @XmlElement(name = "results", type = String.class),
+            @XmlElement(name = "kie-containers", type = KieContainerResourceList.class),
+            @XmlElement(name = "kie-scanner", type = KieScannerResource.class),
+            @XmlElement(name = "release-id", type = ReleaseId.class),
+            // definition model
+            @XmlElement(name = "process-associated-entities", type = AssociatedEntitiesDefinition.class),
+            @XmlElement(name = "process-definition", type = ProcessDefinition.class),
+            @XmlElement(name = "process-service-tasks", type = ServiceTasksDefinition.class),
+            @XmlElement(name = "process-task-inputs", type = TaskInputsDefinition.class),
+            @XmlElement(name = "process-task-outputs", type = TaskOutputsDefinition.class),
+            @XmlElement(name = "user-task-definition", type = UserTaskDefinition.class),
+            @XmlElement(name = "user-task-definitions", type = UserTaskDefinitionList.class),
+            @XmlElement(name = "process-variables", type = VariablesDefinition.class),
+            @XmlElement(name = "process-subprocesses", type = SubProcessesDefinition.class),
 
-        //kie server model
-        @XmlElement(name = "kie-server-info", type = KieServerInfo.class),
-        @XmlElement(name = "kie-container", type = KieContainerResource.class),
-        @XmlElement(name = "results", type = String.class),
-        @XmlElement(name = "kie-containers", type = KieContainerResourceList.class),
-        @XmlElement(name = "kie-scanner", type = KieScannerResource.class),
-        @XmlElement(name = "release-id", type = ReleaseId.class),
-        // definition model
-        @XmlElement(name = "process-associated-entities", type = AssociatedEntitiesDefinition.class),
-        @XmlElement(name = "process-definition", type = ProcessDefinition.class),
-        @XmlElement(name = "process-service-tasks", type = ServiceTasksDefinition.class),
-        @XmlElement(name = "process-task-inputs", type = TaskInputsDefinition.class),
-        @XmlElement(name = "process-task-outputs", type = TaskOutputsDefinition.class),
-        @XmlElement(name = "user-task-definition", type = UserTaskDefinition.class),
-        @XmlElement(name = "user-task-definitions", type = UserTaskDefinitionList.class),
-        @XmlElement(name = "process-variables", type = VariablesDefinition.class),
-        @XmlElement(name = "process-subprocesses", type = SubProcessesDefinition.class),
+            @XmlElement(name = "process-definitions", type = ProcessDefinitionList.class),
+            @XmlElement(name = "process-instance", type = ProcessInstance.class),
+            @XmlElement(name = "process-instance-list", type = ProcessInstanceList.class),
+            @XmlElement(name = "node-instance", type = NodeInstance.class),
+            @XmlElement(name = "node-instance-list", type = NodeInstanceList.class),
+            @XmlElement(name = "variable-instance", type = VariableInstance.class),
+            @XmlElement(name = "variable-instance-list", type = VariableInstanceList.class),
+            @XmlElement(name = "task-instance", type = TaskInstance.class),
+            @XmlElement(name = "task-instance-list", type = TaskInstanceList.class),
+            @XmlElement(name = "task-summary", type = TaskSummary.class),
+            @XmlElement(name = "task-summary-list", type = TaskSummaryList.class),
+            @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
+            @XmlElement(name = "task-event-instance-list", type = TaskEventInstanceList.class),
+            @XmlElement(name = "work-item-instance", type = WorkItemInstance.class),
+            @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class),
+            @XmlElement(name = "request-info-instance", type = RequestInfoInstance.class),
+            @XmlElement(name = "request-info-instance-list", type = RequestInfoInstanceList.class),
+            @XmlElement(name = "error-info-instance", type = ErrorInfoInstance.class),
+            @XmlElement(name = "error-info-instance-list", type = ErrorInfoInstanceList.class),
+            @XmlElement(name = "job-request-instance", type = JobRequestInstance.class),
+            @XmlElement(name = "query-definition", type = QueryDefinition.class),
+            @XmlElement(name = "query-definitions", type = QueryDefinitionList.class),
 
-        @XmlElement(name = "process-definitions", type = ProcessDefinitionList.class),
-        @XmlElement(name = "process-instance", type = ProcessInstance.class),
-        @XmlElement(name = "process-instance-list", type = ProcessInstanceList.class),
-        @XmlElement(name = "node-instance", type = NodeInstance.class),
-        @XmlElement(name = "node-instance-list", type = NodeInstanceList.class),
-        @XmlElement(name = "variable-instance", type = VariableInstance.class),
-        @XmlElement(name = "variable-instance-list", type = VariableInstanceList.class),
-        @XmlElement(name = "task-instance", type = TaskInstance.class),
-        @XmlElement(name = "task-instance-list", type = TaskInstanceList.class),
-        @XmlElement(name = "task-summary", type = TaskSummary.class),
-        @XmlElement(name = "task-summary-list", type = TaskSummaryList.class),
-        @XmlElement(name = "task-event-instance", type = TaskEventInstance.class),
-        @XmlElement(name = "task-event-instance-list", type = TaskEventInstanceList.class),
-        @XmlElement(name = "work-item-instance", type = WorkItemInstance.class),
-        @XmlElement(name = "work-item-instance-list", type = WorkItemInstanceList.class),
-        @XmlElement(name = "request-info-instance", type = RequestInfoInstance.class),
-        @XmlElement(name = "request-info-instance-list", type = RequestInfoInstanceList.class),
-        @XmlElement(name = "error-info-instance", type = ErrorInfoInstance.class),
-        @XmlElement(name = "error-info-instance-list", type = ErrorInfoInstanceList.class),
-        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class),
-        @XmlElement(name = "query-definition", type = QueryDefinition.class),
-        @XmlElement(name = "query-definitions", type = QueryDefinitionList.class)
-
-    })
-    private T result;
-
+            // optaplanner entities
+            @XmlElement(name = "solver-instance", type = SolverInstance.class),
+            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class)
+            })
+    private T                            result;
 
     public ServiceResponse() {
     }
@@ -146,7 +132,7 @@ public class ServiceResponse<T> {
         this.msg = msg;
     }
 
-    public ServiceResponse(ServiceResponse.ResponseType type, String msg, T result ) {
+    public ServiceResponse(ServiceResponse.ResponseType type, String msg, T result) {
         this.type = type;
         this.msg = msg;
         this.result = result;
