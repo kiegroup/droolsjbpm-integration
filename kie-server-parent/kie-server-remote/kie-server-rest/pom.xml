@@ -19,6 +19,7 @@
     <module>kie-server-rest-jbpm</module>
     <module>kie-server-rest-drools</module>
     <module>kie-server-rest-jbpm-ui</module>
+    <module>kie-server-rest-optaplanner</module>
   </modules>
 
 </project>
