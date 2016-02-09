@@ -22,7 +22,6 @@ import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableBeanArgument;
 import org.apache.aries.blueprint.mutable.MutablePassThroughMetadata;
-import org.apache.aries.blueprint.mutable.MutableValueMetadata;
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
@@ -48,6 +47,7 @@ import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.BeanArgument;
 import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
+import org.osgi.service.blueprint.reflect.ValueMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +201,7 @@ public class KieObjectsInjector implements BeanProcessor {
                 if (KieObjectsFactoryBean.class.getName().equals(metadata.getClassName())) {
                     if ("fetchKBase".equalsIgnoreCase(metadata.getFactoryMethod())) {
                         BeanArgument kbRefArg = metadata.getArguments().get(0);
-                        String kBaseName = ((MutableValueMetadata) kbRefArg.getValue()).getStringValue();
+                        String kBaseName = ((ValueMetadata) kbRefArg.getValue()).getStringValue();
                         KieBaseModelImpl kBase = new KieBaseModelImpl();
                         kBase.setKModule(kieModuleModel);
                         kBase.setName(kBaseName);
@@ -261,7 +261,7 @@ public class KieObjectsInjector implements BeanProcessor {
                 if (KieObjectsFactoryBean.class.getName().equals(metadata.getClassName())) {
                     if ("createKieSession".equalsIgnoreCase(metadata.getFactoryMethod())){
                         BeanArgument beanArgument = metadata.getArguments().get(0);
-                        String ksessionName = ((MutableValueMetadata)beanArgument.getValue()).getStringValue();
+                        String ksessionName = ((ValueMetadata)beanArgument.getValue()).getStringValue();
 
                         BeanArgument kbOptionsArg = metadata.getArguments().get(5);
                         PassThroughMetadata passThroughMetadata = (PassThroughMetadata) kbOptionsArg.getValue();
