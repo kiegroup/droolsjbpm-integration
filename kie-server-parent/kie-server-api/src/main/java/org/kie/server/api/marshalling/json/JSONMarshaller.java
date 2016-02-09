@@ -64,13 +64,14 @@ import org.kie.server.api.model.type.JaxbByteArray;
 public class JSONMarshaller implements Marshaller {
 
     private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
+    private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
     private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
     private final ObjectMapper fallbackObjectMapper;
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+    private DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
