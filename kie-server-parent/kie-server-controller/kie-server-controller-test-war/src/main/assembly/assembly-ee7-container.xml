@@ -36,6 +36,10 @@
       <directory>${project.basedir}/src/main/ee7-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/target/classes</directory>
+      <outputDirectory>WEB-INF/classes</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
@@ -47,6 +51,9 @@
         <include>org.kie.server:kie-server-controller-api</include>
         <include>org.kie.server:kie-server-controller-impl</include>
         <include>org.kie.server:kie-server-controller-rest</include>
+
+        <include>com.sun.xml.bind:jaxb-impl</include>
+        <include>com.sun.xml.bind:jaxb-core</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
