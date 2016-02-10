@@ -84,7 +84,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstances");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from processinstancelog where status = 1");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget("PROCESS");
         try {
 
@@ -133,7 +133,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstances");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from processinstancelog where status = 1");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget("CUSTOM");
         try {
 
@@ -178,9 +178,8 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "from ProcessInstanceLog pil " +
                 "inner join (select vil.processInstanceId ,vil.variableId, MAX(vil.ID) maxvilid  FROM VariableInstanceLog vil " +
                 "GROUP BY vil.processInstanceId, vil.variableId ORDER BY vil.processInstanceId)  x " +
-                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid )" +
                 "INNER JOIN VariableInstanceLog v " +
-                "ON (v.processInstanceId = pil.processInstanceId)" +
+                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid AND v.processInstanceId = pil.processInstanceId)" +
                 "where pil.status = 1");
         query.setTarget("CUSTOM");
         try {
@@ -226,9 +225,8 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "from ProcessInstanceLog pil " +
                 "inner join (select vil.processInstanceId ,vil.variableId, MAX(vil.ID) maxvilid  FROM VariableInstanceLog vil " +
                 "GROUP BY vil.processInstanceId, vil.variableId ORDER BY vil.processInstanceId)  x " +
-                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid )" +
                 "INNER JOIN VariableInstanceLog v " +
-                "ON (v.processInstanceId = pil.processInstanceId)" +
+                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid AND v.processInstanceId = pil.processInstanceId)" +
                 "where pil.status = 1");
         query.setTarget("CUSTOM");
         try {
@@ -272,7 +270,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstances");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from processinstancelog where status = 1");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget("CUSTOM");
         try {
 
@@ -313,7 +311,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstances");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from processinstancelog where status = 1");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget("CUSTOM");
         try {
 
@@ -347,7 +345,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstances");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from processinstancelog where status = 1");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget("CUSTOM");
         try {
 
