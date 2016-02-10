@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messaging-deployment xmlns="urn:jboss:messaging-activemq-deployment:1.0">
+  <server name="default">
+    <jms-destinations>
+
+      <!-- Kie Server REQUEST queue -->
+      <jms-queue name="KIE.SERVER.REQUEST">
+        <entry name="queue/KIE.SERVER.REQUEST" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.REQUEST" />
+      </jms-queue>
+
+      <!-- Kie Server RESPONSE queue -->
+      <jms-queue name="KIE.SERVER.RESPONSE">
+        <entry name="queue/KIE.SERVER.RESPONSE" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.RESPONSE" />
+      </jms-queue>
+
+      <!-- Kie Server EXECUTOR queue -->
+      <jms-queue name="KIE.SERVER.EXECUTOR">
+        <entry name="queue/KIE.SERVER.EXECUTOR" />
+      </jms-queue>
+
+      <!-- JMS queue for signals -->
+      <!-- enable when external signals are required -->
+      <!--
+      <jms-queue name="KIE.SERVER.SIGNAL.QUEUE">
+        <entry name="queue/KIE.SERVER.SIGNAL" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.SIGNAL" />
+      </jms-queue>
+      -->
+
+    </jms-destinations>
+  </server>
+</messaging-deployment>

@@ -16,7 +16,7 @@
   <!-- Properties shared between the different test modules -->
   <properties>
     <!-- This property needs to be overridden when running tests against different version of the WAR (e.g. running
-             SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
+         SNAPSHOT tests against Beta3 WAR) so the tests actually know what exact version of server is being tested -->
     <kie.server.version>${project.version}</kie.server.version>
     <!-- Following properties are used only for testing -->
     <container.hostname>localhost</container.hostname>
@@ -29,21 +29,19 @@
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
     <kie.server.testing.remote.repo.dir>${project.build.directory}/kie-server-testing-remote-repo</kie.server.testing.remote.repo.dir>
-    <!-- This property can be overriden when some other remote repo location should be used -->
+    <!-- This property can be overridden when some other remote repo location should be used -->
     <kie.server.testing.remote.repo.url>file://${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.url>
     <!-- Custom settings.xml used when building the testing kjars. By default there is no additional configuration needed,
          but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
     <kie.server.testing.kjars.build.settings.xml/>
 
-    <tomcat7x.download.url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</tomcat7x.download.url>
-    <tomcat8x.download.url>https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.12/bin/apache-tomcat-8.0.12.zip</tomcat8x.download.url>
-    <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
-    <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
-    <!-- The EAP 6.4.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
+    <version.tomcat8>8.0.33</version.tomcat8>
+    <version.wildfly10>10.0.0.Final</version.wildfly10>
+    <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
-    <eap64x.download.url>valid-url-for-eap-6.4.x-needs-to-be-specified-here-or-via-cmd-line</eap64x.download.url>
+    <eap7.download.url>valid-url-for-eap-7-needs-to-be-specified-here-or-via-cmd-line</eap7.download.url>
   </properties>
 
   <modules>
@@ -75,7 +73,7 @@
               <deployable>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server</artifactId>
-                <!-- default, may be overriden in container specific profiles -->
+                <!-- default, may be overridden in container specific profiles -->
                 <classifier>ee6</classifier>
                 <type>war</type>
                 <properties>
@@ -167,9 +165,9 @@
 
   <profiles>
     <profile>
-      <id>wildfly81x</id>
+      <id>tomcat8</id>
       <properties>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
@@ -179,35 +177,109 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>wildfly8x</containerId>
+                  <containerId>tomcat8x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${wildfly81x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat</artifactId>
+                    <version>${version.tomcat8}</version>
+                  </artifactInstaller>
                   <systemProperties>
-                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
-                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat8x</tomcat.home>
+                    <conf.directory>${project.build.testOutputDirectory}</conf.directory>
+                    <tmp.directory>${project.build.directory}</tmp.directory>
+                    <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
+                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
+                    <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                   </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.codehaus.btm</groupId>
+                      <artifactId>btm</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.codehaus.btm</groupId>
+                      <artifactId>btm-tomcat55-lifecycle</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>com.h2database</groupId>
+                      <artifactId>h2</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.jboss.spec.javax.transaction</groupId>
+                      <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.slf4j</groupId>
+                      <artifactId>slf4j-api</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.slf4j</groupId>
+                      <artifactId>slf4j-jdk14</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.jboss.spec.javax.security.jacc</groupId>
+                      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+                    </dependency>
+                  </dependencies>
                 </container>
                 <configuration>
                   <properties>
-                    <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
                   <deployable>
-                    <classifier>ee7</classifier>
+                    <classifier>webc</classifier>
                   </deployable>
                 </deployables>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
         </pluginManagement>
       </build>
+      <dependencies>
+        <!-- Deps needed by Tomcat 8 -->
+        <dependency>
+          <groupId>org.codehaus.btm</groupId>
+          <artifactId>btm</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.codehaus.btm</groupId>
+          <artifactId>btm-tomcat55-lifecycle</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.spec.javax.security.jacc</groupId>
+          <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
-      <id>wildfly82x</id>
+      <id>wildfly10</id>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -220,20 +292,22 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>wildfly8x</containerId>
+                  <containerId>wildfly10x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${wildfly82x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-dist</artifactId>
+                    <version>${version.wildfly10}</version>
+                  </artifactInstaller>
                   <systemProperties>
-                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                   </systemProperties>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
@@ -254,7 +328,7 @@
           <dependency>
             <groupId>org.wildfly</groupId>
             <artifactId>wildfly-parent</artifactId>
-            <version>8.2.0.Final</version>
+            <version>${version.wildfly10}</version>
             <type>pom</type>
             <scope>import</scope>
           </dependency>
@@ -350,233 +424,9 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat7x</id>
+      <id>eap7</id>
       <properties>
-        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <container>
-                  <containerId>tomcat7x</containerId>
-                  <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${tomcat7x.download.url}</url>
-                  </zipUrlInstaller>
-                  <systemProperties>
-                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
-                    <conf.directory>${project.build.testOutputDirectory}</conf.directory>
-                    <tmp.directory>${project.build.directory}</tmp.directory>
-                    <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
-                    <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
-                  </systemProperties>
-                  <dependencies>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm-tomcat55-lifecycle</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>com.h2database</groupId>
-                      <artifactId>h2</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.jboss.spec.javax.transaction</groupId>
-                      <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-api</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-jdk14</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-                      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-                    </dependency>
-                  </dependencies>
-                </container>
-                <configuration>
-                  <properties>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
-                  </properties>
-                </configuration>
-                <deployables>
-                  <deployable>
-                    <classifier>webc</classifier>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-      <dependencies>
-        <!-- deps needed by Tomcat 7x and Tomcat 8x -->
-        <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm-tomcat55-lifecycle</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.spec.javax.security.jacc</groupId>
-          <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>tomcat8x</id>
-      <properties>
-        <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <container>
-                  <containerId>tomcat8x</containerId>
-                  <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${tomcat8x.download.url}</url>
-                  </zipUrlInstaller>
-                  <systemProperties>
-                    <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
-                    <conf.directory>${project.build.testOutputDirectory}</conf.directory>
-                    <tmp.directory>${project.build.directory}</tmp.directory>
-                    <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
-                    <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
-                    <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
-                  </systemProperties>
-                  <dependencies>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm-tomcat55-lifecycle</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>com.h2database</groupId>
-                      <artifactId>h2</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.jboss.spec.javax.transaction</groupId>
-                      <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-api</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-jdk14</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.jboss.spec.javax.security.jacc</groupId>
-                      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-                    </dependency>
-                  </dependencies>
-                </container>
-                <configuration>
-                  <properties>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
-                  </properties>
-                </configuration>
-                <deployables>
-                  <deployable>
-                    <classifier>webc</classifier>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-      <dependencies>
-        <!-- deps needed by Tomcat 7x and Tomcat 8x -->
-        <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm-tomcat55-lifecycle</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.spec.javax.security.jacc</groupId>
-          <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>eap64x</id>
-      <properties>
-        <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
+        <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
       </properties>
       <build>
@@ -587,26 +437,26 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <!-- jboss74x works for now, but should be updated to jboss75x once Cargo supports EAP 6.4 -->
-                  <containerId>jboss74x</containerId>
+                  <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
+                  <containerId>wildfly10x</containerId>
                   <type>installed</type>
                   <zipUrlInstaller>
-                    <url>${eap64x.download.url}</url>
+                    <url>${eap7.download.url}</url>
                   </zipUrlInstaller>
                   <systemProperties>
-                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                   </systemProperties>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
-                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
                 <deployables>
                   <deployable>
-                    <classifier>ee6</classifier>
+                    <classifier>ee7</classifier>
                   </deployable>
                 </deployables>
               </configuration>
@@ -616,44 +466,102 @@
       </build>
       <dependencyManagement>
         <dependencies>
+          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
+               so this is the closest thing I could find.
+               Important: this overrides lots of the versions coming from kie-p-w-d -->
           <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-jms-client-bom</artifactId>
-            <!-- This is the highest version publicly available. Should work even with higher versions of EAP -->
-            <version>7.2.0.Final</version>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-parent</artifactId>
+            <version>${version.wildfly10}</version>
             <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.com.google.guava}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.org.apache.httpcomponents.httpclient}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${version.org.apache.httpcomponents.httpcore}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${version.org.apache.maven}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${version.com.sun.xml.bind}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
         <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-jms-client-bom</artifactId>
-          <type>pom</type>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>jbossas71x</id>
-      <properties>
-        <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-      </properties>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-jms-client-bom</artifactId>
-            <version>7.1.1.Final</version>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-jms-client-bom</artifactId>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
         </dependency>
@@ -714,7 +622,7 @@
                 <configuration>
                   <type>standalone</type>
                   <properties>
-                    <cargo.jvmargs>-Xmx1024m -XX:MaxPermSize=256m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
+                    <cargo.jvmargs>-Xmx1024m -Dkie.server.jms.queues.response=jms/KIE.SERVER.RESPONSE</cargo.jvmargs>
                     <!-- CFs -->
                     <cargo.resource.resource.jms.cf.request>
                       cargo.resource.name=jms/cf/KIE.SERVER.REQUEST|
