@@ -17,12 +17,15 @@ package org.kie.server.integrationtests.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -52,7 +55,8 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId);
+        buildAndDeployCommonMavenParent();
+        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
 
     @Before
