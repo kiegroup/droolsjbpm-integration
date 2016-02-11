@@ -138,6 +138,7 @@
               <!-- Values are supplied by specific profiles -->
               <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
               <kie.server.controller.base.http.url>${kie.server.controller.base.http.url}</kie.server.controller.base.http.url>
+              <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -154,6 +155,7 @@
                 <org.kie.server.controller.pwd>usetheforce123@</org.kie.server.controller.pwd>
                 <org.kie.server.user>yoda</org.kie.server.user>
                 <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
+                <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               </systemProperties>
             </container>
             <deployables>
