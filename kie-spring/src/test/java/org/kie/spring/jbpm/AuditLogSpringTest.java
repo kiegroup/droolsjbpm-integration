@@ -30,6 +30,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.manager.Context;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeManager;
+import org.kie.api.runtime.manager.audit.AuditService;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 
@@ -71,4 +72,29 @@ public class AuditLogSpringTest extends AbstractJbpmSpringParameterizedTest {
 
         manager.disposeRuntimeEngine(engine);
     }
+    
+    @Test
+	public void testAuditLogFromRuntimeEngine() throws Exception {
+		KieSession ksession = getKieSession();
+		final ProcessInstance processInstance = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
+
+		RuntimeManager manager = getManager();
+		RuntimeEngine engine = getEngine();
+		AuditService logService = engine.getAuditService();
+		org.kie.api.runtime.manager.audit.ProcessInstanceLog instanceLog = logService.findProcessInstance(processInstance.getId());
+		assertNotNull(instanceLog);
+		assertEquals(ProcessInstance.STATE_ACTIVE, instanceLog.getStatus().intValue());
+
+		ksession.abortProcessInstance(processInstance.getId());
+
+		instanceLog = logService.findProcessInstance(processInstance.getId());
+		assertNotNull(instanceLog);
+		assertEquals(ProcessInstance.STATE_ABORTED, instanceLog.getStatus().intValue());
+
+		manager.disposeRuntimeEngine(engine);
+	}
+
+    
+    
+   
 }
