@@ -50,7 +50,7 @@ public class AbstractKieSpringDynamicModuleTest {
         MavenRepository repository = getMavenRepository();
 
         InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
-        repository.deployArtifact(releaseId, kJar1, kPom);
+        repository.installArtifact(releaseId, kJar1, kPom);
         return repository;
     }
 

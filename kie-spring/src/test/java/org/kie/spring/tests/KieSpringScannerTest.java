@@ -52,6 +52,7 @@ public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
     private final int SECOND_VALUE = 10;
     protected final int FIRST_VALUE = 5;
 
+
     @Test
     public void testSpringKieScanner() throws Exception {
 
@@ -105,9 +106,10 @@ public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
         assertNotNull(releaseIdScanner);
     }
 
-    protected void redeployModule(MavenRepository repository, KieServices ks) throws IOException {
+    protected void redeployModule(MavenRepository repository, KieServices ks) throws Exception {
+        repository.resolveArtifact(releaseId);
         InternalKieModule kJar2 = createKieJarWithClass(ks, releaseId, SECOND_VALUE);
-        repository.deployArtifact(releaseId, kJar2, kPom);
+        repository.installArtifact(releaseId, kJar2, kPom);
     }
 
     protected void checkForValue(int value) {
