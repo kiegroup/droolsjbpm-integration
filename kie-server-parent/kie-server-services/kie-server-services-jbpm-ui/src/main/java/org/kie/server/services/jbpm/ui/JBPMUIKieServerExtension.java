@@ -60,7 +60,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
     @Override
     public boolean isActive() {
-        return disabled == false || jbpmDisabled == false;
+        return disabled == false && jbpmDisabled == false;
     }
 
     @Override
