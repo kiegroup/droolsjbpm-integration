@@ -26,7 +26,19 @@
     <property name="entityManager" ref="jbpmEM" />
     <property name="transactionManager" ref="jbpmTxManager"/>
     <property name="assets" ref="assets"/>
+    <property name="environmentEntries" ref="env" />
   </bean>
+  
+  	
+	<util:map id="env" key-type="java.lang.String" value-type="java.lang.Object">
+		<entry>
+			<key>
+				<util:constant
+					static-field="org.kie.api.runtime.EnvironmentName.USE_LOCAL_TRANSACTIONS" />
+			</key>
+			<value>true</value>
+		</entry>
+	</util:map>
 
   <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService" depends-on="runtimeEnvironment">
     <constructor-arg value="#{runtimeEnvironment.environment}"/>
