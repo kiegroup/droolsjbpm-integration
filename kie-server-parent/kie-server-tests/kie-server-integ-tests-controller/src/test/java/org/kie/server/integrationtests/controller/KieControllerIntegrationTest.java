@@ -46,7 +46,8 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId);
+        buildAndDeployCommonMavenParent();
+        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
     }
 
     @Before
