@@ -40,14 +40,14 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  */
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerMethod.class)
-public class InstallFeaturesAbstractKarafIntegrationTest extends AbstractKarafIntegrationTest {
+public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private String featureName;
 
     @Inject
     protected FeaturesService featuresService;
 
-    public InstallFeaturesAbstractKarafIntegrationTest(String featureName) {
+    public InstallFeaturesKarafIntegrationTest(String featureName) {
         this.featureName = featureName;
     }
 

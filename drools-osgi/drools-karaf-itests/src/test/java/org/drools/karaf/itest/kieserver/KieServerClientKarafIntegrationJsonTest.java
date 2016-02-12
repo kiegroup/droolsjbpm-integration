@@ -31,31 +31,30 @@ import org.slf4j.LoggerFactory;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
-
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationXstreamTest extends BaseKieServerClientOnKarafIntegrationTest {
+public class KieServerClientKarafIntegrationJsonTest extends BaseKieServerClientKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationXstreamTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJsonTest.class);
     public static final String HOST = "localhost";
-    public static final int PORT = 59500;
-    public static final String TYPE = "xstream";
+    public static final int PORT = 59600;
+    public static final String TYPE = "json";
 
-    public KieServerClientOnKarafIntegrationXstreamTest() {
+    public KieServerClientKarafIntegrationJsonTest() {
         serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
     }
 
     @Test
-    public void testListContainersXSTREAM() throws Exception {
+    public void testListContainersJSON() throws Exception {
 
-        testListContainers(MarshallingFormat.XSTREAM);
+        testListContainers(MarshallingFormat.JSON);
 
     }
 
     @Test
-    public void testCompleteInteractionWithKieServerXSTREAM() throws Exception {
+    public void testCompleteInteractionWithKieServerJSON() throws Exception {
 
-        testCompleteInteractionWithKieServer(MarshallingFormat.XSTREAM);
+        testCompleteInteractionWithKieServer(MarshallingFormat.JSON);
 
     }
 
@@ -81,5 +80,8 @@ public class KieServerClientOnKarafIntegrationXstreamTest extends BaseKieServerC
                 AbstractKarafIntegrationTest.loadKieFeatures("kie-server-client")
         };
     }
+
+
+
 
 }

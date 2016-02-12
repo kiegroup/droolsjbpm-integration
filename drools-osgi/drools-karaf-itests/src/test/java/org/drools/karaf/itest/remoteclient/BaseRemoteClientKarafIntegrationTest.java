@@ -38,7 +38,7 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
  * Tests are very basic and focus only on verification rather than complete test suite.
  */
 
-public class BaseRemoteClientOnKarafIntegrationTest extends AbstractKarafIntegrationTest {
+public class BaseRemoteClientKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     protected String serverUrl = System.getProperty("org.kie.workbench.itest.server.url", "http://localhost:8080/jbpm-console");
     protected String user = System.getProperty("org.kie.workbench.itest.user", "krisv");

@@ -14,48 +14,57 @@
  * limitations under the License.
  */
 
-package org.drools.karaf.itest.kieserver;
+package org.drools.karaf.itest.remoteclient;
+
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
-import org.drools.karaf.itest.util.PaxExamWithWireMock;
+import org.drools.karaf.itest.util.PaxExamWithWireRestClientMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
-
-
-@RunWith(PaxExamWithWireMock.class)
+@RunWith(PaxExamWithWireRestClientMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationJaxbTest extends BaseKieServerClientOnKarafIntegrationTest {
+public class RemoteClientKarafIntegrationJaxbTest extends BaseRemoteClientKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationJaxbTest.class);
     public static final String HOST = "localhost";
     public static final int PORT = 59400;
-    public static final String TYPE = "jaxb";
 
-    public KieServerClientOnKarafIntegrationJaxbTest() {
-        serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
+    public RemoteClientKarafIntegrationJaxbTest() {
+        serverUrl = System.getProperty("org.kie.workbench.itest.server.url", "http://" + HOST + ":" + PORT + "/jbpm-console");
     }
 
     @Test
-    public void testListContainersJAXB() throws Exception {
-        testListContainers(MarshallingFormat.JAXB);
-
-    }
-
-    @Test
-    public void testCompleteInteractionWithKieServerJAXB() throws Exception {
-
-        testCompleteInteractionWithKieServer(MarshallingFormat.JAXB);
-
+    public void testProcess() throws Exception {
+        RuntimeEngine engine = RemoteRuntimeEngineFactory.newRestBuilder()
+            .addUrl(new URL(serverUrl))
+            .addUserName(user).addPassword(password)
+            .addDeploymentId(deploymentId)
+                .build();
+        KieSession ksession = engine.getKieSession();
+        
+        // start a new process instance
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("employee", "krisv");
+        params.put("reason", "Yearly performance evaluation");
+        ProcessInstance processInstance = 
+            ksession.startProcess("evaluation", params);
+        System.out.println("Start Evaluation process " + processInstance.getId());
     }
 
     @Configuration
@@ -76,8 +85,8 @@ public class KieServerClientOnKarafIntegrationJaxbTest extends BaseKieServerClie
                 // Option to be used to do remote debugging
 //                  debugConfiguration("5005", true),
 
-                // Load kie-server-client
-                AbstractKarafIntegrationTest.loadKieFeatures("kie-server-client")
+                // Load kie-remote-client
+                AbstractKarafIntegrationTest.loadKieFeatures("kie-remote-client")
         };
     }
 
