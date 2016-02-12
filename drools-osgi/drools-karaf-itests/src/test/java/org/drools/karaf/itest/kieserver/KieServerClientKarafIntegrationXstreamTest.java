@@ -33,14 +33,14 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationXstreamTest extends BaseKieServerClientOnKarafIntegrationTest {
+public class KieServerClientKarafIntegrationXstreamTest extends BaseKieServerClientKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationXstreamTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationXstreamTest.class);
     public static final String HOST = "localhost";
     public static final int PORT = 59500;
     public static final String TYPE = "xstream";
 
-    public KieServerClientOnKarafIntegrationXstreamTest() {
+    public KieServerClientKarafIntegrationXstreamTest() {
         serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
     }
 

@@ -39,12 +39,12 @@ import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 @RunWith(PaxExamWithWireRestClientMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class RemoteClientOnKarafIntegrationJaxbTest extends BaseRemoteClientOnKarafIntegrationTest {
+public class RemoteClientKarafIntegrationJaxbTest extends BaseRemoteClientKarafIntegrationTest {
 
     public static final String HOST = "localhost";
     public static final int PORT = 59400;
 
-    public RemoteClientOnKarafIntegrationJaxbTest() {
+    public RemoteClientKarafIntegrationJaxbTest() {
         serverUrl = System.getProperty("org.kie.workbench.itest.server.url", "http://" + HOST + ":" + PORT + "/jbpm-console");
     }
 

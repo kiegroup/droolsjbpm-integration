@@ -61,9 +61,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  * Tests are very basic and focus only on verification rather than complete test suite.
  */
 
-public class BaseKieServerClientOnKarafIntegrationTest extends AbstractKarafIntegrationTest {
+public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseKieServerClientOnKarafIntegrationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseKieServerClientKarafIntegrationTest.class);
 
     protected String serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://localhost:8080/kie-server/services/rest/server");
     protected String user = System.getProperty("org.kie.server.itest.user", "kieserver");

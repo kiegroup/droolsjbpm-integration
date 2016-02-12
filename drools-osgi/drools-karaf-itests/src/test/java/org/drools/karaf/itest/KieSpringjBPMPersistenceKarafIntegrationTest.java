@@ -32,7 +32,6 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.OptionUtils;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
@@ -53,9 +52,9 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieSpringjBPMPersistenceOnKarafKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {
+public class KieSpringjBPMPersistenceKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {
 
-    private static final transient Logger logger = LoggerFactory.getLogger(KieSpringjBPMPersistenceOnKarafKarafIntegrationTest.class);
+    private static final transient Logger logger = LoggerFactory.getLogger(KieSpringjBPMPersistenceKarafIntegrationTest.class);
 
     @Before
     public void init() {

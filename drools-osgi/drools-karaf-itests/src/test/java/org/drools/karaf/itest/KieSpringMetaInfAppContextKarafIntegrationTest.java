@@ -38,7 +38,7 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieSpringMetaInfAppContextOnKarafKarafIntegrationTest extends AbstractKarafIntegrationTest {
+public class KieSpringMetaInfAppContextKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String SPRING_APP_CONTEXT_LOCATION = "/org/drools/karaf/itest/kie-beans-service.xml";
 
@@ -73,7 +73,7 @@ public class KieSpringMetaInfAppContextOnKarafKarafIntegrationTest extends Abstr
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
                         .add("META-INF/spring/kie-beans-service.xml",
-                                KieSpringMetaInfAppContextOnKarafKarafIntegrationTest.class.getResource(SPRING_APP_CONTEXT_LOCATION))
+                                KieSpringMetaInfAppContextKarafIntegrationTest.class.getResource(SPRING_APP_CONTEXT_LOCATION))
                         .set(Constants.IMPORT_PACKAGE, "*")
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Spring-Bundle")
                         .set(Constants.DYNAMICIMPORT_PACKAGE, "*")

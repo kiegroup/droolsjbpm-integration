@@ -13,56 +13,65 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.drools.karaf.itest.kieserver;
+package org.drools.karaf.itest;
 
-import org.drools.karaf.itest.AbstractKarafIntegrationTest;
-import org.drools.karaf.itest.util.PaxExamWithWireMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.OptionUtils;
+import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
-
-@RunWith(PaxExamWithWireMock.class)
+@RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationJaxbTest extends BaseKieServerClientOnKarafIntegrationTest {
+public class SimpleKieSpringKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationJaxbTest.class);
-    public static final String HOST = "localhost";
-    public static final int PORT = 59400;
-    public static final String TYPE = "jaxb";
-
-    public KieServerClientOnKarafIntegrationJaxbTest() {
-        serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
+    @Before
+    public void init() {
+        applicationContext = createApplicationContext();
+        assertNotNull("Should have created a valid spring context", applicationContext);
     }
 
     @Test
-    public void testListContainersJAXB() throws Exception {
-        testListContainers(MarshallingFormat.JAXB);
-
+    public void testKieBase() throws Exception {
+        refresh();
+        KieBase kbase = (KieBase) applicationContext.getBean("drl_kiesample");
+        assertNotNull(kbase);
     }
 
     @Test
-    public void testCompleteInteractionWithKieServerJAXB() throws Exception {
-
-        testCompleteInteractionWithKieServer(MarshallingFormat.JAXB);
-
+    public void testKieSession() throws Exception {
+        refresh();
+        StatelessKieSession ksession = (StatelessKieSession) applicationContext.getBean("ksession9");
+        assertNotNull(ksession);
     }
+
+    @Test
+    public void testKieSessionDefaultType() throws Exception {
+        refresh();
+        Object obj = applicationContext.getBean("ksession99");
+        assertNotNull(obj);
+        assertTrue(obj instanceof KieSession);
+    }
+
 
     @Configuration
     public static Option[] configure() {
-
         return new Option[]{
                 // Install Karaf Container
-                AbstractKarafIntegrationTest.getKarafDistributionOption(),
+                getKarafDistributionOption(),
 
                 // It is really nice if the container sticks around after the test so you can check the contents
                 // of the data directory when things go wrong.
@@ -73,14 +82,15 @@ public class KieServerClientOnKarafIntegrationJaxbTest extends BaseKieServerClie
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-//                  debugConfiguration("5005", true),
+                //  debugConfiguration("5005", true),
 
-                // Load kie-server-client
-                AbstractKarafIntegrationTest.loadKieFeatures("kie-server-client")
+                // Load Kie-Spring
+                loadKieFeatures("kie-spring")
         };
     }
 
-
-
+    protected OsgiBundleXmlApplicationContext createApplicationContext() {
+        return new OsgiBundleXmlApplicationContext(new String[]{"org/drools/karaf/itest/kie-beans.xml"});
+    }
 
 }
