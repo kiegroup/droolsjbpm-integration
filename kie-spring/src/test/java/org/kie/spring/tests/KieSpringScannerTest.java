@@ -46,6 +46,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.kie.scanner.MavenRepository.getMavenRepository;
 
+@Ignore
 public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
 
     static ApplicationContext context = null;
