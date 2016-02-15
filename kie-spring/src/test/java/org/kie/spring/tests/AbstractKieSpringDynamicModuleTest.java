@@ -37,27 +37,25 @@ import static org.junit.Assert.assertTrue;
 import static org.kie.scanner.MavenRepository.getMavenRepository;
 
 public class AbstractKieSpringDynamicModuleTest {
-    protected File kPom;
     protected ReleaseId releaseId;
-    private FileManager fileManager;
+    protected FileManager fileManager;
 
-    protected MavenRepository createAndDeployModule(KieServices ks, int FIRST_VALUE) throws IOException {
+    protected MavenRepository createAndInstallModule( KieServices ks, int FIRST_VALUE ) throws IOException {
         this.fileManager = new FileManager();
         this.fileManager.setUp();
+
         releaseId = KieServices.Factory.get().newReleaseId("org.kie.spring", "spring-scanner-test", "1.0-SNAPSHOT");
-        kPom = createKPom(releaseId);
+        File kPom = createKPom(releaseId);
+        InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
 
         MavenRepository repository = getMavenRepository();
-
-        InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
-        repository.deployArtifact(releaseId, kJar1, kPom);
+        repository.installArtifact(releaseId, kJar1, kPom);
         return repository;
     }
 
     protected InternalKieModule createKieJarWithClass(KieServices ks, ReleaseId releaseId, int value) throws IOException {
         KieFileSystem kfs = createKieFileSystemWithKProject(ks, false);
         kfs.writePomXML(getPom(releaseId));
-
 
         kfs.write("src/main/resources/KBase1/rule1.drl", createDRL(value));
 
