@@ -36,7 +36,7 @@ public class KieSpringImportReleaseIdTest extends AbstractKieSpringDynamicModule
         KieServices ks = KieServices.Factory.get();
 
         //step 1: deploy the test module to MAVEN Repo
-        createAndDeployModule(ks, FIRST_VALUE);
+        createAndInstallModule( ks, FIRST_VALUE );
 
         //step 2: load the spring context
         createSpringContext();
