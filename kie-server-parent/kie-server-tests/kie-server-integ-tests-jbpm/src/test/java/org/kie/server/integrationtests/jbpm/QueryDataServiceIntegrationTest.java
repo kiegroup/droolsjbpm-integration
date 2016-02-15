@@ -23,29 +23,16 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
-import org.kie.api.task.model.Status;
-import org.kie.internal.KieInternalServices;
-import org.kie.internal.process.CorrelationKey;
-import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
-import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.VariableInstance;
-import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
-import org.kie.server.client.KieServicesException;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
 
@@ -372,6 +359,50 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             queryClient.unregisterQuery(query.getName());
         }
 
+    }
+
+    @Test
+    public void testQueryDataServiceReplaceQuery() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        Long pid = processClient.startProcess(CONTAINER_ID, "definition-project.usertask", parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("getTasksByState");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from AuditTaskImpl where status = 'Reserved'");
+        query.setTarget("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            Long taskId = tasks.get(0).getId();
+
+            query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
+
+            queryClient.replaceQuery(query);
+
+            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(0, tasks.size());
+
+            taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+
+            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+            assertEquals(taskId, tasks.get(0).getId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, pid);
+            queryClient.unregisterQuery(query.getName());
+        }
     }
 
     protected List<Long> createProcessInstances(Map<String, Object> parameters) {
