@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +53,9 @@ public class NodeInstanceList implements ItemList<NodeInstance> {
 
     @Override
     public List<NodeInstance> getItems() {
+        if (nodeInstances == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(nodeInstances);
     }
 }
