@@ -74,7 +74,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{containerId, taskId, language} )) );
+                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, language} )) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
