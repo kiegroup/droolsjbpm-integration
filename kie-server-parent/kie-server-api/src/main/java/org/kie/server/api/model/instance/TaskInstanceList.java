@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +53,9 @@ public class TaskInstanceList implements ItemList<TaskInstance> {
 
     @Override
     public List<TaskInstance> getItems() {
+        if (tasks == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(tasks);
     }
 }

@@ -16,6 +16,7 @@
 package org.kie.server.api.model.definition;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +53,9 @@ public class ProcessDefinitionList implements ItemList<ProcessDefinition> {
 
     @Override
     public List<ProcessDefinition> getItems() {
+        if (processes == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(processes);
     }
 }
