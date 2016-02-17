@@ -198,7 +198,13 @@ public class ProcessResource  {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            processServiceBase.signalProcessInstances(containerId, processInstanceIds, signalName, eventPayload, type);
+            if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
+                logger.debug("Signaling given process instances - {}", processInstanceIds);
+                processServiceBase.signalProcessInstances(containerId, processInstanceIds, signalName, eventPayload, type);
+            } else {
+                logger.debug("No process instances given, signal container..");
+                processServiceBase.signal(containerId, signalName, eventPayload, type);
+            }
 
             return createResponse("", v, Response.Status.OK);
 
