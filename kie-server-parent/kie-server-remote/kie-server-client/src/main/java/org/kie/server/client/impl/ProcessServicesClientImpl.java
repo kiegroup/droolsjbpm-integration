@@ -430,6 +430,25 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
     }
 
     @Override
+    public void signal(String containerId, String signalName, Object event) {
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(SIGNAL_NAME, signalName);
+
+            Map<String, String> headers = new HashMap<String, String>();
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(baseURI, PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap), event, String.class, headers);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessService", "signal", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, signalName})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
     public List<String> getAvailableSignals(String containerId, Long processInstanceId) {
         Object signals = null;
         if( config.isRest() ) {

@@ -173,6 +173,23 @@ public class ProcessServiceBase {
 
     }
 
+    public void signal(String containerId, String signalName, String marshallingType) {
+
+        logger.debug("Calling signal '{}' on container {} and event {}", signalName, containerId, null);
+        processService.signalEvent(containerId, signalName, null);
+
+    }
+
+    public void signal(String containerId, String signalName, String eventPayload, String marshallingType) {
+
+        logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
+        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
+
+        logger.debug("Calling signal '{}' on container {} and event {}", signalName, containerId, event);
+        processService.signalEvent(containerId, signalName, event);
+
+    }
+
     public String getProcessInstance(String containerId,  Number processInstanceId, boolean withVars, String marshallingType) {
 
         ProcessInstanceDesc instanceDesc = runtimeDataService.getProcessInstanceById(processInstanceId.longValue());
