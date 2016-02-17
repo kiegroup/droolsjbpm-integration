@@ -16,6 +16,7 @@
 package org.kie.server.api.model.definition;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,6 +49,9 @@ public class UserTaskDefinitionList implements ItemList<UserTaskDefinition> {
 
     @Override
     public List<UserTaskDefinition> getItems() {
+        if (tasks == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(tasks);
     }
 }
