@@ -667,8 +667,63 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             }
             fail("Exception " + e.getMessage());
         }
+    }
 
+    @Test
+    public void testSignalContainer() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
 
+        try {
+
+            List<String> availableSignals = processClient.getAvailableSignals("definition-project", processInstanceId);
+            assertNotNull(availableSignals);
+            assertEquals(2, availableSignals.size());
+            assertTrue(availableSignals.contains("Signal1"));
+            assertTrue(availableSignals.contains("Signal2"));
+
+            Object person = createPersonInstance("john");
+            processClient.signal("definition-project", "Signal1", person);
+
+            processClient.signal("definition-project", "Signal2", "My custom string event");
+
+            ProcessInstance pi = processClient.getProcessInstance("definition-project", processInstanceId);
+            assertNotNull(pi);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
+        } catch (Exception e){
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testSignalStartProcess() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        try {
+
+            List<Integer> status = new ArrayList<Integer>();
+            status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+            status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+            status.add(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED);
+
+            List<ProcessInstance> processInstances = queryClient.findProcessInstancesByProcessId("signal-start", status, 0, 10);
+            int initial = processInstances.size();
+
+            Object person = createPersonInstance("john");
+            processClient.signal("definition-project", "start-process", person);
+
+            processInstances = queryClient.findProcessInstancesByProcessId("signal-start", status, 0, 10);
+            assertNotNull(processInstances);
+            assertEquals(initial + 1, processInstances.size());
+
+        } catch (Exception e){
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
 
     }
 }

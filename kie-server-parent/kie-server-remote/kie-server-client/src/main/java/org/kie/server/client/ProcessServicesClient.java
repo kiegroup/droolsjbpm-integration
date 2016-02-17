@@ -72,6 +72,8 @@ public interface ProcessServicesClient {
 
     void signalProcessInstances(String containerId, List<Long> processInstanceId, String signalName, Object event);
 
+    void signal(String containerId, String signalName, Object event);
+
     List<String> getAvailableSignals(String containerId, Long processInstanceId);
 
     void setProcessVariable(String containerId, Long processInstanceId, String variableId, Object value);
