@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,6 +53,9 @@ public class ProcessInstanceList implements ItemList<ProcessInstance> {
 
     @Override
     public List<ProcessInstance> getItems() {
+        if (processInstances == null) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(processInstances);
     }
 }
