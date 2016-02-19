@@ -26,7 +26,7 @@
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>1.11.11</version>
+        <version>1.11.11.jbossorg-1</version>
         <extensions>true</extensions>
       </plugin>
     </plugins>
