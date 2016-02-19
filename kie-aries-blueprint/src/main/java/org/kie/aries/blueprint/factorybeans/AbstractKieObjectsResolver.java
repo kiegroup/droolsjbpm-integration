@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2005 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,15 +26,29 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.blueprint.container.BlueprintEvent;
-import org.osgi.service.blueprint.container.BlueprintListener;
+import org.osgi.framework.wiring.BundleWiring;
 
-public class KieObjectsResolver implements BlueprintListener {
+import java.util.concurrent.Callable;
 
+public abstract class AbstractKieObjectsResolver implements Callable<Object> {
     private BundleContext bundleContext;
 
-    public KieBase resolveKBase(String id, ReleaseId releaseId) {
-        KieContainer kieContainer = resolveKContainer(releaseId);
+    protected final ReleaseId releaseId;
+
+    public AbstractKieObjectsResolver( ReleaseId releaseId ) {
+        this.releaseId = releaseId;
+    }
+
+    public BundleContext getBundleContext() {
+        return bundleContext;
+    }
+
+    public void setBundleContext(BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
+
+    public KieBase resolveKBase( String id, ReleaseId releaseId ) {
+        KieContainer kieContainer = resolveKContainer( releaseId );
         KieBase kieBase = kieContainer.getKieBase(id);
         if (kieBase == null) {
             kieBase = kieContainer.newKieBase(id, null);
@@ -47,7 +61,7 @@ public class KieObjectsResolver implements BlueprintListener {
 
         // KieBase kbase = resolveKBase(kbaseName, releaseId);
         KieProject kProject = ((KieContainerImpl) kieContainer).getKieProject();
-        KieSessionModel kieSessionModel = kProject.getKieSessionModel(id);
+        KieSessionModel kieSessionModel = kProject.getKieSessionModel( id );
         if ( kieSessionModel == null) {
             return null;
         }
@@ -59,19 +73,36 @@ public class KieObjectsResolver implements BlueprintListener {
         return null;
     }
 
-    private KieContainer resolveKContainer(ReleaseId releaseId) {
+    protected KieContainer resolveKContainer( ReleaseId releaseId ) {
         if (releaseId == null) {
             throw new IllegalArgumentException("Cannot resolve a KieContainer using a null ReleaseId");
         }
-        KieContainer kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+        KieContainer kieContainer = KieServices.Factory.get().newKieContainer( releaseId, bundleContext.getBundle().adapt( BundleWiring.class ).getClassLoader() );
         if ( kieContainer == null) {
             throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
         }
         return kieContainer;
     }
 
+    public Object newStatefulSession( String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf ) {
+        KieBase kieBase = resolveKBase( kbaseName, releaseId );
+        if (kieBase == null) {
+            KieContainer kieContainer = resolveKContainer( releaseId );
+            if (conf == null) {
+                return kieContainer.newKieSession(kbaseName);
+            } else {
+                return kieContainer.newKieSession(conf);
+            }
+        } else {
+            if (conf == null) {
+                return kieBase.newKieSession();
+            } else {
+                return kieBase.newKieSession(conf, null);
+            }
+        }
+    }
 
-    public StatelessKieSession newStatelessSession(String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf) {
+    public StatelessKieSession newStatelessSession( String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf ) {
         KieBase kieBase = resolveKBase(kbaseName, releaseId);
         if (kieBase == null) {
             KieContainer kieContainer = resolveKContainer(releaseId);
@@ -87,28 +118,5 @@ public class KieObjectsResolver implements BlueprintListener {
                 return kieBase.newStatelessKieSession(conf);
             }
         }
-    }
-
-    public Object newStatefulSession(String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf) {
-        KieBase kieBase = resolveKBase(kbaseName, releaseId);
-        if (kieBase == null) {
-            KieContainer kieContainer = resolveKContainer(releaseId);
-            if (conf == null) {
-                return kieContainer.newKieSession(kbaseName);
-            } else {
-                return kieContainer.newKieSession(conf);
-            }
-        } else {
-            if (conf == null) {
-                return kieBase.newKieSession();
-            } else {
-                return kieBase.newKieSession(conf, null);
-            }
-        }
-    }
-
-    @Override public void blueprintEvent(BlueprintEvent event) {
-        //TODO
-        System.out.println(">> Something happen : " + event.getType());
     }
 }
