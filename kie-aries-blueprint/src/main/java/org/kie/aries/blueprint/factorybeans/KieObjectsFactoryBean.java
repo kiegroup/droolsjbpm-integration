@@ -20,71 +20,35 @@ import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
-import org.kie.api.KieBase;
-import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
-import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.helpers.JPAPlaceholderResolverStrategyHelper;
-import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class KieObjectsFactoryBean {
 
-    public static KieBase fetchKBase(String id, ReleaseId releaseId, KBaseOptions kbaseOptions){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        return kieObjectsResolver.resolveKBase(id, releaseId);
+    public static Object fetchKBase(String id, ReleaseId releaseId, KBaseOptions kbaseOptions) {
+        return new KieBaseResolver(releaseId, id);
     }
 
-    public static KieContainer fetchKContainer(ReleaseId releaseId){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        KieServices ks = KieServices.Factory.get();
-        if ( releaseId == null) {
-            return ks.getKieClasspathContainer();
-        }
-        return ks.newKieContainer(releaseId);
+    public static Object fetchKContainer(ReleaseId releaseId){
+        return new KieContainerResolver(releaseId);
     }
 
     public static Object createKieSessionRef(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        Object obj = kieObjectsResolver.resolveKSession(id, releaseId);
-        if ( obj != null) {
-            KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
-            KieSessionFactoryBeanHelper.attachLoggers((KieRuntimeEventManager) obj, loggers);
-            if (obj instanceof KieSession){
-                KieSessionFactoryBeanHelper.executeCommands((KieSession)obj, commands);
-            }
-            return obj;
-        }
-        throw new ComponentDefinitionException("No KSession found in kmodule.xml with id '"+id+"'.");
+        return new KieSessionRefResolver( releaseId, id, listeners, loggers, commands );
     }
 
     public static Object createKieSession(String id, ReleaseId releaseId, List<KieListenerAdaptor> listeners, List<KieLoggerAdaptor> loggers, List<?> commands, KSessionOptions kSessionOptions){
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
-        Object obj ;
-        if ("stateless".equalsIgnoreCase(kSessionOptions.getType())) {
-            obj = kieObjectsResolver.newStatelessSession(kSessionOptions.getkBaseRef(), releaseId, null);
-        } else {
-            obj = kieObjectsResolver.newStatefulSession(kSessionOptions.getkBaseRef(), releaseId, null);
-            KieSessionFactoryBeanHelper.executeCommands((KieSession)obj, commands);
-        }
-
-        KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);
-        KieSessionFactoryBeanHelper.attachLoggers((KieRuntimeEventManager) obj, loggers);
-
-        return obj;
+        return new KieSessionResolver( releaseId, listeners, loggers, commands, kSessionOptions );
     }
 
     public static KieStoreServices createKieStore() throws Exception {
-
-        KieObjectsResolver kieObjectsResolver = new KieObjectsResolver();
         return new KnowledgeStoreServiceImpl();
     }
 

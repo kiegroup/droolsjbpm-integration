@@ -17,7 +17,6 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.BeanProcessor;
-import org.apache.aries.blueprint.ExtendedBeanMetadata;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.PassThroughMetadata;
 import org.apache.aries.blueprint.mutable.MutableBeanArgument;
@@ -56,6 +55,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 public class KieObjectsInjector implements BeanProcessor {
 
@@ -302,7 +302,11 @@ public class KieObjectsInjector implements BeanProcessor {
 
     @Override
     public Object afterInit(Object o, String s, BeanCreator beanCreator, BeanMetadata beanMetadata) {
-        return o;
+        try {
+            return o instanceof Callable ? ( (Callable<Object>) o ).call() : o;
+        } catch (Exception e) {
+            throw new RuntimeException( e );
+        }
     }
 
     @Override
