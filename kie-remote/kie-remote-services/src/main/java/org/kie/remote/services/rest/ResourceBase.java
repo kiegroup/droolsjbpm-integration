@@ -75,7 +75,6 @@ import org.kie.services.client.serialization.jaxb.impl.type.JaxbShort;
 import org.kie.services.client.serialization.jaxb.impl.type.JaxbString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.util.BigInt;
 
 public class ResourceBase {
 
@@ -310,7 +309,7 @@ public class ResourceBase {
         if (paramVal.matches(LONG_INTEGER_BIGINTEGER_REGEX)) {
             if (paramVal.matches(".*i$")) {
                 if (mustBeLong) {
-                    throw KieRemoteRestOperationException.badRequest(paramName
+                    throw KieRemoteRestOperationException.badRequest( paramName
                             + " parameter is numerical but contains the \"Integer\" suffix 'i' and must have no suffix or \"Long\" suffix 'l' ("
                             + paramVal + ")");
                 }
