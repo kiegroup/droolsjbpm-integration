@@ -28,6 +28,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-aries-blueprint</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-test</artifactId>
       <scope>test</scope>
