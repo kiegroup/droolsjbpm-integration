@@ -51,4 +51,15 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         super.additionalConfiguration(configuration);
         configuration.setTimeout(30000);
     }
+
+    protected Object valueOf(Object object, String fieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField( fieldName );
+            field.setAccessible( true );
+            return field.get( object );
+        } catch ( Exception e ) {
+            return null;
+        }
+    }
+
 }
