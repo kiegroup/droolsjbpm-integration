@@ -39,13 +39,12 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.api.model.instance.SolverInstance;
 
 public class XStreamMarshaller
         implements Marshaller {
 
     private XStream xstream;
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
 
     public XStreamMarshaller( final Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.classLoader = classLoader;
@@ -70,9 +69,6 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( KieContainerStatus.class );
         this.xstream.processAnnotations( KieScannerResource.class );
         this.xstream.processAnnotations( KieServerInfo.class );
-
-        this.xstream.processAnnotations( SolverInstance.class );
-
 
         if (classes != null) {
             for (Class<?> clazz : classes) {
@@ -105,16 +101,5 @@ public class XStreamMarshaller
     @Override
     public String toString() {
         return "Marshaller{ XSTREAM }";
-    }
-
-    @Override
-    public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-        this.xstream.setClassLoader( classLoader );
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return classLoader;
     }
 }

@@ -190,7 +190,6 @@
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
             </systemPropertyVariables>
@@ -225,8 +224,6 @@
           <container>
             <systemProperties>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
-              <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
             </systemProperties>
           </container>

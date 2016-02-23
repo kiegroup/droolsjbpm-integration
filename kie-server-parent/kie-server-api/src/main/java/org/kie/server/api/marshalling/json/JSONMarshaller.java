@@ -66,7 +66,7 @@ public class JSONMarshaller implements Marshaller {
     private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
     private final ObjectMapper fallbackObjectMapper;
@@ -94,12 +94,10 @@ public class JSONMarshaller implements Marshaller {
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
         objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig()
                 .withAnnotationIntrospector(introspectorPair)
-                .without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .with( DeserializationConfig.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY ));
-        objectMapper.setSerializationConfig(
-                objectMapper.getSerializationConfig()
-                        .withAnnotationIntrospector( introspectorPair )
-                        .with( SerializationConfig.Feature.INDENT_OUTPUT ));
+                .without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES));
+        objectMapper.setSerializationConfig(objectMapper.getSerializationConfig()
+                .withAnnotationIntrospector(introspectorPair)
+                .with(SerializationConfig.Feature.INDENT_OUTPUT));
 
         // setup custom serialization mapper with jaxb adapters
         customSerializationMapper.setDeserializationConfig(customSerializationMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
@@ -412,15 +410,5 @@ public class JSONMarshaller implements Marshaller {
 
             return VALID_JAVA_IDENTIFIER.matcher(classname).matches();
         }
-    }
-
-    @Override
-    public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return classLoader;
     }
 }

@@ -46,25 +46,6 @@ public class RestUtils {
         }
         return responseBuilder.build();
     }
-
-    public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
-        Response.ResponseBuilder responseBuilder = null;
-        Variant v = getVariant(headers);
-        String contentType = getContentType(headers);
-
-        String marshalledResponse;
-        if (marshallerHelper.getRegistry().getContainer(containerId) == null) {
-            marshalledResponse = marshallerHelper.marshal(contentType, responseObj);
-        } else {
-            marshalledResponse = marshallerHelper.marshal(containerId, contentType, responseObj);
-        }
-        if( status != null ) {
-            responseBuilder = Response.status(status).entity(marshalledResponse).variant(v);
-        } else {
-            responseBuilder = Response.ok(marshalledResponse, v);
-        }
-        return responseBuilder.build();
-    }
     
     public static Response createResponse(Object responseObj, Variant v, javax.ws.rs.core.Response.Status status) {
         Response.ResponseBuilder responseBuilder = null;

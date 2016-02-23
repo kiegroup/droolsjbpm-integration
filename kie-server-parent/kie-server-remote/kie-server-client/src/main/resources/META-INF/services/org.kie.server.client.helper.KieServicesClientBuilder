@@ -1,4 +1,3 @@
 org.kie.server.client.helper.JBPMServicesClientBuilder
 org.kie.server.client.helper.DroolsServicesClientBuilder
 org.kie.server.client.helper.JBPMUIServicesClientBuilder
-org.kie.server.client.helper.OptaplannerServicesClientBuilder

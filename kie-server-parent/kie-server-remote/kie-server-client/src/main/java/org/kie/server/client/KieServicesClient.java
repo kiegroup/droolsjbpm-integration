@@ -66,16 +66,4 @@ public interface KieServicesClient {
      */
     @Deprecated
     ServiceResponse<String> executeCommands(String id, Command<?> cmd);
-
-    /**
-     * Sets the classloader for user class unmarshalling
-     * @param classLoader
-     */
-    void setClassLoader(ClassLoader classLoader);
-
-    /**
-     * Returns the current classloader in use for unmarshalling
-     * @return
-     */
-    ClassLoader getClassLoader();
 }

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,11 +30,9 @@ import javax.naming.InitialContext;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
-import org.drools.compiler.kproject.xml.DependencyFilter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
-import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
@@ -222,14 +219,10 @@ public class KieServerImpl {
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
-
-                            KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
-                            Map<String, Object> parameters = new HashMap<String, Object>();
-                            parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
-                                extension.createContainer(containerId, ci, parameters);
+                                extension.createContainer(containerId, ci, new HashMap<String, Object>());
                                 logger.debug("Container {} (for release id {}) {} initialization: DONE", containerId, releaseId, extension);
                             }
 
