@@ -83,15 +83,15 @@ public class KieServerRestImpl {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createContainer( @Context HttpHeaders headers, @PathParam("id") String id, String containerPayload ) {
-        String contentType = getContentType( headers );
+        String contentType = getContentType(headers);
 
-        KieContainerResource container = marshallerHelper.unmarshal( containerPayload, contentType, KieContainerResource.class );
+        KieContainerResource container = marshallerHelper.unmarshal(containerPayload, contentType, KieContainerResource.class);
 
-        ServiceResponse<KieContainerResource> response = server.createContainer( id, container );
-        if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-            return createCorrectVariant( response, headers, Status.CREATED );
+        ServiceResponse<KieContainerResource> response = server.createContainer(id, container);
+        if( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+            return createCorrectVariant(response, headers, Status.CREATED);
         }
-        return createCorrectVariant( response, headers, Status.BAD_REQUEST );
+        return createCorrectVariant(response, headers, Status.BAD_REQUEST);
     }
 
     @GET

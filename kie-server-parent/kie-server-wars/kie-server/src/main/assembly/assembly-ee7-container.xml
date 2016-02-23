@@ -53,13 +53,11 @@
         <include>org.kie.server:kie-server-services-drools</include>
         <include>org.kie.server:kie-server-services-jbpm</include>
         <include>org.kie.server:kie-server-services-jbpm-ui</include>
-        <include>org.kie.server:kie-server-services-optaplanner</include>
         <include>org.kie.server:kie-server-jms</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>
         <include>org.kie.server:kie-server-rest-jbpm</include>
         <include>org.kie.server:kie-server-rest-jbpm-ui</include>
-        <include>org.kie.server:kie-server-rest-optaplanner</include>
         <include>org.kie:jbpm-process-svg</include>
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>

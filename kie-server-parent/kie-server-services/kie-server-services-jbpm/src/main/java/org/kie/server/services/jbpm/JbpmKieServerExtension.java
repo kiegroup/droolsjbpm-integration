@@ -72,7 +72,6 @@ import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
-import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.KieContainerCommandService;
@@ -254,12 +253,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         try {
-            KieModuleMetaData metaData = (KieModuleMetaData) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA);
-            if (metaData.getProcesses() == null || metaData.getProcesses().isEmpty()) {
-                logger.info("Container {} does not include processes, {} skipped", id, this);
-                return;
-            }
-
             boolean hasStatefulSession = false;
             boolean hasDefaultSession = false;
             // let validate if they are any stateful sessions defined and in case there are not, skip this container
@@ -319,7 +312,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         if (!deploymentService.isDeployed(id)) {
-            logger.info("No container with id {} found", id);
+            logger.warn("No container with id {} found", id);
             return;
         }
         List<Integer> states = new ArrayList<Integer>();

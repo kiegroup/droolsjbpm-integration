@@ -19,7 +19,6 @@
     <module>kie-server-services-drools</module>
     <module>kie-server-services-jbpm</module>
     <module>kie-server-services-jbpm-ui</module>
-    <module>kie-server-services-optaplanner</module>
   </modules>
 
 </project>

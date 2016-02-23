@@ -35,19 +35,13 @@ public class MarshallerHelper {
         this.registry = registry;
     }
 
-    public KieServerRegistry getRegistry() {
-        return registry;
-    }
-
     public String marshal(String containerId, String marshallingFormat, Object entity) {
         MarshallingFormat format = getFormat(marshallingFormat);
-        if (format == null) {
-            throw new IllegalArgumentException("Unknown marshalling format " + marshallingFormat);
-        }
 
         KieContainerInstance containerInstance = registry.getContainer(containerId);
-        if (containerInstance == null) {
-            throw new IllegalArgumentException("No container found for id " + containerId + " .");
+
+        if (containerInstance == null || format == null) {
+            throw new IllegalArgumentException("No container found for id " + containerId + " or unknown marshalling format " + marshallingFormat);
         }
 
         Marshaller marshaller = containerInstance.getMarshaller(format);

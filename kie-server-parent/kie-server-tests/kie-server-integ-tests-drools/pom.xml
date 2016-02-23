@@ -178,7 +178,6 @@
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
@@ -213,8 +212,6 @@
           <container>
             <systemProperties>
               <org.jbpm.server.ext.disabled>true</org.jbpm.server.ext.disabled>
-              <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
-              <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
             </systemProperties>
           </container>

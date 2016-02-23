@@ -42,11 +42,11 @@ public enum MarshallingFormat {
     }
 
     public static MarshallingFormat fromType( String type ) {
-        if ("xstream".equalsIgnoreCase( type )) {
+        if ("xstream".equals(type)) {
             return XSTREAM;
-        } else if ("xml".equalsIgnoreCase( type )) {
+        } else if ("xml".equals(type)) {
             return JAXB;
-        } else if ("json".equalsIgnoreCase( type )) {
+        } else if ("json".equals(type)) {
             return JSON;
         } else {
             return null;

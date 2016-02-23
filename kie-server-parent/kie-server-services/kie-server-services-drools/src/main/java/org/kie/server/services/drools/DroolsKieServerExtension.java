@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -35,9 +36,11 @@ import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.impl.KieContainerCommandServiceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.drools.compiler.kproject.xml.DependencyFilter;
 
 public class DroolsKieServerExtension implements KieServerExtension {
 
@@ -87,7 +90,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
             kieContainerInstance.getKieContainer().getKieBase(kbase);
         }
 
-        KieModuleMetaData metaData = (KieModuleMetaData) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA);
+        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(kieContainerInstance.getKieContainer().getReleaseId(), DependencyFilter.COMPILE_FILTER);
         Collection<String> packages = metaData.getPackages();
 
         for (String p : packages) {
