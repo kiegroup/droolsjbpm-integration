@@ -29,6 +29,7 @@ import org.optaplanner.core.api.domain.solution.Solution;
 
 import java.lang.Thread;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -130,9 +131,14 @@ public class OptaplannerIntegrationTest
         assertEquals( "Expected FAILURE response, but got " + type + "!", ServiceResponse.ResponseType.FAILURE, type );
     }
 
-    @Ignore @Test(expected = KieServicesException.class)
+    @Test
     public void testDisposeNotExistingSolver() throws Exception {
-        solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID );
+        try {
+            solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID );
+            fail("A KieServicesException should have been thrown by now.");
+        } catch (KieServicesException e) {
+            assertResultContainsStringRegex(e.getMessage(), ".*Solver.*from container.*not found.*");
+        }
     }
 
     @Test
@@ -273,6 +279,12 @@ public class OptaplannerIntegrationTest
         }
         // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
         assertTrue(solution.getScore() != null);
+
+        List<?> processList = (List<?>) valueOf(solution, "processList");
+        for(Object process : processList) {
+            Object computer = valueOf(process, "computer");
+            assertNotNull(computer);
+        }
 
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
