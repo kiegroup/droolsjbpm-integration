@@ -32,6 +32,7 @@ import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
 
 import static org.junit.Assert.*;
@@ -56,6 +57,13 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
+    }
+
+    @Override
+    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
+        super.additionalConfiguration(configuration);
+        // Having timeout issues due to kjar dependencies -> raised timeout.
+        configuration.setTimeout(120000);
     }
 
     @Test

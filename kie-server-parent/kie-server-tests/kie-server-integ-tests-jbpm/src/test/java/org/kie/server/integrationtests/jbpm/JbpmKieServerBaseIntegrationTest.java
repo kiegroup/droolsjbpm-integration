@@ -61,34 +61,17 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     }
 
     @Override
+    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
+        super.additionalConfiguration(configuration);
+        configuration.setTimeout(30000);
+    }
+
+    @Override
     protected void setupClients(KieServicesClient client) {
         this.processClient = client.getServicesClient(ProcessServicesClient.class);
         this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
         this.queryClient = client.getServicesClient(QueryServicesClient.class);
         this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
-    }
-
-    @Override
-    protected KieServicesClient createDefaultClient() throws Exception {
-
-        KieServicesClient kieServicesClient = null;
-        // Add all extra custom classes defined in tests.
-        addExtraCustomClasses(extraClasses);
-        if (TestConfig.isLocalServer()) {
-            KieServicesConfiguration localServerConfig =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            localServerConfig.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            localServerConfig.setTimeout(30000);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(localServerConfig, kieContainer.getClassLoader());
-        } else {
-            configuration.setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            configuration.setTimeout(30000);
-            kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration, kieContainer.getClassLoader());
-        }
-        setupClients(kieServicesClient);
-
-        return kieServicesClient;
     }
 
     protected Object createPersonInstance(String name) {
