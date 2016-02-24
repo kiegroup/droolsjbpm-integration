@@ -208,7 +208,7 @@ public class OptaplannerIntegrationTest
 
         // the following status starts the solver
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 5, 10 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 5, 15 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
 
@@ -236,7 +236,7 @@ public class OptaplannerIntegrationTest
 
         // start solver
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 50, 300 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
@@ -259,7 +259,7 @@ public class OptaplannerIntegrationTest
 
         // the following status starts the solver
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 10, 100 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 10, 30 ) );
         ServiceResponse<SolverInstance> response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
@@ -280,7 +280,10 @@ public class OptaplannerIntegrationTest
         // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
         assertTrue(solution.getScore() != null);
 
+        List<?> computerList = (List<?>) valueOf(solution, "computerList");
+        assertEquals(10, computerList.size());
         List<?> processList = (List<?>) valueOf(solution, "processList");
+        assertEquals(30, processList.size());
         for(Object process : processList) {
             Object computer = valueOf(process, "computer");
             assertNotNull(computer);
@@ -308,7 +311,7 @@ public class OptaplannerIntegrationTest
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 5, 10 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 5, 15 ) );
         try {
             solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
             fail("A KieServicesException should have been thrown by now.");
@@ -325,7 +328,7 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, instance ) );
 
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 50, 300 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         ServiceResponse<SolverInstance> updateSolverState = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( updateSolverState );
         assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
@@ -343,7 +346,7 @@ public class OptaplannerIntegrationTest
 
         // start solver
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 50, 300 ) );
+        instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
