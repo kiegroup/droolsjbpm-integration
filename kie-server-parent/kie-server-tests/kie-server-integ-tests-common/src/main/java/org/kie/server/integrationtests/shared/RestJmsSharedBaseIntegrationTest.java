@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,13 +73,18 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         // Add all extra custom classes defined in tests.
         addExtraCustomClasses(extraClasses);
         if (TestConfig.isLocalServer()) {
-            configuration =
-                    KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+            configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
+        }
+
+        configuration.setMarshallingFormat(marshallingFormat);
+        configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+        additionalConfiguration(configuration);
+
+        if(extraClasses.size() > 0) {
+            // Use classloader of extra classes as client classloader
+            ClassLoader classLoader = extraClasses.values().iterator().next().getClassLoader();
+            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, classLoader);
         } else {
-            configuration.setMarshallingFormat(marshallingFormat);
-            configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
             kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         }
         setupClients(kieServicesClient);
@@ -93,6 +97,13 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
      * @param extraClasses Map with classname keys and respective Class instances.
      */
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {}
+
+    /**
+     * Additional configuration of KieServicesConfiguration like timeout and such.
+     *
+     * @param configuration Kie server configuration to be configured.
+     */
+    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {}
 
     /**
      * Initialize Execution server clients.
