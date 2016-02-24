@@ -171,10 +171,10 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select pil.*, v.variableId, v.value " +
                 "from ProcessInstanceLog pil " +
-                "inner join (select vil.processInstanceId ,vil.variableId, MAX(vil.ID) maxvilid  FROM VariableInstanceLog vil " +
-                "GROUP BY vil.processInstanceId, vil.variableId ORDER BY vil.processInstanceId)  x " +
-                "INNER JOIN VariableInstanceLog v " +
-                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid AND v.processInstanceId = pil.processInstanceId)" +
+                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
+                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
+                "inner join VariableInstanceLog v " +
+                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
                 "where pil.status = 1");
         query.setTarget("CUSTOM");
         try {
@@ -218,10 +218,10 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select pil.*, v.variableId, v.value " +
                 "from ProcessInstanceLog pil " +
-                "inner join (select vil.processInstanceId ,vil.variableId, MAX(vil.ID) maxvilid  FROM VariableInstanceLog vil " +
-                "GROUP BY vil.processInstanceId, vil.variableId ORDER BY vil.processInstanceId)  x " +
-                "INNER JOIN VariableInstanceLog v " +
-                "ON (v.variableId = x.variableId  AND v.id = x.maxvilid AND v.processInstanceId = pil.processInstanceId)" +
+                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
+                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
+                "inner join VariableInstanceLog v " +
+                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
                 "where pil.status = 1");
         query.setTarget("CUSTOM");
         try {
@@ -447,6 +447,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         for (ProcessInstance instance : instances) {
             ids.add(instance.getId());
         }
+        Collections.sort(ids);
         return ids;
     }
 }
