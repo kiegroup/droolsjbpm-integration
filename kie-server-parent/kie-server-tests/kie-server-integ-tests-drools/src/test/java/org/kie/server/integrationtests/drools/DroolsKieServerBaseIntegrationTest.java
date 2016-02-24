@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.kie.api.KieServices;
 import org.kie.api.command.KieCommands;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
@@ -33,6 +34,12 @@ public abstract class DroolsKieServerBaseIntegrationTest extends RestJmsSharedBa
     @BeforeClass
     public static void setupFactory() throws Exception {
         commandsFactory = KieServices.Factory.get().getCommands();
+    }
+
+    @Override
+    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
+        super.additionalConfiguration(configuration);
+        configuration.setTimeout(10000);
     }
 
     @Override
