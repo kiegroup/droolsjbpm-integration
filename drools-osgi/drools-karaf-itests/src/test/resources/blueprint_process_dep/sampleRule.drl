@@ -1,0 +1,14 @@
+package blueprint_process_dep
+
+// import a class from different bundle than the test bundle
+import org.junit.Assert;
+
+// the rule does not make sense, its purpose is to use the imported class
+rule "rule 1"
+ruleflow-group "approval"
+when
+    m : String()
+    assertInstance: Assert()
+then
+    System.out.println(m + ",  " +  assertInstance);
+end
