@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.drools.karaf.itest;
+package org.drools.karaf.itest.blueprint;
 
+import org.drools.karaf.itest.AbstractKarafIntegrationTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
@@ -43,7 +44,7 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 @ExamReactorStrategy(PerMethod.class)
 public class KieBlueprintDependencyKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    private static final String BLUEPRINT_XML_LOCATION = "/org/drools/karaf/itest/kie-beans-blueprint.xml";
+    private static final String BLUEPRINT_XML_LOCATION = "/org/drools/karaf/itest/blueprint/kie-beans-blueprint.xml";
     private static final String DRL_LOCATION = "/drl_kiesample_dependency/Hal1.drl";
 
     @Inject
