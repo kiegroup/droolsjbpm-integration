@@ -15,9 +15,14 @@
 
 package org.kie.server.client;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.junit.Test;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -45,6 +50,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                         "    <version>1.2.3</version>\n" +
                                         "  </kie-server-info>\n" +
                                         "</response>")));
+
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
@@ -103,6 +109,32 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         assertEquals("Container id", "kie1", container.getContainerId());
         assertEquals("Release id", releaseId, container.getReleaseId());
         assertEquals("Resolved release Id", releaseId, container.getResolvedReleaseId());
+    }
+
+    @Test
+    public void testGetServerInfoWithSingletonExtraClass() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\n" +
+                                    "  \"type\" : \"SUCCESS\",\n" +
+                                    "  \"msg\" : \"Kie Server info\",\n" +
+                                    "  \"result\" : {\n" +
+                                    "    \"kie-server-info\" : {\n" +
+                                    "      \"version\" : \"1.2.3\"\n" +
+                                    "    }\n" +
+                                    "  }\n" +
+                                    "}")));
+
+
+        config.setMarshallingFormat(MarshallingFormat.JSON);
+        config.setExtraJaxbClasses((Set)Collections.singleton(KieContainerStatus.class));
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1.2.3", response.getResult().getVersion());
     }
 
     // TODO create more tests for other operations
