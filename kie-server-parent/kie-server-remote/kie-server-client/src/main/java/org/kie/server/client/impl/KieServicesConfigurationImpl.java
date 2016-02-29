@@ -294,7 +294,10 @@ public final class KieServicesConfigurationImpl
 
     @Override
     public KieServicesConfiguration setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses) {
-        this.extraJaxbClasses = extraJaxbClasses;
+        this.extraJaxbClasses.clear();
+        if (extraJaxbClasses != null) {
+            this.extraJaxbClasses.addAll(extraJaxbClasses);
+        }
         return this;
     }
 
