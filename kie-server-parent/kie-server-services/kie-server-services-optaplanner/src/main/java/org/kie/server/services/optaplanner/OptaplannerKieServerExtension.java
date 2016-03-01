@@ -34,8 +34,8 @@ public class OptaplannerKieServerExtension
 
     public static final String EXTENSION_NAME = "OptaPlanner";
 
-    private static final Boolean droolsDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false"));
-    private static final Boolean disabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
+    private static final Boolean droolsDisabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false" ) );
+    private static final Boolean disabled       = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_OPTAPLANNER_SERVER_EXT_DISABLED, "false" ) );
 
     private KieServerRegistry registry;
     private SolverServiceBase solverServiceBase;
@@ -50,10 +50,11 @@ public class OptaplannerKieServerExtension
     private ExecutorService threadPool = null;
 
     private List<Object> services = new ArrayList<Object>();
+    private OptaplannerCommandServiceImpl optaplannerCommandService;
 
     @Override
     public boolean isActive() {
-        return  disabled == false && droolsDisabled == false;
+        return disabled == false && droolsDisabled == false;
     }
 
     @Override
@@ -67,16 +68,20 @@ public class OptaplannerKieServerExtension
         // the following threadpool will have a max thread count equal to the number of cores on the machine.
         // if new jobs are submited and all threads are busy, the reject policy will kick in.
         int poolSize = Runtime.getRuntime().availableProcessors();
-        if (poolSize >= 4) {
+        if ( poolSize >= 4 ) {
             // Leave 1 processor alone to handle REST/JMS requests and run the OS
             poolSize--;
         }
-        this.threadPool = new ThreadPoolExecutor(2, // core size
+        this.threadPool = new ThreadPoolExecutor(
+                2, // core size
                 poolSize, // max size
-                                                 120, // idle timeout
+                120, // idle timeout
                                                  TimeUnit.SECONDS,
                                                  new ArrayBlockingQueue<Runnable>(poolSize)); // queue with a size
         this.solverServiceBase = new SolverServiceBase( registry, threadPool );
+
+        this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
+
         this.services.add( solverServiceBase );
     }
 
@@ -110,6 +115,9 @@ public class OptaplannerKieServerExtension
 
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
+        if (serviceType.isAssignableFrom(optaplannerCommandService.getClass())) {
+            return (T) optaplannerCommandService;
+        }
         if ( serviceType.isAssignableFrom( solverServiceBase.getClass() ) ) {
             return (T) solverServiceBase;
         }

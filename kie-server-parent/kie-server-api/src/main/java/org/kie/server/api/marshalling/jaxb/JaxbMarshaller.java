@@ -54,6 +54,7 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.commands.optaplanner.*;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -208,6 +209,14 @@ public class JaxbMarshaller implements Marshaller {
                 BendableLongScore.class,
                 BendableBigDecimalScore.class,
                 Message.class,
+
+                // Optaplanner commands
+                CreateSolverCommand.class,
+                DisposeSolverCommand.class,
+                GetBestSolutionCommand.class,
+                GetSolversCommand.class,
+                GetSolverStateCommand.class,
+                UpdateSolverStateCommand.class
         };
     }
 

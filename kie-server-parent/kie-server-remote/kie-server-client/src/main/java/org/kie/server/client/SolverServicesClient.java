@@ -24,7 +24,7 @@ public interface SolverServicesClient {
 
     ServiceResponse<SolverInstanceList> getSolvers( String containerId );
 
-    ServiceResponse<SolverInstance> createSolver( String containerId, String solverId, SolverInstance resource);
+    ServiceResponse<SolverInstance> createSolver( String containerId, String solverId, String configFile);
 
     ServiceResponse<SolverInstance> getSolverState( String containerId, String solverId );
 
