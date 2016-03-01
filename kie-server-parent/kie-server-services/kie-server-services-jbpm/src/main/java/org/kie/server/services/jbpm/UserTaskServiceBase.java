@@ -86,11 +86,24 @@ public class UserTaskServiceBase {
     public void complete(String containerId, Number taskId, String userId, String payload, String marshallerType) {
 
         userId = getUser(userId);
+        
         logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallerType, Map.class);
 
         logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
         userTaskService.complete(taskId.longValue(), userId, parameters);
+
+    }
+
+    public void completeAutoProgress(String containerId, Number taskId, String userId, String payload, String marshallerType) {
+
+        userId = getUser(userId);
+        
+        logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallerType, Map.class);
+
+        logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
+        userTaskService.completeAutoProgress(taskId.longValue(), userId, parameters);
 
     }
 

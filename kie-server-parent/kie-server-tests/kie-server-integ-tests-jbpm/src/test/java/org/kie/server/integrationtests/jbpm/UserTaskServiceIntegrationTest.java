@@ -110,6 +110,51 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     }
 
     @Test
+    public void testAutoProgressComplete() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+            
+            // release task
+            taskClient.releaseTask("definition-project", taskSummary.getId(), "yoda");
+
+            Map<String, Object> taskOutcome = new HashMap<String, Object>();
+            taskOutcome.put("string_", "my custom data");
+            taskOutcome.put("person_", createPersonInstance("mary"));
+
+            // do all operations, claim -> start -> complete, at once
+            taskClient.completeAutoProgress("definition-project", taskSummary.getId(), "yoda", taskOutcome);
+
+            // check if task outcomes are properly set as process variables
+            Object personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            assertNotNull(personVar);
+            assertEquals("mary", valueOf(personVar, "name"));
+
+            String stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            assertNotNull(personVar);
+            assertEquals("my custom data", stringVar);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    @Test
     public void testReleaseAndClaim() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
         Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");

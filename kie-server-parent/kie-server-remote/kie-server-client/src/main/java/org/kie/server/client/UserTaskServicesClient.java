@@ -35,6 +35,8 @@ public interface UserTaskServicesClient {
 
     void completeTask(String containerId, Long taskId, String userId, Map<String, Object> params);
 
+    void completeAutoProgress(String containerId, Long taskId, String userId, Map<String, Object> params);
+
     void delegateTask(String containerId, Long taskId, String userId, String targetUserId);
 
     void exitTask(String containerId, Long taskId, String userId);
