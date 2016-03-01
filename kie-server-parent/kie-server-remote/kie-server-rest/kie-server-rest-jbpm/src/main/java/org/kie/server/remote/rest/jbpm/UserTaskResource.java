@@ -100,12 +100,16 @@ public class UserTaskResource {
     @Path(TASK_INSTANCE_COMPLETE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response complete(@Context HttpHeaders headers, @PathParam("id") String containerId,
-            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, String payload) {
+            @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("auto-progress") boolean autoProgress, String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         try {
-            userTaskServiceBase.complete(containerId, taskId, userId, payload, type);
+            if (autoProgress) {
+                userTaskServiceBase.completeAutoProgress(containerId, taskId, userId, payload, type);
+            } else {
+                userTaskServiceBase.complete(containerId, taskId, userId, payload, type);
+            }
 
             return createResponse("", v, Response.Status.CREATED);
         } catch (TaskNotFoundException e){

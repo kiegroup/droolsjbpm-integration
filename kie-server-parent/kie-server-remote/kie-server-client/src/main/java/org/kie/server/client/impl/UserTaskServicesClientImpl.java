@@ -102,6 +102,35 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
+    public void completeAutoProgress(String containerId, Long taskId, String userId, Map<String, Object> params) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            String userQuery = getUserQueryStr(userId);
+            StringBuilder queryString = new StringBuilder(userQuery);
+            if (queryString.length() == 0) {
+                queryString.append("?");
+            } else {
+                queryString.append("&");
+            }
+            queryString.append("auto-progress=true");
+            
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + queryString.toString(),
+                    params, String.class, getHeaders(null));
+        } else {
+
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskService", "completeAutoProgress", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
     public void delegateTask(String containerId, Long taskId, String userId, String targetUserId) {
         if( config.isRest() ) {
 
