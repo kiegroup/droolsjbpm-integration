@@ -20,6 +20,14 @@
         <entry name="queue/KIE.SERVER.EXECUTOR" />
       </jms-queue>
 
+      <!-- JMS queue for signals -->
+      <!-- enable when external signals are required -->
+      <!--
+      <jms-queue name="KIE.SERVER.SIGNAL.QUEUE">
+        <entry name="queue/KIE.SERVER.SIGNAL" />
+        <entry name="java:jboss/exported/jms/queue/KIE.SERVER.SIGNAL" />
+      </jms-queue>
+      -->
     </jms-destinations>
   </hornetq-server>
 </messaging-deployment>
