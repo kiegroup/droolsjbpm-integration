@@ -29,6 +29,7 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.commands.optaplanner.*;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -72,6 +73,12 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( KieServerInfo.class );
 
         this.xstream.processAnnotations( SolverInstance.class );
+        this.xstream.processAnnotations( CreateSolverCommand.class );
+        this.xstream.processAnnotations( DisposeSolverCommand.class );
+        this.xstream.processAnnotations( GetBestSolutionCommand.class );
+        this.xstream.processAnnotations( GetSolversCommand.class );
+        this.xstream.processAnnotations( GetSolverStateCommand.class );
+        this.xstream.processAnnotations( UpdateSolverStateCommand.class );
 
 
         if (classes != null) {

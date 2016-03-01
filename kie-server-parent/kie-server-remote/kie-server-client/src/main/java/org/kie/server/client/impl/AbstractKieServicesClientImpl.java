@@ -304,7 +304,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
-                response.code() == Response.Status.NO_CONTENT.getStatusCode()) {
+                response.code() == Response.Status.NO_CONTENT.getStatusCode() ) {
             if (resultType == null) {
                 return null;
             }
