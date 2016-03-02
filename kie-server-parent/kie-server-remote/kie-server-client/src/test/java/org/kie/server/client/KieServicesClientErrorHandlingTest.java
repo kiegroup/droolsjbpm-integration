@@ -52,6 +52,16 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
     public void testError404Handling() {
         expectedEx.expect( KieServicesException.class );
         expectedEx.expectMessage( "Error code: 404" );
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
         stubFor(
                 get( urlEqualTo( "/containers" ) )
                         .withHeader( "Accept", equalTo( "application/xml" ) )
@@ -68,6 +78,16 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
     public void testError500Handling() {
         expectedEx.expect( KieServicesException.class );
         expectedEx.expectMessage( "Error code: 500");
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
@@ -82,6 +102,16 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
     public void testXmlDeserializationErrorHandling() {
         expectedEx.expect(KieServicesException.class);
         expectedEx.expectCause(serializationExceptionMatcher);
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
@@ -97,6 +127,20 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
     public void testJsonDeserializationErrorHandling() {
         expectedEx.expect(KieServicesException.class);
         expectedEx.expectCause(serializationExceptionMatcher);
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/json"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\n" +
+                                "  \"type\" : \"SUCCESS\",\n" +
+                                "  \"msg\" : \"Kie Server info\",\n" +
+                                "  \"result\" : {\n" +
+                                "    \"kie-server-info\" : {\n" +
+                                "      \"version\" : \"1.2.3\",\n" +
+                                "    }\n" +
+                                "  }\n" +
+                                "}")));
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/json"))
                 .willReturn(aResponse()

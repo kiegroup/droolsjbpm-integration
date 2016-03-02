@@ -135,6 +135,24 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
     }
 
+    @Test
+    public void testUpdateReleaseIdForNotExistingContainer() throws Exception {
+
+        ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        Assert.assertEquals(releaseId2, reply.getResult());
+
+        ServiceResponse<KieContainerResourceList> replyList = client.listContainers();
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, replyList.getType());
+        List<KieContainerResource> containers = replyList.getResult().getContainers();
+        Assert.assertEquals("Number of listed containers!", 1, containers.size());
+        assertContainsContainer(containers, "update-releaseId");
+
+        ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
+
+    }
+
     private void assertContainsContainer(List<KieContainerResource> containers, String expectedContainerId) {
         for (KieContainerResource container : containers) {
             if (container.getContainerId().equals(expectedContainerId)) {
