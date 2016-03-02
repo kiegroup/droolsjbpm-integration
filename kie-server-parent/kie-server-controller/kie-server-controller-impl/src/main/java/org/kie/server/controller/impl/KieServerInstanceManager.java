@@ -60,6 +60,7 @@ public class KieServerInstanceManager {
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     logger.debug("Scanner failed to start on server instance {} due to {}", container.getUrl(), response.getMsg());
                 }
+                collectContainerInfo(containerSpec, client, container);
 
                 return null;
             }
@@ -80,6 +81,7 @@ public class KieServerInstanceManager {
                     logger.debug("Scanner failed to stop on server instance {} due to {}", container.getUrl(), response.getMsg());
                 }
 
+                collectContainerInfo(containerSpec, client, container);
 
                 return null;
             }
@@ -99,7 +101,7 @@ public class KieServerInstanceManager {
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     logger.debug("Scanner (scan now) failed on server instance {} due to {}", container.getUrl(), response.getMsg());
                 }
-
+                collectContainerInfo(containerSpec, client, container);
                 return null;
             }
         });
@@ -119,7 +121,7 @@ public class KieServerInstanceManager {
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     logger.debug("Container {} failed to start on server instance {} due to {}", containerSpec.getId(), container.getUrl(), response.getMsg());
                 }
-
+                collectContainerInfo(containerSpec, client, container);
                 return null;
             }
         });
@@ -135,7 +137,7 @@ public class KieServerInstanceManager {
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     logger.debug("Container {} failed to stop on server instance {} due to {}", containerSpec.getId(), container.getUrl(), response.getMsg());
                 }
-
+                collectContainerInfo(containerSpec, client, container);
                 return null;
             }
         });
@@ -151,7 +153,7 @@ public class KieServerInstanceManager {
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                     logger.debug("Container {} failed to upgrade on server instance {} due to {}", containerSpec.getId(), container.getUrl(), response.getMsg());
                 }
-
+                collectContainerInfo(containerSpec, client, container);
                 return null;
             }
         });
@@ -281,6 +283,16 @@ public class KieServerInstanceManager {
         KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
 
         return kieServicesClient;
+    }
+
+    protected void collectContainerInfo(ContainerSpec containerSpec, KieServicesClient client, Container container) {
+        // collect up to date information
+        ServiceResponse<KieContainerResource> serviceResponse = client.getContainerInfo(containerSpec.getId());
+        if (serviceResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
+            KieContainerResource containerResource = serviceResponse.getResult();
+
+            container.setMessages(containerResource.getMessages());
+        }
     }
 
     protected String getUser() {
