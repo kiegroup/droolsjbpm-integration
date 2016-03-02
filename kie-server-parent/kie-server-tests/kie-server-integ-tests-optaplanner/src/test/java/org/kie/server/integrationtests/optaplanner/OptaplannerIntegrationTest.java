@@ -25,7 +25,6 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesException;
-import org.kie.server.client.impl.KieServicesClientImpl;
 import org.optaplanner.core.api.domain.solution.Solution;
 
 import java.lang.Thread;
@@ -355,7 +354,7 @@ public class OptaplannerIntegrationTest
 
             Method method = cbgc.getMethod( "createCloudBalance", int.class, int.class );
             problem = (Solution) method.invoke( cbgi, computerListSize, processListSize );
-        } catch ( ReflectiveOperationException e ) {
+        } catch ( Exception e ) {
             e.printStackTrace();
             fail( "Exception trying to create cloud balance unsolved problem.");
         }
