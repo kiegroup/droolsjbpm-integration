@@ -292,7 +292,7 @@ public class KieServerImpl {
         try {
             List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
             for (KieContainerInstanceImpl instance : context.getContainers()) {
-                instance.getResource().setMessages(containerMessages.get(instance.getContainerId()));
+                instance.getResource().setMessages(getMessagesForContainer(instance.getContainerId()));
                 containers.add(instance.getResource());
             }
             KieContainerResourceList cil = new KieContainerResourceList(containers);
@@ -311,7 +311,7 @@ public class KieServerImpl {
                 if( ci.getResource().getScanner() == null ) {
                     ci.getResource().setScanner( getScannerResource( ci ) );
                 }
-                ci.getResource().setMessages(containerMessages.get(id));
+                ci.getResource().setMessages(getMessagesForContainer(id));
                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Info for container " + id, ci.getResource());
             }
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
@@ -481,7 +481,7 @@ public class KieServerImpl {
     }
 
     private ServiceResponse<KieScannerResource> startScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
-        List<Message> messages = containerMessages.get(id);
+        List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             ServiceResponse<KieScannerResource> response = createScanner(id, kci);
@@ -515,7 +515,7 @@ public class KieServerImpl {
     }
 
     private ServiceResponse<KieScannerResource> stopScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
-        List<Message> messages = containerMessages.get(id);
+        List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -540,7 +540,7 @@ public class KieServerImpl {
     }
 
     private ServiceResponse<KieScannerResource> scanNow(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
-        List<Message> messages = containerMessages.get(id);
+        List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             createScanner( id, kci );
@@ -561,7 +561,7 @@ public class KieServerImpl {
     }
 
     private ServiceResponse<KieScannerResource> disposeScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
-        List<Message> messages = containerMessages.get(id);
+        List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
@@ -585,7 +585,7 @@ public class KieServerImpl {
 
     private ServiceResponse<KieScannerResource> createScanner(String id, KieContainerInstanceImpl kci) {
         if (kci.getScanner() == null) {
-            List<Message> messages = containerMessages.get(id);
+            List<Message> messages = getMessagesForContainer(id);
             messages.clear();
             InternalKieScanner scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kci.getKieContainer());
             kci.setScanner(scanner);
@@ -620,7 +620,7 @@ public class KieServerImpl {
             logger.error("Error updating releaseId for container '" + id + "'. ReleaseId is null.");
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ". ReleaseId is null. ");
         }
-        List<Message> messages = containerMessages.get(id);
+        List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         try {
             KieContainerInstanceImpl kci = context.getContainer(id);
@@ -645,7 +645,16 @@ public class KieServerImpl {
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
                 }
             } else {
-                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
+                // no container yet, attempt to create it
+                KieContainerResource containerResource = new KieContainerResource(id, releaseId, KieContainerStatus.STARTED);
+
+                ServiceResponse<KieContainerResource> response = createContainer(id, containerResource);
+                if (response.getType().equals(ResponseType.SUCCESS)) {
+                    kci = context.getContainer(id);
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
+                } else {
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
+                }
             }
         } catch (Exception e) {
             if (messages != null) {
@@ -724,6 +733,17 @@ public class KieServerImpl {
                 .append(new Date());
 
         serverMessages.add(new Message(Severity.INFO, serverInfoMsg.toString()));
+    }
+
+    protected List<Message> getMessagesForContainer(String containerId) {
+        List<Message> messages = containerMessages.get(containerId);
+
+        if (messages == null) {
+            messages = new CopyOnWriteArrayList<Message>();
+            containerMessages.put(containerId, messages);
+        }
+
+        return messages;
     }
 
     @Override

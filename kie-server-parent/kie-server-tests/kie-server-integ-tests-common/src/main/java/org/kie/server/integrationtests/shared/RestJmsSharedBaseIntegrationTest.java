@@ -78,6 +78,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
 
         configuration.setMarshallingFormat(marshallingFormat);
         configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+        configuration.setTimeout(10000000);
         additionalConfiguration(configuration);
 
         if(extraClasses.size() > 0) {
