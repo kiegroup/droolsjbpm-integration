@@ -371,7 +371,6 @@
                     <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                     <tmp.directory>${project.build.directory}</tmp.directory>
-                    <bitronix.tm.configuration>${project.build.testOutputDirectory}/btm-config.properties</bitronix.tm.configuration>
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
@@ -484,7 +483,6 @@
                     <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                     <tmp.directory>${project.build.directory}</tmp.directory>
-                    <bitronix.tm.configuration>${project.build.testOutputDirectory}/btm-config.properties</bitronix.tm.configuration>
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
