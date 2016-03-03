@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 public class KieServerInstanceManager {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerInstanceManager.class);
+    private static final String CONTAINERS_URI_PART = "/containers/";
 
     private static KieServerInstanceManager INSTANCE = new KieServerInstanceManager();
 
@@ -47,7 +48,7 @@ public class KieServerInstanceManager {
         return INSTANCE;
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> startScanner(ServerTemplate serverTemplate, final ContainerSpec containerSpec, final long interval) {
+    public List<Container> startScanner(ServerTemplate serverTemplate, final ContainerSpec containerSpec, final long interval) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -67,7 +68,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> stopScanner(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> stopScanner(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -88,7 +89,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> scanNow(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> scanNow(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -108,7 +109,7 @@ public class KieServerInstanceManager {
     }
 
 
-    public List<org.kie.server.controller.api.model.runtime.Container> startContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> startContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -127,7 +128,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> stopContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> stopContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -143,7 +144,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> upgradeContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> upgradeContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -159,7 +160,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> getContainers(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public List<Container> getContainers(final ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -185,9 +186,9 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<org.kie.server.controller.api.model.runtime.Container> getContainers(ServerInstanceKey serverInstanceKey) {
+    public List<Container> getContainers(ServerInstanceKey serverInstanceKey) {
 
-        List<org.kie.server.controller.api.model.runtime.Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
+        List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
         if (serverInstanceKey == null || serverInstanceKey.getUrl() == null) {
 
             return containers;
@@ -206,7 +207,7 @@ public class KieServerInstanceManager {
                     container.setContainerSpecId(containerResource.getContainerId());
                     container.setContainerName(containerResource.getContainerId());
                     container.setServerInstanceId(serverInstanceKey.getServerInstanceId());
-                    container.setUrl(serverInstanceKey.getUrl() + "/containers/" + containerResource.getContainerId());
+                    container.setUrl(serverInstanceKey.getUrl() + CONTAINERS_URI_PART + containerResource.getContainerId());
                     container.setResolvedReleasedId(containerResource.getResolvedReleaseId() == null ? containerResource.getReleaseId():containerResource.getResolvedReleaseId());
                     container.setServerTemplateId(serverInstanceKey.getServerTemplateId());
                     container.setStatus(containerResource.getStatus());
@@ -227,8 +228,8 @@ public class KieServerInstanceManager {
      * helper methods
      */
 
-    protected List<org.kie.server.controller.api.model.runtime.Container> callRemoteKieServerOperation(ServerTemplate serverTemplate, ContainerSpec containerSpec, RemoteKieServerOperation operation) {
-        List<org.kie.server.controller.api.model.runtime.Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
+    protected List<Container> callRemoteKieServerOperation(ServerTemplate serverTemplate, ContainerSpec containerSpec, RemoteKieServerOperation operation) {
+        List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
 
         if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty()) {
 
