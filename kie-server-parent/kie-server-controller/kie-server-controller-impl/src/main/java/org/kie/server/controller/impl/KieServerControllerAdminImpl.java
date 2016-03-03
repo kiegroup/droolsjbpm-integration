@@ -17,6 +17,7 @@ package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.RuleConfig;
+import org.kie.server.controller.api.model.spec.ServerConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
@@ -62,23 +64,23 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             throw new KieServerControllerException("KieServerInstance is already registered with id: " + kieServerInfo.getServerId());
         }
         // kie server instance is just for backward compatibility
-        KieServerInstance kieServerInstance = new KieServerInstance();
-        kieServerInstance.setIdentifier(kieServerInfo.getServerId());
-        kieServerInstance.setVersion(kieServerInfo.getVersion());
-        kieServerInstance.setName(kieServerInfo.getName());
-        kieServerInstance.setKieServerSetup(new KieServerSetup());
-        kieServerInstance.setStatus(KieServerStatus.UP);
-        kieServerInstance.setManagedInstances(new HashSet<KieServerInstanceInfo>());
+        KieServerInstance kieServerInstance = new KieServerInstance(kieServerInfo.getServerId(),
+                kieServerInfo.getName(),
+                kieServerInfo.getVersion(),
+                new HashSet<KieServerInstanceInfo>(),
+                KieServerStatus.UP,
+                new KieServerSetup());
 
         if (kieServerInfo.getLocation() != null && !kieServerInfo.getLocation().isEmpty()) {
             KieServerInstanceInfo instanceInfo = new KieServerInstanceInfo(kieServerInfo.getLocation(), KieServerStatus.UP, kieServerInfo.getCapabilities());
             kieServerInstance.getManagedInstances().add(instanceInfo);
         }
         // persist the configuration in based on server templates
-        serverTemplate = new ServerTemplate();
-        serverTemplate.setId(kieServerInfo.getServerId());
-        serverTemplate.setName(kieServerInfo.getName());
-        serverTemplate.setCapabilities(kieServerInfo.getCapabilities());
+        serverTemplate = new ServerTemplate(kieServerInfo.getServerId(),
+                kieServerInfo.getName(),
+                kieServerInfo.getCapabilities(),
+                new HashMap<Capability, ServerConfig>(),
+                new ArrayList<ContainerSpec>());
 
         if (kieServerInfo.getLocation() != null && !kieServerInfo.getLocation().isEmpty()) {
             serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getLocation()));
@@ -139,12 +141,12 @@ public abstract class KieServerControllerAdminImpl implements KieServerControlle
             throw new KieServerControllerException("KieContainer already exists with id: " + id);
         }
 
-        containerSpec = new ContainerSpec();
-        containerSpec.setStatus(KieContainerStatus.STOPPED);
-        containerSpec.setId(container.getContainerId());
-        containerSpec.setReleasedId(container.getReleaseId());
-        containerSpec.setServerTemplateKey(serverTemplate);
-        containerSpec.setContainerName(container.getContainerId());
+        containerSpec = new ContainerSpec(container.getContainerId(),
+                container.getContainerId(),
+                serverTemplate,
+                container.getReleaseId(),
+                KieContainerStatus.STOPPED,
+                new HashMap<Capability, ContainerConfig>());
 
         if (container.getScanner() != null) {
             RuleConfig ruleConfig = new RuleConfig();
