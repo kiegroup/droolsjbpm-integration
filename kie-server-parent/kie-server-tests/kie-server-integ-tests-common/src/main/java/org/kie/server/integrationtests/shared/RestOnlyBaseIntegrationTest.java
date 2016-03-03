@@ -48,6 +48,7 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
             config = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
         }
         config.setMarshallingFormat(marshallingFormat);
+        additionalConfiguration(config);
         return KieServicesFactory.newKieServicesClient(config);
     }
 
@@ -64,4 +65,10 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
         }
     }
 
+    /**
+     * Additional configuration of KieServicesConfiguration like timeout and such.
+     *
+     * @param configuration Kie server configuration to be configured.
+     */
+    protected void additionalConfiguration(KieServicesConfiguration configuration) {}
 }

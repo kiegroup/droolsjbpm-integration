@@ -19,36 +19,21 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesException;
-import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.client.UIServicesClient;
-import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
 
 import static org.junit.Assert.*;
 
-public class FormServiceIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
     private static final String CONTAINER_ID = "definition-project";
-
     private static final String HIRING_PROCESS_ID = "hiring";
-
-    private UIServicesClient uiServicesClient;
-    private ProcessServicesClient processClient;
-    private UserTaskServicesClient userTaskClient;
-
-    @ClassRule
-    public static ExternalResource StaticResource = new DBExternalResource();
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -58,40 +43,23 @@ public class FormServiceIntegrationTest extends RestJmsSharedBaseIntegrationTest
 
     }
 
-    @Override
-    protected KieServicesClient createDefaultClient() throws Exception {
-        KieServicesClient servicesClient = super.createDefaultClient();
-
-        uiServicesClient = servicesClient.getServicesClient(UIServicesClient.class);
-        processClient = servicesClient.getServicesClient(ProcessServicesClient.class);
-        userTaskClient = servicesClient.getServicesClient(UserTaskServicesClient.class);
-
-        return servicesClient;
-    }
-
-    @Before
-    public void cleanup() {
-        cleanupSingletonSessionId();
-
-    }
-
     @Test
     public void testGetProcessFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
         String result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_PROCESS_ID, "en");
         logger.debug("Form content is '{}'", result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
-
     }
 
     @Test(expected = KieServicesException.class)
     public void testGetProcessNotExistingFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-        uiServicesClient.getProcessForm(CONTAINER_ID, "not-existing", "en");
 
+        uiServicesClient.getProcessForm(CONTAINER_ID, "not-existing", "en");
     }
 
     @Test
@@ -99,11 +67,10 @@ public class FormServiceIntegrationTest extends RestJmsSharedBaseIntegrationTest
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
-
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {
-            List<TaskSummary> tasks = userTaskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
 
@@ -116,14 +83,13 @@ public class FormServiceIntegrationTest extends RestJmsSharedBaseIntegrationTest
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
-
     }
 
     @Test(expected = KieServicesException.class)
     public void testGetTaskNotExistingFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
-        uiServicesClient.getTaskForm(CONTAINER_ID, 9999l, "en");
 
+        uiServicesClient.getTaskForm(CONTAINER_ID, 9999l, "en");
     }
 }
