@@ -64,7 +64,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
     @Override
     public KieServerSetup connect(KieServerInfo serverInfo) {
 
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
+        ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
         KieServerSetup serverSetup = new KieServerSetup();
         ServerInstanceKey serverInstanceKey = ModelFactory.newServerInstanceKey(serverInfo.getServerId(), serverInfo.getLocation());
         List<Container> containerList = new ArrayList<Container>();
@@ -106,28 +106,28 @@ public abstract class KieServerControllerImpl implements KieServerController {
                     ProcessConfig processConfig = (ProcessConfig) containerConfig;
 
                     KieServerConfigItem configItem = new KieServerConfigItem();
-                    configItem.setType("BPM");
+                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
                     configItem.setName("KBase");
                     configItem.setValue(processConfig.getKBase());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
-                    configItem.setType("BPM");
+                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
                     configItem.setName("KSession");
                     configItem.setValue(processConfig.getKSession());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
-                    configItem.setType("BPM");
+                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
                     configItem.setName("MergeMode");
                     configItem.setValue(processConfig.getMergeMode());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
-                    configItem.setType("BPM");
+                    configItem.setType(KieServerConstants.CAPABILITY_BPM);
                     configItem.setName("RuntimeStrategy");
                     configItem.setValue(processConfig.getRuntimeStrategy());
 
@@ -205,7 +205,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
     @Override
     public void disconnect(KieServerInfo serverInfo) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
+        ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
         if (serverTemplate != null) {
             logger.debug("Server id {} known to the controller, checking if given server exists", serverInfo.getServerId());
 

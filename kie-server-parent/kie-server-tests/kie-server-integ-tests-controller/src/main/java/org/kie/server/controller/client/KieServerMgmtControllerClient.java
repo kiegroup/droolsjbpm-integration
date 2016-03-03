@@ -54,6 +54,16 @@ public class KieServerMgmtControllerClient {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerMgmtControllerClient.class);
 
+    private static final String MANAGEMENT_LAST_URI_PART = "/management/servers";
+    private static final String CONTAINERS_LAST_URI_PART = "/containers";
+
+    private static final String MANAGEMENT_URI_PART = MANAGEMENT_LAST_URI_PART + "/";
+    private static final String CONTAINERS_URI_PART = CONTAINERS_LAST_URI_PART + "/";
+
+    private static final String STARTED_STATUS_URI_PART = "/status/started";
+    private static final String STOPPED_STATUS_URI_PART = "/status/stopped";
+    private static final String CONFIG_URI_PART = "/config/";
+
     private ClientExecutor executor;
     private String controllerBaseUrl;
     private MarshallingFormat format = MarshallingFormat.JAXB;
@@ -84,27 +94,27 @@ public class KieServerMgmtControllerClient {
     }
 
     public ServerTemplate getServerTemplate(String serverTemplateId) {
-        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplateId, ServerTemplate.class);
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId, ServerTemplate.class);
     }
 
     public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
-        makePutRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplateId + "/containers/" +containerSpec.getId(), containerSpec, Object.class);
+        makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART +containerSpec.getId(), containerSpec, Object.class);
     }
 
     public void saveServerTemplate(ServerTemplate serverTemplate) {
-        makePutRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplate.getId(), serverTemplate, Object.class);
+        makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplate.getId(), serverTemplate, Object.class);
     }
 
     public void deleteServerTemplate(String serverTemplateId) {
-        makeDeleteRequest(controllerBaseUrl + "/management/servers/" + serverTemplateId);
+        makeDeleteRequest(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId);
     }
 
     public void deleteContainerSpec(String serverTemplateId, String containerId) {
-        makeDeleteRequest(controllerBaseUrl + "/management/servers/" + serverTemplateId + "/containers/" + containerId);
+        makeDeleteRequest(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId);
     }
 
     public Collection<ServerTemplate> listServerTemplates() {
-        ServerTemplateList serverTemplateList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers", ServerTemplateList.class);
+        ServerTemplateList serverTemplateList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_LAST_URI_PART, ServerTemplateList.class);
         if (serverTemplateList != null && serverTemplateList.getServerTemplates() != null) {
             return Arrays.asList(serverTemplateList.getServerTemplates());
         }
@@ -113,7 +123,7 @@ public class KieServerMgmtControllerClient {
     }
 
     public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
-        ContainerSpecList containerSpecList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers" + serverTemplateId + "/containers", ContainerSpecList.class);
+        ContainerSpecList containerSpecList = makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_LAST_URI_PART, ContainerSpecList.class);
         if (containerSpecList != null && containerSpecList.getContainerSpecs() != null) {
             return Arrays.asList(containerSpecList.getContainerSpecs());
         }
@@ -122,15 +132,15 @@ public class KieServerMgmtControllerClient {
     }
 
     public void startContainer(String serverTemplateId, String containerId) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplateId + "/containers/" + containerId + "/status/started", "", null);
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + STARTED_STATUS_URI_PART, "", null);
     }
 
     public void stopContainer(String serverTemplateId, String containerId) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplateId + "/containers/" + containerId + "/status/stopped", "", null);
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + STOPPED_STATUS_URI_PART, "", null);
     }
 
     public void updateContainerConfig(String serverTemplateId, String containerId, Capability capability, ContainerConfig config) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + "/management/servers/" + serverTemplateId + "/containers/" + containerId + "/config/" + capability.toString(), config, Object.class);
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId + CONFIG_URI_PART + capability.toString(), config, Object.class);
     }
 
 

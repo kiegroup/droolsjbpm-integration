@@ -34,6 +34,18 @@ public class KieServerInstance {
     private KieServerStatus status;
     private KieServerSetup kieServerSetup;
 
+    public KieServerInstance() {
+    }
+
+    public KieServerInstance(String identifier, String name, String version, Set<KieServerInstanceInfo> managedInstances, KieServerStatus status, KieServerSetup kieServerSetup) {
+        this.identifier = identifier;
+        this.name = name;
+        this.version = version;
+        this.managedInstances = managedInstances;
+        this.status = status;
+        this.kieServerSetup = kieServerSetup;
+    }
+
     /**
      * Returns unique identifier of the KieServer
      * @return

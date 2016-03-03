@@ -40,9 +40,11 @@ public class InMemoryKieServerTemplateStorage implements KieServerTemplateStorag
 
 
     @Override
-    public synchronized ServerTemplate store(ServerTemplate serverTemplate) {
-        storeKeys.put(serverTemplate.getId(), new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
-        return store.put(serverTemplate.getId(), serverTemplate);
+    public ServerTemplate store(ServerTemplate serverTemplate) {
+        synchronized (store) {
+            storeKeys.put(serverTemplate.getId(), new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
+            return store.put(serverTemplate.getId(), serverTemplate);
+        }
     }
 
     @Override
@@ -66,22 +68,26 @@ public class InMemoryKieServerTemplateStorage implements KieServerTemplateStorag
     }
 
     @Override
-    public synchronized ServerTemplate update(ServerTemplate serverTemplate) {
-
-        delete(serverTemplate.getId());
-        store(serverTemplate);
-
+    public ServerTemplate update(ServerTemplate serverTemplate) {
+        synchronized (store) {
+            delete(serverTemplate.getId());
+            store(serverTemplate);
+        }
         return serverTemplate;
     }
 
     @Override
-    public synchronized ServerTemplate delete(String identifier) {
-        storeKeys.remove(identifier);
-        return store.remove(identifier);
+    public  ServerTemplate delete(String identifier) {
+        synchronized (store) {
+            storeKeys.remove(identifier);
+            return store.remove(identifier);
+        }
     }
 
-    public synchronized void clear() {
-        this.store.clear();
-        this.storeKeys.clear();
+    public  void clear() {
+        synchronized (store) {
+            this.store.clear();
+            this.storeKeys.clear();
+        }
     }
 }
