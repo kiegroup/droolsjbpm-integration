@@ -51,7 +51,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     @Override
     public void saveContainerSpec( String serverTemplateId,
                                    ContainerSpec containerSpec ) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
             throw new KieServerControllerException( "No server template found for id " + serverTemplateId );
         }
@@ -64,7 +64,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void saveServerTemplate( org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate ) {
+    public void saveServerTemplate( ServerTemplate serverTemplate ) {
         if ( templateStorage.exists( serverTemplate.getId() ) ) {
             templateStorage.update( serverTemplate );
         } else {
@@ -76,7 +76,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public org.kie.server.controller.api.model.spec.ServerTemplate getServerTemplate( String serverTemplateId ) {
+    public ServerTemplate getServerTemplate( String serverTemplateId ) {
         return templateStorage.load( serverTemplateId );
     }
 
@@ -86,13 +86,13 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public Collection<org.kie.server.controller.api.model.spec.ServerTemplate> listServerTemplates() {
+    public Collection<ServerTemplate> listServerTemplates() {
         return templateStorage.load();
     }
 
     @Override
     public Collection<ContainerSpec> listContainerSpec( String serverTemplateId ) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
             throw new KieServerControllerException( "No server template found for id " + serverTemplateId );
         }
@@ -103,7 +103,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     @Override
     public void deleteContainerSpec( String serverTemplateId,
                                      String containerSpecId ) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
             throw new KieServerControllerException( "No server template found for id " + serverTemplateId );
         }
@@ -189,7 +189,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
                                        String containerSpecId,
                                        Capability capability,
                                        ContainerConfig containerConfig ) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
             throw new KieServerControllerException( "No server template found for id " + serverTemplateId );
         }
@@ -210,7 +210,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     public void updateServerTemplateConfig( String serverTemplateId,
                                             Capability capability,
                                             ServerConfig serverTemplateConfig ) {
-        org.kie.server.controller.api.model.spec.ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
             throw new KieServerControllerException( "No server template found for id " + serverTemplateId );
         }
