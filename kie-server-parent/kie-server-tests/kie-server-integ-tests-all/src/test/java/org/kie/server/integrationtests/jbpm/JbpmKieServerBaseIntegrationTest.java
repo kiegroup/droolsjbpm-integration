@@ -35,6 +35,7 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
+import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
@@ -62,6 +63,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected QueryServicesClient queryClient;
     protected JobServicesClient jobServicesClient;
     protected RuleServicesClient ruleClient;
+    protected UIServicesClient uiServicesClient;
 
     @BeforeClass
     public static void setupFactory() throws Exception {
@@ -86,6 +88,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         this.queryClient = client.getServicesClient(QueryServicesClient.class);
         this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
         this.ruleClient = client.getServicesClient(RuleServicesClient.class);
+        this.uiServicesClient = client.getServicesClient(UIServicesClient.class);
     }
 
     protected Object createPersonInstance(String name) {
