@@ -26,6 +26,7 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
@@ -107,6 +108,10 @@ public class KieServerMgmtControllerClient {
 
     public void deleteServerTemplate(String serverTemplateId) {
         makeDeleteRequest(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId);
+    }
+
+    public ContainerSpec getContainerInfo(String serverTemplateId, String containerId) {
+        return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, ContainerSpec.class);
     }
 
     public void deleteContainerSpec(String serverTemplateId, String containerId) {
