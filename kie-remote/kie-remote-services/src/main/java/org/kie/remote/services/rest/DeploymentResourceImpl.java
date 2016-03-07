@@ -90,22 +90,6 @@ public class DeploymentResourceImpl extends ResourceBase {
     @POST
     @Path("/deploy")
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
-    public Response deploy() {
-        JaxbDeploymentJobResult jobResult = doDeployOperation(null);
-        return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
-    }
-
-    /**
-     * Queues a request to deploy the given deployment unit. If the deployment already exist, this
-     * operation will fail.
-     *
-     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
-     * the deployment unit should be deployed.
-     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
-     */
-    @POST
-    @Path("/deploy")
-    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
         JaxbDeploymentJobResult jobResult = doDeployOperation(deployDescriptor);
         return createCorrectVariant(jobResult, headers, Status.ACCEPTED);
