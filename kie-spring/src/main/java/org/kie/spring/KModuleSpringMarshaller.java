@@ -28,6 +28,9 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class is being used by {@link org.drools.compiler.kie.builder.impl.ClasspathKieProject } and via reflection.
+ */
 public class KModuleSpringMarshaller {
 
     public static KieModuleModel fromXML(File kModuleFile){
@@ -42,9 +45,9 @@ public class KModuleSpringMarshaller {
         return null;//kieSpringApplicationListener.getKieModuleModel();
     }
 
-    public static KieModuleModel fromXML(java.net.URL kModuleUrl, String fixedPath, ReleaseId releaseId){
+    public static KieModuleModel fromXML(java.net.URL kModuleUrl, ReleaseId releaseId){
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
-        KModuleBeanFactoryPostProcessor beanFactoryPostProcessor = new KModuleBeanFactoryPostProcessor(kModuleUrl, fixedPath, context);
+        KModuleBeanFactoryPostProcessor beanFactoryPostProcessor = new KModuleBeanFactoryPostProcessor(kModuleUrl, context);
         beanFactoryPostProcessor.setReleaseId(releaseId);
         context.addBeanFactoryPostProcessor(beanFactoryPostProcessor);
         context.setConfigLocation(kModuleUrl.toExternalForm());
@@ -53,16 +56,8 @@ public class KModuleSpringMarshaller {
         return null;//kieSpringApplicationListener.getKieModuleModel();
     }
 
-    public static KieModuleModel fromXML(java.net.URL kModuleUrl, ReleaseId releaseId){
-        return fromXML(kModuleUrl, null, releaseId);
-    }
-
-    public static KieModuleModel fromXML(java.net.URL kModuleUrl, String fixedPath){
-        return fromXML(kModuleUrl, fixedPath, null);
-    }
-
     public static KieModuleModel fromXML(java.net.URL kModuleUrl){
-        return fromXML(kModuleUrl, null, null);
+        return fromXML(kModuleUrl, null);
     }
 
     public static KieModuleModel fromXML(String kmoduleXML){
