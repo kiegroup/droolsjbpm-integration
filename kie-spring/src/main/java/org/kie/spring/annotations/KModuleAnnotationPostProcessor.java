@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
 @Component("kieAnnotationPostProcessor")
 public class KModuleAnnotationPostProcessor extends KModuleBeanFactoryPostProcessor {
 
-    private static final Logger log               = LoggerFactory.getLogger(KModuleAnnotationPostProcessor.class);
-
     public KModuleAnnotationPostProcessor() {
     }
 

@@ -32,21 +32,19 @@ public class OsgiKModuleBeanFactoryPostProcessor extends KModuleBeanFactoryPostP
     }
 
     public OsgiKModuleBeanFactoryPostProcessor(URL configFileURL, ApplicationContext context) {
-        super(configFileURL, null, context);
+        super(configFileURL, context);
     }
 
     @Override
-    protected void initConfigFilePath() { }
-
-    @Override
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
-        if (!OsgiKieModule.isOsgiBundleUrl(configFileURL.toString())) {
+        if (!OsgiKieModule.isOsgiBundleUrl(kModuleRootUrl.toString())) {
             return super.createKieModule(kieProject);
         }
-        return OsgiKieModule.create(configFileURL, releaseId, kieProject);
+        return OsgiKieModule.create(kModuleRootUrl, releaseId, kieProject);
     }
 
     public void setRelease(String release) {
         setReleaseId(new ReleaseIdImpl(release));
     }
+
 }

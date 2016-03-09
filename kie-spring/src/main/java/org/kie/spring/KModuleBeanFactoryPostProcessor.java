@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.kie.spring;
 
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
+import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieBaseModelImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
@@ -43,13 +45,10 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
@@ -57,105 +56,71 @@ import java.util.Map;
 @Component("kiePostProcessor")
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
 
-    private static final Logger log            = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
 
-    private static final String WEB_INF_FOLDER =  "WEB-INF" + File.separator + "classes" + File.separator;
-
-    protected URL configFileURL;
+    private static final String WEB_INF_CLASSES_FOLDER = "WEB-INF" + File.separator + "classes" + File.separator;
+    /**
+     * Root URL of the KieModule which is associated with the Spring app context.
+     *
+     * After transforming the URL to a filesystem path it is used as base dir for the KieModule.
+     *
+     * Example: "file:/some-path/target/test-classes".
+     */
+    protected URL kModuleRootUrl;
     protected ReleaseId releaseId;
-
-    private String configFilePath;
     private ApplicationContext context;
 
     public KModuleBeanFactoryPostProcessor() {
-        initConfigFilePath();
     }
 
-    public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath, ApplicationContext context) {
-        this.configFileURL = configFileURL;
-        this.configFilePath = configFilePath;
+    public KModuleBeanFactoryPostProcessor(URL kModuleRootUrl,ApplicationContext context) {
+        this.kModuleRootUrl = kModuleRootUrl;
         this.context = context;
     }
 
-    public KModuleBeanFactoryPostProcessor(URL configFileURL, String configFilePath) {
-        this.configFileURL = configFileURL;
-        this.configFilePath = configFilePath;
-    }
-
-    protected void initConfigFilePath() {
-        try {
-            configFilePath = getClass().getResource("/").toURI().getPath();
-        } catch (URISyntaxException e) {
-            configFilePath = getClass().getResource("/").getPath();
-        }
+    public KModuleBeanFactoryPostProcessor(URL kModuleRootUrl) {
+        this.kModuleRootUrl = kModuleRootUrl;
     }
 
     public void setReleaseId(ReleaseId releaseId) {
         this.releaseId = releaseId;
     }
 
+    @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         log.info(":: BeanFactoryPostProcessor::postProcessBeanFactory called ::");
-        if ( releaseId == null && configFilePath != null) {
-            fixConfigFilePathForVfs();
+        String kModuleRootPath = parseKModuleRootPath(kModuleRootUrl);
+        if (releaseId == null && kModuleRootPath != null) {
             String pomProperties = null;
-            if ( configFilePath.endsWith(WEB_INF_FOLDER)){
-                String configFilePathForWebApps = configFilePath.substring(0, configFilePath.indexOf(WEB_INF_FOLDER));
+            if (kModuleRootPath.endsWith(WEB_INF_CLASSES_FOLDER)) {
+                String configFilePathForWebApps = kModuleRootPath.substring(0, kModuleRootPath.indexOf(WEB_INF_CLASSES_FOLDER));
                 pomProperties = ClasspathKieProject.getPomProperties(configFilePathForWebApps);
             }
             if (pomProperties == null) {
-                pomProperties = ClasspathKieProject.getPomProperties(configFilePath);
+                pomProperties = ClasspathKieProject.getPomProperties(kModuleRootPath);
             }
             if (pomProperties != null) {
                 releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
             } else {
-                releaseId = new ReleaseIdImpl("org.default", "artifact","1.0.0-SNAPSHOT");
+                releaseId = KieRepositoryImpl.INSTANCE.getDefaultReleaseId();
             }
             log.info("Found project with releaseId: " + releaseId);
         }
+        if (releaseId == null) {
+            releaseId = KieRepositoryImpl.INSTANCE.getDefaultReleaseId();
+        }
 
-        for (String beanDef : beanFactory.getBeanDefinitionNames()){
+        for (String beanDef : beanFactory.getBeanDefinitionNames()) {
             BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanDef);
-            if ( beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KModuleFactoryBean.class.getName())){
+            if (beanDefinition.getBeanClassName() != null && beanDefinition.getBeanClassName().equalsIgnoreCase(KModuleFactoryBean.class.getName())) {
                 KieModuleModel kieModuleModel = fetchKieModuleModel(beanFactory);
                 addKieModuleToRepo(kieModuleModel);
             }
         }
     }
 
-    private void fixConfigFilePathForVfs() {
-        if (configFileURL != null && configFileURL.toExternalForm().startsWith("vfs:")) {
-            String contextPath = ClasspathKieProject.fixURLFromKProjectPath(configFileURL);
-            File contextFile = new File(contextPath);
-            if (contextFile.exists()) {
-                // the spring context file is 2 folders under the temp folder where the war is unzipped
-                contextFile = contextFile.getParentFile().getParentFile();
-                File mavenFolder = recurseToMavenFolder(contextFile);
-                if (mavenFolder != null) {
-                    // remove /META-INF/maven since drools pom.properties lookup adds it back
-                    configFilePath = mavenFolder.getParentFile().getParent();
-                } else {
-                    configFilePath = contextFile.getAbsolutePath();
-                }
-            }
-        }
-    }
-
-    private File recurseToMavenFolder(File file) {
-        if( file.isDirectory() ) {
-            for ( java.io.File child : file.listFiles() ) {
-                if ( child.isDirectory() ) {
-                    if ( child.getName().endsWith( "maven" ) ) {
-                        return child;
-                    }
-                    File returnedFile = recurseToMavenFolder( child );
-                    if ( returnedFile != null ) {
-                        return returnedFile;
-                    }
-                }
-            }
-        }
-        return null;
+    private String parseKModuleRootPath(URL kModuleRootUrl) {
+        return ClasspathKieProject.fixURLFromKProjectPath(kModuleRootUrl);
     }
 
     private void addKieModuleToRepo(KieModuleModel kieProject) {
@@ -165,41 +130,18 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
         if ( kJar != null ) {
             KieServices ks = KieServices.Factory.get();
-            log.info("adding KieModule from " + configFileURL.toExternalForm() + " to repository.");
+            log.info("Adding KieModule from " + parseKModuleRootPath(kModuleRootUrl) + " to repository.");
             ks.getRepository().addKieModule(kJar);
         }
     }
 
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
-        if (configFileURL.toString().startsWith("bundle:") || configFileURL.toString().startsWith("bundleresource:")) {
-            return createOsgiKModule(kieProject);
+        String rootPath = parseKModuleRootPath(kModuleRootUrl);
+        if (rootPath.lastIndexOf(':') > 0) {
+            rootPath = rootPath.substring(rootPath.lastIndexOf(':') + 1);
         }
-
-        if ( configFilePath == null) {
-            configFilePath = getClass().getResource("/").getPath();
-        }
-
-        String rootPath = configFilePath;
-        if ( rootPath.lastIndexOf( ':' ) > 0 ) {
-            rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
-        }
-
-        return ClasspathKieProject.createInternalKieModule(configFileURL, configFilePath, kieProject, releaseId, rootPath);
-    }
-
-    private InternalKieModule createOsgiKModule(KieModuleModel kieProject) {
-        Method m;
-        try {
-            Class<?> c = Class.forName(ClasspathKieProject.OSGI_KIE_MODULE_CLASS_NAME, true, KieBuilderImpl.class.getClassLoader());
-            m = c.getMethod("create", URL.class, ReleaseId.class, KieModuleModel.class);
-        } catch (Exception e) {
-            throw new RuntimeException("It is necessary to have the drools-osgi-integration module on the path in order to create a KieProject from an ogsi bundle", e);
-        }
-        try {
-            return (InternalKieModule) m.invoke(null, configFileURL, releaseId, kieProject);
-        } catch (Exception e) {
-            throw new RuntimeException("Failure creating a OsgiKieModule caused by: " + e.getMessage(), e);
-        }
+        // TODO passing NULLs is bad, but those two first params are not used anyway. They need to be removed from the method.
+        return ClasspathKieProject.createInternalKieModule(null, null, kieProject, releaseId, rootPath);
     }
 
     private KieModuleModel fetchKieModuleModel(ConfigurableListableBeanFactory beanFactory) {
@@ -313,52 +255,63 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
         try {
-            if (isEapContext(applicationContext)) {
-                Enumeration<URL> urls = getClass().getClassLoader().getResources("/");
-                while (urls.hasMoreElements()) {
-                    URL url = urls.nextElement();
-                    if (url.toString().endsWith("WEB-INF/classes/")) {
-                        configFileURL = url;
-                        break;
-                    }
-                }
-            } else if (applicationContext instanceof AbstractRefreshableConfigApplicationContext ) {
-                try {
-                    // The getConfigLocations is protected in spring version currently in use, but
-                    // will be public in newer versions. Try to use it via reflection for now
-                    Method m = AbstractRefreshableConfigApplicationContext.class.getDeclaredMethod( "getConfigLocations" );
-                    m.setAccessible( true );
-                    String[] locations = (String[])m.invoke( applicationContext );
-                    configFileURL = applicationContext.getResource(locations[0]).getURL();
-                } catch (Exception e) {
-                    configFileURL = applicationContext.getResource("classpath:/").getURL();
-                }
-            } else {
-                configFileURL = applicationContext.getResource("classpath:/").getURL();
+            kModuleRootUrl = tryGetRootUrlForEapContext(applicationContext);
+            // in case the kModuleRootUrl is still null at this point, the assumption is we are not running on EAP
+            // so we just get the url from the classpath
+            if (kModuleRootUrl == null) {
+                kModuleRootUrl = applicationContext.getResource("classpath:/").getURL();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error while trying to get root URL for the application context " +
+                    applicationContext.getDisplayName(), e);
         }
-
-        log.info("classpath root URL: " + configFileURL);
+        log.debug("KieModule root URL (based on application context {}): {}", applicationContext.getDisplayName(), kModuleRootUrl);
     }
 
-    private boolean isEapContext(ApplicationContext applicationContext) throws IOException {
-        URL url = applicationContext.getResource("classpath:/").getURL();
-        if (isEapUrl(url)) {
-            return true;
-        } else {
-            Enumeration<URL> urls = getClass().getClassLoader().getResources("/");
-            while (urls.hasMoreElements()) {
-                if (isEapUrl(urls.nextElement())) {
-                    return true;
+    /**
+     * This is a HACK for web applications deployed to EAP/WildFly which are using kie-spring.
+     *
+     * The method tries to figure out the root URL based on the provided app context. It covers (at least) the
+     * following two use cases:
+     *   1) kie-spring deployed together (bundled) with Spring webapp (inside WEB-INF/lib)
+     *   2) kie-spring deployed as EAP module + Spring webapp depending on that module
+     *
+     * First of all it tries to determine if it is running on EAP, based on EAP specific resource URL. If that is the
+     * case it looks for the "WEB-INF/classes" dir and return that as an VFS URL (vfs:/...). Later on this URL
+     * needs to be translated to a real filesystem path. This is one by {@link ClasspathKieProject#fixURLFromKProjectPath(URL)}
+     *
+     * @param applicationContext Spring app context used by the application
+     * @return NULL is case the code is not running on EAP, otherwise root URL of the webapp context (that is webapp's WEB-INF/classes)
+     * @throws IOException in case of I/O error when gathering resources from app context's classloader
+     */
+    private URL tryGetRootUrlForEapContext(ApplicationContext applicationContext) throws IOException {
+        Enumeration<URL> rootUrls = applicationContext.getClassLoader().getResources("/");
+        if (containsEapSpecificUrl(rootUrls)) {
+            while (rootUrls.hasMoreElements()) {
+                URL url = rootUrls.nextElement();
+                if (url.toString().endsWith(WEB_INF_CLASSES_FOLDER)) {
+                    return url;
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check if the provided URL enumeration contains EAP specific URL. The method is used to check if the
+     * code running inside EAP. Yes, this is a very ugly hack, but there does not seem a better way around.
+     *
+     * @param urls enumeration of URLs to check
+     * @return true in case the enumeration contains EAP specific URL, otherwise false
+     */
+    private boolean containsEapSpecificUrl(Enumeration<URL> urls) {
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            if (url.toString().endsWith("service-loader-resources/")) {
+                return true;
             }
         }
         return false;
     }
 
-    private boolean isEapUrl(URL url) {
-        return url.toString().endsWith("service-loader-resources/");
-    }
 }
