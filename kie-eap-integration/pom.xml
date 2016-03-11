@@ -28,11 +28,17 @@
       </snapshots>
     </repository>
   </repositories>
-  
+
+  <properties>
+    <version.fuse.patch>1.6.2</version.fuse.patch>
+  </properties>
+
   <modules>
     <module>kie-jboss-modules-plugin</module>
     <module>kie-eap-modules</module>
+    <module>kie-eap-config</module>
     <module>kie-eap-distributions</module>
+    <module>kie-eap-installer</module>
   </modules>
 
   <dependencyManagement>
@@ -42,6 +48,27 @@
         <artifactId>kie-eap-distributions-bpms-layer</artifactId>
         <version>${version.org.kie}</version>
         <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-eap-config</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-eap-distribution</artifactId>
+        <version>${version.org.kie}</version>
+        <type>zip</type>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.extras.patch</groupId>
+        <artifactId>fuse-patch-config</artifactId>
+        <version>${version.fuse.patch}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.extras.patch</groupId>
+        <artifactId>fuse-patch-installer</artifactId>
+        <version>${version.fuse.patch}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

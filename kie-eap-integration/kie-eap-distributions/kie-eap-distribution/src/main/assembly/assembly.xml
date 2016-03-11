@@ -30,6 +30,7 @@
     <componentDescriptor>src/main/resources/org/springframework/web/assembly-component.xml</componentDescriptor>
     <componentDescriptor>src/main/resources/org/springframework/tx/assembly-component.xml</componentDescriptor>
     <componentDescriptor>src/main/resources/org/kie/spring/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>src/main/resources/org/wildfly/extras/config/plugin/bpms/assembly-component.xml</componentDescriptor>
   </componentDescriptors>
 
   <dependencySets>

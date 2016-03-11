@@ -83,5 +83,9 @@
       <artifactId>kie-eap-distributions-bpms-layer</artifactId>
       <type>zip</type>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-eap-config</artifactId>
+    </dependency>
   </dependencies>
 </project>

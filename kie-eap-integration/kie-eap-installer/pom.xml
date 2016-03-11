@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-eap-integration</artifactId>
+    <version>6.4.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kie-eap-installer</artifactId>
+  <name>KIE EAP - Installer</name>
+
+  <properties>
+    <!-- Installer needs to be Java 7+, because of transitive dependency org.wildfly.extras.patch: fuse-patch-installer
+         Ignoring the animal sniffer for now, but the config should be updated to use Java 7 APIs.  -->
+    <animal.sniffer.skip>true</animal.sniffer.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-eap-distribution</artifactId>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.extras.patch</groupId>
+      <artifactId>fuse-patch-installer</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-distros</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes/META-INF/repository</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.kie</groupId>
+                  <artifactId>kie-eap-distribution</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-eap-installer</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+              <includes>org/wildfly/extras/patch/installer/*.class</includes>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.wildfly.extras.patch</groupId>
+                  <artifactId>fuse-patch-installer</artifactId>
+                  <version>${version.fuse.patch}</version>
+                  <overWrite>true</overWrite>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.kie.eap.installer.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
