@@ -72,7 +72,7 @@ public class ProcessWithPersistenceBean {
                 .classLoader(this.getClass().getClassLoader())
                 .entityManagerFactory(entityManagerFactory)
                 .persistence(true)
-                 // the default MVELUserGroupCallback does not work due to NCDFError, see the error in debugger - BZ TO-DO
+                 // the default MVELUserGroupCallback does not work due to NCDFError, see the error in debugger - BZ 1316974
                 .userGroupCallback(new JBossUserGroupCallbackImpl(new Properties()))
                 .addEnvironmentEntry(EnvironmentName.ENTITY_MANAGER_FACTORY, entityManagerFactory)
                 .addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, transactionManager)
