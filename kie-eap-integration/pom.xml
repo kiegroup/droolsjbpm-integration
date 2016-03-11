@@ -73,8 +73,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <!-- maven-enforcer-plugin disabled because build fails when having enforce-plugin-versions rule enabled
-       this has to be fixed, since kie-eap-integration has a lot of different hard coded versions -->
   <build>
     <plugins>
       <plugin>
@@ -90,9 +88,19 @@
               <skip>true</skip>
             </configuration>
           </execution>
+          <!-- EAP base modules have lot's of hardcoded versions, this needs to be fixed eventually. -->
+          <execution>
+            <id>no-managed-deps</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-  
 </project>

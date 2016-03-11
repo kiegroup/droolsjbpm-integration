@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>kie-eap-distribution</artifactId>
-  <name>KIE EAP distribution</name>
+  <name>KIE EAP - Distribution</name>
 
   <build>
     <plugins>
