@@ -1,0 +1,8 @@
+package blueprint_process_persistence
+
+rule "rule 1"
+ruleflow-group "approval"
+when
+then
+    System.out.println("Business rule task rule fired.");
+end
