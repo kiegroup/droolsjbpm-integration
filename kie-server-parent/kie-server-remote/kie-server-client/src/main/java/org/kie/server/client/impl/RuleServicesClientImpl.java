@@ -51,7 +51,7 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
     @Override
     public ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, String payload) {
         if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateServiceResponse( baseURI + "/containers/instances/" + id, payload, (Class) ExecutionResultImpl.class);
+            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/instances/" + id, payload, (Class) ExecutionResultImpl.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList((KieServerCommand) new CallContainerCommand(id, payload)) );
             ServiceResponse response = executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
@@ -67,7 +67,7 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
     @Override
     public ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd) {
         if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateServiceResponse( baseURI + "/containers/instances/" + id, cmd, (Class)ExecutionResultImpl.class, getHeaders(cmd) );
+            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/instances/" + id, cmd, (Class)ExecutionResultImpl.class, getHeaders(cmd) );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
             ServiceResponse response = executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );
@@ -87,7 +87,7 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
     @Override
     public ServiceResponse<String> executeCommands(String id, String payload) {
         if( config.isRest() ) {
-            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, payload, String.class);
+            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/instances/" + id, payload, String.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList((KieServerCommand) new CallContainerCommand(id, payload)) );
             return (ServiceResponse<String>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
@@ -102,7 +102,7 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
     @Override
     public ServiceResponse<String> executeCommands(String id, Command<?> cmd) {
         if( config.isRest() ) {
-            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd));
+            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd) );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
             return (ServiceResponse<String>) executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );

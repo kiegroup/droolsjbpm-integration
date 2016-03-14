@@ -50,7 +50,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             valuesMap.put(RestURI.PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(baseURI, FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?lang=" + language);
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?lang=" + language);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -70,7 +70,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(baseURI, FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?lang=" + language);
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?lang=" + language);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -93,7 +93,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             headers.put("Accept", MediaType.APPLICATION_SVG_XML);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(baseURI, IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap), headers);
+                    build(loadBalancer.getUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap), headers);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -116,7 +116,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             headers.put("Accept", MediaType.APPLICATION_SVG_XML);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(baseURI, IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap), headers);
+                    build(loadBalancer.getUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap), headers);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(

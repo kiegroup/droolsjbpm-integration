@@ -15,9 +15,16 @@
 
 package org.kie.server.client.impl;
 
+import java.util.Collections;
+
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.optaplanner.*;
+import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
+import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -27,7 +34,6 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.SolverServicesClient;
 
-import java.util.Collections;
 
 public class SolverServicesClientImpl
         extends AbstractKieServicesClientImpl
@@ -144,11 +150,11 @@ public class SolverServicesClientImpl
     }
 
     private String getURI(String containerId) {
-        return (baseURI + "/" + RestURI.SOLVER_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId );
+        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId );
     }
 
     private String getURI(String containerId, String solverId) {
-        return (baseURI + "/" + RestURI.SOLVER_URI + RestURI.SOLVER_ID_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId ).replace( "{" + RestURI.SOLVER_ID + "}", solverId );
+        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI + RestURI.SOLVER_ID_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId ).replace( "{" + RestURI.SOLVER_ID + "}", solverId );
     }
 
     private void checkMandatoryParameter(String parameterName, Object parameter) {

@@ -19,6 +19,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
 
 import javax.jms.ConnectionFactory;
@@ -65,6 +66,8 @@ public final class KieServicesConfigurationImpl
     private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
 
     private CredentialsProvider credentialsProvider;
+    private LoadBalancer loadBalancer;
+
     /*
      * Public constructors and setters
      */
@@ -379,6 +382,16 @@ public final class KieServicesConfigurationImpl
     @Override
     public CredentialsProvider getCredentialsProvider() {
         return credentialsProvider;
+    }
+
+    @Override
+    public void setLoadBalancer(LoadBalancer loadBalancer) {
+        this.loadBalancer = loadBalancer;
+    }
+
+    @Override
+    public LoadBalancer getLoadBalancer() {
+        return this.loadBalancer;
     }
 
     // Clone ---

@@ -29,8 +29,6 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
-import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
@@ -89,7 +87,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + getUserQueryStr(userId),
                     params, String.class, getHeaders(null));
         } else {
 
@@ -118,7 +116,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             queryString.append("auto-progress=true");
             
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + queryString.toString(),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMPLETE_PUT_URI, valuesMap) + queryString.toString(),
                     params, String.class, getHeaders(null));
         } else {
 
@@ -165,7 +163,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_FAIL_PUT_URI, valuesMap) + getUserQueryStr(userId),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_FAIL_PUT_URI, valuesMap) + getUserQueryStr(userId),
                     params, String.class, getHeaders(null));
 
         } else {
@@ -290,7 +288,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_PRIORITY_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_PRIORITY_PUT_URI, valuesMap),
                     priority, String.class, getHeaders(null));
 
         } else {
@@ -310,7 +308,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_EXPIRATION_DATE_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_EXPIRATION_DATE_PUT_URI, valuesMap),
                     serialize(date), String.class, getHeaders(null));
 
         } else {
@@ -330,7 +328,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_SKIPABLE_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_SKIPABLE_PUT_URI, valuesMap),
                     serialize(skipable), String.class, getHeaders(null));
 
         } else {
@@ -350,7 +348,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_NAME_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_NAME_PUT_URI, valuesMap),
                     serialize(name), String.class, getHeaders(null));
 
         } else {
@@ -370,7 +368,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_DESCRIPTION_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_DESCRIPTION_PUT_URI, valuesMap),
                     serialize(description), String.class, getHeaders(null));
 
         } else {
@@ -391,7 +389,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             contentId = makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_PUT_URI, valuesMap),
                     values, Object.class, getHeaders(null));
 
         } else {
@@ -420,7 +418,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             variables = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_GET_URI, valuesMap), Object.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_OUTPUT_DATA_GET_URI, valuesMap), Object.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -447,7 +445,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             variables = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_INPUT_DATA_GET_URI, valuesMap), Object.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_INPUT_DATA_GET_URI, valuesMap), Object.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -474,7 +472,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(CONTENT_ID, contentId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_CONTENT_DATA_DELETE_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_CONTENT_DATA_DELETE_URI, valuesMap),
                     null);
 
         } else {
@@ -501,7 +499,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
 
             commentId = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMMENT_ADD_POST_URI, valuesMap), taskComment, Object.class, getHeaders(taskComment));
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMMENT_ADD_POST_URI, valuesMap), taskComment, Object.class, getHeaders(taskComment));
 
 
         } else {
@@ -530,7 +528,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(COMMENT_ID, commentId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMMENT_DELETE_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMMENT_DELETE_URI, valuesMap),
                     null);
 
         } else {
@@ -550,7 +548,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             commentList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMMENTS_GET_URI, valuesMap), TaskCommentList.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMMENTS_GET_URI, valuesMap), TaskCommentList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -579,7 +577,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(COMMENT_ID, commentId);
 
             taskComment = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_COMMENT_GET_URI, valuesMap), TaskComment.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_COMMENT_GET_URI, valuesMap), TaskComment.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -603,7 +601,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             attachmentId = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserAndAdditionalParam(userId, "name", name),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_ADD_POST_URI, valuesMap) + getUserAndAdditionalParam(userId, "name", name),
                     attachment, Object.class, getHeaders(null));
 
         } else {
@@ -631,7 +629,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_DELETE_URI, valuesMap),
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_DELETE_URI, valuesMap),
                     null);
 
         } else {
@@ -653,7 +651,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
             attachment = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_GET_URI, valuesMap), TaskAttachment.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_GET_URI, valuesMap), TaskAttachment.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -678,7 +676,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(ATTACHMENT_ID, attachmentId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap), Object.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENT_CONTENT_GET_URI, valuesMap), Object.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -706,7 +704,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             attachmentList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_ATTACHMENTS_GET_URI, valuesMap), TaskAttachmentList.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_ATTACHMENTS_GET_URI, valuesMap), TaskAttachmentList.class);
 
 
 
@@ -736,7 +734,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_GET_URI, valuesMap), TaskInstance.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_GET_URI, valuesMap), TaskInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -764,7 +762,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
                     .append("&withAssignments").append("=").append(withAssignments);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, TASK_URI + "/" + TASK_INSTANCE_GET_URI, valuesMap) + queryString.toString(), TaskInstance.class);
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_GET_URI, valuesMap) + queryString.toString(), TaskInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -787,7 +785,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(WORK_ITEM_ID, workItemId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASK_BY_WORK_ITEM_ID_GET_URI, valuesMap), TaskInstance.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_BY_WORK_ITEM_ID_GET_URI, valuesMap), TaskInstance.class);
 
 
         } else {
@@ -807,7 +805,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASK_GET_URI, valuesMap), TaskInstance.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_GET_URI, valuesMap), TaskInstance.class);
 
 
         } else {
@@ -829,7 +827,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
 
         } else {
@@ -861,7 +859,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -889,7 +887,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -918,7 +916,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
 
         } else {
@@ -950,7 +948,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(groupsQuery, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
 
         } else {
@@ -979,7 +977,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -1008,7 +1006,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -1037,7 +1035,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -1065,7 +1063,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getUserAndPagingQueryString(userId, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -1095,7 +1093,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString("", page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
@@ -1127,7 +1125,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
 
         } else {
@@ -1159,7 +1157,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String queryString = getPagingQueryString(statusQuery, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + variableValue, TaskSummaryList.class);
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + variableValue, TaskSummaryList.class);
 
 
 

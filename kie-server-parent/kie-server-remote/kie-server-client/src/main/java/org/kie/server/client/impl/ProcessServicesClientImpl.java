@@ -61,7 +61,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_GET_URI, valuesMap),
                     ProcessDefinition.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "DefinitionService", "getProcessDefinition",  new Object[]{containerId, processId}) ) );
@@ -80,7 +80,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_SUBPROCESS_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_SUBPROCESS_GET_URI, valuesMap),
                     SubProcessesDefinition.class);
 
         } else {
@@ -100,7 +100,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_VARIABLES_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_VARIABLES_GET_URI, valuesMap),
                     VariablesDefinition.class);
 
         } else {
@@ -120,7 +120,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_SERVICE_TASKS_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_SERVICE_TASKS_GET_URI, valuesMap),
                     ServiceTasksDefinition.class);
 
         } else {
@@ -140,7 +140,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_ASSOCIATED_ENTITIES_GET_URI, valuesMap),
                     AssociatedEntitiesDefinition.class);
 
         } else {
@@ -160,7 +160,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASKS_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASKS_GET_URI, valuesMap),
                     UserTaskDefinitionList.class);
 
         } else {
@@ -181,7 +181,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(TASK_NAME, taskName);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_INPUT_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_INPUT_GET_URI, valuesMap),
                     TaskInputsDefinition.class);
 
         } else {
@@ -202,7 +202,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(TASK_NAME, taskName);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_OUTPUT_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_OUTPUT_GET_URI, valuesMap),
                     TaskOutputsDefinition.class);
 
         } else {
@@ -230,7 +230,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_ID, processId);
 
             result = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap), variables,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap), variables,
                     Object.class);
 
         } else {
@@ -265,7 +265,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
             result = makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap), variables,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + START_PROCESS_WITH_CORRELATION_KEY_POST_URI, valuesMap), variables,
                     Object.class);
 
         } else {
@@ -292,7 +292,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap),
                     null);
 
         } else {
@@ -312,7 +312,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(CONTAINER_ID, containerId);
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + ABORT_PROCESS_INSTANCES_DEL_URI, valuesMap) + queryStr,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INSTANCES_DEL_URI, valuesMap) + queryStr,
                     null);
 
         } else {
@@ -338,7 +338,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(VAR_NAME, variableName);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_GET_URI, valuesMap), type);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_GET_URI, valuesMap), type);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -366,7 +366,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             variables = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_VARS_GET_URI, valuesMap),
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VARS_GET_URI, valuesMap),
                     Object.class);
 
         } else {
@@ -397,7 +397,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             Map<String, String> headers = new HashMap<String, String>();
 
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + SIGNAL_PROCESS_INST_POST_URI, valuesMap), event, String.class, headers);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + SIGNAL_PROCESS_INST_POST_URI, valuesMap), event, String.class, headers);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "ProcessService", "signalProcessInstance", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, signalName})));
@@ -419,7 +419,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
             Map<String, String> headers = new HashMap<String, String>();
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap) + queryStr
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap) + queryStr
                     , event, String.class, headers);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -439,7 +439,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
             Map<String, String> headers = new HashMap<String, String>();
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap), event, String.class, headers);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + SIGNAL_PROCESS_INSTANCES_PORT_URI, valuesMap), event, String.class, headers);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "ProcessService", "signal", serialize(event), marshaller.getFormat().getType(), new Object[]{containerId, signalName})));
@@ -457,7 +457,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             signals = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_SIGNALS_GET_URI, valuesMap), Object.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_SIGNALS_GET_URI, valuesMap), Object.class);
 
 
         } else {
@@ -484,7 +484,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
             valuesMap.put(VAR_NAME, variableId);
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_PUT_URI, valuesMap), value, String.class, getHeaders(null));
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_PUT_URI, valuesMap), value, String.class, getHeaders(null));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "ProcessService", "setProcessVariable", serialize(value), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, variableId})));
@@ -501,7 +501,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             makeHttpPostRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_VARS_POST_URI, valuesMap), variables,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VARS_POST_URI, valuesMap), variables,
                     String.class);
 
         } else {
@@ -520,7 +520,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_GET_URI, valuesMap) , ProcessInstance.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_GET_URI, valuesMap) , ProcessInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -540,7 +540,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_GET_URI, valuesMap) + "?withVars=" + withVars , ProcessInstance.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_GET_URI, valuesMap) + "?withVars=" + withVars , ProcessInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -561,7 +561,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(WORK_ITEM_ID, id);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI, valuesMap), results,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI, valuesMap), results,
                     String.class, getHeaders(null));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -580,7 +580,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(WORK_ITEM_ID, id);
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap), null,
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI, valuesMap), null,
                     String.class, getHeaders(null));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -599,7 +599,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(WORK_ITEM_ID, id);
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI, valuesMap), WorkItemInstance.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI, valuesMap), WorkItemInstance.class);
 
 
         } else {
@@ -621,7 +621,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(baseURI, PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI, valuesMap), WorkItemInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_WORK_ITEMS_BY_PROC_INST_ID_GET_URI, valuesMap), WorkItemInstanceList.class);
 
 
 

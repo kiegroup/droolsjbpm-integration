@@ -15,6 +15,7 @@
 
 package org.kie.server.client.impl;
 
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.kie.remote.common.rest.KieRemoteHttpRequest;
+import org.kie.remote.common.rest.KieRemoteHttpRequestException;
 import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
@@ -51,6 +53,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.impl.KieServicesClientImpl;
+import org.kie.server.client.balancer.LoadBalancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,23 +65,27 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected static final Boolean BYPASS_AUTH_USER = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
 
-    protected String baseURI;
+    protected LoadBalancer loadBalancer;
     protected final KieServicesConfiguration config;
     protected final Marshaller marshaller;
     protected ClassLoader classLoader;
 
     protected KieServicesClientImpl owner;
 
+    public LoadBalancer getLoadBalancer() {
+        return loadBalancer;
+    }
+
     public AbstractKieServicesClientImpl(KieServicesConfiguration config) {
         this.config = config.clone();
-        this.baseURI = config.getServerUrl();
+        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
         this.classLoader = Thread.currentThread().getContextClassLoader() != null ? Thread.currentThread().getContextClassLoader() : CommandScript.class.getClassLoader();
         this.marshaller = MarshallerFactory.getMarshaller(config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader);
     }
 
     public AbstractKieServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
         this.config = config.clone();
-        this.baseURI = config.getServerUrl();
+        this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
         this.classLoader = classLoader;
         this.marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader );
     }
@@ -134,13 +141,19 @@ public abstract class AbstractKieServicesClientImpl {
         valuesMap.put(TASK_INSTANCE_ID, taskId);
 
         makeHttpPutRequestAndCreateCustomResponse(
-                build(baseURI, operation, valuesMap) + queryString, null, String.class, getHeaders(null));
+                build(loadBalancer.getUrl(), operation, valuesMap) + queryString, null, String.class, getHeaders(null));
     }
 
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
+
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest(url).get();
+            }
+        });
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -155,7 +168,12 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected <T> T makeHttpGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation() {
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest(url).get();
+            }
+        });
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -170,7 +188,12 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected String makeHttpGetRequestAndCreateRawResponse(String uri) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).get();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation() {
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest(url).get();
+            }
+        });
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -186,7 +209,12 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected String makeHttpGetRequestAndCreateRawResponse(String uri, Map<String, String> headers) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).get();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest( uri ).headers(headers).get();
+            }
+        });
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -219,7 +247,13 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest( uri ).headers(headers).body(body).post();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -244,7 +278,13 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest(uri ).headers(headers).body(body).post();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -266,7 +306,13 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest(uri).body(body).put();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest(uri).body(body).put();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -290,7 +336,13 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).put();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest( uri ).headers(headers).body(body).put();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -308,7 +360,13 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).delete();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest( uri ).delete();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -325,7 +383,13 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = newRequest( uri ).delete();
+        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+            @Override
+            public KieRemoteHttpRequest doOperation(String url) {
+                return newRequest( uri ).delete();
+            }
+        });
+
         KieRemoteHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
@@ -715,5 +779,31 @@ public abstract class AbstractKieServicesClientImpl {
 
     public String getConversationId() {
         return owner.getConversationId();
+    }
+
+    protected KieRemoteHttpRequest invoke(String url, RemoteHttpOperation operation) {
+        String nextUrl = null;
+        do {
+            try {
+                return operation.doOperation(url);
+            } catch (KieRemoteHttpRequestException e) {
+                if (e.getCause() instanceof ConnectException) {
+                    logger.debug("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
+                    loadBalancer.markAsFailed(url);
+                    nextUrl = loadBalancer.getUrl();
+                    url = nextUrl;
+                    logger.debug("Selecting next endpoint from load balancer - '{}'", url);
+                } else {
+                    throw e;
+                }
+            }
+        } while (nextUrl != null);
+
+        throw new KieRemoteHttpRequestException("Unable to invoke operation " + operation);
+    }
+
+    private abstract class RemoteHttpOperation {
+
+        public abstract KieRemoteHttpRequest doOperation(String url);
     }
 }
