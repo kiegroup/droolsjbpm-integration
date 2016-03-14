@@ -50,7 +50,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             valuesMap.put(RestURI.PROCESS_ID, processId);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?lang=" + language);
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?lang=" + language + "&filter=true");
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -90,7 +90,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?lang=" + language);
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?lang=" + language + "&filter=true");
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
