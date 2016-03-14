@@ -69,6 +69,8 @@
         <include>org.hibernate:hibernate-core</include>
         <include>org.hibernate:hibernate-validator</include>
         <include>dom4j:dom4j</include>
+
+        <include>org.quartz-scheduler:quartz</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
