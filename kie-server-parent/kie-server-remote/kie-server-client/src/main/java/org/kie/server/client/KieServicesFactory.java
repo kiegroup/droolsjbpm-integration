@@ -48,6 +48,14 @@ public class KieServicesFactory {
         return new KieServicesConfigurationImpl( serverUrl, login, password, timeout );
     }
 
+    public static KieServicesConfiguration newRestConfiguration( String serverUrl, CredentialsProvider credentialsProvider ) {
+        return new KieServicesConfigurationImpl( serverUrl, credentialsProvider );
+    }
+
+    public static KieServicesConfiguration newRestConfiguration( String serverUrl, CredentialsProvider credentialsProvider, long timeout ) {
+        return new KieServicesConfigurationImpl( serverUrl, credentialsProvider, timeout );
+    }
+
     /**
      * Creates a new configuration object for JMS based service
      * @param connectionFactory a JMS connection factory
@@ -99,6 +107,10 @@ public class KieServicesFactory {
 
     public static KieServicesClient newKieServicesRestClient( String serverUrl, String login, String password ) {
         return new KieServicesClientImpl( newRestConfiguration( serverUrl, login, password ) );
+    }
+
+    public static KieServicesClient newKieServicesRestClient( String serverUrl, CredentialsProvider credentialsProvider ) {
+        return new KieServicesClientImpl( newRestConfiguration( serverUrl, credentialsProvider ) );
     }
 
     public static KieServicesClient newKieServicesJMSClient( ConnectionFactory connectionFactory, Queue requestQueue, Queue responseQueue ) {

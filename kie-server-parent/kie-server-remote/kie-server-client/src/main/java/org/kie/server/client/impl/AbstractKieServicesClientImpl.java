@@ -320,8 +320,13 @@ public abstract class AbstractKieServicesClientImpl {
                 KieRemoteHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
         httpRequest.accept( getMediaType( config.getMarshallingFormat() ) );
         httpRequest.header(KieServerConstants.KIE_CONTENT_TYPE_HEADER, config.getMarshallingFormat().toString());
-        if ( config.getUserName() != null && config.getPassword() != null ) {
-            httpRequest.basicAuthorization( config.getUserName(), config.getPassword() );
+        // apply authorization
+        if (config.getCredentialsProvider() != null) {
+            String authorization = config.getCredentialsProvider().getAuthorization();
+            // add authorization only when it's not empty to allow anonymous requests
+            if (authorization != null && !authorization.isEmpty()) {
+                httpRequest.header(config.getCredentialsProvider().getHeaderName(), authorization);
+            }
         }
         return httpRequest;
     }

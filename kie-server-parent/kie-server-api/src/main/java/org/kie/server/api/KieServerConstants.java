@@ -45,11 +45,19 @@ public class KieServerConstants {
 
     public static final String CFG_BYPASS_AUTH_USER = "org.kie.server.bypass.auth.user";
 
+    /**
+     * security settings used to connect to KIE Server
+     */
     public static final String CFG_KIE_USER = "org.kie.server.user";
     public static final String CFG_KIE_PASSWORD = "org.kie.server.pwd";
+    public static final String CFG_KIE_TOKEN = "org.kie.server.token";
 
+    /**
+     * Security settings used to connect to KIE Server Controller
+     */
     public static final String CFG_KIE_CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String CFG_KIE_CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
+    public static final String CFG_KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
 
     // non kie server parameters but used by its extensions etc
     public static final String CFG_HT_CALLBACK = "org.jbpm.ht.callback";

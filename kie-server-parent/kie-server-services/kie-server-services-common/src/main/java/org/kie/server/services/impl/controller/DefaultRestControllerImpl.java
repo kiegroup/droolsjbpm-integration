@@ -49,9 +49,9 @@ public class DefaultRestControllerImpl implements KieServerController {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password) {
+    protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri, user, password ).body(body).put();
+        KieRemoteHttpRequest request = newRequest( uri, user, password, token ).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
@@ -65,9 +65,9 @@ public class DefaultRestControllerImpl implements KieServerController {
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password) {
+    protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = newRequest( uri, user, password ).delete();
+        KieRemoteHttpRequest request = newRequest( uri, user, password, token ).delete();
         KieRemoteHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
@@ -80,11 +80,15 @@ public class DefaultRestControllerImpl implements KieServerController {
         }
     }
 
-    private KieRemoteHttpRequest newRequest(String uri, String userName, String password) {
+    private KieRemoteHttpRequest newRequest(String uri, String userName, String password, String token) {
 
         KieRemoteHttpRequest httpRequest = KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
         httpRequest.accept(MediaType.APPLICATION_JSON);
-        httpRequest.basicAuthorization(userName, password);
+        if (token != null && !token.isEmpty()) {
+            httpRequest.tokenAuthorization(token);
+        } else {
+            httpRequest.basicAuthorization(userName, password);
+        }
 
         return httpRequest;
 
@@ -129,9 +133,10 @@ public class DefaultRestControllerImpl implements KieServerController {
 
                     String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
                     String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
                     try {
-                        KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password);
+                        KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
 
                         if (kieServerSetup != null) {
                             // once there is non null list let's return it
@@ -171,9 +176,9 @@ public class DefaultRestControllerImpl implements KieServerController {
 
                     String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
                     String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
 
-
-                    makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password);
+                    makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password, token);
 
 
                     break;
