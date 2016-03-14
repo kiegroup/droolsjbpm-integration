@@ -112,6 +112,7 @@ public class ConvertUtils {
                         .priority(taskSummary.getPriority())
                         .processId(taskSummary.getProcessId())
                         .processInstanceId(taskSummary.getProcessInstanceId())
+                        .status(taskSummary.getStatus())
                         .build();
                 tasks[counter] = task;
                 counter++;

@@ -71,6 +71,14 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- security -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.security.jacc</groupId>
+      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+
     <!-- jaxb -->
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -115,6 +123,7 @@
               org.codehaus.jackson;resolution:=optional,
               com.thoughtworks.xstream;resolution:=optional,
               org.xmlpull;resolution:=optional,
+              javax.security.jacc;resolution:=optional,
               *
             </Import-Package>
           </instructions>

@@ -16,6 +16,7 @@
 package org.kie.server.client;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.balancer.LoadBalancer;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -92,5 +93,9 @@ public interface KieServicesConfiguration {
     void setCredentialsProvider(CredentialsProvider credentialsProvider);
 
     CredentialsProvider getCredentialsProvider();
+
+    void setLoadBalancer(LoadBalancer loadBalancer);
+
+    LoadBalancer getLoadBalancer();
 
 }
