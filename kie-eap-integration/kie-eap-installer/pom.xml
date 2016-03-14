@@ -11,12 +11,6 @@
   <artifactId>kie-eap-installer</artifactId>
   <name>KIE EAP - Installer</name>
 
-  <properties>
-    <!-- Installer needs to be Java 7+, because of transitive dependency org.wildfly.extras.patch: fuse-patch-installer
-         Ignoring the animal sniffer for now, but the config should be updated to use Java 7 APIs.  -->
-    <animal.sniffer.skip>true</animal.sniffer.skip>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
