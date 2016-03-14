@@ -31,7 +31,7 @@ import java.io.UnsupportedEncodingException;
  * @author rob@iharder.net
  * @version 2.3.7
  */
-class Base64Util {
+public class Base64Util {
 
     /** The equals sign (=) as a byte. */
     private final static byte EQUALS_SIGN = (byte) '=';

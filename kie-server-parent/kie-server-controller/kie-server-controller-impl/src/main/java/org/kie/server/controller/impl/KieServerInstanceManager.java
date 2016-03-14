@@ -30,6 +30,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -281,6 +282,11 @@ public class KieServerInstanceManager {
 
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
 
+        String authToken = getToken();
+        if (authToken != null && !authToken.isEmpty()) {
+            configuration.setCredentialsProvider(new EnteredTokenCredentialsProvider(authToken));
+        }
+
         KieServicesClient kieServicesClient =  KieServicesFactory.newKieServicesClient(configuration);
 
         return kieServicesClient;
@@ -304,6 +310,9 @@ public class KieServerInstanceManager {
         return System.getProperty(KieServerConstants.CFG_KIE_PASSWORD, "kieserver1!");
     }
 
+    protected String getToken() {
+        return System.getProperty(KieServerConstants.CFG_KIE_TOKEN);
+    }
     private class RemoteKieServerOperation<T> {
 
         public T doOperation(KieServicesClient client, Container container) {
