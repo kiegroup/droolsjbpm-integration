@@ -72,6 +72,7 @@ import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
+import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.server.api.KieServerConstants;
@@ -170,9 +171,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
         // configure user group callback
         UserGroupCallback userGroupCallback = UserDataServiceProvider.getUserGroupCallback();
 
+        UserInfo userInfo = UserDataServiceProvider.getUserInfo();
+
         TaskService taskService = HumanTaskServiceFactory.newTaskServiceConfigurator()
                 .entityManagerFactory(emf)
                 .userGroupCallback(userGroupCallback)
+                .userInfo(userInfo)
                 .getTaskService();
 
         // build runtime data service
