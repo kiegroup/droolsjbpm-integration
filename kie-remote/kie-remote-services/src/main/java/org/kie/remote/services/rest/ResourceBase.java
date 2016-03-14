@@ -19,6 +19,7 @@ import static org.kie.remote.common.rest.RestEasy960Util.defaultVariant;
 import static org.kie.remote.common.rest.RestEasy960Util.getVariant;
 
 import java.lang.reflect.Constructor;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -273,7 +274,7 @@ public class ResourceBase {
     private static Object getObjectFromString(String key, String mapVal) {
         if (mapVal.matches("^\".*\"$")) {
             return mapVal.substring(1, mapVal.length()-1);
-        } else if (mapVal.matches(LONG_INTEGER_REGEX) || mapVal.matches(FLOAT_REGEX) ) {
+        } else if (mapVal.matches(LONG_INTEGER_BIGINTEGER_REGEX) || mapVal.matches(FLOAT_REGEX) ) {
             return getNumberFromString(key, mapVal, false);
         } else if (mapVal.matches(BOOLEAN_REGEX) ) {
             return Boolean.parseBoolean(mapVal);
@@ -287,7 +288,7 @@ public class ResourceBase {
     private final static int MAX_LENGTH_FLOAT = 10;
 
     public static String BOOLEAN_REGEX ="^(TRUE|FALSE)";
-    public static String LONG_INTEGER_REGEX ="^\\d+[li]?$";
+    public static String LONG_INTEGER_BIGINTEGER_REGEX ="^\\d+[liI]?$";
     public static String FLOAT_REGEX = "^\\d[\\d\\.]{1,9}(E-?\\d{1,2})?f?$";
 
     /**
@@ -295,8 +296,9 @@ public class ResourceBase {
      * Otherwise, possible suffixes are:
      * <ul>
      * <li>i : returns an Integer</li>
-     * <li>l : returns an Long</li>
-     * <li>f : returns an Float</li>
+     * <li>I : returns a BigInteger</li>
+     * <li>l : returns a Long</li>
+     * <li>f : returns a Float</li>
      * </ul>
      *
      * @param paramName
@@ -304,7 +306,7 @@ public class ResourceBase {
      * @return
      */
     private static Number getNumberFromString(String paramName, String paramVal, boolean mustBeLong) {
-        if (paramVal.matches(LONG_INTEGER_REGEX)) {
+        if (paramVal.matches(LONG_INTEGER_BIGINTEGER_REGEX)) {
             if (paramVal.matches(".*i$")) {
                 if (mustBeLong) {
                     throw KieRemoteRestOperationException.badRequest( paramName
@@ -317,6 +319,14 @@ public class ResourceBase {
                             + paramVal + "i)");
                 }
                 return Integer.parseInt(paramVal);
+            } else if (paramVal.matches(".*I$")) {
+                if (mustBeLong) {
+                    throw KieRemoteRestOperationException.badRequest(paramName
+                            + " parameter is numerical but contains the \"BigInteger\" suffix 'I' and must have no suffix or \"Long\" suffix 'l' ("
+                            + paramVal + ")");
+                }
+                paramVal = paramVal.substring(0, paramVal.length() - 1);
+                return new BigInteger(paramVal);
             } else {
                 if (paramVal.length() > MAX_LENGTH_LONG) {
                     throw KieRemoteRestOperationException.badRequest(paramName + " parameter is numerical but too large to be a long ("
