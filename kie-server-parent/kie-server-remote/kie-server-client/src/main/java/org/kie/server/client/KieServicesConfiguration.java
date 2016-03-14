@@ -89,4 +89,8 @@ public interface KieServicesConfiguration {
 
     List<String> getCapabilities();
 
+    void setCredentialsProvider(CredentialsProvider credentialsProvider);
+
+    CredentialsProvider getCredentialsProvider();
+
 }

@@ -16,8 +16,10 @@
 package org.kie.server.client.impl;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.credentials.EnteredCredentialsProvider;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -62,6 +64,7 @@ public final class KieServicesConfigurationImpl
     private MarshallingFormat format           = MarshallingFormat.JAXB;
     private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
 
+    private CredentialsProvider credentialsProvider;
     /*
      * Public constructors and setters
      */
@@ -90,6 +93,30 @@ public final class KieServicesConfigurationImpl
         this.userName = username;
         this.password = password;
         this.timeoutInMillisecs = timeout;
+        this.credentialsProvider = new EnteredCredentialsProvider(username, password);
+    }
+
+    /**
+     * REST based constructor
+     * @param url
+     * @param credentialsProvider
+     */
+    public KieServicesConfigurationImpl(String url, CredentialsProvider credentialsProvider) {
+        this( url, credentialsProvider, 5000 );
+    }
+
+    /**
+     * REST based constructor
+     * @param url
+     * @param credentialsProvider
+     * @param timeout the maximum timeout in milliseconds
+     */
+    public KieServicesConfigurationImpl(String url, CredentialsProvider credentialsProvider, long timeout) {
+        this.transport = Transport.REST;
+
+        this.serverUrl = url;
+        this.timeoutInMillisecs = timeout;
+        this.credentialsProvider = credentialsProvider;
     }
 
     @Override
@@ -118,6 +145,7 @@ public final class KieServicesConfigurationImpl
         this.connectionFactory = connectionFactory;
         this.requestQueue = requestQueue;
         this.responseQueue = responseQueue;
+        this.credentialsProvider = null;
         checkValidValues( this.connectionFactory, this.requestQueue, this.responseQueue );
     }
 
@@ -132,6 +160,8 @@ public final class KieServicesConfigurationImpl
         this.transport = Transport.JMS;
         setAndCheckUserNameAndPassword( username, password );
         setRemoteInitialContext( context );
+        this.credentialsProvider = new EnteredCredentialsProvider(username, password);
+
     }
 
     public void checkValidJmsValues() {
@@ -283,12 +313,18 @@ public final class KieServicesConfigurationImpl
     @Override
     public KieServicesConfiguration setUserName(String userName) {
         this.userName = userName;
+        if (credentialsProvider instanceof EnteredCredentialsProvider) {
+            ((EnteredCredentialsProvider) credentialsProvider).setUsername(userName);
+        }
         return this;
     }
 
     @Override
     public KieServicesConfiguration setPassword(String password) {
         this.password = password;
+        if (credentialsProvider instanceof EnteredCredentialsProvider) {
+            ((EnteredCredentialsProvider) credentialsProvider).setPassword(password);
+        }
         return this;
     }
 
@@ -335,6 +371,16 @@ public final class KieServicesConfigurationImpl
         return this.capabilities;
     }
 
+    @Override
+    public void setCredentialsProvider(CredentialsProvider credentialsProvider) {
+        this.credentialsProvider = credentialsProvider;
+    }
+
+    @Override
+    public CredentialsProvider getCredentialsProvider() {
+        return credentialsProvider;
+    }
+
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
         this.connectionFactory = config.connectionFactory;
@@ -350,6 +396,7 @@ public final class KieServicesConfigurationImpl
         this.userName = config.userName;
         this.useSsl = config.useSsl;
         this.capabilities = config.capabilities;
+        this.credentialsProvider = config.credentialsProvider;
     }
 
     @Override
