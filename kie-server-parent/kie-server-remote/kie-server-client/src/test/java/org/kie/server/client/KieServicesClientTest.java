@@ -25,15 +25,10 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.impl.KieServicesClientImpl;
+import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.Assert.assertEquals;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.*;
 
 public class KieServicesClientTest extends BaseKieServicesClientTest {
 
@@ -154,6 +149,52 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+    }
+
+    @Test
+    public void testGetServerInfoBasicAuth() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+
+        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
+        verify(0, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
+    }
+
+    @Test
+    public void testGetServerInfoTokenAuth() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+        config.setCredentialsProvider(new EnteredTokenCredentialsProvider("abcdefghijk"));
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+
+        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
+        verify(0, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
     }
 
     // TODO create more tests for other operations

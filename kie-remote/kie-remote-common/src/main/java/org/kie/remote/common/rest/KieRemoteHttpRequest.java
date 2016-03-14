@@ -1042,6 +1042,17 @@ public class KieRemoteHttpRequest {
     }
 
     /**
+     * Set the 'Authorization' header to given values in Bearer/Token authentication
+     * format
+     *
+     * @param token
+     * @return this request
+     */
+    public KieRemoteHttpRequest tokenAuthorization( final String token ) {
+        return header(AUTHORIZATION, "Bearer " + token);
+    }
+
+    /**
      * Set the 'Content-Type' request header to the given value
      *
      * @param contentType
