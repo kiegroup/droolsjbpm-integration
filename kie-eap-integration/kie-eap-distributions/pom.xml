@@ -13,37 +13,9 @@
   <name>KIE EAP - Distributions</name>
   <packaging>pom</packaging>
 
-  <profiles>
-
-    <!-- Profile for BPMS layer. -->
-    <profile>
-      <id>bpms-layer</id>
-      <activation>
-        <property>
-          <name>bpms-layer</name>
-        </property>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-distributions-bpms-layer</module>
-        <module>kie-eap-distribution</module>
-      </modules>
-    </profile>
-
-    <!-- Profile for BRMS layer. -->
-    <profile>
-      <id>brms-layer</id>
-      <activation>
-        <property>
-          <name>brms-layer</name>
-        </property>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>kie-eap-distributions-brms-layer</module>
-      </modules>
-    </profile>
-
-  </profiles>
+  <modules>
+    <module>kie-eap-distributions-bpms-layer</module>
+    <module>kie-eap-distribution</module>
+  </modules>
 
 </project>
