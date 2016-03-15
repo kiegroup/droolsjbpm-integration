@@ -110,7 +110,7 @@ public class ResourceBaseTest extends ResourceBase {
     }
 
     @Test
-    public void testGetObjectParam() { 
+    public void testGetObjectParam() {
         Map<String, String[]> params = new HashMap<String, String[]>();
         // integer
         String paramName = "int";
@@ -118,12 +118,12 @@ public class ResourceBaseTest extends ResourceBase {
         testParam(paramName, Integer.class, params, "0i");
         testParam(paramName, Integer.class, params, "1i");
         testParam(paramName, Integer.class, params, "10000i");
-        
+
         // long
         testParam(paramName, Long.class, params, "10000l");
         testParam(paramName, Long.class, params, "0l");
         testParam(paramName, Long.class, params, "1");
-       
+
         // float
         testParam(paramName, Float.class, params, "1.00f");
         testParam(paramName, Float.class, params, "2043f");
@@ -132,30 +132,30 @@ public class ResourceBaseTest extends ResourceBase {
         testParam(paramName, Float.class, params, "16.00");
         testParam(paramName, Float.class, params, "32.32E9");
         testParam(paramName, Float.class, params, "64.00E-1");
-        
+
         // boolean
-        testParam(paramName, Boolean.class, params, "TRUE");
-        testParam(paramName, Boolean.class, params, "FALSE");
-        
+        testParam(paramName, Boolean.class, params, "true");
+        testParam(paramName, Boolean.class, params, "false");
+
         // string
-        testParam(paramName, String.class, params, "true");
-        testParam(paramName, String.class, params, "false");
-        
+        testParam(paramName, String.class, params, "TRUE");
+        testParam(paramName, String.class, params, "FALSE");
+
         testParam(paramName, String.class, params, "1.00i");
         testParam(paramName, String.class, params, "1.00l");
         testParam(paramName, String.class, params, "1.00li");
         testParam(paramName, String.class, params, "1.00if");
         testParam(paramName, String.class, params, "1.00Ef");
-        
+
     }
-    
-    private static void testParam(String paramName, Class clazz, Map<String, String[]> params, String... param) { 
+
+    private static void testParam(String paramName, Class clazz, Map<String, String[]> params, String... param) {
        params.put(paramName, param);
        Object result = getObjectParam(paramName, false, params, "/test/get-object-param/" + paramName);
-        assertTrue( "[" + param[0] + "]: expected a " + clazz.getSimpleName() + " not a " + result.getClass().getSimpleName(), 
+        assertTrue( "[" + param[0] + "]: expected a " + clazz.getSimpleName() + " not a " + result.getClass().getSimpleName(),
                     clazz.isAssignableFrom(result.getClass()) );
     }
-    
+
     @Test
     public void testWrapperLogic() {
         wrapperPrimitives.put(String.class, JaxbString.class);
