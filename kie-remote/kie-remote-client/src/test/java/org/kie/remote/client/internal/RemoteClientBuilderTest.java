@@ -114,8 +114,7 @@ public class RemoteClientBuilderTest extends RemoteJmsRuntimeEngineBuilderImpl {
 
     @Test
     public void restRuntimeFactoryBuilderTest() throws MalformedURLException, InsufficientInfoToBuildException {
-       RuntimeEngine restRuntimeEngine =
-               RemoteRuntimeEngineFactory.newRestBuilder()
+       RuntimeEngine restRuntimeEngine = RemoteRuntimeEngineFactory.newRestBuilder()
                .addDeploymentId("deployment")
                .addProcessInstanceId(23l)
                .addUserName("S")
@@ -731,5 +730,32 @@ public class RemoteClientBuilderTest extends RemoteJmsRuntimeEngineBuilderImpl {
             assertTrue( "Exception should explain problem", rae.getMessage().contains("must match the authenticating user"));
 
         }
+
+        runtimeEngine = RemoteRuntimeEngineFactory.newRestBuilder()
+                .addUserName(authUser)
+                .addPassword("pass")
+                .addUrl(new URL("http://localhost:8080/business-central"))
+                .disableTaskSecurity()
+                .build();
+
+        try {
+            runtimeEngine.getTaskService().getTasksOwned(otherUser, "en-Uk");
+        } catch( RemoteCommunicationException rce ) {
+            assertTrue( "Incorrect exception received", rce.getMessage().contains("Unable to send HTTP POST"));
+        }
+
+        System.setProperty("org.kie.task.insecure", "true");
+        runtimeEngine = RemoteRuntimeEngineFactory.newRestBuilder()
+                .addUserName(authUser)
+                .addPassword("pass")
+                .addUrl(new URL("http://localhost:8080/business-central"))
+                .build();
+
+        try {
+            runtimeEngine.getTaskService().getTasksOwned(otherUser, "en-Uk");
+        } catch( RemoteCommunicationException rce ) {
+            assertTrue( "Incorrect exception received", rce.getMessage().contains("Unable to send HTTP POST"));
+        }
     }
+
 }

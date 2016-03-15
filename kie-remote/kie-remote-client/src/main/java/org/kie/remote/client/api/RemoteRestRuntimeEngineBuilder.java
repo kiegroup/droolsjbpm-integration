@@ -18,6 +18,7 @@ package org.kie.remote.client.api;
 import java.net.URL;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.task.TaskService;
 
 
 /**
@@ -42,5 +43,15 @@ public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuild
      * @return The builder instance
      */
     RemoteRestRuntimeEngineBuilder addUrl(URL instanceUrl);
+
+    /**
+     * This method should be used with the "org.kie.task.insecure" property (used on the server side).
+     * </br>
+     * This allows users to send task commands that refer to other users besides the user used for authenticating
+     * the REST request.
+     *
+     * @return An instance of this builder
+     */
+    RemoteRestRuntimeEngineBuilder disableTaskSecurity();
 
 }
