@@ -44,6 +44,12 @@ class RemoteRestRuntimeEngineBuilderImpl
         return this;
     }
 
+    @Override
+    public RemoteRestRuntimeEngineBuilderImpl disableTaskSecurity() {
+        config.setDisableTaskSecurity(true);
+        return this;
+    }
+
     private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
