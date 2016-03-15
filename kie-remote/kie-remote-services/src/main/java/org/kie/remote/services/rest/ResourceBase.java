@@ -286,7 +286,7 @@ public class ResourceBase {
     private final static int MAX_LENGTH_LONG = 18;
     private final static int MAX_LENGTH_FLOAT = 10;
 
-    public static String BOOLEAN_REGEX ="^(TRUE|FALSE)";
+    public static String BOOLEAN_REGEX ="^(true|false)";
     public static String LONG_INTEGER_REGEX ="^\\d+[li]?$";
     public static String FLOAT_REGEX = "^\\d[\\d\\.]{1,9}(E-?\\d{1,2})?f?$";
 
