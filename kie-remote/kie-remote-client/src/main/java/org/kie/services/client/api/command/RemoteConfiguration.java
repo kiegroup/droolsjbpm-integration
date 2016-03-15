@@ -68,7 +68,7 @@ public final class RemoteConfiguration {
 
     // JMS
     private boolean useSsl = false;
-    private boolean disableTaskSecurity = false;
+    private boolean disableTaskSecurity = Boolean.getBoolean("org.kie.task.insecure");
     private String connectionUserName = null;
     private String connectionPassword = null;
     private ConnectionFactory connectionFactory;
