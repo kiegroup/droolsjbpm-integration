@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -27,16 +27,16 @@ import org.kie.services.client.api.command.RemoteRuntimeEngine;
 /**
  * This is the internal implementation of the {@link RemoteRestRuntimeEngineBuilderImpl} class.
  * </p>
- * It takes care of implementing the methods specified as well as managing the 
+ * It takes care of implementing the methods specified as well as managing the
  * state of the internal {@link RemoteConfiguration} instance.
  */
-class RemoteRestRuntimeEngineBuilderImpl 
-    extends AbstractRemoteRuntimeEngineBuilderImpl<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> 
-    implements org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder { 
+class RemoteRestRuntimeEngineBuilderImpl
+    extends AbstractRemoteRuntimeEngineBuilderImpl<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory>
+    implements org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder {
 
     URL url;
-    
-    RemoteRestRuntimeEngineBuilderImpl() { 
+
+    RemoteRestRuntimeEngineBuilderImpl() {
         this.config = new RemoteConfiguration(Type.REST);
     }
 
@@ -46,23 +46,29 @@ class RemoteRestRuntimeEngineBuilderImpl
         return this;
     }
 
-    private void checkAndFinalizeConfig() { 
+    @Override
+    public RemoteRestRuntimeEngineBuilderImpl disableTaskSecurity() {
+        config.setDisableTaskSecurity(true);
+        return this;
+    }
+
+    private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
-    
+
     @Override
     public org.kie.remote.client.api.RemoteRestRuntimeEngineFactory buildFactory() throws InsufficientInfoToBuildException {
         checkAndFinalizeConfig();
         return new RemoteRestRuntimeEngineFactory(config.clone());
     }
-   
+
     @Override
-    public RemoteRuntimeEngine build() { 
+    public RemoteRuntimeEngine build() {
         checkAndFinalizeConfig();
         return new RemoteRuntimeEngine(config.clone());
     }
-    
-    public static RemoteRestRuntimeEngineBuilderImpl newBuilder() { 
+
+    public static RemoteRestRuntimeEngineBuilderImpl newBuilder() {
         return new RemoteRestRuntimeEngineBuilderImpl();
     }
 }

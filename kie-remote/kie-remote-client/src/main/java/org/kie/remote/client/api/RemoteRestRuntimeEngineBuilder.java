@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -18,10 +18,11 @@ package org.kie.remote.client.api;
 import java.net.URL;
 
 import org.kie.api.runtime.manager.RuntimeEngine;
+import org.kie.api.task.TaskService;
 
 
 /**
- * This is fluent API builder class for creating a remote {@link RuntimeEngine} instance 
+ * This is fluent API builder class for creating a remote {@link RuntimeEngine} instance
  * or a {@link RemoteRestRuntimeEngineFactory}.
  */
 public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuilder<RemoteRestRuntimeEngineBuilder, RemoteRestRuntimeEngineFactory> {
@@ -37,10 +38,20 @@ public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuild
      *     <li>kie-wb</li>
      *     <li>jbpm-console</li></ul></li>
      * </ul>
-     * 
+     *
      * @param instanceUrl The URL of the application
      * @return The builder instance
      */
     RemoteRestRuntimeEngineBuilder addUrl(URL instanceUrl);
-    
+
+    /**
+     * This method should be used with the "org.kie.task.insecure" property (used on the server side).
+     * </br>
+     * This allows users to send task commands that refer to other users besides the user used for authenticating
+     * the REST request.
+     *
+     * @return An instance of this builder
+     */
+    RemoteRestRuntimeEngineBuilder disableTaskSecurity();
+
 }
