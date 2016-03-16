@@ -508,22 +508,13 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertNullOrEmpty("Config is not empty.", containerResponseEntity.getConfigs().values());
 
         // Try update not existing ProcessConfig
-        try {
-            ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
-            controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
-            fail("Should throw exception about process config not existing.");
-        } catch (UnexpectedResponseCodeException e) {
-            assertEquals(400, e.getResponseCode());
-        }
+        ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+
 
         // Try update not existing RuleConfig
-        try {
-            RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.SCANNING);
-            controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
-            fail("Should throw exception about rule config not existing.");
-        } catch (UnexpectedResponseCodeException e) {
-            assertEquals(400, e.getResponseCode());
-        }
+        RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.SCANNING);
+        controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
     }
 
     @Test
@@ -533,7 +524,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
             controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
             fail("Should throw exception about kie server instance not existing.");
         } catch (UnexpectedResponseCodeException e) {
-            assertEquals(400, e.getResponseCode());
+            assertEquals(404, e.getResponseCode());
         }
 
         // Create kie server instance connection in controller.
@@ -543,7 +534,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
             controllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, config);
             fail("Should throw exception about container info not found.");
         } catch (UnexpectedResponseCodeException e) {
-            assertEquals(400, e.getResponseCode());
+            assertEquals(404, e.getResponseCode());
         }
     }
 

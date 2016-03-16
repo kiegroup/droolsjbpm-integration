@@ -295,12 +295,16 @@ public class KieServerMgmtControllerClient {
         controllerClasses.add(ServerTemplateList.class);
         controllerClasses.add(ContainerSpecList.class);
 
+        Set<Class<?>> minimalControllerClasses = new HashSet<Class<?>>();
+        minimalControllerClasses.add(RuleConfig.class);
+        minimalControllerClasses.add(ProcessConfig.class);
+
         switch ( format ) {
             case JAXB:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());
                 break;
             case JSON:
-                this.marshaller = MarshallerFactory.getMarshaller(format, KieServerMgmtControllerClient.class.getClassLoader());
+                this.marshaller = MarshallerFactory.getMarshaller(minimalControllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());
                 break;
             default:
                 this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerMgmtControllerClient.class.getClassLoader());

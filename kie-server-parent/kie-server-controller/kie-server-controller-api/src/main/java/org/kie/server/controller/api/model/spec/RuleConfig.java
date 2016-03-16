@@ -27,9 +27,9 @@ import org.kie.server.controller.api.model.spec.RuleConfig;
 @XmlRootElement(name = "rule-config")
 public class RuleConfig extends ContainerConfig {
 
-    @XmlElement(name = "poll-interval")
+    @XmlElement(name = "pollInterval")
     private Long pollInterval;
-    @XmlElement(name = "scanner-status")
+    @XmlElement(name = "scannerStatus")
     private KieScannerStatus scannerStatus;
 
     public RuleConfig() {
