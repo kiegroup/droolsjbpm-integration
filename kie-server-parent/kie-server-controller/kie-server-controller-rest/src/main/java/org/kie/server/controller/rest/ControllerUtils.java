@@ -52,7 +52,7 @@ public class ControllerUtils {
 
     public static Variant defaultVariant = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).add().build().get(0);
 
-    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
+    private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
     private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, ControllerUtils.class.getClassLoader());
 
     public static Set<Class<?>> getModelClasses() {
@@ -77,6 +77,15 @@ public class ControllerUtils {
         modelClasses.add(ContainerKey.class);
         modelClasses.add(ServerTemplateList.class);
         modelClasses.add(ContainerSpecList.class);
+
+        return modelClasses;
+    }
+
+    public static Set<Class<?>> getMinimalModelClasses() {
+        Set<Class<?>> modelClasses = new HashSet<Class<?>>();
+
+        modelClasses.add(RuleConfig.class);
+        modelClasses.add(ProcessConfig.class);
 
         return modelClasses;
     }

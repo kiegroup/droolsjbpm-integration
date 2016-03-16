@@ -35,6 +35,7 @@ import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpecKey;
 import org.kie.server.controller.api.model.spec.ContainerSpecList;
+import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
 import org.kie.server.controller.impl.service.SpecManagementServiceImpl;
@@ -265,14 +266,14 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         try {
             ContainerConfig containerConfig = null;
             Capability capability = null;
-            if (capabilityStr.equals(Capability.PROCESS)) {
+            if (capabilityStr.equals(Capability.PROCESS.name())) {
                 capability = Capability.PROCESS;
                 logger.debug("Received update container (with id {}) process config request for server template with id {}", containerSpecId , serverTemplateId);
                 containerConfig = unmarshal(containerConfigPayload, contentType, ProcessConfig.class);
-            } else if (capabilityStr.equals(Capability.RULE)) {
+            } else if (capabilityStr.equals(Capability.RULE.name())) {
                 capability = Capability.RULE;
                 logger.debug("Received update container (with id {}) rule config request for server template with id {}", containerSpecId, serverTemplateId);
-                containerConfig = unmarshal(containerConfigPayload, contentType, ProcessConfig.class);
+                containerConfig = unmarshal(containerConfigPayload, contentType, RuleConfig.class);
             } else {
                 logger.debug("Not supported configuration type {}, returning bad request response", capabilityStr);
                 return createCorrectVariant("Not supported configuration " + capabilityStr, headers, Response.Status.BAD_REQUEST);
