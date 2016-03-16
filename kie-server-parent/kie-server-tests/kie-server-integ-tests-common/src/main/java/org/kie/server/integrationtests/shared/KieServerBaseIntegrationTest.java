@@ -307,7 +307,7 @@ public abstract class KieServerBaseIntegrationTest {
             mvnArgs.add("-s");
             mvnArgs.add(kjarsBuildSettingsXml);
         }
-        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.out);
+        int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.err);
         if (mvnRunResult != 0) {
             throw new RuntimeException("Error while building Maven project from basedir " + basedir +
                     ". Return code=" + mvnRunResult);
