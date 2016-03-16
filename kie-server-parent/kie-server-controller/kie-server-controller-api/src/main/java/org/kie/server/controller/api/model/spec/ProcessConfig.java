@@ -26,13 +26,13 @@ import org.kie.server.controller.api.model.spec.ProcessConfig;
 @XmlRootElement(name = "process-config")
 public class ProcessConfig extends ContainerConfig {
 
-    @XmlElement(name = "strategy")
+    @XmlElement(name = "runtimeStrategy")
     private String runtimeStrategy;
-    @XmlElement(name = "kie-base-name")
+    @XmlElement(name = "kbase")
     private String kBase;
-    @XmlElement(name = "kie-session-name")
+    @XmlElement(name = "ksession")
     private String kSession;
-    @XmlElement(name = "merge-mode")
+    @XmlElement(name = "mergeMode")
     private String mergeMode;
 
     public ProcessConfig() {
