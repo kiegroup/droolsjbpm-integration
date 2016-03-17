@@ -17,6 +17,7 @@
 package org.kie.server.testing;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 @XStreamAlias("CloudComputer")
 public class CloudComputer extends AbstractPersistable {
@@ -62,6 +63,7 @@ public class CloudComputer extends AbstractPersistable {
     // Complex methods
     // ************************************************************************
 
+    @JsonIgnore
     public int getMultiplicand() {
         return cpuPower * memory * networkBandwidth;
     }
