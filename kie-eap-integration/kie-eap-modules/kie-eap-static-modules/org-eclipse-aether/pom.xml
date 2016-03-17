@@ -32,7 +32,7 @@
     <module.name>org.eclipse.aether</module.name>
     <module.type>static</module.type>
     <module.location>org/eclipse/aether</module.location>
-    <module.slot>main</module.slot>
+    <module.slot>kie</module.slot>
     <!-- import the javax.inject.api -->
     <module.dependencies>javax.inject.api:main,org.eclipse.sisu:main</module.dependencies>
   </properties>
