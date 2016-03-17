@@ -17,6 +17,7 @@
 package org.kie.server.testing;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
@@ -68,10 +69,12 @@ public class CloudProcess extends AbstractPersistable {
     // Complex methods
     // ************************************************************************
 
+    @JsonIgnore
     public int getRequiredMultiplicand() {
         return requiredCpuPower * requiredMemory * requiredNetworkBandwidth;
     }
 
+    @JsonIgnore
     public String getLabel() {
         return "Process " + id;
     }
