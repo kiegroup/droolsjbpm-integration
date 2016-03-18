@@ -119,6 +119,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-test-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
       <scope>test</scope>
@@ -127,11 +133,6 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
       <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-persistence-jpa</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -157,11 +158,6 @@
     </dependency>
 
     <!-- serialization -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-test-util</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
       <artifactId>kie-remote-jaxb</artifactId>
@@ -197,11 +193,6 @@
     <dependency>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-remote-naming</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.xnio</groupId>
-      <artifactId>xnio-nio</artifactId>
       <scope>test</scope>
     </dependency>
     
@@ -247,13 +238,6 @@
       <artifactId>simple-http</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-test-util</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    
   </dependencies>
 
   <build>

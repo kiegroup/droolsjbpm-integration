@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -40,6 +40,7 @@ import org.kie.api.runtime.rule.Agenda;
 import org.kie.api.runtime.rule.AgendaFilter;
 import org.kie.api.runtime.rule.EntryPoint;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.FactHandle.State;
 import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
@@ -65,14 +66,14 @@ import org.kie.remote.jaxb.gen.StartProcessCommand;
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession, CorrelationAwareProcessRuntime {
 
     private WorkItemManager workItemManager;
-    
+
     public KieSessionClientCommandObject(RemoteConfiguration config) {
         super(config);
-        if( config.isJms() && config.getKsessionQueue() == null ) { 
+        if( config.isJms() && config.getKsessionQueue() == null ) {
             throw new MissingRequiredInfoException("A KieSession queue is necessary in order to create a Remote JMS Client KieSession instance.");
         }
     }
-    
+
     @Override
     public int fireAllRules() {
         return (Integer) executeCommand(new FireAllRulesCommand());
@@ -221,6 +222,11 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
     }
 
     @Override
+    public void delete( FactHandle arg0, State arg1 ) {
+        unsupported(KieSession.class, Void.class);
+    }
+
+    @Override
     public void update( FactHandle handle, Object object ) {
         unsupported(KieSession.class, Void.class);
     }
@@ -284,7 +290,7 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
         cmd.setParameter(arrayMap);
         String strCorrKey = convertCorrelationKeyToString(correlationKey);
         cmd.setCorrelationKey(strCorrKey);
-        
+
         return executeCommand(cmd);
     }
 
@@ -359,14 +365,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public WorkItemManager getWorkItemManager() {
-        if( this.workItemManager == null ) { 
+        if( this.workItemManager == null ) {
            this.workItemManager = new WorkItemManager() {
-            
+
             @Override
             public void registerWorkItemHandler( String workItemName, WorkItemHandler handler ) {
                 unsupported(WorkItemManager.class, Void.class);
             }
-            
+
             @Override
             public void completeWorkItem( long id, Map<String, Object> results ) {
                 CompleteWorkItemCommand cmd = new CompleteWorkItemCommand();
@@ -375,14 +381,14 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
                 cmd.setResult(arrayMap);
                 executeCommand(cmd);
             }
-            
+
             @Override
             public void abortWorkItem( long id ) {
                 AbortWorkItemCommand cmd = new AbortWorkItemCommand();
                 cmd.setId(id);
                 executeCommand(cmd);
             }
-        }; 
+        };
         }
         return this.workItemManager;
     }
