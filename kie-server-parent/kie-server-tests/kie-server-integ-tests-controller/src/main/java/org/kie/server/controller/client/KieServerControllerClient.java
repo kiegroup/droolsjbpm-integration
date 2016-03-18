@@ -234,7 +234,19 @@ public class KieServerControllerClient {
         controllerClasses.add(KieServerSetup.class);
         controllerClasses.add(KieServerStatus.class);
 
-        this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerControllerClient.class.getClassLoader());
+        switch (format) {
+            case JAXB:
+                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerControllerClient.class.getClassLoader());
+                break;
+            case JSON:
+                this.marshaller = MarshallerFactory.getMarshaller(format, KieServerControllerClient.class.getClassLoader());
+                break;
+
+            default:
+                this.marshaller = MarshallerFactory.getMarshaller(controllerClasses, format, KieServerControllerClient.class.getClassLoader());
+                break;
+        }
+
     }
 
     private String getMediaType( MarshallingFormat format ) {
