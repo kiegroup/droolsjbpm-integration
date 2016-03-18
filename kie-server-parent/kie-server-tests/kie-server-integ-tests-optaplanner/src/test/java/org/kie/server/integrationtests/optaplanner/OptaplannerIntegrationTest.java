@@ -251,9 +251,9 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
-    @Test // TODO This test currently fails for JSON (if not ignored through assumeFalse())
+    @Test
     public void testGetBestSolution() throws Exception {
-        assumeFalse(marshallingFormat == MarshallingFormat.JSON); // TODO Do not ignore this test for JSON
+
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
