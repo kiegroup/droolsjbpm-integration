@@ -207,7 +207,7 @@ public class KieServerMgmtControllerClient {
 
         try {
             response = clientRequest.accept(getMediaType(format))
-                    .body(getMediaType(format), bodyObject).post(resultType);
+                    .body(getMediaType(format), serialize(bodyObject)).post(resultType);
 
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
