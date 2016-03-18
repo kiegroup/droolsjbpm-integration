@@ -17,15 +17,14 @@ package org.kie.server.integrationtests.controller;
 
 import static org.junit.Assert.*;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
@@ -35,11 +34,13 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.controller.api.model.KieServerInstanceList;
-import org.kie.server.controller.api.model.KieServerStatus;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
+import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.integrationtests.config.TestConfig;
 
-public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
+public class KieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
 
@@ -90,17 +91,17 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         stopKieServer();
 
         // Check that there are no kie servers deployed in controller.
-        KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
+        Collection<ServerTemplate> instanceList = controllerClient.listServerTemplates();
         assertNotNull(instanceList);
-        assertNullOrEmpty("Active kie server instance found!", instanceList.getKieServerInstances());
+        assertNullOrEmpty("Active kie server instance found!", instanceList);
 
         // Turn on new kie server.
         startKieServer();
 
         // Check that kie server is registered in controller.
-        instanceList = controllerClient.listKieServerInstances();
+        instanceList = controllerClient.listServerTemplates();
         assertNotNull(instanceList);
-        assertEquals(1, instanceList.getKieServerInstances().length);
+        assertEquals(1, instanceList.size());
 
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
@@ -108,8 +109,9 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         assertNotNull(reply.getResult());
 
-        assertEquals(reply.getResult().getServerId(), instanceList.getKieServerInstances()[0].getIdentifier());
-        assertEquals(KieServerStatus.UP, instanceList.getKieServerInstances()[0].getStatus());
+        ServerTemplate deployedServerInstance = instanceList.iterator().next();
+        assertNotNull(deployedServerInstance);
+        assertEquals(reply.getResult().getServerId(), deployedServerInstance.getId());
     }
 
     @Test
@@ -119,20 +121,21 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         assertEquals(ServiceResponse.ResponseType.SUCCESS, kieServerInfo.getType());
         assertNotNull(kieServerInfo.getResult());
 
-        controllerClient.createKieServerInstance(kieServerInfo.getResult());
+        ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
+        controllerClient.saveServerTemplate(serverTemplate);
 
         // Check that kie server is registered.
-        KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
-        assertEquals(1, instanceList.getKieServerInstances().length);
-        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getKieServerInstances()[0].getIdentifier());
+        Collection<ServerTemplate> instanceList = controllerClient.listServerTemplates();
+        assertEquals(1, instanceList.size());
+        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.iterator().next().getId()); //maybe change to avoid next -> null
 
         // Turn off embedded kie server.
         stopKieServer();
 
         // Check that kie server is down in controller.
-        instanceList = controllerClient.listKieServerInstances();
-        assertEquals(1, instanceList.getKieServerInstances().length);
-        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.getKieServerInstances()[0].getIdentifier());
+        instanceList = controllerClient.listServerTemplates();
+        assertEquals(1, instanceList.size());
+        assertEquals(kieServerInfo.getResult().getServerId(), instanceList.iterator().next().getId()); //maybe change to avoid next -> null
     }
 
     @Test
@@ -148,20 +151,22 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         assertNullOrEmpty("Active containers found!", containersList.getResult().getContainers());
 
         // Check that there are no kie servers deployed in controller.
-        KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
-        assertNullOrEmpty("Active kie server instance found!", instanceList.getKieServerInstances());
+        Collection<ServerTemplate> instanceList = controllerClient.listServerTemplates();
+        assertNullOrEmpty("Active kie server instance found!", instanceList);
 
         // Turn kie server off, add embedded kie server to controller, create container and start kie server again.
         stopKieServer();
 
-        controllerClient.createKieServerInstance(kieServerInfo.getResult());
+        ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
+        controllerClient.saveServerTemplate(serverTemplate);
 
-        KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieContainerResource deployedContainer = controllerClient.createContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID, containerToDeploy);
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
+        controllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        ContainerSpec deployedContainer = controllerClient.getContainerInfo(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         assertNotNull(deployedContainer);
-        assertEquals(CONTAINER_ID, deployedContainer.getContainerId());
-        assertEquals(containerToDeploy.getReleaseId(), deployedContainer.getReleaseId());
+        assertEquals(CONTAINER_ID, deployedContainer.getId());
+        assertEquals(releaseId, deployedContainer.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, deployedContainer.getStatus());
 
         controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
@@ -184,9 +189,10 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         assertNotNull(kieServerInfo.getResult());
 
         // Create container.
-        controllerClient.createKieServerInstance(kieServerInfo.getResult());
-        KieContainerResource containerToDeploy = new KieContainerResource(CONTAINER_ID, releaseId);
-        controllerClient.createContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID, containerToDeploy);
+        ServerTemplate serverTemplate = new ServerTemplate(kieServerInfo.getResult().getServerId(), kieServerInfo.getResult().getName());
+        controllerClient.saveServerTemplate(serverTemplate);
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap<Capability, ContainerConfig>());
+        controllerClient.saveContainerSpec(kieServerInfo.getResult().getServerId(), containerSpec);
         controllerClient.startContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
 
         // Check that there is one container deployed.
@@ -203,15 +209,14 @@ public class KieControllerStartupIntegrationTest extends KieControllerBaseTest {
         assertNotNull(containersList.getResult().getContainers());
         assertEquals(1, containersList.getResult().getContainers().size());
 
-        KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
-        assertEquals(1, instanceList.getKieServerInstances().length);
-        assertEquals(KieServerStatus.UP, instanceList.getKieServerInstances()[0].getStatus());
+        Collection<ServerTemplate> instanceList = controllerClient.listServerTemplates();
+        assertEquals(1, instanceList.size());
 
         // Turn kie server off, dispose container and start kie server again.
         stopKieServer();
 
         controllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
-        controllerClient.disposeContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
+        controllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
 
         startKieServer();
 
