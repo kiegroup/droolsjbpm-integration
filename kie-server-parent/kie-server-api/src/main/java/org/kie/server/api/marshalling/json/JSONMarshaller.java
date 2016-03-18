@@ -16,12 +16,15 @@
 package org.kie.server.api.marshalling.json;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +51,9 @@ import org.codehaus.jackson.map.deser.std.UntypedObjectDeserializer;
 import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
+import org.codehaus.jackson.map.jsontype.TypeResolverBuilder;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.runtime.rule.impl.FlatQueryResults;
@@ -69,13 +74,16 @@ public class JSONMarshaller implements Marshaller {
     private ClassLoader classLoader;
     private final ObjectMapper objectMapper;
 
-    private final ObjectMapper fallbackObjectMapper;
+    private final Set<Class<?>> classesSet;
+
+    private final ObjectMapper deserializeObjectMapper;
 
     private DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         objectMapper = new ObjectMapper();
+        deserializeObjectMapper = new ObjectMapper();
 
         ObjectMapper customSerializationMapper = new ObjectMapper();
 
@@ -92,14 +100,15 @@ public class JSONMarshaller implements Marshaller {
         AnnotationIntrospector primary = new ExtendedJaxbAnnotationIntrospector(customClasses, customSerializationMapper);
         AnnotationIntrospector secondary = new JacksonAnnotationIntrospector();
         AnnotationIntrospector introspectorPair = new AnnotationIntrospector.Pair(primary, secondary);
-        objectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig()
-                .withAnnotationIntrospector(introspectorPair)
-                .without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .with( DeserializationConfig.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY ));
         objectMapper.setSerializationConfig(
                 objectMapper.getSerializationConfig()
                         .withAnnotationIntrospector( introspectorPair )
                         .with( SerializationConfig.Feature.INDENT_OUTPUT ));
+
+        deserializeObjectMapper.setDeserializationConfig(objectMapper.getDeserializationConfig()
+                .withAnnotationIntrospector(introspectorPair)
+                .without(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES));
+
 
         // setup custom serialization mapper with jaxb adapters
         customSerializationMapper.setDeserializationConfig(customSerializationMapper.getDeserializationConfig().withAnnotationIntrospector(introspectorPair));
@@ -110,37 +119,48 @@ public class JSONMarshaller implements Marshaller {
         // this module makes sure that only custom classes are equipped with type information
         if (classes != null && !classes.isEmpty()) {
             ObjectMapper customObjectMapper = new ObjectMapper();
-            customObjectMapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_OBJECT);
+            TypeResolverBuilder<?> typer = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL){
+                @Override
+                public boolean useForType(JavaType t) {
+                    if (classesSet.contains(t.getRawClass())) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
+            typer = typer.init(JsonTypeInfo.Id.CLASS, null);
+            typer = typer.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
+            customObjectMapper.setDefaultTyping(typer);
 
             SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
-            mod.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
-
             CustomObjectSerializer customObjectSerializer = new CustomObjectSerializer(customObjectMapper);
 
             for (Class<?> clazz : classes) {
                 mod.addSerializer(clazz, customObjectSerializer);
+
             }
 
             objectMapper.registerModule(mod);
-            customSerializationMapper.registerModule(mod);
-        }
 
-        fallbackObjectMapper = new ObjectMapper();
+            SimpleModule modDeser = new SimpleModule("custom-object-unmapper", Version.unknownVersion());
+            modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
+
+            deserializeObjectMapper.registerModule(modDeser);
+        }
 
         if (formatDate) {
 
             objectMapper.setDateFormat(dateFormat);
-            fallbackObjectMapper.setDateFormat(dateFormat);
             customSerializationMapper.setDateFormat(dateFormat);
+            deserializeObjectMapper.setDateFormat(dateFormat);
 
-            objectMapper.getDeserializationConfig().withDateFormat(dateFormat);
-            fallbackObjectMapper.getDeserializationConfig().withDateFormat(dateFormat);
-            customSerializationMapper.getDeserializationConfig().withDateFormat(dateFormat);
+            deserializeObjectMapper.getDeserializationConfig().withDateFormat(dateFormat);
 
             objectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
-            fallbackObjectMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
             customSerializationMapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
         }
+
+        this.classesSet = classes;
 
     }
 
@@ -168,19 +188,9 @@ public class JSONMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String serializedInput, Class<T> type) {
         try {
-
-            return (T) unwrap(objectMapper.readValue(serializedInput, type));
-        } catch (JsonMappingException e){
-
-            // in case of mapping exception try with object mapper without annotation introspection
-            try {
-                return (T) unwrap(fallbackObjectMapper.readValue(serializedInput, type));
-            } catch (IOException ex) {
-
-            }
-            throw new MarshallingException("Error unmarshalling input", e);
+            Class actualType = classesSet.contains(type) ? Object.class : type;
+            return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
-
             throw new MarshallingException("Error unmarshalling input", e);
         }
     }
@@ -281,13 +291,123 @@ public class JSONMarshaller implements Marshaller {
         @Override
         public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonProcessingException {
             String className = value.getClass().getName();
-            String json = customObjectMapper.writeValueAsString(value);
 
-            // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
-            if (!className.startsWith("java.") && !className.startsWith("javax.") && !json.contains(className))  {
-                json = "{\""+ className +"\":" + json + "}";
+            if (value instanceof Collection) {
+                String collectionJson = writeCollection((Collection) value, customObjectMapper);
+                jgen.writeRawValue(collectionJson);
+            } else if (value instanceof Map) {
+                String mapJson = writeMap((Map) value, customObjectMapper);
+                jgen.writeRawValue(mapJson);
+            } else if (value instanceof Object[] || value.getClass().isArray()) {
+                String arrayJson = writeArray((Collection) value, customObjectMapper);
+                jgen.writeRawValue(arrayJson);
+            } else {
+
+                String json = customObjectMapper.writeValueAsString(value);
+
+                // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+                if (!className.startsWith("java.") && !className.startsWith("javax.") && !json.contains(className)) {
+                    json = "{\"" + className + "\":" + json + "}";
+                }
+                jgen.writeRawValue(json);
             }
-            jgen.writeRawValue(json);
+        }
+
+        private String writeArray(Object value, ObjectMapper customObjectMapper) throws IOException{
+            StringBuilder builder = new StringBuilder();
+            builder.append("[");
+
+            int size = Array.getLength(value);
+
+            for (Object element : (Iterable) value) {
+                size--;
+                String elementClassName = element.getClass().getName();
+                String json = customObjectMapper.writeValueAsString(element);
+
+                // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+                if (!elementClassName.startsWith("java.") && !elementClassName.startsWith("javax.") && !json.contains(elementClassName)) {
+                    json = "{\"" + elementClassName + "\":" + json + "}";
+                }
+
+                builder.append(json);
+
+                if (size > 0) {
+                    builder.append(",");
+                }
+            }
+            builder.append("]");
+
+            return  builder.toString();
+        }
+
+        private String writeMap(Map value, ObjectMapper customObjectMapper) throws IOException{
+            StringBuilder builder = new StringBuilder();
+            builder.append("{");
+
+            int size = ((Map<?, ?>)value).size();
+
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>)value).entrySet()) {
+                size--;
+                // handle map key
+                Object key = entry.getKey();
+                String keyClassName = key.getClass().getName();
+                String json = customObjectMapper.writeValueAsString(key);
+
+                // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+                if (!keyClassName.startsWith("java.") && !keyClassName.startsWith("javax.") && !json.contains(keyClassName)) {
+                    json = "{\"" + keyClassName + "\":" + json + "}";
+                }
+                // handle map value
+                Object mValue = entry.getValue();
+                String mValueClassName = mValue.getClass().getName();
+                String jsonValue = customObjectMapper.writeValueAsString(mValue);
+
+                // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+                if (!mValueClassName.startsWith("java.") && !mValueClassName.startsWith("javax.") && !json.contains(mValueClassName)) {
+                    jsonValue = "{\"" + mValueClassName + "\":" + jsonValue + "}";
+                }
+
+                // add as JSON map
+                builder.append(json);
+                builder.append(" : ");
+                builder.append(jsonValue);
+
+                if (size > 0) {
+                    builder.append(",");
+                }
+            }
+
+            builder.append("}");
+            return builder.toString();
+        }
+
+        private String writeCollection(Collection collection, ObjectMapper customObjectMapper) throws IOException {
+
+            StringBuilder builder = new StringBuilder();
+            builder.append("[");
+
+            int size = collection.size();
+            Iterator it = collection.iterator();
+            while (it.hasNext()) {
+                size--;
+                Object element = it.next();
+                String elementClassName = element.getClass().getName();
+                String json = customObjectMapper.writeValueAsString(element);
+
+                // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
+                if (!elementClassName.startsWith("java.") && !elementClassName.startsWith("javax.") && !json.contains(elementClassName)) {
+                    json = "{\"" + elementClassName + "\":" + json + "}";
+                }
+
+                builder.append(json);
+
+                if (size > 0) {
+                    builder.append(",");
+                }
+            }
+            builder.append("]");
+
+            return  builder.toString();
         }
     }
 
@@ -322,14 +442,14 @@ public class JSONMarshaller implements Marshaller {
             String field1 = jp.getText();
             jp.nextToken();
             if (classes.containsKey(field1)) {
-                Object value = objectMapper.readValue(jp, classes.get(field1));
+                Object value = deserializeObjectMapper.readValue(jp, classes.get(field1));
                 jp.nextToken();
 
                 return value;
             } else {
                 if (isFullyQualifiedClassname(field1)) {
                     try {
-                        Object value = objectMapper.readValue(jp, Class.forName(field1, true, classLoader));
+                        Object value = deserializeObjectMapper.readValue(jp, Class.forName(field1, true, classLoader));
                         jp.nextToken();
 
                         return value;

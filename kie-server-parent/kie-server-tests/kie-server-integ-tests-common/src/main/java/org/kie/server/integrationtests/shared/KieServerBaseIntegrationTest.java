@@ -282,7 +282,7 @@ public abstract class KieServerBaseIntegrationTest {
         server = null;
     }
 
-    protected static void buildAndDeployMavenProject(String basedir) {
+    public static void buildAndDeployMavenProject(String basedir) {
         // need to backup (and later restore) the current class loader, because the Maven/Plexus does some classloader
         // magic which then results in CNFE in RestEasy client
         // run the Maven build which will create the kjar. The kjar is then either installed or deployed to local and
@@ -316,7 +316,7 @@ public abstract class KieServerBaseIntegrationTest {
         logger.debug("Maven project successfully built and deployed!");
     }
 
-    protected static void buildAndDeployCommonMavenParent() {
+    public static void buildAndDeployCommonMavenParent() {
         // deploy only once as it is not needed to do that with every request
         if (!commonParentDeployed) {
             buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/common-parent").getFile());
