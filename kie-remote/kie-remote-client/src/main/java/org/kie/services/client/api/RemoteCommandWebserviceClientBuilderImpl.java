@@ -17,7 +17,6 @@ package org.kie.services.client.api;
 
 import static org.kie.services.client.api.command.AbstractRemoteCommandObject.emptyDeploymentId;
 
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,14 +31,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.ConnectionType;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.kie.remote.client.api.RemoteWebserviceClientBuilder;
 import org.kie.remote.client.api.exception.RemoteApiException;
@@ -47,7 +44,6 @@ import org.kie.remote.client.api.exception.RemoteCommunicationException;
 import org.kie.remote.client.jaxb.JaxbCommandsRequest;
 import org.kie.remote.client.jaxb.JaxbCommandsResponse;
 import org.kie.remote.client.ws.KieRemoteWsAuthenticator;
-import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClient;
 import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.remote.services.ws.command.generated.Execute;
 import org.kie.remote.services.ws.command.generated.ExecuteResponse;

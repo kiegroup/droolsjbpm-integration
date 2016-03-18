@@ -42,8 +42,8 @@ import org.kie.remote.services.ws.command.generated.CommandServiceBasicAuthClien
 import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.remote.services.ws.command.test.TestCommandBasicAuthImpl;
 import org.kie.remote.services.ws.command.test.TestServerPasswordCallback;
-import org.kie.services.client.builder.redirect.AvailablePortFinder;
 import org.kie.services.shared.ServicesVersion;
+import org.kie.test.util.network.AvailablePortFinder;
 
 public class CommandServiceTest {
 
