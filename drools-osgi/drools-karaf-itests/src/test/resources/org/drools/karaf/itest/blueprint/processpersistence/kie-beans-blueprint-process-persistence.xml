@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:kie="http://drools.org/schema/kie-aries-blueprint/1.0.0"
+           xsi:schemaLocation="
+           http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+           http://drools.org/schema/kie-aries-blueprint/1.0.0 http://drools.org/schema/kie-aries-blueprint/1.0.0">
+
+  <reference id="entityManagerFactoryRef" interface="javax.persistence.EntityManagerFactory" filter="(osgi.unit.name=process-persistence)"/>
+  <reference id="transactionManagerRef" interface="javax.transaction.TransactionManager"/>
+  <reference id="userTransactionRef" interface="javax.transaction.UserTransaction" />
+  <reference id="transactionSynchronizationRegistryRef" interface="javax.transaction.TransactionSynchronizationRegistry" />
+
+  <!-- this would work if other properties (such as UserTransaction and TransactionSynchronizationRegistry) were set as well, however the XSD does not allow that -->
+  <!--
+  <kie:environment id="environmentWithPersistence">
+      <kie:transaction-manager ref="transactionManagerRef" />
+      <kie:entity-manager-factory ref="entityManagerFactoryRef" />
+  </kie:environment>
+  -->
+
+  <bean id="processBean" class="org.drools.karaf.itest.beans.ProcessWithPersistenceBean"
+        init-method="init" destroy-method="destroy">
+
+      <argument index="0" ref="entityManagerFactoryRef" />
+      <argument index="1" ref="transactionManagerRef" />
+      <argument index="2" ref="userTransactionRef" />
+      <argument index="3" ref="transactionSynchronizationRegistryRef" />
+  </bean>
+
+  <bean id="kieSessionBean" factory-ref="processBean" factory-method="createKieSession" destroy-method="destroy" />
+  <service id="kieSessionService" interface="org.kie.api.runtime.KieSession" ref="kieSessionBean" />
+
+</blueprint>
