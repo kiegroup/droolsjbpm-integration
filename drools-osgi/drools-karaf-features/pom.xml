@@ -34,7 +34,7 @@
     <!-- used by jbpm-commons -->
     <karaf.version.org.jboss.spec.javax.security.jacc>1.0.0.Final</karaf.version.org.jboss.spec.javax.security.jacc>
     <karaf.version.org.jboss.spec.javax.interceptor>1.0.0.Final</karaf.version.org.jboss.spec.javax.interceptor>
-    <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
+    <karaf.version.javax.servlet>3.1.0</karaf.version.javax.servlet>
     <karaf.version.org.apache.geronimo.specs.jms>1.1.1</karaf.version.org.apache.geronimo.specs.jms>
     <karaf.version.org.apache.geronimo.specs.jpa>1.1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
@@ -96,9 +96,9 @@
         <version>${karaf.version.javax.validation}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-servlet_3.0_spec</artifactId>
-        <version>${karaf.version.org.apache.geronimo.specs.servlet}</version>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>${karaf.version.javax.servlet}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -435,9 +435,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-servlet_3.0_spec</artifactId>
-      <scope>provided</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
