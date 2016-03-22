@@ -82,6 +82,8 @@
         <include>org.slf4j:slf4j-jdk14</include>
 
         <include>org.quartz-scheduler:quartz</include>
+
+        <include>org.sonatype.sisu.inject:guice-servlet</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

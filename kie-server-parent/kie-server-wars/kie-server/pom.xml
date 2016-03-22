@@ -200,6 +200,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- kie ci dependency to avoid linkage errors on EAP/Wildfly -->
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-servlet</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
