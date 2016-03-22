@@ -71,6 +71,8 @@
         <include>dom4j:dom4j</include>
 
         <include>org.quartz-scheduler:quartz</include>
+
+        <include>org.sonatype.sisu.inject:guice-servlet</include>
       </includes>
       <excludes>
         <exclude>org.jboss.resteasy:*</exclude>
