@@ -101,7 +101,7 @@ public class KieSessionElementParser extends AbstractElementParser {
             beanMetadata.setFactoryMethod("createKieSessionRef");
         }
 
-        beanMetadata.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+        addBundleContextProperty(beanMetadata, context);
 
         kSessionOptions.setDef(element.getAttribute(ATTRIBUTE_DEFAULT));
         kSessionOptions.setClockType(element.getAttribute(ATTRIBUTE_SCOPE));
