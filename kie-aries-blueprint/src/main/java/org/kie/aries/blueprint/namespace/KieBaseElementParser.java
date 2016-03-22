@@ -71,6 +71,8 @@ public class KieBaseElementParser extends AbstractElementParser {
         passThroughMetadata.setObject(kBaseOptionsAdaptor);
         beanMetadata.addArgument(passThroughMetadata, null, 2);
 
+        addBundleContextProperty(beanMetadata, context);
+
         String prefix = element.getPrefix();
         NodeList ksessionNodeList = element.getElementsByTagName(prefix+":ksession");
         if (ksessionNodeList != null) {

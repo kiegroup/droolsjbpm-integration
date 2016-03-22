@@ -35,6 +35,8 @@ public class KieContainerElementParser extends AbstractElementParser {
         beanMetadata.setFactoryMethod("fetchKContainer");
         beanMetadata.setId(id);
 
+        addBundleContextProperty(beanMetadata, context);
+
         if (!StringUtils.isEmpty(releaseIdRef)) {
             beanMetadata.addArgument(createRef(context, releaseIdRef), null, 0);
 
