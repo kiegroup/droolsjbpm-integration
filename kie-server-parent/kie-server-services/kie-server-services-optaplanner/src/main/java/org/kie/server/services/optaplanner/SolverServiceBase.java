@@ -309,7 +309,9 @@ public class SolverServiceBase {
         }
     }
 
-    private void startSolver(final SolverInstanceContext sic, final SolverInstance instance ) {
+    private void startSolver(final SolverInstanceContext sic, final SolverInstance instance) {
+        sic.getInstance().setPlanningProblem(null);
+        sic.getInstance().setBestSolution(null);
         sic.getInstance().setStatus( SolverInstance.SolverStatus.SOLVING );
         this.executor.execute(
                 new Runnable() {
