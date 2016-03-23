@@ -43,8 +43,10 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
+import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
@@ -164,6 +166,16 @@ public class KieServerMDB
                 throw new JMSRuntimeException(errMsg, jmse);
             }
 
+            String containerId = null;
+            try {
+                if (message.propertyExists(CONTAINER_ID_PROPERTY_NAME)) {
+                    containerId = message.getStringProperty(CONTAINER_ID_PROPERTY_NAME);
+                }
+            } catch (JMSException jmse) {
+                String logMsg = "Unable to retrieve property '" + CONTAINER_ID_PROPERTY_NAME + "' from message " + msgCorrId + ".";
+                logger.debug(logMsg);
+            }
+
             // 1. get marshalling info
             MarshallingFormat format = null;
             String classType = null;
@@ -189,7 +201,7 @@ public class KieServerMDB
             }
 
             // 2. get marshaller
-            Marshaller marshaller = marshallers.get(format);
+            Marshaller marshaller = getMarshaller(containerId, format);
             logger.debug("Selected marshaller is " + marshaller);
 
             // 3. deserialize request
@@ -290,6 +302,19 @@ public class KieServerMDB
                 }
             }
         }
+    }
+
+    protected Marshaller getMarshaller(String containerId, MarshallingFormat format) {
+        if (containerId == null || containerId.isEmpty()) {
+            return marshallers.get(format);
+        }
+
+        KieContainerInstance kieContainerInstance = kieServer.getServerRegistry().getContainer(containerId);
+        if (kieContainerInstance != null) {
+            return kieContainerInstance.getMarshaller(format);
+        }
+
+        return marshallers.get(format);
     }
 
 }
