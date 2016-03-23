@@ -16,19 +16,15 @@
 package org.kie.server.integrationtests.drools;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -67,7 +63,6 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testStateIsKeptBetweenCalls() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -77,17 +72,16 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
         commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> reply1 = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        ServiceResponse<ExecutionResults> reply1 = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply1.getType());
         // first call should set the surname for the inserted person
-        String result1 = reply1.getResult();
-        ExecutionResults actualData = marshaller.unmarshall(result1, ExecutionResultImpl.class);
+        ExecutionResults actualData = reply1.getResult();
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result1, PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false! Got response: " + result1, false, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
 
 
         // insert second person and fire the rules. The duplicated field will be set to true if there are two
@@ -102,15 +96,14 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
         commands.add(commandsFactory.newInsert(person, PERSON_2_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> reply2 = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
-        String result2 = reply2.getResult();
+        ServiceResponse<ExecutionResults> reply2 = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply2.getType());
 
-        actualData = marshaller.unmarshall(result2, ExecutionResultImpl.class);
+        actualData = reply2.getResult();
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false! Got response: " + result2, true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
     }
 

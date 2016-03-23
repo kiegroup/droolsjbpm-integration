@@ -15,25 +15,21 @@
 
 package org.kie.server.integrationtests.drools;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.*;
 
 /**
  * Test used for verification of spreadsheet decision table processing.
@@ -65,7 +61,6 @@ public class SpreadsheetIntegrationTest extends DroolsKieServerBaseIntegrationTe
 
     @Test
     public void testExecuteSpreadsheetRule() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Object person = createInstance(PERSON_CLASS_NAME, PERSON_AGE);
@@ -75,9 +70,9 @@ public class SpreadsheetIntegrationTest extends DroolsKieServerBaseIntegrationTe
         commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        ExecutionResults results = marshaller.unmarshall(response.getResult(), ExecutionResultImpl.class);
+        ExecutionResults results = response.getResult();
         Object value = results.getValue(PERSON_OUT_IDENTIFIER);
         assertEquals(Boolean.TRUE, valueOf(value, PERSON_CAN_BUY_ALCOHOL_FIELD));
     }
