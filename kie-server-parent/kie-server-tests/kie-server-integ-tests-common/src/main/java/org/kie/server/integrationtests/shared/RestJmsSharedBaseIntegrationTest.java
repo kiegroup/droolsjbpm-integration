@@ -77,11 +77,24 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
             configuration =
                     KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null).setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+            if(extraClasses.size() > 0) {
+                // Use classloader of extra classes as client classloader
+                ClassLoader classLoader = extraClasses.values().iterator().next().getClassLoader();
+                kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, classLoader);
+            } else {
+                kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+            }
         } else {
             configuration.setMarshallingFormat(marshallingFormat);
             configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+            if(extraClasses.size() > 0) {
+                // Use classloader of extra classes as client classloader
+                ClassLoader classLoader = extraClasses.values().iterator().next().getClassLoader();
+                kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, classLoader);
+            } else {
+                kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
+            }
+
         }
         setupClients(kieServicesClient);
         return kieServicesClient;

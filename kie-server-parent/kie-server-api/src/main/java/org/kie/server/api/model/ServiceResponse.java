@@ -22,6 +22,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -74,7 +77,6 @@ public class ServiceResponse<T> {
     @XmlAttribute
     private String msg;
     @XmlElements({
-
         // types model
         @XmlElement(name = "boolean-type", type = JaxbBoolean.class),
         @XmlElement(name = "byte-type", type = JaxbByte.class),
@@ -123,7 +125,8 @@ public class ServiceResponse<T> {
         @XmlElement(name = "request-info-instance-list", type = RequestInfoInstanceList.class),
         @XmlElement(name = "error-info-instance", type = ErrorInfoInstance.class),
         @XmlElement(name = "error-info-instance-list", type = ErrorInfoInstanceList.class),
-        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class)
+        @XmlElement(name = "job-request-instance", type = JobRequestInstance.class),
+        @XmlElement(name = "execution-results", type = ExecutionResultImpl.class)
 
     })
     private T result;

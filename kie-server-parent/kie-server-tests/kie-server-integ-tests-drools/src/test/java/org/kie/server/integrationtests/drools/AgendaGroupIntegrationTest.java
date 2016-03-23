@@ -8,9 +8,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.*;
 
 public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -45,11 +48,16 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
-        assertResultContainsStringRegex(result,
-                ".*Rule in first agenda group executed.*Rule without agenda group executed.*");
+        ExecutionResults result = response.getResult();
+
+        List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);
+        assertNotNull(outcome);
+        assertEquals(2, outcome.size());
+
+        assertEquals("Rule in first agenda group executed", outcome.get(0));
+        assertEquals("Rule without agenda group executed", outcome.get(1));
     }
 
     /**
@@ -71,12 +79,15 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
-        assertResultContainsStringRegex(result,
-                ".*Rule without agenda group executed.*");
-        assertResultNotContainingStringRegex(result,
-            ".*Rule in first agenda group executed.*");
+        ExecutionResults result = response.getResult();
+
+        List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);
+        assertNotNull(outcome);
+        assertEquals(1, outcome.size());
+
+        assertEquals("Rule without agenda group executed", outcome.get(0));
+
     }
 }

@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -68,10 +69,12 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> response1 = ruleClient.executeCommands(CONTAINER_1_ID, batchExecution1);
+        ServiceResponse<ExecutionResults> response1 = ruleClient.executeCommandsWithResults(CONTAINER_1_ID, batchExecution1);
         assertSuccess(response1);
-        String result1 = response1.getResult();
-        assertTrue("Person's id should be 'Person from kjar1'!. Got result: " + result1, result1.contains("Person from kjar1"));
+        ExecutionResults result1 = response1.getResult();
+
+        Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
+        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", valueOf(outcome, "id"));
 
         // now execute the same commands, but for the second container. The rule in there should set different id
         // (namely "Person from kjar2") for the inserted person
@@ -84,10 +87,12 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> response2 = ruleClient.executeCommands(CONTAINER_2_ID, batchExecution2);
+        ServiceResponse<ExecutionResults> response2 = ruleClient.executeCommandsWithResults(CONTAINER_2_ID, batchExecution2);
         assertSuccess(response2);
-        String result2 = response2.getResult();
-        assertTrue("Person's id should be 'Person from kjar2'!. Got result: " + result2, result2.contains("Person from kjar2"));
+        ExecutionResults result2 = response2.getResult();
+
+        Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
+        assertEquals("Person's id should be 'Person from kjar2'!", "Person from kjar2", valueOf(outcome2, "id"));
     }
 
 }
