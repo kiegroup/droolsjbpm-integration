@@ -89,7 +89,6 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
 
     @Override
     public Set<Class> getManagedClasses() {
-        //System.out.println("getManagedClasses ::");
         return null;
     }
 
