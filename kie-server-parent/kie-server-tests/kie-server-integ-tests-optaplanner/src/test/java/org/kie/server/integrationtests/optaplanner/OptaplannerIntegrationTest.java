@@ -120,7 +120,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testCreateDuplicitSolver() throws Exception {
+    public void testCreateDuplicateSolver() throws Exception {
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
@@ -251,7 +251,7 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testGetBestSolution() throws Exception {
 
         SolverInstance instance = new SolverInstance();
@@ -269,7 +269,8 @@ public class OptaplannerIntegrationTest
 
         Solution solution = null;
         // It can take a while for the Construction Heuristic to initialize the solution
-        for (int i = 0; i < 15; i++) {
+        // The test timeout will interrupt this thread if it takes too long
+        while (!Thread.currentThread().isInterrupted()) {
             ServiceResponse<SolverInstance> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
             assertSuccess(solutionResponse);
             solution = solutionResponse.getResult().getBestSolution();
