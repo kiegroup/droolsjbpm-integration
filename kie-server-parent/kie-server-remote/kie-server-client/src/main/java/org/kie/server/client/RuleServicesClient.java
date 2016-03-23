@@ -16,12 +16,25 @@
 package org.kie.server.client;
 
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.ServiceResponse;
 
 public interface RuleServicesClient {
 
+    /**
+     * @deprecated use #executeCommandsWithResults
+     */
+    @Deprecated
     ServiceResponse<String> executeCommands(String id, String payload);
 
+    /**
+     * @deprecated use #executeCommandsWithResults
+     */
+    @Deprecated
     ServiceResponse<String> executeCommands(String id, Command<?> cmd);
+
+    ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, String payload);
+
+    ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd);
 }
 

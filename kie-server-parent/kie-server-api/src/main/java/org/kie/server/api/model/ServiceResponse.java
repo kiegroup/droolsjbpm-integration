@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
@@ -120,7 +121,9 @@ public class ServiceResponse<T> {
 
             // optaplanner entities
             @XmlElement(name = "solver-instance", type = SolverInstance.class),
-            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class)
+            @XmlElement(name = "solver-instance-list", type = SolverInstanceList.class),
+
+            @XmlElement(name = "execution-results", type = ExecutionResultImpl.class)
             })
     private T                            result;
 

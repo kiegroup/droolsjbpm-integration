@@ -38,6 +38,7 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
@@ -47,7 +48,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KieContainerCommandServiceImpl implements KieContainerCommandService {
+public class KieContainerCommandServiceImpl implements KieContainerCommandService<ExecutionResults> {
 
     protected static final Pattern LOOKUP            = Pattern.compile("[\"']?lookup[\"']?\\s*[:=]\\s*[\"']([^\"']+)[\"']");
     private static final Logger logger             = LoggerFactory.getLogger(KieContainerCommandServiceImpl.class);
@@ -60,9 +61,13 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
         this.context = context;
     }
 
-    public ServiceResponse<String> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
+    public ServiceResponse<ExecutionResults> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
+        return callContainer(containerId, payload, marshallingFormat, classType, false);
+    }
+
+    protected ServiceResponse<ExecutionResults> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType, boolean marshallResponse) {
         if( payload == null ) {
-            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
+            return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
         }
         try {
             KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId );
@@ -94,24 +99,31 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     Command<?> cmd = kci.getMarshaller( marshallingFormat ).unmarshall(payload, type);
 
                     if (cmd == null) {
-                        return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
+                        return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
                     }
                     if (!(cmd instanceof BatchExecutionCommandImpl)) {
                         cmd = new BatchExecutionCommandImpl(Arrays.asList(new GenericCommand<?>[]{(GenericCommand<?>) cmd}));
                     }
 
                     ExecutionResults results = ks.execute((BatchExecutionCommandImpl) cmd);
-                    String result = kci.getMarshaller( marshallingFormat ).marshall(results);
-                    return new ServiceResponse<String>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
+                    if (marshallResponse) {
+                        Marshaller marshaller = kci.getMarshaller(marshallingFormat);
+                        String result = marshaller.marshall(results);
+
+                        return new ServiceResponse(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
+                    } else {
+
+                        return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", results);
+                    }
                 } else {
-                    return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");
+                    return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Session '" + sessionId + "' not found on container '" + containerId + "'.");
                 }
             } else {
-                return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
+                return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
             }
         } catch (Exception e) {
             logger.error("Error calling container '" + containerId + "'", e);
-            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " +
+            return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
     }
@@ -128,7 +140,9 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 } else if (command instanceof ListContainersCommand) {
                     responses.add(this.kieServer.listContainers());
                 } else if (command instanceof CallContainerCommand) {
-                    responses.add(callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload(), marshallingFormat, classType));
+                    ServiceResponse response = callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload(), marshallingFormat, classType, true);
+
+                    responses.add(response);
                 } else if (command instanceof DisposeContainerCommand) {
                     responses.add(this.kieServer.disposeContainer(((DisposeContainerCommand) command).getContainerId()));
                 } else if (command instanceof GetContainerInfoCommand) {
