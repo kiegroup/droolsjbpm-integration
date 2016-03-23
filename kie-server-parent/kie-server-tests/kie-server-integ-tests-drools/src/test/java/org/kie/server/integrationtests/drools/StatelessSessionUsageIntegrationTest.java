@@ -75,14 +75,13 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
         Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
         commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
 
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
-        String result = reply.getResult();
-        ExecutionResults actualData = marshaller.unmarshall(result, ExecutionResultImpl.class);
+        ExecutionResults actualData = reply.getResult();
         Object value = actualData.getValue(PERSON_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result,
+        assertEquals("Expected surname to be set to 'Vader'",
                 PERSON_EXPECTED_SURNAME, valueOf(value, PERSON_SURNAME_FIELD));
     }
 

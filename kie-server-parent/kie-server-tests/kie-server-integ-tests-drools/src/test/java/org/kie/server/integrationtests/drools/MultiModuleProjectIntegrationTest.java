@@ -24,10 +24,13 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.assertEquals;
 
 public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -71,11 +74,12 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newInsert(car, CAR_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> response1 = ruleClient.executeCommands(CONTAINER_1_ID, batchExecution1);
+        ServiceResponse<ExecutionResults> response1 = ruleClient.executeCommandsWithResults(CONTAINER_1_ID, batchExecution1);
         assertSuccess(response1);
-        String result1 = response1.getResult();
-        // Add checking of result identifier when rule client will be able to return unmarshalled ExecutionResults.
-        assertResultContainsString(result1, "Driving car!");
+        ExecutionResults result = response1.getResult();
+
+        Object outcome = result.getValue(CAR_OUT_IDENTIFIER);
+        assertEquals("Driving car!", valueOf(outcome, "message"));
 
         Object bus = createInstance(BUS_CLASS_NAME);
         commands = new ArrayList<Command<?>>();
@@ -84,11 +88,13 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newInsert(bus, BUS_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> response2 = ruleClient.executeCommands(CONTAINER_2_ID, batchExecution2);
-        String result2 = response2.getResult();
+        ServiceResponse<ExecutionResults> response2 = ruleClient.executeCommandsWithResults(CONTAINER_2_ID, batchExecution2);
+
         assertSuccess(response2);
-        // Add checking of result identifier when rule client will be able to return unmarshalled ExecutionResults.
-        assertResultContainsString(result2, "Driving bus!");
+        ExecutionResults result2 = response2.getResult();
+
+        Object outcome2 = result2.getValue(BUS_OUT_IDENTIFIER);
+        assertEquals("Driving bus!", valueOf(outcome2, "message"));
     }
 
 }

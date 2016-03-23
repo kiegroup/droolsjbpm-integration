@@ -309,10 +309,14 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected ServiceResponsesList executeJmsCommand( CommandScript command, String classType ) {
-        return executeJmsCommand(command, classType, null);
+        return executeJmsCommand(command, classType, null, null);
     }
 
     protected ServiceResponsesList executeJmsCommand( CommandScript command, String classType, String targetCapability ) {
+        return executeJmsCommand(command, classType, targetCapability, null);
+    }
+
+    protected ServiceResponsesList executeJmsCommand( CommandScript command, String classType, String targetCapability, String containerId ) {
         ConnectionFactory factory = config.getConnectionFactory();
         Queue sendQueue = config.getRequestQueue();
         Queue responseQueue = config.getResponseQueue();
@@ -365,6 +369,10 @@ public abstract class AbstractKieServicesClientImpl {
                 }
                 textMsg.setStringProperty(JMSConstants.USER_PROPERTY_NAME, config.getUserName());
                 textMsg.setStringProperty(JMSConstants.PASSWRD_PROPERTY_NAME, config.getPassword());
+
+                if (containerId != null) {
+                    textMsg.setStringProperty(JMSConstants.CONTAINER_ID_PROPERTY_NAME, containerId);
+                }
 
                 // send
                 producer.send(textMsg);
@@ -590,5 +598,40 @@ public abstract class AbstractKieServicesClientImpl {
             return new ArrayList<Object>();
         }
         return new ArrayList<Object>(list);
+    }
+
+    /*
+ * override of the regular method to allow backward compatibility for string based result of ServiceResponse
+ */
+    protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, Object body, Class<T> resultType, Map<String, String> headers) {
+        logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
+        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+            ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
+            // serialize it back to string to make it backward compatible
+            serviceResponse.setResult(serialize(serviceResponse.getResult()));
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
+    }
+
+    protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
+        logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
+        KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
+        KieRemoteHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.OK.getStatusCode() ) {
+            ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
+            // serialize it back to string to make it backward compatible
+            serviceResponse.setResult(serialize(serviceResponse.getResult()));
+            checkResultType(serviceResponse, resultType);
+            return serviceResponse;
+        } else {
+            throw createExceptionForUnexpectedResponseCode( request, response );
+        }
     }
 }

@@ -77,7 +77,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     @Test
     @Category(Smoke.class)
     public void testCallContainer() throws Exception {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
@@ -89,9 +88,9 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
         Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
     }
@@ -112,9 +111,9 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
         String marshalledCommands = marshaller.marshall(batchExecution);
 
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, marshalledCommands);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, marshalledCommands);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
         Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
     }
@@ -154,7 +153,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
 
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
     }
 }

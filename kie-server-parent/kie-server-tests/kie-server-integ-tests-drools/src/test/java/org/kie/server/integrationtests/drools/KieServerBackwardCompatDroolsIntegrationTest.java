@@ -42,6 +42,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
 public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
@@ -70,6 +71,11 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(MESSAGE_CLASS_NAME, Class.forName(MESSAGE_CLASS_NAME, true, kjarClassLoader));
+    }
+
+    @Override
+    protected KieServicesClient createDefaultClient() throws Exception {
+        return super.createDefaultClient();
     }
 
     @Test
