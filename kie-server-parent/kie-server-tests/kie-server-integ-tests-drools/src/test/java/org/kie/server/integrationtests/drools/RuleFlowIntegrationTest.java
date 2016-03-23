@@ -23,9 +23,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.*;
 
 public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -58,11 +61,16 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
-        assertResultContainsStringRegex(result,
-            ".*Rule from first ruleflow group executed.*Rule from second ruleflow group executed.*");
+        ExecutionResults result = response.getResult();
+
+        List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
+        assertNotNull(outcome);
+        assertEquals(2, outcome.size());
+
+        assertEquals("Rule from first ruleflow group executed", outcome.get(0));
+        assertEquals("Rule from second ruleflow group executed", outcome.get(1));
     }
 
     @Test
@@ -77,11 +85,16 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
-        assertResultContainsStringRegex(result,
-            ".*Rule from first ruleflow group executed.*Rule from second ruleflow group executed.*");
+        ExecutionResults result = response.getResult();
+
+        List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
+        assertNotNull(outcome);
+        assertEquals(2, outcome.size());
+
+        assertEquals("Rule from first ruleflow group executed", outcome.get(0));
+        assertEquals("Rule from second ruleflow group executed", outcome.get(1));
     }
 
     @Test
@@ -99,12 +112,14 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
-        assertResultContainsStringRegex(result,
-                ".*Rule from second ruleflow group executed.*");
-        assertResultNotContainingStringRegex(result,
-            ".*Rule from first ruleflow group executed.*");
+        ExecutionResults result = response.getResult();
+
+        List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
+        assertNotNull(outcome);
+        assertEquals(1, outcome.size());
+
+        assertEquals("Rule from second ruleflow group executed", outcome.get(0));
     }
 }

@@ -1,24 +1,20 @@
 package org.kie.server.integrationtests.drools;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+
+import static org.junit.Assert.*;
 
 public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -51,7 +47,6 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
 
     @Test
     public void testGetObjects() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -63,16 +58,15 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
         commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetObjects(GET_OBJECTS_IDENTIFIER));
 
-        ServiceResponse<String> response = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         assertSuccess(response);
-        String result = response.getResult();
 
-        ExecutionResults actualData = marshaller.unmarshall(result, ExecutionResultImpl.class);
+        ExecutionResults actualData = response.getResult();
         List<Object> listOfObjects = (List<Object>) actualData.getValue(GET_OBJECTS_IDENTIFIER);
         assertEquals(1, listOfObjects.size());
 
         Object returnedPerson = listOfObjects.get(0);
-        assertEquals("Expected surname to be set to 'Vader'. Got response: " + result,
+        assertEquals("Expected surname to be set to 'Vader'",
                 PERSON_EXPECTED_SURNAME, valueOf(returnedPerson, PERSON_SURNAME_FIELD));
     }
 }

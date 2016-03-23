@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -99,10 +100,10 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
             commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
 
             long threadId = Thread.currentThread().getId();
-            ServiceResponse<String> reply;
+            ServiceResponse<ExecutionResults> reply;
             for (int i = 0; i < NR_OF_REQUESTS_PER_THREAD; i++) {
                 logger.trace("Container call #{}, thread-id={}", i, threadId);
-                reply = ruleServicesClient.executeCommands(CONTAINER_ID, batchExecution);
+                reply = ruleServicesClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
                 logger.trace("Container reply for request #{}: {}, thread-id={}", i, reply, threadId);
                 assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
             }

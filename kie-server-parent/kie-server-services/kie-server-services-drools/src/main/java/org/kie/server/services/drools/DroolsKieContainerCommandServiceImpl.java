@@ -42,9 +42,9 @@ public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandSer
     }
 
     @Override
-    public ServiceResponse<String> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
+    public ServiceResponse<ExecutionResults> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
         if( payload == null ) {
-            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
+            return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
         }
         try {
             KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId );
@@ -63,19 +63,18 @@ public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandSer
                 }
 
                 if (cmd == null || ((BatchExecutionCommandImpl)cmd).getCommands() == null || ((BatchExecutionCommandImpl)cmd).getCommands().isEmpty()) {
-                    return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Bad request, no commands to be executed - either wrong format or no data");
+                    return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Bad request, no commands to be executed - either wrong format or no data");
                 }
 
                 ExecutionResults results = rulesExecutionService.call(kci, (BatchExecutionCommandImpl) cmd);
-                String result = kci.getMarshaller( marshallingFormat ).marshall(results);
-                return new ServiceResponse<String>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", result);
+                return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully called.", results);
             } else {
-                return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
+                return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Container " + containerId + " is not instantiated.");
             }
 
         } catch (Exception e) {
             logger.error("Error calling container '" + containerId + "'", e);
-            return new ServiceResponse<String>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " + e.getMessage());
+            return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ": " + e.getMessage());
         }
     }
 }
