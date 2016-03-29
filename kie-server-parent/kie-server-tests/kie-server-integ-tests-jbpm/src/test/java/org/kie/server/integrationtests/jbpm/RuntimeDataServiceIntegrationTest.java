@@ -77,7 +77,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(7, definitions.size());
+        assertEquals(8, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
@@ -86,6 +86,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertTrue(processIds.contains("definition-project.usertask"));
         assertTrue(processIds.contains("customtask"));
         assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
 
         // test paging of the result
         definitions = queryClient.findProcesses(0, 3);
@@ -94,7 +95,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
-        assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
         assertTrue(processIds.contains("signal-start"));
 
         definitions = queryClient.findProcesses(1, 3);
@@ -102,7 +103,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.evaluation"));
         assertTrue(processIds.contains("customtask"));
         assertTrue(processIds.contains("definition-project.grouptask"));
 
@@ -144,7 +145,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId("definition-project", 0, 20);
         assertNotNull(definitions);
 
-        assertEquals(7, definitions.size());
+        assertEquals(8, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
@@ -153,6 +154,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertTrue(processIds.contains("definition-project.usertask"));
         assertTrue(processIds.contains("customtask"));
         assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
 
         // test paging of the result
         definitions = queryClient.findProcessesByContainerId("definition-project", 0, 3);
@@ -161,7 +163,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
-        assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
         assertTrue(processIds.contains("signal-start"));
 
         definitions = queryClient.findProcessesByContainerId("definition-project", 1, 3);
@@ -169,7 +171,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.evaluation"));
         assertTrue(processIds.contains("customtask"));
         assertTrue(processIds.contains("definition-project.grouptask"));
 
