@@ -17,18 +17,15 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -62,8 +59,6 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithBusinessRuleTask() throws Exception {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, kieContainer.getClassLoader());
-
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, "business-rule-task");
         assertNotNull(processInstanceId);
@@ -89,7 +84,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             commands.add(commandsFactory.newInsert(person, "person-yoda"));
 
 
-            ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+            ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             // startTask and completeTask task
@@ -114,10 +109,10 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             commands.add(commandsFactory.newGetGlobal("people"));
 
             executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID); // use container id as ksession id to use ksession from jBPM extension
-            reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+            reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
-            ExecutionResultImpl actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+            ExecutionResults actualData = reply.getResult();
             assertNotNull(actualData);
 
         } finally {
@@ -126,7 +121,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
             commands.add(commandsFactory.newFireAllRules());
 
-            ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+            ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -172,7 +167,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             commands.add(commandsFactory.newInsert(person, "person-yoda"));
 
 
-            ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+            ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             // check if it was moved to another human task
@@ -191,7 +186,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
             commands.add(commandsFactory.newFireAllRules());
 
-            ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+            ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
