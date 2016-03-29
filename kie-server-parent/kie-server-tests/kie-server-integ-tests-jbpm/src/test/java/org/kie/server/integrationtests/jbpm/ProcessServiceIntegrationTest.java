@@ -27,11 +27,13 @@ import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.internal.KieInternalServices;
+import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
@@ -722,6 +724,38 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         } catch (Exception e){
             e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void testStartProcessInstanceWithAsyncNodes() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        Long processInstanceId = processClient.startProcess("definition-project", "AsyncScriptTask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        try {
+
+            List<String> status = new ArrayList<String>();
+            status.add(STATUS.QUEUED.toString());
+            List<RequestInfoInstance> jobs = jobServicesClient.getRequestsByStatus(status, 0, 10);
+            assertNotNull(jobs);
+            // there must be one job for async execution of script task
+            assertEquals(1, jobs.size());
+
+            RequestInfoInstance job = jobs.get(0);
+
+            // wait for the job to be completed
+            waitForJobToFinish(job.getId());
+
+            ProcessInstance pi = processClient.getProcessInstance("definition-project", processInstanceId);
+            assertNotNull(pi);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, pi.getState().intValue());
+
+        } catch (Exception e){
+            processClient.abortProcessInstance("definition-project", processInstanceId);
             fail(e.getMessage());
         }
 

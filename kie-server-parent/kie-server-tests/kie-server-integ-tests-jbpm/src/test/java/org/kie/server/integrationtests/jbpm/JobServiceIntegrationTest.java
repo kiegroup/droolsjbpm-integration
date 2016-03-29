@@ -44,8 +44,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
-    private static final long SERVICE_TIMEOUT = 30000;
-    private static final long TIMEOUT_BETWEEN_CALLS = 200;
     private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
     @BeforeClass
@@ -406,19 +404,4 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobServicesClient.cancelRequest(jobId);
     }
 
-    private void waitForJobToFinish(Long jobId) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
-        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
-
-            // If job finished (to one of final states) then return.
-            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
-                STATUS.DONE.toString().equals(result.getStatus()) ||
-                STATUS.ERROR.toString().equals(result.getStatus())) {
-                return;
-            }
-            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
-        }
-        throw new TimeoutException("Timeout while waiting for job executor to finish job.");
-    }
 }

@@ -222,6 +222,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
             ((ExecutorImpl) ((ExecutorServiceImpl) executorService).getExecutor()).setQueueName(executorQueueName);
 
             executorService.init();
+
+            ((KModuleDeploymentService) deploymentService).setExecutorService(executorService);
         }
 
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),

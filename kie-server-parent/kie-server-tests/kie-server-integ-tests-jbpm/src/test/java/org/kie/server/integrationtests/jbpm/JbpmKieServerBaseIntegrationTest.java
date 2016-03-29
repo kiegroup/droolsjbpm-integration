@@ -17,14 +17,18 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.internal.executor.api.STATUS;
+import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -49,6 +53,10 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
     protected static final String PROCESS_ID_GROUPTASK = "definition-project.grouptask";
+
+
+    protected static final long SERVICE_TIMEOUT = 30000;
+    protected static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     protected ProcessServicesClient processClient;
     protected UserTaskServicesClient taskClient;
@@ -120,5 +128,22 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         }
 
         super.disposeAllContainers();
+    }
+
+
+    protected void waitForJobToFinish(Long jobId) throws Exception {
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
+        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
+            RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
+
+            // If job finished (to one of final states) then return.
+            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
+                    STATUS.DONE.toString().equals(result.getStatus()) ||
+                    STATUS.ERROR.toString().equals(result.getStatus())) {
+                return;
+            }
+            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
+        }
+        throw new TimeoutException("Timeout while waiting for job executor to finish job.");
     }
 }
