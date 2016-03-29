@@ -19,7 +19,6 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,17 +30,11 @@ import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.commands.CallContainerCommand;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.CreateContainerCommand;
-import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
@@ -123,30 +116,47 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     }
 
     @Test
-    public void testCommandScript() throws Exception {
+    public void testCallContainerRuleClient() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
-        Command<?> insert = commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER);
-        Command<?> fire = commandsFactory.newFireAllRules();
-        BatchExecutionCommand batch = commandsFactory.newBatchExecution(Arrays.<Command<?>>asList(insert, fire), KIE_SESSION);
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
-        String payload = marshaller.marshall(batch);
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
 
-        String containerId = "command-script-container";
-        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId, null));
-        KieServerCommand call = new CallContainerCommand(containerId, payload);
-        KieServerCommand dispose = new DisposeContainerCommand(containerId);
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, batchExecution);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+    }
 
-        List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
-        CommandScript script = new CommandScript(cmds);
+    @Test
+    public void testCallContainerWithStringPayloadRuleClient() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        ServiceResponsesList reply = client.executeScript(script);
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
-        for (ServiceResponse<? extends Object> r : reply.getResponses()) {
-            Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
-        }
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        String marshalledCommands = marshaller.marshall(batchExecution);
+
+        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, marshalledCommands);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test

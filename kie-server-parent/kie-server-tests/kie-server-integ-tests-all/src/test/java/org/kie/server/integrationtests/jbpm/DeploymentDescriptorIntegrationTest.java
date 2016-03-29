@@ -64,8 +64,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
     @Test
     public void testGlobalVariableFromDeploymentDescriptor() throws Exception {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, kieContainer.getClassLoader());
-
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -74,12 +72,12 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         // retrieve global variable set in deployment descriptor
         commands.add(commandsFactory.newGetGlobal(GLOBAL_PERSON_IDENTIFIER));
 
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
-        ExecutionResultImpl actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        ExecutionResults actualData = reply.getResult();
         assertNotNull(actualData);
-        Object personVar = actualData.getResults().get(GLOBAL_PERSON_IDENTIFIER);
+        Object personVar = actualData.getValue(GLOBAL_PERSON_IDENTIFIER);
         assertNotNull(personVar);
         assertEquals(GLOBAL_PERSON_NAME, valueOf(personVar, PERSON_NAME_FIELD));
     }
@@ -88,8 +86,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
     public void testPerRequestRuntimeStrategy() throws Exception {
         String personOutIdentifier = "personOut";
         String personName = "yoda";
-
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, kieContainer.getClassLoader());
 
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -100,10 +96,10 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         Object createPersonInstance = createPersonInstance(personName);
         commands.add(commandsFactory.newInsert(createPersonInstance, personOutIdentifier));
         commands.add(commandsFactory.newGetObjects(personOutIdentifier));
-        ServiceResponse<String> reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
-        ExecutionResults actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        ExecutionResults actualData = reply.getResult();
         assertNotNull(actualData);
         ArrayList<Object> personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
         assertEquals(1, personVar.size());
@@ -112,10 +108,10 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         // try to retrieve person object by new request
         commands.clear();
         commands.add(commandsFactory.newGetObjects(personOutIdentifier));
-        reply = ruleClient.executeCommands(CONTAINER_ID, executionCommand);
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
-        actualData = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
+        actualData = reply.getResult();
         assertNotNull(actualData);
         personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
         assertNullOrEmpty("Person object was returned!", personVar);
