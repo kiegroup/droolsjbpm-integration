@@ -76,9 +76,8 @@ public class ProcessWithPersistenceBean {
                 .userGroupCallback(new JBossUserGroupCallbackImpl(new Properties()))
                 .addEnvironmentEntry(EnvironmentName.ENTITY_MANAGER_FACTORY, entityManagerFactory)
                 .addEnvironmentEntry(EnvironmentName.TRANSACTION_MANAGER, transactionManager)
-                 // uncomment the following two and the test will pass (however it is not possible to set those from blueprint XML)
-                 //.addEnvironmentEntry(EnvironmentName.TRANSACTION, userTransaction)
-                 //.addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, transactionSynchronizationRegistry)
+                .addEnvironmentEntry(EnvironmentName.TRANSACTION, userTransaction)
+                .addEnvironmentEntry(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, transactionSynchronizationRegistry)
                 .get();
     }
 
