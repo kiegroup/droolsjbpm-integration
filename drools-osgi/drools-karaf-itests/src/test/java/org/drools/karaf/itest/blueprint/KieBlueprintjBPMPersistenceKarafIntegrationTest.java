@@ -35,9 +35,7 @@ import javax.inject.Inject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 /**
@@ -83,7 +81,7 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                //  debugConfiguration("5005", true),
+//                  debugConfiguration("5005", true),
 
                 // Load KIE features
                 loadKieFeatures("jndi", "transaction", "droolsjbpm-hibernate", "h2", "jbpm", "kie-aries-blueprint"),

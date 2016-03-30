@@ -30,6 +30,8 @@
 
     <kie:entity-manager-factory ref="myEmf"/>
     <kie:transaction-manager ref="txManager"/>
+    <kie:user-transaction ref="txManager"/>
+    <kie:transaction-sync-registry ref="txManager"/>
     <kie:globals ref="my-globals" />
     <kie:calendars ref="my-calendars" />
 

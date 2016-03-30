@@ -15,9 +15,11 @@
   <!--
   <kie:environment id="environmentWithPersistence">
       <kie:transaction-manager ref="transactionManagerRef" />
+      <kie:transaction-sync-registry ref="transactionSynchronizationRegistryRef" />
+      <kie:user-transaction ref="userTransactionRef" />
       <kie:entity-manager-factory ref="entityManagerFactoryRef" />
   </kie:environment>
-  -->
+   -->
 
   <bean id="processBean" class="org.drools.karaf.itest.beans.ProcessWithPersistenceBean"
         init-method="init" destroy-method="destroy">
