@@ -45,6 +45,8 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
 
     public static final String ELEMENT_ENTITY_MANAGER_FACTORY = "entity-manager-factory";
     public static final String ELEMENT_TRANSACTION_MANAGER = "transaction-manager";
+    public static final String ELEMENT_USER_TRANSACTION = "user-transaction";
+    public static final String ELEMENT_TRANSACTION_SYNC_REGISTRY = "transaction-sync-registry";
     public static final String ELEMENT_GLOBALS = "globals";
     public static final String ELEMENT_DATE_FORMATS = "date-formats";
     public static final String ELEMENT_CALENDARS = "calendars";
@@ -60,6 +62,8 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
 
     public static final String PROPERTY_ENTITY_MANAGER_FACTORY = "entityManagerFactory";
     public static final String PROPERTY_TRANSACTION_MANAGER = "transactionManager";
+    public static final String PROPERTY_USER_TRANSACTION = "userTransaction";
+    public static final String PROPERTY_TRANSACTION_SYNC_REGISTRY = "transactionSyncRegistry";
     public static final String PROPERTY_GLOBALS = EnvironmentName.GLOBALS;
     public static final String PROPERTY_CALENDARS = "calendars";
     public static final String PROPERTY_DATE_FORMATS = "dateFormats";
@@ -86,6 +90,8 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
 
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_ENTITY_MANAGER_FACTORY, EnvironmentName.ENTITY_MANAGER_FACTORY, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_TRANSACTION_MANAGER, EnvironmentName.TRANSACTION_MANAGER, ATTRIBUTE_REF);
+        checkAndSetReference(context, element, envParamMetadata, ELEMENT_TRANSACTION_SYNC_REGISTRY, EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, ATTRIBUTE_REF);
+        checkAndSetReference(context, element, envParamMetadata, ELEMENT_USER_TRANSACTION, EnvironmentName.TRANSACTION, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_GLOBALS, EnvironmentName.GLOBALS, ATTRIBUTE_REF);
         checkAndSetReference(context, element, envParamMetadata, ELEMENT_CALENDARS, EnvironmentName.CALENDARS, ATTRIBUTE_REF);
 

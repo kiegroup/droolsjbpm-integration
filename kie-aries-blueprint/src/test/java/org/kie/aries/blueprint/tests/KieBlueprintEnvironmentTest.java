@@ -100,6 +100,24 @@ public class KieBlueprintEnvironmentTest {
     }
 
     @Test
+    public void testEnvRefUserTransaction() throws Exception {
+        Environment environment = (Environment) container.getComponentInstance("drools-env");
+        assertNotNull(environment);
+
+        assertNotNull(environment.get(EnvironmentName.TRANSACTION));
+        assertTrue(environment.get(EnvironmentName.TRANSACTION) instanceof MockJpaTransactionManager);
+    }
+
+    @Test
+    public void testEnvRefTransactionSyncRegistry() throws Exception {
+        Environment environment = (Environment) container.getComponentInstance("drools-env");
+        assertNotNull(environment);
+
+        assertNotNull(environment.get(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY));
+        assertTrue(environment.get(EnvironmentName.TRANSACTION) instanceof MockJpaTransactionManager);
+    }
+
+    @Test
     public void testEmptyEnvRef() throws Exception {
         Environment environment = (Environment) container.getComponentInstance("drools-empty-env");
         assertNotNull(environment);
