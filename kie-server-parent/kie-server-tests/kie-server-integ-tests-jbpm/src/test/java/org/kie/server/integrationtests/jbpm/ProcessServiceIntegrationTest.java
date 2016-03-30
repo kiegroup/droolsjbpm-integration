@@ -17,6 +17,8 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -732,6 +734,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testStartProcessInstanceWithAsyncNodes() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        Date startProcessDate = Calendar.getInstance().getTime();
         Long processInstanceId = processClient.startProcess("definition-project", "AsyncScriptTask");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -740,12 +744,16 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             List<String> status = new ArrayList<String>();
             status.add(STATUS.QUEUED.toString());
+            status.add(STATUS.RUNNING.toString());
+            status.add(STATUS.DONE.toString());
             List<RequestInfoInstance> jobs = jobServicesClient.getRequestsByStatus(status, 0, 10);
             assertNotNull(jobs);
-            // there must be one job for async execution of script task
-            assertEquals(1, jobs.size());
+            // there must be at least one job - for async execution of script task
+            assertTrue(jobs.size() > 0);
 
+            // jobs are sorted in descending order - our job is first one
             RequestInfoInstance job = jobs.get(0);
+            assertTrue(job.getScheduledDate().after(startProcessDate));
 
             // wait for the job to be completed
             waitForJobToFinish(job.getId());
