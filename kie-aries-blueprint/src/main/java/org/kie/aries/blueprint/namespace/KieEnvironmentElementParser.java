@@ -18,8 +18,8 @@ package org.kie.aries.blueprint.namespace;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
+import org.apache.aries.blueprint.mutable.MutableMapMetadata;
 import org.apache.aries.blueprint.mutable.MutableRefMetadata;
-import org.apache.aries.blueprint.reflect.MapMetadataImpl;
 import org.drools.core.marshalling.impl.IdentityPlaceholderResolverStrategy;
 import org.drools.core.marshalling.impl.SerializablePlaceholderResolverStrategy;
 import org.drools.core.util.StringUtils;
@@ -84,7 +84,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
             throw new ComponentDefinitionException("'id' attribute is missing for environment definition.");
         }
 
-        MapMetadataImpl envParamMetadata = context.createMetadata(MapMetadataImpl.class);
+        MutableMapMetadata envParamMetadata = context.createMetadata(MutableMapMetadata.class);
         envParamMetadata.setKeyType(String.class.getName());
         envParamMetadata.setValueType(Object.class.getName());
 
@@ -214,7 +214,7 @@ public class KieEnvironmentElementParser extends AbstractElementParser {
         return beanMetadata;
     }
 
-    protected void checkAndSetReference(ParserContext context, Element envElement, MapMetadataImpl envParamMetadata, String elementTag, String propName, String refAttribute) {
+    protected void checkAndSetReference(ParserContext context, Element envElement, MutableMapMetadata envParamMetadata, String elementTag, String propName, String refAttribute) {
 
         String prefix = envElement.getPrefix();
         NodeList nodeList = envElement.getElementsByTagName(prefix+":"+elementTag);
