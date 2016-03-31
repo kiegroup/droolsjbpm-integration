@@ -17,7 +17,9 @@
 package org.drools.karaf.itest.blueprint;
 
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
-import org.drools.karaf.itest.beans.ProcessWithPersistenceBean;
+import org.drools.karaf.itest.beans.AbstractProcessWithPersistenceBean;
+import org.drools.karaf.itest.beans.ProcessWithPersistenceDirectBean;
+import org.drools.karaf.itest.beans.ProcessWithPersistenceEnvBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
@@ -28,7 +30,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.util.Filter;
 import org.osgi.framework.Constants;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.inject.Inject;
 
@@ -57,12 +61,24 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
     private static final String PROCESS_ID = "orderApproval";
 
     @Inject
-    private KieSession processWithPersistence;
+    @Filter("(osgi.jndi.service.name=kiesession/sessionWithoutEnv)")
+    private KieSession processWithPersistenceNoEnv;
+
+    @Inject
+    @Filter("(osgi.jndi.service.name=kiesession/sessionWithEnv)")
+    private KieSession processWithPersistenceEnv;
 
     @Test
-    public void testStartProcess() throws Exception {
-        assertNotNull(processWithPersistence);
-        final ProcessInstance processInstance = processWithPersistence.startProcess(PROCESS_ID);
+    public void testStartProcessNoEnv() throws Exception {
+        assertNotNull(processWithPersistenceNoEnv);
+        final ProcessInstance processInstance = processWithPersistenceNoEnv.startProcess(PROCESS_ID);
+        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_ACTIVE, processInstance.getState());
+    }
+
+    @Test
+    public void testStartProcessEnv() throws Exception {
+        assertNotNull(processWithPersistenceEnv);
+        final ProcessInstance processInstance = processWithPersistenceEnv.startProcess(PROCESS_ID);
         assertEquals("Unexpected process instance state.", ProcessInstance.STATE_ACTIVE, processInstance.getState());
     }
 
@@ -122,8 +138,10 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
                         .add("META-INF/maven/kjar/pom.properties",
                                 KieBlueprintjBPMPersistenceKarafIntegrationTest.class.getResource(POM_PROPS_LOCATION))
 
-                        // add helper bean
-                        .add(ProcessWithPersistenceBean.class)
+                        // add helper beans
+                        .add(ProcessWithPersistenceDirectBean.class)
+                        .add(ProcessWithPersistenceEnvBean.class)
+                        .add(AbstractProcessWithPersistenceBean.class)
 
                         .set("Meta-Persistence", "META-INF/persistence.xml")
                         .set(Constants.IMPORT_PACKAGE, "org.kie.aries.blueprint," +
