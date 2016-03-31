@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,20 +40,22 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
 
     @Inject
-    DynamicJaxbContext dynamicContext;
+    DynamicJaxbContextManager dynamicContextManager;
 
     @PostConstruct
     public void configure() {
-        if (dynamicContext == null) {
+        if (dynamicContextManager == null) {
             logger.info("JaxbContextResolver does not support CDI injection, looking up DynamicJaxbContext programmatically");
             BeanManager beanManager = BeanManagerProvider.getInstance().getBeanManager();
             try {
-                Set<Bean<?>> beans = beanManager.getBeans( DynamicJaxbContext.class );
+                Set<Bean<?>> beans = beanManager.getBeans( DynamicJaxbContextManager.class );
 
                 if (beans != null && !beans.isEmpty()) {
                     Bean<?> bean = (Bean<?>) beans.iterator().next();
 
-                    dynamicContext = (DynamicJaxbContext) beanManager.getReference(bean, DynamicJaxbContext.class,
+                    dynamicContextManager = (DynamicJaxbContextManager)
+                            beanManager.getReference(bean,
+                                                     DynamicJaxbContextManager.class,
                                                           beanManager.createCreationalContext(bean));
                 }
 
@@ -65,7 +67,7 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
 
     @Override
     public JAXBContext getContext(Class<?> type) {
-        return dynamicContext;
+        return dynamicContextManager.getJaxbContext();
     }
 
 }
