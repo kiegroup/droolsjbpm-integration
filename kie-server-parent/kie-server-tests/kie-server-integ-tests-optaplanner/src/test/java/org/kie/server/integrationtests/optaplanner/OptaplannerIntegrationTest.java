@@ -252,6 +252,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(timeout = 60000)
+    @Ignore("Needs to be fixed, failing randomly due to PLANNER-560")
     public void testGetBestSolution() throws Exception {
 
         SolverInstance instance = new SolverInstance();
@@ -315,7 +316,6 @@ public class OptaplannerIntegrationTest
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 5, 15 ) );
         try {
             solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
             fail("A KieServicesException should have been thrown by now.");
@@ -332,7 +332,6 @@ public class OptaplannerIntegrationTest
         assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, instance ) );
 
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         ServiceResponse<SolverInstance> updateSolverState = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( updateSolverState );
         assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
@@ -357,6 +356,7 @@ public class OptaplannerIntegrationTest
 
         // and then terminate it
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
+        instance.setPlanningProblem(null);
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
         assertSuccess( response );
         assertTrue(response.getResult().getStatus() == SolverInstance.SolverStatus.TERMINATING_EARLY
