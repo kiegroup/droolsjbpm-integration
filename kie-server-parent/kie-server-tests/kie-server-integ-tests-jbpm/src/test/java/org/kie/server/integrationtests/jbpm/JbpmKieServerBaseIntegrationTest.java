@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.jbpm;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -26,13 +25,12 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.executor.api.STATUS;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
@@ -52,8 +50,13 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
 
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
+    protected static final String PROCESS_ID_CALL_EVALUATION = "definition-project.call-evaluation";
     protected static final String PROCESS_ID_GROUPTASK = "definition-project.grouptask";
-
+    protected static final String PROCESS_ID_ASYNC_SCRIPT = "AsyncScriptTask";
+    protected static final String PROCESS_ID_TIMER = "definition-project.timer-process";
+    protected static final String PROCESS_ID_SIGNAL_PROCESS = "definition-project.signalprocess";
+    protected static final String PROCESS_ID_SIGNAL_START = "signal-start";
+    protected static final String PROCESS_ID_CUSTOM_TASK = "customtask";
 
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;
@@ -119,10 +122,10 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     @Override
     protected void disposeAllContainers() {
         List<Integer> status = new ArrayList<Integer>();
-        status.add(ProcessInstance.STATE_ACTIVE);
-        List<org.kie.server.api.model.instance.ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
+        status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
         if (activeInstances != null) {
-            for (org.kie.server.api.model.instance.ProcessInstance instance : activeInstances) {
+            for (ProcessInstance instance : activeInstances) {
                 processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
             }
         }
@@ -145,5 +148,20 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
             Thread.sleep(TIMEOUT_BETWEEN_CALLS);
         }
         throw new TimeoutException("Timeout while waiting for job executor to finish job.");
+    }
+
+    protected void waitForProcessInstanceToFinish(String containerId, long processInstanceId) throws Exception {
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
+        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
+            ProcessInstance processInstance = processClient.getProcessInstance(containerId, processInstanceId);
+
+            // If process instance is finished (to one of final states) then return.
+            if(((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED).equals(processInstance.getState()) ||
+                    ((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED).equals(processInstance.getState())) {
+                return;
+            }
+            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
+        }
+        throw new TimeoutException("Timeout while waiting for process instance to finish.");
     }
 }
