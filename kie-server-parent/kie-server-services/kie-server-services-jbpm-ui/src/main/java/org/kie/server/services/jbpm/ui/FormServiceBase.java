@@ -57,7 +57,7 @@ public class FormServiceBase {
     }
 
 
-    public String getFormDisplayProcess(String containerId, String processId, String lang) {
+    public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent) {
         ProcessDefinition processDesc = definitionService.getProcessDefinition(containerId, processId);
         if (processDesc == null) {
             throw new IllegalStateException("Process definition " + containerId + " : " + processId + " not found");
@@ -72,6 +72,7 @@ public class FormServiceBase {
         renderContext.put("process", processDesc);
         renderContext.put("outputs", processData);
         renderContext.put("lang", lang);
+        renderContext.put("filterForm", filterContent);
 
         for (UIFormProvider provider : providers) {
             String template = provider.render(processDesc.getName(), processDesc, renderContext);
@@ -84,7 +85,7 @@ public class FormServiceBase {
         throw new IllegalStateException("No form for process with id " + processDesc.getName() + " found");
     }
 
-    public String getFormDisplayTask(long taskId, String lang) {
+    public String getFormDisplayTask(long taskId, String lang, boolean filterContent) {
         Task task = userTaskService.getTask(taskId);
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
@@ -93,6 +94,7 @@ public class FormServiceBase {
         ProcessDefinition processDesc = dataService.getProcessesByDeploymentIdProcessId(task.getTaskData()
                 .getDeploymentId(), task.getTaskData().getProcessId());
         Map<String, Object> renderContext = new HashMap<String, Object>();
+        renderContext.put("filterForm", filterContent);
 
         Map<String, Object> input = userTaskService.getTaskInputContentByTaskId(taskId);
         renderContext.put("inputs", input);
