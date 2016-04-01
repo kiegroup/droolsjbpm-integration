@@ -21,17 +21,35 @@ public interface UIServicesClient {
      * Returns process form for given process id that resides in given container
      * @param containerId container identifier where process resides
      * @param processId  unique process id
+     * @param language language that form should be filtered for
      * @return string representation (json or xml depending on client marshaling selection) of the process form
      */
     String getProcessForm(String containerId, String processId, String language);
 
     /**
+     * Returns process form for given process id that resides in given container - without filtering values by language
+     * @param containerId container identifier where process resides
+     * @param processId  unique process id
+     * @return string representation (json or xml depending on client marshaling selection) of the process form
+     */
+    String getProcessForm(String containerId, String processId);
+
+    /**
      * Returns task form for given task id that belongs to given container
+     * @param containerId container identifier where task resides
+     * @param taskId unique task id
+     * @param language language that form should be filtered for
+     * @return  string representation (json or xml depending on client marshaling selection) of the task form
+     */
+    String getTaskForm(String containerId, Long taskId, String language);
+
+    /**
+     * Returns task form for given task id that belongs to given container as raw content - without filtering values by language
      * @param containerId container identifier where task resides
      * @param taskId unique task id
      * @return  string representation (json or xml depending on client marshaling selection) of the task form
      */
-    String getTaskForm(String containerId, Long taskId, String language);
+    String getTaskForm(String containerId, Long taskId);
 
     /**
      * Returns process image (svg) of the given process id that belongs to given container
