@@ -70,12 +70,12 @@ public class FormResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId,
-            @QueryParam("lang") @DefaultValue("en") String language) {
+            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = formServiceBase.getFormDisplayProcess(containerId, processId, language);
+            String response = formServiceBase.getFormDisplayProcess(containerId, processId, language, filter);
             if (response != null && !response.isEmpty()) {
 
                 if (v.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
@@ -101,12 +101,12 @@ public class FormResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @QueryParam("lang") @DefaultValue("en") String language) {
+            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = formServiceBase.getFormDisplayTask(taskId, language);
+            String response = formServiceBase.getFormDisplayTask(taskId, language, filter);
             if (v.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
                 JSONObject json = XML.toJSONObject(response);
                 formatJSONResponse(json);

@@ -17,7 +17,6 @@ package org.kie.server.services.jbpm.ui.form;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -34,7 +32,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.drools.core.util.MVELSafeHelper;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.form.provider.AbstractFormProvider;
@@ -84,7 +81,11 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
             return null;
         } else {
             String lang = (String) renderContext.get("lang");
-            templateString = filterXML(templateString, lang, process.getDeploymentId(), null, null);
+            Boolean filterContent = (Boolean) renderContext.get("filterForm");
+
+            if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
+                templateString = filterXML(templateString, lang, process.getDeploymentId(), null, null);
+            }
             return templateString;
         }
     }
@@ -115,9 +116,11 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
             }
 
             String lang = (String) renderContext.get("lang");
+            Boolean filterContent = (Boolean) renderContext.get("filterForm");
 
-            templateString = filterXML(templateString, lang, task.getTaskData().getDeploymentId(), inputs, outputs);
-
+            if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
+                templateString = filterXML(templateString, lang, task.getTaskData().getDeploymentId(), inputs, outputs);
+            }
             return templateString;
         }
     }
@@ -334,16 +337,23 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
         property.getAttributes().getNamedItem(ATTR_VALUE).setNodeValue(label);
     }
 
-    private String getLabel(String lang, String value) {
-        value = value.replaceAll("quot;","\"");
-        String pattern = "(\"[a-z]*\",\"[a-z]*\")";
+    private static String getLabel(String lang, String value) {
+        // logic based on form modeler way of taking values - applies to .form files
+        String[] values = value.split("quot;");
         Map<String,String> langWord = new HashMap<String,String>();
-        for (String s2 : value.split(pattern)) {
-            String[] keyVal = s2.replaceAll("\"","").split(",");
-            if (keyVal.length == 2) {
-                langWord.put(keyVal[0], keyVal[1]);
+
+        for (int i = 0; i < values.length;i=i+4) {
+            String key = values[i + 1];
+            String valueTmp="";
+            if( i+3 < values.length){
+                valueTmp = values[i + 3];
             }
+            if(key.length()==2){
+                langWord.put(key, valueTmp);
+            }
+
         }
+        // end of logic based on form modeler
         String response = langWord.get(lang);
         if (response == null || response.isEmpty()) {
             response = langWord.get("en");
