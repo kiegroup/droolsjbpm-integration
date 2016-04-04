@@ -36,7 +36,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@Ignore
+@Ignore("kie:kbase-ref and kie:ksession-ref not (yet or anymore) supported. ")
 public class KieBlueprintGAVTest {
 
     static BlueprintContainerImpl container = null;
