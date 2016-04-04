@@ -15,8 +15,21 @@
 
 package org.drools.osgi.compiler;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.api.builder.ReleaseId;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
+import org.osgi.framework.Bundle;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 
 public class OsgiKieModuleTest {
 
@@ -46,6 +59,39 @@ public class OsgiKieModuleTest {
         assertBundleIdCorrectlyParsed("bundleresource://151.fwk495985218/", "151");
         // invalid bundle URL results in "null"
         assertBundleIdCorrectlyParsed("invalid-bundle-url", null);
+    }
+
+    @Test
+    public void testGatherResourcesFromWARBundle() throws Exception {
+        KieServices kieServices = KieServices.Factory.get();
+        Bundle bundleMock = Mockito.mock(Bundle.class);
+        final List<URL> urls = new ArrayList<URL>();
+
+        // we only care about the path, the file does not have to exist
+        // can't mock java.net.URL, because it is a final class
+        urls.add(new URL("file:///META-INF/kmodule.xml"));
+        urls.add(new URL("file:///WEB-INF/classes/org/drools/osgi/SomePOJO.class"));
+        urls.add(new URL("file:///WEB-INF/classes/org/drools/osgi/some-process.bpmn2"));
+        Enumeration<URL> resourcesEnumMock = new Enumeration<URL>() {
+            int currentIndex = 0;
+
+            @Override
+            public boolean hasMoreElements() {
+                return currentIndex < urls.size();
+            }
+
+            @Override
+            public URL nextElement() {
+                return urls.get(currentIndex++);
+
+            }
+        };
+        Mockito.when(bundleMock.findEntries("", "*", true)).thenReturn(resourcesEnumMock);
+        ReleaseId releaseId = kieServices.newReleaseId("org.drools.osgi.compiler", "osgi-kie-module-test", "1.0.0.Final");
+        OsgiKieModule kmodule = OsgiKieModule.create(releaseId, null, bundleMock);
+        Collection<String> fileNames = kmodule.getFileNames();
+        Assertions.assertThat(fileNames).hasSize(3);
+        Assertions.assertThat(fileNames).contains("META-INF/kmodule.xml", "org/drools/osgi/SomePOJO.class", "org/drools/osgi/some-process.bpmn2");
     }
 
     private void assertAcceptsStringAsOsgiBundleUrL(String str) {

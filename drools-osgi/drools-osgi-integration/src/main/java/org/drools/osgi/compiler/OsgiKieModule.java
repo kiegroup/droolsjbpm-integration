@@ -35,6 +35,8 @@ import static org.drools.core.util.IoUtils.readBytesFromInputStream;
 
 public class OsgiKieModule extends AbstractKieModule {
 
+    private static final String WEB_INF_CLASSES_PATH = "/WEB-INF/classes";
+
     private final Bundle bundle;
 
     private Collection<String> fileNames;
@@ -62,6 +64,10 @@ public class OsgiKieModule extends AbstractKieModule {
         // file Resource name
         pResourceName = "/" + pResourceName;
         URL url = bundle.getResource(pResourceName);
+        // the following is a hack for specific use case - resources are under WEB-INF/classes when the deployed bundle is a WAR
+        if (url == null) {
+            url = bundle.getResource(WEB_INF_CLASSES_PATH + pResourceName);
+        }
         return url == null ? null : readUrlAsBytes(url);
     }
 
@@ -78,7 +84,13 @@ public class OsgiKieModule extends AbstractKieModule {
             if (path.endsWith("/")) {
                 continue;
             }
-            fileNames.add(path.substring(1, path.length()));
+            // the following is a hack for specific use case - WEB-INF/classes prefix is present when the deployed bundle is a WAR
+            // remove the prefix if present
+            if (path.startsWith(WEB_INF_CLASSES_PATH)) {
+                path = path.substring(WEB_INF_CLASSES_PATH.length());
+            }
+            fileNames.add(path.substring(1));
+
         }
         return fileNames;
     }
@@ -93,26 +105,37 @@ public class OsgiKieModule extends AbstractKieModule {
         return creationTimestamp;
     }
 
+    @Override
+    public String toString() {
+        return "OsgiKieModule[releaseId=" + this.getReleaseId() +
+                ", bundle-id=" + bundle.getBundleId() +
+                ", bundle-location=" + bundle.getLocation() +
+                "]";
+    }
+
     public static OsgiKieModule create(URL url) {
         KieModuleModel kieProject = KieModuleModelImpl.fromXML(url);
         Bundle bundle = getBundle(url.toString());
         if (bundle != null) {
             String pomProperties = getPomProperties(bundle);
             ReleaseId releaseId = ReleaseIdImpl.fromPropertiesString(pomProperties);
-            return new OsgiKieModule(releaseId, kieProject, bundle);
+            return create(releaseId, kieProject, bundle);
         } else {
             throw new RuntimeException("Bundle does not exist or no retrieved for this URL :  " + url);
         }
-
     }
 
     public static OsgiKieModule create(URL url, ReleaseId releaseId, KieModuleModel kieProject) {
         Bundle bundle = getBundle(url.toString());
         if (bundle != null) {
-            return new OsgiKieModule(releaseId, kieProject, bundle);
+            return create(releaseId, kieProject, bundle);
         } else {
             throw new RuntimeException("Bundle does not exist or no retrieved for this URL :  " + url);
         }
+    }
+
+    public static OsgiKieModule create(ReleaseId releaseId, KieModuleModel kieProject, Bundle bundle) {
+        return new OsgiKieModule(releaseId, kieProject, bundle);
     }
 
     /**
