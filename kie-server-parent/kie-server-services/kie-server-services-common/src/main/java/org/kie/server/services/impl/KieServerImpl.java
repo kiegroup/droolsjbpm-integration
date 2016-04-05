@@ -143,7 +143,7 @@ public class KieServerImpl {
                                                                                         containerManager,
                                                                                         this), "KieServer-ControllerConnect");
             connectToControllerThread.start();
-            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "true"))) {
+            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
                 logger.info("Containers were requested to be deployed synchronously, holding application start...");
                 try {
                     connectToControllerThread.join();
