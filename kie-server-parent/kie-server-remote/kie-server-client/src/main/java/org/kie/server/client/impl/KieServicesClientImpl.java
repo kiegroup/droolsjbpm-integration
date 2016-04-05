@@ -143,7 +143,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeHttpPutRequestAndCreateServiceResponse( baseURI + "/containers/" + id, resource, KieContainerResource.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateContainerCommand( resource ) ) );
-            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -153,7 +153,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id, KieContainerResource.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetContainerInfoCommand( id ) ) );
-            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -163,7 +163,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeHttpDeleteRequestAndCreateServiceResponse( baseURI + "/containers/" + id, Void.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DisposeContainerCommand( id ) ) );
-            return (ServiceResponse<Void>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<Void>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -182,7 +182,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id + "/scanner", KieScannerResource.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetScannerInfoCommand( id ) ) );
-            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -194,7 +194,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
                     KieScannerResource.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateScannerCommand( id, resource ) ) );
-            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -206,7 +206,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
                     ReleaseId.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateReleaseIdCommand( id, releaseId ) ) );
-            return (ServiceResponse<ReleaseId>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<ReleaseId>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -224,7 +224,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, payload, String.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, payload ) ) );
-            return (ServiceResponse<String>) executeJmsCommand( script ).getResponses().get( 0 );
+            return (ServiceResponse<String>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
         }
     }
 
@@ -240,7 +240,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd) );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
-            return (ServiceResponse<String>) executeJmsCommand( script, cmd.getClass().getName() ).getResponses().get( 0 );
+            return (ServiceResponse<String>) executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );
         }
     }
 
@@ -261,5 +261,15 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     @Override
     public ClassLoader getClassLoader() {
         return this.marshaller.getClassLoader();
+    }
+
+    @Override
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    @Override
+    public void completeConversation() {
+        conversationId = null;
     }
 }
