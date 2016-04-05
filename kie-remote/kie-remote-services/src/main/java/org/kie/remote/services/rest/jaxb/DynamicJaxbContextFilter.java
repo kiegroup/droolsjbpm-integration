@@ -19,7 +19,6 @@ import static org.kie.remote.services.cdi.DeploymentInfoBean.emptyDeploymentId;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -27,13 +26,20 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
 
-import org.jbpm.kie.services.api.DeploymentIdResolver;
-import org.kie.remote.services.cdi.DeploymentInfoBean;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This is a {@link Filter} implemenation that's responsible for 2 things:<ol>
+ * <li>Resolving the deploymentId value in the HTTP (REST) request so that we can</li>
+ * <li>retrieve (and if necessary create) the {@link JAXBContext} for the given deployment</li>
+ * </ol>
+ * Lastly, once that {@link JAXBContext} has been created, it's set as a {@link ThreadLocal} instance, since
+ * the request (particularly, the de/serialization of the request/response) will all happen in this thread.
+ */
 public class DynamicJaxbContextFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicJaxbContextFilter.class);
