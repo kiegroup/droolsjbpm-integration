@@ -35,6 +35,8 @@ import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
 import org.jbpm.services.api.query.QueryNotFoundException;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,24 +51,27 @@ public class QueryDataResource {
     public static final Logger logger = LoggerFactory.getLogger(QueryDataResource.class);
 
     private QueryDataServiceBase queryDataServiceBase;
+    private KieServerRegistry context;
 
     public QueryDataResource() {
 
     }
 
-    public QueryDataResource(QueryDataServiceBase delegate) {
+    public QueryDataResource(QueryDataServiceBase delegate, KieServerRegistry context) {
         this.queryDataServiceBase = delegate;
+        this.context = context;
     }
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getQueries(@Context HttpHeaders headers,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
-
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         QueryDefinitionList result = queryDataServiceBase.getQueries(page, pageSize);
         logger.debug("Returning result of get queries definition: {}", result);
 
-        return createCorrectVariant(result, headers, Response.Status.OK);
+        return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
     }
 
     @POST
@@ -75,16 +80,18 @@ public class QueryDataResource {
     public Response createQueryDefinition(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("queryName") String queryName, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
             queryDataServiceBase.registerQuery(queryName, payload, type);
 
             logger.debug("Returning CREATED response after registering query with name {}", queryName);
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (QueryAlreadyRegisteredException e) {
-            return alreadyExists(MessageFormat.format(QUERY_ALREADY_EXISTS, queryName), v);
+            return alreadyExists(MessageFormat.format(QUERY_ALREADY_EXISTS, queryName), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -94,13 +101,15 @@ public class QueryDataResource {
     public Response replaceQueryDefinition(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("queryName") String queryName, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
             queryDataServiceBase.replaceQuery(queryName, payload, type);
             logger.debug("Returning CREATED response after registering query with name {}", queryName);
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -109,15 +118,17 @@ public class QueryDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response dropQueryDefinition(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("queryName") String queryName) {
         Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
             queryDataServiceBase.unregisterQuery(queryName);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (QueryNotFoundException e) {
-            return notFound(MessageFormat.format(QUERY_NOT_FOUND, queryName), v);
+            return notFound(MessageFormat.format(QUERY_NOT_FOUND, queryName), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -126,15 +137,17 @@ public class QueryDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getQuery(@Context HttpHeaders headers, @PathParam("queryName") String queryName) {
         Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
             QueryDefinition queryDefinition = queryDataServiceBase.getQuery(queryName);
 
-            return createCorrectVariant(queryDefinition, headers, Response.Status.OK);
+            return createCorrectVariant(queryDefinition, headers, Response.Status.OK, conversationIdHeader);
         } catch (QueryNotFoundException e) {
-            return notFound(MessageFormat.format(QUERY_NOT_FOUND, queryName), v);
+            return notFound(MessageFormat.format(QUERY_NOT_FOUND, queryName), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -145,10 +158,13 @@ public class QueryDataResource {
             @PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("sortBy") String orderBy,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
         Object result = queryDataServiceBase.query(queryName, mapper, orderBy, page, pageSize);
         logger.debug("Returning result of process instance search: {}", result);
 
-        return createCorrectVariant(result, headers, Response.Status.OK);
+        return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
     }
 
     @POST
@@ -159,6 +175,8 @@ public class QueryDataResource {
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, String payload) {
 
         String type = getContentType(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         Object result = null;
 
         if (builder != null && !builder.isEmpty()) {
@@ -168,7 +186,7 @@ public class QueryDataResource {
         }
         logger.debug("Returning result of process instance search: {}", result);
 
-        return createCorrectVariant(result, headers, Response.Status.OK);
+        return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
     }
 
 }

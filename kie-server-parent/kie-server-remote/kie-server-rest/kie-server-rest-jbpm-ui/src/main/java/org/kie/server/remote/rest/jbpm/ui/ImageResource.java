@@ -26,6 +26,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.ui.ImageServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +40,15 @@ public class ImageResource {
 
     private static final Logger logger = LoggerFactory.getLogger(ImageResource.class);
     private ImageServiceBase imageServiceBase;
+    private KieServerRegistry context;
 
     public ImageResource() {
 
     }
 
-    public ImageResource(ImageServiceBase imageServiceBase) {
+    public ImageResource(ImageServiceBase imageServiceBase, KieServerRegistry context) {
         this.imageServiceBase = imageServiceBase;
+        this.context = context;
     }
 
     @GET
@@ -52,17 +56,18 @@ public class ImageResource {
     @Produces({MediaType.APPLICATION_SVG_XML})
     public Response getProcessImage(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String svgString = imageServiceBase.getProcessImage(containerId, processId);
 
             logger.debug("Returning OK response with content '{}'", svgString);
-            return createResponse(svgString, v, Response.Status.OK);
+            return createResponse(svgString, v, Response.Status.OK, conversationIdHeader);
 
         } catch (IllegalArgumentException e) {
-            return notFound("Image for process id " + processId + " not found", v);
+            return notFound("Image for process id " + processId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -72,20 +77,21 @@ public class ImageResource {
     public Response getProcessInstanceImage(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_INST_ID) Long procInstId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String svgString = imageServiceBase.getActiveProcessImage(containerId, procInstId);
 
             logger.debug("Returning OK response with content '{}'", svgString);
-            return createResponse(svgString, v, Response.Status.OK);
+            return createResponse(svgString, v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format("Not found", e.getMessage()), v);
+            return notFound(MessageFormat.format("Not found", e.getMessage()), v, conversationIdHeader);
         } catch (IllegalArgumentException e) {
-            return notFound("Image for process instance id " + procInstId + " not found", v);
+            return notFound("Image for process instance id " + procInstId + " not found", v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
         }
     }
 }

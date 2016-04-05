@@ -39,11 +39,14 @@ import javax.jms.TextMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.kie.server.api.ConversationId;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
@@ -176,6 +179,16 @@ public class KieServerMDB
                 logger.debug(logMsg);
             }
 
+            String conversationId = null;
+            try {
+                if (message.propertyExists(CONVERSATION_ID_PROPERTY_NAME)) {
+                    conversationId = message.getStringProperty(CONVERSATION_ID_PROPERTY_NAME);
+                }
+            } catch (JMSException jmse) {
+                String logMsg = "Unable to retrieve property '" + CONVERSATION_ID_PROPERTY_NAME + "' from message " + msgCorrId + ".";
+                logger.debug(logMsg);
+            }
+
             // 1. get marshalling info
             MarshallingFormat format = null;
             String classType = null;
@@ -226,6 +239,29 @@ public class KieServerMDB
 
             // 5. serialize response
             Message msg = marshallResponse(session, msgCorrId, format, marshaller, response);
+            // set conversation id for routing
+            if (containerId != null && (conversationId == null || conversationId.trim().isEmpty())) {
+                try {
+                    KieContainerInstance containerInstance = kieServer.getServerRegistry().getContainer(containerId);
+                    if (containerInstance != null) {
+                        ReleaseId releaseId = containerInstance.getResource().getResolvedReleaseId();
+                        if (releaseId == null) {
+                            releaseId = containerInstance.getResource().getReleaseId();
+                        }
+
+                        conversationId = ConversationId.from(KieServerEnvironment.getServerId(), containerId, releaseId).toString();
+                    }
+                } catch (Exception e) {
+                    logger.warn("Unable to build conversation id due to {}", e.getMessage(), e);
+                }
+            }
+            try {
+                if (conversationId != null) {
+                    msg.setStringProperty(CONVERSATION_ID_PROPERTY_NAME, conversationId);
+                }
+            } catch (JMSException e) {
+                logger.debug("Unable to set conversation id on response message due to {}", e.getMessage());
+            }
 
             // 6. send response
             sendResponse(msgCorrId, format, msg);
@@ -310,7 +346,7 @@ public class KieServerMDB
         }
 
         KieContainerInstance kieContainerInstance = kieServer.getServerRegistry().getContainer(containerId);
-        if (kieContainerInstance != null) {
+        if (kieContainerInstance != null && kieContainerInstance.getKieContainer() != null) {
             return kieContainerInstance.getMarshaller(format);
         }
 

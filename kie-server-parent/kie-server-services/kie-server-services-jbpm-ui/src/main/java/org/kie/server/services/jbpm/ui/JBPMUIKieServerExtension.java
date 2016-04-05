@@ -53,6 +53,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
     private ConcurrentMap<String, ImageReference> imageReferences = new ConcurrentHashMap<String, ImageReference>();
 
+    private KieServerRegistry registry;
+
     private FormServiceBase formServiceBase;
     private ImageServiceBase imageServiceBase;
 
@@ -66,6 +68,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
     @Override
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
 
+        this.registry = registry;
         KieServerExtension jbpmExtension = registry.getServerExtension("jBPM");
         if (jbpmExtension == null) {
             initialized = false;
@@ -153,7 +156,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
         Object [] services = {
                 formServiceBase,
-                imageServiceBase
+                imageServiceBase,
+                registry
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll(appComponentsService.getAppComponents(EXTENSION_NAME, type, services));

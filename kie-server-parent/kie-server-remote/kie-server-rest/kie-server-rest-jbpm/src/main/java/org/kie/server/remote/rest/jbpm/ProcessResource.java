@@ -37,6 +37,7 @@ import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
@@ -58,6 +59,7 @@ public class ProcessResource  {
     private DefinitionServiceBase definitionServiceBase;
     private RuntimeDataServiceBase runtimeDataServiceBase;
     private MarshallerHelper marshallerHelper;
+    private KieServerRegistry context;
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
@@ -69,6 +71,7 @@ public class ProcessResource  {
         this.processServiceBase = processServiceBase;
         this.definitionServiceBase = definitionServiceBase;
         this.runtimeDataServiceBase = runtimeDataServiceBase;
+        this.context = context;
         this.marshallerHelper = new MarshallerHelper(context);
     }
 
@@ -90,7 +93,8 @@ public class ProcessResource  {
             String response = processServiceBase.startProcess(containerId, processId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED);
+            Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
@@ -111,7 +115,8 @@ public class ProcessResource  {
             String response = processServiceBase.startProcessWithCorrelation(containerId, processId, correlationKey, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED);
+            Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
@@ -125,19 +130,20 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response abortProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             processServiceBase.abortProcessInstance(containerId, processInstanceId);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(
-                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -147,19 +153,20 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response abortProcessInstances(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("instanceId") List<Long> processInstanceIds) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             processServiceBase.abortProcessInstances(containerId, processInstanceIds);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(
-                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -172,19 +179,20 @@ public class ProcessResource  {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             processServiceBase.signalProcessInstance(containerId, processInstanceId, signalName, eventPayload, type);
 
-            return createResponse(null, v, Response.Status.OK);
+            return createResponse(null, v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -197,6 +205,7 @@ public class ProcessResource  {
             @QueryParam("instanceId") List<Long> processInstanceIds, @PathParam("sName") String signalName, String eventPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
                 logger.debug("Signaling given process instances - {}", processInstanceIds);
@@ -206,15 +215,15 @@ public class ProcessResource  {
                 processServiceBase.signal(containerId, signalName, eventPayload, type);
             }
 
-            return createResponse("", v, Response.Status.OK);
+            return createResponse("", v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceIds), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -230,7 +239,8 @@ public class ProcessResource  {
             String response = processServiceBase.getProcessInstance(containerId, processInstanceId, withVars, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
@@ -248,19 +258,19 @@ public class ProcessResource  {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             processServiceBase.setProcessVariable(containerId, processInstanceId, varName, variablePayload, type);
-
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -272,19 +282,19 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId, String variablePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             processServiceBase.setProcessVariables(containerId, processInstanceId, variablePayload, type);
-
-            return createResponse("", v, Response.Status.OK);
+            return createResponse("", v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -295,22 +305,23 @@ public class ProcessResource  {
                                              @PathParam("pInstanceId") Long processInstanceId, @PathParam("varName") String varName) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = processServiceBase.getProcessInstanceVariable(containerId, processInstanceId, varName, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(
-                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -321,22 +332,23 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = processServiceBase.getProcessInstanceVariables(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(
-                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+                    MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
 
     }
@@ -349,19 +361,21 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = processServiceBase.getAvailableSignals(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
         }  catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
 
     }
@@ -376,19 +390,20 @@ public class ProcessResource  {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             processServiceBase.completeWorkItem(containerId, processInstanceId, workItemId, resultPayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -399,20 +414,20 @@ public class ProcessResource  {
     public Response abortWorkItem(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId) {
         Variant v = getVariant(headers);
-
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             processServiceBase.abortWorkItem(containerId, processInstanceId, workItemId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
 
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -424,19 +439,20 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId, @PathParam("workItemId") Long workItemId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = processServiceBase.getWorkItem(containerId, processInstanceId, workItemId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
         }  catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
 
     }
@@ -449,19 +465,20 @@ public class ProcessResource  {
             @PathParam("pInstanceId") Long processInstanceId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = processServiceBase.getWorkItemByProcessInstance(containerId, processInstanceId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
         }  catch (ProcessInstanceNotFoundException e) {
-            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v);
+            return notFound(MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 

@@ -78,4 +78,8 @@ public interface KieServicesClient {
      * @return
      */
     ClassLoader getClassLoader();
+
+    String getConversationId();
+
+    void completeConversation();
 }

@@ -62,7 +62,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_ACTIVATE_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "activate", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -75,7 +75,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_CLAIM_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "claim", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -95,7 +95,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "complete", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -124,7 +124,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "completeAutoProgress", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -137,7 +137,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_DELEGATE_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetUserId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "delegate", new Object[]{containerId, taskId, userId, targetUserId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -150,7 +150,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_EXIT_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "exit", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -172,7 +172,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "fail", serialize(safeMap(params)), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -185,7 +185,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_FORWARD_PUT_URI, getUserAndAdditionalParam(userId, "targetUser", targetEntityId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "forward", new Object[]{containerId, taskId, userId, targetEntityId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -198,7 +198,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_RELEASE_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "release", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<TaskOutputsDefinition> response = (ServiceResponse<TaskOutputsDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<TaskOutputsDefinition> response = (ServiceResponse<TaskOutputsDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -211,7 +211,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_RESUME_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "resume", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -224,7 +224,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_SKIP_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "skip", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -237,7 +237,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_START_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "start", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -250,7 +250,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_STOP_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "stop", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -263,7 +263,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_SUSPEND_PUT_URI, getUserQueryStr(userId));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "suspend", new Object[]{containerId, taskId, userId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -276,7 +276,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             sendTaskOperation(containerId, taskId, TASK_URI + "/" + TASK_INSTANCE_NOMINATE_PUT_URI, getUserAndAdditionalParams(userId, "potOwner", potentialOwners));
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "nominate", new Object[]{containerId, taskId, userId, potentialOwners}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -296,7 +296,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "setPriority", serialize(priority), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -316,7 +316,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "setExpirationDate", serialize(date), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -336,7 +336,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "setSkipable", serialize(skipable), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -356,7 +356,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "setName", serialize(name), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -376,7 +376,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "setDescription", serialize(description), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -397,7 +397,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "saveContent", serialize(values), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -425,7 +425,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getTaskOutputContentByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -452,7 +452,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getTaskInputContentByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
             variables = deserialize(response.getResult(), Object.class);
@@ -479,7 +479,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteContent", new Object[]{containerId, taskId, contentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -507,7 +507,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "addComment", serialize(taskComment), marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -535,7 +535,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteComment", new Object[]{containerId, taskId, commentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -555,7 +555,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getCommentsByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -584,7 +584,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getCommentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, commentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -609,7 +609,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "addAttachment", serialize(attachment), marshaller.getFormat().getType(), new Object[]{containerId, taskId, userId, name}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -636,7 +636,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DescriptorCommand( "UserTaskService", "deleteAttachment", new Object[]{containerId, taskId, attachmentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
         }
@@ -658,7 +658,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getAttachmentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, attachmentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -683,7 +683,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getAttachmentContentById", marshaller.getFormat().getType(), new Object[]{containerId, taskId, attachmentId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -713,7 +713,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getAttachmentsByTaskId", marshaller.getFormat().getType(), new Object[]{containerId, taskId}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
 
@@ -741,7 +741,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getTask", marshaller.getFormat().getType(), new Object[]{containerId, taskId, false, false, false}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
             result = deserialize(response.getResult(), TaskInstance.class);
@@ -769,7 +769,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskService", "getTask", marshaller.getFormat().getType(), new Object[]{containerId, taskId, withInputs, withOutputs, withAssignments}) ) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
             result = deserialize(response.getResult(), TaskInstance.class);

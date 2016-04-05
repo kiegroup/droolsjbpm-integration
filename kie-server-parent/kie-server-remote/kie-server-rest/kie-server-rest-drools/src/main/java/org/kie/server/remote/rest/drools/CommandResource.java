@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -41,7 +42,7 @@ public class CommandResource {
     private static final Logger logger = LoggerFactory.getLogger(CommandResource.class);
 
     private KieContainerCommandService delegate;
-
+    private KieServerRegistry registry;
     private MarshallerHelper marshallerHelper;
 
     public CommandResource() {
@@ -50,6 +51,7 @@ public class CommandResource {
 
     public CommandResource(KieContainerCommandService delegate, KieServerRegistry registry) {
         this.delegate = delegate;
+        this.registry = registry;
         this.marshallerHelper = new MarshallerHelper(registry);
     }
 
@@ -68,15 +70,17 @@ public class CommandResource {
         }
 
         Object result = delegate.callContainer(id, cmdPayload, format, classType);
+        Header conversationIdHeader = buildConversationIdHeader(id, registry, headers);
         try {
             String response = marshallerHelper.marshal(id, format.getType(), result);
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
         } catch (IllegalArgumentException e) {
             // in case marshalling failed return the call container response to keep backward compatibility
             String response = marshallerHelper.marshal(format.getType(), result);
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
         }
 
     }
