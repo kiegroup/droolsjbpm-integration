@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.kie.server.services.api.KieServerApplicationComponentsService;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.ui.FormServiceBase;
 import org.kie.server.services.jbpm.ui.ImageServiceBase;
@@ -39,6 +40,7 @@ public class JbpmUIRestApplicationComponentsService implements KieServerApplicat
 
         FormServiceBase formServiceBase = null;
         ImageServiceBase imageServiceBase = null;
+        KieServerRegistry context = null;
 
         for( Object object : services ) {
             // in case given service is null (meaning was not configured) continue with next one
@@ -51,13 +53,16 @@ public class JbpmUIRestApplicationComponentsService implements KieServerApplicat
             } else if (ImageServiceBase.class.isAssignableFrom(object.getClass())) {
                 imageServiceBase = (ImageServiceBase) object;
                 continue;
+            } else if (KieServerRegistry.class.isAssignableFrom(object.getClass())) {
+                context = (KieServerRegistry) object;
+                continue;
             }
         }
 
         List<Object> components = new ArrayList<Object>(2);
 
-        components.add(new FormResource(formServiceBase));
-        components.add(new ImageResource(imageServiceBase));
+        components.add(new FormResource(formServiceBase, context));
+        components.add(new ImageResource(imageServiceBase, context));
 
         return components;
     }

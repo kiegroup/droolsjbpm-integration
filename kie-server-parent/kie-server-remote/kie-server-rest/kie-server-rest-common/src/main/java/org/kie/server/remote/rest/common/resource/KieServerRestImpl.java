@@ -33,6 +33,7 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -88,8 +89,10 @@ public class KieServerRestImpl {
         KieContainerResource container = marshallerHelper.unmarshal( containerPayload, contentType, KieContainerResource.class );
 
         ServiceResponse<KieContainerResource> response = server.createContainer( id, container );
+
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
         if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-            return createCorrectVariant( response, headers, Status.CREATED );
+            return createCorrectVariant( response, headers, Status.CREATED, conversationIdHeader );
         }
         return createCorrectVariant( response, headers, Status.BAD_REQUEST );
     }
@@ -98,21 +101,24 @@ public class KieServerRestImpl {
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getContainerInfo( @Context HttpHeaders headers, @PathParam("id") String id ) {
-        return createCorrectVariant(server.getContainerInfo(id), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.getContainerInfo(id), headers, conversationIdHeader);
     }
 
     @DELETE
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response disposeContainer( @Context HttpHeaders headers, @PathParam("id") String id ) {
-       return createCorrectVariant(server.disposeContainer(id), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.disposeContainer(id), headers, conversationIdHeader);
     }
 
     @GET
     @Path("containers/{id}/scanner")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getScannerInfo( @Context HttpHeaders headers, @PathParam("id") String id ) {
-        return createCorrectVariant(server.getScannerInfo(id), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.getScannerInfo(id), headers, conversationIdHeader);
     }
     
     @POST
@@ -123,15 +129,16 @@ public class KieServerRestImpl {
         String contentType = getContentType(headers);
 
         KieScannerResource resource = marshallerHelper.unmarshal(resourcePayload, contentType, KieScannerResource.class);
-
-        return createCorrectVariant(server.updateScanner(id, resource), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.updateScanner(id, resource), headers, conversationIdHeader);
     };
 
     @GET
     @Path("containers/{id}/release-id")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getReleaseId( @Context HttpHeaders headers, @PathParam("id") String id) {
-        return createCorrectVariant(server.getContainerReleaseId(id), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.getContainerReleaseId(id), headers, conversationIdHeader);
     }
 
     @POST
@@ -143,8 +150,8 @@ public class KieServerRestImpl {
         String contentType = getContentType(headers);
 
         ReleaseId releaseId = marshallerHelper.unmarshal(releaseIdPayload, contentType, ReleaseId.class);
-
-        return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers);
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers, conversationIdHeader);
     }
 
 

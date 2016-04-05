@@ -65,6 +65,8 @@ public abstract class AbstractKieServicesClientImpl {
     protected final Marshaller marshaller;
     protected ClassLoader classLoader;
 
+    protected String conversationId;
+
     public AbstractKieServicesClientImpl(KieServicesConfiguration config) {
         this.config = config.clone();
         this.baseURI = config.getServerUrl();
@@ -134,6 +136,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
@@ -148,6 +151,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
             return deserialize(response.body(), resultType);
@@ -162,6 +166,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
             return response.body();
@@ -175,6 +181,8 @@ public abstract class AbstractKieServicesClientImpl {
         logger.debug("About to send GET request to '{}'", uri);
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).get();
         KieRemoteHttpResponse response = request.response();
+
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
@@ -207,6 +215,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
@@ -230,6 +240,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.OK.getStatusCode()
                 || response.code() == Response.Status.CREATED.getStatusCode()) {
             return deserialize( response.body(), resultType );
@@ -249,6 +261,8 @@ public abstract class AbstractKieServicesClientImpl {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest(uri).body(body).put();
         KieRemoteHttpResponse response = request.response();
+
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -272,6 +286,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
             T serviceResponse = deserialize( response.body(), resultType );
@@ -288,6 +304,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
@@ -302,6 +320,8 @@ public abstract class AbstractKieServicesClientImpl {
         logger.debug("About to send DELETE request to '{}' ", uri);
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
+
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
                 response.code() == Response.Status.NO_CONTENT.getStatusCode() ) {
@@ -328,6 +348,11 @@ public abstract class AbstractKieServicesClientImpl {
                 httpRequest.header(config.getCredentialsProvider().getHeaderName(), authorization);
             }
         }
+        // apply conversationId
+        if (conversationId != null) {
+            httpRequest.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, conversationId);
+        }
+
         return httpRequest;
     }
 
@@ -407,6 +432,10 @@ public abstract class AbstractKieServicesClientImpl {
                     textMsg.setStringProperty(JMSConstants.CONTAINER_ID_PROPERTY_NAME, containerId);
                 }
 
+                if (conversationId != null) {
+                    textMsg.setStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME, conversationId);
+                }
+
                 // send
                 producer.send(textMsg);
             } catch( JMSException jmse ) {
@@ -429,6 +458,8 @@ public abstract class AbstractKieServicesClientImpl {
             // extract response
             assert response != null: "Response is empty.";
             try {
+                conversationId = response.getStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME);
+
                 String responseStr = ((TextMessage) response).getText();
                 logger.debug("Received response from server '{}'", responseStr);
                 cmdResponse = marshaller.unmarshall(responseStr, ServiceResponsesList.class);
@@ -641,6 +672,8 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
         KieRemoteHttpResponse response = request.response();
 
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             // serialize it back to string to make it backward compatible
@@ -656,6 +689,8 @@ public abstract class AbstractKieServicesClientImpl {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
         KieRemoteHttpResponse response = request.response();
+
+        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );

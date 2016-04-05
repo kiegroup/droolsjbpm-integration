@@ -21,6 +21,7 @@ public class KieServerConstants {
 
     public static final String CLASS_TYPE_HEADER = "X-KIE-ClassType";
     public static final String KIE_CONTENT_TYPE_HEADER = "X-KIE-ContentType";
+    public static final String KIE_CONVERSATION_ID_TYPE_HEADER = "X-KIE-ConversationId";
 
     // extensions control parameters
     public static final String KIE_DROOLS_SERVER_EXT_DISABLED = "org.drools.server.ext.disabled";

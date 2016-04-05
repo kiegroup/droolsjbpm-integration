@@ -22,7 +22,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.remote.common.rest.RestEasy960Util;
+import org.kie.server.api.ConversationId;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 public class RestUtils {
@@ -30,11 +36,11 @@ public class RestUtils {
     public static Variant defaultVariant = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE).add().build().get(0);
     private static MarshallerHelper marshallerHelper = new MarshallerHelper(null);
     
-    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers) {
-        return createCorrectVariant(responseObj, headers, null);
+    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, Header... customHeaders) {
+        return createCorrectVariant(responseObj, headers, null, customHeaders);
     }
 
-    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
+    public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
         String contentType = getContentType(headers);
@@ -44,10 +50,11 @@ public class RestUtils {
         } else {
             responseBuilder = Response.ok(marshallerHelper.marshal(contentType, responseObj), v);
         }
+        applyCustomHeaders(responseBuilder, customHeaders);
         return responseBuilder.build();
     }
 
-    public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status) {
+    public static Response createCorrectVariant(MarshallerHelper marshallerHelper, String containerId, Object responseObj, HttpHeaders headers, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         Variant v = getVariant(headers);
         String contentType = getContentType(headers);
@@ -63,16 +70,18 @@ public class RestUtils {
         } else {
             responseBuilder = Response.ok(marshalledResponse, v);
         }
+        applyCustomHeaders(responseBuilder, customHeaders);
         return responseBuilder.build();
     }
     
-    public static Response createResponse(Object responseObj, Variant v, javax.ws.rs.core.Response.Status status) {
+    public static Response createResponse(Object responseObj, Variant v, javax.ws.rs.core.Response.Status status, Header... customHeaders) {
         Response.ResponseBuilder responseBuilder = null;
         if( status != null ) {
             responseBuilder = Response.status(status).entity(responseObj).variant(v);
         } else {
             responseBuilder = Response.ok(responseObj, v);
         }
+        applyCustomHeaders(responseBuilder, customHeaders);
         return responseBuilder.build();
     }
 
@@ -108,15 +117,50 @@ public class RestUtils {
         return contentType;
     }
 
-    public static Response notFound(String message, Variant v) {
-        return createResponse(message, v, Response.Status.NOT_FOUND);
+    public static Response notFound(String message, Variant v, Header... customHeaders) {
+        return createResponse(message, v, Response.Status.NOT_FOUND, customHeaders);
     }
 
-    public static Response internalServerError(String message, Variant v) {
-        return createResponse(message, v, Response.Status.INTERNAL_SERVER_ERROR);
+    public static Response internalServerError(String message, Variant v, Header... customHeaders) {
+        return createResponse(message, v, Response.Status.INTERNAL_SERVER_ERROR, customHeaders);
     }
 
-    public static Response alreadyExists(String message, Variant v) {
-        return createResponse(message, v, Response.Status.CONFLICT);
+    public static Response alreadyExists(String message, Variant v, Header... customHeaders) {
+        return createResponse(message, v, Response.Status.CONFLICT, customHeaders);
+    }
+
+    public static Response noContent(Variant v, Header... customHeaders) {
+        return createResponse("", v, Response.Status.NO_CONTENT, customHeaders);
+    }
+
+    protected static void applyCustomHeaders(Response.ResponseBuilder builder, Header... customHeaders) {
+        if (customHeaders != null && customHeaders.length > 0) {
+            for (Header header : customHeaders) {
+                if (header != null) {
+                    builder.header(header.getName(), header.getValue());
+                }
+            }
+        }
+    }
+
+    public static Header buildConversationIdHeader(String containerId, KieServerRegistry registry, HttpHeaders headers) {
+        List<String> conversationIdHeader = headers.getRequestHeader(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        if (conversationIdHeader != null && !conversationIdHeader.isEmpty()) {
+            return new Header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, conversationIdHeader.get(0));
+        }
+
+        KieContainerInstanceImpl container = registry.getContainer(containerId);
+        if (container != null) {
+            ReleaseId releaseId = container.getResource().getResolvedReleaseId();
+            if (releaseId == null) {
+                releaseId = container.getResource().getReleaseId();
+            }
+
+            String conversationId = ConversationId.from(KieServerEnvironment.getServerId(), containerId, releaseId).toString();
+
+            return new Header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, conversationId);
+        }
+
+        return null;
     }
 }

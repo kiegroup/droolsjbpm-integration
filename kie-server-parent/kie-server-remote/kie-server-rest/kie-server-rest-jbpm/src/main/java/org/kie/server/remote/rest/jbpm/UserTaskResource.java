@@ -32,6 +32,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.TaskNotFoundException;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +48,15 @@ public class UserTaskResource {
     public static final Logger logger = LoggerFactory.getLogger(UserTaskResource.class);
 
     private UserTaskServiceBase userTaskServiceBase;
+    private KieServerRegistry context;
 
     public UserTaskResource() {
 
     }
 
-    public UserTaskResource(UserTaskServiceBase userTaskServiceBase) {
+    public UserTaskResource(UserTaskServiceBase userTaskServiceBase, KieServerRegistry context) {
         this.userTaskServiceBase = userTaskServiceBase;
+        this.context = context;
     }
 
 
@@ -63,16 +67,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.activate(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
 
     }
@@ -83,16 +88,17 @@ public class UserTaskResource {
     public Response claim(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user")  String userId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.claim(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -104,19 +110,19 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             if (autoProgress) {
                 userTaskServiceBase.completeAutoProgress(containerId, taskId, userId, payload, type);
             } else {
                 userTaskServiceBase.complete(containerId, taskId, userId, payload, type);
             }
-
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -127,16 +133,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("targetUser") String targetUserId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.delegate(containerId, taskId, userId, targetUserId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
 
     }
@@ -148,16 +155,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.exit(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -169,15 +177,16 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             userTaskServiceBase.fail(containerId, taskId, userId, payload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -188,16 +197,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("targetUser") String targetUserId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.forward(containerId, taskId, userId, targetUserId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -207,15 +217,16 @@ public class UserTaskResource {
     public Response release(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             userTaskServiceBase.release(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -225,16 +236,17 @@ public class UserTaskResource {
     public Response resume(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.resume(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -244,16 +256,17 @@ public class UserTaskResource {
     public Response skip(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.skip(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
     @PUT
@@ -263,15 +276,16 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             userTaskServiceBase.start(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -282,16 +296,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.stop(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -301,15 +316,16 @@ public class UserTaskResource {
     public Response suspend(@Context HttpHeaders headers, @PathParam("id") String containerId,
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId) {
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             userTaskServiceBase.suspend(containerId, taskId, userId);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -320,16 +336,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("potOwner") List<String> potentialOwners) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.nominate(containerId, taskId, userId, potentialOwners);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -341,16 +358,17 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.setPriority(containerId, taskId, priorityPayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -362,16 +380,17 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.setExpirationDate(containerId, taskId, datePayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -383,16 +402,17 @@ public class UserTaskResource {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.setSkipable(containerId, taskId, skipablePayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -403,15 +423,16 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String namePayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             userTaskServiceBase.setName(containerId, taskId, namePayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -422,16 +443,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String descriptionPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.setDescription(containerId, taskId, descriptionPayload, type);
 
-            return createResponse("", v, Response.Status.CREATED);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -442,17 +464,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = userTaskServiceBase.saveContent(containerId, taskId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -463,17 +486,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getTaskOutputContentByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -484,17 +508,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getTaskInputContentByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -505,16 +530,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("contentId") Long contentId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.deleteContent(containerId, taskId, contentId);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -525,16 +551,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.addComment(containerId, taskId, payload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -545,16 +572,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("commentId") Long commentId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.deleteComment(containerId, taskId, commentId);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -565,17 +593,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getCommentsByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -586,17 +615,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("commentId") Long commentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getCommentById(containerId, taskId, commentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -607,17 +637,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @QueryParam("user") String userId, @QueryParam("name") String name, String attachmentPayload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = userTaskServiceBase.addAttachment(containerId, taskId, userId, name, attachmentPayload, type);
 
             logger.debug("Returning CREATED response with content '{}'", response);
-            return createResponse(response, v, Response.Status.CREATED);
+            return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -628,16 +659,17 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("attachmentId") Long attachmentId) {
 
         Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             userTaskServiceBase.deleteAttachment(containerId, taskId, attachmentId);
-            // return null to produce 204 NO_CONTENT response code
-            return null;
+            // produce 204 NO_CONTENT response code
+            return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -648,17 +680,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("attachmentId") Long attachmentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getAttachmentById(containerId, taskId, attachmentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -669,17 +702,18 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId, @PathParam("attachmentId") Long attachmentId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             String response = userTaskServiceBase.getAttachmentContentById(containerId, taskId, attachmentId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
     @GET
@@ -689,18 +723,19 @@ public class UserTaskResource {
             @PathParam("tInstanceId") Long taskId) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = userTaskServiceBase.getAttachmentsByTaskId(containerId, taskId, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e){
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 
@@ -711,18 +746,19 @@ public class UserTaskResource {
             @QueryParam("withInputData") boolean withInput, @QueryParam("withOutputData") boolean withOutput, @QueryParam("withAssignments") boolean withAssignments) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
             String response = userTaskServiceBase.getTask(containerId, taskId, withInput, withOutput, withAssignments, type);
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK);
+            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
 
         } catch (TaskNotFoundException e) {
-            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
     }
 }

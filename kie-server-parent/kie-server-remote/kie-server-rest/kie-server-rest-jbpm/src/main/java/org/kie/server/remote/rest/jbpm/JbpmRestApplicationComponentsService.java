@@ -94,11 +94,11 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         QueryDataServiceBase queryDataServiceBase = new QueryDataServiceBase(queryService, context);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
-        components.add(new RuntimeDataResource(runtimeDataServiceBase));
-        components.add(new DefinitionResource(definitionServiceBase));
-        components.add(new UserTaskResource(userTaskServiceBase));
-        components.add(new ExecutorResource(executorServiceBase));
-        components.add(new QueryDataResource(queryDataServiceBase));
+        components.add(new RuntimeDataResource(runtimeDataServiceBase, context));
+        components.add(new DefinitionResource(definitionServiceBase, context));
+        components.add(new UserTaskResource(userTaskServiceBase, context));
+        components.add(new ExecutorResource(executorServiceBase, context));
+        components.add(new QueryDataResource(queryDataServiceBase, context));
 
         return components;
     }
