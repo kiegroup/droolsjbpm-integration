@@ -234,7 +234,6 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(timeout = 60000)
-    @Ignore("Needs to be fixed, failing randomly due to PLANNER-560")
     public void testGetBestSolution() throws Exception {
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
