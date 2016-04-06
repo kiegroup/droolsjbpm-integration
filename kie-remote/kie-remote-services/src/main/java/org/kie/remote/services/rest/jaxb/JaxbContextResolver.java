@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -40,21 +40,23 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
     private static final Logger logger = LoggerFactory.getLogger(JaxbContextResolver.class);
 
     @Inject
-    DynamicJaxbContext dynamicContext;
+    DynamicJaxbContextManager dynamicContextManager;
 
     @PostConstruct
     public void configure() {
-        if (dynamicContext == null) {
+        if (dynamicContextManager == null) {
             logger.info("JaxbContextResolver does not support CDI injection, looking up DynamicJaxbContext programmatically");
             BeanManager beanManager = BeanManagerProvider.getInstance().getBeanManager();
             try {
-                Set<Bean<?>> beans = beanManager.getBeans( DynamicJaxbContext.class );
+                Set<Bean<?>> beans = beanManager.getBeans( DynamicJaxbContextManager.class );
 
                 if (beans != null && !beans.isEmpty()) {
                     Bean<?> bean = (Bean<?>) beans.iterator().next();
 
-                    dynamicContext = (DynamicJaxbContext) beanManager.getReference(bean, DynamicJaxbContext.class,
-                                                          beanManager.createCreationalContext(bean));
+                    dynamicContextManager = (DynamicJaxbContextManager)
+                            beanManager.getReference(bean,
+                                                     DynamicJaxbContextManager.class,
+                                                     beanManager.createCreationalContext(bean));
                 }
 
             } catch (Exception e) {
@@ -65,8 +67,7 @@ public class JaxbContextResolver implements ContextResolver<JAXBContext> {
 
     @Override
     public JAXBContext getContext(Class<?> type) {
-
-        return dynamicContext;
+        return dynamicContextManager.getJaxbContext();
     }
 
 }
