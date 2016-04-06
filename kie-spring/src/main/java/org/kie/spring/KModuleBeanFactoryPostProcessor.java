@@ -58,7 +58,11 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
     private static final Logger log = LoggerFactory.getLogger(KModuleBeanFactoryPostProcessor.class);
 
-    private static final String WEB_INF_CLASSES_FOLDER = "WEB-INF" + File.separator + "classes" + File.separator;
+    /* URLs only contain forward slashes - '/'
+     * See https://docs.oracle.com/javase/6/docs/api/java/net/URL.html for more info. */
+    private static final String WEB_INF_CLASSES_URL_SUFFIX = "WEB-INF/classes/";
+    /* Paths do contain OS-specific separators */
+    private static final String WEB_INF_CLASSES_PATH_SUFFIX = "WEB-INF" + File.separator + "classes";
     /**
      * Root URL of the KieModule which is associated with the Spring app context.
      *
@@ -73,13 +77,17 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     public KModuleBeanFactoryPostProcessor() {
     }
 
-    public KModuleBeanFactoryPostProcessor(URL kModuleRootUrl,ApplicationContext context) {
+    public KModuleBeanFactoryPostProcessor(URL kModuleRootUrl, ApplicationContext context) {
         this.kModuleRootUrl = kModuleRootUrl;
         this.context = context;
     }
 
     public KModuleBeanFactoryPostProcessor(URL kModuleRootUrl) {
         this.kModuleRootUrl = kModuleRootUrl;
+    }
+
+    public URL getkModuleRootUrl() {
+        return kModuleRootUrl;
     }
 
     public void setReleaseId(ReleaseId releaseId) {
@@ -92,8 +100,8 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
         String kModuleRootPath = parseKModuleRootPath(kModuleRootUrl);
         if (releaseId == null && kModuleRootPath != null) {
             String pomProperties = null;
-            if (kModuleRootPath.endsWith(WEB_INF_CLASSES_FOLDER)) {
-                String configFilePathForWebApps = kModuleRootPath.substring(0, kModuleRootPath.indexOf(WEB_INF_CLASSES_FOLDER));
+            if (kModuleRootPath.endsWith(WEB_INF_CLASSES_PATH_SUFFIX)) {
+                String configFilePathForWebApps = kModuleRootPath.substring(0, kModuleRootPath.indexOf(WEB_INF_CLASSES_PATH_SUFFIX));
                 pomProperties = ClasspathKieProject.getPomProperties(configFilePathForWebApps);
             }
             if (pomProperties == null) {
@@ -255,7 +263,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.context = applicationContext;
         try {
-            kModuleRootUrl = tryGetRootUrlForEapContext(applicationContext);
+            kModuleRootUrl = tryGetRootUrlForEapContext(applicationContext.getClassLoader().getResources("/"));
             // in case the kModuleRootUrl is still null at this point, the assumption is we are not running on EAP
             // so we just get the url from the classpath
             if (kModuleRootUrl == null) {
@@ -271,47 +279,47 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
     /**
      * This is a HACK for web applications deployed to EAP/WildFly which are using kie-spring.
      *
-     * The method tries to figure out the root URL based on the provided app context. It covers (at least) the
+     * The method tries to figure out the root URL based on the provided URL enumeration. It covers (at least) the
      * following two use cases:
      *   1) kie-spring deployed together (bundled) with Spring webapp (inside WEB-INF/lib)
      *   2) kie-spring deployed as EAP module + Spring webapp depending on that module
      *
      * First of all it tries to determine if it is running on EAP, based on EAP specific resource URL. If that is the
-     * case it looks for the "WEB-INF/classes" dir and return that as an VFS URL (vfs:/...). Later on this URL
+     * case it looks for the "WEB-INF/classes" dir and return that as an VFS URL (vfs:/...). Later on, this URL
      * needs to be translated to a real filesystem path. This is one by {@link ClasspathKieProject#fixURLFromKProjectPath(URL)}
      *
-     * @param applicationContext Spring app context used by the application
+     * @param rootUrls Classpath root URLs
      * @return NULL is case the code is not running on EAP, otherwise root URL of the webapp context (that is webapp's WEB-INF/classes)
-     * @throws IOException in case of I/O error when gathering resources from app context's classloader
      */
-    private URL tryGetRootUrlForEapContext(ApplicationContext applicationContext) throws IOException {
-        Enumeration<URL> rootUrls = applicationContext.getClassLoader().getResources("/");
-        if (containsEapSpecificUrl(rootUrls)) {
-            while (rootUrls.hasMoreElements()) {
-                URL url = rootUrls.nextElement();
-                if (url.toString().endsWith(WEB_INF_CLASSES_FOLDER)) {
-                    return url;
-                }
+    URL tryGetRootUrlForEapContext(Enumeration<URL> rootUrls) {
+        boolean containsEapSpecificUrl = false;
+        boolean containsWebInfClassesUrl = false;
+        URL webInfClassesUrl = null;
+        while (rootUrls.hasMoreElements()) {
+            URL url = rootUrls.nextElement();
+            if (isEapSpecificUrl(url)) {
+                containsEapSpecificUrl = true;
+            } else if (url.toString().endsWith(WEB_INF_CLASSES_URL_SUFFIX)) {
+                containsWebInfClassesUrl = true;
+                webInfClassesUrl = url;
             }
         }
-        return null;
+        if (containsEapSpecificUrl && containsWebInfClassesUrl) {
+            return webInfClassesUrl;
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Check if the provided URL enumeration contains EAP specific URL. The method is used to check if the
+     * Check if the provided URL is EAP specific URL. The method is used to check if the
      * code running inside EAP. Yes, this is a very ugly hack, but there does not seem a better way around.
      *
-     * @param urls enumeration of URLs to check
+     * @param url URL to check
      * @return true in case the enumeration contains EAP specific URL, otherwise false
      */
-    private boolean containsEapSpecificUrl(Enumeration<URL> urls) {
-        while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            if (url.toString().endsWith("service-loader-resources/")) {
-                return true;
-            }
-        }
-        return false;
+    boolean isEapSpecificUrl(URL url) {
+        return url.toString().endsWith("service-loader-resources/");
     }
 
 }
