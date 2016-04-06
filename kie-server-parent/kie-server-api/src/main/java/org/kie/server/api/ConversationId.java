@@ -34,6 +34,9 @@ import org.kie.server.api.model.ReleaseId;
  */
 public class ConversationId {
 
+    private static final String WRAP = "'";
+    private static final String SPLIT_PATTERN = WRAP + ":" + WRAP;
+
     private String kieServerId;
     private String containerId;
     private ReleaseId releaseId;
@@ -60,15 +63,18 @@ public class ConversationId {
         try {
             String conversationId = URLDecoder.decode(conversationIdString, "UTF-8");
 
-            String[] conversationIdElements = conversationId.split(":");
-            if (conversationIdElements.length != 6) {
+            String[] conversationIdElements = conversationId.split(SPLIT_PATTERN);
+            if (conversationIdElements.length != 4) {
                 throw new IllegalArgumentException("Non-parsable conversationId '" + conversationIdString + "'");
             }
 
-            String kieServerId = conversationIdElements[0];
+            String kieServerId = conversationIdElements[0].replaceAll("'", "");
             String containerId = conversationIdElements[1];
-            ReleaseId releaseId = new ReleaseId(conversationIdElements[2], conversationIdElements[3], conversationIdElements[4]);
-            String uniqueString = conversationIdElements[5];
+
+            String[] releaseIdElements = conversationIdElements[2].split(":");
+
+            ReleaseId releaseId = new ReleaseId(releaseIdElements[0], releaseIdElements[1], releaseIdElements[2]);
+            String uniqueString = conversationIdElements[3].replaceAll("'", "");;
 
             return new ConversationId(kieServerId, containerId, releaseId, uniqueString);
         } catch (UnsupportedEncodingException e) {
@@ -95,13 +101,16 @@ public class ConversationId {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(kieServerId)
-        .append(":")
+        builder
+        .append(WRAP)
+        .append(kieServerId)
+        .append(WRAP + ":" + WRAP)
         .append(containerId)
-        .append(":")
+        .append(WRAP + ":" + WRAP)
         .append(releaseId.toExternalForm())
-        .append(":")
-        .append(uniqueString);
+        .append(WRAP + ":" + WRAP)
+        .append(uniqueString)
+        .append(WRAP);
 
         try {
             return URLEncoder.encode(builder.toString(), "UTF-8");
