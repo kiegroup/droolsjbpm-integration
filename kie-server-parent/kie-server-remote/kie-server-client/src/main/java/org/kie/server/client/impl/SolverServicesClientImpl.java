@@ -49,7 +49,7 @@ public class SolverServicesClientImpl
             return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstanceList.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetSolversCommand( containerId ) ) );
-            ServiceResponse<SolverInstanceList> response = (ServiceResponse<SolverInstanceList>) executeJmsCommand( script, GetSolversCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<SolverInstanceList> response = (ServiceResponse<SolverInstanceList>) executeJmsCommand( script, GetSolversCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
             return response;
@@ -70,7 +70,7 @@ public class SolverServicesClientImpl
             return makeHttpPutRequestAndCreateServiceResponse( uri, instance, SolverInstance.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateSolverCommand( containerId, solverId, configFile ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, CreateSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, CreateSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             return response;
         }
@@ -85,7 +85,7 @@ public class SolverServicesClientImpl
             return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstance.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetSolverStateCommand( containerId, solverId ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
             return response;
@@ -101,7 +101,7 @@ public class SolverServicesClientImpl
             return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstance.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetBestSolutionCommand( containerId, solverId ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetBestSolutionCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetBestSolutionCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
             return response;
@@ -120,7 +120,7 @@ public class SolverServicesClientImpl
             instance.setContainerId( containerId );
             instance.setSolverId( solverId );
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateSolverStateCommand( containerId, solverId, serialize( instance ) ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, UpdateSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, UpdateSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
             return response;
@@ -136,7 +136,7 @@ public class SolverServicesClientImpl
             return makeHttpDeleteRequestAndCreateCustomResponse( uri, ServiceResponse.class );
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DisposeSolverCommand( containerId, solverId ) ) );
-            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand( script, DisposeSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP ).getResponses().get( 0 );
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand( script, DisposeSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
             return response;

@@ -116,7 +116,6 @@ public class ProcessServiceBase {
     public Object abortProcessInstance(String containerId, Number processInstanceId) {
 
         processService.abortProcessInstance(processInstanceId.longValue());
-        // return null to produce 204 NO_CONTENT response code
         return null;
     }
 
@@ -133,7 +132,6 @@ public class ProcessServiceBase {
 
     public Object abortProcessInstances(String containerId, List<Long> processInstanceIds) {
         processService.abortProcessInstances(convert(processInstanceIds));
-        // return null to produce 204 NO_CONTENT response code
         return null;
 
     }
