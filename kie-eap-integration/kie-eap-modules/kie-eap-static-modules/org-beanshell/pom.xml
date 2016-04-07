@@ -22,7 +22,7 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.beanshell</groupId>
+      <groupId>org.apache-extras.beanshell</groupId>
       <artifactId>bsh</artifactId>
       <type>jar</type>
     </dependency>
