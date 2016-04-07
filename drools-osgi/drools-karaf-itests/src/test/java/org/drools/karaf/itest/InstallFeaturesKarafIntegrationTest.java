@@ -58,6 +58,7 @@ public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegratio
                 {"drools-module"},
                 //{"drools-templates"}, // TODO: feature install fails, needs to be investigated
                 {"drools-decisiontable"},
+                {"drools-wb-guided-decisiontables"},
                 {"drools-jpa"},
                 //{"kie"}, // TODO: feature install fails, needs to be investigated
                 //{"kie-ci"}, // TODO: feature install fails, needs to be investigated
