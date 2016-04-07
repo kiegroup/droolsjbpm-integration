@@ -188,12 +188,6 @@
     </dependency>
     <dependency>
       <groupId>org.kie.modules</groupId>
-      <artifactId>org-apache-camel</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.modules</groupId>
       <artifactId>jakarta-regexp</artifactId>
       <version>${project.version}</version>
       <type>pom</type>

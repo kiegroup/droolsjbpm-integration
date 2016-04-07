@@ -18,7 +18,7 @@
     <module.location>org/jbpm</module.location>
     <module.slot>main</module.slot>
     <!-- Added due to jbpm-persistence-jpa runtime hibernate dependency with EAP. -->
-    <module.dependencies>org.hibernate:main,javax.api:main,javaee.api:main,com.thoughtworks.xstream:main,org.apache.camel:main,org.apache.maven:main</module.dependencies>
+    <module.dependencies>org.hibernate:main,javax.api:main,javaee.api:main,com.thoughtworks.xstream:main,org.apache.maven:main</module.dependencies>
   </properties>
 
   <dependencies>
