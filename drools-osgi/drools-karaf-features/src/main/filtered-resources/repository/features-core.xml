@@ -16,6 +16,8 @@
     <bundle>wrap:mvn:org.codehaus.janino/janino/${karaf.version.org.codehaus.janino}$Bundle-SymbolicName=Codehaus-Janino&amp;Bundle-Version=${karaf.version.org.codehaus.janino}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-atinject_1.0_spec/${karaf.version.javax.inject}</bundle>
     <bundle>wrap:mvn:javax.enterprise/cdi-api/${karaf.version.javax.enterprise.cdi}</bundle>
+    <bundle>mvn:org.jboss.spec.javax.el/jboss-el-api_2.2_spec/${karaf.version.org.jboss.spec.javax.el.jboss-el-api_2.2_spec}</bundle>
+    <bundle>mvn:org.jboss.spec.javax.interceptor/jboss-interceptors-api_1.2_spec/${karaf.version.org.jboss.spec.javax.interceptor}</bundle>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
   </feature>
 
@@ -153,12 +155,14 @@
     <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-core/${version.org.hibernate}$overwrite=merge&amp;Import-Package=org.jbpm.services.task*,*</bundle>
     <bundle start-level="100">wrap:mvn:org.hibernate/hibernate-entitymanager/${version.org.hibernate}$overwrite=merge&amp;DynamicImport-Package=*</bundle>
     <bundle start-level="100">mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
+    <bundle start-level="100">mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
   <feature name="hibernate-validator" version="${version.org.hibernate.validator}" description="Hibernate Validator">
     <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr303-api-1.1.0/${karaf.version.org.apache.servicemix.specs.jsr303-api}</bundle>
     <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
     <bundle>mvn:org.hibernate/hibernate-validator/${version.org.hibernate.validator}</bundle>
+    <bundle>mvn:org.apache.logging.log4j/log4j-api/${karaf.version.org.apache.logging.log4j}</bundle>
   </feature>
 
   <feature name="jbpm-spring-persistent" version="${project.version}" description="jBPM Spring Persistence support">
