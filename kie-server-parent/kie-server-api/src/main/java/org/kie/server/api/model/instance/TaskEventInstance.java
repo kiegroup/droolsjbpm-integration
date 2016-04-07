@@ -46,6 +46,9 @@ public class TaskEventInstance {
     @XmlElement(name="task-work-item-id")
     private Long workItemId;
 
+    @XmlElement(name="task-event-message")
+    private String message;
+
     public TaskEventInstance() {
     }
 
@@ -109,6 +112,14 @@ public class TaskEventInstance {
         this.workItemId = workItemId;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return "TaskEventInstance{" +
@@ -119,6 +130,7 @@ public class TaskEventInstance {
                 ", logTime=" + logTime +
                 ", processInstanceId=" + processInstanceId +
                 ", workItemId=" + workItemId +
+                ", message=" + message +
                 '}';
     }
 
@@ -162,6 +174,11 @@ public class TaskEventInstance {
 
         public Builder date(Date date) {
             taskEventInstance.setLogTime(date == null ? date : new Date(date.getTime()));
+            return this;
+        }
+
+        public Builder message(String message) {
+            taskEventInstance.setMessage(message);
             return this;
         }
     }
