@@ -501,6 +501,7 @@ public class RuntimeDataServiceBase {
                         .type(taskSummary.getType().toString())
                         .user(taskSummary.getUserId())
                         .workItemId(taskSummary.getWorkItemId())
+                        .message(taskSummary.getMessage())
                         .build();
                 instances[counter] = task;
                 counter++;
