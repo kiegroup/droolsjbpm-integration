@@ -34,7 +34,6 @@ import org.kie.aries.blueprint.KieBlueprintContainer;
 
 import static org.junit.Assert.*;
 
-@Ignore("Add when org.apache.aries.blueprint.noosgi 1.0.1 is released")
 public class KieBlueprintBPMNTest {
 
     static BlueprintContainerImpl container = null;

@@ -25,51 +25,59 @@ import java.util.Set;
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
 import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
+import org.apache.aries.blueprint.reflect.PassThroughMetadataImpl;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.wiring.BundleWiring;
 
 public class KieBlueprintContainer extends BlueprintContainerImpl {
 
     public KieBlueprintContainer(ClassLoader loader, List<URL> resources) throws Exception {
-        super(loader, resources);
+        this(loader, resources, null, true);
     }
 
     public KieBlueprintContainer(ClassLoader loader, List<URL> resources, boolean init) throws Exception {
-        super(loader, resources, init);
+        this(loader, resources, null, init);
     }
 
     public KieBlueprintContainer(ClassLoader loader, List<URL> resources, Map<String, String> properties, boolean init) throws Exception {
-        super(loader, resources, properties, init);
+        super(loader, resources, properties, createKieNamespaceHandlerSet(loader), false);
+        // kie-aries-blueprint relies on the following for retrieving bundle classloader [BZ-1310039]
+        getComponentDefinitionRegistry().registerComponentDefinition(new PassThroughMetadataImpl("blueprintBundleContext", createMockBundleContext(loader)));
+        // the initialization must happen after blueprintBundleContext is registered
+        if (init) {
+            super.init();
+        }
     }
 
-    @Override
-    public void init() throws Exception {
-        super.init();
-    }
-
-    /**
-     * Readd when org.apache.aries.blueprint.noosgi 1.0.1 is released
-     * 
-    @Override
-    protected NamespaceHandlerSet createNamespaceHandlerSet(Set<URI> namespaces) {
+    private static NamespaceHandlerSet createKieNamespaceHandlerSet(ClassLoader classloader) {
         NamespaceHandlerSet handlerSet = new SimpleNamespaceHandlerSet();
-        try {
-            URI namespaceURL = URI.create("http://drools.org/schema/kie-aries-blueprint/1.0.0");
-            URL schemaURL = getResource("org/kie/aries/blueprint/kie-aries-blueprint.xsd");
-            KieNamespaceHandler namespaceHandler = new KieNamespaceHandler();
-            ((SimpleNamespaceHandlerSet)handlerSet).addNamespace(namespaceURL, schemaURL, namespaceHandler);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        // Check namespaces
-        Set<URI> unsupported = new LinkedHashSet<URI>();
-        for (URI ns : namespaces) {
-            if (!handlerSet.getNamespaces().contains(ns)) {
-                unsupported.add(ns);
-            }
-        }
-        if (unsupported.size() > 0) {
-            throw new IllegalArgumentException("Unsupported namespaces: " + unsupported.toString());
-        }
+        URI namespaceURL = URI.create("http://drools.org/schema/kie-aries-blueprint/1.0.0");
+        URL schemaURL = classloader.getResource("org/kie/aries/blueprint/kie-aries-blueprint.xsd");
+        KieNamespaceHandler namespaceHandler = new KieNamespaceHandler();
+        ((SimpleNamespaceHandlerSet) handlerSet).addNamespace(namespaceURL, schemaURL, namespaceHandler);
         return handlerSet;
     }
-    */
+
+    private static BundleContext createMockBundleContext(ClassLoader classLoader) {
+        BundleContext mockBundleContext = Mockito.mock(BundleContext.class);
+        Bundle mockBundle = createMockBundle(classLoader);
+        Mockito.when(mockBundleContext.getBundle()).thenReturn(mockBundle);
+        return mockBundleContext;
+    }
+
+    private static Bundle createMockBundle(ClassLoader classLoader) {
+        Bundle mockBundle = Mockito.mock(Bundle.class);
+        BundleWiring mockBundleWiring = createMockBundleWiring(classLoader);
+        Mockito.when(mockBundle.adapt(Matchers.eq(BundleWiring.class))).thenReturn(mockBundleWiring);
+        return mockBundle;
+    }
+
+    private static BundleWiring createMockBundleWiring(ClassLoader classLoader) {
+        BundleWiring mockBundleWiring = Mockito.mock(BundleWiring.class);
+        Mockito.when(mockBundleWiring.getClassLoader()).thenReturn(classLoader);
+        return mockBundleWiring;
+    }
 }
