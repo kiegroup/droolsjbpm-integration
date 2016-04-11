@@ -33,6 +33,10 @@
       <outputDirectory>.</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>${project.basedir}/src/main/ee6-resources</directory>
+      <outputDirectory>.</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>${project.basedir}/src/main/docs</directory>
       <outputDirectory>docs</outputDirectory>
     </fileSet>

@@ -208,46 +208,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat7x</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server-controller-test-war</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.controller.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.controller.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>tomcat8x</id>
+      <id>tomcat8</id>
       <build>
         <pluginManagement>
           <plugins>
