@@ -27,7 +27,6 @@ import org.drools.persistence.info.SessionInfo;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.command.Context;
-import org.kie.internal.marshalling.MarshallerFactory;
 
 public class ManualPersistInterceptor extends AbstractInterceptor {
 

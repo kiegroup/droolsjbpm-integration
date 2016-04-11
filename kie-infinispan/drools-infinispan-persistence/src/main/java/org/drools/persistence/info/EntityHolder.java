@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -30,7 +30,7 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed
 public class EntityHolder {
 
-	@Id @DocumentId @Field 
+	@Id @DocumentId @Field
 	private String key;
 	@Field
 	private String type;
@@ -69,7 +69,7 @@ public class EntityHolder {
 		this.sessionInfoLastModificationDate = sessionInfo.getLastModificationDate();
 		this.sessionInfoStartDate = sessionInfo.getStartDate();
 	}
-	
+
 	public EntityHolder(String key, WorkItemInfo workItemInfo) {
 		this.key = key;
 		this.type = "workItemInfo";
@@ -82,7 +82,7 @@ public class EntityHolder {
 		this.workItemInfoCreationDate = workItemInfo.getCreationDate();
 		this.workItemInfoByteArray = Base64.encodeBase64String(workItemInfo.getWorkItemByteArray());
 	}
-	
+
 	protected EntityHolder(String key, String type) {
 		this.key = key;
 		this.type = type;
@@ -91,11 +91,11 @@ public class EntityHolder {
 	public String getKey() {
 		return key;
 	}
-	
+
 	public void setKey(String key) {
 		this.key = key;
 	}
-	
+
 	public SessionInfo getSessionInfo() {
 		SessionInfo sessionInfo = new SessionInfo();
 		sessionInfo.setId(this.sessionInfoId);
@@ -109,10 +109,10 @@ public class EntityHolder {
 			startDateField.setAccessible(true);
 			startDateField.set(sessionInfo, this.sessionInfoStartDate);
 		} catch (Exception e) { /* TODO */ }
-		
+
 		return sessionInfo;
 	}
-	
+
 	public void setSessionInfo(SessionInfo sessionInfo) {
 		this.sessionInfoId = sessionInfo.getId();
 		this.sessionInfoVersion = sessionInfo.getVersion();
@@ -121,7 +121,7 @@ public class EntityHolder {
 		this.sessionInfoLastModificationDate = sessionInfo.getLastModificationDate();
 		this.sessionInfoStartDate = sessionInfo.getStartDate();
 	}
-	
+
 	public WorkItemInfo getWorkItemInfo() {
 		WorkItemImpl workItem = new WorkItemImpl();
 		workItem.setName(this.workItemInfoName);
@@ -129,31 +129,33 @@ public class EntityHolder {
 		WorkItemInfo workItemInfo = new WorkItemInfo(workItem, null);
 		workItemInfo.setId(this.workItemInfoId);
 		try {
-			java.lang.reflect.Field versionField = WorkItemInfo.class.getField("version");
+			java.lang.reflect.Field versionField = WorkItemInfo.class.getDeclaredField("version");
 			versionField.setAccessible(true);
 			versionField.set(workItemInfo, this.workItemInfoVersion);
-			java.lang.reflect.Field stateField = WorkItemInfo.class.getField("state");
+			java.lang.reflect.Field stateField = WorkItemInfo.class.getDeclaredField("state");
 			stateField.setAccessible(true);
 			stateField.set(workItemInfo, this.workItemInfoState);
-			java.lang.reflect.Field creationDateField = WorkItemInfo.class.getField("creationDate");
+			java.lang.reflect.Field creationDateField = WorkItemInfo.class.getDeclaredField("creationDate");
 			creationDateField.setAccessible(true);
 			creationDateField.set(workItemInfo, this.workItemInfoCreationDate);
-			java.lang.reflect.Field workItemByteArrayField = WorkItemInfo.class.getField("workItemByteArray");
+			java.lang.reflect.Field workItemByteArrayField = WorkItemInfo.class.getDeclaredField("workItemByteArray");
 			workItemByteArrayField.setAccessible(true);
 			workItemByteArrayField.set(workItemInfo, Base64.decodeBase64(this.workItemInfoByteArray));
-		} catch (Exception e) { /* TODO */ }
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 
 		return workItemInfo;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public void setWorkItemInfo(WorkItemInfo workItemInfo) {
 		workItemInfo.transform();
 		this.workItemInfoId = workItemInfo.getId();

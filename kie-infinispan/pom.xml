@@ -14,17 +14,12 @@
   <packaging>pom</packaging>
 
   <name>KIE :: Infinispan</name>
-  <description>Infinispan integration modules for KIE projecs</description>
+  <description>Infinispan integration modules for KIE projects</description>
 
   <modules>
     <module>drools-infinispan-persistence</module>
     <module>jbpm-infinispan-persistence</module>
   </modules>
-
-  <properties>
-    <version.org.infinispan>5.2.5.Final</version.org.infinispan>
-    <version.org.apache.lucene>3.6.2</version.org.apache.lucene>
-  </properties>
 
   <dependencyManagement>
     <!-- these dependency versions should eventually be moved to droolsjbpm-build-bootstrap -->
@@ -46,26 +41,30 @@
         <version>${project.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-core</artifactId>
-        <version>${version.org.infinispan}</version>
-      </dependency>
+      <!-- Should be removed once these deps are in ip-bom -->
       <dependency>
         <groupId>org.infinispan</groupId>
         <artifactId>infinispan-query</artifactId>
         <version>${version.org.infinispan}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-core</artifactId>
-        <version>${version.org.apache.lucene}</version>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-commons</artifactId>
+        <version>${version.org.infinispan}</version>
+      </dependency>
+ 
+      <!-- Cersions of hibernate that infinispan 8.1 use. Should be removed once ip-bom upgrades to these versions. -->
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-search-engine</artifactId>
+        <version>5.5.1.Final</version>
       </dependency>
       <dependency>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr</artifactId>
-        <version>3.5</version>
+        <groupId>org.hibernate.common</groupId>
+        <artifactId>hibernate-commons-annotations</artifactId>
+        <version>5.0.1.Final</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  
 </project>
