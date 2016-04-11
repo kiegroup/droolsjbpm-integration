@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -22,18 +22,18 @@ import org.drools.persistence.info.WorkItemInfo;
 import org.infinispan.Cache;
 
 public class InfinispanPersistenceContext implements PersistenceContext {
-	
+
 	private static long SESSIONINFO_KEY = 1;
 	private static long WORKITEMINFO_KEY = 1;
 	private static final Object syncObject = new Object();
-	
+
     private Cache<String, Object> cache;
     private boolean isJTA;
-    
+
     public InfinispanPersistenceContext(Cache<String, Object> cache) {
         this(cache, true);
     }
-    
+
     public InfinispanPersistenceContext(Cache<String, Object> cache, boolean isJTA) {
         this.cache = cache;
         this.isJTA = isJTA;
@@ -48,7 +48,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
         this.cache.put(key , new EntityHolder(key, entity) );
         return entity;
     }
-    
+
     private Long generateSessionInfoId() {
     	synchronized (syncObject) {
     		while (cache.containsKey("sessionInfo" + SESSIONINFO_KEY)) {
@@ -57,7 +57,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     	}
     	return SESSIONINFO_KEY;
     }
-    
+
     private Long generateWorkItemInfoId() {
     	synchronized (syncObject) {
     		while (cache.containsKey("workItem" + WORKITEMINFO_KEY)) {
@@ -70,11 +70,11 @@ public class InfinispanPersistenceContext implements PersistenceContext {
 	private String createSessionKey(Long id) {
 		return "sessionInfo" + safeId(id);
 	}
-	
+
 	private String createWorkItemKey(Long id) {
 		return "workItem" + safeId(id);
 	}
-	
+
 	private String safeId(Number id) {
 		return String.valueOf(id); //TODO
 	}
@@ -134,9 +134,11 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     public WorkItemInfo merge(WorkItemInfo workItemInfo) {
     	String key = createWorkItemKey(workItemInfo.getId());
     	workItemInfo.transform();
-    	return ((EntityHolder) cache.put(key, new EntityHolder(key, workItemInfo))).getWorkItemInfo();
+    	EntityHolder entityHolder = new EntityHolder(key, workItemInfo);
+    	cache.put(key, entityHolder);
+    	return workItemInfo;
     }
-    
+
     public Cache<String, Object> getCache() {
 		return cache;
 	}

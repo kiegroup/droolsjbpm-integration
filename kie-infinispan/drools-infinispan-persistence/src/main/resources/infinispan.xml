@@ -1,25 +1,20 @@
-<infinispan
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-5.1.xsd"
-      xmlns="urn:infinispan:config:5.1">
+<infinispan 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="urn:infinispan:config:5.1 http://www.infinispan.org/schemas/infinispan-config-8.1.xsd"
+    xmlns="urn:infinispan:config:8.1">
 
-   <global>
-      <globalJmxStatistics enabled="true" allowDuplicateDomains="true" />
-   </global>
-
-   <namedCache name="jbpm-configured-cache">
+  <cache-container name="kie" default-cache="default" statistics="true" shutdown-hook="DONT_REGISTER">
+    <jmx duplicate-domains="true"  />
+    <local-cache name="jbpm-configured-cache">
       <eviction strategy="NONE" />
-      <transaction transactionMode="TRANSACTIONAL" lockingMode="OPTIMISTIC" autoCommit="false"
-                   syncRollbackPhase="false" syncCommitPhase="false" useEagerLocking="false"
-                   useSynchronization="true" use1PcForAutoCommitTransactions="false"
-                   transactionManagerLookupClass="org.infinispan.transaction.lookup.BitronixTransactionManagerLookup"/>
-      <indexing enabled="true" indexLocalOnly="true">
-         <properties>
-            <property name="jta.UserTransaction" value="java:comp/UserTransaction" />
-            <property name="hibernate.search.default.directory_provider" value="filesystem" />
-            <property name="hibernate.search.default.exclusive_index_use" value="false" />
-         </properties>
+      <!-- NON_XA is: useSynchronization=true, recovery=false, -->
+      <transaction mode="NON_XA" locking="OPTIMISTIC" auto-commit="false"
+        transaction-manager-lookup="org.infinispan.transaction.lookup.BitronixTransactionManagerLookup" />
+      <indexing index="LOCAL">
+        <property name="hibernate.search.default.directory_provider">filesystem</property>
+        <property name="hibernate.search.default.exclusive_index_use">false</property>
       </indexing>
-   </namedCache>
-   
+    </local-cache>
+  </cache-container>
+
 </infinispan>

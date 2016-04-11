@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -30,7 +30,7 @@ import org.drools.persistence.info.SessionInfo;
 import org.drools.persistence.info.WorkItemInfo;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
-import org.infinispan.util.Base64;
+import org.infinispan.commons.util.Base64;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.persistence.correlation.CorrelationPropertyInfo;
 import org.kie.internal.process.CorrelationProperty;
@@ -71,7 +71,7 @@ public class ProcessEntityHolder extends EntityHolder {
 	public ProcessEntityHolder(String key, WorkItemInfo workItemInfo) {
 		super(key, workItemInfo);
 	}
-	
+
 	public ProcessEntityHolder(String key, ProcessInstanceInfo processInstanceInfo) {
 		super(key, "processInstanceInfo");
 		this.processInstanceEventTypes = generateString(processInstanceInfo.getEventTypes());
@@ -85,7 +85,7 @@ public class ProcessEntityHolder extends EntityHolder {
 		this.processInstanceState = processInstanceInfo.getState();
 		this.processInstanceVersion = processInstanceInfo.getVersion();
 	}
-	
+
 	public ProcessEntityHolder(String key, CorrelationKeyInfo correlationKeyInfo) {
 		super(key, "correlationInfo");
 		this.correlationKeyId = correlationKeyInfo.getId() == 0 ? correlationKeyInfo.getProperties().size() : correlationKeyInfo.getId();
@@ -104,7 +104,7 @@ public class ProcessEntityHolder extends EntityHolder {
 			throw new RuntimeException("Cant set field " + fieldName, e);
 		}
 	}
-	
+
 	public ProcessInstanceInfo getProcessInstanceInfo() {
 		ProcessInstanceInfo info = new ProcessInstanceInfo();
 		info.setId(this.processInstanceId);
@@ -118,7 +118,7 @@ public class ProcessEntityHolder extends EntityHolder {
 		set(info, "eventTypes", toSet(this.processInstanceEventTypes));
 		return info;
 	}
-	
+
 	public CorrelationKeyInfo getCorrelationKeyInfo() {
 		CorrelationKeyInfo info = new CorrelationKeyInfo();
 		info.setName(this.correlationKeyName);
@@ -144,7 +144,7 @@ public class ProcessEntityHolder extends EntityHolder {
 		}
 		return sb.toString();
 	}
-	
+
 	public static String generateString(Set<String> setOfStrings) {
 		StringBuilder sb = new StringBuilder();
 		if (setOfStrings != null) {
@@ -166,7 +166,7 @@ public class ProcessEntityHolder extends EntityHolder {
 			return new HashSet<String>();
 		}
 	}
-	
+
 	public static List<CorrelationPropertyInfo> toProperties(String properties) {
 		String[] props = properties.split(",");
 		List<CorrelationPropertyInfo> retval = new ArrayList<CorrelationPropertyInfo>(props.length);
@@ -247,7 +247,7 @@ public class ProcessEntityHolder extends EntityHolder {
 	public Long getProcessInstanceId() {
 		return processInstanceId;
 	}
-	
+
 	public void setProcessInstanceId(Long processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}

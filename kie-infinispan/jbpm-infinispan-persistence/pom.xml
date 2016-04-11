@@ -17,6 +17,22 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>drools-infinispan-persistence</artifactId>
+    </dependency>
+    
+    <!-- kie -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    
+    <!-- drools -->
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
     </dependency>
@@ -24,6 +40,8 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-persistence-jpa</artifactId>
     </dependency>
+    
+    <!-- jbpm -->
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
@@ -33,21 +51,11 @@
       <artifactId>jbpm-flow</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>drools-infinispan-persistence</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-internal</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-persistence-jpa</artifactId>
     </dependency>
+    
+    <!--  hibernate/infinispan -->    
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-search-engine</artifactId>
@@ -56,6 +64,11 @@
       <groupId>org.infinispan</groupId>
       <artifactId>infinispan-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-commons</artifactId>
+    </dependency>
+
 
     <!-- Logging -->
     <dependency>
@@ -90,6 +103,12 @@
       <groupId>org.kie</groupId>
       <artifactId>drools-infinispan-persistence</artifactId>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.hibernate.common</groupId>
+      <artifactId>hibernate-commons-annotations</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
