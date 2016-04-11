@@ -313,7 +313,7 @@ public class KieServerInstanceManager {
     protected String getToken() {
         return System.getProperty(KieServerConstants.CFG_KIE_TOKEN);
     }
-    private class RemoteKieServerOperation<T> {
+    protected class RemoteKieServerOperation<T> {
 
         public T doOperation(KieServicesClient client, Container container) {
 
