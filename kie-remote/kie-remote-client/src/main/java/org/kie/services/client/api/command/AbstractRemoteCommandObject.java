@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -92,26 +92,26 @@ public abstract class AbstractRemoteCommandObject {
 
     protected AbstractRemoteCommandObject(RemoteConfiguration config) {
         this.config = config;
-        if( config.isJms() && config.getResponseQueue() == null ) { 
+        if( config.isJms() && config.getResponseQueue() == null ) {
             throw new MissingRequiredInfoException("A Response queue is necessary in order to create a Remote JMS Client instance.");
         }
         this.config.initializeJaxbSerializationProvider();
     }
 
-    RemoteConfiguration getConfig() { 
-       return config; 
+    RemoteConfiguration getConfig() {
+       return config;
     }
 
     // Client object helper methods -----------------------------------------------------------------------------------------------
-  
-    protected String convertCorrelationKeyToString(CorrelationKey correlationKey) { 
+
+    protected String convertCorrelationKeyToString(CorrelationKey correlationKey) {
         try {
             return CorrelationKeyXmlAdapter.marshalCorrelationKey(correlationKey);
         } catch( Exception e ) {
             throw new RemoteApiException("Unable to marshal correlation key to a string value", e);
         }
     }
-        
+
     // Compatibility methods -----------------------------------------------------------------------------------------------------
 
     public void readExternal( ObjectInput arg0 ) throws IOException, ClassNotFoundException {
@@ -144,8 +144,8 @@ public abstract class AbstractRemoteCommandObject {
                     }
                     extraJaxbClasses.add(jaxbClass);
                 }
-                if( config.addJaxbClasses(extraJaxbClasses) ) { 
-                    for( Class<?> extraClass : extraJaxbClasses ) { 
+                if( config.addJaxbClasses(extraJaxbClasses) ) {
+                    for( Class<?> extraClass : extraJaxbClasses ) {
                         logger.debug( "Adding {} to the JAXBContext instance in this client instance.", extraClass.getName() );
                     }
                     config.initializeJaxbSerializationProvider();
@@ -154,28 +154,28 @@ public abstract class AbstractRemoteCommandObject {
         }
 
         preprocessCommand(cmd);
-       
+
         if( config.isRest() ) {
             return executeRestCommand(cmd);
         } else {
             return executeJmsCommand(cmd);
         }
     }
-    
+
     void preprocessCommand( Command cmd ) {
         String cmdName = cmd.getClass().getSimpleName();
-        if( cmd instanceof TaskCommand && cmdName.startsWith("GetTask") ) {
+        if( ! config.getDisableTaskSecurity() && cmd instanceof TaskCommand && cmdName.startsWith("GetTask") ) {
            TaskCommand taskCmd = (TaskCommand) cmd;
            String cmdUserId = taskCmd.getUserId();
            String authUserId = config.getUserName();
-           if( cmdUserId == null ) { 
+           if( cmdUserId == null ) {
                taskCmd.setUserId(authUserId);
                logger.debug("Using user id '" + authUserId + "' for '" + cmdName + "'.");
            } else if( ! cmdUserId.equals(authUserId) ) {
               throw new RemoteApiException("The user id used when retrieving task information (" + cmdUserId + ")"
                       + " must match the authenticating user (" + authUserId + ")!");
            }
-        } 
+        }
     }
 
     void preprocessParameterCommand( Object cmdObj, List<Object> extraClassInstanceList ) {
@@ -185,15 +185,15 @@ public abstract class AbstractRemoteCommandObject {
             addPossiblyNullObject(((SignalEventCommand) cmdObj).getEvent(), extraClassInstanceList);
         } else if( cmdObj instanceof StartCorrelatedProcessCommand ) {
             StartCorrelatedProcessCommand cmd = (StartCorrelatedProcessCommand) cmdObj;
-            if( cmd.getData() != null ) { 
+            if( cmd.getData() != null ) {
                 addPossiblyNullObject(cmd.getData().getDatas(), extraClassInstanceList);
             }
             addPossiblyNullObject(cmd.getParameter(), extraClassInstanceList);
         } else if( cmdObj instanceof StartProcessCommand ) {
             StartProcessCommand startProcCmd = (StartProcessCommand) cmdObj;
-            if( startProcCmd.getData() != null ) { 
+            if( startProcCmd.getData() != null ) {
                 addPossiblyNullObject(startProcCmd.getData().getDatas(), extraClassInstanceList);
-            } 
+            }
             addPossiblyNullObject(((StartProcessCommand) cmdObj).getParameter(), extraClassInstanceList);
         } else if( cmdObj instanceof SetGlobalCommand ) {
             addPossiblyNullObject(((SetGlobalCommand) cmdObj).getObject(), extraClassInstanceList);
@@ -213,7 +213,7 @@ public abstract class AbstractRemoteCommandObject {
             AddContentCommand cmd = (AddContentCommand) cmdObj;
             addPossiblyNullObject(cmd.getParameter(), extraClassInstanceList);
             Content jaxbContent = cmd.getJaxbContent();
-            if( jaxbContent != null ) { 
+            if( jaxbContent != null ) {
                 addPossiblyNullObject(jaxbContent.getContentMap(), extraClassInstanceList);
             }
         } else if( cmdObj instanceof SetTaskPropertyCommand ) {
@@ -235,7 +235,7 @@ public abstract class AbstractRemoteCommandObject {
                 for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
                     objectList.add(stringObjectPair.getValue());
                 }
-            } else if( inputObject instanceof StringKeyObjectValueMap ) { 
+            } else if( inputObject instanceof StringKeyObjectValueMap ) {
                 for( Object obj : ((StringKeyObjectValueMap) inputObject).values() ) {
                     objectList.add(obj);
                 } 
@@ -245,13 +245,13 @@ public abstract class AbstractRemoteCommandObject {
         }
     }
 
-    static JaxbCommandsRequest prepareCommandRequest( 
-            Command command, 
-            String userName, 
-            String deploymentId, 
+    static JaxbCommandsRequest prepareCommandRequest(
+            Command command,
+            String userName,
+            String deploymentId,
             Long processInstanceId,
             Collection<String> correlationKeyProps) {
-        
+
         if( deploymentId == null && !(command instanceof TaskCommand || command instanceof AuditCommand) ) {
             throw new MissingRequiredInfoException("A deployment id is required when sending commands involving the KieSession.");
         }
@@ -261,29 +261,29 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             req = new JaxbCommandsRequest(deploymentId, command);
         }
-        if( command instanceof TaskCommand ) { 
-           TaskCommand taskCmd = (TaskCommand) command; 
-           if( taskCmd.getUserId() == null ) { 
+        if( command instanceof TaskCommand ) {
+           TaskCommand taskCmd = (TaskCommand) command;
+           if( taskCmd.getUserId() == null ) {
                taskCmd.setUserId(userName);
            }
         }
 
-        if( processInstanceId != null ) { 
+        if( processInstanceId != null ) {
             if (command instanceof ProcessInstanceIdCommand) {
                 processInstanceId = ((ProcessInstanceIdCommand) command).getProcessInstanceId();
-            } 
+            }
         }
-      
+
         if( correlationKeyProps != null && ! correlationKeyProps.isEmpty() ) {
             StringBuffer correlationKeyString = new StringBuffer();
             Iterator<String> iter = correlationKeyProps.iterator();
             correlationKeyString.append(iter.next());
-            while( iter.hasNext() ) { 
+            while( iter.hasNext() ) {
                 correlationKeyString.append(":").append(iter.next());
             }
             req.setCorrelationKeyString(correlationKeyString.toString());
         }
-        
+
         req.setProcessInstanceId(processInstanceId);
         req.setUser(userName);
         req.setVersion(VERSION);
@@ -293,12 +293,12 @@ public abstract class AbstractRemoteCommandObject {
 
     /**
      * Method to communicate with the backend via JMS.
-     * 
+     *
      * @param command The {@link Command} object to be executed.
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeJmsCommand( Command command ) {
-       
+
         Queue sendQueue;
         boolean isTaskCommand = (command instanceof TaskCommand);
         if( isTaskCommand ) {
@@ -309,37 +309,37 @@ public abstract class AbstractRemoteCommandObject {
         } else {
             sendQueue = config.getKsessionQueue();
         }
-        
+
         return internalExecuteJmsCommand(command,
-                config.getConnectionUserName(), config.getConnectionPassword(), 
-                config.getUserName(), config.getPassword(), 
+                config.getConnectionUserName(), config.getConnectionPassword(),
+                config.getUserName(), config.getPassword(),
                 config.getDeploymentId(), config.getProcessInstanceId(), config.getCorrelationProperties(),
                 config.getConnectionFactory(), sendQueue, config.getResponseQueue(),
                 (SerializationProvider) config.getJaxbSerializationProvider(), config.getExtraJaxbClasses(),
                 config.getSerializationType(), config.getTimeout());
 
     }
-   
+
     /**
      * Method to communicate with the backend via REST.
-     * 
+     *
      * @param command The {@link Command} object to be executed.
      * @return The result of the {@link Command} object execution.
      */
     private <T> T executeRestCommand( Command command ) {
         String cmdName = command.getClass().getSimpleName();
-        
+
         JaxbCommandsRequest jaxbRequest = prepareCommandRequest(
-                command, 
-                config.getUserName(), 
-                config.getDeploymentId(), 
-                config.getProcessInstanceId(), 
+                command,
+                config.getUserName(),
+                config.getDeploymentId(),
+                config.getProcessInstanceId(),
                 config.getCorrelationProperties());
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
-        
+
         // necessary for deserialization
         String deploymentId = config.getDeploymentId();
-        if( ! emptyDeploymentId(deploymentId) ) { 
+        if( ! emptyDeploymentId(deploymentId) ) {
             httpRequest.header(JaxbSerializationProvider.EXECUTE_DEPLOYMENT_ID_HEADER, deploymentId);
         }
 
@@ -364,8 +364,8 @@ public abstract class AbstractRemoteCommandObject {
         } catch( Exception e ) {
             httpRequest.disconnect();
             throw new RemoteCommunicationException("Unable to send HTTP POST request", e);
-        } 
-        
+        }
+
         // Get response
         boolean htmlException = false;
         JaxbExceptionResponse exceptionResponse = null;
@@ -388,10 +388,10 @@ public abstract class AbstractRemoteCommandObject {
                 }
             } else {
                 String contentType = httpResponse.contentType();
-                if( contentType.equals(MediaType.APPLICATION_XML) ) { 
+                if( contentType.equals(MediaType.APPLICATION_XML) ) {
                     String content = httpResponse.body();
                     Object response = deserializeResponseContent(content, JaxbExceptionResponse.class);
-                    if( response instanceof JaxbRestRequestException ) { 
+                    if( response instanceof JaxbRestRequestException ) {
                         JaxbRestRequestException exception = (JaxbRestRequestException) response;
                         exceptionResponse = new JaxbExceptionResponse(
                                 exception.getUrl(),
@@ -403,7 +403,7 @@ public abstract class AbstractRemoteCommandObject {
                     } else if( response instanceof JaxbExceptionResponse ) {
                         exceptionResponse = (JaxbExceptionResponse) response;
                     }
-                } else if( contentType.startsWith(MediaType.TEXT_HTML) ) { 
+                } else if( contentType.startsWith(MediaType.TEXT_HTML) ) {
                     String content = httpResponse.body();
                     htmlException = true;
                     exceptionResponse = new JaxbExceptionResponse();
@@ -412,8 +412,8 @@ public abstract class AbstractRemoteCommandObject {
                     exceptionResponse.setMessage(body);
                     exceptionResponse.setUrl(httpRequest.getUri().toString());
                     exceptionResponse.setStackTrace("");
-                } else { 
-                    if( responseStatus == 401 ) { 
+                } else {
+                    if( responseStatus == 401 ) {
                         String user = config.getUserName();
                         throw new RemoteApiException("User '" + user + "'is not authorized for the /rest/execute operation: does '" + user + "' have the 'rest-client' or 'rest-all' role?");
                     }
@@ -423,17 +423,17 @@ public abstract class AbstractRemoteCommandObject {
         } catch( Exception e ) {
             logger.error("Unable to retrieve response content from request with status {}: {}", e.getMessage(), e);
             throw new RemoteCommunicationException("Unable to retrieve content from response", e);
-        } finally { 
+        } finally {
             httpRequest.disconnect();
         }
-        
+
         if( cmdResponse != null ) {
             List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
             if( responses.size() == 0 ) {
                 return null;
             } else if( responses.size() == 1 ) {
-                // The type information *should* come from the Command class -- but it's a jaxb-gen class, 
-                // which means that it has lost it's type information.. 
+                // The type information *should* come from the Command class -- but it's a jaxb-gen class,
+                // which means that it has lost it's type information..
                 // TODO: fix this?
                 JaxbCommandResponse<T> responseObject = (JaxbCommandResponse<T>) responses.get(0);
                 if( responseObject instanceof JaxbExceptionResponse ) {
@@ -453,25 +453,25 @@ public abstract class AbstractRemoteCommandObject {
         case 409:
             throw new RemoteTaskException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
         default:
-            if( exceptionResponse != null ) { 
-                if( ! htmlException ) { 
+            if( exceptionResponse != null ) {
+                if( ! htmlException ) {
                     throw new RemoteApiException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
-                } else { 
+                } else {
                     throw new RemoteCommunicationException(exceptionResponse.getMessage(), exceptionResponse.getStackTrace());
-                } 
-            } else { 
-                throw new RemoteCommunicationException("Unable to communicate with remote API via URL " 
+                }
+            } else {
+                throw new RemoteCommunicationException("Unable to communicate with remote API via URL "
                         + "'" + httpRequest.getUri().toString() + "'");
             }
         }
     }
-    
-    private <T> T deserializeResponseContent(String responseBody, Class<T> entityClass) { 
+
+    private <T> T deserializeResponseContent(String responseBody, Class<T> entityClass) {
        JaxbSerializationProvider jaxbSerializationProvider = config.getJaxbSerializationProvider();
        T responseEntity = null;
-       try { 
+       try {
            responseEntity = (T) jaxbSerializationProvider.deserialize(responseBody);
-       } catch( ClassCastException cce ) { 
+       } catch( ClassCastException cce ) {
            throw new RemoteApiException("Unexpected entity in response body, expected " + entityClass.getName() + " instance.", cce);
        }
        return responseEntity;
@@ -490,7 +490,7 @@ public abstract class AbstractRemoteCommandObject {
         throw new UnsupportedOperationException("The " + realClass.getSimpleName() + "." + methodName + "(..) method is not supported on the Remote Client instance.");
     }
 
-    public static boolean emptyDeploymentId(String deploymentId) { 
+    public static boolean emptyDeploymentId(String deploymentId) {
         return deploymentId == null || deploymentId.trim().isEmpty();
     }
 }
