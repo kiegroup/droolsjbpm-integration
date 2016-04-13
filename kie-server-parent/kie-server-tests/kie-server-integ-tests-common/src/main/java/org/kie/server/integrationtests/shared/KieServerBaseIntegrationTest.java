@@ -366,7 +366,7 @@ public abstract class KieServerBaseIntegrationTest {
         InternalKieModule kieModule = (InternalKieModule) ks.getRepository().getKieModule(releaseId);
         byte[] jar = kieModule.getBytes();
 
-        getRepository().deployArtifact(releaseId, jar, pom);
+        getRepository().installArtifact(releaseId, jar, pom);
     }
 
     protected static void assertSuccess(ServiceResponse<?> response) {

@@ -28,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
+import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
@@ -37,6 +38,8 @@ import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.*;
 import static org.kie.server.api.rest.RestURI.*;
 
 
@@ -107,6 +110,17 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             throw new ClientResponseFailure(e, response);
         }
         
+    }
+
+    @Test
+    public void testKieModuleMetaDataGetProcesses() throws Exception {
+
+        final KieModuleMetaData kieModuleMetaData = KieModuleMetaData.Factory.newKieModuleMetaData( releaseId );
+
+        assertNotNull(kieModuleMetaData);
+
+        assertFalse( kieModuleMetaData.getProcesses().isEmpty() );
+        assertTrue( kieModuleMetaData.getProcesses().containsKey("humanTaskWithOwnType.bpmn" ) );
     }
     
 }
