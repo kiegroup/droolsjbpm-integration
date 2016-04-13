@@ -21,11 +21,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
 import org.kie.spring.beans.Person;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -82,6 +84,37 @@ public class KieSpringCommandsTest {
                 assertTrue(((Person) object).isHappy());
             }
         }
+    }
+
+    @Test
+    public void testStatelessKieSessionWithGlobal() throws Exception {
+        StatelessKieSession ksession = (StatelessKieSession) context.getBean( "statlessKsessionWithGlobal" );
+        assertNotNull(ksession);
+
+        Person person = new Person("HAL2", 42);
+        person.setHappy(false);
+        ksession.execute(person);
+        assertTrue(person.isHappy());
+    }
+
+    @Test
+    public void testStatelessKieSessionWithGlobalExecutingList() throws Exception {
+        StatelessKieSession ksession = (StatelessKieSession) context.getBean( "statlessKsessionWithGlobal" );
+        assertNotNull(ksession);
+
+        List<Person> persons = new ArrayList<Person>();
+
+        Person person1 = new Person("HAL", 42);
+        person1.setHappy(false);
+        persons.add(person1);
+
+        Person person2 = new Person("HAL2", 42);
+        person2.setHappy(false);
+        persons.add(person2);
+
+        ksession.execute(persons);
+        assertTrue(person1.isHappy());
+        assertTrue(person2.isHappy());
     }
 
     @Test

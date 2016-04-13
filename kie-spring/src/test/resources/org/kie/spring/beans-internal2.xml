@@ -9,6 +9,7 @@
 
     <kie:kbase name="drl_kiesample3" packages="drl_kiesample3">
       <kie:ksession name="ksession1" type="stateless"/>
+      <kie:ksession name="ksession1p" type="stateless" scope="prototype"/>
       <kie:ksession name="ksession2"/>
     </kie:kbase>
 

@@ -36,6 +36,12 @@
           <kie:fire-all-rules max="10"/>
         </kie:batch>
       </kie:ksession>
+
+      <kie:ksession name="statlessKsessionWithGlobal" type="stateless">
+        <kie:batch>
+          <kie:set-global identifier="persons" ref="personsList"/>
+        </kie:batch>
+      </kie:ksession>
     </kie:kbase>
   </kie:kmodule>
 
