@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -76,88 +75,88 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         extraClasses.put(MESSAGE_CLASS_NAME, Class.forName(MESSAGE_CLASS_NAME, true, kjarClassLoader));
     }
 
-//    @Test
-//    @Category(Smoke.class)
-//    public void testCallContainer() throws Exception {
-//        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-//
-//        Object message = createInstance(MESSAGE_CLASS_NAME);
-//        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
-//
-//        List<Command<?>> commands = new ArrayList<Command<?>>();
-//        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
-//
-//        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
-//        commands.add(commandsFactory.newFireAllRules());
-//
-//        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-//        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-//        ExecutionResults results = reply.getResult();
-//        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-//        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
-//    }
-//
-//    @Test
-//    public void testCallContainerWithStringPayload() throws Exception {
-//        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-//        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-//
-//        Object message = createInstance(MESSAGE_CLASS_NAME);
-//        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
-//
-//        List<Command<?>> commands = new ArrayList<Command<?>>();
-//        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
-//
-//        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
-//        commands.add(commandsFactory.newFireAllRules());
-//
-//        String marshalledCommands = marshaller.marshall(batchExecution);
-//
-//        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, marshalledCommands);
-//        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-//        ExecutionResults results = reply.getResult();
-//        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-//        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
-//    }
-//
-//    @Test
-//    @Category(Smoke.class)
-//    public void testCommandScript() throws Exception {
-//        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-//        Object message = createInstance(MESSAGE_CLASS_NAME);
-//        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
-//
-//        Command<?> insert = commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER);
-//        Command<?> fire = commandsFactory.newFireAllRules();
-//        BatchExecutionCommand batch = commandsFactory.newBatchExecution(Arrays.<Command<?>>asList(insert, fire), KIE_SESSION);
-//
-//        String payload = marshaller.marshall(batch);
-//
-//        String containerId = "command-script-container";
-//        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId, null));
-//        KieServerCommand call = new CallContainerCommand(containerId, payload);
-//        KieServerCommand dispose = new DisposeContainerCommand(containerId);
-//
-//        List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
-//        CommandScript script = new CommandScript(cmds);
-//
-//        ServiceResponsesList reply = client.executeScript(script);
-//
-//        for (ServiceResponse<? extends Object> r : reply.getResponses()) {
-//            Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
-//        }
-//    }
-//
-//    @Test
-//    public void testCallContainerLookupError() throws Exception {
-//        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-//
-//        List<Command<?>> commands = new ArrayList<Command<?>>();
-//        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
-//
-//        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-//        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
-//    }
+    @Test
+    @Category(Smoke.class)
+    public void testCallContainer() throws Exception {
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        ExecutionResults results = reply.getResult();
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+    }
+
+    @Test
+    public void testCallContainerWithStringPayload() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        String marshalledCommands = marshaller.marshall(batchExecution);
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, marshalledCommands);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        ExecutionResults results = reply.getResult();
+        Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
+        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+    }
+
+    @Test
+    @Category(Smoke.class)
+    public void testCommandScript() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
+        Object message = createInstance(MESSAGE_CLASS_NAME);
+        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+
+        Command<?> insert = commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER);
+        Command<?> fire = commandsFactory.newFireAllRules();
+        BatchExecutionCommand batch = commandsFactory.newBatchExecution(Arrays.<Command<?>>asList(insert, fire), KIE_SESSION);
+
+        String payload = marshaller.marshall(batch);
+
+        String containerId = "command-script-container";
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId, null));
+        KieServerCommand call = new CallContainerCommand(containerId, payload);
+        KieServerCommand dispose = new DisposeContainerCommand(containerId);
+
+        List<KieServerCommand> cmds = Arrays.asList(create, call, dispose);
+        CommandScript script = new CommandScript(cmds);
+
+        ServiceResponsesList reply = client.executeScript(script);
+
+        for (ServiceResponse<? extends Object> r : reply.getResponses()) {
+            Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, r.getType());
+        }
+    }
+
+    @Test
+    public void testCallContainerLookupError() throws Exception {
+        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
+        Assert.assertEquals(ServiceResponse.ResponseType.FAILURE, reply.getType());
+    }
 
     @Test
     public void testCallContainerWithinConversation() throws Exception {
