@@ -164,9 +164,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         String conversationId = client.getConversationId();
         assertNotNull(conversationId);
 
-        String afterNextCallConversationId = client.getConversationId();
-        assertEquals(conversationId, afterNextCallConversationId);
-
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
@@ -176,16 +173,13 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         commands.add(commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
 
-        // complete conversation to start with new one
-        client.completeConversation();
-
         ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
         Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
 
-        afterNextCallConversationId = client.getConversationId();
-        assertNotEquals(conversationId, afterNextCallConversationId);
+        String afterNextCallConversationId = client.getConversationId();
+        assertEquals(conversationId, afterNextCallConversationId);
     }
 }
