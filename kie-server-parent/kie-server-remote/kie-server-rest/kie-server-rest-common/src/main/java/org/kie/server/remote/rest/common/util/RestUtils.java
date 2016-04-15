@@ -25,6 +25,7 @@ import org.kie.remote.common.rest.RestEasy960Util;
 import org.kie.server.api.ConversationId;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
@@ -150,7 +151,7 @@ public class RestUtils {
         }
 
         KieContainerInstanceImpl container = registry.getContainer(containerId);
-        if (container != null) {
+        if (container != null && KieContainerStatus.STARTED.equals(container.getStatus())) {
             ReleaseId releaseId = container.getResource().getResolvedReleaseId();
             if (releaseId == null) {
                 releaseId = container.getResource().getReleaseId();
