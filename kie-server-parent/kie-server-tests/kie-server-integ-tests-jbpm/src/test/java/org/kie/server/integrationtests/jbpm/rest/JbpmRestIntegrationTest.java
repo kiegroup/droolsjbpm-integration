@@ -29,6 +29,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.kie.scanner.KieModuleMetaData;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
@@ -49,6 +50,7 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
    
     private static Logger logger = LoggerFactory.getLogger(JbpmRestIntegrationTest.class);
 
+    private static Map<MarshallingFormat, String> acceptHeadersByFormat = new HashMap<MarshallingFormat, String>();
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -57,6 +59,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     public static void buildAndDeployArtifacts() {
         buildAndDeployCommonMavenParent();
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rest-processes").getFile());
+        // set the accepted formats with quality param to express preference
+        acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
+        acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
     }
 
 
@@ -99,6 +104,7 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             logger.info( "[POST] " + clientRequest.getUri());
             response = clientRequest.post();
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
 
             valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
@@ -114,7 +120,7 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
         }
-        
+
     }
 
     @Test
@@ -127,5 +133,67 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         assertFalse( kieModuleMetaData.getProcesses().isEmpty() );
         assertTrue( kieModuleMetaData.getProcesses().containsKey("humanTaskWithOwnType.bpmn" ) );
     }
-    
+
+    @Test
+    public void testBasicJbpmRequestWithSingleAcceptHeader() throws Exception {
+        KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
+        assertSuccess(client.createContainer("rest-processes", resource));
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
+
+        ClientResponse<JaxbLong> response = null;
+        try {
+            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
+                    .header("Content-Type", getMediaType().toString())
+                    .header("Accept", getMediaType().toString());
+            logger.info( "[POST] " + clientRequest.getUri());
+            response = clientRequest.post();
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+
+            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            logger.info( "[DELETE] " + clientRequest.getUri());
+            response = clientRequest.delete();
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+            response.releaseConnection();
+        } catch (Exception e) {
+            throw new ClientResponseFailure(e, response);
+        }
+
+    }
+
+    @Test
+    public void testBasicJbpmRequestManyAcceptHeaders() throws Exception {
+        KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
+        assertSuccess(client.createContainer("rest-processes", resource));
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
+
+        ClientResponse<JaxbLong> response = null;
+        try {
+
+            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
+                    .header("Content-Type", getMediaType().toString())
+                    .header("Accept", acceptHeadersByFormat.get(marshallingFormat));
+            logger.info( "[POST] " + clientRequest.getUri());
+            response = clientRequest.post();
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+            Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
+
+            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            logger.info( "[DELETE] " + clientRequest.getUri());
+            response = clientRequest.delete();
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+            response.releaseConnection();
+        } catch (Exception e) {
+            throw new ClientResponseFailure(e, response);
+        }
+
+    }
 }
