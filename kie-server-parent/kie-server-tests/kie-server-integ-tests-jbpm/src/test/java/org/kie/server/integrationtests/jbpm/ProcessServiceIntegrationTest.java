@@ -731,32 +731,29 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testStartProcessInstanceWithAsyncNodes() throws Exception {
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
-        Date startProcessDate = Calendar.getInstance().getTime();
+        List<String> status = new ArrayList<String>();
+        status.add(STATUS.QUEUED.toString());
+        status.add(STATUS.RUNNING.toString());
+        status.add(STATUS.DONE.toString());
+        int originalJobCount = jobServicesClient.getRequestsByStatus(status, 0, 1000).size();
+
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_ASYNC_SCRIPT);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
         try {
 
-            List<String> status = new ArrayList<String>();
-            status.add(STATUS.QUEUED.toString());
-            status.add(STATUS.RUNNING.toString());
-            status.add(STATUS.DONE.toString());
-            List<RequestInfoInstance> jobs = jobServicesClient.getRequestsByStatus(status, 0, 10);
+            // async node is executed as a job
+            List<RequestInfoInstance> jobs = jobServicesClient.getRequestsByStatus(status, 0, 1000);
             assertNotNull(jobs);
-            // there must be at least one job - for async execution of script task
-            assertTrue(jobs.size() > 0);
+            assertEquals(originalJobCount + 1, jobs.size());
 
-            // jobs are sorted in descending order - our job is first one
-            RequestInfoInstance job = jobs.get(0);
-            assertTrue(job.getScheduledDate().after(startProcessDate));
-
-            // wait for the job to be completed
-            waitForJobToFinish(job.getId());
+            // wait for process instance to be completed
+            waitForProcessInstanceToFinish(CONTAINER_ID, processInstanceId);
 
             ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
             assertNotNull(pi);
@@ -768,7 +765,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         }
     }
 
-    @Test
+    @Test(timeout = 60 * 1000)
     public void testProcessInstanceWithTimer() throws Exception {
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
