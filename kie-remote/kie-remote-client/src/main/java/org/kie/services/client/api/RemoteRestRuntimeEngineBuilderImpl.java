@@ -19,6 +19,7 @@ import java.net.URL;
 
 import org.kie.remote.client.api.RemoteRestRuntimeEngineBuilder;
 import org.kie.remote.client.api.RemoteRestRuntimeEngineFactory;
+import org.kie.remote.client.api.RemoteRuntimeEngineBuilder;
 import org.kie.remote.client.api.exception.InsufficientInfoToBuildException;
 import org.kie.services.client.api.command.RemoteConfiguration;
 import org.kie.services.client.api.command.RemoteConfiguration.Type;
@@ -52,6 +53,18 @@ class RemoteRestRuntimeEngineBuilderImpl
         return this;
     }
 
+    @Override
+    public RemoteRestRuntimeEngineBuilder addHeader(String headerFieldName, String headerFieldValue) {
+        config.addHeader(headerFieldName, headerFieldValue);
+        return this;
+    }
+
+    @Override
+    public RemoteRestRuntimeEngineBuilder clearHeaderFields() {
+        config.clearHeaders();
+        return this;
+    }
+
     private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
@@ -71,4 +84,5 @@ class RemoteRestRuntimeEngineBuilderImpl
     public static RemoteRestRuntimeEngineBuilderImpl newBuilder() {
         return new RemoteRestRuntimeEngineBuilderImpl();
     }
+
 }
