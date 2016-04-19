@@ -92,6 +92,22 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
             }
     	}
     }
+    
+    @Override
+    public void retryWorkItemWithParams(long workItemId,Map<String,Object> map) {
+        
+        Environment env = this.kruntime.getEnvironment();
+        WorkItem workItem = getWorkItem(workItemId);
+        
+        if (workItem != null) {
+            workItem.setParameters( map );
+            WorkItemInfo workItemInfo = new WorkItemInfo(workItem, env);
+          
+            PersistenceContext context = ((PersistenceContextManager) env.get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getCommandScopedPersistenceContext();
+            context.merge( workItemInfo );
+            retryWorkItem(workItemInfo.getId());
+        }
+    }
 
     @Override
     public void internalAbortWorkItem(long id) {
