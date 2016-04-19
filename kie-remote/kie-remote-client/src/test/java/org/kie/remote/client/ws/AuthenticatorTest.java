@@ -55,7 +55,7 @@ import org.kie.remote.services.ws.command.generated.CommandWebService;
 import org.kie.remote.services.ws.command.generated.Execute;
 import org.kie.remote.services.ws.command.generated.ExecuteResponse;
 import org.kie.remote.services.ws.command.generated.ObjectFactory;
-import org.kie.services.client.builder.redirect.AvailablePortFinder;
+import org.kie.services.client.builder.http.AvailablePortFinder;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbStringListResponse;
 import org.kie.services.shared.ServicesVersion;

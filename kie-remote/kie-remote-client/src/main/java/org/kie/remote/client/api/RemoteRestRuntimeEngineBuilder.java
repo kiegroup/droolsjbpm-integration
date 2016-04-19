@@ -54,4 +54,24 @@ public interface RemoteRestRuntimeEngineBuilder extends RemoteRuntimeEngineBuild
      */
     RemoteRestRuntimeEngineBuilder disableTaskSecurity();
 
+    /**
+     * Adds a header field that will be sent with each request.
+     * </p>
+     * Multiple calls to this method with the same header field name will *not* replace existing header fields
+     * with the same header field name.
+     *
+     * @param headerFieldName The header field name
+     * @param headerFieldValue The header field value
+     *
+     * @return An instance of this builder
+     */
+    RemoteRestRuntimeEngineBuilder addHeader(String headerFieldName, String headerFieldValue);
+
+    /**
+     * Clears all existing header field values for this builder.
+     *
+     * @return An instance of this builder
+     */
+    RemoteRestRuntimeEngineBuilder clearHeaderFields();
+
 }
