@@ -25,6 +25,7 @@
          (the default one, unless changed from outside) -->
     <kie.server.context>kie-server-services</kie.server.context>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
+    <kie.server.classifier>ee7</kie.server.classifier>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
@@ -74,7 +75,7 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server</artifactId>
                 <!-- default, may be overridden in container specific profiles -->
-                <classifier>ee6</classifier>
+                <classifier>${kie.server.classifier}</classifier>
                 <type>war</type>
                 <properties>
                   <context>${kie.server.context}</context>
@@ -168,6 +169,7 @@
       <id>tomcat8</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
+        <kie.server.classifier>webc</kie.server.classifier>
       </properties>
       <build>
         <pluginManagement>
@@ -229,11 +231,6 @@
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
-                <deployables>
-                  <deployable>
-                    <classifier>webc</classifier>
-                  </deployable>
-                </deployables>
               </configuration>
             </plugin>
             <plugin>
@@ -310,11 +307,6 @@
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
-                <deployables>
-                  <deployable>
-                    <classifier>ee7</classifier>
-                  </deployable>
-                </deployables>
               </configuration>
             </plugin>
           </plugins>
@@ -454,11 +446,6 @@
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
-                <deployables>
-                  <deployable>
-                    <classifier>ee7</classifier>
-                  </deployable>
-                </deployables>
               </configuration>
             </plugin>
           </plugins>
@@ -575,8 +562,8 @@
         <kie.server.jndi.request.queue>jms/KIE.SERVER.REQUEST</kie.server.jndi.request.queue>
         <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
-        <kie.server.context>kie-server-${project.version}-ee7</kie.server.context>
-        <kie.server.controller.context>kie-server-controller-${project.version}-ee7</kie.server.controller.context>
+        <kie.server.context>kie-server-${project.version}-${kie.server.classifier}</kie.server.context>
+        <kie.server.controller.context>kie-server-controller-${project.version}-${kie.server.classifier}</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
@@ -611,14 +598,6 @@
                     </dependency>
                   </dependencies>
                 </container>
-                <deployables>
-                  <deployable>
-                    <groupId>org.kie.server</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <type>war</type>
-                    <classifier>ee7</classifier>
-                  </deployable>
-                </deployables>
                 <configuration>
                   <type>standalone</type>
                   <properties>
@@ -703,6 +682,7 @@
         <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+        <kie.server.classifier>ee6</kie.server.classifier>
       </properties>
       <build>
         <pluginManagement>
@@ -733,14 +713,6 @@
                     </dependency>
                   </dependencies>
                 </container>
-                <deployables>
-                  <deployable>
-                    <groupId>org.kie.server</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <type>war</type>
-                    <classifier>ee6</classifier>
-                  </deployable>
-                </deployables>
                 <configuration>
                   <type>standalone</type>
                   <properties>
