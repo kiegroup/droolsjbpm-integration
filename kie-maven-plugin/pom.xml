@@ -130,6 +130,11 @@
       <artifactId>drools-workbench-models-guided-scorecard</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-core</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
