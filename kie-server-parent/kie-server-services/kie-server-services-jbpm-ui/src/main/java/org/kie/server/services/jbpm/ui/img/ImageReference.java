@@ -30,7 +30,13 @@ public class ImageReference {
 
     }
 
-    public byte[] getImageContent(String name) {
-        return kieModule.getBytes(name + SVG_SUFFIX);
+    public byte[] getImageContent(String location, String name) {
+        byte[] data = kieModule.getBytes(location + name + SVG_SUFFIX);
+
+        if (data == null) {
+            data = kieModule.getBytes(name + SVG_SUFFIX);
+        }
+
+        return data;
     }
 }

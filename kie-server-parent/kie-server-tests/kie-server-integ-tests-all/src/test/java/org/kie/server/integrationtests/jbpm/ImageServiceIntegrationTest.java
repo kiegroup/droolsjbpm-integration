@@ -31,6 +31,7 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
 
     private static final String CONTAINER_ID = "definition-project";
     private static final String HIRING_PROCESS_ID = "hiring";
+    private static final String HIRING_2_PROCESS_ID = "hiring2";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -82,5 +83,33 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         uiServicesClient.getProcessInstanceImage(CONTAINER_ID, 9999l);
+    }
+
+    @Test
+    public void testGetProcessImageInPackageViaUIClientTest() throws Exception {
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
+        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
+        String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        logger.debug("Image content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    public void testGetProcessInstanceImageInPackageViaUIClientTest() throws Exception {
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
+        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        assertTrue(processInstanceId > 0);
+        try {
+            String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
+            logger.debug("Image content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
     }
 }

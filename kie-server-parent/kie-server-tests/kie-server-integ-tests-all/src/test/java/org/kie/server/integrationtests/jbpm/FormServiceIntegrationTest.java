@@ -34,6 +34,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     private static final String CONTAINER_ID = "definition-project";
     private static final String HIRING_PROCESS_ID = "hiring";
+    private static final String HIRING_2_PROCESS_ID = "hiring2";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -91,5 +92,39 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         uiServicesClient.getTaskForm(CONTAINER_ID, 9999l, "en");
+    }
+
+    @Test
+    public void testGetProcessFormInPackageViaUIClientTest() throws Exception {
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
+        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
+        String result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_2_PROCESS_ID, "en");
+        logger.debug("Form content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    public void testGetTaskFormInPackageViaUIClientTest() throws Exception {
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
+        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            Long taskId = tasks.get(0).getId();
+
+            String result = uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
     }
 }
