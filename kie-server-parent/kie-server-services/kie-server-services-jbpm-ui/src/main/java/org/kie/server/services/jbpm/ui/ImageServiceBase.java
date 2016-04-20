@@ -52,8 +52,12 @@ public class ImageServiceBase {
             throw new IllegalArgumentException("No process found for " + processId + " within container " + containerId);
         }
 
+        String location = "";
+        if (procDef.getPackageName() != null && !procDef.getPackageName().trim().isEmpty()) {
+            location = procDef.getPackageName().replaceAll("\\.", "/") + "/";
+        }
         // get SVG String
-        byte[] imageSVG = imageReferenceMap.get(containerId).getImageContent(processId);
+        byte[] imageSVG = imageReferenceMap.get(containerId).getImageContent(location, processId);
         if( imageSVG == null ) {
             logger.warn("Could not find SVG image file for process '" + processId + "' within container " + containerId);
             return null;
