@@ -125,6 +125,10 @@ public class DynamicJaxbContext extends JAXBContext {
 
     // JAXBContext methods --------------------------------------------------------------------------------------------------------
 
+    JAXBContext getRequestContext() {
+        return requestJaxbContext.get();
+    }
+
     /*
      * (non-Javadoc)
      * @see javax.xml.bind.JAXBContext#createUnmarshaller()
@@ -167,8 +171,6 @@ public class DynamicJaxbContext extends JAXBContext {
 
     // Deployment jaxbContext management and creation logic -----------------------------------------------------------------------
 
-
-
     @Override
     public boolean equals( Object obj ) {
         if( obj instanceof DynamicJaxbContext ) {
@@ -176,6 +178,5 @@ public class DynamicJaxbContext extends JAXBContext {
         }
         return false;
     }
-
 
 }
