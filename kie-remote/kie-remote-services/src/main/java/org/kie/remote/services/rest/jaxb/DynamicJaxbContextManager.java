@@ -54,18 +54,33 @@ public class DynamicJaxbContextManager {
     private final static boolean smartJaxbContextInitialization;
     private final static String EXPECTED_JAXB_CONTEXT_IMPL_CLASS = "com.sun.xml.bind.v2.runtime.JAXBContextImpl";
 
+    private final static boolean onWebsphere;
+    private final static String WEBSPHERE_JAXB_CACHING_CLASS_NAME
+        = "org.apache.wink.common.internal.providers.entity.xml.AbstractJAXBProvider";
+
     // only use smart initialization if we're using the (default) JAXB RI
     static {
-         boolean smartJaxbContextInitProperty = Boolean.parseBoolean(System.getProperty(SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME, "true"));
-         if( smartJaxbContextInitProperty ) {
+        // smart jaxb context initialization
+        boolean smartJaxbContextInitProperty = Boolean.parseBoolean(System.getProperty(SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME, "true"));
+        if( smartJaxbContextInitProperty ) {
             try {
                 smartJaxbContextInitProperty = false;
                 smartJaxbContextInitProperty = EXPECTED_JAXB_CONTEXT_IMPL_CLASS.equals(JAXBContext.newInstance(new Class[0]).getClass().getName());
             } catch( JAXBException jaxbe ) {
                 logger.error("Unable to initialize empty JAXB Context: something is VERY wrong!", jaxbe);
             }
-         }
-         smartJaxbContextInitialization = smartJaxbContextInitProperty;
+        }
+        smartJaxbContextInitialization = smartJaxbContextInitProperty;
+
+        // websphere stuff
+        boolean classFound = false;
+        try {
+            Class.forName(WEBSPHERE_JAXB_CACHING_CLASS_NAME);
+            classFound = true;
+        } catch (ClassNotFoundException e) {
+            // no-op
+        }
+        onWebsphere = classFound;
     }
 
     // LOGGING IF MULTIPLE INSTANCES ARE CREATED ----------------------------------------------------------------------------------
@@ -204,6 +219,10 @@ public class DynamicJaxbContextManager {
     }
 
     public JAXBContext getJaxbContext() {
-        return this._jaxbContextInstance;
+        if (onWebsphere ) {
+            return _jaxbContextInstance.getRequestContext();
+        } else {
+            return _jaxbContextInstance;
+        }
     }
 }

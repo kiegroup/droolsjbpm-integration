@@ -93,7 +93,7 @@ public class DynamicJaxbContext extends JAXBContext {
      * create a {@link Marshaller}, {@link Unmarshaller} or {@link Validator} instance.
      * @return The {@link JAXBContext} created or retrieved from cache for the request.
      */
-    private JAXBContext getRequestContext() {
+    JAXBContext getRequestContext() {
         JAXBContext requestJaxbContext = requestJaxbContextLocal.get();
         if( requestJaxbContext == null ) {
             logger.error("No JAXB context could be found for request, using default!");
@@ -156,15 +156,6 @@ public class DynamicJaxbContext extends JAXBContext {
         } catch (JAXBException e) {
             throw new IllegalStateException( "Unable to create new " + JAXBContext.class.getSimpleName() + " instance.", e);
         }
-    }
-
-    public JAXBContext getDeploymentJaxbContext(String deploymentId) {
-        JAXBContext jaxbContext = contextsCache.get(deploymentId);
-        if( jaxbContext == null ) {
-            logger.debug("No JAXBContext available for deployment '" + deploymentId + "', using default JAXBContext instance.");
-            jaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
-        }
-        return jaxbContext;
     }
 
     @Override
