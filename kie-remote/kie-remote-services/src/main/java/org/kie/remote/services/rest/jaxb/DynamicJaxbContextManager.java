@@ -39,6 +39,25 @@ public class DynamicJaxbContextManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicJaxbContextManager.class);
 
+
+    private final static boolean onWebsphere;
+    private final static String WEBSPHERE_JAXB_CACHING_CLASS_NAME
+        = "org.apache.wink.common.internal.providers.entity.xml.AbstractJAXBProvider";
+
+    static {
+        // websphere stuff
+        boolean classFound = false;
+        try {
+            Class.forName(WEBSPHERE_JAXB_CACHING_CLASS_NAME);
+            classFound = true;
+        } catch (ClassNotFoundException e) {
+            // no-op
+        }
+        onWebsphere = classFound;
+    }
+
+    // LOGGING IF MULTIPLE INSTANCES ARE CREATED ----------------------------------------------------------------------------------
+
     private static AtomicInteger instanceCreated = new AtomicInteger(0);
 
     public DynamicJaxbContextManager() {
@@ -204,6 +223,10 @@ public class DynamicJaxbContextManager {
     }
 
     public JAXBContext getJaxbContext() {
-        return _jaxbContextInstance;
+        if (onWebsphere ) {
+            return _jaxbContextInstance.getRequestContext();
+        } else {
+            return _jaxbContextInstance;
+        }
     }
 }
