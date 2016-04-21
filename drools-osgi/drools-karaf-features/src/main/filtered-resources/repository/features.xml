@@ -39,6 +39,14 @@
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
   </feature>
 
+  <feature name="drools-wb-guided-decisiontables" description="Drools Workbench Guided Decision Tables" version="${project.version}">
+    <feature version="${project.version}">drools-module</feature>
+    <bundle>mvn:org.drools/drools-workbench-models-datamodel-api/${version.org.kie}</bundle>
+    <bundle>mvn:org.drools/drools-workbench-models-commons/${version.org.kie}</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
+    <bundle>mvn:org.drools/drools-workbench-models-guided-dtable/${version.org.kie}</bundle>
+  </feature>
+
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
     <feature version="[3.1,4.0)">spring-orm</feature>
