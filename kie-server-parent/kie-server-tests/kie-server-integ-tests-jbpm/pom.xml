@@ -171,6 +171,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!-- This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
          parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
