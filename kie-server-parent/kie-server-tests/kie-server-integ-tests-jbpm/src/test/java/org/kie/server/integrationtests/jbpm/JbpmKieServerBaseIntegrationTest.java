@@ -57,6 +57,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_SIGNAL_PROCESS = "definition-project.signalprocess";
     protected static final String PROCESS_ID_SIGNAL_START = "signal-start";
     protected static final String PROCESS_ID_CUSTOM_TASK = "customtask";
+    protected static final String PROCESS_ID_USERTASK_ESCALATION = "humanTaskEscalation";
 
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;

@@ -202,6 +202,12 @@
                 </deployables>
               </configuration>
             </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
+              </configuration>
+            </plugin>
           </plugins>
         </pluginManagement>
       </build>
@@ -241,6 +247,12 @@
                     <classifier>ee7</classifier>
                   </deployable>
                 </deployables>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -422,7 +434,7 @@
             <plugin>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -534,7 +546,7 @@
             <plugin>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly</excludedGroups>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -587,8 +599,7 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <!-- jboss74x works for now, but should be updated to jboss75x once Cargo supports EAP 6.4 -->
-                  <containerId>jboss74x</containerId>
+                  <containerId>jboss75x</containerId>
                   <type>installed</type>
                   <zipUrlInstaller>
                     <url>${eap64x.download.url}</url>
@@ -596,12 +607,22 @@
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
+                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
+                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+                    <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                     <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                    <cargo.resource.resource.mail>
+                       cargo.resource.name=mail/Session|
+                       cargo.resource.type=javax.mail.Session|
+                       cargo.resource.id=mail|
+                       cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
+                    </cargo.resource.resource.mail>
                   </properties>
                 </configuration>
                 <deployables>
@@ -767,6 +788,7 @@
                 <additionalClasspathElements>
                   <additionalClasspathElement>${weblogic.home}/wlserver/server/lib/wljmsclient.jar</additionalClasspathElement>
                 </additionalClasspathElements>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -902,6 +924,7 @@
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_8.5.0.jar</additionalClasspathElement>
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</additionalClasspathElement>
                 </additionalClasspathElements>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
