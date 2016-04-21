@@ -14,6 +14,10 @@
 
   <name>Drools :: OSGi Integration</name>
 
+  <properties>
+    <osgi.Bundle-SymbolicName>org.drools.osgi.integration</osgi.Bundle-SymbolicName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
@@ -98,7 +102,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>org.drools.osgi.integration</Bundle-SymbolicName>
             <Fragment-Host>org.drools.compiler;bundle-version="[7,8)"</Fragment-Host>
             <Export-Package>org.drools.osgi.*</Export-Package>
             <Import-Package>

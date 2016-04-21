@@ -17,6 +17,10 @@
   <description>Drools and jBPM integration for Aries Blueprint</description>
   <packaging>bundle</packaging>
 
+  <properties>
+    <osgi.Bundle-SymbolicName>org.kie.aries.blueprint</osgi.Bundle-SymbolicName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -160,7 +164,6 @@
         <configuration>
           <instructions>
             <_removeheaders>Ignore-Package</_removeheaders>
-            <Bundle-SymbolicName>org.kie.aries.blueprint</Bundle-SymbolicName>
             <Bundle-Name>Kie Aries Blueprint</Bundle-Name>
             <Import-Package>
               !org.kie.aries.blueprint*,

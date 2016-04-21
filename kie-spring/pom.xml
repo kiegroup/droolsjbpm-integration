@@ -17,6 +17,10 @@
   <name>Kie :: Spring</name>
   <description>Drools and jBPM integration for Spring.</description>
 
+  <properties>
+    <osgi.Bundle-SymbolicName>org.kie.spring</osgi.Bundle-SymbolicName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jbpm</groupId>
@@ -240,7 +244,6 @@
         <configuration>
           <instructions>
             <_removeheaders>Ignore-Package</_removeheaders>
-            <Bundle-SymbolicName>org.kie.spring</Bundle-SymbolicName>
             <Bundle-Name>Kie Spring</Bundle-Name>
             <Import-Package>
               !org.kie.spring*,
