@@ -26,6 +26,13 @@
       <groupId>batik</groupId>
       <artifactId>batik-util</artifactId>
     </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <artifactId>xercesImpl</artifactId>
+      <groupId>xerces</groupId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
