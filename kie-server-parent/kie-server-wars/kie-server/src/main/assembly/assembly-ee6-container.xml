@@ -61,6 +61,7 @@
         <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
         <exclude>xml-apis:xml-apis</exclude>
         <exclude>org.javassist:javassist</exclude>
+        <exclude>javax.mail:mail</exclude>
       </excludes>
       <includes>
         <include>org.kie.server:kie-server-services-common</include>
