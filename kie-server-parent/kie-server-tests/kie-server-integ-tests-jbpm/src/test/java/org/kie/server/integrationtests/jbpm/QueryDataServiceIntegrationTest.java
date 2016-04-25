@@ -63,7 +63,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
         super.additionalConfiguration(configuration);
         // Having timeout issues due to kjar dependencies -> raised timeout.
-        configuration.setTimeout(120000);
+        configuration.setTimeout(300000);
     }
 
     @Test

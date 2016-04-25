@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -326,7 +325,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         String businessKey = "testkey";
         String command = "org.jbpm.executor.commands.PrintOutCommand";
 
-        int currentNumberOfCancelled = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 100).size();
+        int currentNumberOfRequests = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 100).size();
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", businessKey);
@@ -345,14 +344,22 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         List<RequestInfoInstance> result = jobServicesClient.getRequestsByBusinessKey(businessKey, 0, 100);
         assertNotNull(result);
-        assertEquals(1 + currentNumberOfCancelled, result.size());
+        assertEquals(1 + currentNumberOfRequests, result.size());
 
-        RequestInfoInstance jobRequest = result.get(result.size()-1);
-        assertNotNull(jobRequest);
-        assertEquals(jobId, jobRequest.getId());
-        assertEquals(businessKey, jobRequest.getBusinessKey());
-        assertEquals(STATUS.QUEUED.toString(), jobRequest.getStatus());
-        assertEquals(command, jobRequest.getCommandName());
+        List<RequestInfoInstance> queuedJobs = new ArrayList<RequestInfoInstance>();
+        for(RequestInfoInstance job : result) {
+            if(job.getStatus().equals(STATUS.QUEUED.toString())) {
+                queuedJobs.add(job);
+            }
+        }
+
+        assertEquals(1, queuedJobs.size());
+
+        RequestInfoInstance queuedJob = queuedJobs.get(0);
+        assertEquals(jobId, queuedJob.getId());
+        assertEquals(businessKey, queuedJob.getBusinessKey());
+        assertEquals(STATUS.QUEUED.toString(), queuedJob.getStatus());
+        assertEquals(command, queuedJob.getCommandName());
 
         jobServicesClient.cancelRequest(jobId);
     }

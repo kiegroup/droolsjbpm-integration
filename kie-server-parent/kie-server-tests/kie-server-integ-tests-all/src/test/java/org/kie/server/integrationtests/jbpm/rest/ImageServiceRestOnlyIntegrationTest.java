@@ -156,8 +156,12 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info("[DELETE] " + clientRequest.getUri());
+
             response = clientRequest.delete();
-            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+            int okStatusCode = Response.Status.OK.getStatusCode();
+            assertTrue("Wrong status code returned: " + response.getStatus(),
+                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
