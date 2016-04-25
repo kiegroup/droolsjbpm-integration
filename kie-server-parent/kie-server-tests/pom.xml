@@ -35,10 +35,10 @@
          but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
     <kie.server.testing.kjars.build.settings.xml/>
 
-    <tomcat7x.download.url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.55/bin/apache-tomcat-7.0.55.zip</tomcat7x.download.url>
-    <tomcat8x.download.url>https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.12/bin/apache-tomcat-8.0.12.zip</tomcat8x.download.url>
-    <wildfly81x.download.url>http://download.jboss.org/wildfly/8.1.0.Final/wildfly-8.1.0.Final.zip</wildfly81x.download.url>
-    <wildfly82x.download.url>http://download.jboss.org/wildfly/8.2.0.Final/wildfly-8.2.0.Final.zip</wildfly82x.download.url>
+    <version.tomcat7>7.0.55</version.tomcat7>
+    <version.tomcat8>8.0.12</version.tomcat8>
+    <version.wildfly81>8.1.0.Final</version.wildfly81>
+    <version.wildfly82>8.2.1.Final</version.wildfly82>
     <!-- The EAP 6.4.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
@@ -181,9 +181,11 @@
                 <container>
                   <containerId>wildfly8x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${wildfly81x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-dist</artifactId>
+                    <version>${version.wildfly81}</version>
+                  </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
@@ -222,9 +224,11 @@
                 <container>
                   <containerId>wildfly8x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${wildfly82x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-dist</artifactId>
+                    <version>${version.wildfly82}</version>
+                  </artifactInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
@@ -364,9 +368,11 @@
                 <container>
                   <containerId>tomcat7x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${tomcat7x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat</artifactId>
+                    <version>${version.tomcat7}</version>
+                  </artifactInstaller>
                   <systemProperties>
                     <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
@@ -476,9 +482,11 @@
                 <container>
                   <containerId>tomcat8x</containerId>
                   <type>installed</type>
-                  <zipUrlInstaller>
-                    <url>${tomcat8x.download.url}</url>
-                  </zipUrlInstaller>
+                  <artifactInstaller>
+                    <groupId>org.apache.tomcat</groupId>
+                    <artifactId>tomcat</artifactId>
+                    <version>${version.tomcat8}</version>
+                  </artifactInstaller>
                   <systemProperties>
                     <tomcat.home>${project.build.directory}/cargo/configurations/tomcat7x</tomcat.home>
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
@@ -621,31 +629,6 @@
             <artifactId>jboss-as-jms-client-bom</artifactId>
             <!-- This is the highest version publicly available. Should work even with higher versions of EAP -->
             <version>7.2.0.Final</version>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-jms-client-bom</artifactId>
-          <type>pom</type>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>jbossas71x</id>
-      <properties>
-        <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
-      </properties>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-jms-client-bom</artifactId>
-            <version>7.1.1.Final</version>
             <type>pom</type>
           </dependency>
         </dependencies>
