@@ -229,17 +229,17 @@ public abstract class AbstractRemoteCommandObject {
 
     void addPossiblyNullObject( Object inputObject, List<Object> objectList ) {
         if( inputObject != null ) {
-            if( inputObject instanceof List )  { 
+            if( inputObject instanceof List )  {
                 objectList.addAll((List) inputObject);
-            } else if( inputObject instanceof JaxbStringObjectPairArray ) { 
+            } else if( inputObject instanceof JaxbStringObjectPairArray ) {
                 for( JaxbStringObjectPair stringObjectPair : ((JaxbStringObjectPairArray) inputObject).getItems() ) {
                     objectList.add(stringObjectPair.getValue());
                 }
             } else if( inputObject instanceof StringKeyObjectValueMap ) {
                 for( Object obj : ((StringKeyObjectValueMap) inputObject).values() ) {
                     objectList.add(obj);
-                } 
-            } else {  
+                }
+            } else {
                 objectList.add(inputObject);
             }
         }
@@ -336,6 +336,13 @@ public abstract class AbstractRemoteCommandObject {
                 config.getProcessInstanceId(),
                 config.getCorrelationProperties());
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
+
+        List<String[]> headers = config.getHeaders();
+        if( headers != null ) {
+           for( String [] header : config.getHeaders() ) {
+              httpRequest.header(header[0], header[1]);
+           }
+        }
 
         // necessary for deserialization
         String deploymentId = config.getDeploymentId();

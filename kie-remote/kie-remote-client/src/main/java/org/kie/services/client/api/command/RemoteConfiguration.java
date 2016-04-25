@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jms.ConnectionFactory;
@@ -49,21 +48,21 @@ public final class RemoteConfiguration {
 
     public static final int DEFAULT_TIMEOUT_IN_SECS = 5;
     private long timeoutInMillisecs = DEFAULT_TIMEOUT_IN_SECS * 1000;; // in seconds
-    
+
     // REST or JMS
     private final Type type;
 
     // General
     private String deploymentId;
     private Long processInstanceId;
-    
+
     private String userName;
     private String password;
     private URL serverBaseUrl;
 
     private Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
     private JaxbSerializationProvider jaxbSerializationProvider;
-    
+
     private List<String> correlationProperties = new ArrayList<String>();
 
     // JMS
@@ -76,47 +75,49 @@ public final class RemoteConfiguration {
     private Queue taskQueue;
     private Queue responseQueue;
     private int jmsSerializationType = JaxbSerializationProvider.JMS_SERIALIZATION_TYPE;
-    
+
     // WS
     private String webserviceName =  "CommandService";
     private String wsdlLocRelativePath = "ws/" + webserviceName + "?wsdl";
     private boolean httpRedirect = false;
 
+    private List<String[]> headers = null;
+
     /**
      * Public constructors and setters
      */
 
-    public RemoteConfiguration(Type type) { 
+    public RemoteConfiguration(Type type) {
         this.type = type;
     }
-   
-    public void dispose() { 
-       if( jaxbSerializationProvider != null ) { 
+
+    public void dispose() {
+       if( jaxbSerializationProvider != null ) {
            jaxbSerializationProvider.dispose();
            jaxbSerializationProvider = null;
        }
-       if( extraJaxbClasses != null ) { 
+       if( extraJaxbClasses != null ) {
            extraJaxbClasses.clear();
            extraJaxbClasses = null;
        }
-       if( connectionFactory != null ) { 
-          connectionFactory = null; 
+       if( connectionFactory != null ) {
+          connectionFactory = null;
        }
-       if( ksessionQueue != null ) { 
-           ksessionQueue = null; 
+       if( ksessionQueue != null ) {
+           ksessionQueue = null;
        }
-       if( taskQueue != null ) { 
-           taskQueue = null; 
+       if( taskQueue != null ) {
+           taskQueue = null;
        }
-       if( responseQueue != null ) { 
-           responseQueue = null; 
+       if( responseQueue != null ) {
+           responseQueue = null;
        }
     }
-    
+
     public void initializeJaxbSerializationProvider() {
-        if( extraJaxbClasses != null ) { 
+        if( extraJaxbClasses != null ) {
             jaxbSerializationProvider = ClientJaxbSerializationProvider.newInstance(extraJaxbClasses);
-        } else {  
+        } else {
             jaxbSerializationProvider = ClientJaxbSerializationProvider.newInstance();
         }
     }
@@ -130,7 +131,7 @@ public final class RemoteConfiguration {
     public RemoteConfiguration(String deploymentId, URL url, String username, String password, int timeoutInSecs) {
         this.type = Type.REST;
         this.deploymentId = deploymentId;
-        
+
         this.userName = username;
         this.password = password;
         this.timeoutInMillisecs = timeoutInSecs * 1000;
@@ -138,7 +139,7 @@ public final class RemoteConfiguration {
 
     /**
      * Initializes the URL that will be used for REST service access
-     * 
+     *
      * @param deploymentId Deployment ID
      * @param url URL of the server instance
      * @return An URL that can be used to access the REST services
@@ -146,10 +147,10 @@ public final class RemoteConfiguration {
     URL initializeRestServicesUrl(URL url) {
        return initializeServicesUrl(url, "rest");
     }
-    
+
     /**
      * Initializes the URL that will be used for web service access
-     * 
+     *
      * @param deploymentId Deployment ID
      * @param url URL of the server instance
      * @return An URL that can be used for the web services
@@ -157,10 +158,10 @@ public final class RemoteConfiguration {
     URL initializeWebServicesUrl(URL url) {
        return initializeServicesUrl(url, "ws");
     }
-    
+
     /**
      * Initializes the URL that will be used for web service access
-     * 
+     *
      * @param deploymentId Deployment ID
      * @param url URL of the server instance
      * @return An URL that can be used for the web services
@@ -192,11 +193,11 @@ public final class RemoteConfiguration {
 
         return serverPlusServicePrefixUrl;
     }
-    
-    KieRemoteHttpRequest createHttpRequest() { 
+
+    KieRemoteHttpRequest createHttpRequest() {
         return KieRemoteHttpRequest.newRequest(serverBaseUrl, userName, password).timeout(timeoutInMillisecs);
     }
-    
+
     // JMS ----------------------------------------------------------------------------------------------------------------------
 
     public RemoteConfiguration(String deploymentId, ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
@@ -205,19 +206,19 @@ public final class RemoteConfiguration {
         setQueuesAndConnectionFactory(connectionFactory, ksessionQueue, taskQueue, responseQueue);
     }
 
-    public void setQueuesAndConnectionFactory(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) { 
+    public void setQueuesAndConnectionFactory(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) {
         this.connectionFactory = connectionFactory;
         this.ksessionQueue = ksessionQueue;
         this.taskQueue = taskQueue;
         this.responseQueue = responseQueue;
         checkValidValues(this.connectionFactory, this.ksessionQueue, this.taskQueue, this.responseQueue);
     }
-    
+
     public void checkValidJmsValues() {
         checkValidValues(connectionFactory, ksessionQueue, taskQueue, responseQueue);
     }
-    
-    private static void checkValidValues(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue) 
+
+    private static void checkValidValues(ConnectionFactory connectionFactory, Queue ksessionQueue, Queue taskQueue, Queue responseQueue)
             throws InsufficientInfoToBuildException {
         if (connectionFactory == null) {
             throw new InsufficientInfoToBuildException("The connection factory argument may not be null.");
@@ -242,11 +243,11 @@ public final class RemoteConfiguration {
         setAndCheckUserNameAndPassword(username, password);
         setRemoteInitialContext(context);
     }
-    
-    public void setRemoteInitialContext(InitialContext context) { 
+
+    public void setRemoteInitialContext(InitialContext context) {
         String prop = CONNECTION_FACTORY_NAME;
         try {
-            if( this.connectionFactory == null ) { 
+            if( this.connectionFactory == null ) {
                 this.connectionFactory = (ConnectionFactory) context.lookup(prop);
             }
             prop = SESSION_QUEUE_NAME;
@@ -298,10 +299,10 @@ public final class RemoteConfiguration {
         REST, JMS, WS, CONSTRUCTOR;
     }
 
-    public URL getServerBaseUrl() { 
+    public URL getServerBaseUrl() {
         return serverBaseUrl;
     }
-    
+
     public String getUserName() {
         return userName;
     }
@@ -311,19 +312,19 @@ public final class RemoteConfiguration {
     }
 
     public String getConnectionUserName() {
-        if( connectionUserName == null ) { 
+        if( connectionUserName == null ) {
             return userName;
-        } 
+        }
         return connectionUserName;
     }
 
     public String getConnectionPassword() {
-        if( this.connectionPassword == null ) { 
+        if( this.connectionPassword == null ) {
            return password;
         }
         return connectionPassword;
     }
-    
+
     ConnectionFactory getConnectionFactory() {
         assert connectionFactory != null : "connectionFactory value should not be null!";
         return connectionFactory;
@@ -355,42 +356,46 @@ public final class RemoteConfiguration {
     public Set<Class<?>> getExtraJaxbClasses() {
         return this.extraJaxbClasses;
     }
-    
-    JaxbSerializationProvider getJaxbSerializationProvider() { 
+
+    JaxbSerializationProvider getJaxbSerializationProvider() {
         return jaxbSerializationProvider;
     }
 
-    public Type getType() { 
+    public Type getType() {
         return this.type;
     }
 
     public long getTimeout() {
         return timeoutInMillisecs;
     }
-    
+
     public boolean getUseUssl() {
         return useSsl;
-    } 
-    
+    }
+
     public boolean getDisableTaskSecurity() {
         return disableTaskSecurity;
-    } 
-    
+    }
+
     Long getProcessInstanceId() {
         return processInstanceId;
     }
 
-    List<String> getCorrelationProperties() { 
+    List<String> getCorrelationProperties() {
         return correlationProperties;
     }
 
-    
+
     public String getWsdlLocationRelativePath() {
         return wsdlLocRelativePath;
     }
 
     public boolean getHttpRedirect() {
         return httpRedirect;
+    }
+
+    List<String[]> getHeaders() {
+        return this.headers;
     }
 
     // Setters -------------------------------------------------------------------------------------------------------------------
@@ -424,7 +429,7 @@ public final class RemoteConfiguration {
         URL checkedModifiedUrl = initializeWebServicesUrl(url);
         this.serverBaseUrl = checkedModifiedUrl;
     }
-    
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -456,24 +461,38 @@ public final class RemoteConfiguration {
     public void setUseSsl(boolean useSsl) {
         this.useSsl = useSsl;
     }
-   
+
     public void setDisableTaskSecurity(boolean disableTaskSecurity) {
         this.disableTaskSecurity = disableTaskSecurity;
     }
-    
+
     public void setWsdlLocationRelativePath(String wsdlLocationRelativePath) {
         this.wsdlLocRelativePath = wsdlLocationRelativePath;
     }
-  
+
     public void setHttpRedirect(boolean httpRedirect) {
         this.httpRedirect = httpRedirect;
     }
-    
-    // Clone --- 
-   
-    private RemoteConfiguration(RemoteConfiguration config) { 
+
+
+    public void addHeader(String headerFieldName, String headerFieldValue) {
+        if( this.headers == null ) {
+           this.headers = new ArrayList<String[]>();
+        }
+        this.headers.add(new String [] { headerFieldName, headerFieldValue });
+    }
+
+    public void clearHeaders() {
+        if( this.headers != null ) {
+            this.headers.clear();
+        }
+    }
+
+    // Clone ---
+
+    private RemoteConfiguration(RemoteConfiguration config) {
        this.connectionFactory = config.connectionFactory;
-       
+
        this.deploymentId = config.deploymentId;
        this.extraJaxbClasses = config.extraJaxbClasses;
        this.jmsSerializationType = config.jmsSerializationType;
@@ -488,8 +507,9 @@ public final class RemoteConfiguration {
        this.userName = config.userName;
        this.useSsl = config.useSsl;
        this.disableTaskSecurity = config.disableTaskSecurity;
+       this.headers = config.headers;
     }
-    
+
     public RemoteConfiguration clone() {
        return new RemoteConfiguration(this);
     }

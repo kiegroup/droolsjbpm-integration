@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,9 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.services.client.builder.redirect;
+package org.kie.services.client.builder.http;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,10 +27,11 @@ import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.URL;
 
 import javax.ws.rs.core.HttpHeaders;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.remote.client.api.RemoteRuntimeEngineFactory;
 import org.kie.remote.client.api.exception.RemoteCommunicationException;
@@ -59,13 +62,23 @@ public class RedirectTest {
     private static final String REDIRECT_LOOP = "/redirect/loop/1";
     private static final String REDIRECT_LOOP_2 = "/redirect/loop/2";
 
+    private RedirectServer server;
+    private int port;
+
+    @Before
+    public void before() throws Exception {
+        port = AvailablePortFinder.getNextAvailable(1025);
+        server = new RedirectServer(port);
+        server.start();
+    }
+
+    @After
+    public void after() throws Exception {
+        server.stop();
+    }
+
     @Test
     public void testRedirect() throws Exception {
-        int port = AvailablePortFinder.getNextAvailable(1025);
-        RedirectServer server = new RedirectServer(port);
-
-        server.start();
-
         // @formatter:off
         // 1. test only setting the endpoint
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
@@ -73,34 +86,34 @@ public class RedirectTest {
             .addServerUrl("http://localhost:" + port + "/")
             .setWsdlLocationRelativePath(REAL_ENDPOINT_PATH)
             .buildBasicAuthClient();
-        
+
         // 2. test failure because no redirect
-        try { 
+        try {
             RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
                 .addPassword("user").addUserName("pass")
                 .addServerUrl("http://localhost:" + port + "/")
                 .setWsdlLocationRelativePath("/redirect/url")
                 .buildBasicAuthClient();
             fail("An execption should have been thrown: redirect was not set");
-        } catch(RemoteCommunicationException rce) { 
+        } catch(RemoteCommunicationException rce) {
            assertTrue( rce.getMessage().contains("HTTP Redirect is not set but") );
         }
-       
-        // 3. test redirect 
+
+        // 3. test redirect
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
             .addServerUrl("http://localhost:" + port + "/")
             .useHttpRedirect()
             .buildBasicAuthClient();
-        
-        // 4. test set endpoint with redirect URL 
+
+        // 4. test set endpoint with redirect URL
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
             .addServerUrl("http://localhost:" + port + "/")
             .useHttpRedirect()
             .setWsdlLocationRelativePath(REDIRECT_URL)
             .buildBasicAuthClient();
-        
+
         // 5. test set endpoint with redirect path
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
@@ -108,41 +121,39 @@ public class RedirectTest {
             .useHttpRedirect()
             .setWsdlLocationRelativePath(REDIRECT_PATH)
             .buildBasicAuthClient();
-        
-        // 6. test set endpoint with 2x redirect 
+
+        // 6. test set endpoint with 2x redirect
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
             .addServerUrl("http://localhost:" + port + "/")
             .useHttpRedirect()
             .setWsdlLocationRelativePath(REDIRECT_DOUBLE)
             .buildBasicAuthClient();
-        
-        // 6. test set endpoint with endless redirect 
-        try { 
+
+        // 6. test set endpoint with endless redirect
+        try {
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
             .addServerUrl("http://localhost:" + port + "/")
             .useHttpRedirect()
             .setWsdlLocationRelativePath(REDIRECT_ENDLESS)
             .buildBasicAuthClient();
-        } catch(RemoteCommunicationException rce) { 
+        } catch(RemoteCommunicationException rce) {
             assertTrue( rce.getMessage().contains("Unable to verify WSDL URL"));
         }
-        
-        // 6. test set endpoint with endless redirect 
-        try { 
+
+        // 6. test set endpoint with endless redirect
+        try {
         RemoteRuntimeEngineFactory.newCommandWebServiceClientBuilder()
             .addPassword("user").addUserName("pass")
             .addServerUrl("http://localhost:" + port + "/")
             .useHttpRedirect()
             .setWsdlLocationRelativePath(REDIRECT_LOOP)
             .buildBasicAuthClient();
-        } catch(RemoteCommunicationException rce) { 
+        } catch(RemoteCommunicationException rce) {
             assertTrue( rce.getMessage().contains("Unable to verify WSDL URL"));
         }
         // @formatter:on
-
-        server.stop();
     }
 
     private static class RedirectServer implements Container {
