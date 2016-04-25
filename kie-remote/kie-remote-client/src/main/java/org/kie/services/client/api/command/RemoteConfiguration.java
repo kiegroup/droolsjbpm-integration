@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jms.ConnectionFactory;
@@ -81,6 +80,8 @@ public final class RemoteConfiguration {
     private String webserviceName =  "CommandService";
     private String wsdlLocRelativePath = "ws/" + webserviceName + "?wsdl";
     private boolean httpRedirect = false;
+
+    private List<String[]> headers = null;
 
     /**
      * Public constructors and setters
@@ -393,6 +394,10 @@ public final class RemoteConfiguration {
         return httpRedirect;
     }
 
+    List<String[]> getHeaders() {
+        return this.headers;
+    }
+
     // Setters -------------------------------------------------------------------------------------------------------------------
 
     public void setTimeout(long timeout) {
@@ -469,6 +474,19 @@ public final class RemoteConfiguration {
         this.httpRedirect = httpRedirect;
     }
 
+    public void addHeader(String headerFieldName, String headerFieldValue) {
+        if( this.headers == null ) {
+           this.headers = new ArrayList<String[]>();
+        }
+        this.headers.add(new String [] { headerFieldName, headerFieldValue });
+    }
+
+    public void clearHeaders() {
+        if( this.headers != null ) {
+            this.headers.clear();
+        }
+    }
+
     // Clone ---
 
     private RemoteConfiguration(RemoteConfiguration config) {
@@ -488,6 +506,7 @@ public final class RemoteConfiguration {
        this.userName = config.userName;
        this.useSsl = config.useSsl;
        this.disableTaskSecurity = config.disableTaskSecurity;
+       this.headers = config.headers;
     }
 
     public RemoteConfiguration clone() {

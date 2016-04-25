@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.kie.services.client.builder.redirect;
+package org.kie.services.client.builder.http;
 
 import java.io.IOException;
 import java.net.DatagramSocket;

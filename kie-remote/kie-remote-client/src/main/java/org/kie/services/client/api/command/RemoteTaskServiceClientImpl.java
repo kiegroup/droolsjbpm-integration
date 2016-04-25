@@ -1,6 +1,6 @@
 package org.kie.services.client.api.command;
 
-import static org.kie.remote.client.jaxb.ConversionUtil.*;
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
 import static org.kie.remote.client.jaxb.ConversionUtil.convertStringListToGenOrgEntList;
 
 import java.util.Arrays;

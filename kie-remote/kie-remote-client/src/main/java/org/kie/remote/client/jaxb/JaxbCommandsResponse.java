@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -83,7 +83,7 @@ public class JaxbCommandsResponse {
     @XmlSchemaType(name = "string")
     private String version;
 
-    @XmlElements({ 
+    @XmlElements({
             @XmlElement(name = "exception", type = JaxbExceptionResponse.class),
             @XmlElement(name = "long-list", type = JaxbLongListResponse.class),
             @XmlElement(name = "string-list", type = JaxbStringListResponse.class),
@@ -114,6 +114,7 @@ public class JaxbCommandsResponse {
         super();
         this.deploymentId = request.getDeploymentId();
         this.processInstanceId = request.getProcessInstanceId();
+        this.version = request.getVersion();
     }
 
     public String getDeploymentId() {
@@ -140,8 +141,8 @@ public class JaxbCommandsResponse {
         this.version = version;
     }
 
-    private void lazyInitResponseList() { 
-        if( this.responses == null ) { 
+    private void lazyInitResponseList() {
+        if( this.responses == null ) {
             this.responses = new ArrayList<JaxbCommandResponse<?>>();
         }
     }
