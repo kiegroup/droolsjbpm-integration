@@ -155,7 +155,11 @@ public class KieServerImpl {
 
         if (readyToRun) {
             addServerStatusMessage(kieServerInfo);
-            containerManager.installContainers(this, containers, currentState, kieServerSetup);
+            if (Boolean.parseBoolean(currentState.getConfiguration().getConfigItemValue(KieServerConstants.CFG_SYNC_DEPLOYMENT, "false"))) {
+                containerManager.installContainersSync(this, containers, currentState, kieServerSetup);
+            } else {
+                containerManager.installContainers(this, containers, currentState, kieServerSetup);
+            }
         }
     }
 
