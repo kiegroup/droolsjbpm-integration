@@ -15,9 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +29,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.integrationtests.category.JMSOnly;
@@ -40,6 +38,8 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.control.ContainerRemoteController;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.junit.Assert.*;
 
 @Category({JMSOnly.class, RemotelyControlled.class})
 public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -86,9 +86,9 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
             customProcessClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
             fail("Should throw exception about Kie server being unavailable.");
         } catch (Exception e) {
-            // TODO uncomment to test JBPM-5098
-//            assertTrue(e instanceof KieServicesException);
-//            assertEquals("Response is empty", ((KieServicesException) e).getMessage());
+
+            assertTrue(e instanceof KieServicesException);
+            assertEquals("Response is empty", ((KieServicesException) e).getMessage());
         } finally {
             containerRemoteController.deployWarFile(TestConfig.getKieServerContext(), TestConfig.getKieServerWarPath());
         }
