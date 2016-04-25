@@ -36,6 +36,7 @@ public class SetBorderColorTransformation extends NodeTransformation {
             Element border = node.getBorder();
             if (border != null) {
                 border.setAttribute("stroke", color);
+                border.setAttribute("stroke-width", "2");
             }
         }
     }

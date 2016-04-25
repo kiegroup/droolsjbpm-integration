@@ -66,12 +66,12 @@ public class SVGImageProcessor {
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
         SVGImageProcessor processor = new SVGImageProcessor(svg);
         for (String nodeId : completed) {
-            processor.defaultCompletedTransformation(nodeId);
+            if (!active.contains(nodeId)) {
+                processor.defaultCompletedTransformation(nodeId);
+            }
         }
         for (String nodeId : active) {
-            if (!completed.contains(nodeId)) {
-                processor.defaultActiveTransformation(nodeId);
-            }
+            processor.defaultActiveTransformation(nodeId);
         }
         return processor.getSVG();
     }
@@ -79,12 +79,13 @@ public class SVGImageProcessor {
     public static String transformByName(InputStream svg, List<String> completed, List<String> active) {
         SVGImageProcessor processor = new SVGImageProcessor(svg, false);
         for (String nodeId : completed) {
-            processor.defaultCompletedTransformation(nodeId);
+            if (!active.contains(nodeId)) {
+                processor.defaultCompletedTransformation(nodeId);
+            }
         }
         for (String nodeId : active) {
-            if (!completed.contains(nodeId)) {
-                processor.defaultActiveTransformation(nodeId);
-            }
+            processor.defaultActiveTransformation(nodeId);
+
         }
         return processor.getSVG();
     }
