@@ -22,6 +22,8 @@ public class KieServerLocator {
     private KieServerLocator() {
     }
 
-    public static KieServerImpl getInstance() { return INSTANCE; }
+    public static KieServerImpl getInstance() {
+        return INSTANCE;
+    }
 
 }

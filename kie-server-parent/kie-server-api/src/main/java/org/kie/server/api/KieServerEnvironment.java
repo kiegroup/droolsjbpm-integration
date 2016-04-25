@@ -26,8 +26,8 @@ public class KieServerEnvironment {
     
     private static final Pattern VERSION_PAT = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)([\\.-].*)?");
     private static Version version;
-    private static String serverId;
-    private static String name;
+    private static String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);;
+    private static String name = System.getProperty(KieServerConstants.KIE_SERVER_ID);
 
     static {
         String kieServerString = KieServerEnvironment.class.getPackage().getImplementationVersion();
