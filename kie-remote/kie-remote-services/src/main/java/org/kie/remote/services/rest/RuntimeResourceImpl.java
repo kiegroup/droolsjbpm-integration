@@ -18,6 +18,7 @@ package org.kie.remote.services.rest;
 import static org.kie.internal.remote.PermissionConstants.REST_PROCESS_ROLE;
 import static org.kie.internal.remote.PermissionConstants.REST_PROCESS_RO_ROLE;
 import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
+import static org.kie.remote.common.rest.RestEasy960Util.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
@@ -230,7 +232,11 @@ public class RuntimeResourceImpl extends ResourceBase {
         }
 
         // only wrap if json property set or JAXB/XML
-        if( wrapJsonValues || RestEasy960Util.getVariant(headers).getMediaType().equals(MediaType.APPLICATION_XML_TYPE) ) {
+        Variant v = getVariant(headers);
+        if( v == null ) {
+            v = defaultVariant;
+        }
+        if( wrapJsonValues || v.getMediaType().equals(MediaType.APPLICATION_XML_TYPE) ) {
             procVar = wrapObjectIfNeeded(procVar);
         }
 
