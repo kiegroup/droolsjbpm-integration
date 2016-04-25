@@ -49,7 +49,7 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
     @Override
     protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
         super.additionalConfiguration(configuration);
-        configuration.setTimeout(30000);
+        configuration.setTimeout(60000);
     }
 
     protected Object valueOf(Object object, String fieldName) {
