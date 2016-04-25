@@ -27,6 +27,7 @@ import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesException;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import java.lang.Thread;
 import java.lang.reflect.Method;
@@ -234,7 +235,6 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(timeout = 60000)
-    @Ignore("Needs to be fixed, failing randomly due to PLANNER-560")
     public void testGetBestSolution() throws Exception {
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
@@ -263,7 +263,14 @@ public class OptaplannerIntegrationTest
             Thread.sleep(1000);
         }
         // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
-        assertTrue(solution.getScore() != null);
+        HardSoftScore score = (HardSoftScore) solution.getScore();
+        assertNotNull(score);
+        // We expect that soft score is somewhere between -1 and -1 000 000 to check that we got some real response
+        // Other value would be really suspicious
+        assertTrue(score.getSoftScore() < 0);
+        assertTrue(score.getSoftScore() > -1000000);
+        assertTrue(score.getHardScore() <= 0);
+        assertTrue(score.getHardScore() > -1000);
 
         List<?> computerList = (List<?>) valueOf(solution, "computerList");
         assertEquals(10, computerList.size());

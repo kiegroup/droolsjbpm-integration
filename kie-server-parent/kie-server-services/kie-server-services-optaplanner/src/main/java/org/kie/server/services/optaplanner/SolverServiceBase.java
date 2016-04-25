@@ -24,6 +24,7 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.impl.solver.DefaultSolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,8 +150,10 @@ public class SolverServiceBase {
         try {
             SolverInstanceContext sic = solvers.get( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
             if( sic != null ) {
+                // TODO race condition: the solver.getBestSolution() returned pointer can change
+                // between the next 2 lines, in which case the score would not match the solution
                 updateSolverInstance( sic );
-                sic.getInstance().setBestSolution((Solution)  sic.getSolver().getBestSolution() );
+                sic.getInstance().setBestSolution(getBestSolutionUninitializedSafe(sic));
                 return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
                                                            "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
                                                             sic.getInstance() );
@@ -289,9 +292,22 @@ public class SolverServiceBase {
     private  void updateSolverInstance(SolverInstanceContext sic) {
         synchronized ( sic ) {
             // We keep track of the solver status ourselves, so there's no need to call buggy updateSolverStatus( sic );
-            Solution bestSolution = (Solution) sic.getSolver().getBestSolution();
+            Solution bestSolution = getBestSolutionUninitializedSafe(sic);
             sic.getInstance().setScore( bestSolution != null ? bestSolution.getScore() : null );
         }
+    }
+
+    // TODO remove this workaround when PLANNER-405 is fixed
+    private Solution getBestSolutionUninitializedSafe(SolverInstanceContext sic) {
+        Solver solver = sic.getSolver();
+        boolean bestSolutionInitialized = ((DefaultSolver) solver).getSolverScope().isBestSolutionInitialized();
+        Solution bestSolution = (Solution) solver.getBestSolution();
+        if (bestSolution != null && !bestSolutionInitialized) {
+            // This is questionable, because the Solver can still have a reference to that bestSolution.
+            // Luckily, in the current code, the Solver stores the bestScore separately, so no risk for a race condition
+            bestSolution.setScore(null);
+        }
+        return bestSolution;
     }
 
     private void updateSolverStatus(SolverInstanceContext sic) {
