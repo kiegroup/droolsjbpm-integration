@@ -447,13 +447,16 @@ public abstract class AbstractKieServicesClientImpl {
             try {
                 response = consumer.receive( config.getTimeout() );
             } catch( JMSException jmse ) {
-                jmse.printStackTrace();
+                logger.warn("JMS exception while waiting for response - {}", jmse.getMessage());
                 throw new KieServicesException("Unable to receive or retrieve the JMS response.", jmse);
             }
 
             if( response == null ) {
                 logger.warn("Response is empty");
-                return null;
+                // return actual instance to avoid null points on client side
+                List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
+                responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Response is empty"));
+                return new ServiceResponsesList(responses);
             }
             // extract response
             assert response != null: "Response is empty.";
