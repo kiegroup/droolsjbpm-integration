@@ -49,6 +49,7 @@ public class TestConfig {
      */
     private static Integer CONTROLLER_ALLOCATED_PORT;
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
+    private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
 
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
@@ -61,6 +62,12 @@ public class TestConfig {
     private static final StringTestParameter RESPONSE_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
+
+    private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
+    private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
+    private static final StringTestParameter KIE_SERVER_WAR_PATH = new StringTestParameter("kie.server.war.path");
+
+    private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
     /**
      * Get kie-server URL for HTTP services - like REST.
@@ -277,6 +284,48 @@ public class TestConfig {
      */
     public static String getKjarsBuildSettingsXml() {
         return TestConfig.KJARS_BUILD_SETTINGS_XML.getParameterValue();
+    }
+
+    /**
+     * @return Cargo container ID.
+     */
+    public static String getContainerId() {
+        return TestConfig.CONTAINER_ID.getParameterValue();
+    }
+
+    /**
+     * @return Kie server context value.
+     */
+    public static String getKieServerContext() {
+        return TestConfig.PROVIDED_CONTEXT.getParameterValue();
+    }
+
+    /**
+     * @return Path to Kie server WAR file.
+     */
+    public static String getKieServerWarPath() {
+        return TestConfig.KIE_SERVER_WAR_PATH.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static String getContainerPort() {
+        return TestConfig.CONTAINER_PORT.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static String getWebLogicHome() {
+        return TestConfig.WEBLOGIC_HOME.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static boolean isWebLogicHomeProvided() {
+        return TestConfig.WEBLOGIC_HOME.isParameterConfigured();
     }
 
     // Used for printing all configuration values at the beginning of first test run.

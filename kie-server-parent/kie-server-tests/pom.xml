@@ -24,6 +24,7 @@
          is not able to override the value of the property. The port number would then always be the same
          (the default one, unless changed from outside) -->
     <kie.server.context>kie-server-services</kie.server.context>
+    <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
     <kie.server.classifier>ee7</kie.server.classifier>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
@@ -86,6 +87,11 @@
         <artifactId>kie-server-integ-tests-all</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
+      <dependency>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-core-uberjar</artifactId>
+        <version>1.4.19</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -97,6 +103,7 @@
           <artifactId>cargo-maven2-plugin</artifactId>
           <configuration>
             <container>
+              <containerId>${cargo.container.id}</containerId>
               <systemProperties>
                 <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
                 <!-- Fixes issue when Tomcat hangs during deployment due to insufficient amount of entropy.
@@ -205,6 +212,7 @@
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
+        <cargo.container.id>tomcat8x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -214,7 +222,6 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>tomcat8x</containerId>
                   <type>installed</type>
                   <artifactInstaller>
                     <groupId>org.apache.tomcat</groupId>
@@ -271,7 +278,7 @@
             <plugin>
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email</excludedGroups>
+                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -315,6 +322,7 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <cargo.container.id>wildfly10x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -324,7 +332,6 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>wildfly10x</containerId>
                   <type>installed</type>
                   <artifactInstaller>
                     <groupId>org.wildfly</groupId>
@@ -445,6 +452,11 @@
             <artifactId>jaxb-impl</artifactId>
             <version>${version.com.sun.xml.bind}</version>
           </dependency>
+          <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-controller-client</artifactId>
+            <version>8.2.1.Final</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -454,6 +466,11 @@
           <type>pom</type>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-controller-client</artifactId>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -461,6 +478,8 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
+        <cargo.container.id>wildfly10x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -470,8 +489,6 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
-                  <containerId>wildfly10x</containerId>
                   <type>installed</type>
                   <zipUrlInstaller>
                     <url>${eap7.download.url}</url>
@@ -612,6 +629,7 @@
         <kie.server.context>kie-server-${project.version}-${kie.server.classifier}</kie.server.context>
         <kie.server.controller.context>kie-server-controller-${project.version}-${kie.server.classifier}</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+        <cargo.container.id>weblogic122x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -621,7 +639,6 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>weblogic122x</containerId>
                   <type>installed</type>
                   <home>${weblogic.home}/wlserver</home>
                   <systemProperties>
@@ -731,6 +748,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>ee6</kie.server.classifier>
+        <cargo.container.id>websphere85x</cargo.container.id>
       </properties>
       <build>
         <pluginManagement>
@@ -740,7 +758,6 @@
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
                 <container>
-                  <containerId>websphere85x</containerId>
                   <type>installed</type>
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
@@ -830,7 +847,7 @@
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_8.5.0.jar</additionalClasspathElement>
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</additionalClasspathElement>
                 </additionalClasspathElements>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
+                <excludedGroups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
