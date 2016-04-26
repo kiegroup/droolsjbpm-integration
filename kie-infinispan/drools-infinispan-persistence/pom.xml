@@ -151,6 +151,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.hibernate.common</groupId>
+      <artifactId>hibernate-commons-annotations</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <!--
