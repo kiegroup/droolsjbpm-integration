@@ -351,6 +351,13 @@ public abstract class AbstractRemoteCommandObject {
                 config.getCorrelationProperties());
         KieRemoteHttpRequest httpRequest = config.createHttpRequest().relativeRequest("/execute");
 
+        List<String[]> headers = config.getHeaders();
+        if( headers != null ) {
+           for( String [] header : config.getHeaders() ) {
+              httpRequest.header(header[0], header[1]);
+           }
+        }
+
         // necessary for deserialization
         String deploymentId = config.getDeploymentId();
         if( ! emptyDeploymentId(deploymentId) ) {

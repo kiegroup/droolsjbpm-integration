@@ -23,7 +23,6 @@ import static org.kie.services.client.serialization.SerializationConstants.SERIA
 import static org.kie.services.shared.ServicesVersion.VERSION;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
