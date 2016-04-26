@@ -15,6 +15,7 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,8 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     private static Logger logger = LoggerFactory.getLogger( KieServicesClientImpl.class );
 
     private static final ServiceLoader<KieServicesClientBuilder> clientBuilders = ServiceLoader.load(KieServicesClientBuilder.class, KieServicesClientImpl.class.getClassLoader());
+    private static List<KieServicesClientBuilder> loadedClientBuilders = loadClientBuilders();   // load it only once to make sure it's thread safe
+
     private KieServerInfo kieServerInfo;
     private Map<Class<?>, Object> servicesClients = new HashMap<Class<?>, Object>();
 
@@ -79,7 +82,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
             // process available client builders
             Map<String, KieServicesClientBuilder> clientBuildersByCapability = new HashMap<String, KieServicesClientBuilder>();
-            for (KieServicesClientBuilder builder : clientBuilders) {
+            for (KieServicesClientBuilder builder : loadedClientBuilders) {
                 clientBuildersByCapability.put(builder.getImplementedCapability(), builder);
             }
 
@@ -271,5 +274,15 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     @Override
     public void completeConversation() {
         conversationId = null;
+    }
+
+
+    private synchronized static List<KieServicesClientBuilder> loadClientBuilders() {
+        List<KieServicesClientBuilder> builders = new ArrayList<KieServicesClientBuilder>();
+        for (KieServicesClientBuilder builder : clientBuilders) {
+            builders.add(builder);
+        }
+
+        return builders;
     }
 }
