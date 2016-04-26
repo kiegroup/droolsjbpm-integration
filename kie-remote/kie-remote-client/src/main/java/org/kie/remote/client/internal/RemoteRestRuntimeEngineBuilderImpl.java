@@ -50,6 +50,18 @@ class RemoteRestRuntimeEngineBuilderImpl
         return this;
     }
 
+    @Override
+    public RemoteRestRuntimeEngineBuilder addHeader(String headerFieldName, String headerFieldValue) {
+        config.addHeader(headerFieldName, headerFieldValue);
+        return this;
+    }
+
+    @Override
+    public RemoteRestRuntimeEngineBuilder clearHeaderFields() {
+        config.clearHeaders();
+        return this;
+    }
+
     private void checkAndFinalizeConfig() {
         RemoteRuntimeEngineFactory.checkAndFinalizeConfig(config, this);
     }
@@ -63,4 +75,5 @@ class RemoteRestRuntimeEngineBuilderImpl
     public static RemoteRestRuntimeEngineBuilderImpl newBuilder() {
         return new RemoteRestRuntimeEngineBuilderImpl();
     }
+
 }

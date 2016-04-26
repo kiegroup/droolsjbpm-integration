@@ -758,4 +758,26 @@ public class RemoteClientBuilderTest extends RemoteJmsRuntimeEngineBuilderImpl {
         }
     }
 
+
+    @Test
+    public void setHeaderFields() throws Exception {
+        RuntimeEngine runtimeEngine =
+                RemoteRuntimeEngineFactory.newRestBuilder()
+                .addUserName("user")
+                .addPassword("pass")
+                .addUrl(new URL("http://localhost:8080/business-central"))
+                .addHeader("HEADER-NAME", "header-value")
+                .clearHeaderFields()
+                .addCorrelationProperties()
+                .addDeploymentId("dep-id")
+                .build();
+
+        try {
+            runtimeEngine.getTaskService().claim(23l, "user");
+            fail( "This should have failed because there's no server running... ");
+        } catch( org.kie.remote.client.api.exception.RemoteCommunicationException rce ) {
+            // expected
+        }
+
+    }
 }
