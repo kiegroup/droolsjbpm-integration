@@ -115,7 +115,13 @@
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
+    <!-- Cargo dependencies -->
+    <dependency>
+     <groupId>org.codehaus.cargo</groupId>
+     <artifactId>cargo-core-uberjar</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
