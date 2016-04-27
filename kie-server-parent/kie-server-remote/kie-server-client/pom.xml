@@ -13,6 +13,10 @@
   <name>KIE :: Execution Server :: Remote :: Client</name>
   <description>KIE Execution Server Client</description>
 
+  <properties>
+    <osgi.Bundle-SymbolicName>org.kie.server.client</osgi.Bundle-SymbolicName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
@@ -103,7 +107,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>org.kie.server.client</Bundle-SymbolicName>
             <Export-Package>
               org.kie.server.client.*
             </Export-Package>

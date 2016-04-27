@@ -13,6 +13,7 @@
   <packaging>bundle</packaging><!-- bundle = jar + OSGi metadata -->
 
   <properties>
+    <osgi.Bundle-SymbolicName>org.kie.remote.client</osgi.Bundle-SymbolicName>
     <maven.jdbc.url>jdbc:h2:file:test;MVCC=true</maven.jdbc.url>
   </properties>
   
@@ -261,7 +262,6 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>org.kie.remote.client</Bundle-SymbolicName>
             <Export-Package>
               org.kie.remote.client.api.*,
               org.kie.remote.client.jaxb.*,
