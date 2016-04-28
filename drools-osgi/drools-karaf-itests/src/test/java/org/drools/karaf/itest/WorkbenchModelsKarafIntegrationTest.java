@@ -16,7 +16,9 @@
 
 package org.drools.karaf.itest;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
@@ -39,18 +41,38 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 @ExamReactorStrategy(PerMethod.class)
 public class WorkbenchModelsKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
-    private static final String GDST_LOCATION = "/wb-models/simple-guided-dtable.gdst";
+    private static final String SIMPLE_GDST_LOCATION = "/wb-models/simple-guided-dtable.gdst";
+    private static final String ADVANCED_GDST_LOCATION = "/wb-models/bz-1312164-guided-dtable-with-fqcn.gdst";
+
+    private final KieServices ks = KieServices.Factory.get();
+    private final KieResources kieResources = ks.getResources();
+
+    private ClassLoader origTCCL;
+
+    @Before
+    public void setTCCL() {
+        origTCCL = Thread.currentThread().getContextClassLoader();
+        // Pax-exam sets the TCCL to the bundle-under-test classloader which in turn means that the XStream marshalling
+        // will work with different TCCL than it would with standalone bundle. Setting system/application classloader as
+        // TCCL is needed to reproduce the fails related to XStream unmarshalling in guided-dtables module
+        Thread.currentThread().setContextClassLoader(Object.class.getClassLoader());
+    }
+
+    @After
+    public void restoreTCCL() {
+        Thread.currentThread().setContextClassLoader(origTCCL);
+    }
 
     @Test
-    public void testBuildKieBaseFromSimpleWorkbenchModels() throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        KieResources kieResources = ks.getResources();
-        KieHelper kieHelper = new KieHelper();
-        kieHelper.addResource(kieResources.newUrlResource(getClass().getResource(GDST_LOCATION)));
-        Results results = kieHelper.verify();
-        Assert.assertTrue(results.toString(), results.getMessages().isEmpty());
-        KieBase kieBase = kieHelper.build();
+    public void buildKieBaseFromSimpleGuidedDTable() throws Exception {
+        KieBase kieBase = createKieBase(SIMPLE_GDST_LOCATION);
         assertContainsPackage(kieBase, "guided_dtable");
+    }
+
+    @Test
+    public void buildKieBaseFromAdvancedDTableUsingFQCN() {
+        KieBase kieBase = createKieBase(ADVANCED_GDST_LOCATION);
+        assertContainsPackage(kieBase, "guided_dtable_fqcn");
     }
 
     @Configuration
@@ -58,6 +80,7 @@ public class WorkbenchModelsKarafIntegrationTest extends AbstractKarafIntegratio
         return new Option[]{
                 // Install Karaf Container
                 getKarafDistributionOption(),
+
 
                 // It is really nice if the container sticks around after the test so you can check the contents
                 // of the data directory when things go wrong.
@@ -74,10 +97,24 @@ public class WorkbenchModelsKarafIntegrationTest extends AbstractKarafIntegratio
         };
     }
 
+    private KieBase createKieBase(String... resourcePaths) {
+        KieHelper kieHelper = new KieHelper();
+        ClassLoader bundleClassloader = getClass().getClassLoader();
+        kieHelper.setClassLoader(bundleClassloader);
+        for (String resourcePath : resourcePaths) {
+            kieHelper.addResource(kieResources.newUrlResource(getClass().getResource(resourcePath)));
+        }
+        Results results = kieHelper.verify();
+        Assert.assertTrue(results.toString(), results.getMessages().isEmpty());
+        return kieHelper.build();
+    }
+
+
     private void assertContainsPackage(KieBase kieBase, String packageName) {
         if (kieBase.getKiePackage(packageName) == null) {
             Assert.fail("KieBase with packages [" + kieBase.getKiePackages() + "] does not contain expected package [" +
                     packageName + "]!");
         }
     }
+
 }
