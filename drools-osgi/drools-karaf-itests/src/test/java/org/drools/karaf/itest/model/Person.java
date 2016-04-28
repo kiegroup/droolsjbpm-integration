@@ -21,6 +21,7 @@ public class Person {
     private int age;
     private boolean canDrink = false;
     private boolean happy;
+    private String result;
 
     public String getName() {
         return name;
@@ -44,6 +45,14 @@ public class Person {
 
     public void setCanDrink(boolean canDrink) {
         this.canDrink = canDrink;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     @Override
