@@ -145,7 +145,8 @@ abstract public class AbstractKarafIntegrationTest {
         karafConfiguration
             .karafVersion(karafVersion)
             .name("Apache Karaf")
-            .useDeployFolder(false).unpackDirectory(new File("target/paxexam/unpack/"));
+            .useDeployFolder(false)
+            .unpackDirectory(new File("target/paxexam/unpack/"));
         options.add(karafConfiguration);
         
         /* Set maximal perm space size */
