@@ -16,7 +16,7 @@
     <osgi.Bundle-SymbolicName>org.kie.remote.client</osgi.Bundle-SymbolicName>
     <maven.jdbc.url>jdbc:h2:file:test;MVCC=true</maven.jdbc.url>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -77,7 +77,7 @@
     <!--  webservices: cxf -->
    <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-api</artifactId>
+      <artifactId>cxf-core</artifactId>
    </dependency> 
    <dependency>
       <groupId>org.apache.cxf</groupId>

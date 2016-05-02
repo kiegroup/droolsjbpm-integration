@@ -596,11 +596,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             public void handle( Request request, HttpServletResponse response ) {
                 String auth = request.getHeader("Authorization");
                 auth = auth.substring(auth.indexOf(' ') + 1);
-                try {
-                    auth = B64Code.decode(auth, CHARSET_UTF8);
-                } catch( UnsupportedEncodingException e ) {
-                    throw new RuntimeException(e);
-                }
+                auth = B64Code.decode(auth, CHARSET_UTF8);
                 int colon = auth.indexOf(':');
                 user.set(auth.substring(0, colon));
                 password.set(auth.substring(colon + 1));
@@ -859,7 +855,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
             }
         };
         Map<String, List<String>> headers = newRequest(url).get().response().headers();
-        assertEquals(headers.size(), 5);
+        assertEquals(headers.size(), 6);
         assertEquals(headers.get("a").size(), 2);
         assertTrue(headers.get("b").get(0).equals("b"));
     }
@@ -885,7 +881,7 @@ public class KieRemoteHttpRequestTest extends ServerTestCase {
         KieRemoteHttpRequest request = newRequest(url).header("h1", 5).header("h2", (Number) null);
         assertEquals(HTTP_OK, request.get().response().code());
         assertEquals("5", h1.get());
-        assertEquals("", h2.get());
+        assertEquals(null, h2.get());
     }
 
     /**
