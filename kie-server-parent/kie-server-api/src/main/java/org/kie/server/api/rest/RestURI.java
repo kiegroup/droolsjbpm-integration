@@ -39,6 +39,7 @@ public class RestURI {
     public static final String JOB_KEY = "key";
     public static final String QUERY_NAME = "queryName";
     public static final String SOLVER_ID = "solverId";
+    public static final String DOCUMENT_ID = "documentId";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
@@ -48,6 +49,7 @@ public class RestURI {
     public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
+    public static final String DOCUMENT_URI = "documents";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -178,6 +180,12 @@ public class RestURI {
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
     public static final String SOLVER_ID_URI = "/{" + SOLVER_ID + "}";
     public static final String SOLVER_BEST_SOLUTION = "/bestsolution";
+
+    // document related
+    public static final String DOCUMENT_INSTANCE_GET_URI = "{" + DOCUMENT_ID + "}";
+    public static final String DOCUMENT_INSTANCE_CONTENT_GET_URI = "{" + DOCUMENT_ID + "}/content";
+    public static final String DOCUMENT_INSTANCE_PUT_URI = "{" + DOCUMENT_ID + "}";
+    public static final String DOCUMENT_INSTANCE_DELETE_URI = "{" + DOCUMENT_ID + "}";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

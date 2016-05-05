@@ -226,9 +226,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
             ((KModuleDeploymentService) deploymentService).setExecutorService(executorService);
         }
 
+
+
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
-                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context));
+                new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
+                new DocumentServiceBase(context));
 
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());

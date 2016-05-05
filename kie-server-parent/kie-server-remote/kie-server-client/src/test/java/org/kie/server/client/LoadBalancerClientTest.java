@@ -46,49 +46,34 @@ public class LoadBalancerClientTest {
 
     private KieServicesConfiguration config;
 
+    protected WireMockServer createMockServer(String version, int port) {
+        WireMockServer wireMockServer = new WireMockServer(port);
+        wireMockServer.stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>" + version + "</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+        return wireMockServer;
+    }
+
     @Before
     public void startServers() {
         int port1 = BaseKieServicesClientTest.findFreePort();
-        wireMockServer1 = new WireMockServer(port1);
-        wireMockServer1.stubFor(get(urlEqualTo("/"))
-                .withHeader("Accept", equalTo("application/xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/xml")
-                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
-                                "  <kie-server-info>\n" +
-                                "    <version>1</version>\n" +
-                                "  </kie-server-info>\n" +
-                                "</response>")));
+        wireMockServer1 = createMockServer("1", port1);
         wireMockServer1.start();
 
         int port2 = BaseKieServicesClientTest.findFreePort();
-        wireMockServer2 = new WireMockServer(port2);
-
-        wireMockServer2.stubFor(get(urlEqualTo("/"))
-                .withHeader("Accept", equalTo("application/xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/xml")
-                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
-                                "  <kie-server-info>\n" +
-                                "    <version>2</version>\n" +
-                                "  </kie-server-info>\n" +
-                                "</response>")));
+        wireMockServer2 = createMockServer("2", port2);
         wireMockServer2.start();
 
         int port3 = BaseKieServicesClientTest.findFreePort();
-        wireMockServer3 = new WireMockServer(port3);
-        wireMockServer3.stubFor(get(urlEqualTo("/"))
-                .withHeader("Accept", equalTo("application/xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/xml")
-                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
-                                "  <kie-server-info>\n" +
-                                "    <version>3</version>\n" +
-                                "  </kie-server-info>\n" +
-                                "</response>")));
+        wireMockServer3 = createMockServer("3", port3);
         wireMockServer3.start();
 
         mockServerBaseUri1 = "http://localhost:" + port1;

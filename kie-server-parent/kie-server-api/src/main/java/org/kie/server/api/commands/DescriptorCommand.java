@@ -15,6 +15,7 @@
 
 package org.kie.server.api.commands;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -92,6 +93,9 @@ public class DescriptorCommand implements KieServerCommand {
     }
 
     public List<Object> getArguments() {
+        if (arguments == null) {
+            return new ArrayList<Object>();
+        }
         return arguments;
     }
 

@@ -28,6 +28,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.client.DocumentServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -66,6 +67,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected UserTaskServicesClient taskClient;
     protected QueryServicesClient queryClient;
     protected JobServicesClient jobServicesClient;
+    protected DocumentServicesClient documentClient;
 
     @Before
     public void cleanup() {
@@ -84,6 +86,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         this.taskClient = client.getServicesClient(UserTaskServicesClient.class);
         this.queryClient = client.getServicesClient(QueryServicesClient.class);
         this.jobServicesClient = client.getServicesClient(JobServicesClient.class);
+        this.documentClient = client.getServicesClient(DocumentServicesClient.class);
     }
 
     protected Object createPersonInstance(String name) {

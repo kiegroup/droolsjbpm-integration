@@ -19,11 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.client.DocumentServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.impl.DocumentServicesClientImpl;
 import org.kie.server.client.impl.JobServicesClientImpl;
 import org.kie.server.client.impl.ProcessServicesClientImpl;
 import org.kie.server.client.impl.QueryServicesClientImpl;
@@ -45,6 +47,7 @@ public class JBPMServicesClientBuilder implements KieServicesClientBuilder {
         services.put(UserTaskServicesClient.class, new UserTaskServicesClientImpl(configuration, classLoader));
         services.put(QueryServicesClient.class, new QueryServicesClientImpl(configuration, classLoader));
         services.put(JobServicesClient.class, new JobServicesClientImpl(configuration, classLoader));
+        services.put(DocumentServicesClient.class, new DocumentServicesClientImpl(configuration, classLoader));
 
         return services;
     }

@@ -62,7 +62,7 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 6;
+        int numComponents = 7;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
@@ -72,6 +72,7 @@ public class JbpmApplicationComponentsServiceTest {
                     || appComponent instanceof UserTaskResource
                     || appComponent instanceof ExecutorResource
                     || appComponent instanceof QueryDataResource
+                    || appComponent instanceof DocumentResource
                     );
         }
     }

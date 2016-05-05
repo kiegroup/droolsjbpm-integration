@@ -47,11 +47,12 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     private RuntimeDataServiceBase runtimeDataServiceBase;
     private ExecutorServiceBase executorServiceBase;
     private QueryDataServiceBase queryDataServiceBase;
+    private DocumentServiceBase documentServiceBase;
 
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
-            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase) {
+            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase, DocumentServiceBase documentServiceBase) {
 
         this.context = context;
         this.deploymentService = deploymentService;
@@ -61,6 +62,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
         this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.executorServiceBase = executorServiceBase;
         this.queryDataServiceBase = queryDataServiceBase;
+        this.documentServiceBase = documentServiceBase;
     }
 
     @Override
@@ -101,6 +103,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
                         wrapResults = true;
                     }
+                } else if ("DocumentService".equals(descriptorCommand.getService())) {
+                    handler = documentServiceBase;
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }
