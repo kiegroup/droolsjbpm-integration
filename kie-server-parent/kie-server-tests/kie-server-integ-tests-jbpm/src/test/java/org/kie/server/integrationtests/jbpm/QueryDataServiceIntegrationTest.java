@@ -413,6 +413,57 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         }
     }
 
+    @Test
+    public void testCRUDOnQueryDefinitionWithDSAsProperty() throws Exception {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        String expectedResolvedDS = System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds");
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstances");
+        query.setSource("${org.kie.server.persistence.ds}");
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
+        query.setTarget("PROCESS");
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
+            assertNotNull(queries);
+            assertEquals(1, queries.size());
+
+            QueryDefinition registeredQuery = queries.get(0);
+            assertNotNull(registeredQuery);
+            assertEquals(query.getName(), registeredQuery.getName());
+            assertEquals(expectedResolvedDS, registeredQuery.getSource());
+            assertEquals(query.getExpression(), registeredQuery.getExpression());
+            assertEquals(query.getTarget(), registeredQuery.getTarget());
+
+            registeredQuery = queryClient.getQuery(query.getName());
+
+            assertNotNull(registeredQuery);
+            assertEquals(query.getName(), registeredQuery.getName());
+            assertEquals(expectedResolvedDS, registeredQuery.getSource());
+            assertEquals(query.getExpression(), registeredQuery.getExpression());
+            assertEquals(query.getTarget(), registeredQuery.getTarget());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+
+            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
+            assertNotNull(queries);
+            assertEquals(0, queries.size());
+        }
+
+    }
+
     protected List<Long> createProcessInstances(Map<String, Object> parameters) {
         List<Long> processInstanceIds = new ArrayList<Long>();
 

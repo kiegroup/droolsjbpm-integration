@@ -30,6 +30,7 @@ import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
+import org.kie.server.services.jbpm.DocumentServiceBase;
 import org.kie.server.services.jbpm.ExecutorServiceBase;
 import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.jbpm.ProcessServiceBase;
@@ -85,13 +86,14 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             }
         }
 
-        List<Object> components = new ArrayList<Object>(5);
+        List<Object> components = new ArrayList<Object>(6);
         DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService);
         ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
         RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);
         ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
         QueryDataServiceBase queryDataServiceBase = new QueryDataServiceBase(queryService, context);
+        DocumentServiceBase documentServiceBase = new DocumentServiceBase(context);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase, context));
@@ -99,6 +101,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         components.add(new UserTaskResource(userTaskServiceBase, context));
         components.add(new ExecutorResource(executorServiceBase, context));
         components.add(new QueryDataResource(queryDataServiceBase, context));
+        components.add(new DocumentResource(documentServiceBase, context));
 
         return components;
     }

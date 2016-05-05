@@ -34,6 +34,8 @@ public class LoadBalancer {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadBalancer.class);
 
+    private static final String URL_SEP = "\\|";
+
     private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     private final BalancerStrategy balancerStrategy;
@@ -81,7 +83,10 @@ public class LoadBalancer {
      */
 
     public static LoadBalancer getDefault(String urls) {
-        String[] endpoints = urls.split("\\|");
+        String[] endpoints = new String[0];
+        if (urls != null) {
+            endpoints = urls.split(URL_SEP);
+        }
         return getDefault(Arrays.asList(endpoints));
     }
 
@@ -91,7 +96,7 @@ public class LoadBalancer {
     }
 
     public static LoadBalancer forStrategy(String urls, BalancerStrategy.Type type) {
-        String[] endpoints = urls.split("\\|");
+        String[] endpoints = urls.split(URL_SEP);
         return forStrategy(Arrays.asList(endpoints), type);
     }
 

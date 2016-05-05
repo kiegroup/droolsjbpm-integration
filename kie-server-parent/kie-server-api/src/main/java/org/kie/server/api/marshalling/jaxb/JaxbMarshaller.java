@@ -184,6 +184,8 @@ public class JaxbMarshaller implements Marshaller {
                 ErrorInfoInstanceList.class,
                 JobRequestInstance.class,
 
+                DocumentInstance.class,
+
                 QueryDefinition.class,
                 QueryDefinitionList.class,
                 QueryFilterSpec.class,

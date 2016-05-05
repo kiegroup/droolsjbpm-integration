@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -35,6 +37,9 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
@@ -49,11 +54,15 @@ public class QueryDataServiceBase {
 
     public static final Logger logger = LoggerFactory.getLogger(QueryDataServiceBase.class);
 
+    protected static final Pattern PARAMETER_MATCHER = Pattern.compile("\\$\\{([\\S&&[^\\}]]+)\\}", Pattern.DOTALL);
+
     private QueryService queryService;
     private MarshallerHelper marshallerHelper;
+    private KieServerRegistry context;
 
     public QueryDataServiceBase(QueryService queryService, KieServerRegistry context) {
         this.queryService = queryService;
+        this.context = context;
         this.marshallerHelper = new MarshallerHelper(context);
     }
 
@@ -219,7 +228,15 @@ public class QueryDataServiceBase {
     }
 
     protected SqlQueryDefinition build(QueryDefinition queryDefinition) {
-        SqlQueryDefinition actualDefinition = new SqlQueryDefinition(queryDefinition.getName(), queryDefinition.getSource());
+
+        String dataSource = queryDefinition.getSource();
+        Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);
+        while (matcher.find()) {
+            String paramName = matcher.group(1);
+            KieServerConfig configuration = context.getStateRepository().load(KieServerEnvironment.getServerId()).getConfiguration();
+            dataSource = configuration.getConfigItemValue(paramName, "java:jboss/datasources/ExampleDS");
+        }
+        SqlQueryDefinition actualDefinition = new SqlQueryDefinition(queryDefinition.getName(), dataSource);
         actualDefinition.setExpression(queryDefinition.getExpression());
         actualDefinition.setTarget(org.jbpm.services.api.query.model.QueryDefinition.Target.valueOf(queryDefinition.getTarget()));
 
