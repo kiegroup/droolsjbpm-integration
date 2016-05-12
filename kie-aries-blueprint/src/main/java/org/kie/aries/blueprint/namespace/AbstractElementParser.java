@@ -16,6 +16,7 @@
 package org.kie.aries.blueprint.namespace;
 
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableComponentMetadata;
 import org.apache.aries.blueprint.mutable.MutableRefMetadata;
 import org.apache.aries.blueprint.mutable.MutableValueMetadata;
@@ -107,4 +108,16 @@ public abstract class AbstractElementParser {
     }
 
     public abstract Metadata parseElement(ParserContext context, Element element);
+
+    /**
+     * Adds 'bundleContext' property into the specific bean metadata. Bundle context can then be used to get
+     * a bundle classloader which is needed in order to correctly use resources from other bundles (e.g. domain classes
+     * in different bundle from the ones with DRL rules)
+     *
+     * @param beanMetadata mutable bean metadata holding
+     * @param context blueprint parser context
+     */
+    protected void addBundleContextProperty(MutableBeanMetadata beanMetadata, ParserContext context) {
+        beanMetadata.addProperty("bundleContext", createRef(context, "blueprintBundleContext"));
+    }
 }

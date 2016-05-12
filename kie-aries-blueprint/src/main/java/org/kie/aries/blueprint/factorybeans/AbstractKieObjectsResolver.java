@@ -81,6 +81,9 @@ public abstract class AbstractKieObjectsResolver implements Callable<Object> {
         if (releaseId == null) {
             throw new IllegalArgumentException("Cannot resolve a KieContainer using a null ReleaseId");
         }
+        if (bundleContext == null) {
+            throw new IllegalStateException("Blueprint 'bundleContext' was not set! It is needed in order to create new KieContainer.");
+        }
         KieContainer kieContainer = KieServices.Factory.get().newKieContainer( releaseId, bundleContext.getBundle().adapt( BundleWiring.class ).getClassLoader() );
         if ( kieContainer == null) {
             throw new IllegalArgumentException("Could not find a KModule with ReleaseId ("+releaseId+")");
