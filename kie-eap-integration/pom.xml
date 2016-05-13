@@ -36,7 +36,7 @@
   <modules>
     <module>kie-eap-modules</module>
     <module>kie-eap-config</module>
-    <module>kie-eap-distributions</module>
+    <module>kie-eap-distribution</module>
     <module>kie-eap-installer</module>
   </modules>
 
