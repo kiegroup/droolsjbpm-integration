@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.apache.commons.compress" slot="main">
+
+  <resources>
+    <resource-root path="commons-compress-${version.org.apache.commons.compress}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="org.tukaani" slot="main" services="import"/>
+  </dependencies>
+</module>

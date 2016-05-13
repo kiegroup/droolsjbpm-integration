@@ -15,41 +15,64 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
 
-  <id>eap-6</id>
+  <id>eap-7</id>
   <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
     <format>zip</format>
+    <format>dir</format>
   </formats>
 
   <componentDescriptors>
-    <componentDescriptor>src/main/resources/org/springframework/beans/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/expression/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/core/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/context/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/aop/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/web/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/springframework/tx/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/kie/spring/assembly-component.xml</componentDescriptor>
-    <componentDescriptor>src/main/resources/org/wildfly/extras/config/plugin/bpms/assembly-component.xml</componentDescriptor>
-  </componentDescriptors>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/api/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/ci/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/kie/spring/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/drools/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/jbpm/assembly-component.xml</componentDescriptor>
 
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>.</outputDirectory>
-      <includes>
-        <include>org.kie:kie-eap-distributions-bpms-layer:zip</include>
-      </includes>
-      <useProjectArtifact>false</useProjectArtifact>
-      <useProjectAttachments>false</useProjectAttachments>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <useTransitiveFiltering>false</useTransitiveFiltering>
-      <directoryMode>0755</directoryMode>
-      <fileMode>0755</fileMode>
-      <unpack>true</unpack>
-      <excludes>
-        <exclude>META-INF/*</exclude>
-      </excludes>
-    </dependencySet>
-  </dependencySets>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/aopalliance/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/com/fasterxml/jackson/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/com/google/protobuf/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/com/sun/xml/bind/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/com/thoughtworks/xstream/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/jivesoftware/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/junit/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/antlr/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/ant/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/compress/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/exec/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/fileupload/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/jxpath/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/lang3/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/math/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/commons/net/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/maven/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/maven/wagon/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/poi/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/apache/xmlbeans/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/codehaus/plexus/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/eclipse/aether/kie/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/eclipse/jdt/core/compiler/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/eclipse/emf/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/eclipse/sisu/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/freemarker/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/hamcrest/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/jsoup/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/mvel/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/quartz/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/reflections/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/sonatype/plexus/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/beans/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/expression/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/core/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/context/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/aop/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/web/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/tx/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/tukaani/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/wildfly/extras/config/plugin/bpms/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/rome/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/xmlpull/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/xpp3/assembly-component.xml</componentDescriptor>
+  </componentDescriptors>
 
 </assembly>

@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>kie-eap-config</artifactId>
-  <name>KIE EAP - Config</name>
+  <name>KIE EAP :: Config</name>
 
   <dependencies>
     <dependency>

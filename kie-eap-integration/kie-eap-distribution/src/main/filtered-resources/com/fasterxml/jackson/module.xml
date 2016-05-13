@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="com.fasterxml.jackson" slot="main">
+
+  <resources>
+    <resource-root path="jackson-core-${version.com.fasterxml.jackson}.jar"/>
+    <resource-root path="jackson-databind-${version.com.fasterxml.jackson}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+  </dependencies>
+</module>

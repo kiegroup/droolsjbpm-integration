@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.sonatype.plexus" slot="main">
+
+  <resources>
+    <resource-root path="plexus-cipher-${version.org.sonatype.plexus.plexus-cipher}.jar"/>
+    <resource-root path="plexus-sec-dispatcher-${version.org.sonatype.plexus.plexus-sec-dispatcher}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="org.codehaus.plexus" slot="main" services="import"/>
+    <module name="org.eclipse.sisu" slot="main" services="import"/>
+  </dependencies>
+</module>

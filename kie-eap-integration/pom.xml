@@ -9,7 +9,7 @@
 
   <artifactId>kie-eap-integration</artifactId>
   <packaging>pom</packaging>
-  <name>KIE EAP - Drools and jBPM Module layers for JBoss EAP</name>
+  <name>KIE EAP :: Drools and jBPM Module layers for JBoss EAP</name>
 
   <repositories>
     <!-- Bootstrap repository to locate the parent pom when the parent pom has not been build locally. -->
@@ -34,20 +34,14 @@
   </properties>
 
   <modules>
-    <module>kie-eap-modules</module>
     <module>kie-eap-config</module>
     <module>kie-eap-distribution</module>
     <module>kie-eap-installer</module>
+    <module>kie-eap-tests</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-eap-distributions-bpms-layer</artifactId>
-        <version>${version.org.kie}</version>
-        <type>zip</type>
-      </dependency>
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-eap-config</artifactId>
@@ -72,34 +66,4 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-plugin-versions</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </execution>
-          <!-- EAP base modules have lot's of hardcoded versions, this needs to be fixed eventually. -->
-          <execution>
-            <id>no-managed-deps</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <phase>initialize</phase>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

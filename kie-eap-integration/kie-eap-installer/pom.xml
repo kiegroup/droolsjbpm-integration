@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>kie-eap-installer</artifactId>
-  <name>KIE EAP - Installer</name>
+  <name>KIE EAP :: Installer</name>
 
   <dependencies>
     <dependency>
