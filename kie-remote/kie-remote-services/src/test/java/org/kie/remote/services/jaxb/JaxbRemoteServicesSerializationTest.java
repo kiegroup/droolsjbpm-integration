@@ -16,6 +16,7 @@
 package org.kie.remote.services.jaxb;
 
 import static org.junit.Assert.*;
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
 import static org.jbpm.query.QueryBuilderCoverageTestUtil.hackTheDatabaseMetadataLoggerBecauseTheresALogbackXmlInTheClasspath;
 
 import java.lang.reflect.Field;
@@ -57,9 +58,11 @@ import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
 import org.kie.remote.client.jaxb.ConversionUtil;
 import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
+import org.kie.remote.jaxb.gen.CompleteTaskCommand;
 import org.kie.remote.jaxb.gen.I18NText;
 import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
+import org.kie.remote.jaxb.gen.util.JaxbUnknownAdapter;
 import org.kie.remote.services.AcceptedServerCommands;
 import org.kie.services.client.serialization.JaxbSerializationProvider;
 import org.kie.services.client.serialization.SerializationProvider;
@@ -108,10 +111,10 @@ public class JaxbRemoteServicesSerializationTest extends JbpmJUnitBaseTestCase {
         return (T) jaxbProvider.deserialize(xmlObject);
     }
 
-    private Object clientServicesRoundTrip( Object in ) throws Exception {
+    private <T> T clientServicesRoundTrip( Object in ) throws Exception {
         String xmlObject = ClientJaxbSerializationProvider.newInstance().serialize(in);
         logger.debug(xmlObject);
-        return jaxbProvider.deserialize(xmlObject);
+        return (T) jaxbProvider.deserialize(xmlObject);
     }
 
     /**
@@ -481,4 +484,35 @@ public class JaxbRemoteServicesSerializationTest extends JbpmJUnitBaseTestCase {
         obj = ((Set) obj).iterator().next();
         assertTrue( "Expected a map: " + obj.getClass(), Map.class.isAssignableFrom(obj.getClass()));
     }
+
+    @Test
+    public void recursiveMapSerializationTest() throws Exception {
+
+        String sourceNodeId = "capp-";
+        String targetNodeId = "-ucino";
+
+        // create input param
+        Map<String, Object> srcTarget = new HashMap<String, Object>();
+        srcTarget.put("nodemap_sourceNodeId", sourceNodeId);
+        srcTarget.put("nodemap_targetNodeId", targetNodeId);
+        Map<String, Object>[] marray = new Map[1];
+        marray[0] = srcTarget;
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("out_mapping", marray);
+
+        CompleteTaskCommand cmd = new CompleteTaskCommand();
+        cmd.setTaskId(23l);
+        cmd.setUserId("pancake");
+        cmd.setData(convertMapToJaxbStringObjectPairArray(data));
+
+        org.jbpm.services.task.commands.CompleteTaskCommand serverCmd = clientServicesRoundTrip(cmd);
+
+        assertNotNull( "Null cmd round-tripped!", serverCmd);
+
+        assertEquals( "de/serialization not correctly done!",
+                sourceNodeId,
+                ((Map[]) serverCmd.getData().get("out_mapping"))[0].get("nodemap_sourceNodeId") );
+    }
+
 }

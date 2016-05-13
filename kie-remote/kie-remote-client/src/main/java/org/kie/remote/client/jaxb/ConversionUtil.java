@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -15,7 +15,6 @@
 
 package org.kie.remote.client.jaxb;
 
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,8 +33,11 @@ import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
 import org.kie.remote.jaxb.gen.OrganizationalEntity;
 import org.kie.remote.jaxb.gen.Type;
 import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
+import org.kie.remote.jaxb.gen.util.JaxbUnknownAdapter;
 
 public class ConversionUtil {
+
+    private static final JaxbUnknownAdapter unknownAdapter = new JaxbUnknownAdapter();
 
     private static DatatypeFactory datatypeFactory;
     static {
@@ -72,12 +74,16 @@ public class ConversionUtil {
         for( Entry<String, Object> entry : map.entrySet() ) {
             JaxbStringObjectPair pair = new JaxbStringObjectPair();
             pair.setKey(entry.getKey());
-            pair.setValue(entry.getValue());
+            try {
+                pair.setValue(unknownAdapter.marshal(entry.getValue()));
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to serialize map in command: " + e.getMessage(), e);
+            }
             items.add(pair);
         }
         return arrayMap;
     }
-    
+
     public static StringKeyObjectValueMap convertMapToStringKeyObjectValueMap( Map<String, Object> map ) {
         StringKeyObjectValueMap jaxbMap = new StringKeyObjectValueMap();
 
@@ -89,9 +95,9 @@ public class ConversionUtil {
         }
         return jaxbMap;
     }
-    
-    public static List<OrganizationalEntity> convertStringListToGenOrgEntList( List<String> orgEntIdList ) { 
-        if( orgEntIdList == null ) { 
+
+    public static List<OrganizationalEntity> convertStringListToGenOrgEntList( List<String> orgEntIdList ) {
+        if( orgEntIdList == null ) {
             return new ArrayList<OrganizationalEntity>(0);
         }
         List<OrganizationalEntity> genOrgEntList = new ArrayList<OrganizationalEntity>(orgEntIdList.size());
@@ -102,10 +108,10 @@ public class ConversionUtil {
         }
         return genOrgEntList;
     }
-   
-    public static byte [] convertSerializableToByteArray(Serializable input) { 
+
+    public static byte [] convertSerializableToByteArray(Serializable input) {
         byte [] result = null;
-       
+
         return result;
     }
 }

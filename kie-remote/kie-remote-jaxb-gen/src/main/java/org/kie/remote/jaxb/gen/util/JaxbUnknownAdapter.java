@@ -205,7 +205,7 @@ public class JaxbUnknownAdapter extends XmlAdapter<Object, Object> {
                     // create and fill array
                     Object realArr = Array.newInstance(realArrComponentType, objList.size());
                     for( int i = 0; i < length; ++i ) {
-                        Array.set(realArr, i, objList.get(i));
+                        Array.set(realArr, i, convertSerializedObjectToObject(objList.get(i)));
                     }
                     return realArr;
                 default:
