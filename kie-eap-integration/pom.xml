@@ -34,7 +34,6 @@
   </properties>
 
   <modules>
-    <module>kie-jboss-modules-plugin</module>
     <module>kie-eap-modules</module>
     <module>kie-eap-config</module>
     <module>kie-eap-distributions</module>
