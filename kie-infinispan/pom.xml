@@ -41,18 +41,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Should be removed once these deps are in ip-bom -->
-      <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-query</artifactId>
-        <version>${version.org.infinispan}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-commons</artifactId>
-        <version>${version.org.infinispan}</version>
-      </dependency>
- 
       <!-- Cersions of hibernate that infinispan 8.1 use. Should be removed once ip-bom upgrades to these versions. -->
       <dependency>
         <groupId>org.hibernate</groupId>
