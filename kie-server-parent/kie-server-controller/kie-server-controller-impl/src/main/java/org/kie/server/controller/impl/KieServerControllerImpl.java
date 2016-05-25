@@ -32,7 +32,9 @@ import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
+import org.kie.server.controller.api.model.events.ServerInstanceConnected;
 import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
+import org.kie.server.controller.api.model.events.ServerInstanceDisconnected;
 import org.kie.server.controller.api.model.events.ServerInstanceUpdated;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -200,6 +202,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
 
         notificationService.notify(new ServerInstanceUpdated(serverInstance));
+        notificationService.notify(new ServerInstanceConnected(serverInstance));
         return serverSetup;
     }
 
@@ -218,6 +221,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
                 notificationService.notify(new ServerInstanceDeleted(serverInstanceKey.getServerInstanceId()));
                 notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+                notificationService.notify(new ServerInstanceDisconnected(serverInstanceKey.getServerInstanceId()));
             }
         }
     }

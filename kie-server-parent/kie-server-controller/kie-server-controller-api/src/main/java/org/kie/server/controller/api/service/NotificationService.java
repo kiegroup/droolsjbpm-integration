@@ -17,7 +17,9 @@ package org.kie.server.controller.api.service;
 
 import java.util.List;
 
+import org.kie.server.controller.api.model.events.ServerInstanceConnected;
 import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
+import org.kie.server.controller.api.model.events.ServerInstanceDisconnected;
 import org.kie.server.controller.api.model.events.ServerInstanceUpdated;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
@@ -36,4 +38,8 @@ public interface NotificationService {
     void notify(ServerInstanceUpdated serverInstanceUpdated);
 
     void notify(ServerInstanceDeleted serverInstanceDeleted);
+
+    void notify(ServerInstanceConnected serverInstanceConnected);
+
+    void notify(ServerInstanceDisconnected serverInstanceDisconnected);
 }
