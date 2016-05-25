@@ -17,7 +17,9 @@ package org.kie.server.controller.impl.service;
 
 import java.util.List;
 
+import org.kie.server.controller.api.model.events.ServerInstanceConnected;
 import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
+import org.kie.server.controller.api.model.events.ServerInstanceDisconnected;
 import org.kie.server.controller.api.model.events.ServerInstanceUpdated;
 import org.kie.server.controller.api.model.events.ServerTemplateDeleted;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
@@ -65,5 +67,15 @@ public class LoggingNotificationService implements NotificationService {
     @Override
     public void notify(ServerInstanceDeleted serverInstanceDeleted) {
         logger.info("Notify on instance delete :: {}", serverInstanceDeleted);
+    }
+
+    @Override
+    public void notify(ServerInstanceConnected serverInstanceConnected) {
+        logger.info("Notify on instance connected :: {}", serverInstanceConnected);
+    }
+
+    @Override
+    public void notify(ServerInstanceDisconnected serverInstanceDisconnected) {
+        logger.info("Notify on instance disconnect :: {}", serverInstanceDisconnected);
     }
 }
