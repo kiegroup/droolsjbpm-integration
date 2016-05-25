@@ -12,8 +12,6 @@
   <name>KIE Remote Services :: Services</name>
 
   <properties>
-    <version.org.jboss.byteman>2.1.4</version.org.jboss.byteman>
-
     <!-- Oracle test properties:
     <maven.datasource.classname>oracle.jdbc.xa.client.OracleXADataSource</maven.datasource.classname>
     <maven.hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</maven.hibernate.dialect>
