@@ -42,14 +42,14 @@ public enum MarshallingFormat {
     }
 
     public static MarshallingFormat fromType( String type ) {
-        if ("xstream".equalsIgnoreCase( type )) {
+        if ("xstream".equalsIgnoreCase( type ) || "application/xstream".equalsIgnoreCase( type ) ) {
             return XSTREAM;
-        } else if ("xml".equalsIgnoreCase( type )) {
+        } else if ("xml".equalsIgnoreCase( type ) || "application/xml".equalsIgnoreCase( type ) ) {
             return JAXB;
-        } else if ("json".equalsIgnoreCase( type )) {
+        } else if ("json".equalsIgnoreCase( type ) || "application/json".equalsIgnoreCase( type ) ) {
             return JSON;
         } else {
-            return null;
+            return valueOf(type);
         }
     }
 }
