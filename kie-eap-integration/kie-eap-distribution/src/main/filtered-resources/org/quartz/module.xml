@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.quartz" slot="main">
+
+  <resources>
+    <resource-root path="quartz-${version.org.quartz-scheduler}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.activation.api" slot="main" services="import"/>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="javax.jms.api" slot="main" services="import"/>
+    <module name="javax.mail.api" slot="main" services="import"/>
+    <module name="javax.servlet.api" slot="main" services="import"/>
+    <module name="org.drools" slot="main" services="import"/>
+    <module name="org.jbpm" slot="main" services="import"/>
+    <module name="org.kie.api" slot="main" services="import"/>
+    <module name="org.slf4j" slot="main" services="import"/>
+  </dependencies>
+</module>

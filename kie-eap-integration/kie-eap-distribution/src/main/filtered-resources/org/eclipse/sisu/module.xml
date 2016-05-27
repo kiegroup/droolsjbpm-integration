@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.eclipse.sisu" slot="main">
+
+  <resources>
+    <resource-root path="org.eclipse.sisu.inject-${version.org.eclipse.sisu}.jar"/>
+    <resource-root path="org.eclipse.sisu.plexus-${version.org.eclipse.sisu}.jar"/>
+    <resource-root path="sisu-guice-${version.org.sonatype.sisu.sisu-guice}-no_aop.jar"/>
+    <resource-root path="guice-servlet-${version.org.sonatype.sisu.sisu-guice}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="javax.enterprise.api" slot="main" services="import"/>
+    <module name="javax.inject.api" export="true" slot="main" services="import"/>
+    <module name="org.codehaus.plexus" slot="main" services="import"/>
+    <module name="com.google.guava" slot="main" services="import"/>
+  </dependencies>
+</module>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.3">
+  <deployment>
+    <dependencies>
+      <module name="org.drools"/>
+      <module name="org.jbpm"/>
+    </dependencies>
+  </deployment>
+
+</jboss-deployment-structure>

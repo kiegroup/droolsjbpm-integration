@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.reflections" slot="main">
+
+  <resources>
+    <resource-root path="reflections-${version.org.reflections}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="com.google.guava" slot="main" services="import"/>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="org.javassist" slot="main" services="import"/>
+  </dependencies>
+</module>
