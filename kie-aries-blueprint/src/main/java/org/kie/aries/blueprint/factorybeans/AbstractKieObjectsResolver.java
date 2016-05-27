@@ -27,6 +27,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
 import org.osgi.framework.BundleContext;
@@ -91,7 +92,7 @@ public abstract class AbstractKieObjectsResolver implements Callable<Object> {
         return kieContainer;
     }
 
-    public Object newStatefulSession( String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf ) {
+    public KieSession newStatefulSession( String kbaseName, ReleaseId releaseId, KieSessionConfiguration conf ) {
         KieBase kieBase = resolveKBase( kbaseName, releaseId );
         if (kieBase == null) {
             KieContainer kieContainer = resolveKContainer( releaseId );
