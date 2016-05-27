@@ -119,6 +119,7 @@ public class ServiceResponse<T> {
             @XmlElement(name = "query-definition", type = QueryDefinition.class),
             @XmlElement(name = "query-definitions", type = QueryDefinitionList.class),
             @XmlElement(name = "document-instance", type = DocumentInstance.class),
+            @XmlElement(name = "document-instance-list", type = DocumentInstanceList.class),
 
             // optaplanner entities
             @XmlElement(name = "solver-instance", type = SolverInstance.class),

@@ -15,12 +15,17 @@
 
 package org.kie.server.services.jbpm;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.jbpm.document.Document;
 import org.jbpm.document.service.DocumentStorageService;
+import org.jbpm.document.service.DocumentStorageServiceProvider;
 import org.jbpm.document.service.impl.DocumentStorageServiceImpl;
 import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieServerRuntimeException;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -31,8 +36,7 @@ public class DocumentServiceBase {
 
     private static final Logger logger = LoggerFactory.getLogger(DocumentServiceBase.class);
 
-    // TODO make it configurable
-    private DocumentStorageService documentStorageService = new DocumentStorageServiceImpl();
+    private DocumentStorageService documentStorageService = DocumentStorageServiceProvider.get().getStorageService();
     private MarshallerHelper marshallerHelper;
 
     public DocumentServiceBase(KieServerRegistry context) {
@@ -93,6 +97,30 @@ public class DocumentServiceBase {
 
         documentStorageService.deleteDocument(document);
         logger.debug("Document {} deleted successfully", document);
+    }
+
+    public DocumentInstanceList listDocuments(Integer page, Integer pageSize) {
+        logger.debug("About to list documents with page {} and pageSize {}", page, pageSize);
+        final List<Document> documents = documentStorageService.listDocuments(page, pageSize);
+        logger.debug("Documents loaded from repository {}", documents);
+        DocumentInstanceList result = new DocumentInstanceList(Collections.emptyList());
+        if (documents == null) {
+            return result;
+        }
+        List<DocumentInstance> list = convertDocumentList(documents);
+        result.setDocumentInstances(list.toArray(new DocumentInstance[list.size()]));
+
+        return result;
+    }
+
+    protected List<DocumentInstance> convertDocumentList(List<Document> documents) {
+
+        List<DocumentInstance> list = new ArrayList<DocumentInstance>();
+        for (Document doc : documents) {
+            list.add(convertDocument(doc));
+        }
+
+        return list;
     }
 
     protected DocumentInstance convertDocument(Document document) {

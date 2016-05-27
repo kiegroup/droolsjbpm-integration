@@ -17,6 +17,7 @@ package org.kie.server.client.impl;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.kie.server.api.commands.CommandScript;
@@ -25,6 +26,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.client.DocumentServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
@@ -128,5 +130,29 @@ public class DocumentServicesClientImpl extends AbstractKieServicesClientImpl im
 
             throwExceptionOnFailure(response);
         }
+    }
+
+    @Override
+    public List<DocumentInstance> listDocuments(Integer page, Integer pageSize) {
+        DocumentInstanceList result = null;
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), DOCUMENT_URI, valuesMap) + queryString, DocumentInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("DocumentService", "listDocuments", new Object[]{page, pageSize})) );
+            ServiceResponse<DocumentInstanceList> response = (ServiceResponse<DocumentInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            result = response.getResult();
+        }
+
+        return result.getItems();
     }
 }

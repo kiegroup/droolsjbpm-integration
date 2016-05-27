@@ -247,6 +247,7 @@ public abstract class KieServerBaseIntegrationTest {
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
+        System.setProperty(KieServerConstants.CFG_DOCUMENT_STORAGE_PATH, "./target/docs");
 
         // Register server id if wasn't done yet
         if (KieServerEnvironment.getServerId() == null) {

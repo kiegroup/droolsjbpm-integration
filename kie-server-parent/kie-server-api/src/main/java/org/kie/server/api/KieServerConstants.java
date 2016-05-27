@@ -70,6 +70,8 @@ public class KieServerConstants {
     public static final String CFG_EXECUTOR_TIME_UNIT = "org.kie.executor.timeunit";
     public static final String CFG_EXECUTOR_DISABLED = "org.kie.executor.disabled";
 
+    public static final String CFG_DOCUMENT_STORAGE_PATH = "org.jbpm.document.storage";
+
     public static final String CFG_KIE_MVN_SETTINGS = "kie.maven.settings.custom";
 
     public static final String CFG_SYNC_DEPLOYMENT = "org.kie.server.sync.deploy";
