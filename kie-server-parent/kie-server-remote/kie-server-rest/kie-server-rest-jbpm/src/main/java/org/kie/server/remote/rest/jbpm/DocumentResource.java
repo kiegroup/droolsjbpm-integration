@@ -26,6 +26,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +35,7 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.KieServerRuntimeException;
@@ -109,6 +111,23 @@ public class DocumentResource {
             return createCorrectVariant(document, headers, Response.Status.OK, conversationIdHeader);
         } catch (KieServerRuntimeException e){
             return notFound("Document with id " + documentId + " not found", v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response listDocuments(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize) {
+        Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        try {
+
+            DocumentInstanceList documents = documentServiceBase.listDocuments(page, pageSize);
+
+            return createCorrectVariant(documents, headers, Response.Status.OK, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

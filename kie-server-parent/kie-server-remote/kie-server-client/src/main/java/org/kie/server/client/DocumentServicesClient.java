@@ -15,6 +15,8 @@
 
 package org.kie.server.client;
 
+import java.util.List;
+
 import org.kie.server.api.model.instance.DocumentInstance;
 
 public interface DocumentServicesClient {
@@ -28,4 +30,6 @@ public interface DocumentServicesClient {
     void updateDocument(DocumentInstance documentInstance);
 
     void deleteDocument(String identifier);
+
+    List<DocumentInstance> listDocuments(Integer page, Integer pageSize);
 }

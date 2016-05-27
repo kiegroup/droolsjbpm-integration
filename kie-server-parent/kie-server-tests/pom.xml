@@ -237,6 +237,7 @@
                     <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
                   </systemProperties>
                   <dependencies>
                     <dependency>
@@ -323,6 +324,7 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
         <cargo.container.id>wildfly10x</cargo.container.id>
       </properties>
       <build>
@@ -343,6 +345,7 @@
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
                   </systemProperties>
                 </container>
                 <configuration>
@@ -480,6 +483,7 @@
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
         <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
         <cargo.container.id>wildfly10x</cargo.container.id>
       </properties>
@@ -632,6 +636,7 @@
         <kie.server.context>kie-server-${project.version}-${kie.server.classifier}</kie.server.context>
         <kie.server.controller.context>kie-server-controller-${project.version}-${kie.server.classifier}</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+        <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
         <cargo.container.id>weblogic122x</cargo.container.id>
       </properties>
       <build>
@@ -654,6 +659,7 @@
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
                   </systemProperties>
                   <dependencies>
                     <dependency>
@@ -752,6 +758,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>ee6</kie.server.classifier>
+        <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
         <cargo.container.id>websphere85x</cargo.container.id>
       </properties>
       <build>
@@ -775,6 +782,7 @@
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
                   </systemProperties>
                   <dependencies>
                     <dependency>

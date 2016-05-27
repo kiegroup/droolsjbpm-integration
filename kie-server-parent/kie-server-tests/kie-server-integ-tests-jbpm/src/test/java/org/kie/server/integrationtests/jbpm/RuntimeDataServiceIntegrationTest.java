@@ -77,7 +77,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
-        assertEquals(10, definitions.size());
+        assertEquals(11, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
@@ -146,7 +146,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId("definition-project", 0, 20);
         assertNotNull(definitions);
 
-        assertEquals(10, definitions.size());
+        assertEquals(11, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.call-evaluation"));
         assertTrue(processIds.contains("definition-project.evaluation"));
