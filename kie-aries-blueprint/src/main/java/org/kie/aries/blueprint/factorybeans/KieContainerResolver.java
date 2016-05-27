@@ -15,10 +15,22 @@
  */
 package org.kie.aries.blueprint.factorybeans;
 
+import org.kie.api.KieBase;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
+import org.kie.api.builder.Results;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.StatelessKieSession;
 
-public class KieContainerResolver extends AbstractKieObjectsResolver {
+import java.util.Collection;
+
+public class KieContainerResolver extends AbstractKieObjectsResolver implements KieContainer {
+
+    private KieContainer kieContainer;
 
     public KieContainerResolver( ReleaseId releaseId ) {
         super( releaseId );
@@ -26,10 +38,131 @@ public class KieContainerResolver extends AbstractKieObjectsResolver {
 
     @Override
     public Object call() throws Exception {
-        KieServices ks = KieServices.Factory.get();
-        if ( releaseId == null) {
-            return ks.getKieClasspathContainer();
-        }
-        return resolveKContainer(releaseId);
+        return getKieContainer();
     }
+
+    private synchronized KieContainer getKieContainer() {
+        KieServices ks = KieServices.Factory.get();
+        if ( releaseId == null ) {
+            kieContainer = ks.getKieClasspathContainer();
+        } else {
+            kieContainer = resolveKContainer(releaseId);
+        }
+        return kieContainer;
+    }
+
+    public ReleaseId getReleaseId() {
+        return getKieContainer().getReleaseId();
+    }
+
+    public Results verify() {
+        return getKieContainer().verify();
+    }
+
+    @Override
+    public Results verify( String... kBaseNames ) {
+        return getKieContainer().verify(kBaseNames);
+    }
+
+    @Override
+    public Results updateToVersion( ReleaseId version ) {
+        return getKieContainer().updateToVersion( version );
+    }
+
+    @Override
+    public Collection<String> getKieBaseNames() {
+        return getKieContainer().getKieBaseNames();
+    }
+
+    @Override
+    public Collection<String> getKieSessionNamesInKieBase( String kBaseName ) {
+        return getKieContainer().getKieSessionNamesInKieBase( kBaseName );
+    }
+
+    @Override
+    public KieBase getKieBase() {
+        return getKieContainer().getKieBase();
+    }
+
+    @Override
+    public KieBase getKieBase( String kBaseName ) {
+        return getKieContainer().getKieBase( kBaseName );
+    }
+
+    @Override
+    public KieBase newKieBase( KieBaseConfiguration conf ) {
+        return getKieContainer().newKieBase( conf ) ;
+    }
+
+    @Override
+    public KieBase newKieBase( String kBaseName, KieBaseConfiguration conf ) {
+        return getKieContainer().newKieBase( kBaseName, conf );
+    }
+
+    @Override
+    public KieSession newKieSession() {
+        return getKieContainer().newKieSession();
+    }
+
+    @Override
+    public KieSession newKieSession( KieSessionConfiguration conf ) {
+        return getKieContainer().newKieSession( conf );
+    }
+
+    @Override
+    public KieSession newKieSession( Environment environment ) {
+        return getKieContainer().newKieSession( environment );
+    }
+
+    @Override
+    public KieSession newKieSession( Environment environment, KieSessionConfiguration conf ) {
+        return getKieContainer().newKieSession( environment, conf );
+    }
+
+    @Override
+    public KieSession newKieSession( String kSessionName ) {
+        return getKieContainer().newKieSession( kSessionName );
+    }
+
+    @Override
+    public KieSession newKieSession( String kSessionName, Environment environment ) {
+        return getKieContainer().newKieSession( kSessionName, environment );
+    }
+
+    @Override
+    public KieSession newKieSession( String kSessionName, KieSessionConfiguration conf ) {
+        return getKieContainer().newKieSession( kSessionName, conf );
+    }
+
+    @Override
+    public KieSession newKieSession( String kSessionName, Environment environment, KieSessionConfiguration conf ) {
+        return getKieContainer().newKieSession(kSessionName, environment, conf);
+    }
+
+    @Override
+    public StatelessKieSession newStatelessKieSession() {
+        return getKieContainer().newStatelessKieSession();
+    }
+
+    @Override
+    public StatelessKieSession newStatelessKieSession( KieSessionConfiguration conf ) {
+        return getKieContainer().newStatelessKieSession( conf );
+
+    }
+
+    @Override
+    public StatelessKieSession newStatelessKieSession( String kSessionName ) {
+        return getKieContainer().newStatelessKieSession( kSessionName );
+    }
+
+    @Override
+    public StatelessKieSession newStatelessKieSession( String kSessionName, KieSessionConfiguration conf ) {
+        return getKieContainer().newStatelessKieSession(kSessionName, conf);
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return getKieContainer().getClassLoader();
+    }
+
 }
