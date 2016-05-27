@@ -158,7 +158,9 @@
                   <outputDirectory>${basedir}/src/main/java</outputDirectory>
                   <includes>org/drools/core/command/impl/GenericCommand.java,
                     org.drools.core.xml.jaxb.util.JaxbUnknownAdapter.java,
-                    org/drools/core/command/runtime/process/*WorkItemCommand.java,
+                    org/drools/core/command/runtime/process/CompleteWorkItemCommand.java,
+                    org/drools/core/command/runtime/process/AbortWorkItemCommand.java,
+                    org/drools/core/command/runtime/process/GetWorkItemCommand.java,
                     org/drools/core/command/runtime/process/AbortProcessInstanceCommand.java,
                     org/drools/core/command/runtime/process/GetProcessIdsCommand.java,
                     org/drools/core/command/runtime/process/GetProcessInstanceByCorrelationKeyCommand.java,
