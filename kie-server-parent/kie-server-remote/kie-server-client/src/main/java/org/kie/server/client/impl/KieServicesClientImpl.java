@@ -56,6 +56,8 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     private static final ServiceLoader<KieServicesClientBuilder> clientBuilders = ServiceLoader.load(KieServicesClientBuilder.class, KieServicesClientImpl.class.getClassLoader());
     private static List<KieServicesClientBuilder> loadedClientBuilders = loadClientBuilders();   // load it only once to make sure it's thread safe
 
+    private String conversationId;
+
     private KieServerInfo kieServerInfo;
     private Map<Class<?>, Object> servicesClients = new HashMap<Class<?>, Object>();
 
@@ -70,6 +72,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     }
 
     private void init() {
+        setOwner(this);
         List<String> serverCapabilities = config.getCapabilities();
 
         if (serverCapabilities == null) {
@@ -95,6 +98,12 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
                     try {
                         logger.debug("Builder '{}' for capability '{}'", builder, capability);
                         Map<Class<?>, Object> clients = builder.build(config, classLoader);
+
+                        for (Object serviceClient : clients.values()) {
+                            if (serviceClient instanceof AbstractKieServicesClientImpl) {
+                                ((AbstractKieServicesClientImpl) serviceClient).setOwner(this);
+                            }
+                        }
 
                         logger.debug("Capability implemented by {}", clients);
                         servicesClients.putAll(clients);
@@ -274,6 +283,12 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     @Override
     public void completeConversation() {
         conversationId = null;
+    }
+
+    public void setConversationId(String conversationId) {
+        if (conversationId != null) {
+            this.conversationId = conversationId;
+        }
     }
 
 
