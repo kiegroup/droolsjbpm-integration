@@ -47,8 +47,10 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.impl.KieServicesClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +67,7 @@ public abstract class AbstractKieServicesClientImpl {
     protected final Marshaller marshaller;
     protected ClassLoader classLoader;
 
-    protected String conversationId;
+    protected KieServicesClientImpl owner;
 
     public AbstractKieServicesClientImpl(KieServicesConfiguration config) {
         this.config = config.clone();
@@ -115,6 +117,11 @@ public abstract class AbstractKieServicesClientImpl {
         return urlString;
     }
 
+    public void setOwner(KieServicesClientImpl owner) {
+        this.owner = owner;
+    }
+
+
     protected void throwExceptionOnFailure(ServiceResponse<?> serviceResponse) {
         if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())){
             throw new KieServicesException(serviceResponse.getMsg());
@@ -136,7 +143,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
             checkResultType( serviceResponse, resultType );
@@ -151,7 +158,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
             return deserialize(response.body(), resultType);
@@ -166,7 +173,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).get();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
@@ -182,7 +189,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).get();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
 
@@ -215,7 +222,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
@@ -240,7 +247,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).post();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode()
                 || response.code() == Response.Status.CREATED.getStatusCode()) {
@@ -262,7 +269,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest(uri).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -286,7 +293,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(body).put();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -304,7 +311,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
@@ -321,7 +328,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).delete();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
                 response.code() == Response.Status.NO_CONTENT.getStatusCode() ) {
@@ -349,8 +356,8 @@ public abstract class AbstractKieServicesClientImpl {
             }
         }
         // apply conversationId
-        if (conversationId != null) {
-            httpRequest.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, conversationId);
+        if (owner.getConversationId() != null) {
+            httpRequest.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER, owner.getConversationId());
         }
 
         return httpRequest;
@@ -432,8 +439,8 @@ public abstract class AbstractKieServicesClientImpl {
                     textMsg.setStringProperty(JMSConstants.CONTAINER_ID_PROPERTY_NAME, containerId);
                 }
 
-                if (conversationId != null) {
-                    textMsg.setStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME, conversationId);
+                if (owner.getConversationId() != null) {
+                    textMsg.setStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME, owner.getConversationId());
                 }
 
                 // send
@@ -461,7 +468,7 @@ public abstract class AbstractKieServicesClientImpl {
             // extract response
             assert response != null: "Response is empty.";
             try {
-                conversationId = response.getStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME);
+                owner.setConversationId(response.getStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME));
 
                 String responseStr = ((TextMessage) response).getText();
                 logger.debug("Received response from server '{}'", responseStr);
@@ -512,7 +519,7 @@ public abstract class AbstractKieServicesClientImpl {
             return null;
         }
         try {
-            return marshaller.unmarshall( content, type );
+            return marshaller.unmarshall(content, type);
         } catch ( MarshallingException e ) {
             throw new KieServicesException( "Error while deserializing data received from server!", e );
         }
@@ -675,7 +682,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
@@ -693,7 +700,7 @@ public abstract class AbstractKieServicesClientImpl {
         KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
         KieRemoteHttpResponse response = request.response();
 
-        conversationId = response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER);
+        owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
             ServiceResponse serviceResponse = deserialize( response.body(), ServiceResponse.class );
@@ -704,5 +711,9 @@ public abstract class AbstractKieServicesClientImpl {
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }
+    }
+
+    public String getConversationId() {
+        return owner.getConversationId();
     }
 }

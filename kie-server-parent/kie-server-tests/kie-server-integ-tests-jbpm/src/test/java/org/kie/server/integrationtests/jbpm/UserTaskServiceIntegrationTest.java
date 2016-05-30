@@ -34,6 +34,7 @@ import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
@@ -122,7 +123,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
             assertEquals("First task", taskSummary.getName());
-            
+
             // release task
             taskClient.releaseTask("definition-project", taskSummary.getId(), "yoda");
 
@@ -1065,6 +1066,84 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals(1, taskList.size());
             taskSummary = taskList.get(0);
             assertEquals("Second task", taskSummary.getName());
+
+        } finally {
+            processClient.abortProcessInstance("definition-project", processInstanceId);
+        }
+    }
+
+    @Test
+    public void testProcessWithUserTasksWithConversationId() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        String conversationId = client.getConversationId();
+        assertNotNull(conversationId);
+
+        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask");
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        String afterNextCallConversationId = ((AbstractKieServicesClientImpl)processClient).getConversationId();
+        assertEquals(conversationId, afterNextCallConversationId);
+
+        // complete conversation to start with new one
+        client.completeConversation();
+
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)taskClient).getConversationId();
+            // since there is no container id in the query endpoint no conversation is set
+            assertNull(afterNextCallConversationId);
+
+            // startTask and completeTask task
+            taskClient.startTask("definition-project", taskSummary.getId(), "yoda");
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)taskClient).getConversationId();
+            assertNotEquals(conversationId, afterNextCallConversationId);
+            conversationId = afterNextCallConversationId;
+
+            Map<String, Object> taskOutcome = new HashMap<String, Object>();
+            taskOutcome.put("string_", "my custom data");
+            taskOutcome.put("person_", createPersonInstance("mary"));
+
+            taskClient.completeTask("definition-project", taskSummary.getId(), "yoda", taskOutcome);
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)taskClient).getConversationId();
+            assertEquals(conversationId, afterNextCallConversationId);
+
+            // complete conversation to start with new one
+            client.completeConversation();
+
+            // check if task outcomes are properly set as process variables
+            Object personVar = processClient.getProcessInstanceVariable("definition-project", processInstanceId, "personData");
+            assertNotNull(personVar);
+            assertEquals("mary", valueOf(personVar, "name"));
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)processClient).getConversationId();
+            assertNotEquals(conversationId, afterNextCallConversationId);
+            conversationId = ((AbstractKieServicesClientImpl)processClient).getConversationId();
+
+            String stringVar = (String) processClient.getProcessInstanceVariable("definition-project", processInstanceId, "stringData");
+            assertNotNull(personVar);
+            assertEquals("my custom data", stringVar);
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)processClient).getConversationId();
+            assertEquals(conversationId, afterNextCallConversationId);
+
+            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            assertEquals("Second task", taskSummary.getName());
+
+            afterNextCallConversationId = ((AbstractKieServicesClientImpl)taskClient).getConversationId();
+            assertEquals(conversationId, afterNextCallConversationId);
 
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
