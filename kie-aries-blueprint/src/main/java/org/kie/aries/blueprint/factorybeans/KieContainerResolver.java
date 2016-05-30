@@ -20,6 +20,8 @@ import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.Results;
+import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -167,4 +169,23 @@ public class KieContainerResolver extends AbstractKieObjectsResolver implements 
         return getKieContainer().getClassLoader();
     }
 
+    @Override
+    public KieSessionConfiguration getKieSessionConfiguration() {
+        return getKieContainer().getKieSessionConfiguration();
+    }
+
+    @Override
+    public KieSessionConfiguration getKieSessionConfiguration( String s ) {
+        return getKieContainer().getKieSessionConfiguration( s );
+    }
+
+    @Override
+    public KieBaseModel getKieBaseModel( String s ) {
+        return getKieContainer().getKieBaseModel( s );
+    }
+
+    @Override
+    public KieSessionModel getKieSessionModel( String s ) {
+        return getKieContainer().getKieSessionModel( s );
+    }
 }
