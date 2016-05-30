@@ -72,8 +72,19 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     private synchronized Object getSession() {
+        boolean stateless = isStateless();
+        if ( stateless ) {
+            if (statelessKieSession != null) {
+                return statelessKieSession;
+            }
+        } else {
+            if (kieSession != null) {
+                return kieSession;
+            }
+        }
+
         Object obj;
-        if ( isStateless() ) {
+        if ( stateless ) {
             statelessKieSession = newStatelessSession(kSessionOptions.getkBaseRef(), releaseId, null);
             obj = statelessKieSession;
         } else {
