@@ -16,6 +16,7 @@
 package org.drools.simulation.fluent.batch.impl;
 
 import org.drools.core.command.IdentifiableResult;
+import org.drools.core.command.SetVariableCommandFromLastReturn;
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.GetGlobalCommand;
@@ -29,6 +30,7 @@ import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.test.impl.MapVariableContext;
 import org.kie.api.command.BatchExecutionCommand;
+import org.kie.internal.fluent.Scope;
 import org.kie.internal.fluent.VariableContext;
 import org.kie.api.runtime.rule.FactHandle;
 
@@ -104,6 +106,11 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         return this;
     }
 
+    public FluentBatchExecution set(String name, Scope scope) {
+        addCommand(new SetVariableCommandFromLastReturn(null, name, scope));
+        return this;
+    }
+
     public FluentBatchExecution set(String name) {
         if (lastAddedCommand instanceof IdentifiableResult){
             ((IdentifiableResult) lastAddedCommand).setOutIdentifier(name);
@@ -165,5 +172,4 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         addCommand(lastAddedCommand);
         return this;
     }
-
 }

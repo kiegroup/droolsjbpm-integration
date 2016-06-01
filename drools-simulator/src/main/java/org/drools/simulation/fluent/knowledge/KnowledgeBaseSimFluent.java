@@ -24,7 +24,7 @@ import org.kie.internal.fluent.KnowledgeBaseFluent;
 
 public interface KnowledgeBaseSimFluent 
     extends KnowledgeBaseFluent<KnowledgeBaseSimFluent>, 
-    TestableFluent<KnowledgeBaseSimFluent>, 
-    EndContextFluent<SimulationFluent> {
+    TestableFluent<KnowledgeBaseSimFluent> {//,
+    //EndContextFluent<SimulationFluent> {
 
 }

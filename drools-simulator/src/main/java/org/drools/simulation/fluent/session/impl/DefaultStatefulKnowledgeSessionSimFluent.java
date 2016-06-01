@@ -44,6 +44,7 @@ import org.drools.simulation.impl.command.AssertRulesFiredCommand;
 import org.drools.simulation.impl.command.FiredRuleCounter;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.fluent.Scope;
 import org.kie.internal.fluent.runtime.WorkItemManagerFluent;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.simulation.SimulationStep;
@@ -132,7 +133,7 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         addCommand(new SetVariableCommandFromLastReturn(context, name));
         return simulationFluent;
     }
-    
+
     public SimulationFluent end(String name) {
         addCommand(new GetVariableCommand(StatefulKnowledgeSession.class.getName()));
         addCommand(new SetVariableCommandFromLastReturn(name));
@@ -145,6 +146,11 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
 
     public KieSessionSimulationFluent set(String name) {
         addCommand(new SetVariableCommandFromLastReturn(null, name));
+        return this;
+    }
+
+    public KieSessionSimulationFluent set(String name, Scope scope) {
+        addCommand(new SetVariableCommandFromLastReturn(null, name, scope));
         return this;
     }
 

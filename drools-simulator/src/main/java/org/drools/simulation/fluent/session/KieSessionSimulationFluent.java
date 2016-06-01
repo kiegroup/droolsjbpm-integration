@@ -20,6 +20,7 @@ import org.drools.simulation.fluent.SimulationFluentBuilder;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.RuleTestFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
+import org.kie.internal.fluent.ContextFluent;
 import org.kie.internal.fluent.EndContextFluent;
 import org.kie.internal.fluent.runtime.KieSessionFluent;
 
@@ -27,7 +28,8 @@ import org.kie.internal.fluent.runtime.KieSessionFluent;
 public interface KieSessionSimulationFluent
         extends KieSessionFluent<KieSessionSimulationFluent>,
         TestableFluent<KieSessionSimulationFluent>, 
-        SimulationFluentBuilder<KieSessionSimulationFluent>, 
+        SimulationFluentBuilder<KieSessionSimulationFluent>,
+        ContextFluent<KieSessionSimulationFluent>,
         EndContextFluent<SimulationFluent>,
         RuleTestFluent<KieSessionSimulationFluent> {
 

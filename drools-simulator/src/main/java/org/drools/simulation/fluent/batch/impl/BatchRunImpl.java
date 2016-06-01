@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2011 JBoss Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-package org.drools.simulation.fluent.knowledge;
+package org.drools.simulation.fluent.batch.impl;
 
-import org.drools.simulation.fluent.simulation.SimulationFluent;
-import org.drools.simulation.fluent.test.TestableFluent;
-import org.kie.internal.fluent.EndContextFluent;
-import org.kie.internal.fluent.builder.KnowledgeBuilderFluent;
+import org.drools.simulation.fluent.batch.Batch;
+import org.drools.simulation.fluent.batch.BatchRuns;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public interface KnowledgeBuilderSimFluent 
-    extends KnowledgeBuilderFluent<KnowledgeBuilderSimFluent>, 
-    TestableFluent<KnowledgeBuilderSimFluent> {//,
-    //EndContextFluent<SimulationFluent> {
+public class BatchRunImpl implements BatchRuns {
 
+    private List<Batch> batches;
+
+    public BatchRunImpl() {
+        this.batches = new ArrayList<Batch>();
+    }
+    
+    public List<Batch> getBatches() {
+        return this.batches;
+    }
+        
 }
