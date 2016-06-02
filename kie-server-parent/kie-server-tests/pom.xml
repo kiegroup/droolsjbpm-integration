@@ -27,6 +27,8 @@
     <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
     <kie.server.classifier>ee7</kie.server.classifier>
+    <!-- Path to Kie server WAR file. Used for referencing WAR file in on-demand deployment/undeployment. -->
+    <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
     <kie.server.controller.base.http.url>http://${container.hostname}:${container.port}/${kie.server.controller.context}/rest/controller</kie.server.controller.base.http.url>
     <kie.server.testing.server.local.repo.dir>${project.build.directory}/kie-server-testing-server-local-repo</kie.server.testing.server.local.repo.dir>
@@ -167,6 +169,19 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>set-properties-for-dependencies</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
@@ -212,6 +227,7 @@
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <kie.server.classifier>webc</kie.server.classifier>
+        <kie.server.war.path>${org.kie.server:kie-server:war:webc}</kie.server.war.path>
         <cargo.container.id>tomcat8x</cargo.container.id>
       </properties>
       <build>
@@ -457,11 +473,6 @@
             <artifactId>jaxb-impl</artifactId>
             <version>${version.com.sun.xml.bind}</version>
           </dependency>
-          <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-controller-client</artifactId>
-            <version>8.2.1.Final</version>
-          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -472,7 +483,7 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>org.wildfly.core</groupId>
           <artifactId>wildfly-controller-client</artifactId>
           <scope>test</scope>
         </dependency>
@@ -621,6 +632,11 @@
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-controller-client</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>

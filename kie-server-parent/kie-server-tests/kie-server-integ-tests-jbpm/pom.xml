@@ -204,7 +204,7 @@
               <cargo.container.id>${cargo.container.id}</cargo.container.id>
               <cargo.servlet.port>${container.port}</cargo.servlet.port>
               <kie.server.context>${kie.server.context}</kie.server.context>
-              <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
+              <kie.server.war.path>${kie.server.war.path}</kie.server.war.path>
               <weblogic.home>${weblogic.home}</weblogic.home>
               <kie.server.remoting.url>${kie.server.remoting.url}</kie.server.remoting.url>
               <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
@@ -258,19 +258,6 @@
             </systemProperties>
           </container>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>set-properties-for-dependencies</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>properties</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
