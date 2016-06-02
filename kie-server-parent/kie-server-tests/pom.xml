@@ -457,11 +457,6 @@
             <artifactId>jaxb-impl</artifactId>
             <version>${version.com.sun.xml.bind}</version>
           </dependency>
-          <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-controller-client</artifactId>
-            <version>8.2.1.Final</version>
-          </dependency>
         </dependencies>
       </dependencyManagement>
       <dependencies>
@@ -472,7 +467,7 @@
           <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.wildfly</groupId>
+          <groupId>org.wildfly.core</groupId>
           <artifactId>wildfly-controller-client</artifactId>
           <scope>test</scope>
         </dependency>
@@ -621,6 +616,11 @@
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-jms-client-bom</artifactId>
           <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-controller-client</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
