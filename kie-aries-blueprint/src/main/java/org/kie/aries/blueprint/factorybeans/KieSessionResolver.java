@@ -357,7 +357,7 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
 
     @Override
     public void signalEvent( String type, Object event, long processInstanceId ) {
-        getKieSession().signalEvent( type, event );
+        getKieSession().signalEvent( type, event, processInstanceId );
     }
 
     @Override
