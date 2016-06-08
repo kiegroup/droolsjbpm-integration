@@ -47,11 +47,12 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
                     e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
 
@@ -65,9 +66,10 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
     
