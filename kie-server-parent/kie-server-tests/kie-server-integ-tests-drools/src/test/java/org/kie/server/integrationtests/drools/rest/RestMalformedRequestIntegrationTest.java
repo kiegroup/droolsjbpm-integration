@@ -75,11 +75,12 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
                     e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
 
@@ -93,9 +94,10 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     new GenericType<ServiceResponse<KieContainerResource>>() {
                     });
             assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
 
@@ -119,9 +121,10 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
             ServiceResponse serviceResponse = response.getEntity();
             assertEquals(ServiceResponse.ResponseType.FAILURE, serviceResponse.getType());
             assertEquals("Bad request, no commands to be executed - either wrong format or no data", serviceResponse.getMsg());
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
 
@@ -154,9 +157,10 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     assertEquals("Error calling container stateful-session: Error unmarshalling input", serviceResponse.getMsg());
                     break;
             }
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+        } finally {
+            response.releaseConnection();
         }
     }
 
