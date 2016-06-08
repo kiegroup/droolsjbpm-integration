@@ -114,9 +114,10 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             assertTrue("Wrong status code returned: " + response.getStatus(),
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
-            response.releaseConnection();
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
+        } finally {
+            response.releaseConnection();
         }
 
     }
@@ -143,11 +144,17 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info( "[DELETE] " + clientRequest.getUri());
+
             response = clientRequest.delete();
-            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-            response.releaseConnection();
+            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+            int okStatusCode = Response.Status.OK.getStatusCode();
+            assertTrue("Wrong status code returned: " + response.getStatus(),
+                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
+
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
+        } finally {
+            response.releaseConnection();
         }
 
     }
@@ -175,11 +182,17 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
             logger.info( "[DELETE] " + clientRequest.getUri());
+
             response = clientRequest.delete();
-            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-            response.releaseConnection();
+            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+            int okStatusCode = Response.Status.OK.getStatusCode();
+            assertTrue("Wrong status code returned: " + response.getStatus(),
+                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
+
         } catch (Exception e) {
             throw new ClientResponseFailure(e, response);
+        } finally {
+            response.releaseConnection();
         }
 
     }
