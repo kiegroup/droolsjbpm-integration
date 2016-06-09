@@ -16,6 +16,7 @@
 
 package org.kie.karaf.itest.blueprint;
 
+import org.junit.Ignore;
 import org.kie.karaf.itest.AbstractKarafIntegrationTest;
 import org.kie.karaf.itest.beans.AbstractProcessWithPersistenceBean;
 import org.kie.karaf.itest.beans.ProcessWithPersistenceDirectBean;
@@ -44,6 +45,7 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 /**
  * Tests starting a jBPM process using RuntimeManager with persistence enabled in Blueprint environment.
  */
+@Ignore("JPA 2.1 not supported with Aries Blueprint - see https://issues.jboss.org/browse/DROOLS-1380")
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKarafIntegrationTest {

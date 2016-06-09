@@ -58,7 +58,7 @@
         <exclude>javax.validation:validation-api</exclude>
         <exclude>stax:stax-api</exclude>
         <exclude>javax.activation:activation</exclude>
-        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
+        <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</exclude>
         <exclude>xml-apis:xml-apis</exclude>
         <exclude>org.javassist:javassist</exclude>
         <exclude>javax.mail:mail</exclude>
