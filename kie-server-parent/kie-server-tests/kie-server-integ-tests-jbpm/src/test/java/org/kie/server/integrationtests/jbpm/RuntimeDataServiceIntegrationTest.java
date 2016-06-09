@@ -505,19 +505,24 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             Map<String, Object> variables = processInstance.getVariables();
             assertNotNull(variables);
-            assertEquals(2, variables.size());
+            assertEquals(3, variables.size());
 
             assertTrue(variables.containsKey("stringData"));
             assertTrue(variables.containsKey("personData"));
+            assertTrue(variables.containsKey("initiator"));
 
             String stringVar = (String) variables.get("stringData");
             Object personVar = variables.get("personData");
+            String initiator = (String) variables.get("initiator");
 
             assertNotNull(personVar);
             assertEquals(person.toString(), personVar);
 
             assertNotNull(stringVar);
             assertEquals("waiting for signal", stringVar);
+
+            assertNotNull(initiator);
+            assertEquals(TestConfig.getUsername(), initiator);
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
         }
@@ -793,7 +798,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             List<VariableInstance> currentState = queryClient.findVariablesCurrentState(processInstanceId);
             assertNotNull(currentState);
-            assertEquals(2, currentState.size());
+            assertEquals(3, currentState.size());
 
             for (VariableInstance variableInstance : currentState) {
 
@@ -804,12 +809,16 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     assertEquals("Person{name='john'}", variableInstance.getValue());
                     assertEquals("personData", variableInstance.getVariableName());
                 } else if ("stringData".equals(variableInstance.getVariableName())) {
-
                     assertNotNull(variableInstance);
                     assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
                     assertNullOrEmpty(variableInstance.getOldValue());
                     assertEquals("waiting for signal", variableInstance.getValue());
                     assertEquals("stringData", variableInstance.getVariableName());
+                } else if("initiator".equals(variableInstance.getVariableName())){
+                    assertNotNull(variableInstance);
+                    assertEquals(processInstanceId, variableInstance.getProcessInstanceId());
+                    assertEquals(TestConfig.getUsername(), variableInstance.getValue());
+                    assertNullOrEmpty(variableInstance.getOldValue());
                 } else {
                     fail("Got unexpected variable " + variableInstance.getVariableName());
                 }
@@ -830,7 +839,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             currentState = queryClient.findVariablesCurrentState(processInstanceId);
             assertNotNull(currentState);
-            assertEquals(2, currentState.size());
+            assertEquals(3, currentState.size());
 
             for (VariableInstance variable : currentState) {
                 if ("personData".equals(variable.getVariableName())) {
@@ -845,6 +854,11 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                     assertEquals("waiting for signal", variable.getOldValue());
                     assertEquals("updated value", variable.getValue());
                     assertEquals("stringData", variable.getVariableName());
+                } else if("initiator".equals(variable.getVariableName())){
+                    assertNotNull(variable);
+                    assertEquals(processInstanceId, variable.getProcessInstanceId());
+                    assertEquals(TestConfig.getUsername(), variable.getValue());
+                    assertNullOrEmpty(variable.getOldValue());
                 } else {
                     fail("Got unexpected variable " + variable.getVariableName());
                 }

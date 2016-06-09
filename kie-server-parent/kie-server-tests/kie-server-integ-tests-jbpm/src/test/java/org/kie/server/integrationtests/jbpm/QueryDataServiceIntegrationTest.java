@@ -34,6 +34,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 
@@ -166,7 +167,35 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
+        final QueryDefinition query = getProcessInstanceWithVariablesQueryDefinition();
+        try {
+
+            queryClient.registerQuery(query);
+
+            final List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_VARS, 0, 20, ProcessInstance.class);
+            assertNotNull(instances);
+            final List<Long> found = collectInstances(instances);
+            assertEquals(processInstanceIds, found);
+
+            for (ProcessInstance instance : instances) {
+                final Map<String, Object> variables = instance.getVariables();
+                assertNotNull(variables);
+                assertEquals(3, variables.size());
+
+                assertEquals(TestConfig.getUsername(), variables.get("initiator"));
+                assertEquals("waiting for signal", variables.get("stringData"));
+                assertEquals("Person{name='john'}", variables.get("personData"));
+            }
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
+        final QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstancesWithVars");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select pil.*, v.variableId, v.value " +
@@ -177,30 +206,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
                 "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
                 "where pil.status = 1");
         query.setTarget("CUSTOM");
-        try {
-
-            queryClient.registerQuery(query);
-
-            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_VARS, 0, 10, ProcessInstance.class);
-            assertNotNull(instances);
-            assertEquals(5, instances.size());
-
-            for (ProcessInstance instance : instances) {
-                assertNotNull(instance.getVariables());
-                assertEquals(2, instance.getVariables().size());
-
-                assertEquals("waiting for signal", instance.getVariables().get("stringData"));
-                assertEquals("Person{name='john'}", instance.getVariables().get("personData"));
-            }
-
-            List<Long> found = collectInstances(instances);
-            assertEquals(processInstanceIds, found);
-
-        } finally {
-            abortProcessInstances(processInstanceIds);
-            queryClient.unregisterQuery(query.getName());
-        }
-
+        return query;
     }
 
     @Test
@@ -213,17 +219,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstancesWithVars");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select pil.*, v.variableId, v.value " +
-                "from ProcessInstanceLog pil " +
-                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
-                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
-                "inner join VariableInstanceLog v " +
-                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
-                "where pil.status = 1");
-        query.setTarget("CUSTOM");
+        final QueryDefinition query = getProcessInstanceWithVariablesQueryDefinition();
         try {
 
             queryClient.registerQuery(query);
@@ -238,11 +234,13 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             assertEquals(1, instances.size());
 
             for (ProcessInstance instance : instances) {
-                assertNotNull(instance.getVariables());
-                assertEquals(2, instance.getVariables().size());
+                final Map<String, Object> variables = instance.getVariables();
+                assertNotNull(variables);
+                assertEquals(3, variables.size());
 
-                assertEquals("waiting for signal", instance.getVariables().get("stringData"));
-                assertEquals("Person{name='john'}", instance.getVariables().get("personData"));
+                assertEquals(TestConfig.getUsername(), variables.get("initiator"));
+                assertEquals("waiting for signal", variables.get("stringData"));
+                assertEquals("Person{name='john'}", variables.get("personData"));
             }
 
         } finally {
