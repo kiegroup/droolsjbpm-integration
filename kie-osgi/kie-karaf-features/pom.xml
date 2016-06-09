@@ -37,7 +37,7 @@
     <karaf.version.org.apache.geronimo.specs.servlet>1.0</karaf.version.org.apache.geronimo.specs.servlet>
     <karaf.version.javax.servlet>3.1.0</karaf.version.javax.servlet>
     <karaf.version.org.apache.geronimo.specs.jms>1.1.1</karaf.version.org.apache.geronimo.specs.jms>
-    <karaf.version.org.apache.geronimo.specs.jpa>1.1</karaf.version.org.apache.geronimo.specs.jpa>
+    <karaf.version.org.apache.geronimo.specs.jpa>1.0-alpha-1</karaf.version.org.apache.geronimo.specs.jpa>
     <karaf.version.org.apache.geronimo.specs.jta>1.1.1</karaf.version.org.apache.geronimo.specs.jta>
     <karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>${version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec}</karaf.version.org.jboss.spec.javax.el.jboss-el-api_3.0_spec>
     <!-- used by optaplanner -->
@@ -48,7 +48,7 @@
     <karaf.version.org.apache.servicemix.bundles.ant>1.8.2_2</karaf.version.org.apache.servicemix.bundles.ant>
     <karaf.version.org.apache.servicemix.bundles.dom4j>1.6.1_5</karaf.version.org.apache.servicemix.bundles.dom4j>
     <karaf.version.org.apache.servicemix.bundles.serp>1.14.1_1</karaf.version.org.apache.servicemix.bundles.serp>
-    <karaf.version.com.fasterxml.classmate>0.9.0</karaf.version.com.fasterxml.classmate>
+    <karaf.version.com.fasterxml.classmate>1.1.0</karaf.version.com.fasterxml.classmate>
     <karaf.version.org.jboss.jandex>1.1.0.Final</karaf.version.org.jboss.jandex>
     <karaf.version.javax.validation>1.1.0.Final</karaf.version.javax.validation>
 
@@ -114,7 +114,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jpa_2.0_spec</artifactId>
+        <artifactId>geronimo-jpa_2.1_spec</artifactId>
         <version>${karaf.version.org.apache.geronimo.specs.jpa}</version>
       </dependency>
       <dependency>
@@ -132,7 +132,7 @@
         <artifactId>org.apache.servicemix.bundles.antlr</artifactId>
         <!--
         there are 2 different versions of this dependency used by osgi features
-        for now one of the 2 has been arbitrarily choosen
+        for now one of the 2 has been arbitrarily chosen
         -->
         <version>${karaf.servicemix.version.org.antlr}</version>
       </dependency>
@@ -466,7 +466,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jpa_2.0_spec</artifactId>
+      <artifactId>geronimo-jpa_2.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
