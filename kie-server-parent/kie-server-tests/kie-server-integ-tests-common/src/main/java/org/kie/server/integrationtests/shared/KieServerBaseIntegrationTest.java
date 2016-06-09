@@ -119,9 +119,13 @@ public abstract class KieServerBaseIntegrationTest {
 
     private static void setupCustomSettingsXml() {
         if (!TestConfig.isLocalServer()) {
-            String clientDeploymentSettingsXml = ClassLoader.class.getResource(
-                    "/kie-server-testing-client-deployment-settings.xml").getFile();
-            System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, clientDeploymentSettingsXml);
+            String deploymentSettings = TestConfig.getKieClientDeploymentSettings();
+
+            if (deploymentSettings == null) {
+                deploymentSettings = ClassLoader.class.getResource("/kie-server-testing-client-deployment-settings.xml").getFile();
+            }
+
+            System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, deploymentSettings);
         }
     }
 

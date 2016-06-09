@@ -61,6 +61,7 @@ public class TestConfig {
     private static final StringTestParameter RESPONSE_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
+    private static final StringTestParameter KIE_CLIENT_DEPLOYMENT_SETTINGS = new StringTestParameter("kie.server.client.deployment.settings.xml");
 
     /**
      * Get kie-server URL for HTTP services - like REST.
@@ -277,6 +278,13 @@ public class TestConfig {
      */
     public static String getKjarsBuildSettingsXml() {
         return TestConfig.KJARS_BUILD_SETTINGS_XML.getParameterValue();
+    }
+
+    /**
+     * @return location of custom kie-server-testing-client-deployment-settings.xml
+     */
+    public static String getKieClientDeploymentSettings() {
+        return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
     }
 
     // Used for printing all configuration values at the beginning of first test run.
