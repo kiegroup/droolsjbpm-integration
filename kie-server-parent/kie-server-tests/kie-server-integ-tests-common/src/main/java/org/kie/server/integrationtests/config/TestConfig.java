@@ -62,6 +62,7 @@ public class TestConfig {
     private static final StringTestParameter RESPONSE_QUEUE_JNDI = new StringTestParameter("kie.server.jndi.response.queue", "jms/queue/KIE.SERVER.RESPONSE");
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
+    private static final StringTestParameter KIE_CLIENT_DEPLOYMENT_SETTINGS = new StringTestParameter("kie.server.client.deployment.settings.xml");
 
     private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
     private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
@@ -326,6 +327,13 @@ public class TestConfig {
      */
     public static boolean isWebLogicHomeProvided() {
         return TestConfig.WEBLOGIC_HOME.isParameterConfigured();
+    }
+
+    /**
+     * @return location of custom kie-server-testing-client-deployment-settings.xml
+     */
+    public static String getKieClientDeploymentSettings() {
+        return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
     }
 
     // Used for printing all configuration values at the beginning of first test run.
