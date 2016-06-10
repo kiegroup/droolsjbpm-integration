@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -62,6 +62,12 @@ public class TestConfig {
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
     private static final StringTestParameter KIE_CLIENT_DEPLOYMENT_SETTINGS = new StringTestParameter("kie.server.client.deployment.settings.xml");
+
+    private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
+    private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
+    private static final StringTestParameter KIE_SERVER_WAR_PATH = new StringTestParameter("kie.server.war.path");
+
+    private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
     /**
      * Get kie-server URL for HTTP services - like REST.
@@ -278,6 +284,13 @@ public class TestConfig {
      */
     public static String getKjarsBuildSettingsXml() {
         return TestConfig.KJARS_BUILD_SETTINGS_XML.getParameterValue();
+    }
+
+    /**
+     * @return location of custom kie-server-testing-client-deployment-settings.xml
+     */
+    public static String getKieClientDeploymentSettings() {
+        return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
     }
 
     /**
