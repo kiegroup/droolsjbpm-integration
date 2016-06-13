@@ -53,6 +53,7 @@
           <bpmn2:dataInputRefs>_D05A98B9-118F-4A15-8D83-2B386F7E97C3_GroupIdInputX</bpmn2:dataInputRefs>
           <bpmn2:dataInputRefs>_D05A98B9-118F-4A15-8D83-2B386F7E97C3_SkippableInputX</bpmn2:dataInputRefs>
         </bpmn2:inputSet>
+        <bpmn2:outputSet/>
       </bpmn2:ioSpecification>
       <bpmn2:dataInputAssociation id="_EK2FXvMuEeSoD-9HcIhmjA">
         <bpmn2:targetRef>_D05A98B9-118F-4A15-8D83-2B386F7E97C3_GroupIdInputX</bpmn2:targetRef>

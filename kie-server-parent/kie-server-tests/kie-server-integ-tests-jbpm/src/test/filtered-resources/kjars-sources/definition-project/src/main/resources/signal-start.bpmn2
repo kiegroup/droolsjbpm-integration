@@ -25,9 +25,6 @@
         <sourceRef>_1_Output</sourceRef>
         <targetRef>x</targetRef>
       </dataOutputAssociation>
-      <outputSet>
-        <dataOutputRefs>_1_Output</dataOutputRefs>
-      </outputSet>
       <signalEventDefinition signalRef="start-process" />
     </startEvent>
     <scriptTask id="_2" name="Hello" >
