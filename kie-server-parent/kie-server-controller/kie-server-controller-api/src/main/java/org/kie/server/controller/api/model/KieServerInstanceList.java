@@ -15,6 +15,7 @@
 
 package org.kie.server.controller.api.model;
 
+import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,6 +32,7 @@ public class KieServerInstanceList {
     private KieServerInstance[] KieServerInstances;
 
     public KieServerInstanceList() {
+        this(Collections.EMPTY_LIST);
     }
 
     public KieServerInstanceList(KieServerInstance[] KieServerInstances) {

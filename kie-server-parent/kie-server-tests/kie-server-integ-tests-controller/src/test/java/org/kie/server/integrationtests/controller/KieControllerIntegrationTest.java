@@ -193,7 +193,7 @@ public class KieControllerIntegrationTest extends KieControllerBaseTest {
     public void testEmptyListKieServerInstances() throws Exception {
         KieServerInstanceList instanceList = controllerClient.listKieServerInstances();
         assertNotNull(instanceList);
-        assertNullOrEmpty("Active kie server instance found!", instanceList.getKieServerInstances());
+        assertEquals("Active kie server instance found!", 0, instanceList.getKieServerInstances().length);
     }
 
     @Test
