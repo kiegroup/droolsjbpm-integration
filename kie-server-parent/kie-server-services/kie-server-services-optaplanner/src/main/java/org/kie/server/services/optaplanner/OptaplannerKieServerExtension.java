@@ -73,7 +73,7 @@ public class OptaplannerKieServerExtension
             poolSize--;
         }
         this.threadPool = new ThreadPoolExecutor(
-                2, // core size
+                Math.min(2, poolSize), // core size
                 poolSize, // max size
                 120, // idle timeout
                                                  TimeUnit.SECONDS,
