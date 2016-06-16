@@ -15,19 +15,16 @@
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-core</artifactId>
-      <version>${version.org.kie}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-xstream</artifactId>
-      <version>${version.org.kie}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-core-asl</artifactId>
-      <version>${version.org.codehaus.jackson}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
