@@ -27,6 +27,7 @@ import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesException;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import java.lang.Thread;
 import java.lang.reflect.Method;
@@ -234,8 +235,9 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(timeout = 60000)
-    @Ignore("Needs to be fixed, failing randomly due to PLANNER-560")
     public void testGetBestSolution() throws Exception {
+        assumeTrue(marshallingFormat != MarshallingFormat.JAXB); // TODO Fix https://issues.jboss.org/browse/PLANNER-565
+
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
@@ -255,15 +257,18 @@ public class OptaplannerIntegrationTest
             ServiceResponse<SolverInstance> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
             assertSuccess(solutionResponse);
             solution = solutionResponse.getResult().getBestSolution();
-            // Only once the solution's score is null, the solution is fully uninitialized
-            // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
-            if (solution != null && solution.getScore() != null) {
+            // Wait until the solver finished initializing the solution
+            if (solution != null && solution.getScore() != null && solution.getScore().isSolutionInitialized()) {
                 break;
             }
             Thread.sleep(1000);
         }
-        // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
-        assertTrue(solution.getScore() != null);
+        HardSoftScore score = (HardSoftScore) solution.getScore();
+        assertNotNull(score);
+        assertTrue(solution.getScore().isSolutionInitialized());
+        assertTrue(score.getHardScore() <= 0);
+        // A soft score of 0 is impossible because we'll always need at least 1 computer
+        assertTrue(score.getSoftScore() < 0);
 
         List<?> computerList = (List<?>) valueOf(solution, "computerList");
         assertEquals(10, computerList.size());

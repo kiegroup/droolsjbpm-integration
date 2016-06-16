@@ -150,7 +150,7 @@ public class SolverServiceBase {
             SolverInstanceContext sic = solvers.get( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
             if( sic != null ) {
                 updateSolverInstance( sic );
-                sic.getInstance().setBestSolution((Solution)  sic.getSolver().getBestSolution() );
+                sic.getInstance().setBestSolution((Solution) sic.getSolver().getBestSolution() );
                 return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
                                                            "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
                                                             sic.getInstance() );
