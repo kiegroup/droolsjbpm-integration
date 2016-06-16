@@ -72,9 +72,10 @@ import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
+import org.kie.internal.runtime.conf.ObjectModel;
+import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
-import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.services.api.KieContainerCommandService;
@@ -226,8 +227,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
             ((KModuleDeploymentService) deploymentService).setExecutorService(executorService);
         }
 
-
-
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
@@ -322,6 +321,21 @@ public class JbpmKieServerExtension implements KieServerExtension {
             unit.setKieContainer(kieContainer);
 
             addAsyncHandler(unit, kieContainer);
+
+            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_CLEANUP_LISTENER, "true").equalsIgnoreCase("true")) {
+                logger.debug("Registering TaskCleanUpProcessEventListener");
+                addTaskCleanUpProcessListener(unit, kieContainer);
+            }
+
+            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_BAM_LISTENER, "true").equalsIgnoreCase("true")) {
+                logger.debug("Registering BAMTaskEventListener");
+                addTaskBAMEventListener(unit, kieContainer);
+            }
+
+            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_PROCESS_IDENTITY_LISTENER, "true").equalsIgnoreCase("true")) {
+                logger.debug("Registering IdentityProviderAwareProcessListener");
+                addProcessIdentityProcessListener(unit, kieContainer);
+            }
 
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
@@ -458,20 +472,58 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
     }
 
-    protected void addAsyncHandler(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
+    protected void addAsyncHandler(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
         // add async only when the executor component is not disabled
         if (isExecutorAvailable && executorService != null) {
-            DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
-            if (descriptor == null) {
-                List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
-                descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
-            }
+            final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
             descriptor.getBuilder()
                     .addWorkItemHandler(new NamedObjectModel("mvel", "async",
                             "new org.jbpm.executor.impl.wih.AsyncWorkItemHandler(org.jbpm.executor.ExecutorServiceFactory.newExecutorService(),\"org.jbpm.executor.commands.PrintOutCommand\")"));
 
             unit.setDeploymentDescriptor(descriptor);
         }
+    }
+
+    protected void addTaskBAMEventListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
+        final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
+        descriptor.getBuilder().addTaskEventListener(
+                new ObjectModel(
+                        "mvel",
+                        "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
+                )
+        );
+        unit.setDeploymentDescriptor(descriptor);
+    }
+
+    protected void addTaskCleanUpProcessListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
+        final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
+        descriptor.getBuilder().addEventListener(
+                new ObjectModel(
+                        "mvel",
+                        "new org.jbpm.services.task.admin.listener.TaskCleanUpProcessEventListener(taskService)"
+                )
+        );
+        unit.setDeploymentDescriptor(descriptor);
+    }
+
+    protected void addProcessIdentityProcessListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
+        final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
+        descriptor.getBuilder().addEventListener(
+                new ObjectModel(
+                        "mvel",
+                        "new org.jbpm.kie.services.impl.IdentityProviderAwareProcessListener(ksession)"
+                )
+        );
+        unit.setDeploymentDescriptor(descriptor);
+    }
+
+    protected DeploymentDescriptor getDeploymentDescriptor(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
+        DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
+        if (descriptor == null) {
+            List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
+            descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
+        }
+        return descriptor;
     }
 
     protected boolean isExecutorOnClasspath() {

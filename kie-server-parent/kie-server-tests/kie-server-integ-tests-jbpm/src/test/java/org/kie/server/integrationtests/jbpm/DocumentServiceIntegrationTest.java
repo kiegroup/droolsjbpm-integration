@@ -268,7 +268,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             Map<String, Object> taskInputs = taskClient.getTaskInputContentByTaskId("definition-project", taskId);
             assertNotNull(taskInputs);
-            assertEquals(5, taskInputs.size());
+            assertEquals(6, taskInputs.size());
 
             docVar = taskInputs.get("in_doc");
             assertNotNull(docVar);
@@ -294,7 +294,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             taskInputs = taskClient.getTaskInputContentByTaskId("definition-project", taskId);
             assertNotNull(taskInputs);
-            assertEquals(7, taskInputs.size());
+            assertEquals(8, taskInputs.size());
 
             docVar = taskInputs.get("in_doc");
             assertNotNull(docVar);

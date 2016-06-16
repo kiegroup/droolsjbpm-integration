@@ -101,27 +101,31 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             Map<String, Object> variables = processClient.getProcessInstanceVariables("definition-project", processInstanceId);
             assertNotNull(variables);
-            assertEquals(4, variables.size());
+            assertEquals(5, variables.size());
             assertTrue(variables.containsKey("test"));
             assertTrue(variables.containsKey("number"));
             assertTrue(variables.containsKey("list"));
             assertTrue(variables.containsKey("person"));
+            assertTrue(variables.containsKey("initiator"));
 
             assertNotNull(variables.get("test"));
             assertNotNull(variables.get("number"));
             assertNotNull(variables.get("list"));
             assertNotNull(variables.get("person"));
+            assertNotNull(variables.get("initiator"));
 
             assertTrue(String.class.isAssignableFrom(variables.get("test").getClass()));
             assertTrue(Integer.class.isAssignableFrom(variables.get("number").getClass()));
             assertTrue(List.class.isAssignableFrom(variables.get("list").getClass()));
             assertTrue(personClass.isAssignableFrom(variables.get("person").getClass()));
+            assertTrue(String.class.isAssignableFrom(variables.get("initiator").getClass()));
 
             assertEquals("mary", variables.get("test"));
             assertEquals(12345, variables.get("number"));
             assertEquals(1, ((List) variables.get("list")).size());
             assertEquals("item", ((List) variables.get("list")).get(0));
             assertEquals("john", valueOf(variables.get("person"), "name"));
+            assertEquals(TestConfig.getUsername(), variables.get("initiator"));
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance("definition-project", processInstanceId);
@@ -447,19 +451,24 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             Map<String, Object> variables = processInstance.getVariables();
             assertNotNull(variables);
-            assertEquals(2, variables.size());
+            assertEquals(3, variables.size());
 
             assertTrue(variables.containsKey("stringData"));
             assertTrue(variables.containsKey("personData"));
+            assertTrue(variables.containsKey("initiator"));
 
             String stringVar = (String) variables.get("stringData");
             Object personVar = variables.get("personData");
+            String initiator = (String) variables.get("initiator");
 
             assertNotNull(personVar);
             assertEquals("john", valueOf(personVar, "name"));
 
             assertNotNull(personVar);
             assertEquals("waiting for signal", stringVar);
+
+            assertNotNull(initiator);
+            assertEquals(TestConfig.getUsername(), initiator);
 
         } finally {
             processClient.abortProcessInstance("definition-project", processInstanceId);
