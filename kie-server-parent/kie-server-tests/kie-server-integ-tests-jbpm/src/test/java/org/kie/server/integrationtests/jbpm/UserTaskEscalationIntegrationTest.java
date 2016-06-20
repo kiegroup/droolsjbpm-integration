@@ -89,7 +89,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
     }
 
-    @Test(timeout = 30000)
+    @Test
     public void testEscalation() throws InterruptedException, MessagingException, Exception {
         assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -138,6 +138,39 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         } finally {
             changeUser(TestConfig.getUsername());
         }
+    }
+
+    @Test
+    public void testCompleteTaskBeforeEscalation() throws InterruptedException {
+        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId > 0);
+
+        List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertNotNull(taskList);
+        assertEquals(1, taskList.size());
+        TaskSummary taskSummary = taskList.get(0);
+        assertEquals("User Task", taskSummary.getName());
+        Long taskId = taskSummary.getId();
+
+        TaskInstance taskInstance = taskClient.findTaskById(taskId);
+        assertNotNull(taskInstance);
+        assertEquals(USER_YODA, taskInstance.getActualOwner());
+
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+        taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
+
+        ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+        assertNotNull(processInstance);
+        assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
+
+        assertNullOrEmpty("Email recieved!", wiser.getMessages());
+
+        //wait while, cause email is sended 2s after task start
+        Thread.sleep(3000l);
+        assertNullOrEmpty("Email recieved!", wiser.getMessages());
     }
 
     private void assertEmails(final String subj) throws MessagingException, IOException {
