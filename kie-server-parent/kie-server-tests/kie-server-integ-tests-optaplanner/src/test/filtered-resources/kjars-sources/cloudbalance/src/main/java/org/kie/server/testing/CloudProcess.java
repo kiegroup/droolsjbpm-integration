@@ -16,6 +16,11 @@
 
 package org.kie.server.testing;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -23,6 +28,8 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity()
 @XStreamAlias("CloudProcess")
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class CloudProcess extends AbstractPersistable {
 
     private int requiredCpuPower; // in gigahertz
@@ -30,6 +37,7 @@ public class CloudProcess extends AbstractPersistable {
     private int requiredNetworkBandwidth; // in gigabyte per hour
 
     // Planning variables: changes during planning, between score calculations.
+    // TODO use @XmlIDREF to avoid XML duplication
     private CloudComputer computer;
 
     public int getRequiredCpuPower() {

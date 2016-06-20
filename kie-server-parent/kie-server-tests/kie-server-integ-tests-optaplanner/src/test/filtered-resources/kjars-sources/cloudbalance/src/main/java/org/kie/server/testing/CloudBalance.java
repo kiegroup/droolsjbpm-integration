@@ -28,13 +28,17 @@ import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.buildin.hardsoft.HardSoftScoreDefinition;
+import org.optaplanner.persistence.jaxb.impl.score.buildin.hardsoft.HardSoftScoreJaxbXmlAdapter;
 import org.optaplanner.persistence.xstream.impl.score.XStreamScoreConverter;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @PlanningSolution
 @XStreamAlias("CloudBalance")
-@XmlRootElement
+@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 public class CloudBalance extends AbstractPersistable implements Solution<HardSoftScore> {
 
     private List<CloudComputer> computerList;
@@ -42,6 +46,7 @@ public class CloudBalance extends AbstractPersistable implements Solution<HardSo
     private List<CloudProcess> processList;
 
     @XStreamConverter(value = XStreamScoreConverter.class, types = {HardSoftScoreDefinition.class})
+    @XmlJavaTypeAdapter(HardSoftScoreJaxbXmlAdapter.class)
     private HardSoftScore score;
 
     @ValueRangeProvider(id = "computerRange")

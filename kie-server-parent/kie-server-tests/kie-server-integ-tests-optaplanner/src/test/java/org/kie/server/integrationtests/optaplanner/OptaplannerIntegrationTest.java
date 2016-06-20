@@ -236,8 +236,6 @@ public class OptaplannerIntegrationTest
 
     @Test(timeout = 60000)
     public void testGetBestSolution() throws Exception {
-        assumeTrue(marshallingFormat != MarshallingFormat.JAXB); // TODO Fix https://issues.jboss.org/browse/PLANNER-565
-
         assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );

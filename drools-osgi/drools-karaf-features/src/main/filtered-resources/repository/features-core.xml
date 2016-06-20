@@ -138,6 +138,7 @@
     <bundle>mvn:org.optaplanner/optaplanner-core/${version.org.optaplanner}</bundle>
     <bundle>mvn:org.optaplanner/optaplanner-persistence-common/${version.org.optaplanner}</bundle>
     <bundle>mvn:org.optaplanner/optaplanner-persistence-xstream/${version.org.optaplanner}</bundle>
+    <bundle>mvn:org.optaplanner/optaplanner-persistence-jaxb/${version.org.optaplanner}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
     <bundle>mvn:org.apache.commons/commons-math3/${version.org.apache.commons.math3}</bundle>
     <bundle>mvn:commons-io/commons-io/${version.commons-io}</bundle>

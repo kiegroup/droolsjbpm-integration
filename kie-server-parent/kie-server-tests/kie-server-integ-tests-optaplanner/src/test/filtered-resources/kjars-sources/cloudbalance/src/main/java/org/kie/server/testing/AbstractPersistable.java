@@ -18,11 +18,20 @@ package org.kie.server.testing;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlID;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.optaplanner.core.api.score.constraint.ConstraintMatch;
 
+@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractPersistable implements Serializable, Comparable<AbstractPersistable> {
 
+    // TODO Use @XmlID @XmlJavaTypeAdapter(IdAdapter.class) to allow CloudProcess's usage of @XmlIDREF
     protected Long id;
 
     protected AbstractPersistable() {
@@ -56,5 +65,20 @@ public abstract class AbstractPersistable implements Serializable, Comparable<Ab
     public String toString() {
         return getClass().getName().replaceAll(".*\\.", "") + "-" + id;
     }
+
+    // TODO Needed for @XmlIDREF
+//    public static class IdAdapter extends XmlAdapter<String, Long>{
+//
+//        @Override
+//        public Long unmarshal(String v) throws Exception {
+//            return Long.parseLong(v);
+//        }
+//
+//        @Override
+//        public String marshal(Long v) throws Exception {
+//            return String.valueOf(v);
+//        }
+//
+//    }
 
 }
