@@ -275,6 +275,8 @@ public class OptaplannerIntegrationTest
         for(Object process : processList) {
             Object computer = valueOf(process, "computer");
             assertNotNull(computer);
+            // TODO: Change to identity comparation after @XmlID is implemented
+            assertTrue(computerList.contains(computer));
         }
 
         assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );

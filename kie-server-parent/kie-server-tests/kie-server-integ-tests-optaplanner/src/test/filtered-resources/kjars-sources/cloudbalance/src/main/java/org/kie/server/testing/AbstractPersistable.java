@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.optaplanner.core.api.score.constraint.ConstraintMatch;
 
 @XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
@@ -81,4 +83,22 @@ public abstract class AbstractPersistable implements Serializable, Comparable<Ab
 //
 //    }
 
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(id)
+                .toHashCode();
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        } else if (o instanceof AbstractPersistable) {
+            AbstractPersistable other = (AbstractPersistable) o;
+            return new EqualsBuilder()
+                    .append(id, other.id)
+                    .isEquals();
+        } else {
+            return false;
+        }
+    }
 }
