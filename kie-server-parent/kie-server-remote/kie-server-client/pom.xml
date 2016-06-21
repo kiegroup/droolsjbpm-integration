@@ -41,8 +41,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.remote</groupId>
@@ -67,14 +67,14 @@
     <!-- JMS -->
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_1.1_spec</artifactId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
       <scope>compile</scope>
     </dependency>
 
     <!-- security -->
     <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>

@@ -108,14 +108,14 @@
     <!-- JMS -->
     <dependency>
       <groupId>org.jboss.spec.javax.jms</groupId>
-      <artifactId>jboss-jms-api_1.1_spec</artifactId>
+      <artifactId>jboss-jms-api_2.0_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <!-- REST -->
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -141,7 +141,7 @@
     <!-- general -->
     <dependency>
       <groupId>org.jboss.spec.javax.ejb</groupId>
-      <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+      <artifactId>jboss-ejb-api_3.2_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
@@ -177,7 +177,7 @@
     <!-- security -->
     <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
       <scope>provided</scope>
     </dependency>
 

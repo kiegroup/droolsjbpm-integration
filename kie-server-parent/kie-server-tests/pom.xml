@@ -283,7 +283,7 @@
                     </dependency>
                     <dependency>
                       <groupId>org.jboss.spec.javax.security.jacc</groupId>
-                      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+                      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
                     </dependency>
                   </dependencies>
                 </container>
@@ -331,7 +331,7 @@
         </dependency>
         <dependency>
           <groupId>org.jboss.spec.javax.security.jacc</groupId>
-          <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+          <artifactId>jboss-jacc-api_1.5_spec</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -400,11 +400,6 @@
           <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
             <version>${version.org.jboss.resteasy}</version>
           </dependency>
           <dependency>
@@ -551,11 +546,6 @@
           <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>${version.org.jboss.resteasy}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>jaxrs-api</artifactId>
             <version>${version.org.jboss.resteasy}</version>
           </dependency>
           <dependency>

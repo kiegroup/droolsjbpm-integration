@@ -64,7 +64,7 @@
     <!-- security -->
     <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
-      <artifactId>jboss-jacc-api_1.4_spec</artifactId>
+      <artifactId>jboss-jacc-api_1.5_spec</artifactId>
     </dependency>
 
     <!-- Needed by aether-http stuff, but mistakenly excluded in assemblies so adding it here explicitly -->
@@ -81,8 +81,8 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>jaxrs-api</artifactId>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

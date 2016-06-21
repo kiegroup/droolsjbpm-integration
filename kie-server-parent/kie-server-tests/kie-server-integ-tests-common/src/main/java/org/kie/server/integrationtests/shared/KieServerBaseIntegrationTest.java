@@ -74,7 +74,6 @@ import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.rest.RestKieServerControllerAdminImpl;
 import org.kie.server.controller.rest.RestKieServerControllerImpl;
 import org.kie.server.controller.rest.RestSpecManagementServiceImpl;
-import org.kie.server.integrationtests.config.JacksonRestEasyTestConfig;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
@@ -225,7 +224,6 @@ public abstract class KieServerBaseIntegrationTest {
         controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerImpl());
         controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerAdminImpl());
         controller.getDeployment().getRegistry().addSingletonResource(new RestSpecManagementServiceImpl());
-        controller.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
     }
 
     protected static void stopKieController() {
@@ -274,8 +272,6 @@ public abstract class KieServerBaseIntegrationTest {
                 server.getDeployment().getRegistry().addSingletonResource(component);
             }
         }
-
-        server.getDeployment().setProviderFactory(JacksonRestEasyTestConfig.createRestEasyProviderFactory());
     }
 
     protected static void stopKieServer() {
