@@ -28,8 +28,8 @@ import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.impl.score.buildin.hardsoft.HardSoftScoreDefinition;
-import org.optaplanner.persistence.jaxb.impl.score.buildin.hardsoft.HardSoftScoreJaxbXmlAdapter;
-import org.optaplanner.persistence.xstream.impl.score.XStreamScoreConverter;
+import org.optaplanner.persistence.jaxb.api.score.buildin.hardsoft.HardSoftScoreJaxbXmlAdapter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoft.HardSoftScoreXStreamConverter ;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -45,7 +45,7 @@ public class CloudBalance extends AbstractPersistable implements Solution<HardSo
 
     private List<CloudProcess> processList;
 
-    @XStreamConverter(value = XStreamScoreConverter.class, types = {HardSoftScoreDefinition.class})
+    @XStreamConverter(HardSoftScoreXStreamConverter.class)
     @XmlJavaTypeAdapter(HardSoftScoreJaxbXmlAdapter.class)
     private HardSoftScore score;
 
