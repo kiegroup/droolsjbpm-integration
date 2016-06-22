@@ -41,6 +41,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
@@ -111,6 +112,46 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessDefinitionsSorted() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
+        assertNotNull(definitions);
+
+        assertEquals(11, definitions.size());
+        List<String> processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("definition-project.call-evaluation"));
+        assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
+        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.usertask"));
+        assertTrue(processIds.contains("customtask"));
+        assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
+        assertTrue(processIds.contains("definition-project.timer-process"));
+
+        // test paging of the result
+        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, true);
+
+        assertNotNull(definitions);
+        assertEquals(3, definitions.size());
+        processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("AsyncScriptTask"));
+        assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("definition-project.timer-process"));
+
+        definitions = queryClient.findProcesses(0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        assertNotNull(definitions);
+
+        assertEquals(3, definitions.size());
+        processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("xyz-translations"));
+        assertTrue(processIds.contains("definition-project.usertask"));
+        assertTrue(processIds.contains("definition-project.signalprocess"));
+
+    }
+
+    @Test
     public void testGetProcessDefinitionsWithFilter() throws Exception {
         assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
@@ -136,6 +177,29 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(1, definitions.size());
         processIds = collectDefinitions(definitions);
         assertTrue(processIds.contains("definition-project.evaluation"));
+
+    }
+
+    @Test
+    public void testGetProcessDefinitionsWithFilterSorted() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        List<ProcessDefinition> definitions = queryClient.findProcesses("evaluation", 0, 20, QueryServicesClient.SORT_BY_NAME, true);
+        assertNotNull(definitions);
+
+        assertEquals(2, definitions.size());
+        List<String> processIds = collectDefinitions(definitions);
+        assertTrue(processIds.get(0).equals("definition-project.call-evaluation"));
+        assertTrue(processIds.get(1).equals("definition-project.evaluation"));
+
+        // test paging of the result
+        definitions = queryClient.findProcesses("evaluation", 0, 20, QueryServicesClient.SORT_BY_NAME, false);
+
+        assertNotNull(definitions);
+        assertEquals(2, definitions.size());
+        processIds = collectDefinitions(definitions);
+        assertTrue(processIds.get(0).equals("definition-project.evaluation"));
+        assertTrue(processIds.get(1).equals("definition-project.call-evaluation"));
 
     }
 
@@ -182,6 +246,46 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(definitions);
 
         assertEquals(0, definitions.size());
+
+    }
+
+    @Test
+    public void testGetProcessDefinitionsByContainerSorted() throws Exception {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+
+        List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId("definition-project", 0, 20, QueryServicesClient.SORT_BY_NAME, true);
+        assertNotNull(definitions);
+
+        assertEquals(11, definitions.size());
+        List<String> processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("definition-project.call-evaluation"));
+        assertTrue(processIds.contains("definition-project.evaluation"));
+        assertTrue(processIds.contains("definition-project.grouptask"));
+        assertTrue(processIds.contains("definition-project.signalprocess"));
+        assertTrue(processIds.contains("definition-project.usertask"));
+        assertTrue(processIds.contains("customtask"));
+        assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("AsyncScriptTask"));
+        assertTrue(processIds.contains("definition-project.timer-process"));
+
+        // test paging of the result
+        definitions = queryClient.findProcessesByContainerId("definition-project", 0, 3, QueryServicesClient.SORT_BY_NAME, true);
+
+        assertNotNull(definitions);
+        assertEquals(3, definitions.size());
+        processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("AsyncScriptTask"));
+        assertTrue(processIds.contains("signal-start"));
+        assertTrue(processIds.contains("definition-project.timer-process"));
+
+        definitions = queryClient.findProcessesByContainerId("definition-project", 0, 3, QueryServicesClient.SORT_BY_NAME, false);
+        assertNotNull(definitions);
+
+        assertEquals(3, definitions.size());
+        processIds = collectDefinitions(definitions);
+        assertTrue(processIds.contains("xyz-translations"));
+        assertTrue(processIds.contains("definition-project.usertask"));
+        assertTrue(processIds.contains("definition-project.signalprocess"));
 
     }
 
@@ -487,7 +591,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         Long processInstanceId = processClient.startProcess("definition-project", "definition-project.signalprocess", parameters);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
-        
+
         try {
             ProcessInstance processInstance = queryClient.findProcessInstanceById(processInstanceId, true);
             assertNotNull(processInstance);

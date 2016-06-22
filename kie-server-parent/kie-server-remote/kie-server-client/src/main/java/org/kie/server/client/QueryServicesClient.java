@@ -37,6 +37,10 @@ public interface QueryServicesClient {
     public static final String QUERY_MAP_PI_WITH_CUSTOM_VARS = "ProcessInstancesWithCustomVariables";
     public static final String QUERY_MAP_TASK_WITH_CUSTOM_VARS = "UserTasksWithCustomVariables";
 
+    public static final String SORT_BY_NAME = "ProcessName";
+    public static final String SORT_BY_VERSION = "ProcessVersion";
+    public static final String SORT_BY_PROJECT = "Project";
+
     // runtime data searches
     ProcessDefinition findProcessByContainerIdProcessId(String containerId, String processId);
 
@@ -47,6 +51,12 @@ public interface QueryServicesClient {
     List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize);
 
     List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize);
+
+    List<ProcessDefinition> findProcesses(Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize);
 
@@ -65,6 +75,24 @@ public interface QueryServicesClient {
     List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize);
 
     List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize);
+
+    List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     ProcessInstance findProcessInstanceById(Long processInstanceId);
 
