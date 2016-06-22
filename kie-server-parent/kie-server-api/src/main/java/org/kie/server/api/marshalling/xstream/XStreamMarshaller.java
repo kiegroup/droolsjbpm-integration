@@ -41,6 +41,19 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.instance.SolverInstance;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendablebigdecimal.BendableBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendablelong.BendableLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoft.HardMediumSoftScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoft.HardSoftScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftbigdecimal.HardSoftBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftdouble.HardSoftDoubleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftlong.HardSoftLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simple.SimpleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simplebigdecimal.SimpleBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simpledouble.SimpleDoubleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simplelong.SimpleLongScoreXStreamConverter;
 
 public class XStreamMarshaller
         implements Marshaller {
@@ -52,6 +65,20 @@ public class XStreamMarshaller
         this.classLoader = classLoader;
         this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) );
         this.xstream.setClassLoader( classLoader );
+
+        this.xstream.registerConverter(new BendableScoreXStreamConverter());
+        this.xstream.registerConverter(new BendableLongScoreXStreamConverter());
+        this.xstream.registerConverter(new BendableBigDecimalScoreXStreamConverter());
+        this.xstream.registerConverter(new HardMediumSoftScoreXStreamConverter());
+        this.xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
+        this.xstream.registerConverter(new HardSoftScoreXStreamConverter());
+        this.xstream.registerConverter(new HardSoftLongScoreXStreamConverter());
+        this.xstream.registerConverter(new HardSoftDoubleScoreXStreamConverter());
+        this.xstream.registerConverter(new HardSoftBigDecimalScoreXStreamConverter());
+        this.xstream.registerConverter(new SimpleScoreXStreamConverter());
+        this.xstream.registerConverter(new SimpleLongScoreXStreamConverter());
+        this.xstream.registerConverter(new SimpleDoubleScoreXStreamConverter());
+        this.xstream.registerConverter(new SimpleBigDecimalScoreXStreamConverter());
 
         this.xstream.processAnnotations( CommandScript.class );
         this.xstream.processAnnotations( CallContainerCommand.class );
@@ -79,7 +106,6 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( GetSolversCommand.class );
         this.xstream.processAnnotations( GetSolverStateCommand.class );
         this.xstream.processAnnotations( UpdateSolverStateCommand.class );
-
 
         if (classes != null) {
             for (Class<?> clazz : classes) {

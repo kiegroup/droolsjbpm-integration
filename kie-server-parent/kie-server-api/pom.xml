@@ -38,6 +38,14 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-xstream</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-jaxb</artifactId>
+    </dependency>
 
     <!-- json -->
     <dependency>

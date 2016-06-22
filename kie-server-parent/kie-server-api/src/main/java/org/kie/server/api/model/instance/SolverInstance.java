@@ -36,6 +36,7 @@ public class SolverInstance {
 
     @XmlElement(name = "score")
     @XStreamAlias("score")
+    // TODO https://issues.jboss.org/browse/PLANNER-604 this might be corrupted during marshalling and it's not tested
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Score score;
 
