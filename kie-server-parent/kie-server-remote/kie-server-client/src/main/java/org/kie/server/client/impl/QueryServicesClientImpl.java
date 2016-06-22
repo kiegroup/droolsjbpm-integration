@@ -88,6 +88,21 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
+    public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize) {
+        return findProcesses(page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize) {
+        return findProcesses(filter, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize) {
+        return findProcessesByContainerId(containerId, page, pageSize, "", true);
+    }
+
+    @Override
     public ProcessDefinition findProcessByContainerIdProcessId(String containerId, String processId) {
         ProcessDefinition  result = null;
         if( config.isRest() ) {
@@ -114,19 +129,19 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize) {
+    public List<ProcessDefinition> findProcesses(Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessDefinitionList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessesByFilter", new Object[]{"", page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessesByFilter", new Object[]{"", page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -142,19 +157,19 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize) {
+    public List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessDefinitionList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = getPagingQueryString("?filter=" + filter, page, pageSize);
+            String queryString = getPagingQueryString("?filter=" + filter+"&sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessesByFilter", new Object[]{filter, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessesByFilter", new Object[]{filter, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -170,13 +185,13 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize) {
+    public List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessDefinitionList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI, valuesMap) + queryString, ProcessDefinitionList.class);
@@ -184,7 +199,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessesByDeploymentId", new Object[]{containerId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessesByDeploymentId", new Object[]{containerId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -201,18 +216,63 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
     @Override
     public List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize) {
+        return findProcessInstances(page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize) {
+        return findProcessInstancesByCorrelationKey(correlationKey, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByProcessId(processId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByProcessName(processName, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByContainerId(containerId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByStatus(status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByInitiator(initiator, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByVariable(variableName, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize) {
+        return findProcessInstancesByVariableAndValue(variableName, variableValue, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstances(Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{new ArrayList(), "", "", page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{new ArrayList(), "", "", page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -229,20 +289,20 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByCorrelationKey(CorrelationKey correlationKey, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CORRELATION_KEY, correlationKey.toExternalForm());
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstancesByCorrelationKey", new Object[]{correlationKey.toExternalForm(), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstancesByCorrelationKey", new Object[]{correlationKey.toExternalForm(), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -258,13 +318,13 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByProcessId(String processId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(PROCESS_ID, processId);
 
-            String statusQueryString = getAdditionalParams("", "status", status);
+            String statusQueryString = getAdditionalParams("?sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -272,7 +332,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), "", page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstancesByProcessId", new Object[]{processId, safeList(status), "", page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -289,12 +349,12 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByProcessName(String processName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String statusQueryString = getAdditionalParams("?processName=" + processName, "status", status);
+            String statusQueryString = getAdditionalParams("?processName=" + processName+"&sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -302,7 +362,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), "", processName, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), "", processName, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -319,13 +379,13 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByContainerId(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
 
-            String statusQueryString = getAdditionalParams("", "status", status);
+            String statusQueryString = getAdditionalParams("?sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -333,7 +393,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstancesByDeploymentId", new Object[]{containerId, safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstancesByDeploymentId", new Object[]{containerId, safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -350,19 +410,19 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByStatus(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String statusQueryString = getAdditionalParams("", "status", status);
+            String statusQueryString = getAdditionalParams("?sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), "", "", page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), "", "", page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -379,12 +439,12 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByInitiator(String initiator, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String statusQueryString = getAdditionalParams("?initiator=" + initiator, "status", status);
+            String statusQueryString = getAdditionalParams("?initiator=" + initiator+"&sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -393,7 +453,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), initiator, "", page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstances", new Object[]{safeList(status), initiator, "", page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -410,13 +470,13 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByVariable(String variableName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if (config.isRest()) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(VAR_NAME, variableName);
 
-            String statusQueryString = getAdditionalParams("", "status", status);
+            String statusQueryString = getAdditionalParams("?sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -425,7 +485,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstanceByVariables", new Object[]{variableName, "", safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstanceByVariables", new Object[]{variableName, "", safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -441,13 +501,13 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
     }
 
     @Override
-    public List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize) {
+    public List<ProcessInstance> findProcessInstancesByVariableAndValue(String variableName, String variableValue, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList result = null;
         if (config.isRest()) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(VAR_NAME, variableName);
 
-            String statusQueryString = getAdditionalParams("?varValue=" + variableValue, "status", status);
+            String statusQueryString = getAdditionalParams("?varValue=" + variableValue+"&sort="+sort+"&sortOrder="+sortOrder, "status", status);
             String queryString = getPagingQueryString(statusQueryString, page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
@@ -457,7 +517,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getProcessInstanceByVariables", new Object[]{variableName, variableValue, safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getProcessInstanceByVariables", new Object[]{variableName, variableValue, safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);

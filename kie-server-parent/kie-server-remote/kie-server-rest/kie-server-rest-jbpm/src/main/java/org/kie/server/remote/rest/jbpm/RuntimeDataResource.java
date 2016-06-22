@@ -72,10 +72,11 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstances(@Context HttpHeaders headers,
             @QueryParam("status") List<Integer> status, @QueryParam("initiator") String initiator, @QueryParam("processName") String processName,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstances(status, initiator, processName, page, pageSize);
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstances(status, initiator, processName, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
@@ -88,11 +89,12 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstancesByProcessId(@Context HttpHeaders headers, @PathParam("pId")String processId,
             @QueryParam("status") List<Integer> status, @QueryParam("initiator") String initiator,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByProcessId(processId, status, initiator, page, pageSize);
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByProcessId(processId, status, initiator, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
@@ -103,12 +105,13 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("status")List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize);
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
@@ -135,12 +138,13 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCES_BY_CORRELATION_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstancesByCorrelationKey(@Context HttpHeaders headers, @PathParam("correlationKey") String correlationKey
-            , @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            , @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByCorrelationKey(correlationKey, page, pageSize);
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByCorrelationKey(correlationKey, page, pageSize, sort, sortOrder);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
 
@@ -150,12 +154,13 @@ public class RuntimeDataResource {
     @Path(PROCESS_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceByVariables(@Context HttpHeaders headers, @PathParam("varName") String variableName, @QueryParam("varValue") String variableValue,
-            @QueryParam("status")List<Integer> status, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("status")List<Integer> status, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstanceByVariables(variableName, variableValue, status, page, pageSize);
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstanceByVariables(variableName, variableValue, status, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
 
         return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
@@ -245,12 +250,13 @@ public class RuntimeDataResource {
     @Path(PROCESS_DEFINITIONS_BY_CONTAINER_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByDeploymentId(@Context HttpHeaders headers, @PathParam("id") String containerId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize);
+        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process definition search: {}", processDefinitionList);
 
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
@@ -261,12 +267,13 @@ public class RuntimeDataResource {
     @Path(PROCESS_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessesByFilter(@Context HttpHeaders headers, @QueryParam("filter") String filter,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByFilter(filter, page, pageSize);
+        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByFilter(filter, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process definition search: {}", processDefinitionList);
 
         return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
@@ -339,13 +346,14 @@ public class RuntimeDataResource {
     @Path(TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksAssignedAsBusinessAdministratorByStatus(@Context HttpHeaders headers, @QueryParam("status") List<String> status,
-            @QueryParam("user") String userId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("user") String userId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsBusinessAdministratorByStatus(status, userId, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsBusinessAdministratorByStatus(status, userId, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -361,7 +369,8 @@ public class RuntimeDataResource {
     public Response getTasksAssignedAsPotentialOwner(@Context HttpHeaders headers,
             @QueryParam("status") List<String> status,  @QueryParam("groups") List<String> groupIds,
             @QueryParam("user") String userId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize ) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -369,7 +378,7 @@ public class RuntimeDataResource {
 
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsPotentialOwner(status, groupIds, userId, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsPotentialOwner(status, groupIds, userId, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -385,14 +394,15 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksOwnedByStatus(@Context HttpHeaders headers,
             @QueryParam("status") List<String> status, @QueryParam("user") String userId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksOwnedByStatus(status, userId, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksOwnedByStatus(status, userId, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -407,13 +417,14 @@ public class RuntimeDataResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksByStatusByProcessInstanceId(@Context HttpHeaders headers, @PathParam("pInstanceId") Long processInstanceId,
             @QueryParam("status") List<String> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksByStatusByProcessInstanceId(processInstanceId, status, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksByStatusByProcessInstanceId(processInstanceId, status, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -427,14 +438,15 @@ public class RuntimeDataResource {
     @Path(TASKS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getAllAuditTask(@Context HttpHeaders headers, @QueryParam("user") String userId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getAllAuditTask(userId, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getAllAuditTask(userId, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -448,14 +460,15 @@ public class RuntimeDataResource {
     @Path(TASKS_EVENTS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskEvents(@Context HttpHeaders headers, @PathParam("tInstanceId") Long taskId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
         try {
 
-            TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize);
+            TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
@@ -469,7 +482,8 @@ public class RuntimeDataResource {
     @Path(TASKS_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTasksByVariables(@Context HttpHeaders headers, @PathParam("varName") String variableName, @QueryParam("varValue") String variableValue,
-            @QueryParam("status")List<String> status, @QueryParam("user") String userId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("status")List<String> status, @QueryParam("user") String userId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -477,7 +491,7 @@ public class RuntimeDataResource {
 
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksByVariables(userId, variableName, variableValue, status, page, pageSize);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksByVariables(userId, variableName, variableValue, status, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 

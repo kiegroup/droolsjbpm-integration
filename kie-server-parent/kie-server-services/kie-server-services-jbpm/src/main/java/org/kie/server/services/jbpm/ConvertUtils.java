@@ -158,7 +158,11 @@ public class ConvertUtils {
     }
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
-        return new QueryContext(page * pageSize, pageSize, orderBy, asc);
+        if (orderBy != null && !orderBy.isEmpty()) {
+            return new QueryContext(page * pageSize, pageSize, orderBy, asc);
+        }
+
+        return new QueryContext(page * pageSize, pageSize);
     }
 
     public static QueryFilter buildQueryFilter(Integer page, Integer pageSize) {
@@ -166,7 +170,11 @@ public class ConvertUtils {
     }
 
     public static QueryFilter buildQueryFilter(Integer page, Integer pageSize, String orderBy, boolean asc) {
-        return new QueryFilter(page * pageSize, pageSize, orderBy, asc);
+        if (orderBy != null && !orderBy.isEmpty()) {
+            return new QueryFilter(page * pageSize, pageSize, orderBy, asc);
+        }
+
+        return new QueryFilter(page * pageSize, pageSize);
     }
 
     public static List<Status> buildTaskStatuses(List<String> status) {

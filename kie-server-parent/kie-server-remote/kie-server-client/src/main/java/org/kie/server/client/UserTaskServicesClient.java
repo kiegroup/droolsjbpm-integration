@@ -127,4 +127,28 @@ public interface UserTaskServicesClient {
     List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize);
 
     List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize);
+
+    List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }

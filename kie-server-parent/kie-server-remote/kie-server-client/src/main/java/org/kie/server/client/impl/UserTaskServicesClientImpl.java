@@ -822,11 +822,71 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
     @Override
     public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize) {
+        return findTasksAssignedAsBusinessAdministrator(userId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize) {
+        return findTasksAssignedAsBusinessAdministrator(userId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize) {
+        return findTasksAssignedAsPotentialOwner(userId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize) {
+        return findTasksAssignedAsPotentialOwner(userId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize) {
+        return findTasksAssignedAsPotentialOwner(userId, groups, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize) {
+        return findTasksOwned(userId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize) {
+        return findTasksOwned(userId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize) {
+        return findTasksByStatusByProcessInstanceId(processInstanceId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize) {
+        return findTasks(userId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize) {
+        return findTaskEvents(taskId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize) {
+        return findTasksByVariable(userId, variableName, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize) {
+        return findTasksByVariableAndValue(userId, variableName, variableValue, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
@@ -834,7 +894,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{new ArrayList(), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{new ArrayList(), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -851,21 +911,21 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksAssignedAsBusinessAdministrator(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{safeList(status), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsBusinessAdministratorByStatus", new Object[]{safeList(status), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -880,20 +940,20 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
 
-            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{new ArrayList(), new ArrayList(), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{new ArrayList(), new ArrayList(), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -908,14 +968,14 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
@@ -923,7 +983,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), new ArrayList(), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), new ArrayList(), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -939,7 +999,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -947,7 +1007,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
             String groupsQuery = getAdditionalParams(statusQuery, "groups", groups);
-            String queryString = getPagingQueryString(groupsQuery, page, pageSize);
+            String queryString = getPagingQueryString(groupsQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
@@ -955,7 +1015,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), safeList(groups), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), safeList(groups), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -971,19 +1031,19 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{new ArrayList(), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{new ArrayList(), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -998,21 +1058,21 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksOwned(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_OWNED_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{safeList(status), userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksOwnedByStatus", new Object[]{safeList(status), userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -1027,21 +1087,21 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksByStatusByProcessInstanceId(Long processInstanceId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             String statusQuery = getAdditionalParams("", "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksByStatusByProcessInstanceId", new Object[]{processInstanceId, safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksByStatusByProcessInstanceId", new Object[]{processInstanceId, safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -1056,20 +1116,20 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasks(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
 
-            String queryString = getUserAndPagingQueryString(userId, page, pageSize);
+            String queryString = getUserAndPagingQueryString(userId, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getAllAuditTask", new Object[]{userId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getAllAuditTask", new Object[]{userId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -1086,20 +1146,20 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize) {
+    public List<TaskEventInstance> findTaskEvents(Long taskId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskEventInstanceList taskSummaryList = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(TASK_INSTANCE_ID, taskId);
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
 
             taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTaskEvents", new Object[]{taskId, page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTaskEvents", new Object[]{taskId, page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskEventInstanceList> response = (ServiceResponse<TaskEventInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -1116,7 +1176,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList result = null;
         if (config.isRest()) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -1124,7 +1184,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
@@ -1132,7 +1192,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, "", safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, "", safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -1148,7 +1208,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
-    public List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize) {
+    public List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         TaskSummaryList result = null;
         if (config.isRest()) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -1156,7 +1216,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
             String userQuery = getUserQueryStr(userId);
             String statusQuery = getAdditionalParams(userQuery, "status", status);
-            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
 
             result = makeHttpGetRequestAndCreateCustomResponse(
                     build(baseURI, QUERY_URI + "/" + TASKS_BY_VAR_NAME_GET_URI, valuesMap) + queryString + "&varValue=" + variableValue, TaskSummaryList.class);
@@ -1165,7 +1225,7 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
-                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, variableValue, safeList(status), page, pageSize}) ) );
+                    new DescriptorCommand( "QueryService", "getTasksByVariables", new Object[]{userId, variableName, variableValue, safeList(status), page, pageSize, sort, sortOrder}) ) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
