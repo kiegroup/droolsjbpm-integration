@@ -81,6 +81,7 @@ import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
 import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.score.AbstractScore;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
 import org.optaplanner.core.api.score.buildin.bendablebigdecimal.BendableBigDecimalScore;
@@ -95,6 +96,22 @@ import org.optaplanner.core.api.score.buildin.simple.SimpleScore;
 import org.optaplanner.core.api.score.buildin.simplebigdecimal.SimpleBigDecimalScore;
 import org.optaplanner.core.api.score.buildin.simpledouble.SimpleDoubleScore;
 import org.optaplanner.core.api.score.buildin.simplelong.SimpleLongScore;
+import org.optaplanner.persistence.jaxb.api.score.buildin.bendable.BendableScoreJaxbXmlAdapter;
+import org.optaplanner.persistence.jaxb.api.score.buildin.bendablelong.BendableLongScoreJaxbXmlAdapter;
+import org.optaplanner.persistence.jaxb.api.score.buildin.hardsoft.HardSoftScoreJaxbXmlAdapter;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendablebigdecimal.BendableBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.bendablelong.BendableLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoft.HardMediumSoftScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoft.HardSoftScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftbigdecimal.HardSoftBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftdouble.HardSoftDoubleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftlong.HardSoftLongScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simple.SimpleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simplebigdecimal.SimpleBigDecimalScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simpledouble.SimpleDoubleScoreXStreamConverter;
+import org.optaplanner.persistence.xstream.api.score.buildin.simplelong.SimpleLongScoreXStreamConverter;
 
 public class JaxbMarshaller implements Marshaller {
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
@@ -197,7 +214,10 @@ public class JaxbMarshaller implements Marshaller {
                 // OptaPlanner
                 SolverInstance.class,
                 SolverInstanceList.class,
-                // TODO We should build and use optaplanner-persistence-jaxb in a future version
+                Message.class,
+
+                // TODO Needed to not fail SolverInstance.score but it probably corrupts the score...
+                // See https://issues.jboss.org/browse/PLANNER-604
                 SimpleScore.class,
                 SimpleLongScore.class,
                 SimpleDoubleScore.class,
@@ -211,7 +231,6 @@ public class JaxbMarshaller implements Marshaller {
                 BendableScore.class,
                 BendableLongScore.class,
                 BendableBigDecimalScore.class,
-                Message.class,
 
                 // Optaplanner commands
                 CreateSolverCommand.class,
