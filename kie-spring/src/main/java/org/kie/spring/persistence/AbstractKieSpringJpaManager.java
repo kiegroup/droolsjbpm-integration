@@ -118,6 +118,8 @@ public abstract class AbstractKieSpringJpaManager
                 this.appScopedEntityManager = null;
             }
             this.endCommandScopedEntityManager();
+        }  else {
+            logger.debug("Not cleaning application scoped manager em holder = {} em = {}", TransactionSynchronizationManager.getResource(this.emf), this.env.get(EnvironmentName.APP_SCOPED_ENTITY_MANAGER));
         }
     }
 
