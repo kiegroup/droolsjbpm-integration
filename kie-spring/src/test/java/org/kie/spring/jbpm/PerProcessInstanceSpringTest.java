@@ -20,8 +20,11 @@ import java.util.Collection;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
+import javax.transaction.UserTransaction;
 
+import org.drools.persistence.jta.JtaTransactionManager;
 import org.jbpm.process.audit.ProcessInstanceLog;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +37,9 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.AbstractPlatformTransactionManager;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * Tests verifying per process instance configuration.
@@ -72,7 +78,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         assertNotNull(sessions);
         assertEquals(0, sessions.size());
     }
-    
+
     /**
      * Test verifying ProcessInstanceIdContext functionality for per process instance Runtime manager.
      *
@@ -124,5 +130,112 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         System.out.println("Process instance completed");
 
         manager.disposeRuntimeEngine(engine);
+    }
+
+    @Test
+    public void testProcessWithTaskCompletionWithDispose() throws Exception{
+        RuntimeManager manager = getManager();
+
+        final AbstractPlatformTransactionManager transactionManager = getTransactionManager();
+        final DefaultTransactionDefinition defTransDefinition = new DefaultTransactionDefinition();
+
+        TransactionStatus status = transactionManager.getTransaction(defTransDefinition);
+
+        // start process 1
+        RuntimeEngine runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get());
+        KieSession ksession = runtime.getKieSession();
+
+        assertNotNull(ksession);
+        ProcessInstance pi1 = ksession.startProcess(SAMPLE_HELLO_PROCESS_ID);
+        assertEquals(ProcessInstance.STATE_ACTIVE, pi1.getState());
+
+        // collect task for process instance 1
+        List<Long> taskIds = runtime.getTaskService().getTasksByProcessInstanceId(pi1.getId());
+        assertNotNull(taskIds);
+        assertEquals(1, taskIds.size());
+
+        Long taskId1 = taskIds.get(0);
+
+        runtime.getTaskService().start(taskId1, USER_JOHN);
+
+        transactionManager.commit(status);
+
+        status = transactionManager.getTransaction(defTransDefinition);
+        // start process 2
+        RuntimeEngine runtime2 = manager.getRuntimeEngine(ProcessInstanceIdContext.get());
+        KieSession ksession2 = runtime2.getKieSession();
+        assertNotNull(ksession2);
+
+        ProcessInstance pi2 = ksession2.startProcess(SAMPLE_HELLO_PROCESS_ID);
+        assertEquals(ProcessInstance.STATE_ACTIVE, pi2.getState());
+
+        // collect task for process instance 2
+        List<Long> taskIds2 = runtime2.getTaskService().getTasksByProcessInstanceId(pi2.getId());
+        assertNotNull(taskIds2);
+        assertEquals(1, taskIds2.size());
+
+        Long taskId2 = taskIds2.get(0);
+        runtime2.getTaskService().start(taskId2, USER_JOHN);
+        transactionManager.commit(status);
+
+        status = transactionManager.getTransaction(defTransDefinition);
+        // start and complete first task in process instance 1
+        runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
+
+        runtime.getTaskService().complete(taskId1, USER_JOHN, null);
+
+        transactionManager.commit(status);
+
+        status = transactionManager.getTransaction(defTransDefinition);
+        // start and complete first task in process instance 2
+        runtime2 = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId()));
+
+        runtime2.getTaskService().complete(taskId2, USER_JOHN, null);
+
+        transactionManager.commit(status);
+
+        status = transactionManager.getTransaction(defTransDefinition);
+        runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
+        taskIds = runtime.getTaskService().getTasksByProcessInstanceId(pi1.getId());
+        assertNotNull(taskIds);
+        assertEquals(2, taskIds.size());
+
+        taskId1 = taskIds.get(1);
+        // start and complete second task in process instance 1
+
+        runtime.getTaskService().start(taskId1, USER_MARY);
+        runtime.getTaskService().complete(taskId1, USER_MARY, null);
+
+        transactionManager.commit(status);
+
+        // since process is completed now session should not be there any more
+        try {
+            manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId())).getKieSession();
+            fail("Session for this (" + pi1.getId() + ") process instance is no more accessible");
+        } catch (RuntimeException e) {
+
+        }
+        status = transactionManager.getTransaction(defTransDefinition);
+        runtime2 = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId()));
+        taskIds2 = runtime2.getTaskService().getTasksByProcessInstanceId(pi2.getId());
+        assertNotNull(taskIds2);
+        assertEquals(2, taskIds2.size());
+
+        taskId2 = taskIds2.get(1);
+
+        // start and complete second task in process instance 2
+        runtime2.getTaskService().start(taskId2, USER_MARY);
+        runtime2.getTaskService().complete(taskId2, USER_MARY, null);
+
+        transactionManager.commit(status);
+
+        // since process is completed now session should not be there any more
+        try {
+            manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi2.getId())).getKieSession();
+            fail("Session for this (" + pi2.getId() + ") process instance is no more accessible");
+        } catch (RuntimeException e) {
+
+        }
+
     }
 }
