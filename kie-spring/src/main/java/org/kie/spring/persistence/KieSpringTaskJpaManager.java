@@ -37,14 +37,6 @@ public class KieSpringTaskJpaManager extends AbstractKieSpringJpaManager
 
     public KieSpringTaskJpaManager(Environment env) {
         super(env);
-
-        getApplicationScopedPersistenceContext(); // we create this on initialisation so that we own the EMF reference
-        // otherwise Spring will close it after the transaction finishes
-    }
-
-    public PersistenceContext getApplicationScopedPersistenceContext() {
-
-        return new JpaPersistenceContext(getApplicationScopedEntityManager(), isJTA, (TransactionManager)this.env.get(EnvironmentName.TRANSACTION_MANAGER));
     }
 
     @Override
