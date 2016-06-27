@@ -19,7 +19,11 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <exclusions>
-        <!-- org.javassist:javassist is already included and clashes with this one -->
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <!-- 'org.javassist:javassist' is already included and clashes with this one -->
         <exclusion>
           <groupId>javassist</groupId>
           <artifactId>javassist</artifactId>
@@ -29,6 +33,12 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
+    </dependency>
+    <!-- Replacement for the above excluded 'commons-logging:commons-logging' -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
