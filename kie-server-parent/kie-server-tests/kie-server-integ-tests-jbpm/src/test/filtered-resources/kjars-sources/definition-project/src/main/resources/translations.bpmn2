@@ -224,13 +224,6 @@
         <bpmn2:sourceRef>initiator</bpmn2:sourceRef>
         <bpmn2:targetRef>_C76FA7FA-805F-43C0-877F-958500BE3CAA_BusinessAdministratorIdInputX</bpmn2:targetRef>
       </bpmn2:dataInputAssociation>
-      <bpmn2:dataInputAssociation id="_sVT8IWM5EeSn6fb5ztA1kA">
-        <bpmn2:targetRef>_C76FA7FA-805F-43C0-877F-958500BE3CAA_GroupIdInputX</bpmn2:targetRef>
-        <bpmn2:assignment id="_sVT8ImM5EeSn6fb5ztA1kA">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_sVT8I2M5EeSn6fb5ztA1kA"><![CDATA[Reviewer]]></bpmn2:from>
-          <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_sVT8JGM5EeSn6fb5ztA1kA">_C76FA7FA-805F-43C0-877F-958500BE3CAA_GroupIdInputX</bpmn2:to>
-        </bpmn2:assignment>
-      </bpmn2:dataInputAssociation>
       <bpmn2:dataOutputAssociation id="_sVT8JWM5EeSn6fb5ztA1kA">
         <bpmn2:sourceRef>_C76FA7FA-805F-43C0-877F-958500BE3CAA_out_statusOutputX</bpmn2:sourceRef>
         <bpmn2:targetRef>status</bpmn2:targetRef>

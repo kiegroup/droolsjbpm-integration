@@ -306,4 +306,51 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     }
 
+    @Test
+    public void testUserTasksDefinitionWithEmptyAssociatedEntities() {
+        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        UserTaskDefinitionList result = processClient.getUserTaskDefinitions("definition-project", "xyz-translations");
+
+        assertNotNull(result);
+        UserTaskDefinition[] tasks = result.getTasks();
+
+        // assert user tasks
+        assertNotNull(tasks);
+        assertEquals(3, tasks.length);
+
+        UserTaskDefinition task = tasks[0];
+
+        assertNotNull(task);
+        assertEquals("review-incoming", task.getName());
+
+        // assert associated entities - users and groups
+        String[] evaluateItemsEntities = task.getAssociatedEntities();
+
+        assertEquals(2, evaluateItemsEntities.length);
+        assertEquals("yoda", evaluateItemsEntities[0]);
+        assertEquals("Reviewer", evaluateItemsEntities[1]);
+
+        task = tasks[1];
+
+        assertNotNull(task);
+        assertEquals("translate", task.getName());
+
+        // assert associated entities - users and groups
+        evaluateItemsEntities = task.getAssociatedEntities();
+
+        assertEquals(2, evaluateItemsEntities.length);
+        assertEquals("yoda", evaluateItemsEntities[0]);
+        assertEquals("Writer", evaluateItemsEntities[1]);
+
+        task = tasks[2];
+
+        assertNotNull(task);
+        assertEquals("review-translation", task.getName());
+
+        // assert associated entities - users and groups
+        evaluateItemsEntities = task.getAssociatedEntities();
+
+        assertEquals(0, evaluateItemsEntities.length);
+    }
+
 }
