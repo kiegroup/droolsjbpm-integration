@@ -44,6 +44,9 @@
 
   <dependencySets>
     <dependencySet>
+      <excludes>
+        <exclude>org.jboss.spec.javax.transaction:*</exclude>
+      </excludes>
       <includes>
         <include>org.kie.server:kie-server-services-common</include>
         <include>org.kie.server:kie-server-services-drools</include>
