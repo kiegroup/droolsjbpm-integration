@@ -34,6 +34,8 @@ import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.client.KieServicesException;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -45,8 +47,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -54,15 +56,15 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testEvaluationProcessDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        ProcessDefinition result = processClient.getProcessDefinition("definition-project", "definition-project.evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        ProcessDefinition result = processClient.getProcessDefinition(CONTAINER_ID, PROCESS_ID_EVALUATION);
 
         assertNotNull(result);
-        assertEquals("definition-project.evaluation", result.getId());
+        assertEquals(PROCESS_ID_EVALUATION, result.getId());
         assertEquals("evaluation", result.getName());
         assertEquals("org.jbpm", result.getPackageName());
         assertEquals("1.0", result.getVersion());
-        assertEquals("definition-project", result.getContainerId());
+        assertEquals(CONTAINER_ID, result.getContainerId());
 
         // assert variable definitions
         Map<String, String> variables = result.getProcessVariables();
@@ -101,15 +103,15 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testCallEvaluationProcessDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        ProcessDefinition result = processClient.getProcessDefinition("definition-project", "definition-project.call-evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        ProcessDefinition result = processClient.getProcessDefinition(CONTAINER_ID, PROCESS_ID_CALL_EVALUATION);
 
         assertNotNull(result);
-        assertEquals("definition-project.call-evaluation", result.getId());
+        assertEquals(PROCESS_ID_CALL_EVALUATION, result.getId());
         assertEquals("call-evaluation", result.getName());
         assertEquals("org.jbpm", result.getPackageName());
         assertEquals("1.0", result.getVersion());
-        assertEquals("definition-project", result.getContainerId());
+        assertEquals(CONTAINER_ID, result.getContainerId());
 
         // assert variable definitions
         Map<String, String> variables = result.getProcessVariables();
@@ -142,31 +144,30 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test(expected = KieServicesException.class)
     public void testNonExistingProcessDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        processClient.getProcessDefinition("definition-project", "non-existing-process");
-
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        processClient.getProcessDefinition(CONTAINER_ID, "non-existing-process");
     }
 
 
     @Test
     public void testReusableSubProcessDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        SubProcessesDefinition result = processClient.getReusableSubProcessDefinitions("definition-project", "definition-project.call-evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        SubProcessesDefinition result = processClient.getReusableSubProcessDefinitions(CONTAINER_ID, PROCESS_ID_CALL_EVALUATION);
 
         assertNotNull(result);
         // assert reusable subprocesses
         assertEquals(1, result.getSubProcesses().size());
-        assertEquals("definition-project.evaluation", result.getSubProcesses().iterator().next());
+        assertEquals(PROCESS_ID_EVALUATION, result.getSubProcesses().iterator().next());
 
     }
 
 
     @Test
     public void testProcessVariableDefinitions() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         // assert variable definitions
-        VariablesDefinition variablesDefinition = processClient.getProcessVariableDefinitions("definition-project", "definition-project.evaluation");
+        VariablesDefinition variablesDefinition = processClient.getProcessVariableDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION);
 
         Map<String, String> variables = variablesDefinition.getVariables();
         assertNotNull(variables);
@@ -183,8 +184,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testServiceTasksDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        ServiceTasksDefinition result = processClient.getServiceTaskDefinitions("definition-project", "definition-project.evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        ServiceTasksDefinition result = processClient.getServiceTaskDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION);
         // assert services tasks
         assertEquals(1, result.getServiceTasks().size());
         assertTrue(result.getServiceTasks().containsKey("Email results"));
@@ -195,8 +196,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testAssociatedEntitiesDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        AssociatedEntitiesDefinition result = processClient.getAssociatedEntityDefinitions("definition-project", "definition-project.evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        AssociatedEntitiesDefinition result = processClient.getAssociatedEntityDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION);
 
         // assert associated entities - users and groups
         Map<String, String[]> entities = result.getAssociatedEntities();
@@ -206,14 +207,14 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         String[] evaluateItemsEntities = entities.get("Evaluate items");
 
         assertEquals(2, evaluateItemsEntities.length);
-        assertEquals("john", evaluateItemsEntities[0]);
+        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
     }
 
     @Test
     public void testUserTasksDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        UserTaskDefinitionList result = processClient.getUserTaskDefinitions("definition-project", "definition-project.evaluation");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        UserTaskDefinitionList result = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION);
 
         assertNotNull(result);
         UserTaskDefinition[] tasks = result.getTasks();
@@ -235,7 +236,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         String[] evaluateItemsEntities = task.getAssociatedEntities();
 
         assertEquals(2, evaluateItemsEntities.length);
-        assertEquals("john", evaluateItemsEntities[0]);
+        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
 
         // assert task inputs and outputs
@@ -267,8 +268,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testUserTaskInputDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        TaskInputsDefinition result = processClient.getUserTaskInputDefinitions("definition-project", "definition-project.evaluation", "Evaluate items");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        TaskInputsDefinition result = processClient.getUserTaskInputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items");
 
         assertNotNull(result);
         // assert task inputs and outputs
@@ -291,8 +292,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testTaskOutputsDefinition() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        TaskOutputsDefinition result = processClient.getUserTaskOutputDefinitions("definition-project", "definition-project.evaluation", "Evaluate items");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        TaskOutputsDefinition result = processClient.getUserTaskOutputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items");
 
         assertNotNull(result);
         // assert task inputs and outputs

@@ -31,6 +31,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.assertEquals;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -49,9 +51,9 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployCommonMavenParent();
         // the parent will build and deploy also all of its modules, so no need to deploy them individually
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/multimodule-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/multimodule-project").getFile());
     }
 
     @Override
@@ -64,8 +66,8 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test
     public void testCreateMultipleContainersAndExecuteRules() {
-        assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, releaseIdRules1)));
-        assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, releaseIdRules2)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, releaseIdRules1)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, releaseIdRules2)));
 
         Object car = createInstance(CAR_CLASS_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -75,7 +77,7 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newFireAllRules());
 
         ServiceResponse<ExecutionResults> response1 = ruleClient.executeCommandsWithResults(CONTAINER_1_ID, batchExecution1);
-        assertSuccess(response1);
+        KieServerAssert.assertSuccess(response1);
         ExecutionResults result = response1.getResult();
 
         Object outcome = result.getValue(CAR_OUT_IDENTIFIER);
@@ -90,7 +92,7 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
 
         ServiceResponse<ExecutionResults> response2 = ruleClient.executeCommandsWithResults(CONTAINER_2_ID, batchExecution2);
 
-        assertSuccess(response2);
+        KieServerAssert.assertSuccess(response2);
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(BUS_OUT_IDENTIFIER);

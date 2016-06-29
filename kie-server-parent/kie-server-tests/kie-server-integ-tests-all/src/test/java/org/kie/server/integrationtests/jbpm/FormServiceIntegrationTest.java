@@ -17,7 +17,6 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResource;
@@ -26,6 +25,8 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesException;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -39,15 +40,15 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
     }
 
     @Test
     public void testGetProcessFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         String result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_PROCESS_ID, "en");
         logger.debug("Form content is '{}'", result);
@@ -58,7 +59,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test(expected = KieServicesException.class)
     public void testGetProcessNotExistingFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         uiServicesClient.getProcessForm(CONTAINER_ID, "not-existing", "en");
     }
@@ -66,7 +67,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetTaskFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
@@ -89,7 +90,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test(expected = KieServicesException.class)
     public void testGetTaskNotExistingFormViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         uiServicesClient.getTaskForm(CONTAINER_ID, 9999l, "en");
     }
@@ -97,7 +98,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetProcessFormInPackageViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         String result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_2_PROCESS_ID, "en");
         logger.debug("Form content is '{}'", result);
@@ -108,7 +109,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetTaskFormInPackageViaUIClientTest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
 
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
         assertTrue(processInstanceId > 0);

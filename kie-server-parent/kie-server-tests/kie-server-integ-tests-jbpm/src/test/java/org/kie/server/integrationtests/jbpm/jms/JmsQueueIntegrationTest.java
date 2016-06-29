@@ -36,16 +36,17 @@ import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.category.RemotelyControlled;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.control.ContainerRemoteController;
+import org.kie.server.integrationtests.controller.ContainerRemoteController;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category({JMSOnly.class, RemotelyControlled.class})
 public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static final ReleaseId RELEASE_ID = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
-    private static final String CONTAINER_ID = "definition-project";
 
     private static ContainerRemoteController containerRemoteController;
 
@@ -64,15 +65,15 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         containerRemoteController = new ContainerRemoteController(TestConfig.getContainerId(), TestConfig.getContainerPort());
     }
 
     @Test
     public void testStartProcessFromJmsAfterApplicationStart() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, RELEASE_ID)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, RELEASE_ID)));
 
         // Custom client with reduced timeout
         KieServicesConfiguration customConfig = configuration.clone();

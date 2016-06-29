@@ -31,6 +31,8 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
@@ -47,9 +49,9 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test 
     public void testUseClassWithSameFQNInDifferentContainers() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1)));
 
         Object person = createInstance(PERSON_CLASS_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -70,7 +72,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newFireAllRules());
 
         ServiceResponse<ExecutionResults> response1 = ruleClient.executeCommandsWithResults(CONTAINER_1_ID, batchExecution1);
-        assertSuccess(response1);
+        KieServerAssert.assertSuccess(response1);
         ExecutionResults result1 = response1.getResult();
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
@@ -78,7 +80,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
 
         // now execute the same commands, but for the second container. The rule in there should set different id
         // (namely "Person from kjar2") for the inserted person
-        assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, kjar2)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, kjar2)));
 
         person = createInstance(PERSON_CLASS_NAME);
         commands = new ArrayList<Command<?>>();
@@ -88,7 +90,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newFireAllRules());
 
         ServiceResponse<ExecutionResults> response2 = ruleClient.executeCommandsWithResults(CONTAINER_2_ID, batchExecution2);
-        assertSuccess(response2);
+        KieServerAssert.assertSuccess(response2);
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
