@@ -16,6 +16,7 @@
 package org.kie.server.services.jbpm;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.jbpm.services.api.DefinitionService;
@@ -143,13 +144,18 @@ public class DefinitionServiceBase {
 
         int i = 0;
         for (UserTaskDefinition orig : taskDefinitions) {
+
+            Collection<String> entities = orig.getAssociatedEntities();
+            if (entities == null) {
+                entities = Collections.emptyList();
+            }
             org.kie.server.api.model.definition.UserTaskDefinition definition = org.kie.server.api.model.definition.UserTaskDefinition.builder()
                     .name(orig.getName())
                     .comment(orig.getComment())
                     .createdBy(orig.getCreatedBy())
                     .priority(orig.getPriority())
                     .skippable(orig.isSkippable())
-                    .entities(orig.getAssociatedEntities().toArray(new String[orig.getAssociatedEntities().size()]))
+                    .entities(entities.toArray(new String[entities.size()]))
                     .taskInputs(orig.getTaskInputMappings())
                     .taskOutputs(orig.getTaskOutputMappings())
                     .build();
