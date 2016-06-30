@@ -27,6 +27,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -36,13 +38,12 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
     private static final String DISPOSE_FAILURE_MSG = "Container definition-project failed to dispose, exception was raised: java.lang.IllegalStateException:" +
             " Undeploy forbidden - there are active processes instances for deployment definition-project";
 
-    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -54,29 +55,29 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
 
     @Test
     public void testNotAllowedDisposeContainerDueToActiveProcessInstances() throws Exception {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
-        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
         // dispose not allowed as there is active process instance
-        ServiceResponse<Void> disposeContainerResponse = client.disposeContainer("definition-project");
+        ServiceResponse<Void> disposeContainerResponse = client.disposeContainer(CONTAINER_ID);
 
         assertEquals(ServiceResponse.ResponseType.FAILURE, disposeContainerResponse.getType());
         String failureMessage = disposeContainerResponse.getMsg();
         assertEquals(DISPOSE_FAILURE_MSG, failureMessage);
         // after failed dispose container should be fully operational and in started state
-        ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo("definition-project");
+        ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containerResponse.getType());
         KieContainerResource container = containerResponse.getResult();
         assertNotNull(container);
         assertEquals(KieContainerStatus.STARTED, container.getStatus());
         // let's abort the active instance
-        processClient.abortProcessInstance("definition-project", processInstanceId);
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         // and now proceed with dispose again which must be successful
-        disposeContainerResponse = client.disposeContainer("definition-project");
+        disposeContainerResponse = client.disposeContainer(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeContainerResponse.getType());
     }
 }

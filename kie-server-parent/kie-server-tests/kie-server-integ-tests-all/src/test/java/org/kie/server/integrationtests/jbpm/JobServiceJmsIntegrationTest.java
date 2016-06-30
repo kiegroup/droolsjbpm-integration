@@ -22,7 +22,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -36,6 +35,9 @@ import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 @Category(JMSOnly.class)
 public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -46,14 +48,12 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
     private static final long NUMBER_OF_JOBS = 10;
     private static final long MAXIMUM_PROCESSING_TIME = 20000;
     private static final String CONTAINER_ID = "definition-project";
-    private static final long SERVICE_TIMEOUT = 2000;
-    private static final long TIMEOUT_BETWEEN_CALLS = 100;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -63,7 +63,7 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
         // Test is using JMS, isn't available for local execution.
         Assume.assumeFalse(TestConfig.isLocalServer());
 
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         String businessKey = "test key";
         String command = "org.jbpm.executor.commands.PrintOutCommand";
@@ -88,7 +88,8 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
         // All jobs are processed successfully.
         for (Long jobId : jobIds) {
-            RequestInfoInstance jobRequest = waitForJobToFinish(jobId);
+            KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
+            RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId, false, false);
 
             assertNotNull(jobRequest);
             assertEquals(jobId, jobRequest.getId());
@@ -100,21 +101,5 @@ public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTe
 
         // All jobs should be processed and done in less than 20 s.
         assertTrue("Job processing exceeded expected time! Actual time: " + durationTime + "ms", durationTime < MAXIMUM_PROCESSING_TIME);
-    }
-
-    private RequestInfoInstance waitForJobToFinish(Long jobId) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
-        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
-
-            // If job finished (to one of final states) then return.
-            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
-                STATUS.DONE.toString().equals(result.getStatus()) ||
-                STATUS.ERROR.toString().equals(result.getStatus())) {
-                return result;
-            }
-            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
-        }
-        throw new TimeoutException("Timeout while waiting for job executor to finish job.");
     }
 }

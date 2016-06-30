@@ -1,4 +1,4 @@
-package org.kie.server.controller.client;
+package org.kie.server.integrationtests.controller.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,7 +25,6 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
@@ -47,7 +45,7 @@ import org.kie.server.controller.api.model.spec.ServerConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
-import org.kie.server.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

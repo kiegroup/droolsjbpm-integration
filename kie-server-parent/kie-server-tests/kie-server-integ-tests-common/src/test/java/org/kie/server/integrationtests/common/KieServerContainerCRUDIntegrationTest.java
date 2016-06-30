@@ -29,7 +29,9 @@ import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.Smoke;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
@@ -38,8 +40,8 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId1);
-        createAndDeployKJar(releaseId2);
+        KieServerDeployer.createAndDeployKJar(releaseId1);
+        KieServerDeployer.createAndDeployKJar(releaseId2);
     }
 
     @Test
@@ -128,7 +130,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         ServiceResponse<KieContainerResourceList> listReply = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, listReply.getType());
         List<KieContainerResource> containers = listReply.getResult().getContainers();
-        assertNullOrEmpty("No containers returned!", containers);
+        KieServerAssert.assertNullOrEmpty("No containers returned!", containers);
     }
 
     @Test

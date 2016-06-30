@@ -43,9 +43,9 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.integrationtests.category.Smoke;
-import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -64,9 +64,9 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId);
+        KieServerDeployer.createAndDeployKJar(releaseId);
 
-        File jar = KieServerBaseIntegrationTest.getRepository().resolveArtifact(releaseId).getFile();
+        File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
     }
 

@@ -14,6 +14,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -28,8 +30,8 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
     }
 
     /**
@@ -37,7 +39,7 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
      */
     @Test
     public void testAgendaGroup() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
@@ -49,7 +51,7 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);
@@ -65,7 +67,7 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
      */
     @Test
     public void testClearAgendaGroup() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
@@ -80,7 +82,7 @@ public class AgendaGroupIntegrationTest extends DroolsKieServerBaseIntegrationTe
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);

@@ -15,23 +15,13 @@
 
 package org.kie.server.integrationtests.controller;
 
-import java.util.Calendar;
-import java.util.concurrent.TimeoutException;
-
 import org.junit.After;
 import org.junit.Before;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceList;
-import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.controller.client.KieServerControllerClient;
+import org.kie.server.integrationtests.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public abstract class KieControllerBaseTest extends RestOnlyBaseIntegrationTest {
-
-    private static final long SYNCHRONIZATION_TIMEOUT = 2000;
-    private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     protected KieServerControllerClient controllerClient;
 
@@ -50,32 +40,4 @@ public abstract class KieControllerBaseTest extends RestOnlyBaseIntegrationTest 
         controllerClient.close();
     }
 
-    protected void waitForKieServerSynchronization(int numberOfExpectedContainers) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SYNCHRONIZATION_TIMEOUT;
-        while(Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
-
-            // If synchronization finished (number of containers same as expected) then return.
-            if (containersList.getResult().getContainers() == null) {
-                if(numberOfExpectedContainers == 0) {
-                    return;
-                }
-            } else if (numberOfExpectedContainers == containersList.getResult().getContainers().size()) {
-                // Check that all containers are created or disposed.
-                boolean containersInitializing = false;
-                for (KieContainerResource container : containersList.getResult().getContainers()) {
-                    if (KieContainerStatus.CREATING.equals(container.getStatus()) ||
-                            KieContainerStatus.DISPOSING.equals(container.getStatus())) {
-                        containersInitializing = true;
-                    }
-                }
-                if (!containersInitializing) {
-                    return;
-                }
-            }
-
-            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
-        }
-        throw new TimeoutException("Timeout while waiting for kie server synchronization.");
-    }
 }

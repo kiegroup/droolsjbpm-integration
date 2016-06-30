@@ -19,15 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.command.BatchExecutionCommand;
-import org.kie.api.command.Command;
-import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieScannerResource;
@@ -36,7 +30,8 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -46,8 +41,8 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId1);
-        createAndDeployKJar(releaseId2);
+        KieServerDeployer.createAndDeployKJar(releaseId1);
+        KieServerDeployer.createAndDeployKJar(releaseId2);
     }
 
     @Test
