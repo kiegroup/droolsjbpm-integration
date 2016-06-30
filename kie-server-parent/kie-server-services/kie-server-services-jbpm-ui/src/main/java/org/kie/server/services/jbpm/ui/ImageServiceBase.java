@@ -101,6 +101,11 @@ public class ImageServiceBase {
                     completed.add(nodeId);
                 }
             }
+            // remove completed from active
+            for (String completedNode : completed) {
+                // if it has the exit type it's then not active anymore
+                active.remove(completedNode);
+            }
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
             imageSVGString = SVGImageProcessor.transform(svgStream, completed, active);
