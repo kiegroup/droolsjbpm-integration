@@ -32,6 +32,8 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -51,8 +53,8 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/per-process-instance-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/per-process-instance-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -64,7 +66,7 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithBusinessRuleTask() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Long processInstanceId1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID);
         assertNotNull(processInstanceId1);
@@ -100,7 +102,7 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         commands.add(commandsFactory.newInsert(person));
 
-        assertSuccess(ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand));
+        KieServerAssert.assertSuccess(ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand));
     }
 
     private void checkSinglePersonFact(Object person, String kieSession) {

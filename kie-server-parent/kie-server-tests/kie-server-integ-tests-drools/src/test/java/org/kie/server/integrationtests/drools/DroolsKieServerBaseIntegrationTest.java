@@ -15,19 +15,14 @@
 
 package org.kie.server.integrationtests.drools;
 
-import java.lang.reflect.Field;
-
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
-import org.kie.api.command.KieCommands;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.RuleServicesClient;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class DroolsKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
-
-    protected static KieCommands commandsFactory;
 
     protected RuleServicesClient ruleClient;
 
@@ -47,23 +42,4 @@ public abstract class DroolsKieServerBaseIntegrationTest extends RestJmsSharedBa
         this.ruleClient = kieServicesClient.getServicesClient(RuleServicesClient.class);
     }
 
-    protected Object valueOf(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    protected void setValue(Object object, String fieldName, Object newValue) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(object, newValue);
-        } catch (Exception e) {
-            throw new RuntimeException(String.format("Unable to set value to field %s in object %s due " + e.getMessage(), fieldName, object), e);
-        }
-    }
 }

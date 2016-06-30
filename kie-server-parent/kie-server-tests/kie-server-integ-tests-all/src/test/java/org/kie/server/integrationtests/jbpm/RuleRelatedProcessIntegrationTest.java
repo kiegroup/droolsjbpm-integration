@@ -32,6 +32,8 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.TaskSummary;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -46,8 +48,8 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -59,15 +61,15 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithBusinessRuleTask() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, "business-rule-task");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
-        Object person = createPersonInstance("yoda");
+        Object person = createPersonInstance(USER_YODA);
 
         try {
-            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -88,16 +90,16 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             // startTask and completeTask task
-            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), "yoda");
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
             Map<String, Object> taskOutcome = new HashMap<String, Object>();
             taskOutcome.put("string_", "my custom data");
-            taskOutcome.put("person_", createPersonInstance("mary"));
+            taskOutcome.put("person_", createPersonInstance(USER_MARY));
 
-            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), "yoda", taskOutcome);
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, taskOutcome);
 
             // check if it was moved to another human task
-            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -132,12 +134,12 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
     @Test
     public void testProcessWithConditionalEvent() throws Exception {
 
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, "conditionalevent");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
         try {
-            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());
@@ -145,15 +147,15 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals("Before rule", taskSummary.getName());
 
             // startTask and completeTask task
-            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), "yoda");
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
             Map<String, Object> taskOutcome = new HashMap<String, Object>();
             taskOutcome.put("string_", "my custom data");
-            taskOutcome.put("person_", createPersonInstance("mary"));
+            taskOutcome.put("person_", createPersonInstance(USER_MARY));
 
-            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), "yoda", taskOutcome);
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, taskOutcome);
 
-            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(0, taskList.size());
@@ -163,7 +165,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             List<Command<?>> commands = new ArrayList<Command<?>>();
             BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID); // use container id as ksession id to use ksession from jBPM extension
 
-            Object person = createPersonInstance("yoda");
+            Object person = createPersonInstance(USER_YODA);
             commands.add(commandsFactory.newInsert(person, "person-yoda"));
 
 
@@ -171,7 +173,7 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
             // check if it was moved to another human task
-            taskList = taskClient.findTasksAssignedAsPotentialOwner("yoda", 0, 10);
+            taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
 
             assertEquals(1, taskList.size());

@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.control;
+package org.kie.server.integrationtests.controller;
 
 import org.codehaus.cargo.container.Container;
 import org.codehaus.cargo.container.ContainerType;

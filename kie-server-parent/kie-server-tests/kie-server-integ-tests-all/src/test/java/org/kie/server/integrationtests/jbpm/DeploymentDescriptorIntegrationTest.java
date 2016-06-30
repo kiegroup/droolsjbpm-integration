@@ -19,22 +19,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -51,8 +49,8 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/deployment-descriptor-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/deployment-descriptor-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -64,7 +62,7 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
     @Test
     public void testGlobalVariableFromDeploymentDescriptor() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);
@@ -85,9 +83,9 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
     @Test
     public void testPerRequestRuntimeStrategy() throws Exception {
         String personOutIdentifier = "personOut";
-        String personName = "yoda";
+        String personName = USER_YODA;
 
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);
@@ -114,6 +112,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         actualData = reply.getResult();
         assertNotNull(actualData);
         personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
-        assertNullOrEmpty("Person object was returned!", personVar);
+        KieServerAssert.assertNullOrEmpty("Person object was returned!", personVar);
     }
 }

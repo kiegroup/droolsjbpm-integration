@@ -29,6 +29,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -45,13 +47,13 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/ruleflow-group").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/ruleflow-group").getFile());
     }
 
     @Test
     public void testExecuteSimpleRuleFlowProcess() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -62,7 +64,7 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
@@ -75,7 +77,7 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
 
     @Test
     public void testExecuteSimpleRuleFlowProcessInStatelessSession() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION_STATELESS);
@@ -86,7 +88,7 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);
@@ -99,7 +101,7 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
 
     @Test
     public void testClearRuleFlowGroup() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -113,7 +115,7 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<String> outcome = (List<String>) result.getValue(LIST_OUTPUT_NAME);

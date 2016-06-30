@@ -34,6 +34,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -54,8 +55,8 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
@@ -130,8 +131,8 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         actualData = reply2.getResult();
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
-        // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        // and 'duplicated' flag should be true, because second person was added
+        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
     }
 
@@ -202,14 +203,14 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
         assertEquals("Expected surname to be set to 'Vader'.", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
-        // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        // and 'duplicated' flag should be true, because was added 2 persons
+        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
 
         assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
-        // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        // and 'duplicated' flag should be true, because was added 2 persons
+        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
         QueryResults queryResult = (QueryResults) actualData.getValue("query-result");
         assertNotNull(queryResult);

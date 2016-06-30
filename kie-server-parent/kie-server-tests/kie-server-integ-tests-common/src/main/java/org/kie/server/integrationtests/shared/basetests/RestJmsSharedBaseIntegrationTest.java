@@ -13,17 +13,20 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.shared;
+package org.kie.server.integrationtests.shared.basetests;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.jms.ConnectionFactory;
+import javax.jms.Queue;
+import javax.naming.InitialContext;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.kie.api.command.KieCommands;
+import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -66,52 +69,20 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
     @Parameterized.Parameter(1)
     public KieServicesConfiguration configuration;
 
-    protected Map<String, Class<?>> extraClasses = new ConcurrentHashMap<String, Class<?>>();
+    protected static KieCommands commandsFactory;
+    protected static KieContainer kieContainer;
 
+    protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
+
+    @Override
     protected KieServicesClient createDefaultClient() throws Exception {
-        KieServicesClient kieServicesClient = null;
-        // Add all extra custom classes defined in tests.
         addExtraCustomClasses(extraClasses);
         if (TestConfig.isLocalServer()) {
             configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), null, null);
         }
-
-        configuration.setMarshallingFormat(marshallingFormat);
-        configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
-        additionalConfiguration(configuration);
-
-        if(extraClasses.size() > 0) {
-            // Use classloader of extra classes as client classloader
-            ClassLoader classLoader = extraClasses.values().iterator().next().getClassLoader();
-            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration, classLoader);
-        } else {
-            kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
-        }
-        setupClients(kieServicesClient);
-        return kieServicesClient;
+        return createDefaultClient(configuration, marshallingFormat);
     }
 
-    /**
-     * Add custom classes needed by marshallers.
-     *
-     * @param extraClasses Map with classname keys and respective Class instances.
-     */
-    protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {}
-
-    /**
-     * Additional configuration of KieServicesConfiguration like timeout and such.
-     *
-     * @param configuration Kie server configuration to be configured.
-     */
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {}
-
-    /**
-     * Initialize Execution server clients.
-     * Override to initialize specific clients.
-     *
-     * @param kieServicesClient Kie services client.
-     */
-    protected void setupClients(KieServicesClient kieServicesClient){}
 
     /**
      * Instantiate custom object.
@@ -137,4 +108,64 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         }
         throw new RuntimeException("Instantiated class isn't defined in extraClasses set. Please define it first.");
     }
+
+    protected Object createPersonInstance(String name) {
+        return createInstance(PERSON_CLASS_NAME, name);
+    }
+
+    /**
+     * Change user used by client.
+     *
+     * @param username Name of user, default user taken from TestConfig in case of null parameter.
+     */
+    protected void changeUser(String username) throws Exception {
+        if(username == null) {
+            username = TestConfig.getUsername();
+        }
+        configuration.setUserName(username);
+        client = createDefaultClient();
+    }
+
+    protected Object valueOf(Object object, String fieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(object);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    protected void setValue(Object object, String fieldName, Object newValue) {
+        try {
+            Field field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(object, newValue);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Unable to set value to field %s in object %s due " + e.getMessage(), fieldName, object), e);
+        }
+    }
+
+    protected static KieServicesConfiguration createKieServicesJmsConfiguration() {
+        try {
+            InitialContext context = TestConfig.getInitialRemoteContext();
+
+            Queue requestQueue = (Queue) context.lookup(TestConfig.getRequestQueueJndi());
+            Queue responseQueue = (Queue) context.lookup(TestConfig.getResponseQueueJndi());
+            ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup(TestConfig.getConnectionFactory());
+
+            KieServicesConfiguration jmsConfiguration = KieServicesFactory.newJMSConfiguration(
+                    connectionFactory, requestQueue, responseQueue, TestConfig.getUsername(),
+                    TestConfig.getPassword());
+
+            return jmsConfiguration;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create JMS client configuration!", e);
+        }
+    }
+
+    protected static KieServicesConfiguration createKieServicesRestConfiguration() {
+        return KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
+    }
+
 }

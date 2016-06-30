@@ -35,8 +35,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -55,20 +54,15 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
 
     @BeforeClass
     public static void initialize() throws Exception {
-        createAndDeployKJar(releaseId);
+        KieServerDeployer.createAndDeployKJar(releaseId);
 
-        File jar = KieServerBaseIntegrationTest.getRepository().resolveArtifact(releaseId).getFile();
+        File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
     }
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(MESSAGE_CLASS_NAME, Class.forName(MESSAGE_CLASS_NAME, true, kjarClassLoader));
-    }
-
-    @Override
-    protected KieServicesClient createDefaultClient() throws Exception {
-        return super.createDefaultClient();
     }
 
     @Test

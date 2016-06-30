@@ -15,23 +15,15 @@
 
 package org.kie.server.integrationtests.optaplanner;
 
-import java.lang.reflect.Field;
-import java.util.HashSet;
-
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
-import org.kie.api.command.KieCommands;
-import org.kie.api.runtime.KieContainer;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.SolverServicesClient;
-import org.kie.server.integrationtests.shared.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class OptaplannerKieServerBaseIntegrationTest
         extends RestJmsSharedBaseIntegrationTest {
-
-    protected static KieCommands commandsFactory;
-    protected static KieContainer kieContainer;
 
     protected SolverServicesClient solverClient;
 
@@ -52,14 +44,5 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         configuration.setTimeout(60000);
     }
 
-    protected Object valueOf(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
-            return field.get( object );
-        } catch ( Exception e ) {
-            return null;
-        }
-    }
 
 }

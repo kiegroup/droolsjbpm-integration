@@ -15,24 +15,14 @@
 
 package org.kie.server.integrationtests.drools.rest;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.util.GenericType;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.api.KieServices;
-import org.kie.api.command.BatchExecutionCommand;
-import org.kie.internal.runtime.helper.BatchExecutionHelper;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
@@ -40,12 +30,13 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category(RESTOnly.class)
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -57,8 +48,8 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
 
     }
 

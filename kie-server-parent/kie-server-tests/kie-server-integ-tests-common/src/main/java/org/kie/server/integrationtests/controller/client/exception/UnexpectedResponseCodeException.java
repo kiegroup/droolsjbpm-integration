@@ -1,4 +1,4 @@
-package org.kie.server.controller.client.exception;
+package org.kie.server.integrationtests.controller.client.exception;
 
 public class UnexpectedResponseCodeException extends RuntimeException{
 

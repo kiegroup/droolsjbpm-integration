@@ -17,7 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import org.junit.rules.ExternalResource;
-import org.kie.server.integrationtests.shared.KieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 
 public class DBExternalResource extends ExternalResource {
     PoolingDataSource pds;
