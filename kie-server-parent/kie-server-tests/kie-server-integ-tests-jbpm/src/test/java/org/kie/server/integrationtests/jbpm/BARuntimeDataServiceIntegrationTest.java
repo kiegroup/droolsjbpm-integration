@@ -30,6 +30,8 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -37,14 +39,13 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
-    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -57,43 +58,43 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
     @Test
     public void testFindTaskAssignedAsBusinessAdmin() throws Exception {
         changeUser(USER_ADMINISTRATOR);
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
-        Long processInstanceId = processClient.startProcess("definition-project", "definition-project.usertask", parameters);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
 
         try {
 
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator("Administrator", 0, 10);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             assertNotNull(tasks);
             assertEquals(1, tasks.size());
 
             TaskSummary taskInstance = tasks.get(0);
             assertNotNull(taskInstance);
             assertEquals("First task", taskInstance.getName());
-            assertNullOrEmpty(taskInstance.getDescription());
+            KieServerAssert.assertNullOrEmpty(taskInstance.getDescription());
             assertEquals("Reserved", taskInstance.getStatus());
             assertEquals(0, taskInstance.getPriority().intValue());
-            assertEquals("yoda", taskInstance.getActualOwner());
-            assertEquals("yoda", taskInstance.getCreatedBy());
-            assertEquals("definition-project.usertask", taskInstance.getProcessId());
-            assertEquals("definition-project", taskInstance.getContainerId());
+            assertEquals(USER_YODA, taskInstance.getActualOwner());
+            assertEquals(USER_YODA, taskInstance.getCreatedBy());
+            assertEquals(PROCESS_ID_USERTASK, taskInstance.getProcessId());
+            assertEquals(CONTAINER_ID, taskInstance.getContainerId());
             assertEquals(-1, taskInstance.getParentId().longValue());
             assertEquals(processInstanceId, taskInstance.getProcessInstanceId());
 
             List<String> status = new ArrayList<String>();
             status.add(Status.InProgress.toString());
 
-            tasks = taskClient.findTasksAssignedAsBusinessAdministrator("Administrator", status, 0, 10);
+            tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, status, 0, 10);
             assertNotNull(tasks);
             assertEquals(0, tasks.size());
 
 
         } finally {
-            processClient.abortProcessInstance("definition-project", processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             changeUser(TestConfig.getUsername());
         }
     }

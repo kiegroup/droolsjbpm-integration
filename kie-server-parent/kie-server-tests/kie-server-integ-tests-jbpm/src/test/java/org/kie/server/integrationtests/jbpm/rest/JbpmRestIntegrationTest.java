@@ -34,12 +34,14 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.api.rest.RestURI.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -55,8 +57,8 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rest-processes").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/rest-processes").getFile());
         // set the accepted formats with quality param to express preference
         acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
@@ -85,12 +87,13 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 //    private static final String GROUP_ASSSIGN_VAR_PROCESS_ID = "org.test.kjar.groupAssign";
 //    private static final String CLASSPATH_OBJECT_PROCESS_ID  = "org.test.kjar.classpath.process";
 
-    private static final String HUMAN_TASK_OWN_TYPE_ID       = "org.test.kjar.HumanTaskWithOwnType";
-
+    private static final String CONTAINER = "rest-processes";
+    private static final String HUMAN_TASK_OWN_TYPE_ID = "org.test.kjar.HumanTaskWithOwnType";
+    
     @Test
     public void testBasicJbpmRequest() throws Exception {
-        KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
-        assertSuccess(client.createContainer("rest-processes", resource));
+        KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
@@ -124,8 +127,8 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @Test
     public void testBasicJbpmRequestWithSingleAcceptHeader() throws Exception {
-        KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
-        assertSuccess(client.createContainer("rest-processes", resource));
+        KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
@@ -161,8 +164,8 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @Test
     public void testBasicJbpmRequestManyAcceptHeaders() throws Exception {
-        KieContainerResource resource = new KieContainerResource("rest-processes", releaseId);
-        assertSuccess(client.createContainer("rest-processes", resource));
+        KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());

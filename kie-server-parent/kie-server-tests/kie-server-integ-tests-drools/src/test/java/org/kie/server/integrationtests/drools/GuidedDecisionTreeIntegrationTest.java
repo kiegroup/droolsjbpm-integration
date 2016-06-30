@@ -30,6 +30,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 /**
  * Test used for verification of spreadsheet decision table processing.
@@ -48,8 +50,8 @@ public class GuidedDecisionTreeIntegrationTest extends DroolsKieServerBaseIntegr
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/tdrl-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/tdrl-project").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
@@ -61,7 +63,7 @@ public class GuidedDecisionTreeIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test
     public void testExecuteGuidedDecisionTableRule() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
@@ -71,7 +73,7 @@ public class GuidedDecisionTreeIntegrationTest extends DroolsKieServerBaseIntegr
         commands.add(commandsFactory.newFireAllRules());
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults results = response.getResult();
         Object value = results.getValue(PERSON_OUT_IDENTIFIER);
         assertEquals("Bob", valueOf(value, PERSON_SURNAME_FIELD));

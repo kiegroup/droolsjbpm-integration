@@ -14,6 +14,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -28,8 +30,8 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/activation-group").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/activation-group").getFile());
     }
 
     /**
@@ -37,7 +39,7 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
      */
     @Test
     public void testActivationGroup() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
@@ -48,7 +50,7 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);
@@ -65,7 +67,7 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
      */
     @Test
     public void testClearActivationGroup() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
@@ -79,7 +81,7 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);

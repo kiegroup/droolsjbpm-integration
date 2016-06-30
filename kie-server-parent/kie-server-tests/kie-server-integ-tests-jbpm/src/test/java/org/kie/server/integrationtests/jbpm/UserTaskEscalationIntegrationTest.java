@@ -40,6 +40,8 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.category.Email;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
@@ -55,7 +57,6 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
-    private static final String CONTAINER_ID = "definition-project";
 
     private final static Map<String, Object> params = new HashMap<String, Object>();
 
@@ -85,13 +86,13 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
     }
 
     @Test
     public void testEscalation() throws InterruptedException, MessagingException, Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
         assertNotNull(processInstanceId);
@@ -142,7 +143,7 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testCompleteTaskBeforeEscalation() throws InterruptedException {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
         assertNotNull(processInstanceId);
@@ -166,11 +167,11 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(processInstance);
         assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
-        assertNullOrEmpty("Email recieved!", wiser.getMessages());
+        KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
 
         //wait while, cause email is sended 2s after task start
         Thread.sleep(3000l);
-        assertNullOrEmpty("Email recieved!", wiser.getMessages());
+        KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
     }
 
     private void assertEmails(final String subj) throws MessagingException, IOException {
@@ -200,6 +201,9 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
             }
         }
     }
+
+    private static final long SERVICE_TIMEOUT = 30000;
+    private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     protected void waitForEmailsRecieve(Wiser wiser) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;

@@ -35,6 +35,8 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class OptaplannerIntegrationTest
         extends OptaplannerKieServerBaseIntegrationTest {
@@ -54,8 +56,8 @@ public class OptaplannerIntegrationTest
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/cloudbalance" ).getFile() );
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/cloudbalance" ).getFile() );
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
     }
@@ -72,9 +74,9 @@ public class OptaplannerIntegrationTest
     @Test
     public void testCreateDisposeSolver()
             throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
-        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
-        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
+        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     @Test
@@ -84,37 +86,37 @@ public class OptaplannerIntegrationTest
 
         ServiceResponse.ResponseType type = createSolverResponse.getType();
         assertEquals( "Expected FAILURE response, but got " + type + "!", ServiceResponse.ResponseType.FAILURE, type );
-        assertResultContainsString( createSolverResponse.getMsg(), "Failed to create solver. Container does not exist" );
+        KieServerAssert.assertResultContainsString( createSolverResponse.getMsg(), "Failed to create solver. Container does not exist" );
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateSolverWithoutSolverInstance() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
         ServiceResponse<SolverInstance> createSolverResponse = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, null);
     }
 
     @Test
     public void testCreateSolverWrongSolverInstanceConfigPath() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
         ServiceResponse<SolverInstance> createSolverResponse = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, "NonExistingPath");
 
         ServiceResponse.ResponseType type = createSolverResponse.getType();
         assertEquals( "Expected FAILURE response, but got " + type + "!", ServiceResponse.ResponseType.FAILURE, type );
-        assertResultContainsStringRegex( createSolverResponse.getMsg(), ".*The solverConfigResource.*does not exist as a classpath resource in the classLoader.*" );
+        KieServerAssert.assertResultContainsStringRegex( createSolverResponse.getMsg(), ".*The solverConfigResource.*does not exist as a classpath resource in the classLoader.*" );
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateSolverNullContainer() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
         solverClient.createSolver( null, SOLVER_1_ID, null );
     }
 
     @Test
     public void testCreateDuplicitSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         ServiceResponse<SolverInstance> createSolverResponse = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
-        assertSuccess(createSolverResponse);
+        KieServerAssert.assertSuccess(createSolverResponse);
 
         createSolverResponse = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
         ServiceResponse.ResponseType type = createSolverResponse.getType();
@@ -127,17 +129,17 @@ public class OptaplannerIntegrationTest
             solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID );
             fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
-            assertResultContainsStringRegex(e.getMessage(), ".*Solver.*from container.*not found.*");
+            KieServerAssert.assertResultContainsStringRegex(e.getMessage(), ".*Solver.*from container.*not found.*");
         }
     }
 
     @Test
     public void testGetSolverState() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
-        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
 
         ServiceResponse<SolverInstance> solverState = solverClient.getSolverState(CONTAINER_1_ID, SOLVER_1_ID);
-        assertSuccess(solverState);
+        KieServerAssert.assertSuccess(solverState);
 
         SolverInstance returnedInstance = solverState.getResult();
         assertEquals(CONTAINER_1_ID, returnedInstance.getContainerId());
@@ -150,27 +152,27 @@ public class OptaplannerIntegrationTest
 
     @Test
     public void testGetNotExistingSolverState() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         try {
             solverClient.getSolverState(CONTAINER_1_ID, SOLVER_1_ID);
             fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
-            assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
+            KieServerAssert.assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
     }
 
     @Test
     public void testGetSolvers() throws Exception {
         ServiceResponse<SolverInstanceList> solvers = solverClient.getSolvers(CONTAINER_1_ID);
-        assertSuccess(solvers);
+        KieServerAssert.assertSuccess(solvers);
         assertEquals( 0, solvers.getResult().getContainers().size() );
 
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
-        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
 
         solvers = solverClient.getSolvers(CONTAINER_1_ID);
-        assertSuccess(solvers);
+        KieServerAssert.assertSuccess(solvers);
         assertEquals( 1, solvers.getResult().getContainers().size() );
 
         SolverInstance returnedInstance = solvers.getResult().getContainers().get(0);
@@ -184,10 +186,10 @@ public class OptaplannerIntegrationTest
 
     @Test
     public void testExecuteSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
 
         // the following status starts the solver
@@ -195,26 +197,26 @@ public class OptaplannerIntegrationTest
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
         instance.setPlanningProblem( loadPlanningProblem( 5, 15 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
 
         // solver should finish in 5 seconds, but we wait up to 15s before timing out
         for( int i = 0; i < 5 && response.getResult().getStatus() == SolverInstance.SolverStatus.SOLVING; i++ ) {
             Thread.sleep( 3000 );
             response = solverClient.getSolverState( CONTAINER_1_ID, SOLVER_1_ID );
-            assertSuccess( response );
+            KieServerAssert.assertSuccess( response );
         }
 
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
 
-        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     @Test
     public void testExecuteRunningSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
 
         // start solver
@@ -222,30 +224,30 @@ public class OptaplannerIntegrationTest
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
         instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
 
         // start solver again
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
-        assertResultContainsStringRegex( response.getMsg(), "Solver.*on container.*is already executing." );
+        KieServerAssert.assertSuccess( response );
+        KieServerAssert.assertResultContainsStringRegex( response.getMsg(), "Solver.*on container.*is already executing." );
 
-        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     @Test(timeout = 60000)
     @Ignore("Needs to be fixed, failing randomly due to PLANNER-560")
     public void testGetBestSolution() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
-        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
+        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
 
         // the following status starts the solver
         SolverInstance instance = new SolverInstance();
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
         instance.setPlanningProblem( loadPlanningProblem( 10, 30 ) );
         ServiceResponse<SolverInstance> response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
 
         Solution solution = null;
@@ -253,7 +255,7 @@ public class OptaplannerIntegrationTest
         // The test timeout will interrupt this thread if it takes too long
         while (!Thread.currentThread().isInterrupted()) {
             ServiceResponse<SolverInstance> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
-            assertSuccess(solutionResponse);
+            KieServerAssert.assertSuccess(solutionResponse);
             solution = solutionResponse.getResult().getBestSolution();
             // Only once the solution's score is null, the solution is fully uninitialized
             // TODO add "|| solution.getScore().isInitialized()" once PLANNER-405 is fixed
@@ -274,24 +276,24 @@ public class OptaplannerIntegrationTest
             assertNotNull(computer);
         }
 
-        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     @Test
     public void testGetBestSolutionNotExistingSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         try {
             solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
             fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
-            assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
+            KieServerAssert.assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
     }
 
     @Test
     public void testTerminateEarlyNotExistingSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         SolverInstance instance = new SolverInstance();
         instance.setSolverConfigFile( SOLVER_1_CONFIG );
@@ -300,28 +302,28 @@ public class OptaplannerIntegrationTest
             solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
             fail("A KieServicesException should have been thrown by now.");
         } catch (KieServicesException e) {
-            assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
+            KieServerAssert.assertResultContainsStringRegex(e.getMessage(), ".*Solver.*not found in container.*");
         }
     }
 
     @Test
     public void testTerminateEarlyStoppedSolver() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
-        assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
 
         SolverInstance instance = new SolverInstance();
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         ServiceResponse<SolverInstance> updateSolverState = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( updateSolverState );
-        assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
+        KieServerAssert.assertSuccess( updateSolverState );
+        KieServerAssert.assertResultContainsStringRegex(updateSolverState.getMsg(), "Solver.*on container.*already terminated.");
     }
 
     @Test
     public void testTerminateEarly() throws Exception {
-        assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
+        KieServerAssert.assertSuccess( client.createContainer( CONTAINER_1_ID, new KieContainerResource( CONTAINER_1_ID, kjar1 ) ) );
 
         ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
 
         // start solver
@@ -329,18 +331,18 @@ public class OptaplannerIntegrationTest
         instance.setStatus( SolverInstance.SolverStatus.SOLVING );
         instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
 
         // and then terminate it
         instance.setStatus( SolverInstance.SolverStatus.NOT_SOLVING );
         instance.setPlanningProblem(null);
         response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        assertSuccess( response );
+        KieServerAssert.assertSuccess( response );
         assertTrue(response.getResult().getStatus() == SolverInstance.SolverStatus.TERMINATING_EARLY
                 || response.getResult().getStatus() == SolverInstance.SolverStatus.NOT_SOLVING);
 
-        assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
+        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
     public Solution loadPlanningProblem( int computerListSize, int processListSize ) {

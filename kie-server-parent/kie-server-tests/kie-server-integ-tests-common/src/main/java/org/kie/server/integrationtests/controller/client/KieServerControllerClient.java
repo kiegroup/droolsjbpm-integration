@@ -1,4 +1,4 @@
-package org.kie.server.controller.client;
+package org.kie.server.integrationtests.controller.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,7 +30,7 @@ import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.controller.api.model.KieServerStatus;
-import org.kie.server.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

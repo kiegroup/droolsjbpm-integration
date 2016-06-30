@@ -15,6 +15,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -34,8 +36,8 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
@@ -47,7 +49,7 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
 
     @Test
     public void testGetObjects() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
@@ -59,7 +61,7 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
         commands.add(commandsFactory.newGetObjects(GET_OBJECTS_IDENTIFIER));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
 
         ExecutionResults actualData = response.getResult();
         List<Object> listOfObjects = (List<Object>) actualData.getValue(GET_OBJECTS_IDENTIFIER);

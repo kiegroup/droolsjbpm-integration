@@ -14,21 +14,23 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "agenda-group",
             "1.0.0.Final");
 
-    private static final String CONTAINER_ID = "activation";
+    private static final String CONTAINER_ID = "agenda";
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
     private static final String KIE_SESSION = "defaultKieSession";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
     }
 
     /**
@@ -36,7 +38,7 @@ public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
      */
     @Test
     public void testClearAgenda() {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
@@ -50,7 +52,7 @@ public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
 
         ServiceResponse<ExecutionResults> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertSuccess(response);
+        KieServerAssert.assertSuccess(response);
         ExecutionResults result = response.getResult();
 
         List<?> outcome = (List<?>) result.getValue(LIST_OUTPUT_NAME);

@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -36,6 +36,8 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.QueryServicesClient;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -43,13 +45,12 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             "1.0.0.Final");
 
     private static final String CONTAINER_ID = "query-definition-project";
-    private static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/query-definition-project").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/query-definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
     }
@@ -68,19 +69,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testCRUDOnQueryDefinition() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstances");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ProcessInstanceLog where status = 1");
-        query.setTarget("PROCESS");
+        QueryDefinition query = createQueryDefinition("PROCESS");
         try {
 
             queryClient.registerQuery(query);
@@ -117,19 +114,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataService() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstances");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ProcessInstanceLog where status = 1");
-        query.setTarget("CUSTOM");
+        QueryDefinition query = createQueryDefinition("CUSTOM");
         try {
 
             queryClient.registerQuery(query);
@@ -158,11 +151,11 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithVariablesQueryDataService() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
@@ -205,11 +198,11 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesFilteredWithVariablesQueryDataService() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
@@ -254,19 +247,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceUsingCustomMapper() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstances");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ProcessInstanceLog where status = 1");
-        query.setTarget("CUSTOM");
+        QueryDefinition query = createQueryDefinition("CUSTOM");
         try {
 
             queryClient.registerQuery(query);
@@ -295,19 +284,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilder() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstances");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ProcessInstanceLog where status = 1");
-        query.setTarget("CUSTOM");
+        QueryDefinition query = createQueryDefinition("CUSTOM");
         try {
 
             queryClient.registerQuery(query);
@@ -329,19 +314,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceRawMapper() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(USER_JOHN));
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
-        QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstances");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ProcessInstanceLog where status = 1");
-        query.setTarget("CUSTOM");
+        QueryDefinition query = createQueryDefinition("CUSTOM");
         try {
 
             queryClient.registerQuery(query);
@@ -371,13 +352,13 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testQueryDataServiceReplaceQuery() throws Exception {
-        assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
-        parameters.put("personData", createPersonInstance("john"));
+        parameters.put("personData", createPersonInstance(CONTAINER_ID));
 
-        Long pid = processClient.startProcess(CONTAINER_ID, "definition-project.usertask", parameters);
+        Long pid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
 
         QueryDefinition query = new QueryDefinition();
         query.setName("getTasksByState");
@@ -413,14 +394,23 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         }
     }
 
+    private QueryDefinition createQueryDefinition(String target) {
+        QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstances");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
+        query.setTarget(target);
+        return query;
+    }
+
     protected List<Long> createProcessInstances(Map<String, Object> parameters) {
         List<Long> processInstanceIds = new ArrayList<Long>();
 
-        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, "definition-project.signalprocess", parameters));
-        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, "definition-project.usertask", parameters));
-        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, "definition-project.signalprocess", parameters));
-        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, "definition-project.usertask", parameters));
-        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, "definition-project.signalprocess", parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
 
         Collections.sort(processInstanceIds);
         return processInstanceIds;

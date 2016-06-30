@@ -30,6 +30,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -50,8 +51,8 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/classes-included-kjar").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/classes-included-kjar").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
@@ -102,8 +103,8 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
         actualData = reply2.getResult();
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
-        // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        // and 'duplicated' flag should be true, because second person was added.
+        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
 
     }
 

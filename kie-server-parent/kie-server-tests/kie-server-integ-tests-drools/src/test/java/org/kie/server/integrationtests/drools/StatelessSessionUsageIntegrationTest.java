@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -35,6 +34,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -53,8 +53,8 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
 
     @BeforeClass
     public static void deployArtifacts() {
-        buildAndDeployCommonMavenParent();
-        buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+        KieServerDeployer.buildAndDeployCommonMavenParent();
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
