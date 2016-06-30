@@ -309,8 +309,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testUserTasksDefinitionWithEmptyAssociatedEntities() {
-        assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
-        UserTaskDefinitionList result = processClient.getUserTaskDefinitions("definition-project", "xyz-translations");
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        UserTaskDefinitionList result = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_XYZ_TRANSLATIONS);
 
         assertNotNull(result);
         UserTaskDefinition[] tasks = result.getTasks();
