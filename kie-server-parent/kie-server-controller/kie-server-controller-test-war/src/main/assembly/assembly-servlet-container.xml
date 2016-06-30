@@ -32,6 +32,10 @@
       <directory>${project.basedir}/src/main/webc-resources</directory>
       <outputDirectory>.</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${project.build.outputDirectory}</directory>
+      <outputDirectory>WEB-INF/classes</outputDirectory>
+    </fileSet>
   </fileSets>
 
   <dependencySets>
