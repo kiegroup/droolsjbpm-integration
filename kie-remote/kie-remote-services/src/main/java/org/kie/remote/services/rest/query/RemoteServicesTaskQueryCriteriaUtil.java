@@ -27,7 +27,7 @@ public class RemoteServicesTaskQueryCriteriaUtil extends TaskSummaryQueryCriteri
 
     // Query Field Info -----------------------------------------------------------------------------------------------------------
 
-    public final static Map<Class, Map<String, Attribute>> criteriaAttributes
+    public static final Map<Class, Map<String, Attribute>> criteriaAttributes
         = RemoteServicesQueryData.criteriaAttributes;
 
     @Override

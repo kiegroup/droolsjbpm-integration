@@ -68,7 +68,7 @@ import static org.kie.server.api.jms.JMSConstants.*;
 public class KieServerMDB
         implements MessageListener {
 
-    private final static Logger logger = LoggerFactory.getLogger( KieServerMDB.class );
+    private static final Logger logger = LoggerFactory.getLogger( KieServerMDB.class );
 
     // Constants / properties
     private              String RESPONSE_QUEUE_NAME          = null;

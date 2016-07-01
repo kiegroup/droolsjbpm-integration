@@ -186,14 +186,14 @@ public abstract class JaxbSerializationProvider implements SerializationProvider
 
     // Other fields, methods, etc -------------------------------------------------------------------------------------------------
 
-    public final static int JMS_SERIALIZATION_TYPE = 0;
+    public static final int JMS_SERIALIZATION_TYPE = 0;
 
     @Override
     public int getSerializationType() {
        return JMS_SERIALIZATION_TYPE;
     }
 
-    public final static String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
+    public static final String EXECUTE_DEPLOYMENT_ID_HEADER = "Kie-Deployment-Id";
 
     private boolean prettyPrint = false;
 

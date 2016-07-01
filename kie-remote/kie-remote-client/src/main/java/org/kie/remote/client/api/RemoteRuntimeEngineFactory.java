@@ -68,7 +68,7 @@ public abstract class RemoteRuntimeEngineFactory {
      * @return a new (remote client) {@link RuntimeEngine} instance.
      * @see {@link RemoteRuntimeEngineBuilder#buildRuntimeEngine()}
      */
-    abstract public RuntimeEngine newRuntimeEngine();
+     public abstract RuntimeEngine newRuntimeEngine();
     
     /**
      * Retrieves the (remote) {@link InitialContext} from the JBoss AS server instance in order 

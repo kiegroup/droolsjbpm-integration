@@ -292,7 +292,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
     }
 
 
-    private synchronized static List<KieServicesClientBuilder> loadClientBuilders() {
+    private static synchronized List<KieServicesClientBuilder> loadClientBuilders() {
         List<KieServicesClientBuilder> builders = new ArrayList<KieServicesClientBuilder>();
         for (KieServicesClientBuilder builder : clientBuilders) {
             builders.add(builder);

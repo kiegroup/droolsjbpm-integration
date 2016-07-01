@@ -40,7 +40,7 @@ import org.kie.services.shared.ServicesVersion;
         targetNamespace = HistoryWebServiceImpl.NAMESPACE)
 public class HistoryWebServiceImpl extends ResourceBase implements HistoryWebService {
 
-    final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
+    static final String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
 
     @Override
     public ProcessInstanceLogResponse findProcessInstanceLogs( HistoryInstanceLogRequest request ) throws HistoryWebServiceException {

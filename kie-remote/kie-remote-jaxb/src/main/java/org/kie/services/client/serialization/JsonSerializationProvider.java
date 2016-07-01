@@ -23,7 +23,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class JsonSerializationProvider implements SerializationProvider {
 
-    public final static int JMS_SERIALIZATION_TYPE = 1;
+    public static final int JMS_SERIALIZATION_TYPE = 1;
 
     private ObjectMapper mapper = new ObjectMapper();
    

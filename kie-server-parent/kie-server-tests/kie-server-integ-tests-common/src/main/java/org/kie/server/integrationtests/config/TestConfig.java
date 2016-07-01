@@ -365,7 +365,7 @@ public class TestConfig {
         }
     }
 
-    private static abstract class TestParameter<T> {
+    private abstract static class TestParameter<T> {
 
         private String key;
         private T defaultValue;
