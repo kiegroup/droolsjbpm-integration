@@ -244,7 +244,7 @@ public class KSessionFactoryBean
     }
 
     public void attachLoggers(KieRuntimeEventManager ksession) {
-        if (loggerAdaptors != null && loggerAdaptors.size() > 0) {
+        if (loggerAdaptors != null && !loggerAdaptors.isEmpty()) {
             KieServices ks = KieServices.Factory.get();
             KieLoggers loggers = ks.getLoggers();
             for (LoggerAdaptor adaptor : loggerAdaptors) {

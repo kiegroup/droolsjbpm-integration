@@ -61,7 +61,7 @@ public class KBaseDefinitionParser extends AbstractBeanDefinitionParser {
 
         element.setAttribute("name", id);
         List<Element> ksessionElements = DomUtils.getChildElementsByTagName(element, "ksession");
-        if (ksessionElements != null && ksessionElements.size() > 0) {
+        if (ksessionElements != null && !ksessionElements.isEmpty()) {
             for (Element kbaseElement : ksessionElements){
                 BeanDefinitionHolder obj = (BeanDefinitionHolder) parserContext.getDelegate().parsePropertySubElement(kbaseElement, null);
                 obj.getBeanDefinition().getPropertyValues().addPropertyValue("kBaseName", id);

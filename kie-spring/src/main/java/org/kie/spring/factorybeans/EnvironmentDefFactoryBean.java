@@ -187,7 +187,7 @@ public class EnvironmentDefFactoryBean implements
             environment.set(EnvironmentName.CALENDARS, calendars);
         }
 
-        if (objectMarshallersOrder != null && objectMarshallersOrder.size() > 0) {
+        if (objectMarshallersOrder != null && !objectMarshallersOrder.isEmpty()) {
             List<ObjectMarshallingStrategy> strategies = getStrategies();
             environment.set(EnvironmentName.OBJECT_MARSHALLING_STRATEGIES, strategies.toArray(new ObjectMarshallingStrategy[]{}));
         }

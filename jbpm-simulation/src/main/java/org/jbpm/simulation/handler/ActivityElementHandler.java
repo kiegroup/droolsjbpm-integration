@@ -30,14 +30,14 @@ public class ActivityElementHandler extends MainElementHandler {
 
     public boolean handle(FlowElement element, PathContextManager manager) {
         List<SequenceFlow> outgoing = new ArrayList<SequenceFlow>(getOutgoing(element));
-        if (outgoing.size() == 0) {
+        if (outgoing.isEmpty()) {
             return false;
         }
         
         PathContext context = manager.getContextFromStack();
         
         List<BoundaryEvent> bEvents = ((Activity) element).getBoundaryEventRefs();
-        if (bEvents != null && bEvents.size() > 0) {
+        if (bEvents != null && !bEvents.isEmpty()) {
             boolean cancelActivity = false;
             for (BoundaryEvent bEvent : bEvents) {
 

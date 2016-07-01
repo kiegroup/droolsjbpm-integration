@@ -30,7 +30,7 @@ import java.util.List;
 public class KieSessionFactoryBeanHelper {
 
     protected static void addListeners(KieRuntimeEventManager kieRuntimeEventManager, List<KieListenerAdaptor> listeners){
-        if (listeners == null || listeners.size() == 0){
+        if (listeners == null || listeners.isEmpty()){
             //do nothing
             return;
         }
@@ -47,7 +47,7 @@ public class KieSessionFactoryBeanHelper {
     }
 
     protected static void attachLoggers(KieRuntimeEventManager ksession, List<KieLoggerAdaptor> loggerAdaptors) {
-        if (loggerAdaptors != null && loggerAdaptors.size() > 0) {
+        if (loggerAdaptors != null && !loggerAdaptors.isEmpty()) {
             KieServices ks = KieServices.Factory.get();
             KieLoggers loggers = ks.getLoggers();
             for (KieLoggerAdaptor adaptor : loggerAdaptors) {

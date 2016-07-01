@@ -267,7 +267,7 @@ public class DynamicJaxbContext extends JAXBContext {
         // while we have no guarantees that JAXBContext instances are thread-safe,
         // the REST framework using the JAXBContext instance is responsible for that thread-safety
         // since it is caching the JAXBContext in any case..
-        if( depClasses == null || depClasses.size() == 0 ) {
+        if( depClasses == null || depClasses.isEmpty() ) {
             JAXBContext defaultJaxbContext = contextsCache.get(DEFAULT_JAXB_CONTEXT_ID);
             contextsCache.put(deploymentId, defaultJaxbContext);
             return;

@@ -30,7 +30,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
         JSONObject parent = new JSONObject();
         JSONObject paths = new JSONObject();
         try {
-            if(completePaths != null && completePaths.size() > 0) {
+            if(completePaths != null && !completePaths.isEmpty()) {
                 for(PathContext pc : completePaths) {
                     paths.put(pc.getPathId(), getPathFlowElementsAsString(pc.getPathElements()));
                 }
@@ -45,7 +45,7 @@ public class JSONPathFormatConverter implements PathFormatConverter<JSONObject> 
     
     private String getPathFlowElementsAsString(Set<FlowElement> flowElements) {
         String ret = "";
-        if(flowElements != null && flowElements.size() > 0) {
+        if(flowElements != null && !flowElements.isEmpty()) {
             for(FlowElement fe : flowElements) {
                 ret += fe.getId();
                 ret += "|";

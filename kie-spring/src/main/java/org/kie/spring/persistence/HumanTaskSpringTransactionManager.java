@@ -93,7 +93,7 @@ public class HumanTaskSpringTransactionManager implements TransactionManager {
             TransactionStatus transaction = null;
             boolean commitNewTransaction = false;
             try {
-                if (currentTransaction.size() == 0) {
+                if (currentTransaction.isEmpty()) {
                     transaction = ptm.getTransaction(td);
                     currentTransaction.push(transaction);
                     commitNewTransaction = true;

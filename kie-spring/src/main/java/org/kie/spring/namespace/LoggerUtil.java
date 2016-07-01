@@ -45,7 +45,7 @@ public class LoggerUtil {
             parserContext.getDelegate().parsePropertySubElement(consoleLoggerElement, null, null);
             loggerAdaptors.add(new RuntimeBeanReference(id));
         }
-        if (loggerAdaptors.size() > 0) {
+        if (!loggerAdaptors.isEmpty()) {
             factory.addPropertyValue("knowledgeRuntimeLoggers", loggerAdaptors);
         }
     }

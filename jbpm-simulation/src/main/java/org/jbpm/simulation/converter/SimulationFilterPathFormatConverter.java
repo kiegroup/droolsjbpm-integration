@@ -92,7 +92,7 @@ public class SimulationFilterPathFormatConverter implements
                   simPath.addBoundaryEventId(fe.getId());  
                 } else if (fe instanceof CatchEvent) {
                     CatchEvent act = (CatchEvent) fe;
-                    if(act.getIncoming() == null || act.getIncoming().size() == 0 && !isParentEventSubprocess(fe)) {
+                    if(act.getIncoming() == null || act.getIncoming().isEmpty() && !isParentEventSubprocess(fe)) {
                         String ref = processEventDefinitions(((CatchEvent) fe).getEventDefinitions());
                         simPath.setSignalName(ref);
                     }

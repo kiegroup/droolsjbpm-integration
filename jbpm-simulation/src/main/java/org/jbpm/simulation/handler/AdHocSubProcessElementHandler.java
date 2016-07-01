@@ -33,7 +33,7 @@ public class AdHocSubProcessElementHandler extends MainElementHandler {
         
         for (FlowElement fElement : flowElements) {
             if (fElement instanceof Activity) {
-                if (((Activity) fElement).getIncoming().size() == 0) {
+                if (((Activity) fElement).getIncoming().isEmpty()) {
                     
                     manager.cloneGiven(manager.getContextFromStack());
                     boolean canBeFinsihed = manager.getContextFromStack().isCanBeFinished();
