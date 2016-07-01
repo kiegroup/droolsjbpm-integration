@@ -21,6 +21,7 @@ import org.jbpm.process.instance.ProcessInstanceManagerFactory;
 
 public class InfinispanProcessInstanceManagerFactory implements ProcessInstanceManagerFactory {
 
+	@Override
 	public ProcessInstanceManager createProcessInstanceManager(InternalKnowledgeRuntime kruntime) {
 		InfinispanProcessInstanceManager result = new InfinispanProcessInstanceManager();
 		result.setKnowledgeRuntime(kruntime);

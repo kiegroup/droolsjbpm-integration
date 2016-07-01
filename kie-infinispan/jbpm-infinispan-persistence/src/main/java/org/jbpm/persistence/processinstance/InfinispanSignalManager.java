@@ -29,7 +29,8 @@ public class InfinispanSignalManager extends DefaultSignalManager {
     public InfinispanSignalManager(InternalKnowledgeRuntime kruntime) {
         super(kruntime);
     }
-    
+
+    @Override
     public void signalEvent(String type,
                             Object event) {
         for ( long id : getProcessInstancesForEvent( type ) ) {
