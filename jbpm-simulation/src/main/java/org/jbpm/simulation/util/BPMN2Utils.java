@@ -39,6 +39,8 @@ import org.jboss.drools.impl.DroolsPackageImpl;
 
 public class BPMN2Utils {
 
+    private BPMN2Utils() {}
+
     public static Definitions getDefinitions(InputStream is) {
         DroolsPackageImpl.init();
         BpsimPackageImpl.init();

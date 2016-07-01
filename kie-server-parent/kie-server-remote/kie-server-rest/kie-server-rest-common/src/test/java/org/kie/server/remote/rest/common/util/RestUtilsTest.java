@@ -44,6 +44,8 @@ public class RestUtilsTest {
     private KieServerRegistry registry;
     private HttpHeaders headers;
 
+    private RestUtilsTest() {}
+
     @Before
     public void setup() {
         registry = Mockito.mock(KieServerRegistry.class);

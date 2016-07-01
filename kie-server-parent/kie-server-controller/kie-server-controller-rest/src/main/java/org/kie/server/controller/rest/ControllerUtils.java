@@ -53,6 +53,8 @@ public class ControllerUtils {
     private static Marshaller jsonMarshaller = MarshallerFactory.getMarshaller(getMinimalModelClasses(), MarshallingFormat.JSON, ControllerUtils.class.getClassLoader());
     private static Marshaller jaxbMarshaller = MarshallerFactory.getMarshaller(getModelClasses(), MarshallingFormat.JAXB, ControllerUtils.class.getClassLoader());
 
+    private ControllerUtils() {}
+
     public static Set<Class<?>> getModelClasses() {
         Set<Class<?>> modelClasses = new HashSet<Class<?>>();
 

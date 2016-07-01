@@ -52,6 +52,8 @@ import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class TestUtils {
 
+    private TestUtils() {}
+
     public static boolean matchExpected(List<PathContext> paths, List<String>... expectedIds) {
         
         for (PathContext context : paths) {
