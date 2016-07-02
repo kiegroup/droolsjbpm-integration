@@ -16,9 +16,7 @@
 package org.kie.remote.client.jaxb;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,29 +24,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.kie.api.command.Command;
-import org.kie.api.runtime.manager.audit.NodeInstanceLog;
-import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
-import org.kie.api.runtime.manager.audit.VariableInstanceLog;
-import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.api.task.model.TaskSummary;
-import org.kie.remote.jaxb.gen.FindActiveProcessInstancesCommand;
-import org.kie.remote.jaxb.gen.FindNodeInstancesCommand;
-import org.kie.remote.jaxb.gen.FindProcessInstancesCommand;
-import org.kie.remote.jaxb.gen.FindSubProcessInstancesCommand;
-import org.kie.remote.jaxb.gen.FindVariableInstancesByNameCommand;
-import org.kie.remote.jaxb.gen.FindVariableInstancesCommand;
-import org.kie.remote.jaxb.gen.GetProcessIdsCommand;
-import org.kie.remote.jaxb.gen.GetProcessInstancesCommand;
-import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
-import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
-import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
-import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
-import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
-import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
-import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbOtherResponse;
