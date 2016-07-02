@@ -24,7 +24,7 @@ public abstract class RemoteServicesQueryData {
 
     // Query Field Info -----------------------------------------------------------------------------------------------------------
 
-    final static Map<Class, Map<String, Attribute>> criteriaAttributes
+    static final Map<Class, Map<String, Attribute>> criteriaAttributes
         = new ConcurrentHashMap<Class, Map<String, Attribute>>();
     private static final AtomicBoolean criteriaAttributesInitialized = new AtomicBoolean(false);
 
@@ -124,12 +124,12 @@ public abstract class RemoteServicesQueryData {
         return true;
     }
 
-    public final static Set<String> procInstLogNeededCriterias = new CopyOnWriteArraySet<String>();
-    public final static Set<String> varInstLogNeededCriterias = new CopyOnWriteArraySet<String>();
-    public final static Set<String> taskNeededCriterias = new CopyOnWriteArraySet<String>();
+    public static final Set<String> procInstLogNeededCriterias = new CopyOnWriteArraySet<String>();
+    public static final Set<String> varInstLogNeededCriterias = new CopyOnWriteArraySet<String>();
+    public static final Set<String> taskNeededCriterias = new CopyOnWriteArraySet<String>();
 
-    public final static Set<String> taskSpecificCriterias = new CopyOnWriteArraySet<String>();
-    public final static Set<String> varInstLogSpecificCriterias = new CopyOnWriteArraySet<String>();
+    public static final Set<String> taskSpecificCriterias = new CopyOnWriteArraySet<String>();
+    public static final Set<String> varInstLogSpecificCriterias = new CopyOnWriteArraySet<String>();
 
     static {
 

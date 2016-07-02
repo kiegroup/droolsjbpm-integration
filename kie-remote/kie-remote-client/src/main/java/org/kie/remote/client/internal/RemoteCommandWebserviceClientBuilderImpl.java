@@ -59,8 +59,8 @@ import org.kie.services.shared.ServicesVersion;
  */
 class RemoteCommandWebserviceClientBuilderImpl extends RemoteWebserviceClientBuilderImpl<CommandWebService> {
 
-    private final static String commandServiceNamespace = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
-    private final static QName commandServiceQName = new QName(commandServiceNamespace, "CommandServiceBasicAuth");
+    private static final String commandServiceNamespace = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
+    private static final QName commandServiceQName = new QName(commandServiceNamespace, "CommandServiceBasicAuth");
 
     @Override
     public CommandWebService buildBasicAuthClient() {

@@ -295,9 +295,9 @@ public class DynamicJaxbContext extends JAXBContext {
         }
     }
 
-    private final static String SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME = "org.kie.remote.jaxb.smart.init";
-    private final static boolean smartJaxbContextInitialization;
-    private final static String EXPECTED_JAXB_CONTEXT_IMPL_CLASS = "com.sun.xml.bind.v2.runtime.JAXBContextImpl";
+    private static final String SMART_JAXB_CONTEXT_INIT_PROPERTY_NAME = "org.kie.remote.jaxb.smart.init";
+    private static final boolean smartJaxbContextInitialization;
+    private static final String EXPECTED_JAXB_CONTEXT_IMPL_CLASS = "com.sun.xml.bind.v2.runtime.JAXBContextImpl";
 
     // only use smart initialization if we're using the (default) JAXB RI
     static {

@@ -52,7 +52,7 @@ import org.kie.services.shared.ServicesVersion;
         targetNamespace = DeploymentWebServiceImpl.NAMESPACE)
 public class DeploymentWebServiceImpl extends ResourceBase implements DeploymentWebService {
 
-    final static String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
+    static final String NAMESPACE = "http://services.remote.kie.org/" + ServicesVersion.VERSION + "/command";
 
     @Inject 
     private DeployResourceBase deployBase;

@@ -19,7 +19,7 @@ import com.codahale.metrics.jvm.ThreadDeadlockDetector;
 public class ThreadStatesGaugeSet implements MetricSet {
 
     // do not compute stack traces.
-    private final static int STACK_TRACE_DEPTH = 0;
+    private static final int STACK_TRACE_DEPTH = 0;
 
     private Class<?> scenario;
 

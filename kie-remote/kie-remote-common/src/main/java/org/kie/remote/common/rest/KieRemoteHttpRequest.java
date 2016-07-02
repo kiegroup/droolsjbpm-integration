@@ -289,7 +289,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    private static abstract class Operation<V> implements Callable<V> {
+    private abstract static class Operation<V> implements Callable<V> {
 
         /**
          * Run operation
@@ -335,7 +335,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    private static abstract class CloseOperation<V> extends Operation<V> {
+    private abstract static class CloseOperation<V> extends Operation<V> {
 
         private final Closeable closeable;
 
@@ -373,7 +373,7 @@ public class KieRemoteHttpRequest {
      *
      * @param <V>
      */
-    private static abstract class FlushOperation<V> extends Operation<V> {
+    private abstract static class FlushOperation<V> extends Operation<V> {
 
         private final Flushable flushable;
 

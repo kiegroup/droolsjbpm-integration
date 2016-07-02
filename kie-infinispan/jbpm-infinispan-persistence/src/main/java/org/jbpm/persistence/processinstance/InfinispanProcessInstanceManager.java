@@ -57,7 +57,7 @@ public class InfinispanProcessInstanceManager
     // In a scenario in which 1000's of processes are running daily,
     //   lazy initialization is more costly than eager initialization
     // Added volatile so that if something happens, we can figure out what
-    private volatile transient ConcurrentHashMap<Long, ProcessInstance> processInstances = new ConcurrentHashMap<Long, ProcessInstance>();
+    private transient volatile ConcurrentHashMap<Long, ProcessInstance> processInstances = new ConcurrentHashMap<Long, ProcessInstance>();
 
     
     public void setKnowledgeRuntime(InternalKnowledgeRuntime kruntime) {

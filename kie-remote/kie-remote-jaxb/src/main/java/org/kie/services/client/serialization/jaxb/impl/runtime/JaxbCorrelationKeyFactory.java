@@ -7,7 +7,7 @@ import org.kie.internal.process.CorrelationKeyFactory;
 
 public class JaxbCorrelationKeyFactory implements CorrelationKeyFactory {
 
-    private final static JaxbCorrelationKeyFactory _instance = new JaxbCorrelationKeyFactory();
+    private static final JaxbCorrelationKeyFactory _instance = new JaxbCorrelationKeyFactory();
    
     private JaxbCorrelationKeyFactory() { 
        // private constructor 

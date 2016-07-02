@@ -26,7 +26,7 @@ public class RemoteServicesAuditQueryCriteriaUtil extends AuditQueryCriteriaUtil
 
     // Query Field Info -----------------------------------------------------------------------------------------------------------
 
-    public final static Map<Class, Map<String, Attribute>> criteriaAttributes
+    public static final Map<Class, Map<String, Attribute>> criteriaAttributes
         = RemoteServicesQueryData.criteriaAttributes;
 
     @Override

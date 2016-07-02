@@ -27,13 +27,13 @@ public class Edge {
 
     private boolean            plotted;
 
-    final public static String NIL   = "empty";
+    public static final String NIL   = "empty";
 
-    final public static String B     = "B";
+    public static final String B     = "B";
 
-    final public static String PLUS  = "+";
+    public static final String PLUS  = "+";
 
-    final public static String MINUS = "-";
+    public static final String MINUS = "-";
 
     public Edge() {
 

@@ -282,9 +282,9 @@ public class ResourceBase {
         }
     }
 
-    private final static int MAX_LENGTH_INT = 9;
-    private final static int MAX_LENGTH_LONG = 18;
-    private final static int MAX_LENGTH_FLOAT = 10;
+    private static final int MAX_LENGTH_INT = 9;
+    private static final int MAX_LENGTH_LONG = 18;
+    private static final int MAX_LENGTH_FLOAT = 10;
 
     public static String BOOLEAN_REGEX ="^(true|false)";
     public static String LONG_INTEGER_REGEX ="^\\d+[li]?$";

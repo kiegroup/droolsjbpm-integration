@@ -27,21 +27,21 @@ public class Stage
     Externalizable {
     private static final long serialVersionUID      = 510l;
 
-    final public static int   START                 = 0;
+    public static final int   START                 = 0;
 
-    final public static int   DUPLICATE             = 1;
+    public static final int   DUPLICATE             = 1;
 
-    final public static int   DETECT_JUNCTIONS      = 2;
+    public static final int   DETECT_JUNCTIONS      = 2;
 
-    final public static int   FIND_INITIAL_BOUNDARY = 3;
+    public static final int   FIND_INITIAL_BOUNDARY = 3;
 
-    final public static int   FIND_SECOND_BOUNDARY  = 4;
+    public static final int   FIND_SECOND_BOUNDARY  = 4;
 
-    final public static int   LABELING              = 5;
+    public static final int   LABELING              = 5;
 
-    final public static int   PLOT_REMAINING_EDGES  = 9;
+    public static final int   PLOT_REMAINING_EDGES  = 9;
 
-    final public static int   DONE                  = 10;
+    public static final int   DONE                  = 10;
 
     private int               value;
 
