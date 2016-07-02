@@ -64,6 +64,7 @@ public class InfinispanProcessInstanceManager
         this.kruntime = kruntime;
     }
 
+    @Override
     public void addProcessInstance(ProcessInstance processInstance, CorrelationKey correlationKey) {
         ProcessInstanceInfo processInstanceInfo = new ProcessInstanceInfo( processInstance, this.kruntime.getEnvironment() );
         ProcessPersistenceContext context 
@@ -82,7 +83,8 @@ public class InfinispanProcessInstanceManager
         }
         internalAddProcessInstance(processInstance);
     }
-    
+
+    @Override
     public void internalAddProcessInstance(ProcessInstance processInstance) {
         if( processInstances.putIfAbsent(processInstance.getId(), processInstance) != null ) { 
             throw new ConcurrentModificationException(
@@ -91,10 +93,12 @@ public class InfinispanProcessInstanceManager
         }
     }
 
+    @Override
     public ProcessInstance getProcessInstance(long id) {
         return getProcessInstance(id, false);
     }
 
+    @Override
     public ProcessInstance getProcessInstance(long id, boolean readOnly) {
         InternalRuntimeManager manager = (InternalRuntimeManager) kruntime.getEnvironment().get("RuntimeManager");
         if (manager != null) {
@@ -148,10 +152,12 @@ public class InfinispanProcessInstanceManager
         return processInstance;
     }
 
+    @Override
     public Collection<ProcessInstance> getProcessInstances() {
     	return Collections.unmodifiableCollection(processInstances.values());
     }
 
+    @Override
     public void removeProcessInstance(ProcessInstance processInstance) {
         ProcessPersistenceContext context = ((ProcessPersistenceContextManager) this.kruntime.getEnvironment().get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getProcessPersistenceContext();
         ProcessInstanceInfo processInstanceInfo = context.findProcessInstanceInfo( processInstance.getId() );
@@ -162,16 +168,19 @@ public class InfinispanProcessInstanceManager
         internalRemoveProcessInstance(processInstance);
     }
 
+    @Override
     public void internalRemoveProcessInstance(ProcessInstance processInstance) {
         processInstances.remove( processInstance.getId() );
     }
-    
+
+    @Override
     public void clearProcessInstances() {
     	/*for (ProcessInstance processInstance: new ArrayList<ProcessInstance>(processInstances.values())) {
             ((ProcessInstanceImpl) processInstance).disconnect();
         }*/
     }
 
+    @Override
     public void clearProcessInstancesState() {
         try {
             // at this point only timers are considered as state that needs to be cleared
