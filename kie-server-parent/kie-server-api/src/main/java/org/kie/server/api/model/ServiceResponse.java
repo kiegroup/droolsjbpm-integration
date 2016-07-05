@@ -85,6 +85,7 @@ public class ServiceResponse<T> {
             @XmlElement(name = "kie-containers", type = KieContainerResourceList.class),
             @XmlElement(name = "kie-scanner", type = KieScannerResource.class),
             @XmlElement(name = "release-id", type = ReleaseId.class),
+            @XmlElement(name = "kie-server-state-info", type = KieServerStateInfo.class),
             // definition model
             @XmlElement(name = "process-associated-entities", type = AssociatedEntitiesDefinition.class),
             @XmlElement(name = "process-definition", type = ProcessDefinition.class),
