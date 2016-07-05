@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.common;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -24,6 +25,7 @@ import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.Smoke;
@@ -151,6 +153,33 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
 
+    }
+
+    @Test
+    public void testUpdateReleaseIdForExistingContainerAndCheckServerState() throws Exception {
+        client.createContainer("update-releaseId", new KieContainerResource("update-releaseId", releaseId1));
+
+        ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        Assert.assertEquals(releaseId2, reply.getResult());
+
+        ServiceResponse<KieServerStateInfo> currentServerStateReply = client.getServerState();
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, currentServerStateReply.getType());
+
+        KieServerStateInfo currentServerState = currentServerStateReply.getResult();
+        Assert.assertNotNull(currentServerState);
+
+        Set<KieContainerResource> containers = currentServerState.getContainers();
+        Assert.assertEquals(1, containers.size());
+
+        KieContainerResource container = containers.iterator().next();
+        Assert.assertNotNull(container);
+
+        Assert.assertEquals(releaseId2, container.getReleaseId());
+        Assert.assertEquals(releaseId2, container.getResolvedReleaseId());
+
+        ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, disposeReply.getType());
     }
 
     private void assertContainsContainer(List<KieContainerResource> containers, String expectedContainerId) {

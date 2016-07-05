@@ -154,6 +154,11 @@ public class KieServerRestImpl {
         return createCorrectVariant(server.updateContainerReleaseId(id, releaseId), headers, conversationIdHeader);
     }
 
-
+    @GET
+    @Path("state")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getServerState(@Context HttpHeaders headers) {
+        return createCorrectVariant(server.getServerState(), headers);
+    }
 
 }
