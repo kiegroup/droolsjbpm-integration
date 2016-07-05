@@ -51,6 +51,7 @@ import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
+import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
@@ -65,6 +66,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -129,6 +131,7 @@ public class JaxbMarshaller implements Marshaller {
                 UpdateScannerCommand.class,
                 UpdateReleaseIdCommand.class,
                 DescriptorCommand.class,
+                GetServerStateCommand.class,
 
                 KieContainerResource.class,
                 KieContainerResourceList.class,
@@ -137,6 +140,7 @@ public class JaxbMarshaller implements Marshaller {
                 ReleaseId.class,
                 ServiceResponse.class,
                 ServiceResponsesList.class,
+                KieServerStateInfo.class,
 
                 BatchExecutionCommandImpl.class,
                 ExecutionResultImpl.class,

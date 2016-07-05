@@ -35,6 +35,7 @@ import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
+import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
@@ -153,6 +154,8 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     responses.add(this.kieServer.updateScanner(((UpdateScannerCommand) command).getContainerId(), ((UpdateScannerCommand) command).getScanner()));
                 } else if (command instanceof UpdateReleaseIdCommand) {
                     responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
+                } else if (command instanceof GetServerStateCommand) {
+                    responses.add(this.kieServer.getServerState());
                 }
             }
         }

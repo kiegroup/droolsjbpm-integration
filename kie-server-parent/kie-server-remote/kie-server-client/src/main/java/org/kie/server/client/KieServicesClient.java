@@ -22,6 +22,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
@@ -47,6 +48,8 @@ public interface KieServicesClient {
     ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource);
 
     ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId);
+
+    ServiceResponse<KieServerStateInfo> getServerState();
 
 
     // for backward compatibility reason

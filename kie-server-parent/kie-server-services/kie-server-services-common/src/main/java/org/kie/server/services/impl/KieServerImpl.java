@@ -48,6 +48,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -652,6 +653,21 @@ public class KieServerImpl {
                     logger.error("Error updating releaseId for container " + id + " to version " + releaseId + "\nMessages: " + results.getMessages());
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
                 } else {
+                    // store the current state of the server
+                    KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+
+                    List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
+                    for (KieContainerResource containerResource : currentState.getContainers()) {
+                        if ( id.equals(containerResource.getContainerId()) ) {
+                            containerResource.setReleaseId(releaseId);
+                            containerResource.setResolvedReleaseId(new ReleaseId(kci.getKieContainer().getContainerReleaseId()));
+                        }
+                        containers.add(containerResource);
+                    }
+
+                    currentState.setContainers(new HashSet<KieContainerResource>(containers));
+                    repository.store(KieServerEnvironment.getServerId(), currentState);
+
                     messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
                 }
@@ -674,6 +690,18 @@ public class KieServerImpl {
             logger.error("Error updating releaseId for container '" + id + "'", e);
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating releaseId for container " + id + ": " +
                     e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
+    public ServiceResponse<KieServerStateInfo> getServerState() {
+        try {
+            KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
+            KieServerStateInfo state = new KieServerStateInfo(currentState.getControllers(), currentState.getConfiguration(), currentState.getContainers());
+            return new ServiceResponse<KieServerStateInfo>(ServiceResponse.ResponseType.SUCCESS,
+                    "Successfully loaded server state for server id " + KieServerEnvironment.getServerId(), state);
+        } catch (Exception e) {
+            logger.error("Error when loading server state due to {}", e.getMessage(), e);
+            return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state due to " + e.getMessage());
         }
     }
 
