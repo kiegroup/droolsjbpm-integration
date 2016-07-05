@@ -30,6 +30,7 @@ import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
+import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
@@ -38,6 +39,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
@@ -219,6 +221,16 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateReleaseIdCommand( id, releaseId ) ) );
             return (ServiceResponse<ReleaseId>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+        }
+    }
+
+    @Override
+    public ServiceResponse<KieServerStateInfo> getServerState() {
+        if( config.isRest() ) {
+            return makeHttpGetRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/state", KieServerStateInfo.class);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetServerStateCommand() ) );
+            return (ServiceResponse<KieServerStateInfo>) executeJmsCommand( script).getResponses().get( 0 );
         }
     }
 
