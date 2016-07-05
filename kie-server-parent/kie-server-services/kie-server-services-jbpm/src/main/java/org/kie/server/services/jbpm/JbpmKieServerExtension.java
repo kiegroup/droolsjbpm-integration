@@ -190,10 +190,6 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 .getTaskAuditService());
         ((KModuleDeploymentService) deploymentService).setRuntimeDataService(runtimeDataService);
 
-        // set runtime data service as listener on deployment service
-        ((KModuleDeploymentService) deploymentService).addListener(((RuntimeDataServiceImpl) runtimeDataService));
-        ((KModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
-
         // build process service
         processService = new ProcessServiceImpl();
         ((ProcessServiceImpl) processService).setDataService(runtimeDataService);
@@ -209,6 +205,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((QueryServiceImpl)queryService).setIdentityProvider(registry.getIdentityProvider());
         ((QueryServiceImpl)queryService).setCommandService(new TransactionalCommandService(emf));
         ((QueryServiceImpl)queryService).init();
+
+        // set runtime data service as listener on deployment service
+        ((KModuleDeploymentService) deploymentService).addListener(((RuntimeDataServiceImpl) runtimeDataService));
+        ((KModuleDeploymentService) deploymentService).addListener(((BPMN2DataServiceImpl) definitionService));
+        ((KModuleDeploymentService) deploymentService).addListener(((QueryServiceImpl) queryService));
 
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "false").equalsIgnoreCase("false")) {
             String executorQueueName = System.getProperty("org.kie.executor.jms.queue", "queue/KIE.SERVER.EXECUTOR");

@@ -37,6 +37,8 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -439,6 +441,47 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             List<QueryDefinition> queries = queryClient.getQueries(0, 10);
             assertNotNull(queries);
             assertEquals(0, queries.size());
+        }
+
+    }
+
+    @Test
+    public void testGetFilteredProcessInstancesWithQueryDataService() throws Exception {
+        // don't run the test on local server as it does not properly support authentication
+        assumeFalse(TestConfig.isLocalServer());
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance("john"));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstancesForUser");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
+        query.setTarget("FILTERED_PROCESS");
+        try {
+
+            queryClient.registerQuery(query);
+            // default user (yoda) does not have engineering role so should not be able to find any instances
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(0, instances.size());
+
+            // switch to john user who has engineering role
+            changeUser(USER_JOHN);
+
+
+            instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+            changeUser(TestConfig.getUsername());
         }
 
     }
