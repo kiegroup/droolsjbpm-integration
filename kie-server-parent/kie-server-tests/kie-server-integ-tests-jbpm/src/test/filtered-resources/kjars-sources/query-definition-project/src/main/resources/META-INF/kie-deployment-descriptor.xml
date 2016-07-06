@@ -43,6 +43,8 @@
     </work-item-handlers>
     <environment-entries/>
     <configurations/>
-    <required-roles/>
+    <required-roles>
+        <required-role>view:engineering</required-role>
+    </required-roles>
     <remoteable-classes/>
 </deployment-descriptor>
