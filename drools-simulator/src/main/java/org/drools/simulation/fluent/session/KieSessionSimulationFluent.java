@@ -17,6 +17,7 @@
 package org.drools.simulation.fluent.session;
 
 import org.drools.simulation.fluent.SimulationFluentBuilder;
+import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.test.RuleTestFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
@@ -26,7 +27,7 @@ import org.kie.internal.fluent.runtime.KieSessionFluent;
 
 
 public interface KieSessionSimulationFluent
-        extends KieSessionFluent<KieSessionSimulationFluent>,
+        extends KieSessionFluent<KieSessionSimulationFluent, BatchBuilderFluent>,
         TestableFluent<KieSessionSimulationFluent>, 
         SimulationFluentBuilder<KieSessionSimulationFluent>,
         ContextFluent<KieSessionSimulationFluent>,

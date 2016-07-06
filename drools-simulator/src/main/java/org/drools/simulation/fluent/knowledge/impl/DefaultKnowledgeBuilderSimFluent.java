@@ -38,7 +38,7 @@ public class DefaultKnowledgeBuilderSimFluent extends AbstractTestableFluent<Kno
         this.simulationFluent = simulationFluent;
     }
 
-    protected KnowledgeBuilderSimFluent addCommand(Command command) {
+    public KnowledgeBuilderSimFluent addCommand(Command command) {
         simulationFluent.addCommand(command);
         return this;
     }

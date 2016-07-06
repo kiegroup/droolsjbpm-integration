@@ -16,6 +16,7 @@
 
 package org.drools.simulation.fluent.test.impl;
 
+import org.drools.simulation.fluent.batch.impl.BaseBatchFluent;
 import org.drools.simulation.fluent.test.CheckableFluent;
 import org.drools.simulation.fluent.test.TestableFluent;
 import org.hamcrest.Matcher;
@@ -24,12 +25,13 @@ import org.kie.internal.fluent.test.ReflectiveMatcherAssert;
 
 import static org.junit.Assert.assertThat;
 
-public abstract class AbstractTestableFluent<P> implements TestableFluent<P> {
+public abstract class AbstractTestableFluent<P> extends BaseBatchFluent<P> implements TestableFluent<P> {
     
     public AbstractTestableFluent() {
+        super(null);
     }
 
-    protected abstract TestableFluent<P> addCommand(Command command);
+    //protected abstract TestableFluent<P> addCommand(Command command);
 
     public <T> P test(String reason,
                       T actual,

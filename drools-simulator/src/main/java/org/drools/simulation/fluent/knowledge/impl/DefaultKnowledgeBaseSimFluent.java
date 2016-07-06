@@ -36,7 +36,7 @@ public class DefaultKnowledgeBaseSimFluent extends AbstractTestableFluent<Knowle
         this.simulationFluent = simulationFluent;
     }
 
-    protected KnowledgeBaseSimFluent addCommand(Command command) {
+    public KnowledgeBaseSimFluent addCommand(Command command) {
         simulationFluent.addCommand(command);
         return this;
     }

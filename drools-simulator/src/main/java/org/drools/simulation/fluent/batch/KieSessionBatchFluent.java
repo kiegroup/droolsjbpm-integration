@@ -7,7 +7,7 @@ import org.kie.internal.fluent.runtime.KieSessionFluent;
 
 public interface KieSessionBatchFluent extends
         TimeFluent<KieSessionBatchFluent>,
-        KieSessionFluent<KieSessionBatchFluent>,
+        KieSessionFluent<KieSessionBatchFluent, BatchBuilderFluent>,
         ContextFluent<KieSessionBatchFluent>,
         EndContextFluent<BatchBuilderFluent> {
 }

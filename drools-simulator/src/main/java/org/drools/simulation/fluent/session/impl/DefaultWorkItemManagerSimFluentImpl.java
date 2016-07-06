@@ -20,12 +20,13 @@ import java.util.Map;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.core.command.runtime.process.RegisterWorkItemHandlerCommand;
+import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.internal.fluent.runtime.KieSessionFluent;
 import org.kie.internal.fluent.runtime.WorkItemManagerFluent;
 
-public class DefaultWorkItemManagerSimFluentImpl implements WorkItemManagerFluent<WorkItemManagerFluent, KieSessionSimulationFluent> {
+public class DefaultWorkItemManagerSimFluentImpl implements WorkItemManagerFluent<WorkItemManagerFluent, KieSessionSimulationFluent, BatchBuilderFluent> {
  
     private DefaultStatefulKnowledgeSessionSimFluent parent;
     
@@ -52,7 +53,7 @@ public class DefaultWorkItemManagerSimFluentImpl implements WorkItemManagerFluen
     }
 
     @Override
-    public KieSessionFluent<KieSessionSimulationFluent> getKieSession() {
+    public KieSessionFluent<KieSessionSimulationFluent, BatchBuilderFluent> getKieSession() {
         return parent;
     }
 }

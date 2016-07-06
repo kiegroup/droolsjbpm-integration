@@ -27,6 +27,7 @@ import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
+import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.batch.FluentBatchExecution;
 import org.drools.simulation.fluent.test.impl.MapVariableContext;
 import org.kie.api.command.BatchExecutionCommand;
@@ -41,13 +42,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // TODO Do we really want this as a separate class hierarchy just to do batches? Does this fit in with the SimulationFluent?
-public class FluentBatchExecutionImpl implements FluentBatchExecution {
+public class FluentBatchExecutionImpl  extends BaseBatchFluent<FluentBatchExecution> implements FluentBatchExecution {
 
     private List<GenericCommand<?>> cmds = new ArrayList<GenericCommand<?>>();
     private VariableContext vars;
     private GenericCommand<?> lastAddedCommand;
 
     public FluentBatchExecutionImpl() {
+        super(null);
         vars = new MapVariableContext();
     }
 
@@ -156,20 +158,17 @@ public class FluentBatchExecutionImpl implements FluentBatchExecution {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public FluentBatchExecution out() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public FluentBatchExecution out(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     // added but not yet tested
     public FluentBatchExecution getGlobal(String identifier) {
         lastAddedCommand = new GetGlobalCommand(identifier);
         addCommand(lastAddedCommand);
         return this;
     }
+
+    @Override
+    public BatchBuilderFluent dispose() {
+        return null;
+    }
+
+
 }

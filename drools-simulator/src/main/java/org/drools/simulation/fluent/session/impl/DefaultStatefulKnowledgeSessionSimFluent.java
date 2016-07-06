@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.SetVariableCommandFromLastReturn;
 import org.drools.core.command.runtime.AddEventListenerCommand;
+import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
@@ -36,6 +37,7 @@ import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
+import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
 import org.drools.simulation.fluent.simulation.SimulationFluent;
 import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
@@ -59,7 +61,7 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
         this.simulationFluent = simulationFluent;
     }
 
-    protected KieSessionSimulationFluent addCommand(Command command) {
+    public KieSessionSimulationFluent addCommand(Command command) {
         simulationFluent.addCommand(command);
         return this;
     }
@@ -228,8 +230,13 @@ public class DefaultStatefulKnowledgeSessionSimFluent extends AbstractTestableFl
     }
 
     @Override
-    public WorkItemManagerFluent<WorkItemManagerFluent, KieSessionSimulationFluent> getWorkItemManager() {
+    public WorkItemManagerFluent<WorkItemManagerFluent, KieSessionSimulationFluent, BatchBuilderFluent> getWorkItemManager() {
         return new DefaultWorkItemManagerSimFluentImpl(this);
+    }
+
+    @Override
+    public BatchBuilderFluent dispose() {
+        return null;
     }
 
 }

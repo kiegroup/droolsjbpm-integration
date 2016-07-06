@@ -16,33 +16,60 @@
 
 package org.drools.simulation.fluent.batch.impl;
 
+import org.drools.core.command.ConversationManager;
+import org.drools.core.command.RequestContextImpl;
 import org.drools.core.command.impl.ContextImpl;
 import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.world.impl.ContextManagerImpl;
 import org.drools.simulation.fluent.batch.Batch;
-import org.drools.simulation.fluent.batch.BatchRuns;
 import org.kie.api.command.Command;
 import org.kie.internal.command.Context;
+import org.kie.internal.command.ContextManager;
 
 import java.util.*;
 
 public class PsuedoClockRunner {
-//    private Map<String, Context>  appContexts;
-//    private Map<String, Context>  conversationContexts;
+    private Map<String, Context>  appContexts;
 
+    private long                   counter;
 
-    private Map<String, Context>  contexts;
-    //private Map<String, List<Step>> steps;
-
-    private PriorityQueue<Step>           queue;
+    //private PriorityQueue<Step>           queue;
 
     public PsuedoClockRunner() {
-        contexts = new HashMap<String, Context>();
+        appContexts = new HashMap<String, Context>();
+
     }
 
-    public Map<String, Map<String, Object>> execute(BatchRuns batchRuns) {
-        Map<String, Context>  requestContexts = new HashMap<String, Context>();
+    public Map<String, Context> getAppContexts() {
+        return appContexts;
+    }
 
-        long distance = 0;
+    public Context execute(List<? extends Batch> batches) {
+        Map<String, Context>  requestContexts = new HashMap<String, Context>();
+        if ( batches.get(0) instanceof AfterBatchCommand ) {
+            List<AfterBatchCommand> clone = new ArrayList<AfterBatchCommand>();
+            for (Batch batch : batches) {
+                clone.add((AfterBatchCommand)batch);
+            }
+            Collections.sort(clone, BatchSorter.instance);
+            batches = clone;
+        }
+
+        ContextManager ctxManager = new ContextManagerImpl(appContexts);
+        ConversationManager cvnManager = new ConversationManager();
+
+        RequestContextImpl requestCtx = new RequestContextImpl(counter++,
+                                                               ctxManager,
+                                                               cvnManager);
+
+        for (Batch batch : batches) {
+            for (Command cmd : batch.getCommands() ) {
+                Object returned = ((GenericCommand)cmd).execute(requestCtx);
+                if ( returned != null ) {
+                    requestCtx.setLastReturned(returned);
+                }
+            }
+        }
 
 //        for ( String ctxName : batchRuns.getBatches().keySet() ) {
 //            List<Step> steps = new ArrayList<Step>();
@@ -60,34 +87,36 @@ public class PsuedoClockRunner {
 //            }
 //        }
 
-        Map<String, Map<String, Object>> results = new HashMap<String, Map<String, Object>>();
-        for ( Step s = queue.remove(); !queue.isEmpty(); s = queue.remove() ) {
-            Context ctx = s.getContext();
-            Batch b = s.getBatch();
-            for (Command cmd : b.getCommands() ) {
-                ((GenericCommand)cmd).execute(ctx);
-            }
-        }
+//        Map<String, Map<String, Object>> results = new HashMap<String, Map<String, Object>>();
+//        for ( Step s = queue.remove(); !queue.isEmpty(); s = queue.remove() ) {
+//            Context ctx = s.getApplicationContext();
+//            Batch b = s.getBatch();
+//            for (Command cmd : b.getCommands() ) {
+//                ((GenericCommand)cmd).execute(ctx);
+//            }
+//        }
 
-        return null;
+        return requestCtx;
 
     }
 
-    public static class Step {
-        private Context ctx;
-        private Batch batch;
 
-        public Step(Context ctx, Batch batch) {
-            this.ctx = ctx;
-            this.batch = batch;
+
+    public static class BatchSorter implements Comparator<AfterBatchCommand> {
+        public static BatchSorter instance = new BatchSorter();
+
+
+        @Override
+        public int compare(AfterBatchCommand o1, AfterBatchCommand o2) {
+            if(o1.getDistance() > o2.getDistance()) {
+                return 1;
+            }
+            else if(o1.getDistance() < o2.getDistance()) {
+                return -1;
+            }
+
+            return 0;
         }
 
-        public Context getContext() {
-            return ctx;
-        }
-
-        public Batch getBatch() {
-            return batch;
-        }
     }
 }

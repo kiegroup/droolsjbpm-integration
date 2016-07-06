@@ -4,16 +4,20 @@ import org.drools.simulation.fluent.batch.Batch;
 import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.kie.api.command.Command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FluentContext {
     private BatchBuilderFluent batchBuilderFluent;
 
     private Batch batch;
 
-    private Batch focus;
+    private List<Batch> batches;
 
     public FluentContext() {
         batch = new BatchImpl();
-        focus = batch;
+        batches = new ArrayList<Batch>();
+        batches.add(batch);
     }
 
     public BatchBuilderFluent getBatchBuilderFluent() {
@@ -26,14 +30,18 @@ public class FluentContext {
 
     public void addCommand(Command cmd) {
         if( cmd instanceof Batch) {
-            batch.addCommand(cmd);
-            this.focus = (Batch) cmd;
-        } else {
-            this.focus.addCommand(cmd);
+            batches.add((Batch)cmd);
+            batch = (Batch) cmd;
         }
+
+        batch.addCommand(cmd);
     }
 
     public Batch getBatch() {
         return batch;
+    }
+
+    public List<Batch> getBatches() {
+        return batches;
     }
 }

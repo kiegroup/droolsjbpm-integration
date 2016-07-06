@@ -1,5 +1,9 @@
 package org.drools.simulation.fluent.batch.impl;
 
+import org.drools.core.command.OutCommand;
+import org.drools.core.command.runtime.DisposeCommand;
+import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.batch.KieSessionBatchFluent;
 import org.kie.api.runtime.rule.FactHandle;
@@ -8,26 +12,11 @@ import org.kie.internal.fluent.runtime.WorkItemManagerFluent;
 
 import java.util.Map;
 
-public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFluentImpl> implements KieSessionBatchFluent {
+public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFluent> implements KieSessionBatchFluent {
 
 
     public KieSessionBatchFluentImpl(FluentContext fluentCtx) {
         super(fluentCtx);
-    }
-
-    @Override
-    public KieSessionBatchFluent set(String name) {
-        return this;
-    }
-
-    @Override
-    public KieSessionBatchFluent out() {
-        return this;
-    }
-
-    @Override
-    public KieSessionBatchFluent out(String name) {
-        return this;
     }
 
     @Override
@@ -79,23 +68,18 @@ public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFl
     }
 
     @Override
-    public WorkItemManagerFluent<WorkItemManagerFluent, KieSessionBatchFluent> getWorkItemManager() {
+    public WorkItemManagerFluent<WorkItemManagerFluent, KieSessionBatchFluent, BatchBuilderFluent> getWorkItemManager() {
         return null;
     }
 
     @Override
     public KieSessionBatchFluent fireAllRules() {
+        fluentCtx.addCommand( new FireAllRulesCommand());
         return this;
     }
 
     @Override
     public KieSessionBatchFluent setGlobal(String identifier, Object object) {
-        return this;
-    }
-
-    @Override
-    public KieSessionBatchFluent set(String name, Scope scope) {
-        //addCommand(new SetVariableCommandFromLastReturn(null, name, scope));
         return this;
     }
 
@@ -106,6 +90,7 @@ public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFl
 
     @Override
     public KieSessionBatchFluent insert(Object object) {
+        fluentCtx.addCommand( new InsertObjectCommand(object));
         return this;
     }
 
@@ -117,6 +102,12 @@ public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFl
     @Override
     public KieSessionBatchFluent delete(FactHandle handle) {
         return this;
+    }
+
+    @Override
+    public BatchBuilderFluent dispose() {
+        fluentCtx.addCommand( new DisposeCommand());
+        return fluentCtx.getBatchBuilderFluent();
     }
 
 }

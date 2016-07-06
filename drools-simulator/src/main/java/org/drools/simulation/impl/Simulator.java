@@ -33,14 +33,14 @@ import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.time.SessionPseudoClock;
 import org.kie.api.command.Command;
 import org.kie.internal.command.Context;
-import org.kie.internal.command.World;
+import org.kie.internal.command.ContextManager;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.kie.internal.simulation.Simulation;
 import org.kie.internal.simulation.SimulationPath;
 import org.kie.internal.simulation.SimulationStep;
 
 public class Simulator
-        implements World, GetDefaultValue {
+        implements ContextManager, GetDefaultValue {
 
     private PriorityQueue<SimulationStep>           queue;
     private SimulationImpl                simulation;
@@ -167,6 +167,17 @@ public class Simulator
         return this.contexts.get( identifier );
     }
 
+    @Override
+    public Context createContext(String identifier) {
+        Context ctx = this.contexts.get(  identifier );
+        if ( ctx == null ) {
+            ctx = new ContextImpl( identifier, this, root );
+            this.contexts.put(  identifier, ctx );
+        }
+
+        return ctx;
+    }
+
     public Context getRootContext() {
         return this.root;
     }
@@ -197,7 +208,7 @@ public class Simulator
         return lastReturnValue;
     }
 
-	public World getContextManager() {
+	public ContextManager getContextManager() {
 		return this;
 	}
 
@@ -240,12 +251,12 @@ public class Simulator
     //    }
     //    
     //    public static interface CommandContextAdapter {
-    //        Context getContext();
+    //        Context getApplicationContext();
     //    }
     //    
     //    public static class KnowledgeBuilderCommandContextAdapter implements CommandContextAdapter {
     //
-    //        public Context getContext() {
+    //        public Context getApplicationContext() {
     //            return new KnowledgeBuilderCommandContext();
     //        }
     //        
