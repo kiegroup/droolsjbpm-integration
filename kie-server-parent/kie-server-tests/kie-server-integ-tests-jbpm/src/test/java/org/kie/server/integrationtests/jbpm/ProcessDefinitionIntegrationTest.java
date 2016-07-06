@@ -226,10 +226,10 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         assertNotNull(task);
         assertEquals("Evaluate items", task.getName());
-        assertNull(task.getComment());
-        assertNull(task.getCreatedBy());
+        assertEquals("", task.getComment());
+        assertEquals("", task.getCreatedBy());
         assertEquals(0, task.getPriority().intValue());
-        assertEquals(false, task.isSkippable());
+        assertEquals(true, task.isSkippable());
 
         // assert associated entities - users and groups
         String[] evaluateItemsEntities = task.getAssociatedEntities();
