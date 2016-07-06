@@ -24,6 +24,8 @@ import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 
 public class PathContext {
+
+    private final int maxElementsSize = Integer.parseInt(System.getProperty("org.jbpm.simulation.max.elements", "500"));
     
     public enum Type {
         ROOT,
@@ -41,6 +43,8 @@ public class PathContext {
     private String pathId;
 
     private Set<FlowElement> visitedSplitPoint = new LinkedHashSet<FlowElement>();
+
+    private FlowElement splitOrigin = null;
 
     protected int getCanBeFinishedCounter() {
         return canBeFinishedCounter;
@@ -61,6 +65,7 @@ public class PathContext {
     }
     
     public void addPathElement(FlowElement element) {
+        checkSize();
         if (!locked) {
             this.pathElements.add(element);
         }
@@ -73,6 +78,7 @@ public class PathContext {
     }
     
     public void addAllPathElement(List<SequenceFlow> elements) {
+        checkSize();
         if (!locked) {
             this.pathElements.addAll(elements);
         }
@@ -150,5 +156,21 @@ public class PathContext {
     public void setVisitedSplitPoint(Set<FlowElement> visitedSplitPoint) {
         this.visitedSplitPoint = visitedSplitPoint;
     }
+
+
+    protected void checkSize() {
+        if (pathElements.size() > maxElementsSize) {
+            throw new RuntimeException("Unable to calculate path elements of the process - max size (" + maxElementsSize + ") of elements exceeded");
+        }
+    }
+
+    public FlowElement getSplitOrigin() {
+        return splitOrigin;
+    }
+
+    public void setSplitOrigin(FlowElement splitOrigin) {
+        this.splitOrigin = splitOrigin;
+    }
+
 
 }

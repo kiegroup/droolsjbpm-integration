@@ -28,11 +28,17 @@ import org.jbpm.simulation.converter.JSONPathFormatConverter;
 import org.jbpm.simulation.helper.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 @SuppressWarnings("unchecked")
 public class PathFinderTest {
-    
-    
+
+    @After
+    public void setup() {
+        System.clearProperty("org.jbpm.simulation.max.paths");
+        System.clearProperty("org.jbpm.simulation.max.elements");
+    }
     @Test
     public void testSinglePath() throws IOException {
         List<String> expectedIds = new ArrayList<String>();
@@ -1687,6 +1693,24 @@ public class PathFinderTest {
         }
 
         TestUtils.printOutPaths(paths, jsonPaths, "testEventSubProcessPath");
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testMaxPathExceeded() throws IOException {
+        System.setProperty("org.jbpm.simulation.max.paths", "3");
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-MortgageProcess.bpmn2"));
+
+        finder.findPaths();
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testMaxElementsExceeded() throws IOException {
+        System.setProperty("org.jbpm.simulation.max.elements", "3");
+        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN2-MortgageProcess.bpmn2"));
+
+        finder.findPaths();
 
     }
 }
