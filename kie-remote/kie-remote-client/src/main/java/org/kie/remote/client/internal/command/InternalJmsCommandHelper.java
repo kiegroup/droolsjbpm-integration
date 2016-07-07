@@ -215,7 +215,7 @@ public class InternalJmsCommandHelper {
                     version, VERSION);
         }
         List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
-        if( responses.size() > 0 ) {
+        if( !responses.isEmpty() ) {
             JaxbCommandResponse<?> response = responses.get(0);
             if( response instanceof JaxbExceptionResponse ) {
                 JaxbExceptionResponse exceptionResponse = (JaxbExceptionResponse) response;
@@ -224,7 +224,7 @@ public class InternalJmsCommandHelper {
                 return (T) response.getResult();
             }
         } else {
-            assert responses.size() == 0: "There should only be 1 response, not " + responses.size() + ", returned by a command!";
+            assert responses.isEmpty() : "There should only be 1 response, not " + responses.size() + ", returned by a command!";
             return null;
         }
     }

@@ -25,7 +25,7 @@ public class DefaultElementHandler extends MainElementHandler {
 
     public boolean handle(FlowElement element, PathContextManager manager) {
         List<SequenceFlow> outgoing = getOutgoing(element);
-        if (outgoing.size() == 0) {
+        if (outgoing.isEmpty()) {
             return false;
         }
         for (SequenceFlow seqFlow : outgoing) {

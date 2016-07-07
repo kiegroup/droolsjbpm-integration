@@ -160,13 +160,13 @@ public class BPMN2PathFinderImpl implements PathFinder {
                 processEventDefinitions(fElement, eventDefinitions, catchingEvents);
             } else if((fElement instanceof Activity) && BPMN2Utils.isContainerAdHoc(container)) {
                 Activity act = (Activity) fElement;
-                if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                if(act.getIncoming() == null || act.getIncoming().isEmpty()) {
                     triggerElements.add(0, fElement);
                 }
             } else if (fElement instanceof IntermediateCatchEvent) {
                 
                 IntermediateCatchEvent act = (IntermediateCatchEvent) fElement;
-                if(act.getIncoming() == null || act.getIncoming().size() == 0) {
+                if(act.getIncoming() == null || act.getIncoming().isEmpty()) {
                     triggerElements.add(0, fElement);
                 } 
                 

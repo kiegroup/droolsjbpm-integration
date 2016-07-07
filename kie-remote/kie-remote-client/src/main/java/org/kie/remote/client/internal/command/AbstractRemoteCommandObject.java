@@ -450,7 +450,7 @@ public abstract class AbstractRemoteCommandObject {
 
         if( cmdResponse != null ) {
             List<JaxbCommandResponse<?>> responses = cmdResponse.getResponses();
-            if( responses.size() == 0 ) {
+            if( responses.isEmpty() ) {
                 return null;
             } else if( responses.size() == 1 ) {
                 // The type information *should* come from the Command class -- but it's a jaxb-gen class,

@@ -100,7 +100,7 @@ public class KieObjectsInjector implements BeanProcessor {
 
     public void afterPropertiesSet(){
         log.debug(" :: Starting Blueprint KieObjectsInjector for kmodule ("+contextId+") :: ");
-        if ( resources == null || resources.size() == 0) {
+        if ( resources == null || resources.isEmpty()) {
             configFileURL = getClass().getResource("/");
             if (configFileURL == null) {
                 createOsgiKieModule();

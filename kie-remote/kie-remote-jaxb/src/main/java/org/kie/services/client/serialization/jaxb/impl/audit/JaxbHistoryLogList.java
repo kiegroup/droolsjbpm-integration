@@ -84,7 +84,7 @@ public class JaxbHistoryLogList implements JaxbCommandResponse<List<Object>>, Ja
     
     private void initialize( List<? extends Object> logList ) { 
         this.historyLogList = new ArrayList<AbstractJaxbHistoryObject>();
-        if( logList == null || logList.size() == 0 ) { 
+        if( logList == null || logList.isEmpty() ) {
             return;
         }
         for( Object logObj : logList ) { 

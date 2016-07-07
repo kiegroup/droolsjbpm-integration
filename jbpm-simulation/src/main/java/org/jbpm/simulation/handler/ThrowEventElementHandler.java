@@ -40,7 +40,7 @@ public class ThrowEventElementHandler extends DefaultElementHandler {
     public boolean handle(FlowElement element, PathContextManager manager) {
         List<EventDefinition> throwDefinitions = getEventDefinitions(element);
     
-        if (throwDefinitions != null && throwDefinitions.size() > 0) {
+        if (throwDefinitions != null && !throwDefinitions.isEmpty()) {
             for (EventDefinition def : throwDefinitions) {
                 String key = "";
                 if (def instanceof SignalEventDefinition) {

@@ -45,7 +45,7 @@ public class KieServerAssert {
 
     public static void assertNullOrEmpty(String errorMessage, Collection<?> result ) {
         if (result != null) {
-            assertTrue(errorMessage, result.size() == 0);
+            assertTrue(errorMessage, result.isEmpty());
         }
     }
 

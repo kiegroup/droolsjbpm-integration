@@ -48,7 +48,7 @@ public class KModuleDefinitionParser extends AbstractBeanDefinitionParser {
         factory.addPropertyValue(ATTRIBUTE_ID, id);
         List<Element> kbaseElements = DomUtils.getChildElementsByTagName(element, "kbase");
         AbstractBeanDefinition beanDefinition = factory.getBeanDefinition();
-        if (kbaseElements != null && kbaseElements.size() > 0) {
+        if (kbaseElements != null && !kbaseElements.isEmpty()) {
             for (Element kbaseElement : kbaseElements){
                 kbaseElement.setAttribute("id", kbaseElement.getAttribute("name"));
                 BeanDefinitionHolder obj = (BeanDefinitionHolder) parserContext.getDelegate().parsePropertySubElement(kbaseElement, null, null);
