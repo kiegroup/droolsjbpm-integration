@@ -410,6 +410,7 @@ public final class KieServicesConfigurationImpl
         this.useSsl = config.useSsl;
         this.capabilities = config.capabilities;
         this.credentialsProvider = config.credentialsProvider;
+        this.loadBalancer = config.loadBalancer;
     }
 
     @Override

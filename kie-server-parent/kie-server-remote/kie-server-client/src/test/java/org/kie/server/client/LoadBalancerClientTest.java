@@ -16,15 +16,18 @@
 package org.kie.server.client;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.remote.common.rest.KieRemoteHttpRequestException;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.balancer.BalancerStrategy;
@@ -79,12 +82,14 @@ public class LoadBalancerClientTest {
         mockServerBaseUri1 = "http://localhost:" + port1;
         mockServerBaseUri2 = "http://localhost:" + port2;
         mockServerBaseUri3 = "http://localhost:" + port3;
+        String mockServerBaseUri3Duplicated = "http://localhost:" + port3;
 
-        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1+"|"+ mockServerBaseUri2 + "|" + mockServerBaseUri3, null, null );
+        config = KieServicesFactory.newRestConfiguration( mockServerBaseUri1+"|"+ mockServerBaseUri2 + "|" + mockServerBaseUri3 + "|" + mockServerBaseUri3Duplicated, null, null );
         // set capabilities upfront to avoid additional request to server info to make the tests more determinable
         config.setCapabilities(Arrays.asList("KieServer"));
     }
 
+    @After
     public void stopServers() {
         wireMockServer1.stop();
         wireMockServer2.stop();
@@ -92,9 +97,29 @@ public class LoadBalancerClientTest {
     }
 
     @Test
+    public void testCloneConfigurationWithLoadBalancer() {
+        KieServicesConfiguration cloned = config.clone();
+        assertNotNull(cloned);
+        assertNull(cloned.getLoadBalancer());
+
+        cloned.setLoadBalancer(LoadBalancer.getDefault("test url"));
+
+        KieServicesConfiguration cloneOfCloned = cloned.clone();
+        assertNotNull(cloned);
+        assertNotNull(cloned.getLoadBalancer());
+
+        assertEquals(cloned.getLoadBalancer(), cloneOfCloned.getLoadBalancer());
+    }
+
+    @Test
     public void testDefaultLoadBalancer() {
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+
+        List<String> available = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
+        assertNotNull(available);
+        assertEquals(3, available.size());
+
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1", response.getResult().getVersion());
@@ -112,6 +137,11 @@ public class LoadBalancerClientTest {
     public void testRandomLoadBalancer() {
         config.setLoadBalancer(LoadBalancer.forStrategy(config.getServerUrl(), BalancerStrategy.Type.RANDOM_STRATEGY));
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+
+        List<String> available = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
+        assertNotNull(available);
+        assertEquals(3, available.size());
+
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
 //        assertEquals("Server version", "1", response.getResult().getVersion());
@@ -131,6 +161,7 @@ public class LoadBalancerClientTest {
         wireMockServer1.stop();
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "2", response.getResult().getVersion());
@@ -147,11 +178,19 @@ public class LoadBalancerClientTest {
         assertSuccess(response);
         assertEquals("Server version", "3", response.getResult().getVersion());
 
+        List<String> available = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
+        assertNotNull(available);
+        assertEquals(2, available.size());
+
         // now let's put back online server 1
         wireMockServer1.start();
 
         Future waitForResult = ((AbstractKieServicesClientImpl)client).getLoadBalancer().checkFailedEndpoints();
         waitForResult.get(5, TimeUnit.SECONDS);
+
+        available = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getAvailableEndpoints();
+        assertNotNull(available);
+        assertEquals(3, available.size());
 
         response = client.getServerInfo();
         assertSuccess(response);

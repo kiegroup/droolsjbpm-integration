@@ -15,14 +15,15 @@
 
 package org.kie.server.client.balancer.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RandomBalancerStrategy extends AbstractBalancerStrategy {
 
-    private List<String> availableEndpoints;
+    private List<String> availableEndpoints = new ArrayList<String>();
 
     public RandomBalancerStrategy(List<String> availableEndpoints) {
-        this.availableEndpoints = availableEndpoints;
+        availableEndpoints.forEach(endpoint -> markAsOnline(endpoint));
     }
 
     @Override
@@ -48,8 +49,15 @@ public class RandomBalancerStrategy extends AbstractBalancerStrategy {
     @Override
     public void markAsOnline(String url) {
         synchronized (availableEndpoints) {
-            availableEndpoints.add(url);
+            if (!availableEndpoints.contains(url)) {
+                availableEndpoints.add(url);
+            }
         }
+    }
+
+    @Override
+    public List<String> getAvailableEndpoints() {
+        return new ArrayList<String>(availableEndpoints);
     }
 
     protected int getRandomInt(int min, int max) {
