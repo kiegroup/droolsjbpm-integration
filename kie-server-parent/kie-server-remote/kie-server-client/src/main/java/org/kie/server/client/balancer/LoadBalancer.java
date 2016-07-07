@@ -15,6 +15,7 @@
 
 package org.kie.server.client.balancer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -69,6 +70,14 @@ public class LoadBalancer {
         } catch (Exception e) {
             logger.debug("Error when shutting down load balancer executor service");
         }
+    }
+
+    public List<String> getAvailableEndpoints() {
+        return this.balancerStrategy.getAvailableEndpoints();
+    }
+
+    public List<String> getFailedEndpoints() {
+        return new ArrayList<String>(failedEndpoints);
     }
 
     /*

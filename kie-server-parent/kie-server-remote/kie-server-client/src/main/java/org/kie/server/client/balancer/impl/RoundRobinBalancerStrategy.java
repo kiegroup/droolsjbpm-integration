@@ -16,18 +16,21 @@
 package org.kie.server.client.balancer.impl;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 public class RoundRobinBalancerStrategy extends AbstractBalancerStrategy {
 
-    private ArrayDeque<String> availableEndpoints;
+    private ArrayDeque<String> availableEndpoints = new ArrayDeque<String>();
 
     public RoundRobinBalancerStrategy(ArrayDeque<String> availableEndpoints) {
         this.availableEndpoints = availableEndpoints;
     }
 
     public RoundRobinBalancerStrategy(Collection<String> availableEndpoints) {
-        this.availableEndpoints = new ArrayDeque<String>(availableEndpoints);
+        availableEndpoints.forEach(endpoint -> markAsOnline(endpoint));
     }
 
     @Override
@@ -49,8 +52,15 @@ public class RoundRobinBalancerStrategy extends AbstractBalancerStrategy {
     @Override
     public void markAsOnline(String url) {
         synchronized (availableEndpoints) {
-            availableEndpoints.addLast(url);
+            if (!availableEndpoints.contains(url)) {
+                availableEndpoints.addLast(url);
+            }
         }
+    }
+
+    @Override
+    public List<String> getAvailableEndpoints() {
+        return new ArrayList<String>(availableEndpoints.clone());
     }
 
     protected String roundRobin() {

@@ -15,6 +15,8 @@
 
 package org.kie.server.client.balancer;
 
+import java.util.List;
+
 public interface BalancerStrategy {
 
     public enum Type {
@@ -27,4 +29,6 @@ public interface BalancerStrategy {
     void markAsOffline(String url);
 
     void markAsOnline(String url);
+
+    List<String> getAvailableEndpoints();
 }
