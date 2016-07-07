@@ -15,13 +15,15 @@
 
 package org.kie.server.integrationtests.jbpm.rest;
 
+import static org.junit.Assert.*;
+import static org.kie.server.api.rest.RestURI.*;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,15 +37,11 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
+import org.kie.server.integrationtests.shared.KieServerAssert;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
 public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -101,28 +99,27 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
         valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
 
-        ClientResponse<JaxbLong> response = null;
+        Response response = null;
         try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
             logger.info( "[POST] " + clientRequest.getUri());
-            response = clientRequest.post();
+            response = clientRequest.request().post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
             Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
 
-            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            JaxbLong pId = response.readEntity(JaxbLong.class);
+            valuesMap.put(PROCESS_INST_ID, pId.unwrap());
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
             logger.info( "[DELETE] " + clientRequest.getUri());
 
-            response = clientRequest.delete();
+            response = clientRequest.request(getMediaType()).delete();
             int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
             int okStatusCode = Response.Status.OK.getStatusCode();
             assertTrue("Wrong status code returned: " + response.getStatus(),
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
     }
@@ -147,30 +144,27 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
         valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
 
-        ClientResponse<JaxbLong> response = null;
+        Response response = null;
         try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
             logger.info( "[POST] " + clientRequest.getUri());
-            response = clientRequest.post();
+            response = clientRequest.request(getMediaType()).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
             Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
 
-            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            JaxbLong pId = response.readEntity(JaxbLong.class);
+            valuesMap.put(PROCESS_INST_ID, pId.unwrap());
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
             logger.info( "[DELETE] " + clientRequest.getUri());
 
-            response = clientRequest.delete();
+            response = clientRequest.request(getMediaType()).delete();
             int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
             int okStatusCode = Response.Status.OK.getStatusCode();
             assertTrue("Wrong status code returned: " + response.getStatus(),
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
     }
@@ -184,31 +178,27 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
         valuesMap.put(PROCESS_ID, HUMAN_TASK_OWN_TYPE_ID);
 
-        ClientResponse<JaxbLong> response = null;
+        Response response = null;
         try {
-
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", acceptHeadersByFormat.get(marshallingFormat));
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
             logger.info( "[POST] " + clientRequest.getUri());
-            response = clientRequest.post();
+            response = clientRequest.request(acceptHeadersByFormat.get(marshallingFormat)).post(createEntity(""));
             Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
             Assert.assertEquals(getMediaType().toString(), response.getHeaders().getFirst("Content-Type"));
 
-            valuesMap.put(PROCESS_INST_ID, response.getEntity(JaxbLong.class).unwrap());
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
+            JaxbLong pId = response.readEntity(JaxbLong.class);
+            valuesMap.put(PROCESS_INST_ID, pId.unwrap());
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
             logger.info( "[DELETE] " + clientRequest.getUri());
 
-            response = clientRequest.delete();
+            response = clientRequest.request(getMediaType()).delete();
             int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
             int okStatusCode = Response.Status.OK.getStatusCode();
             assertTrue("Wrong status code returned: " + response.getStatus(),
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
 
     }

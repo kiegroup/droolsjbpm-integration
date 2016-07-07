@@ -15,14 +15,16 @@
  */
 package org.kie.server.integrationtests.jbpm.rest;
 
+import static org.junit.Assert.*;
+import static org.kie.server.api.rest.RestURI.*;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,15 +38,12 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest{
 
@@ -54,7 +53,7 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
     private static final String CONTAINER_ID = "definition-project";
     private static final String HIRING_PROCESS_ID = "hiring";
 
-    private ClientResponse<?> response = null;
+    private Response response = null;
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -81,7 +80,7 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
     @After
     public void releaseConnection() {
         if (response != null) {
-            response.releaseConnection();
+            response.close();
         }
     }
 
@@ -94,24 +93,16 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
         valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
         valuesMap.put(RestURI.PROCESS_ID, HIRING_PROCESS_ID);
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", MediaType.APPLICATION_SVG_XML);
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        response = clientRequest.request(MediaType.APPLICATION_SVG_XML).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            String result = response.getEntity(String.class);
-            logger.debug("Image content is '{}'", result);
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        String result = response.readEntity(String.class);
+        logger.debug("Image content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
     }
 
     @Test
@@ -125,49 +116,39 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, ClassLoader.getSystemClassLoader());
 
-        try {
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("name", "john");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("name", "john");
 
-            // start process instance
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString())
-                    .body(getMediaType(), marshaller.marshall(params));
-            logger.info("[POST] " + clientRequest.getUri());
-            response = clientRequest.post();
-            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        // start process instance
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+        logger.info("[POST] " + clientRequest.getUri());
+        response = clientRequest.request(getMediaType()).post(createEntity(marshaller.marshall(params)));
+        Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
-            Long result = response.getEntity(JaxbLong.class).unwrap();
-            assertNotNull(result);
+        Long result = response.readEntity(JaxbLong.class).unwrap();
+        assertNotNull(result);
 
-            valuesMap.put(RestURI.PROCESS_INST_ID, result);
+        valuesMap.put(RestURI.PROCESS_INST_ID, result);
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", MediaType.APPLICATION_SVG_XML);
-            logger.info("[GET] " + clientRequest.getUri());
+        clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        response = clientRequest.request(MediaType.APPLICATION_SVG_XML).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            String image = response.getEntity(String.class);
-            logger.debug("Image content is '{}'", image);
-            assertNotNull(image);
-            assertFalse(image.isEmpty());
+        String image = response.readEntity(String.class);
+        logger.debug("Image content is '{}'", image);
+        assertNotNull(image);
+        assertFalse(image.isEmpty());
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
-            logger.info("[DELETE] " + clientRequest.getUri());
+        clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
+        logger.info("[DELETE] " + clientRequest.getUri());
 
-            response = clientRequest.delete();
-            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
-            int okStatusCode = Response.Status.OK.getStatusCode();
-            assertTrue("Wrong status code returned: " + response.getStatus(),
-                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request().delete();
+        int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+        int okStatusCode = Response.Status.OK.getStatusCode();
+        assertTrue("Wrong status code returned: " + response.getStatus(),
+                response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
     }
 
     @Test
@@ -179,18 +160,11 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
         valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
         valuesMap.put(RestURI.PROCESS_ID, "not-existing");
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", MediaType.APPLICATION_SVG_XML);
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_IMG_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request(MediaType.APPLICATION_SVG_XML).get();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -202,17 +176,10 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
         valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
         valuesMap.put(RestURI.PROCESS_INST_ID, 9999);
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", MediaType.APPLICATION_SVG_XML);
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), IMAGE_URI + "/" + PROCESS_INST_IMG_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request(MediaType.APPLICATION_SVG_XML).get();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 }

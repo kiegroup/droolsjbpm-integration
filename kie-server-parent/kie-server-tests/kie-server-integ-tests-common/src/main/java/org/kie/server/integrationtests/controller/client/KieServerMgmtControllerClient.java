@@ -1,26 +1,19 @@
 package org.kie.server.integrationtests.controller.client;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.jboss.resteasy.client.ClientExecutor;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.spi.ReaderException;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
@@ -45,7 +38,9 @@ import org.kie.server.controller.api.model.spec.ServerConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.model.spec.ServerTemplateList;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.integrationtests.shared.filter.Authenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,33 +58,21 @@ public class KieServerMgmtControllerClient {
     private static final String STOPPED_STATUS_URI_PART = "/status/stopped";
     private static final String CONFIG_URI_PART = "/config/";
 
-    private ClientExecutor executor;
     private String controllerBaseUrl;
     private MarshallingFormat format = MarshallingFormat.JAXB;
-    private CloseableHttpClient httpClient;
+    private Client httpClient;
     protected Marshaller marshaller;
 
     public KieServerMgmtControllerClient(String controllerBaseUrl, String login, String password) {
-        URL url;
-        try {
-            url = new URL(controllerBaseUrl);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed controller URL was specified: '" + controllerBaseUrl + "'!", e);
-        }
 
         this.controllerBaseUrl = controllerBaseUrl;
-        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+        httpClient = new ResteasyClientBuilder()
+                .establishConnectionTimeout(10, TimeUnit.SECONDS)
+                .socketTimeout(10, TimeUnit.SECONDS)
+                .build();
         if (login != null) {
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(
-                    new AuthScope(url.getHost(), url.getPort()),
-                    new UsernamePasswordCredentials(login, password));
-            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            httpClient.register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()));
         }
-        this.httpClient = httpClientBuilder.build();
-        this.executor = new ApacheHttpClient4Executor(httpClient);
-
-
     }
 
     public ServerTemplate getServerTemplate(String serverTemplateId) {
@@ -149,14 +132,10 @@ public class KieServerMgmtControllerClient {
 
 
     private <T> T makeGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
-        ClientRequest clientRequest = new ClientRequest(uri, executor);
-        ClientResponse<T> response;
+        WebTarget clientRequest = httpClient.target(uri);
+        Response response;
 
-        try {
-            response = clientRequest.accept(getMediaType(format)).get(resultType);
-        } catch (Exception e) {
-            throw createExceptionForUnexpectedFailure(clientRequest, e);
-        }
+        response = clientRequest.request(getMediaType(format)).get();
 
         if ( response.getStatus() == Response.Status.OK.getStatusCode() ) {
             return deserialize(response, resultType);
@@ -166,12 +145,12 @@ public class KieServerMgmtControllerClient {
     }
 
     private void makeDeleteRequest(String uri) {
-        ClientRequest clientRequest = new ClientRequest(uri, executor);
-        ClientResponse<?> response;
+        WebTarget clientRequest = httpClient.target(uri);
+        Response response;
 
         try {
-            response = clientRequest.accept(getMediaType(format)).delete();
-            response.releaseConnection();
+            response = clientRequest.request(getMediaType(format)).delete();
+            response.close();
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
         }
@@ -182,12 +161,12 @@ public class KieServerMgmtControllerClient {
     }
 
     private <T> T makePutRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
-        ClientRequest clientRequest = new ClientRequest(uri, executor);
-        ClientResponse<T> response;
+        WebTarget clientRequest = httpClient.target(uri);
+        Response response;
 
         try {
-            response = clientRequest.accept(getMediaType(format))
-                    .body(getMediaType(format), serialize(bodyObject)).put(resultType);
+            Entity<String> requestEntity = Entity.entity(serialize(bodyObject), getMediaType(format));
+            response = clientRequest.request(getMediaType(format)).put(requestEntity);
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
         }
@@ -200,12 +179,12 @@ public class KieServerMgmtControllerClient {
     }
 
     private <T> T makePostRequestAndCreateCustomResponse(String uri, Object bodyObject, Class<T> resultType) {
-        ClientRequest clientRequest = new ClientRequest(uri, executor);
-        ClientResponse<T> response;
+        WebTarget clientRequest = httpClient.target(uri);
+        Response response;
 
         try {
-            response = clientRequest.accept(getMediaType(format))
-                    .body(getMediaType(format), serialize(bodyObject)).post(resultType);
+            Entity<String> requestEntity = Entity.entity(serialize(bodyObject), getMediaType(format));
+            response = clientRequest.request(getMediaType(format)).post(requestEntity);
 
         } catch (Exception e) {
             throw createExceptionForUnexpectedFailure(clientRequest, e);
@@ -220,19 +199,19 @@ public class KieServerMgmtControllerClient {
     }
 
     private RuntimeException createExceptionForUnexpectedResponseCode(
-            ClientRequest request,
-            ClientResponse<?> response) {
+            WebTarget request,
+            Response response) {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Unexpected HTTP response code when requesting URI '");
         stringBuffer.append(getClientRequestUri(request));
         stringBuffer.append("'! Response code: ");
         stringBuffer.append(response.getStatus());
         try {
-            String responseEntity = response.getEntity(String.class);
+            String responseEntity = response.readEntity(String.class);
             stringBuffer.append(" Response message: ");
             stringBuffer.append(responseEntity);
-        } catch (ReaderException e) {
-            response.releaseConnection();
+        } catch (IllegalStateException e) {
+            response.close();
             // Exception while reading response - most probably empty response and closed input stream
         }
 
@@ -241,16 +220,16 @@ public class KieServerMgmtControllerClient {
     }
 
     private RuntimeException createExceptionForUnexpectedFailure(
-            ClientRequest request, Exception e) {
+            WebTarget request, Exception e) {
         String summaryMessage = "Unexpected exception when requesting URI '" + getClientRequestUri(request) + "'!";
         logger.debug( summaryMessage);
         return new RuntimeException(summaryMessage, e);
     }
 
-    private String getClientRequestUri(ClientRequest clientRequest) {
+    private String getClientRequestUri(WebTarget clientRequest) {
         String uri;
         try {
-            uri = clientRequest.getUri();
+            uri = clientRequest.getUri().toString();
         } catch (Exception e) {
             throw new RuntimeException("Malformed client URL was specified!", e);
         }
@@ -259,7 +238,6 @@ public class KieServerMgmtControllerClient {
 
     public void close() {
         try {
-            executor.close();
             httpClient.close();
         } catch (Exception e) {
             logger.error("Exception thrown while closing resources!", e);
@@ -330,23 +308,22 @@ public class KieServerMgmtControllerClient {
         }
     }
 
-    protected <T> T deserialize(ClientResponse<T> response, Class<T> type) {
+    protected <T> T deserialize(Response response, Class<T> type) {
         try {
             if(type == null) {
                 return null;
             }
-            String content = response.getEntity(String.class);
+            String content = response.readEntity(String.class);
             logger.debug("About to deserialize content: \n '{}' \n into type: '{}'", content, type);
             if (content == null || content.isEmpty()) {
                 return null;
             }
 
-            T result = marshaller.unmarshall( content, type );
-            return result;
+            return marshaller.unmarshall( content, type );
         } catch ( MarshallingException e ) {
             throw new RuntimeException( "Error while deserializing data received from server!", e );
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 

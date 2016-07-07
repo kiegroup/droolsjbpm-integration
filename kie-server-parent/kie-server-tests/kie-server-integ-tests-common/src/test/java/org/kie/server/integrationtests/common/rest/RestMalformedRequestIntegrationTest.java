@@ -15,21 +15,17 @@
 
 package org.kie.server.integrationtests.common.rest;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
-import org.jboss.resteasy.util.GenericType;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-
-import javax.ws.rs.core.Response;
 
 @Category(RESTOnly.class)
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -39,37 +35,33 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         KieContainerResource resource = new KieContainerResource("no-gav2-container",
                 new ReleaseId("foo", "bar", "0.0.0"));
 
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        Response response = null;
         try {
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/" + resource.getContainerId());
-            response = clientRequest.body(
-                    getMediaType(), resource).accept(getMediaType()).put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/" + resource.getContainerId());
+            response = clientRequest.request(getMediaType()).put(createEntity(resource));
+
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         } catch (Exception e) {
-            throw new ClientResponseFailure(
+            throw new RuntimeException(
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
-                    e, response);
+                    e);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 
     @Test
     public void testCreateContainerEmptyBody() throws Exception {
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        Response response = null;
         try {
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/empty-body-container");
-            response = clientRequest.body(
-                    getMediaType(), "").accept(getMediaType()).put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/empty-body-container");
+            response = clientRequest.request(getMediaType()).put(createEntity(""));
+
             Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+            throw new RuntimeException("Unexpected exception on empty body", e);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
     
