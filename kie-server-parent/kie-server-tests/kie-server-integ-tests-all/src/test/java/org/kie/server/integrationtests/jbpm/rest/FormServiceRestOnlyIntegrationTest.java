@@ -15,13 +15,15 @@
  */
 package org.kie.server.integrationtests.jbpm.rest;
 
+import static org.junit.Assert.*;
+import static org.kie.server.api.rest.RestURI.*;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,15 +39,12 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest {
 
@@ -55,7 +54,7 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
     private static final String CONTAINER_ID = "definition-project";
     private static final String HIRING_PROCESS_ID = "hiring";
 
-    private ClientResponse<?> response = null;
+    private Response response = null;
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -82,7 +81,7 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
     @After
     public void releaseConnection() {
         if (response != null) {
-            response.releaseConnection();
+            response.close();
         }
     }
 
@@ -95,23 +94,16 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
         valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
         valuesMap.put(RestURI.PROCESS_ID, HIRING_PROCESS_ID);
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        response = clientRequest.request(getMediaType()).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            String result = response.getEntity(String.class);
-            logger.debug("Form content is '{}'", result);
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        String result = response.readEntity(String.class);
+        logger.debug("Form content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
     }
 
     @Test
@@ -125,69 +117,57 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, ClassLoader.getSystemClassLoader());
 
-        try {
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("name", "john");
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("name", "john");
 
-            // start process instance
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString())
-                    .body(getMediaType(), marshaller.marshall(params));
-            logger.info("[POST] " + clientRequest.getUri());
-            response = clientRequest.post();
-            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        // start process instance
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + START_PROCESS_POST_URI, valuesMap));
+        logger.info("[POST] " + clientRequest.getUri());
+        response = clientRequest.request(getMediaType()).post(createEntity(marshaller.marshall(params)));
+        Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
 
-            Long result = response.getEntity(JaxbLong.class).unwrap();
-            assertNotNull(result);
+        Long result = response.readEntity(JaxbLong.class).unwrap();
+        assertNotNull(result);
 
-            // find tasks by process instance id
-            valuesMap.put(RestURI.PROCESS_INST_ID, result);
+        // find tasks by process instance id
+        valuesMap.put(RestURI.PROCESS_INST_ID, result);
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
+        clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), QUERY_URI + "/" + TASK_BY_PROCESS_INST_ID_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        response = clientRequest.request(getMediaType()).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            TaskSummaryList taskSummaryList = marshaller.unmarshall(response.getEntity(String.class), TaskSummaryList.class);
-            logger.debug("Form content is '{}'", taskSummaryList);
+        TaskSummaryList taskSummaryList = response.readEntity(TaskSummaryList.class);
+        logger.debug("Form content is '{}'", taskSummaryList);
 
-            assertNotNull(taskSummaryList);
-            TaskSummary[] task = taskSummaryList.getTasks();
-            assertEquals(1, task.length);
+        assertNotNull(taskSummaryList);
+        TaskSummary[] task = taskSummaryList.getTasks();
+        assertEquals(1, task.length);
 
-            Long taskId = task[0].getId();
+        Long taskId = task[0].getId();
 
-            valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
+        valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
+        clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        response = clientRequest.request(getMediaType()).get();
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            String formdata = response.getEntity(String.class);
-            logger.debug("Form content is '{}'", formdata);
-            assertNotNull(formdata);
-            assertFalse(formdata.isEmpty());
+        String formdata = response.readEntity(String.class);
+        logger.debug("Form content is '{}'", formdata);
+        assertNotNull(formdata);
+        assertFalse(formdata.isEmpty());
 
-            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap)).header("Content-Type", getMediaType().toString());
-            logger.info("[DELETE] " + clientRequest.getUri());
+        clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
+        logger.info("[DELETE] " + clientRequest.getUri());
 
-            response = clientRequest.delete();
-            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
-            int okStatusCode = Response.Status.OK.getStatusCode();
-            assertTrue("Wrong status code returned: " + response.getStatus(),
-                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request().delete();
+        int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+        int okStatusCode = Response.Status.OK.getStatusCode();
+        assertTrue("Wrong status code returned: " + response.getStatus(),
+                response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
     }
 
     @Test
@@ -200,18 +180,11 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
         valuesMap.put(RestURI.PROCESS_ID, "not-existing");
         valuesMap.put(RestURI.TASK_INSTANCE_ID, 99999);
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request(getMediaType()).get();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -223,17 +196,10 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
         valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
         valuesMap.put(RestURI.PROCESS_ID, "not-existing");
 
-        try {
-            ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
-                    .header("Content-Type", getMediaType().toString())
-                    .header("Accept", getMediaType().toString());
-            logger.info("[GET] " + clientRequest.getUri());
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap));
+        logger.info("[GET] " + clientRequest.getUri());
 
-            response = clientRequest.get();
-            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
-
-        } catch (Exception e) {
-            throw new ClientResponseFailure(e, response);
-        }
+        response = clientRequest.request(getMediaType()).get();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 }

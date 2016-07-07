@@ -15,11 +15,13 @@
 
 package org.kie.server.integrationtests.drools.rest;
 
+import static org.junit.Assert.assertEquals;
+
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ClientResponseFailure;
-import org.jboss.resteasy.util.GenericType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -30,13 +32,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.RESTOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import static org.junit.Assert.assertEquals;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 @Category(RESTOnly.class)
 public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegrationTest {
@@ -54,68 +51,27 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     }
 
     @Test
-    public void testCreateContainerNonExistingGAV2() throws Exception {
-        KieContainerResource resource = new KieContainerResource("no-gav2-container",
-                new ReleaseId("foo", "bar", "0.0.0"));
-
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/" + resource.getContainerId());
-            response = clientRequest.body(
-                    getMediaType(), resource).accept(getMediaType()).put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
-            assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        } catch (Exception e) {
-            throw new ClientResponseFailure(
-                    "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
-                    e, response);
-        } finally {
-            response.releaseConnection();
-        }
-    }
-
-    @Test
-    public void testCreateContainerEmptyBody() throws Exception {
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
-        try {
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/empty-body-container");
-            response = clientRequest.body(
-                    getMediaType(), "").accept(getMediaType()).put(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
-            assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
-        } finally {
-            response.releaseConnection();
-        }
-    }
-
-    @Test
     public void testInvalidCommandBodyOnCallContainer() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, this.getClass().getClassLoader());
         client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        Response response = null;
         try {
             // empty commands can be considered as invalid request
             String body = marshaller.marshall(new BatchExecutionCommandImpl());
 
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
-            response = clientRequest.body(
-                    getMediaType(), body).accept(getMediaType()).post(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
+            response = clientRequest.request(getMediaType()).post(createEntity(body));
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            ServiceResponse serviceResponse = response.getEntity();
+            ServiceResponse<KieContainerResource> serviceResponse =
+                    response.readEntity(new GenericType<ServiceResponse<KieContainerResource>>(){});
             assertEquals(ServiceResponse.ResponseType.FAILURE, serviceResponse.getType());
             assertEquals("Bad request, no commands to be executed - either wrong format or no data", serviceResponse.getMsg());
         } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+            throw new RuntimeException("Unexpected exception on empty body", e);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 
@@ -124,21 +80,17 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
         client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
+        Response response = null;
         try {
             // empty commands can be considered as invalid request
             String body = "invalid content that cannot be parsed";
 
-            MediaType mediaType = getMediaType();
-
-            ClientRequest clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
-            response = clientRequest.body(
-                    mediaType, body).accept(mediaType).post(
-                    new GenericType<ServiceResponse<KieContainerResource>>() {
-                    });
+            WebTarget clientRequest = newRequest(TestConfig.getKieServerHttpUrl() + "/containers/instances/" + CONTAINER_ID);
+            response = clientRequest.request(getMediaType()).post(createEntity(body));
             assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-            ServiceResponse serviceResponse = response.getEntity();
+            ServiceResponse<KieContainerResource> serviceResponse =
+                    response.readEntity(new GenericType<ServiceResponse<KieContainerResource>>(){});
             assertEquals(ServiceResponse.ResponseType.FAILURE, serviceResponse.getType());
             switch (marshallingFormat) {
                 case JAXB:
@@ -149,9 +101,9 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     break;
             }
         } catch (Exception e) {
-            throw new ClientResponseFailure("Unexpected exception on empty body", e, response);
+            throw new RuntimeException("Unexpected exception on invalid body", e);
         } finally {
-            response.releaseConnection();
+            response.close();
         }
     }
 

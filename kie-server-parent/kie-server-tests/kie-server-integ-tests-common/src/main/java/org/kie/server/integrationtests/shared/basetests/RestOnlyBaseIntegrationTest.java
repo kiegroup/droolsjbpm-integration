@@ -15,22 +15,16 @@
 
 package org.kie.server.integrationtests.shared.basetests;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -38,6 +32,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.filter.Authenticator;
 
 @RunWith(Parameterized.class)
 public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrationTest {
@@ -74,38 +69,21 @@ public abstract class RestOnlyBaseIntegrationTest extends KieServerBaseIntegrati
         }
     }
 
-    private static HttpClient httpClient;
+    private static Client httpClient;
 
-    protected ClientRequest newRequest(String uriString) {
-        URI uri;
-        try {
-            uri = new URI(uriString);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Malformed request URI was specified: '" + uriString + "'!", e);
+    protected WebTarget newRequest(String uriString) {
+
+        if(httpClient == null) {
+            httpClient = new ResteasyClientBuilder()
+                    .establishConnectionTimeout(10, TimeUnit.SECONDS)
+                    .socketTimeout(10, TimeUnit.SECONDS)
+                    .register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()))
+                    .build();
         }
-        if (httpClient == null) {
-            if (TestConfig.isLocalServer()) {
-                RequestConfig requestConfig = RequestConfig.custom()
-                        .setConnectionRequestTimeout(1000)
-                        .setConnectTimeout(1000)
-                        .setSocketTimeout(1000)
-                        .build();
-                httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
-            } else {
-                RequestConfig requestConfig = RequestConfig.custom()
-                        .setConnectionRequestTimeout(2000)
-                        .setConnectTimeout(2000)
-                        .setSocketTimeout(2000)
-                        .build();
-                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(
-                        new AuthScope(uri.getHost(), uri.getPort()),
-                        new UsernamePasswordCredentials(TestConfig.getUsername(), TestConfig.getPassword())
-                );
-                httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).setDefaultCredentialsProvider(credentialsProvider).build();
-            }
-        }
-        ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(httpClient);
-        return new ClientRequest(uriString, executor);
+        return httpClient.target(uriString);
+    }
+
+    protected <T> Entity<T> createEntity(T requestObject) {
+        return Entity.entity(requestObject, getMediaType());
     }
 }
