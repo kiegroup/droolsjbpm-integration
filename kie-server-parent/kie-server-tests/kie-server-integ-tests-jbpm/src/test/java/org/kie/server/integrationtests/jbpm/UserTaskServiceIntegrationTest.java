@@ -1065,6 +1065,40 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     }
 
     @Test
+    public void testFindTasksByVariableAndValueSortedByProcessInstanceId() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "john is working on it");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+            assertEquals(2, taskList.size());
+
+            List<String> status = new ArrayList<String>();
+            status.add(Status.Reserved.toString());
+
+            taskList = taskClient.findTasksByVariableAndValue(USER_YODA, "_string", "john is working on it", status, 0, 10, "processInstanceId", true);
+            assertEquals(2, taskList.size());
+            assertEquals(processInstanceId, taskList.get(0).getProcessInstanceId());
+            assertEquals(processInstanceId2, taskList.get(1).getProcessInstanceId());
+
+            taskList = taskClient.findTasksByVariableAndValue(USER_YODA, "_string", "john is working on it", status, 0, 10, "processInstanceId", false);
+            assertEquals(2, taskList.size());
+            assertEquals(processInstanceId2, taskList.get(0).getProcessInstanceId());
+            assertEquals(processInstanceId, taskList.get(1).getProcessInstanceId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
+        }
+    }
+
+    @Test
     public void testProcessWithUserTasksWithConversationId() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 

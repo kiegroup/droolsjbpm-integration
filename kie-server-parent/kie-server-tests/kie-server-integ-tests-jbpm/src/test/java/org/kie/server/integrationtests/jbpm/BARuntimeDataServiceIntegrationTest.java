@@ -98,4 +98,39 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             changeUser(TestConfig.getUsername());
         }
     }
+
+    @Test
+    public void testFindTaskAssignedAsBusinessAdminSorted() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10, "t.taskData.processInstanceId", true);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(processInstanceId, tasks.get(0).getProcessInstanceId());
+            assertEquals(processInstanceId2, tasks.get(1).getProcessInstanceId());
+
+            List<String> status = new ArrayList<>();
+            status.add(Status.Reserved.toString());
+
+            tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, status, 0, 10, "t.taskData.processInstanceId", false);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(processInstanceId2, tasks.get(0).getProcessInstanceId());
+            assertEquals(processInstanceId, tasks.get(1).getProcessInstanceId());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
+            changeUser(TestConfig.getUsername());
+        }
+    }
 }
