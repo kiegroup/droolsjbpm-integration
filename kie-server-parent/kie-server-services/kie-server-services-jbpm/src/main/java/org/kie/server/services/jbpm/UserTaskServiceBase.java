@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
@@ -436,6 +437,9 @@ public class UserTaskServiceBase {
     public String  getTask(String containerId, Number taskId, boolean withInput, boolean withOutput, boolean withAssignments, String marshallingType) {
 
         Task task = userTaskService.getTask(taskId.longValue());
+        if (task == null) {
+            throw new TaskNotFoundException("No task found with id " + taskId);
+        }
         TaskInstance.Builder builder = TaskInstance.builder();
         builder
                 .id(task.getId())
