@@ -458,6 +458,13 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
+    @Test (expected = KieServicesException.class)
+    public void testNotExistingUserTaskById() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+        taskClient.getTaskInstance(CONTAINER_ID, -9999l);
+
+    }
+
     @Test
     public void testUserTaskByIdWithDetails() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
