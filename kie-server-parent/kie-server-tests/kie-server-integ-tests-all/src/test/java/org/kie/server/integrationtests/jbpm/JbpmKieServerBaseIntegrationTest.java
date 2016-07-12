@@ -26,7 +26,6 @@ import org.kie.api.KieServices;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
@@ -65,10 +64,16 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         cleanupSingletonSessionId();
     }
 
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
-        super.additionalConfiguration(configuration);
-        configuration.setTimeout(15000);
+    @Before
+    public void abortAllProcesses() {
+        List<Integer> status = new ArrayList<Integer>();
+        status.add(ProcessInstance.STATE_ACTIVE);
+        List<org.kie.server.api.model.instance.ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
+        if (activeInstances != null) {
+            for (org.kie.server.api.model.instance.ProcessInstance instance : activeInstances) {
+                processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
+            }
+        }
     }
 
     @Override
@@ -79,19 +84,5 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
         ruleClient = client.getServicesClient(RuleServicesClient.class);
         uiServicesClient = client.getServicesClient(UIServicesClient.class);
-    }
-
-    @Override
-    protected void disposeAllContainers() {
-        List<Integer> status = new ArrayList<Integer>();
-        status.add(ProcessInstance.STATE_ACTIVE);
-        List<org.kie.server.api.model.instance.ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
-        if (activeInstances != null) {
-            for (org.kie.server.api.model.instance.ProcessInstance instance : activeInstances) {
-                processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
-            }
-        }
-
-        super.disposeAllContainers();
     }
 }

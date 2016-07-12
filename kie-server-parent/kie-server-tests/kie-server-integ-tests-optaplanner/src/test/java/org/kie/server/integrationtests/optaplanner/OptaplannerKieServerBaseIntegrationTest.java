@@ -15,10 +15,18 @@
 
 package org.kie.server.integrationtests.optaplanner;
 
+import java.util.List;
+
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
@@ -33,16 +41,35 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
         commandsFactory = KieServices.Factory.get().getCommands();
     }
 
+    @Before
+    public void abortAllSolvers() {
+        for(KieContainerResource container : getContainers()) {
+            abortSolvers(container.getContainerId());
+        }
+    }
+
+    public void abortSolvers(String containerId) {
+        for(SolverInstance solver : getSolvers(containerId)) {
+            ServiceResponse<Void> response = solverClient.disposeSolver(containerId, solver.getSolverId());
+            Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
+        }
+    }
+
+    private List<KieContainerResource> getContainers() {
+        ServiceResponse<KieContainerResourceList> response = client.listContainers();
+        Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
+        return response.getResult().getContainers();
+    }
+
+    private List<SolverInstance> getSolvers(String containerId) {
+        ServiceResponse<SolverInstanceList> response = solverClient.getSolvers(containerId);
+        Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
+        return response.getResult().getContainers();
+    }
+
     @Override
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.solverClient = kieServicesClient.getServicesClient( SolverServicesClient.class );
     }
-
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
-        super.additionalConfiguration(configuration);
-        configuration.setTimeout(60000);
-    }
-
 
 }

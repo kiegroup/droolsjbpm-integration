@@ -17,12 +17,10 @@ package org.kie.server.integrationtests.jbpm;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.client.KieServicesException;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -40,13 +38,12 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Test
     public void testGetProcessImageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_PROCESS_ID);
         logger.debug("Image content is '{}'", result);
         assertNotNull(result);
@@ -55,17 +52,11 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
 
     @Test(expected = KieServicesException.class)
     public void testGetProcessNotExistingImageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         uiServicesClient.getProcessImage(CONTAINER_ID, "not-existing");
     }
 
     @Test
     public void testGetProcessInstanceImageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {
@@ -80,17 +71,11 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
 
     @Test(expected = KieServicesException.class)
     public void testGetProcessInstanceNotExistingImageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         uiServicesClient.getProcessInstanceImage(CONTAINER_ID, 9999l);
     }
 
     @Test
     public void testGetProcessImageInPackageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_2_PROCESS_ID);
         logger.debug("Image content is '{}'", result);
         assertNotNull(result);
@@ -99,9 +84,6 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
 
     @Test
     public void testGetProcessInstanceImageInPackageViaUIClientTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {

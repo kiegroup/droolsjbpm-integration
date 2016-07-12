@@ -25,7 +25,6 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.DocumentServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
@@ -71,10 +70,16 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         cleanupSingletonSessionId();
     }
 
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
-        super.additionalConfiguration(configuration);
-        configuration.setTimeout(30000);
+    @Before
+    public void abortAllProcesses() {
+        List<Integer> status = new ArrayList<Integer>();
+        status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
+        if (activeInstances != null) {
+            for (ProcessInstance instance : activeInstances) {
+                processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
+            }
+        }
     }
 
     @Override
@@ -85,19 +90,4 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
         documentClient = client.getServicesClient(DocumentServicesClient.class);
     }
-
-    @Override
-    protected void disposeAllContainers() {
-        List<Integer> status = new ArrayList<Integer>();
-        status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
-        if (activeInstances != null) {
-            for (ProcessInstance instance : activeInstances) {
-                processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
-            }
-        }
-
-        super.disposeAllContainers();
-    }
-
 }

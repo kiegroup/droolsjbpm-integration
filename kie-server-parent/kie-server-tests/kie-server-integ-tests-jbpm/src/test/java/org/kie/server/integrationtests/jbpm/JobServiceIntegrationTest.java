@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
@@ -38,7 +37,6 @@ import org.kie.server.integrationtests.category.Smoke;
 import static org.junit.Assert.*;
 import static org.hamcrest.core.AnyOf.*;
 import static org.hamcrest.core.IsEqual.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -57,6 +55,9 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Before
@@ -79,8 +80,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleViewAndCancelJob() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DATE, 1);
 
@@ -106,8 +105,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     @Test
     @Category(Smoke.class)
     public void testScheduleAndRunJob() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         JobRequestInstance jobRequestInstance = createJobRequestInstance();
 
         Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
@@ -137,8 +134,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRunJobWithCustomTypeFromContainer() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Class<?> personClass = Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader());
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -197,8 +192,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleSearchByStatusAndCancelJob() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         int currentNumberOfCancelled = jobServicesClient.getRequestsByStatus(Collections.singletonList(STATUS.CANCELLED.toString()), 0, 100).size();
 
         Calendar tomorrow = Calendar.getInstance();
@@ -240,8 +233,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRequeueJob() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         String command = "org.jbpm.executor.commands.PrintOutCommand123";
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -285,8 +276,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleSearchByKeyJob() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         int currentNumberOfRequests = jobServicesClient.getRequestsByBusinessKey(BUSINESS_KEY, 0, 100).size();
 
         Calendar tomorrow = Calendar.getInstance();

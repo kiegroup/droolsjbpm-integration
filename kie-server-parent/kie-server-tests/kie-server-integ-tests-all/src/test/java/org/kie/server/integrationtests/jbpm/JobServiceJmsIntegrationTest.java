@@ -24,46 +24,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.api.KieServices;
 import org.kie.internal.executor.api.STATUS;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 @Category(JMSOnly.class)
 public class JobServiceJmsIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.0.Final");
-
     private static final long NUMBER_OF_JOBS = 10;
     private static final long MAXIMUM_PROCESSING_TIME = 20000;
-    private static final String CONTAINER_ID = "definition-project";
-
-    @BeforeClass
-    public static void buildAndDeployArtifacts() {
-
-        KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
-
-        kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
-    }
 
     @Test
     public void testScheduleSeveralJobs() throws Exception {
         // Test is using JMS, isn't available for local execution.
         Assume.assumeFalse(TestConfig.isLocalServer());
-
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         String businessKey = "test key";
         String command = "org.jbpm.executor.commands.PrintOutCommand";

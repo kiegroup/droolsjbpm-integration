@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -25,12 +24,15 @@ public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static final String CONTAINER_ID = "agenda";
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
-    private static final String KIE_SESSION = "defaultKieSession";
+    private static final String KIE_SESSION = "ksession1";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     /**
@@ -38,8 +40,6 @@ public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
      */
     @Test
     public void testClearAgenda() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);

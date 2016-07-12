@@ -29,7 +29,6 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -57,6 +56,9 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/per-process-instance-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -66,8 +68,6 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithBusinessRuleTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID);
         assertNotNull(processInstanceId1);
         assertTrue(processInstanceId1.longValue() > 0);

@@ -19,7 +19,6 @@ package org.kie.server.integrationtests.drools;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -29,9 +28,6 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -57,6 +53,9 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -66,9 +65,6 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
 
     @Test
     public void testStatelessCall() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 

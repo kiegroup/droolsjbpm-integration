@@ -35,14 +35,15 @@ import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegra
 
 public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
-    private static ReleaseId releaseId2 = new ReleaseId("foo.bar", "baz", "2.1.1.GA");
 
     private static final String CONTAINER_ID = "kie1";
 
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId1);
-        KieServerDeployer.createAndDeployKJar(releaseId2);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId1);
     }
 
     @Test
@@ -60,10 +61,6 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     @Test
     public void testScanner() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId1));
-        ServiceResponse<KieContainerResource> reply = client.getContainerInfo(CONTAINER_ID);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-        
         ServiceResponse<KieScannerResource> si = client.getScannerInfo(CONTAINER_ID);
         Assert.assertEquals( ResponseType.SUCCESS, si.getType() );
         KieScannerResource info = si.getResult();
@@ -102,10 +99,6 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     @Test
     public void testScannerScanNow() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId1));
-        ServiceResponse<KieContainerResource> reply = client.getContainerInfo(CONTAINER_ID);
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
-
         ServiceResponse<KieScannerResource> si = client.getScannerInfo(CONTAINER_ID);
         Assert.assertEquals( ResponseType.SUCCESS, si.getType() );
         KieScannerResource info = si.getResult();
@@ -134,7 +127,6 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     @Test
     public void testScannerStatusOnContainerInfo() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId1));
         ServiceResponse<KieContainerResource> reply = client.getContainerInfo(CONTAINER_ID);
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
 
@@ -169,7 +161,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
     @Test
     public void testConversationIdHandling() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId1));
+        client.getContainerInfo(CONTAINER_ID);
         String conversationId = client.getConversationId();
         assertNotNull(conversationId);
 

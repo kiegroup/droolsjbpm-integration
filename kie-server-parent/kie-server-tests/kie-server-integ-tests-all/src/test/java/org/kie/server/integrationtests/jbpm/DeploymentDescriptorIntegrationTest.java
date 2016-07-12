@@ -28,7 +28,6 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -53,6 +52,9 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/deployment-descriptor-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -62,8 +64,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
     @Test
     public void testGlobalVariableFromDeploymentDescriptor() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);
 
@@ -84,8 +84,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
     public void testPerRequestRuntimeStrategy() throws Exception {
         String personOutIdentifier = "personOut";
         String personName = USER_YODA;
-
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, CONTAINER_ID);

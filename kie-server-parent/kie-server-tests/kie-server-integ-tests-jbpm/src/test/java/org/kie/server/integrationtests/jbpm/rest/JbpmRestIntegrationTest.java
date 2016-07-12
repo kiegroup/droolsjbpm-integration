@@ -37,7 +37,6 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
@@ -62,6 +61,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         // set the accepted formats with quality param to express preference
         acceptHeadersByFormat.put(MarshallingFormat.JAXB, "application/xml;q=0.9,application/json;q=0.3");// xml is preferred over json
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
+
+        disposeAllContainers();
+        createContainer(CONTAINER, releaseId);
     }
 
 
@@ -93,7 +95,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     @Test
     public void testBasicJbpmRequest() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
@@ -138,7 +139,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     @Test
     public void testBasicJbpmRequestWithSingleAcceptHeader() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
@@ -172,7 +172,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
     @Test
     public void testBasicJbpmRequestManyAcceptHeaders() throws Exception {
         KieContainerResource resource = new KieContainerResource(CONTAINER, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER, resource));
 
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(CONTAINER_ID, resource.getContainerId());
