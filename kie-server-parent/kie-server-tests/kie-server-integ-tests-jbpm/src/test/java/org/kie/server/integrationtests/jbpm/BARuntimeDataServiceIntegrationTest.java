@@ -24,7 +24,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -43,11 +42,13 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -58,7 +59,6 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
     @Test
     public void testFindTaskAssignedAsBusinessAdmin() throws Exception {
         changeUser(USER_ADMINISTRATOR);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
@@ -102,7 +102,6 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
     @Test
     public void testFindTaskAssignedAsBusinessAdminSorted() throws Exception {
         changeUser(USER_ADMINISTRATOR);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");

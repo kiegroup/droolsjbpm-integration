@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -42,6 +43,11 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId1);
         KieServerDeployer.createAndDeployKJar(releaseId2);
+    }
+
+    @Before
+    public void setupKieServer() throws Exception {
+        disposeAllContainers();
     }
 
     @Test

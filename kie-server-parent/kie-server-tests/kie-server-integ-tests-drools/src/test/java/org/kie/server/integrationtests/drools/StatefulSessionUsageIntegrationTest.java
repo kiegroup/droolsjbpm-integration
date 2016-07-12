@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -29,7 +30,6 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -61,6 +61,12 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
 
+    @Before
+    public void cleanContainers() {
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
+    }
+
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kjarClassLoader));
@@ -68,8 +74,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testErrorHandlingWhenContainerIsDisposedBetweenCalls() {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
@@ -91,8 +95,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testStateIsKeptBetweenCalls() {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
@@ -138,8 +140,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testInsertFireGetQuery() {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
@@ -183,8 +183,6 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testInsertFireGetQueryMultipleResults() {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 

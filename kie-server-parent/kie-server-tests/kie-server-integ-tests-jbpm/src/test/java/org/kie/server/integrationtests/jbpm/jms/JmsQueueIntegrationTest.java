@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesClient;
@@ -40,7 +39,6 @@ import org.kie.server.integrationtests.controller.ContainerRemoteController;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category({JMSOnly.class, RemotelyControlled.class})
@@ -69,12 +67,13 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         containerRemoteController = new ContainerRemoteController(TestConfig.getContainerId(), TestConfig.getContainerPort());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, RELEASE_ID);
     }
 
     @Test
     public void testStartProcessFromJmsAfterApplicationStart() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, RELEASE_ID)));
-
         // Custom client with reduced timeout
         KieServicesConfiguration customConfig = configuration.clone();
         customConfig.setTimeout(3000);

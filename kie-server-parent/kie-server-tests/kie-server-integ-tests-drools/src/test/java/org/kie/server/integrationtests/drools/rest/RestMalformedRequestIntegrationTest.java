@@ -48,12 +48,13 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
 
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Test
     public void testInvalidCommandBodyOnCallContainer() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, this.getClass().getClassLoader());
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Response response = null;
         try {
@@ -77,8 +78,6 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
 
     @Test
     public void testInvalidBodyOnCallContainer() throws Exception {
-
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Response response = null;
         try {

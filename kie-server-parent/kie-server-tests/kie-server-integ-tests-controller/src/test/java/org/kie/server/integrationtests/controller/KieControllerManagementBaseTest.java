@@ -35,6 +35,14 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
         mgmtControllerClient.setMarshallingFormat(marshallingFormat);
     }
 
+    @Before
+    @Override
+    public void setup() throws Exception {
+        super.setup();
+        disposeAllContainers();
+        disposeAllServerInstances();
+    }
+
     @After
     public void closeControllerClient() {
         mgmtControllerClient.close();

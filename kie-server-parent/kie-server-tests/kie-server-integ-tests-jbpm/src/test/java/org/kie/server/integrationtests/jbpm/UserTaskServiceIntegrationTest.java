@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
@@ -58,6 +57,9 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -68,7 +70,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     @Test
     @Category(Smoke.class)
     public void testProcessWithUserTasks() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -112,7 +113,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testAutoProgressComplete() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -157,7 +157,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testReleaseAndClaim() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -195,7 +194,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testStartAndStop() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -233,7 +231,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testSuspendAndResume() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -270,7 +267,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFailUserTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -305,7 +301,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testSkipUserTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -334,8 +329,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskContentOperations() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -416,7 +409,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskById() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -460,15 +452,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test (expected = KieServicesException.class)
     public void testNotExistingUserTaskById() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         taskClient.getTaskInstance(CONTAINER_ID, -9999l);
-
     }
 
     @Test
     public void testUserTaskByIdWithDetails() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -546,7 +534,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
      */
     @Test
     public void testForwardUserTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -608,7 +595,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
      */
     @Test
     public void testDelegateUserTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -668,8 +654,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskSetTaskProperties() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -716,8 +700,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskComments() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -777,8 +759,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskAttachments() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -851,8 +831,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testUserTaskAttachmentsAsByteArray() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -879,7 +857,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testExitUserTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -910,7 +887,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
     public void testGroupUserTask() throws Exception {
         String taskName = "Group task";
 
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_GROUPTASK);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -961,8 +937,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFindTasksByVariable() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1017,8 +991,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFindTasksByVariableAndValue() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1073,8 +1045,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testFindTasksByVariableAndValueSortedByProcessInstanceId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "john is working on it");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1107,8 +1077,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testProcessWithUserTasksWithConversationId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
+        // Used to load conversation Id.
+        client.getContainerInfo(CONTAINER_ID);
         String conversationId = client.getConversationId();
         assertNotNull(conversationId);
 

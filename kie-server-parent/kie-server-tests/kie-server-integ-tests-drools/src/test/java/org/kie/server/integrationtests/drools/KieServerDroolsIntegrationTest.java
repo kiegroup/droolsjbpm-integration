@@ -68,6 +68,9 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
         File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -78,8 +81,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     @Test
     @Category(Smoke.class)
     public void testCallContainer() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
@@ -99,7 +100,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     @Test
     public void testCallContainerWithStringPayload() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
@@ -149,8 +149,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
 
@@ -160,7 +158,8 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
 
     @Test
     public void testCallContainerWithinConversation() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+        // Call container info to get conversation Id.
+        client.getContainerInfo(CONTAINER_ID);
         String conversationId = client.getConversationId();
         assertNotNull(conversationId);
 

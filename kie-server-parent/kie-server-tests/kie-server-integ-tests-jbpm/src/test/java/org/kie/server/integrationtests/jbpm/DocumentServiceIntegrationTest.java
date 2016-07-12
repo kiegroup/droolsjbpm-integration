@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -37,7 +36,6 @@ import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -54,6 +52,9 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     private DocumentInstance document;
@@ -228,8 +229,6 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testDocumentProcess() {
-
-        KieServerAssert.assertSuccess(client.createContainer("definition-project", new KieContainerResource("definition-project", releaseId)));
 
         DocumentImpl docToTranslate = new DocumentImpl();
         docToTranslate.setContent(document.getContent());
