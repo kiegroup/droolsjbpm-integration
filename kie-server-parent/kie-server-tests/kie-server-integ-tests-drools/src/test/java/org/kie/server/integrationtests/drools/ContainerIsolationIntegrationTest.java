@@ -28,7 +28,6 @@ import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -52,6 +51,10 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_1_ID, kjar1);
+        createContainer(CONTAINER_2_ID, kjar2);
     }
 
     @Override
@@ -62,8 +65,6 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test 
     public void testUseClassWithSameFQNInDifferentContainers() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, kjar1)));
-
         Object person = createInstance(PERSON_CLASS_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution1 = commandsFactory.newBatchExecution(commands, KIE_SESSION_1);
@@ -80,8 +81,6 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
 
         // now execute the same commands, but for the second container. The rule in there should set different id
         // (namely "Person from kjar2") for the inserted person
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, kjar2)));
-
         person = createInstance(PERSON_CLASS_NAME);
         commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution2 = commandsFactory.newBatchExecution(commands, KIE_SESSION_2);

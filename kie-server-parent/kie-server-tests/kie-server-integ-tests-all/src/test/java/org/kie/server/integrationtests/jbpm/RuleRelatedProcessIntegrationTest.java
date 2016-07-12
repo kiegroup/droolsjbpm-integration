@@ -26,13 +26,11 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.TaskSummary;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
@@ -52,6 +50,9 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -61,7 +62,6 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithBusinessRuleTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, "business-rule-task");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -133,8 +133,6 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testProcessWithConditionalEvent() throws Exception {
-
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, "conditionalevent");
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);

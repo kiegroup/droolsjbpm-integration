@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -51,6 +51,8 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
 
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Test
@@ -95,7 +97,6 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     @Test
     public void testInvalidCommandBodyOnCallContainer() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, this.getClass().getClassLoader());
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
@@ -122,9 +123,8 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     @Test
     public void testInvalidBodyOnCallContainer() throws Exception {
 
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+        Response response = null;
 
-        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
         try {
             // empty commands can be considered as invalid request
             String body = "invalid content that cannot be parsed";

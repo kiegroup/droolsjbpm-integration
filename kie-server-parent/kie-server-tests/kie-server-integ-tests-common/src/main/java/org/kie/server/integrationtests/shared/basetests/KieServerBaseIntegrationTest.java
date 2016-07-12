@@ -27,12 +27,14 @@ import javax.naming.Context;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -83,9 +85,7 @@ public abstract class KieServerBaseIntegrationTest {
 
     @Before
     public void setup() throws Exception {
-        startClient();
-        disposeAllContainers();
-        disposeAllServerInstances();
+        client = createDefaultClient();
     }
 
     @AfterClass
@@ -97,7 +97,8 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
-    protected void disposeAllContainers() {
+    protected static void disposeAllContainers() {
+        KieServicesClient client = createDefaultStaticClient();
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, response.getType());
         List<KieContainerResource> containers = response.getResult().getContainers();
@@ -108,7 +109,13 @@ public abstract class KieServerBaseIntegrationTest {
         }
     }
 
-    protected void disposeAllServerInstances() throws Exception {
+    protected static void createContainer(String containerId, ReleaseId releaseId) {
+        KieServicesClient client = createDefaultStaticClient();
+        ServiceResponse<KieContainerResource> reply = client.createContainer(containerId, new KieContainerResource(containerId, releaseId));
+        Assume.assumeTrue(reply.getType().equals(ServiceResponse.ResponseType.SUCCESS));
+    }
+
+    protected void disposeAllServerInstances() {
         // Is done just if we run local server (controller always on) or controller is deployed.
         if (TestConfig.isLocalServer() || TestConfig.isControllerProvided()) {
             disposeServerInstances();
@@ -144,10 +151,6 @@ public abstract class KieServerBaseIntegrationTest {
             mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
         }
         mgmtControllerClient.close();
-    }
-
-    private void startClient() throws Exception {
-        client = createDefaultClient();
     }
 
     protected abstract KieServicesClient createDefaultClient() throws Exception;
@@ -191,6 +194,27 @@ public abstract class KieServerBaseIntegrationTest {
         }
 
         setupClients(kieServicesClient);
+        return kieServicesClient;
+    }
+
+    /**
+     * Create client with default REST configuration - usable for helper purposes(creating containers...).
+     * @return Kie server client.
+     */
+    protected static KieServicesClient createDefaultStaticClient() {
+        return createDefaultStaticClient(DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Create client with default REST configuration - usable for helper purposes(creating containers...).
+     * @param timeout
+     * @return Kie server client.
+     */
+    protected static KieServicesClient createDefaultStaticClient(long timeout) {
+        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(),TestConfig.getUsername(), TestConfig.getPassword(), timeout);
+        configuration.setMarshallingFormat(MarshallingFormat.JAXB);
+
+        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
         return kieServicesClient;
     }
 

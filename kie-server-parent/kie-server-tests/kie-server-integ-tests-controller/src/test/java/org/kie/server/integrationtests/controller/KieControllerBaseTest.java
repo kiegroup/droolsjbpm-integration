@@ -35,6 +35,14 @@ public abstract class KieControllerBaseTest extends RestOnlyBaseIntegrationTest 
         controllerClient.setMarshallingFormat(marshallingFormat);
     }
 
+    @Before
+    @Override
+    public void setup() throws Exception {
+        super.setup();
+        disposeAllContainers();
+        disposeAllServerInstances();
+    }
+
     @After
     public void closeControllerClient() {
         controllerClient.close();

@@ -25,7 +25,6 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
@@ -70,23 +69,8 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         cleanupSingletonSessionId();
     }
 
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
-        super.additionalConfiguration(configuration);
-        configuration.setTimeout(30000);
-    }
-
-    @Override
-    protected void setupClients(KieServicesClient client) {
-
-        processClient = client.getServicesClient(ProcessServicesClient.class);
-        taskClient = client.getServicesClient(UserTaskServicesClient.class);
-        queryClient = client.getServicesClient(QueryServicesClient.class);
-        jobServicesClient = client.getServicesClient(JobServicesClient.class);
-    }
-
-    @Override
-    protected void disposeAllContainers() {
+    @Before
+    public void abortAllProcesses() {
         List<Integer> status = new ArrayList<Integer>();
         status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
         List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
@@ -95,8 +79,14 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
                 processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
             }
         }
-
-        super.disposeAllContainers();
     }
 
+    @Override
+    protected void setupClients(KieServicesClient client) {
+        processClient = client.getServicesClient(ProcessServicesClient.class);
+        taskClient = client.getServicesClient(UserTaskServicesClient.class);
+        queryClient = client.getServicesClient(QueryServicesClient.class);
+        jobServicesClient = client.getServicesClient(JobServicesClient.class);
+        documentClient = client.getServicesClient(DocumentServicesClient.class);
+    }
 }

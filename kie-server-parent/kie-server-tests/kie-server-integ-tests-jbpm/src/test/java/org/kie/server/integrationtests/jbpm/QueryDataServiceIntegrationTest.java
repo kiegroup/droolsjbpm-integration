@@ -21,22 +21,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
-import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 
 import static org.junit.Assert.*;
+
 import org.kie.server.integrationtests.shared.KieServerAssert;
+import static org.junit.Assume.assumeFalse;
+
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -46,13 +51,20 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     private static final String CONTAINER_ID = "query-definition-project";
 
+    private static final long EXTENDED_TIMEOUT = 300000;
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/query-definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        // Having timeout issues due to kjar dependencies -> raised timeout.
+        KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
+        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
+        Assume.assumeTrue(reply.getType().equals(ServiceResponse.ResponseType.SUCCESS));
     }
 
     @Override
@@ -60,17 +72,8 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) throws Exception {
-        super.additionalConfiguration(configuration);
-        // Having timeout issues due to kjar dependencies -> raised timeout.
-        configuration.setTimeout(300000);
-    }
-
     @Test
     public void testCRUDOnQueryDefinition() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -114,8 +117,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataService() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -151,8 +152,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithVariablesQueryDataService() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -198,8 +197,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesFilteredWithVariablesQueryDataService() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -247,8 +244,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceUsingCustomMapper() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -284,8 +279,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilder() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -314,8 +307,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testGetProcessInstancesWithQueryDataServiceRawMapper() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -352,8 +343,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     @Test
     public void testQueryDataServiceReplaceQuery() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(CONTAINER_ID));

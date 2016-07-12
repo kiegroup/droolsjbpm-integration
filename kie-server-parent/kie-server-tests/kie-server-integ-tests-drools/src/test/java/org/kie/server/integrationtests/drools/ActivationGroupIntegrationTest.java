@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -25,13 +24,16 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
     private static final String CONTAINER_ID = "activation";
     private static final String LIST_NAME = "list";
     private static final String LIST_OUTPUT_NAME = "output-list";
-    private static final String KIE_SESSION = "defaultKieSession";
+    private static final String KIE_SESSION = "ksession1";
     private static final String ACTIVATION_GROUP = "first-group";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/activation-group").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     /**
@@ -39,8 +41,6 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
      */
     @Test
     public void testActivationGroup() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -67,8 +67,6 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
      */
     @Test
     public void testClearActivationGroup() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
 
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
