@@ -56,6 +56,10 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    protected static final String SORT_BY_PROCESS_ID = "ProcessId";
+    protected static final String SORT_BY_INSTANCE_PROCESS_ID = "Id";
+    protected static final String SORT_BY_TASK_STATUS = "Status";
+    protected static final String SORT_BY_TASK_EVENTS_TYPE = "Type";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -336,6 +340,48 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessInstancesSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstances(0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+    }
+
+    @Test
     public void testGetProcessInstancesByContainer() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -372,6 +418,48 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             abortProcessInstances(processInstanceIds);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesByContainerSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, null, 0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, null, 1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, null, 0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
     }
 
     @Test
@@ -413,6 +501,29 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessInstancesByProcessIdSortedByInstanceId() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, null, 0, 10, SORT_BY_INSTANCE_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+            assertEquals(PROCESS_ID_USERTASK, instances.get(1).getProcessId());
+            assertTrue(instances.get(0).getId() > instances.get(1).getId());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+    }
+
+    @Test
     public void testGetProcessInstancesByProcessName() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -451,6 +562,29 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessInstancesByProcessNameSortedByInstanceId() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessName("usertask", null, 0, 10, SORT_BY_INSTANCE_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+            assertEquals(PROCESS_ID_USERTASK, instances.get(1).getProcessId());
+            assertTrue(instances.get(0).getId() > instances.get(1).getId());
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+    }
+
+    @Test
     public void testGetProcessInstancesByStatus() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -483,6 +617,48 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             abortProcessInstances(processInstanceIds);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesByStatusSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
     }
 
     @Test
@@ -520,6 +696,48 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             abortProcessInstances(processInstanceIds);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesByInitiatorSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByInitiator(USER_YODA, null, 0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByInitiator(USER_YODA, null, 1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByInitiator(USER_YODA, null, 0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
     }
 
     @Test
@@ -659,6 +877,36 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessInstancesByCorrelationKeySortedById() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
+
+        String firstBusinessKey = "my-simple-key-first";
+        String secondBusinessKey = "my-simple-key-second";
+        CorrelationKey firstKey = correlationKeyFactory.newCorrelationKey(firstBusinessKey);
+        CorrelationKey secondKey = correlationKeyFactory.newCorrelationKey(secondBusinessKey);
+        CorrelationKey partKey = correlationKeyFactory.newCorrelationKey("my-simple%");
+
+        Long processInstanceEvalutionId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, firstKey);
+        Long processInstanceSignalId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, secondKey);
+        try {
+            List<ProcessInstance> returnedProcessInstances = queryClient.findProcessInstancesByCorrelationKey(partKey, 0, 10, SORT_BY_INSTANCE_PROCESS_ID, false);
+            assertNotNull(returnedProcessInstances);
+
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, returnedProcessInstances.get(0).getProcessId());
+            assertEquals(processInstanceSignalId, returnedProcessInstances.get(0).getId());
+            assertEquals(secondBusinessKey, returnedProcessInstances.get(0).getCorrelationKey());
+            assertEquals(PROCESS_ID_EVALUATION, returnedProcessInstances.get(1).getProcessId());
+            assertEquals(processInstanceEvalutionId, returnedProcessInstances.get(1).getId());
+            assertEquals(firstBusinessKey, returnedProcessInstances.get(1).getCorrelationKey());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceEvalutionId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceSignalId);
+        }
+    }
+
+    @Test
     public void testGetProcessInstanceByCorrelationKeyPaging() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -714,6 +962,48 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testGetProcessInstancesByVariableNameSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariable("stringData", null, 0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByVariable("stringData", null, 1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByVariable("stringData", null, 0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
+    }
+
+    @Test
     public void testGetProcessInstancesByVariableNameAndValue() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -756,6 +1046,51 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             abortProcessInstances(processInstanceIds);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesByVariableNameAndValueSortedByName() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        for (Long processInstanceId : processInstanceIds) {
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "stringData", "waiting for signal");
+        }
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            abortProcessInstances(processInstanceIds);
+        }
     }
 
     @Test
@@ -983,6 +1318,36 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testFindTasksSortedByProcessInstanceId() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<TaskSummary> tasks = taskClient.findTasks(USER_YODA, 0, 50, "processInstanceId", false);
+            assertNotNull(tasks);
+
+            //latest task is from second process
+            TaskSummary task = tasks.get(0);
+            TaskSummary expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
+            assertTaskSummary(expectedTaskSummary, task);
+
+            task = tasks.get(1);
+            expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
+            assertTaskSummary(expectedTaskSummary, task);
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
+        }
+    }
+
+    @Test
     public void testFindTaskEvents() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -1065,6 +1430,68 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testFindTaskEventsSortedByType() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            TaskSummary taskInstance = tasks.get(0);
+
+            // now let's start it
+            taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
+
+            // now let's stop it
+            taskClient.stopTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
+
+            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, true);
+            assertNotNull(events);
+            assertEquals(3, events.size());
+
+            TaskEventInstance event = events.get(0);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.ADDED.toString(), event.getType());
+
+            event = events.get(1);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
+
+            event = events.get(2);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
+
+            events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, false);
+            assertNotNull(events);
+            assertEquals(3, events.size());
+
+            event = events.get(0);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
+
+            event = events.get(1);
+            assertNotNull(event);
+            assertEquals(taskInstance.getId(), event.getTaskId());
+            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), event.getType());
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
     public void testFindTasksOwned() throws Exception {
         KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
@@ -1102,6 +1529,42 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertTaskSummary(expectedTaskSummary, taskInstance);
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testFindTasksOwnedSortedByStatus() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksOwned(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, true);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            Long someTaskId = tasks.get(0).getId();
+
+            taskClient.startTask(CONTAINER_ID, someTaskId, USER_YODA);
+            tasks = taskClient.findTasksOwned(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, true);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(Status.InProgress.toString(), tasks.get(0).getStatus());
+            assertEquals(Status.Reserved.toString(), tasks.get(1).getStatus());
+
+            tasks = taskClient.findTasksOwned(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, false);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(Status.Reserved.toString(), tasks.get(0).getStatus());
+            assertEquals(Status.InProgress.toString(), tasks.get(1).getStatus());
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
         }
     }
 
@@ -1144,6 +1607,42 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testFindTasksAssignedAsPotentialOwnerSortedByStatus() throws Exception {
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+        Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, true);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            Long someTaskId = tasks.get(0).getId();
+
+            taskClient.startTask(CONTAINER_ID, someTaskId, USER_YODA);
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, true);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(Status.InProgress.toString(), tasks.get(0).getStatus());
+            assertEquals(Status.Reserved.toString(), tasks.get(1).getStatus());
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10, SORT_BY_TASK_STATUS, false);
+            assertNotNull(tasks);
+            assertEquals(2, tasks.size());
+            assertEquals(Status.Reserved.toString(), tasks.get(0).getStatus());
+            assertEquals(Status.InProgress.toString(), tasks.get(1).getStatus());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
         }
     }
 
@@ -1216,12 +1715,12 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     private void assertTaskSummary(TaskSummary expected, TaskSummary actual) {
         assertNotNull(actual);
         assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getProcessId(), actual.getProcessId());
         KieServerAssert.assertNullOrEmpty(actual.getDescription());
         assertEquals(expected.getStatus(), actual.getStatus());
         assertEquals(expected.getPriority(), actual.getPriority());
         assertEquals(expected.getActualOwner(), actual.getActualOwner());
         assertEquals(expected.getCreatedBy(), actual.getCreatedBy());
-        assertEquals(expected.getProcessId(), actual.getProcessId());
         assertEquals(expected.getContainerId(), actual.getContainerId());
         assertEquals(expected.getParentId(), actual.getParentId());
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
