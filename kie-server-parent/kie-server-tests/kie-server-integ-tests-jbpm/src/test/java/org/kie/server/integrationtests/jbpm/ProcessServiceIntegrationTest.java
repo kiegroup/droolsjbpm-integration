@@ -30,7 +30,6 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
@@ -42,7 +41,6 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -60,6 +58,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -69,7 +70,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testStartCheckVariablesAndAbortProcess() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Class<?> personClass = Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader());
 
         Object person = createPersonInstance(USER_JOHN);
@@ -134,14 +134,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(expected = KieServicesException.class)
     public void testStartNotExistingProcess() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         processClient.startProcess(CONTAINER_ID, "not-existing", (Map)null);
     }
 
     @Test()
     public void testAbortExistingProcess() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
@@ -168,14 +165,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(expected = KieServicesException.class)
     public void testAbortNonExistingProcess() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         processClient.abortProcessInstance(CONTAINER_ID, 9999l);
     }
 
     @Test(expected = KieServicesException.class)
     public void testStartCheckNonExistingVariables() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         try {
@@ -188,8 +182,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testAbortMultipleProcessInstances() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
 
         Long processInstanceId1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
         Long processInstanceId2 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
@@ -207,7 +199,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testSignalProcessInstance() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
@@ -230,7 +221,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testSignalProcessInstanceNullEvent() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -251,7 +241,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testSignalProcessInstances() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
@@ -284,7 +273,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testManipulateProcessVariable() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
@@ -322,7 +310,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testManipulateProcessVariables() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
@@ -373,7 +360,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     @Category(Smoke.class)
     public void testGetProcessInstance() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
@@ -394,8 +380,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testGetProcessInstanceWithVariables() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -433,7 +417,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(expected = KieServicesException.class)
     public void testGetNonExistingProcessInstance() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         processClient.getProcessInstance(CONTAINER_ID, 9999l);
     }
 
@@ -441,8 +424,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     public void testWorkItemOperations() throws Exception {
 
         changeUser(USER_JOHN);
-
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
 
         Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -517,8 +498,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
         changeUser(USER_JOHN);
 
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
@@ -565,8 +544,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testStartCheckProcessWithCorrelationKey() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         String firstSimpleKey = "first-simple-key";
         String secondSimpleKey = "second-simple-key";
         String stringVarName = "stringData";
@@ -601,7 +578,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testStartProcessWithCustomTask() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("id", "custom id");
         Long processInstanceId = null;
@@ -625,7 +601,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testSignalContainer() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS);
 
         assertNotNull(processInstanceId);
@@ -652,7 +627,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test
     public void testSignalStartProcess() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
         try {
 
             List<Integer> status = new ArrayList<Integer>();
@@ -679,8 +653,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(timeout = 60 * 1000)
     public void testStartProcessInstanceWithAsyncNodes() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<String> status = new ArrayList<String>();
         status.add(STATUS.QUEUED.toString());
         status.add(STATUS.RUNNING.toString());
@@ -713,8 +685,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(timeout = 60 * 1000)
     public void testProcessInstanceWithTimer() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);

@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -57,6 +57,12 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
     }
 
+    @Before
+    public void cleanupContainers() {
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
+    }
+
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kjarClassLoader));
@@ -64,8 +70,6 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
 
     @Test
     public void testStateIsKeptBetweenCalls() {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 

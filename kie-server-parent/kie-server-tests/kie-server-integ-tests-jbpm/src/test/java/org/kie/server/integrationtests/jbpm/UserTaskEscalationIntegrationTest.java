@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -88,12 +87,13 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Test
     public void testEscalation() throws InterruptedException, MessagingException, Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId > 0);
@@ -143,8 +143,6 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testCompleteTaskBeforeEscalation() throws InterruptedException {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK_ESCALATION, params);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId > 0);

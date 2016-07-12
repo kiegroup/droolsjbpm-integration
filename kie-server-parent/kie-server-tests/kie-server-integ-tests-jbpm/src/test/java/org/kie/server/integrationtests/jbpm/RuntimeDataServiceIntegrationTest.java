@@ -30,7 +30,6 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.task.api.model.TaskEvent;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -68,6 +67,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -77,8 +79,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitions() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20);
         assertNotNull(definitions);
 
@@ -109,8 +109,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsSorted() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
@@ -141,8 +139,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsWithFilter() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcesses("evaluation", 0, 20);
         assertNotNull(definitions);
 
@@ -170,8 +166,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsWithFilterSorted() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcesses("evaluation", 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
@@ -193,8 +187,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsByContainer() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20);
         assertNotNull(definitions);
 
@@ -231,8 +223,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsByContainerSorted() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
@@ -262,8 +252,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionsById() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<ProcessDefinition> definitions = queryClient.findProcessesById(PROCESS_ID_USERTASK);
         assertNotNull(definitions);
 
@@ -282,8 +270,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionByContainerAndId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         ProcessDefinition definition = queryClient.findProcessByContainerIdProcessId(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertNotNull(definition);
         assertEquals(PROCESS_ID_USERTASK, definition.getId());
@@ -296,8 +282,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessDefinitionByContainerAndNonExistingId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         try {
             queryClient.findProcessByContainerIdProcessId(CONTAINER_ID, "non-existing");
             fail("KieServicesException should be thrown complaining about process definition not found.");
@@ -309,8 +293,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstances() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -341,8 +323,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -383,8 +363,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByContainer() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         int offset = queryClient.findProcessInstancesByContainerId(CONTAINER_ID, Collections.singletonList(2), 0, 10).size();
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -422,8 +400,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByContainerSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -464,8 +440,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByProcessId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -502,8 +476,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByProcessIdSortedByInstanceId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -525,8 +497,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByProcessName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -563,8 +533,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByProcessNameSortedByInstanceId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -586,8 +554,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByStatus() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -621,8 +587,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByStatusSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -663,8 +627,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByInitiator() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         int offset = queryClient.findProcessInstancesByInitiator(USER_YODA, Collections.singletonList(2), 0, 10).size();
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -700,8 +662,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByInitiatorSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -743,8 +703,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     @Test
     @Category(Smoke.class)
     public void testGetProcessInstanceById() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         try {
@@ -766,8 +724,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstanceWithVariables() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         Object person = createPersonInstance(USER_JOHN);
@@ -814,8 +770,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstanceByNonExistingId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         try {
             queryClient.findProcessInstanceById(-9999l);
             fail("KieServicesException should be thrown complaining about process instance not found.");
@@ -827,8 +781,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstanceByCorrelationKey() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
         String businessKey = "simple-key";
@@ -878,8 +830,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByCorrelationKeySortedById() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
         String firstBusinessKey = "my-simple-key-first";
@@ -908,8 +858,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstanceByCorrelationKeyPaging() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
         String businessKey = "simple-key";
@@ -931,8 +879,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByVariableName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -963,8 +909,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByVariableNameSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1005,8 +949,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByVariableNameAndValue() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
@@ -1050,8 +992,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetProcessInstancesByVariableNameAndValueSortedByName() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
@@ -1095,8 +1035,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetNodeInstances() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1171,8 +1109,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testGetVariableInstance() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1266,8 +1202,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasks() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1319,8 +1253,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksSortedByProcessInstanceId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1349,8 +1281,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTaskEvents() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1431,8 +1361,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTaskEventsSortedByType() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1493,8 +1421,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksOwned() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1534,8 +1460,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksOwnedSortedByStatus() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1570,8 +1494,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksAssignedAsPotentialOwner() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1612,8 +1534,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksAssignedAsPotentialOwnerSortedByStatus() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
@@ -1648,8 +1568,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     @Test
     public void testFindTasksByStatusByProcessInstanceId() throws Exception {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));

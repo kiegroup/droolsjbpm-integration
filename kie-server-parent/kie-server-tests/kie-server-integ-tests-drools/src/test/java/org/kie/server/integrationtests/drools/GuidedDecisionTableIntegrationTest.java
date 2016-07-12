@@ -25,7 +25,6 @@ import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -54,6 +53,9 @@ public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseInteg
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/gdst-project").getFile());
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -63,8 +65,6 @@ public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseInteg
 
     @Test
     public void testExecuteGuidedDecisionTableRule() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "kbase1.stateless");

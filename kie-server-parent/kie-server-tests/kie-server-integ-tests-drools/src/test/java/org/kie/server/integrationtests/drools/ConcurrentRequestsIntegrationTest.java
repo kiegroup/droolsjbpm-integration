@@ -32,7 +32,6 @@ import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
@@ -58,6 +57,9 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
     public static void initialize() throws Exception {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -70,8 +72,6 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test
     public void testCallingStatelessSessionFromMultipleThreads() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Future<String>> futureResults = new ArrayList<Future<String>>();
         ExecutorService es = Executors.newFixedThreadPool(NR_OF_THREADS);
         for (int i = 0; i < NR_OF_THREADS; i++) {

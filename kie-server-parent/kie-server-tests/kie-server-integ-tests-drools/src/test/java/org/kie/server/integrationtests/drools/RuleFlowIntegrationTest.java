@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.drools.core.command.runtime.rule.ClearRuleFlowGroupCommand;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -51,10 +51,14 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/ruleflow-group").getFile());
     }
 
+    @Before
+    public void cleanContainers() {
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
+    }
+
     @Test
     public void testExecuteSimpleRuleFlowProcess() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
@@ -77,8 +81,6 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
 
     @Test
     public void testExecuteSimpleRuleFlowProcessInStatelessSession() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION_STATELESS);
 
@@ -101,8 +103,6 @@ public class RuleFlowIntegrationTest extends DroolsKieServerBaseIntegrationTest 
 
     @Test
     public void testClearRuleFlowGroup() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId)));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 

@@ -32,18 +32,11 @@ import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
-
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest{
@@ -65,11 +58,8 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
-    }
-
-    @Override
-    protected void additionalConfiguration(KieServicesConfiguration configuration) {
-        configuration.setTimeout(30000);
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Before
@@ -87,11 +77,8 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
     @Test
     public void testGetProcessImageTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         Map<String, Object> valuesMap = new HashMap<String, Object>();
-        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_ID, HIRING_PROCESS_ID);
 
         try {
@@ -116,11 +103,8 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
     @Test
     public void testGetProcessInstanceImageTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         Map<String, Object> valuesMap = new HashMap<String, Object>();
-        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_ID, HIRING_PROCESS_ID);
 
         Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, ClassLoader.getSystemClassLoader());
@@ -172,11 +156,8 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
     @Test
     public void testGetProcessImageNotExistingTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         Map<String, Object> valuesMap = new HashMap<String, Object>();
-        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_ID, "not-existing");
 
         try {
@@ -195,11 +176,8 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
 
     @Test
     public void testGetProcessInstanceImageNotExistingTest() throws Exception {
-        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseId);
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
-
         Map<String, Object> valuesMap = new HashMap<String, Object>();
-        valuesMap.put(RestURI.CONTAINER_ID, resource.getContainerId());
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_INST_ID, 9999);
 
         try {

@@ -32,7 +32,6 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -58,6 +57,9 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
 
         File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
+
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Override
@@ -68,7 +70,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     @Test
     public void testCallContainer() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
@@ -89,7 +90,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     @Test
     public void testCallContainerWithStringPayload() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
@@ -112,7 +112,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     @Test
     public void testCallContainerRuleClient() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
@@ -133,7 +132,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
     @Test
     public void testCallContainerWithStringPayloadRuleClient() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
         setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
@@ -155,8 +153,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
 
     @Test
     public void testCallContainerLookupError() throws Exception {
-        client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));
-
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, "xyz");
 

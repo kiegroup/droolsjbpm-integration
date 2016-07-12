@@ -26,7 +26,6 @@ import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
-import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 
@@ -54,6 +53,10 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
         KieServerDeployer.buildAndDeployCommonMavenParent();
         // the parent will build and deploy also all of its modules, so no need to deploy them individually
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/multimodule-project").getFile());
+
+        disposeAllContainers();
+        createContainer(CONTAINER_1_ID, releaseIdRules1);
+        createContainer(CONTAINER_2_ID, releaseIdRules2);
     }
 
     @Override
@@ -66,9 +69,6 @@ public class MultiModuleProjectIntegrationTest extends DroolsKieServerBaseIntegr
 
     @Test
     public void testCreateMultipleContainersAndExecuteRules() {
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_1_ID, new KieContainerResource(CONTAINER_1_ID, releaseIdRules1)));
-        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_2_ID, new KieContainerResource(CONTAINER_2_ID, releaseIdRules2)));
-
         Object car = createInstance(CAR_CLASS_NAME);
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution1 = commandsFactory.newBatchExecution(commands, KIE_SESSION);
