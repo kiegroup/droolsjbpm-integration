@@ -48,7 +48,6 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/state-is-kept-for-stateful-session").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

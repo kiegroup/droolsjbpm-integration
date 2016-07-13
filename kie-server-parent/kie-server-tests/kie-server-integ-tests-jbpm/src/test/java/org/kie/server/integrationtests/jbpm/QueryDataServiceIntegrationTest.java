@@ -59,7 +59,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        disposeAllContainers();
         // Having timeout issues due to kjar dependencies -> raised timeout.
         KieServicesClient client = createDefaultStaticClient(EXTENDED_TIMEOUT);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_ID, new KieContainerResource(CONTAINER_ID, releaseId));

@@ -59,7 +59,6 @@ public class OptaplannerIntegrationTest
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
 
-        disposeAllContainers();
         createContainer(CONTAINER_1_ID, kjar1);
     }
 

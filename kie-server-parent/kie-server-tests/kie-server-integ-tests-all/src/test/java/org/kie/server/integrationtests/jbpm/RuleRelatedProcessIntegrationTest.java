@@ -51,7 +51,6 @@ public class RuleRelatedProcessIntegrationTest extends JbpmKieServerBaseIntegrat
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

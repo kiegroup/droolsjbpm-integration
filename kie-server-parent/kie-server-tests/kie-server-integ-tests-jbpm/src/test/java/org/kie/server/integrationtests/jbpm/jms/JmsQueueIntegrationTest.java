@@ -68,7 +68,6 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
         containerRemoteController = new ContainerRemoteController(TestConfig.getContainerId(), TestConfig.getContainerPort());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, RELEASE_ID);
     }
 

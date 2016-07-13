@@ -40,7 +40,6 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

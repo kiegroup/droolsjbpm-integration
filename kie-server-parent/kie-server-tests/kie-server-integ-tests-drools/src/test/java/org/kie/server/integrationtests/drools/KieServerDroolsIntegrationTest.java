@@ -69,7 +69,6 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

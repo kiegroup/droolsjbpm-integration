@@ -58,7 +58,6 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 
