@@ -50,7 +50,6 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

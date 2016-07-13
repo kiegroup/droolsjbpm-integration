@@ -69,6 +69,7 @@ public abstract class KieServerBaseIntegrationTest {
             server.startKieServer();
         }
         setupCustomSettingsXml();
+        disposeAllContainers();
     }
 
     private static void setupCustomSettingsXml() {

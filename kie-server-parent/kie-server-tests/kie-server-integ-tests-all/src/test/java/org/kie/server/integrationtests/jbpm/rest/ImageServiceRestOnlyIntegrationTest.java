@@ -61,7 +61,6 @@ public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

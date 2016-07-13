@@ -56,7 +56,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

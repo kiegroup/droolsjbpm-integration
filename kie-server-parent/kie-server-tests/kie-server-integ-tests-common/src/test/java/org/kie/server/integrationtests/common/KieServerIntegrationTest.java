@@ -42,7 +42,6 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId1);
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId1);
     }
 

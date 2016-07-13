@@ -52,7 +52,6 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar2").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_1_ID, kjar1);
         createContainer(CONTAINER_2_ID, kjar2);
     }

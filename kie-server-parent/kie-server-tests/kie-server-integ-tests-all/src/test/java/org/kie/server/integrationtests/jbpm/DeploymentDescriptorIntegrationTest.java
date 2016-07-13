@@ -53,7 +53,6 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

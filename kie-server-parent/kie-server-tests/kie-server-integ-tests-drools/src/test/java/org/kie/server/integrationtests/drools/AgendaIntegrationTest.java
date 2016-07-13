@@ -31,7 +31,6 @@ public class AgendaIntegrationTest extends DroolsKieServerBaseIntegrationTest {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/agenda-group").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 
