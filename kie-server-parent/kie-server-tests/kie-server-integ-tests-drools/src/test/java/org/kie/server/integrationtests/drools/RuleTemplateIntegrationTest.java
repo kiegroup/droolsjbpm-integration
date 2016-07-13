@@ -54,7 +54,6 @@ public class RuleTemplateIntegrationTest extends DroolsKieServerBaseIntegrationT
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

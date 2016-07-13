@@ -54,7 +54,6 @@ public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseInteg
 
         kjarClassLoader = KieServices.Factory.get().newKieContainer(releaseId).getClassLoader();
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 

@@ -32,7 +32,6 @@ public class ActivationGroupIntegrationTest extends DroolsKieServerBaseIntegrati
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/activation-group").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 
