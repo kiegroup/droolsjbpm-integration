@@ -58,7 +58,6 @@ public class ConcurrentRequestsIntegrationTest extends DroolsKieServerBaseIntegr
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/stateless-session-kjar").getFile());
 
-        disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
     }
 
