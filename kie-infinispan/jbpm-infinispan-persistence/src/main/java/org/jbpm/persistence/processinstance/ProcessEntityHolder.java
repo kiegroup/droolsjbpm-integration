@@ -173,7 +173,10 @@ public class ProcessEntityHolder extends EntityHolder {
 		for (String prop : props) {
 			String[] sub = prop.split("=");
 			String key = sub[0];
-			String value = sub[1];
+			String value = "";
+			if (sub.length == 2) {
+				value = sub[1];
+			}
 			retval.add(new CorrelationPropertyInfo(key, value));
 		}
 		return retval;

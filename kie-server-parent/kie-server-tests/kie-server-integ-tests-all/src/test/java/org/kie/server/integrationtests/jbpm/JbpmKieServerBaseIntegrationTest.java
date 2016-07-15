@@ -24,6 +24,7 @@ import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -53,6 +54,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected JobServicesClient jobServicesClient;
     protected RuleServicesClient ruleClient;
     protected UIServicesClient uiServicesClient;
+    protected CaseServicesClient caseClient;
 
     @BeforeClass
     public static void setupFactory() throws Exception {
@@ -84,5 +86,6 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
         ruleClient = client.getServicesClient(RuleServicesClient.class);
         uiServicesClient = client.getServicesClient(UIServicesClient.class);
+        caseClient = client.getServicesClient(CaseServicesClient.class);
     }
 }

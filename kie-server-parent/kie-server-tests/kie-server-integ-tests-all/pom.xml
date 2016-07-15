@@ -57,6 +57,11 @@
       <artifactId>kie-server-services-jbpm-ui</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-case-mgmt</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -81,6 +86,11 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm-ui</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-case-mgmt</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
