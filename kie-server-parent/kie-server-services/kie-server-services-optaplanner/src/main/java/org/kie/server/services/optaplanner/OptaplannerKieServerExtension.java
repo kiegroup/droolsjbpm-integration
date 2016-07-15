@@ -97,6 +97,16 @@ public class OptaplannerKieServerExtension
     }
 
     @Override
+    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // same as createContainer - no op
+    }
+
+    @Override
+    public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        return true;
+    }
+
+    @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         solverServiceBase.disposeSolversForContainer( id, kieContainerInstance );
     }

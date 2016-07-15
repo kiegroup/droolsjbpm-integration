@@ -640,8 +640,26 @@ public class KieServerImpl {
             // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent 
             // call do dispose() is executed.
             if (kci != null && kci.getKieContainer() != null) {
-
-
+                // before upgrade check with all extensions if that is allowed
+                KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
+                Map<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+                // process server extensions
+                List<KieServerExtension> extensions = context.getServerExtensions();
+                for (KieServerExtension extension : extensions) {
+                    boolean allowed = extension.isUpdateContainerAllowed(id, kci, parameters);
+                    if (!allowed) {
+                        String message = (String)parameters.get(KieServerConstants.FAILURE_REASON_PROP);
+                        logger.warn("Container {} (for release id {}) on {} cannot be updated due to {}", id, releaseId, extension, message);
+                        if (messages != null) {
+                            messages.add(new Message(Severity.WARN, message));
+                        }
+                        return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, message);
+                    }
+                    logger.debug("Container {} (for release id {}) on {} ready to be updated", id, releaseId, extension);
+                }
+                kci.clearJaxbClasses();
+                kci.disposeMarshallers();
                 Results results = kci.getKieContainer().updateToVersion(releaseId);
                 if (results.hasMessages(Level.ERROR)) {
 
@@ -653,6 +671,11 @@ public class KieServerImpl {
                     logger.error("Error updating releaseId for container " + id + " to version " + releaseId + "\nMessages: " + results.getMessages());
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
                 } else {
+                    // once the upgrade was successful, notify all extensions so they can be upgraded (if needed)
+                    for (KieServerExtension extension : extensions) {
+                        extension.updateContainer(id, kci, parameters);
+                        logger.debug("Container {} (for release id {}) on {} updated successfully", id, releaseId, extension);
+                    }
                     // store the current state of the server
                     KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
 
@@ -667,6 +690,8 @@ public class KieServerImpl {
 
                     currentState.setContainers(new HashSet<KieContainerResource>(containers));
                     repository.store(KieServerEnvironment.getServerId(), currentState);
+
+                    logger.info("Container {} successfully updated to release id {}", id, releaseId);
 
                     messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());

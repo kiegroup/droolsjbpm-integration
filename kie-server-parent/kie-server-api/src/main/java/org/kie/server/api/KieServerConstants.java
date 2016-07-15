@@ -86,4 +86,6 @@ public class KieServerConstants {
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
+
+    public static final String FAILURE_REASON_PROP = "failure-reason";
 }
