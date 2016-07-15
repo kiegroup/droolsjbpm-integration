@@ -12,12 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package org.kie.server.testing;
-import org.kie.server.testing.Person;
 
-rule "Update person's id"
-when
-    $person : Person(id == null)
-then
-    $person.updateId();
-end
+package org.kie.server.testing;
+
+public class Person {
+    private String id;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void updateId() {
+        id = "Person from kjar102";
+    }
+}
