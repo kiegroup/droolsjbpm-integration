@@ -19,7 +19,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -81,7 +83,12 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         UserTaskDefinitionList userTaskDefinitions = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertEquals(2, userTaskDefinitions.getItems().size());
 
-        UserTaskDefinition firstTaskDefinition = userTaskDefinitions.getItems().get(0);
+        Map<String, UserTaskDefinition> map = mapByName(userTaskDefinitions.getItems());
+
+        assertTrue(map.containsKey("First task"));
+        assertTrue(map.containsKey("Second task"));
+
+        UserTaskDefinition firstTaskDefinition = map.get("First task");
         assertEquals("First task", firstTaskDefinition.getName());
         assertTrue("Task should be skippable.", firstTaskDefinition.isSkippable());
 
@@ -91,7 +98,12 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         userTaskDefinitions = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertEquals(2, userTaskDefinitions.getItems().size());
 
-        firstTaskDefinition = userTaskDefinitions.getItems().get(0);
+        map = mapByName(userTaskDefinitions.getItems());
+
+        assertTrue(map.containsKey("Updated first task"));
+        assertTrue(map.containsKey("Second task"));
+
+        firstTaskDefinition = map.get("Updated first task");
         assertEquals("Updated first task", firstTaskDefinition.getName());
         assertFalse("Task shouldn't be skippable.", firstTaskDefinition.isSkippable());
     }
@@ -102,13 +114,20 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
 
         try {
             ServiceResponse<ReleaseId> updateReleaseId = client.updateReleaseId(CONTAINER_ID, releaseId101);
-            KieServerAssert.assertSuccess(updateReleaseId);
-
-            // TODO how it should behave in this case? Throwing error or keeping old container and returning failure?
-            assertEquals(ServiceResponse.ResponseType.FAILURE, updateReleaseId.getType());
-            assertEquals("Cannot update container, active process instances found.", updateReleaseId.getMsg());
+            KieServerAssert.assertFailure(updateReleaseId);
+            assertEquals("Update of container forbidden - there are active process instances for container " + CONTAINER_ID, updateReleaseId.getMsg());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
+    }
+
+    protected Map<String, UserTaskDefinition> mapByName(List<UserTaskDefinition> taskDefinitions) {
+        Map<String, UserTaskDefinition> mapped = new HashMap<String, UserTaskDefinition>();
+
+        for (UserTaskDefinition definition : taskDefinitions) {
+            mapped.put(definition.getName(), definition);
+        }
+
+        return mapped;
     }
 }

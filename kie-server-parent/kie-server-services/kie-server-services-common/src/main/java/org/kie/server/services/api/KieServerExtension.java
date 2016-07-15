@@ -30,6 +30,10 @@ public interface KieServerExtension {
 
     void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 
+    void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
+
+    boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
+
     void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters);
 
     List<Object> getAppComponents(SupportedTransports type);

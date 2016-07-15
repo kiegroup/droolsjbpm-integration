@@ -29,6 +29,12 @@ public class KieServerAssert {
                 type);
     }
 
+    public static void assertFailure(ServiceResponse<?> response) {
+        ServiceResponse.ResponseType type = response.getType();
+        assertEquals("Expected FAILURE, but got " + type + "! Response: " + response, ServiceResponse.ResponseType.FAILURE,
+                type);
+    }
+
     public static void assertResultContainsString(String result, String expectedString) {
         assertTrue("Expecting string '" + expectedString + "' in result, but got: " + result, result.contains(expectedString));
     }

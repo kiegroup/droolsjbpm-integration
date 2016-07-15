@@ -137,6 +137,18 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
     }
 
     @Override
+    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // recreate configuration for updated container
+        disposeContainer(id, kieContainerInstance, parameters);
+        createContainer(id, kieContainerInstance, parameters);
+    }
+
+    @Override
+    public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        return true;
+    }
+
+    @Override
     public void disposeContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         if (!initialized) {
             return;

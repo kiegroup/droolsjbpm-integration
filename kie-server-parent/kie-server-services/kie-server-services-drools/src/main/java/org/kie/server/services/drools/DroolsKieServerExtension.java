@@ -97,7 +97,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
                 String type = p + "." + c;
                 try {
                     logger.debug("Adding {} type into extra jaxb classes set", type);
-                    Class<?> clazz = Class.forName(type, true, kieContainerInstance.getKieContainer().getClassLoader());
+                    Class<?> clazz = kieContainerInstance.getKieContainer().getClassLoader().loadClass(type);
 
                     addExtraClass(extraClasses, clazz, filterRemoteable);
                     logger.debug("Added {} type into extra jaxb classes set", type);
@@ -114,6 +114,18 @@ public class DroolsKieServerExtension implements KieServerExtension {
 
         kieContainerInstance.addJaxbClasses(extraClasses);
 
+    }
+
+    @Override
+    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        disposeContainer(id, kieContainerInstance, parameters);
+        // just do the same as when creating container to make sure all is up to date
+        createContainer(id, kieContainerInstance, parameters);
+    }
+
+    @Override
+    public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        return true;
     }
 
     @Override
