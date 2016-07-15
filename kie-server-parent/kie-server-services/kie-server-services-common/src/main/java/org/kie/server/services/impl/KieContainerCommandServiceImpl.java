@@ -94,7 +94,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 if (ks != null) {
                     Class<? extends Command> type =  BatchExecutionCommandImpl.class;
                     if (classType != null && !classType.isEmpty()) {
-                        type = (Class<? extends Command>) Class.forName(classType, true, kci.getKieContainer().getClassLoader());
+                        type = (Class<? extends Command>) kci.getKieContainer().getClassLoader().loadClass(classType);
                     }
 
                     Command<?> cmd = kci.getMarshaller( marshallingFormat ).unmarshall(payload, type);

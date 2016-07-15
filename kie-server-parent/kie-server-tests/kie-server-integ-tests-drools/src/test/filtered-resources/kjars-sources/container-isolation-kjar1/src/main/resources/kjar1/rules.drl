@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
+    package org.kie.server.testing;
 import org.kie.server.testing.Person;
 
 rule "Update person's id"

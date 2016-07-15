@@ -449,7 +449,7 @@ public class JSONMarshaller implements Marshaller {
             } else {
                 if (isFullyQualifiedClassname(field1)) {
                     try {
-                        Object value = deserializeObjectMapper.readValue(jp, Class.forName(field1, true, classLoader));
+                        Object value = deserializeObjectMapper.readValue(jp, classLoader.loadClass(field1));
                         jp.nextToken();
 
                         return value;

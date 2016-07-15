@@ -15,9 +15,13 @@
 
 package org.kie.server.api.marshalling.xstream;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -47,10 +51,25 @@ public class XStreamMarshaller
 
     private XStream xstream;
     private ClassLoader classLoader;
+    private Map<String, Class> classNames = new HashMap<String, Class>();
 
     public XStreamMarshaller( final Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.classLoader = classLoader;
-        this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) );
+        this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) {
+
+            protected MapperWrapper wrapMapper(MapperWrapper next) {
+                return new MapperWrapper(next) {
+                    public Class realClass(String elementName) {
+
+                        Class customClass = classNames.get(elementName);
+                        if (customClass != null) {
+                            return customClass;
+                        }
+                        return super.realClass(elementName);
+                    }
+                };
+            }
+        });
         this.xstream.setClassLoader( classLoader );
 
         this.xstream.processAnnotations( CommandScript.class );
@@ -84,6 +103,7 @@ public class XStreamMarshaller
         if (classes != null) {
             for (Class<?> clazz : classes) {
                 this.xstream.processAnnotations( clazz );
+                this.classNames.put(clazz.getName(), clazz);
             }
         }
     }

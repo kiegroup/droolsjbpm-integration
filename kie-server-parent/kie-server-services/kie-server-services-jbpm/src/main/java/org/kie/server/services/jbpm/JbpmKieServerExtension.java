@@ -57,6 +57,7 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.DeployedUnit;
+import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.query.QueryMapperRegistry;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
@@ -67,6 +68,7 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.executor.ExecutorService;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
@@ -333,10 +335,35 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // add any query param builder factories
             QueryParamBuilderManager.get().discoverAndAddQueryFactories(id, kieContainer.getClassLoader());
 
-            logger.info("Container {} created successfully", id);
+            logger.debug("Container {} created successfully by extension {}", id, this);
         } catch (Exception e) {
             logger.error("Error when creating container {} by extension {}", id, this);
         }
+    }
+
+    @Override
+    public boolean isUpdateContainerAllowed(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // first check if there are any active process instances
+        List<Integer> states = new ArrayList<Integer>();
+        states.add(ProcessInstance.STATE_ACTIVE);
+        states.add(ProcessInstance.STATE_PENDING);
+        states.add(ProcessInstance.STATE_SUSPENDED);
+        Collection<ProcessInstanceDesc> activeProcesses = runtimeDataService.getProcessInstancesByDeploymentId(id, states, new QueryContext());
+        if (!activeProcesses.isEmpty()) {
+            parameters.put(KieServerConstants.FAILURE_REASON_PROP, "Update of container forbidden - there are active process instances for container " + id);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        // essentially it's a redeploy to make sure all components are up to date,
+        // though update of kie base is done only once on kie server level and KieContainer is reused across all extensions
+        disposeContainer(id, kieContainerInstance, parameters);
+
+        createContainer(id, kieContainerInstance, parameters);
     }
 
     @Override
@@ -363,7 +390,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
         // remove any query param builder factories
         QueryParamBuilderManager.get().removeQueryFactories(id);
-        logger.info("Container {} disposed successfully", id);
+        logger.debug("Container {} disposed successfully by extension {}", id, this);
     }
 
     @Override

@@ -15,8 +15,6 @@
 
 package org.kie.server.integrationtests.drools;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,19 +29,20 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-public class ContainerUpdateIntegrationTest extends DroolsKieServerBaseIntegrationTest {
+import static org.junit.Assert.*;
+
+public class ContainerUpdateDifferentPackageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
             "1.0.0.Final");
-    private static final ReleaseId kjar101 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
-            "1.0.1.Final");
+    private static final ReleaseId kjar102 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
+            "1.0.2.Final");
 
     private static final String CONTAINER_ID = "container-update";
     private static final String KIE_SESSION_1 = "kjar1.session";
-    private static final String KIE_SESSION_101 = "kjar1.session";
+    private static final String KIE_SESSION_102 = "kjar1.session";
     private static final String PERSON_OUT_IDENTIFIER = "person";
     private static final String PERSON_CLASS_NAME = "org.kie.server.testing.Person";
 
@@ -51,7 +50,7 @@ public class ContainerUpdateIntegrationTest extends DroolsKieServerBaseIntegrati
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar1").getFile());
-        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar101").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/container-isolation-kjar102").getFile());
     }
 
     @Before
@@ -84,12 +83,11 @@ public class ContainerUpdateIntegrationTest extends DroolsKieServerBaseIntegrati
 
         // now update container with second release id. The rule in there should set different id
         // (namely "Person from kjar101") for the inserted person
-        KieServerAssert.assertSuccess(client.updateReleaseId(CONTAINER_ID, kjar101));
-
+        KieServerAssert.assertSuccess(client.updateReleaseId(CONTAINER_ID, kjar102));
 
         person = createInstance(PERSON_CLASS_NAME);
         commands = new ArrayList<Command<?>>();
-        BatchExecutionCommand batchExecution2 = commandsFactory.newBatchExecution(commands, KIE_SESSION_101);
+        BatchExecutionCommand batchExecution2 = commandsFactory.newBatchExecution(commands, KIE_SESSION_102);
 
         commands.add(commandsFactory.newInsert(person, PERSON_OUT_IDENTIFIER));
         commands.add(commandsFactory.newFireAllRules());
@@ -99,6 +97,6 @@ public class ContainerUpdateIntegrationTest extends DroolsKieServerBaseIntegrati
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar101'!", "Person from kjar101", valueOf(outcome2, "id"));
+        assertEquals("Person's id should be 'Person from kjar102'!", "Person from kjar102", valueOf(outcome2, "id"));
     }
 }
