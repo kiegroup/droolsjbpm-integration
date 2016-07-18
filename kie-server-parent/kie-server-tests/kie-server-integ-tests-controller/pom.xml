@@ -127,6 +127,10 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <kie.server.wars.classifier>ee6</kie.server.wars.classifier>
+  </properties>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -162,8 +166,7 @@
               <deployable>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server-controller-test-war</artifactId>
-                <!-- default, may be overriden in container specific profiles -->
-                <classifier>ee6</classifier>
+                <classifier>${kie.server.wars.classifier}</classifier>
                 <type>war</type>
                 <properties>
                   <context>${kie.server.controller.context}</context>
@@ -174,8 +177,7 @@
               <deployable>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server</artifactId>
-                <!-- default, may be overriden in container specific profiles -->
-                <classifier>ee6</classifier>
+                <classifier>${kie.server.wars.classifier}</classifier>
                 <type>war</type>
                 <properties>
                   <context>${kie.server.context}</context>
@@ -209,120 +211,33 @@
   <profiles>
     <profile>
       <id>tomcat7x</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server-controller-test-war</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.controller.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.controller.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <kie.server.wars.classifier>webc</kie.server.wars.classifier>
+      </properties>
     </profile>
     <profile>
       <id>tomcat8x</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server-controller-test-war</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.controller.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.controller.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <classifier>webc</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <kie.server.wars.classifier>webc</kie.server.wars.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>wildfly10x</id>
+      <properties>
+        <kie.server.wars.classifier>ee7</kie.server.wars.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>eap7x</id>
+      <properties>
+        <kie.server.wars.classifier>ee7</kie.server.wars.classifier>
+      </properties>
     </profile>
     <profile>
       <id>oracle-wls-12</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <deployables>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server-controller-test-war</artifactId>
-                    <classifier>ee7</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.controller.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.controller.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                  <deployable>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>kie-server</artifactId>
-                    <classifier>ee7</classifier>
-                    <type>war</type>
-                    <properties>
-                      <context>${kie.server.context}</context>
-                    </properties>
-                    <pingURL>${kie.server.base.http.url}</pingURL>
-                    <pingTimeout>30000</pingTimeout>
-                  </deployable>
-                </deployables>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <kie.server.wars.classifier>ee7</kie.server.wars.classifier>
+      </properties>
     </profile>
   </profiles>
 </project>
