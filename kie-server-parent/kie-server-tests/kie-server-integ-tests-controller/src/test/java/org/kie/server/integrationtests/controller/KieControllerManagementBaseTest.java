@@ -31,7 +31,7 @@ import org.kie.server.integrationtests.shared.RestOnlyBaseIntegrationTest;
 
 public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegrationTest {
 
-    private static final long SYNCHRONIZATION_TIMEOUT = 2000;
+    private static final long SYNCHRONIZATION_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     protected KieServerMgmtControllerClient controllerClient;
