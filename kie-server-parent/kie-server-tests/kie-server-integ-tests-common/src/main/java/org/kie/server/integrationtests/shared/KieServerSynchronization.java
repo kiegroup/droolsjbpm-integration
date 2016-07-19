@@ -32,7 +32,6 @@ public class KieServerSynchronization {
 
     private static final long SERVICE_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
-    private static final long SYNCHRONIZATION_TIMEOUT = 2000;
 
     public static void waitForJobToFinish(JobServicesClient jobServicesClient, Long jobId) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
@@ -51,7 +50,7 @@ public class KieServerSynchronization {
     }
 
     public static void waitForKieServerSynchronization(KieServicesClient client, int numberOfExpectedContainers) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SYNCHRONIZATION_TIMEOUT;
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
             ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
 
