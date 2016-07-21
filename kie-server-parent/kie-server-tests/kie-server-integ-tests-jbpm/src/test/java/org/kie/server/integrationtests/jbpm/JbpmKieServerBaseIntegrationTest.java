@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
@@ -54,7 +53,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_SIGNAL_START = "signal-start";
     protected static final String PROCESS_ID_CUSTOM_TASK = "customtask";
     protected static final String PROCESS_ID_USERTASK_ESCALATION = "humanTaskEscalation";
-    protected static final String PROCESS_ID_XYZ_TRANSLATIONS = "xyz-translations";
+
 
     protected static final long SERVICE_TIMEOUT = 30000;
     protected static final long TIMEOUT_BETWEEN_CALLS = 200;
@@ -87,6 +86,5 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         taskClient = client.getServicesClient(UserTaskServicesClient.class);
         queryClient = client.getServicesClient(QueryServicesClient.class);
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
-        documentClient = client.getServicesClient(DocumentServicesClient.class);
     }
 }

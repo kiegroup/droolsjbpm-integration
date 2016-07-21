@@ -38,8 +38,12 @@ import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
-public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest{
+import static org.junit.Assert.*;
+import static org.kie.server.api.rest.RestURI.*;
+
+public class ImageServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");

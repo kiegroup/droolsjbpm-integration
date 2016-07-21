@@ -38,8 +38,11 @@ import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
-
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
+
+import static org.junit.Assert.*;
+import static org.kie.server.api.rest.RestURI.*;
 
 public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest {
 
