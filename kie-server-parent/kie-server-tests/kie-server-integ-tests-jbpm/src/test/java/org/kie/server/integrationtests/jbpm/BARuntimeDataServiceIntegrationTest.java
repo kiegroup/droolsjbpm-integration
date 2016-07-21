@@ -117,7 +117,7 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             assertEquals(processInstanceId, tasks.get(0).getProcessInstanceId());
             assertEquals(processInstanceId2, tasks.get(1).getProcessInstanceId());
 
-            List<String> status = new ArrayList<>();
+            List<String> status = new ArrayList<String>();
             status.add(Status.Reserved.toString());
 
             tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, status, 0, 10, "t.taskData.processInstanceId", false);

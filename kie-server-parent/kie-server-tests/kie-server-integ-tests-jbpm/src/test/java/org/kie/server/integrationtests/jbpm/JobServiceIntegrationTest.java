@@ -370,7 +370,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     }
 
     private JobRequestInstance createJobRequestInstance() {
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", BUSINESS_KEY);
 
         JobRequestInstance jobRequestInstance = new JobRequestInstance();

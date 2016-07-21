@@ -293,13 +293,6 @@ public class TestConfig {
         return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
     }
 
-    /**
-     * @return location of custom kie-server-testing-client-deployment-settings.xml
-     */
-    public static String getKieClientDeploymentSettings() {
-        return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
-    }
-
     // Used for printing all configuration values at the beginning of first test run.
     static {
         TreeMap<String, String> params = new TreeMap<String, String>();

@@ -111,7 +111,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcesses(0, 20, QueryServicesClient.SORT_BY_NAME, false);
         assertNotNull(definitions);
 
-        assertEquals(11, definitions.size());
+        assertEquals(10, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -130,7 +130,6 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
         assertTrue(processIds.contains(PROCESS_ID_USERTASK));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
 
@@ -225,7 +224,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessDefinition> definitions = queryClient.findProcessesByContainerId(CONTAINER_ID, 0, 20, QueryServicesClient.SORT_BY_NAME, true);
         assertNotNull(definitions);
 
-        assertEquals(11, definitions.size());
+        assertEquals(10, definitions.size());
         List<String> processIds = collectDefinitions(definitions);
         checkProcessDefinitions(processIds);
 
@@ -244,9 +243,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
         assertEquals(3, definitions.size());
         processIds = collectDefinitions(definitions);
-        assertTrue(processIds.contains(PROCESS_ID_XYZ_TRANSLATIONS));
         assertTrue(processIds.contains(PROCESS_ID_USERTASK));
         assertTrue(processIds.contains(PROCESS_ID_SIGNAL_PROCESS));
+        assertTrue(processIds.contains(PROCESS_ID_USERTASK_ESCALATION));
     }
 
     @Test

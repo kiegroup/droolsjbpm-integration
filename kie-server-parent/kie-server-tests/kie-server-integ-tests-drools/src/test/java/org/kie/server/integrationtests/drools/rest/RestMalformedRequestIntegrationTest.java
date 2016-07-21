@@ -122,7 +122,7 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
     @Test
     public void testInvalidBodyOnCallContainer() throws Exception {
 
-        Response response = null;
+        ClientResponse<ServiceResponse<KieContainerResource>> response = null;
 
         try {
             // empty commands can be considered as invalid request

@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.optaplanner;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
