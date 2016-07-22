@@ -49,6 +49,7 @@ public class TestConfig {
      */
     private static Integer CONTROLLER_ALLOCATED_PORT;
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
+    private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
 
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
@@ -291,6 +292,48 @@ public class TestConfig {
      */
     public static String getKieClientDeploymentSettings() {
         return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
+    }
+
+    /**
+     * @return Cargo container ID.
+     */
+    public static String getContainerId() {
+        return TestConfig.CONTAINER_ID.getParameterValue();
+    }
+
+    /**
+     * @return Kie server context value.
+     */
+    public static String getKieServerContext() {
+        return TestConfig.PROVIDED_CONTEXT.getParameterValue();
+    }
+
+    /**
+     * @return Path to Kie server WAR file.
+     */
+    public static String getKieServerWarPath() {
+        return TestConfig.KIE_SERVER_WAR_PATH.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static String getContainerPort() {
+        return TestConfig.CONTAINER_PORT.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static String getWebLogicHome() {
+        return TestConfig.WEBLOGIC_HOME.getParameterValue();
+    }
+
+    /**
+     * @return Servlet port to container.
+     */
+    public static boolean isWebLogicHomeProvided() {
+        return TestConfig.WEBLOGIC_HOME.isParameterConfigured();
     }
 
     // Used for printing all configuration values at the beginning of first test run.
