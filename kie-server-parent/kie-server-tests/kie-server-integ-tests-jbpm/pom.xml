@@ -299,5 +299,23 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>eap64x</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <kie.server.war.path>${org.kie.server:kie-server:war:ee6}</kie.server.war.path>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
   </profiles>
 </project>

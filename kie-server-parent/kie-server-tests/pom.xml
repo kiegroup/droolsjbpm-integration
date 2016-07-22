@@ -666,8 +666,13 @@
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-jms-client-bom</artifactId>
             <!-- This is the highest version publicly available. Should work even with higher versions of EAP -->
-            <version>7.2.0.Final</version>
+            <version>${version.org.jboss.as}</version>
             <type>pom</type>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-controller-client</artifactId>
+            <version>${version.org.jboss.as}</version>
           </dependency>
         </dependencies>
       </dependencyManagement>
@@ -677,6 +682,10 @@
           <artifactId>jboss-as-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-controller-client</artifactId>
         </dependency>
       </dependencies>
     </profile>
