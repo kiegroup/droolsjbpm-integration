@@ -165,7 +165,7 @@ public abstract class AbstractRemoteCommandObject {
 
     void preprocessCommand( Command cmd ) {
         String cmdName = cmd.getClass().getSimpleName();
-        if( ! config.getDisableTaskSecurity() && cmd instanceof TaskCommand && cmdName.startsWith("GetTask") ) {
+        if( ! config.getDisableTaskSecurity() && cmd instanceof TaskCommand ) {
            TaskCommand taskCmd = (TaskCommand) cmd;
            String cmdUserId = taskCmd.getUserId();
            String authUserId = config.getUserName();
