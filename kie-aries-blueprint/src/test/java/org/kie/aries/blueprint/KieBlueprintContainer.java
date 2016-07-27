@@ -15,13 +15,6 @@
  */
 package org.kie.aries.blueprint;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.apache.aries.blueprint.container.SimpleNamespaceHandlerSet;
 import org.apache.aries.blueprint.parser.NamespaceHandlerSet;
@@ -31,6 +24,15 @@ import org.mockito.Mockito;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWiring;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class KieBlueprintContainer extends BlueprintContainerImpl {
 
@@ -79,5 +81,43 @@ public class KieBlueprintContainer extends BlueprintContainerImpl {
         BundleWiring mockBundleWiring = Mockito.mock(BundleWiring.class);
         Mockito.when(mockBundleWiring.getClassLoader()).thenReturn(classLoader);
         return mockBundleWiring;
+    }
+
+    public void registerBean(String name, Object bean) {
+        getRepository().addFullObject( name, new CompletedFuture<Object>(bean));
+    }
+
+    public static class CompletedFuture<T> implements Future<T> {
+
+        private final T result;
+
+        public CompletedFuture( T result ) {
+            this.result = result;
+        }
+
+        @Override
+        public boolean cancel( boolean mayInterruptIfRunning ) {
+            return false;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isDone() {
+            return true;
+        }
+
+        @Override
+        public T get() throws InterruptedException, ExecutionException {
+            return result;
+        }
+
+        @Override
+        public T get( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+            return result;
+        }
     }
 }
