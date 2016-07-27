@@ -94,7 +94,15 @@ public abstract class AbstractElementParser {
         return createValue(context, value, "java.lang.Integer");
     }
 
-    public static ValueMetadata createValue(ParserContext context, int value, String type) {
+    public static ValueMetadata createValue(ParserContext context, long value) {
+        return createValue(context, value, "java.lang.Long");
+    }
+
+    public static ValueMetadata createValue(ParserContext context, boolean value) {
+        return createValue(context, value, "java.lang.Boolean");
+    }
+
+    public static ValueMetadata createValue(ParserContext context, Object value, String type) {
         MutableValueMetadata m = context.createMetadata(MutableValueMetadata.class);
         m.setStringValue(""+value);
         m.setType(type);

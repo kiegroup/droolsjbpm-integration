@@ -37,6 +37,7 @@ import org.kie.api.conf.DeclarativeAgendaOption;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.conf.ClockTypeOption;
+import org.kie.aries.blueprint.factorybeans.Initializable;
 import org.kie.aries.blueprint.factorybeans.KBaseOptions;
 import org.kie.aries.blueprint.factorybeans.KSessionOptions;
 import org.kie.aries.blueprint.factorybeans.KieObjectsFactoryBean;
@@ -55,7 +56,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class KieObjectsInjector implements BeanProcessor {
 
@@ -67,6 +67,7 @@ public class KieObjectsInjector implements BeanProcessor {
     private ReleaseId releaseId;
     private URL configFileURL;
     private ParserContext parserContext;
+    private BlueprintContextHelper context;
 
     /** The list of Aries Blueprint XML files*/
     protected java.util.List<java.net.URL> resources;
@@ -89,16 +90,14 @@ public class KieObjectsInjector implements BeanProcessor {
         this.contextId = contextId;
     }
 
-    public KieObjectsInjector() {
-
-    }
-
+    public KieObjectsInjector() { }
 
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
+        this.context = new BlueprintContextHelper( blueprintContainer );
     }
 
-    public void afterPropertiesSet(){
+    public void afterKmoduleSet() {
         log.debug(" :: Starting Blueprint KieObjectsInjector for kmodule ("+contextId+") :: ");
         if ( resources == null || resources.isEmpty()) {
             configFileURL = getClass().getResource("/");
@@ -129,6 +128,10 @@ public class KieObjectsInjector implements BeanProcessor {
         if ( componentMetadata instanceof MutablePassThroughMetadata){
             ((MutablePassThroughMetadata)componentMetadata).setObject(kieModuleModel);
         }
+    }
+
+    public void afterImportSet() {
+        // no-op
     }
 
     private void createOsgiKieModule() {
@@ -303,7 +306,7 @@ public class KieObjectsInjector implements BeanProcessor {
     @Override
     public Object afterInit(Object o, String s, BeanCreator beanCreator, BeanMetadata beanMetadata) {
         try {
-            return o instanceof Callable ? ( (Callable<Object>) o ).call() : o;
+            return o instanceof Initializable ? ( (Initializable) o ).init( context ) : o;
         } catch (Exception e) {
             throw new RuntimeException( e );
         }
