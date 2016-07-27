@@ -19,6 +19,7 @@ package org.kie.aries.blueprint.factorybeans;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.runtime.KieSession;
+import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 import org.osgi.service.blueprint.container.ComponentDefinitionException;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class KieSessionRefResolver extends AbstractKieObjectsResolver {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object init(BlueprintContextHelper context) {
         Object obj = resolveKSession(id, releaseId);
         if ( obj != null) {
             KieSessionFactoryBeanHelper.addListeners((KieRuntimeEventManager) obj, listeners);

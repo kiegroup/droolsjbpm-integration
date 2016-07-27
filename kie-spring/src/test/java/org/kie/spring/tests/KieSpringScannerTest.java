@@ -17,7 +17,7 @@
 package org.kie.spring.tests;
 
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.junit.*;
+import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
@@ -27,7 +27,6 @@ import org.kie.scanner.MavenRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,13 +34,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.kie.scanner.MavenRepository.getMavenRepository;
 
 public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
 
-    static ApplicationContext context = null;
+    private static ApplicationContext context = null;
+    private final int FIRST_VALUE = 5;
     private final int SECOND_VALUE = 10;
-    protected final int FIRST_VALUE = 5;
 
     @Test
     public void testSpringKieScanner() throws Exception {

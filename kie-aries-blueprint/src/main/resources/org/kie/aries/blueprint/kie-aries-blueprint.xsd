@@ -97,6 +97,14 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="import">
+    <xsd:complexType>
+      <xsd:attribute name="releaseId-ref" use="optional" type="xsd:string"/>
+      <xsd:attribute name="enableScanner" use="optional" type="xsd:boolean"/>
+      <xsd:attribute name="scannerInterval" use="optional" type="xsd:int" default="30"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="kcontainer-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>

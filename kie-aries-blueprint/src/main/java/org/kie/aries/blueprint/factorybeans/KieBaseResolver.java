@@ -28,6 +28,7 @@ import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
 import java.util.Collection;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class KieBaseResolver extends AbstractKieObjectsResolver implements KieBa
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object init(BlueprintContextHelper context ) {
         return getKieBase();
     }
 

@@ -43,6 +43,7 @@ import org.kie.api.runtime.rule.LiveQuery;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.ViewChangedEventListener;
 import org.kie.api.time.SessionClock;
+import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
 import java.util.Collection;
 import java.util.List;
@@ -67,7 +68,7 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object init(BlueprintContextHelper context) {
         return getSession();
     }
 

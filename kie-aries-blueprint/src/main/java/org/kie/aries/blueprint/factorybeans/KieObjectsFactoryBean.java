@@ -56,6 +56,10 @@ public class KieObjectsFactoryBean {
         return new ReleaseIdImpl(groupId, artifactId, version);
     }
 
+    public static Object createImport(String releaseIdName, ReleaseId releaseId, boolean enableScanner, long scannerInterval) {
+        return new KieImportResolver( releaseIdName, releaseId, enableScanner, scannerInterval );
+    }
+
     public static Environment createEnvironment(String id, HashMap<String, Object> parameters, List<Object> marshallingStrategies){
         Environment environment = EnvironmentFactory.newEnvironment();
         if ( parameters != null) {

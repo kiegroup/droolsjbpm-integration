@@ -15,8 +15,6 @@
  */
 package org.kie.aries.blueprint.namespace;
 
-import java.util.ArrayList;
-
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
@@ -30,6 +28,10 @@ import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+
+import static org.kie.aries.blueprint.namespace.AbstractElementParser.createValue;
 
 class KieSessionBatchElementParser {
 
@@ -83,7 +85,7 @@ class KieSessionBatchElementParser {
                         argument.setValue(kieSessionElementParser.createValue(context, identifier));
                         componentMetadata.addArgument(argument);
                         */
-                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, identifier), null, 0);
+                        componentMetadata.addArgument( createValue( context, identifier ), null, 0 );
 
                         //argument = new BeanArgumentImpl();
                         //argument.setIndex(1);
@@ -103,7 +105,7 @@ class KieSessionBatchElementParser {
                                 // argument.setIndex(0);
                                 // argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(max)));
                                 // componentMetadata.addArgument(argument);
-                                componentMetadata.addArgument(kieSessionElementParser.createValue(context, Integer.parseInt(max)), null, 0);
+                                componentMetadata.addArgument( createValue(context, Integer.parseInt(max)), null, 0 );
                             }catch (NumberFormatException e1){
                                 //xsd will prevent this from happening.
                             }
@@ -132,7 +134,7 @@ class KieSessionBatchElementParser {
                             //argument = new BeanArgumentImpl();
                             try{
                                 // argument.setValue(kieSessionElementParser.createValue(context, Integer.parseInt(processInstanceId)));
-                                componentMetadata.addArgument(kieSessionElementParser.createValue(context, Integer.parseInt(processInstanceId)), null, 0);
+                                componentMetadata.addArgument( createValue( context, Integer.parseInt( processInstanceId ) ), null, 0 );
                             } catch (NumberFormatException e1){
                                 //xsd will prevent this from happening.
                             }
@@ -151,13 +153,13 @@ class KieSessionBatchElementParser {
                         /*argument = new BeanArgumentImpl();
                         argument.setIndex(index++);
                         argument.setValue(kieSessionElementParser.createRef(context, ref)); */
-                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, ref), null, index++);
+                        componentMetadata.addArgument( createValue( context, ref ), null, index++ );
 
                         /*argument = new BeanArgumentImpl();
                         argument.setIndex(index++);
                         argument.setValue(kieSessionElementParser.createValue(context, eventType));
                         componentMetadata.addArgument(argument);*/
-                        componentMetadata.addArgument(kieSessionElementParser.createValue(context, eventType), null, index++);
+                        componentMetadata.addArgument( createValue( context, eventType ), null, index++ );
                     } else {
                         throw new ComponentDefinitionException("Unknown child element found in batch element.");
                     }
