@@ -42,16 +42,14 @@ public class ExecuteCommandUtil {
                 if( cmd instanceof TaskCommand ) {
                     String cmdName = cmd.getClass().getSimpleName();
                     if( ! allowAllUsersAccessToAllTasks ) {
-                        if( cmdName.startsWith("GetTask") ) {
-                            String cmdUserId = ((TaskCommand) cmd).getUserId();
-                            if( cmdUserId == null ) {
-                                throw KieRemoteRestOperationException.badRequest("A null user id for a '" + cmdName + "' is not allowed!");
-                            }
-                            String authUserId = identityProvider.getName();
-                            if( ! cmdUserId.equals(authUserId) ) {
-                                throw KieRemoteRestOperationException.conflict("The user id used when retrieving task information (" + cmdUserId + ")"
-                                        + " must match the authenticating user (" + authUserId + ")!");
-                            }
+                        String cmdUserId = ((TaskCommand) cmd).getUserId();
+                        if( cmdUserId == null ) {
+                            throw KieRemoteRestOperationException.badRequest("A null user id for a '" + cmdName + "' is not allowed!");
+                        }
+                        String authUserId = identityProvider.getName();
+                        if( ! cmdUserId.equals(authUserId) ) {
+                            throw KieRemoteRestOperationException.conflict("The user id used when retrieving task information (" + cmdUserId + ")"
+                                    + " must match the authenticating user (" + authUserId + ")!");
                         }
                     }
                 }
