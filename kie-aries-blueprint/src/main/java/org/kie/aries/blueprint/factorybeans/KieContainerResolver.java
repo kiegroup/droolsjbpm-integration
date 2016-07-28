@@ -27,6 +27,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
 import java.util.Collection;
 
@@ -39,7 +40,7 @@ public class KieContainerResolver extends AbstractKieObjectsResolver implements 
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object init(BlueprintContextHelper context ) {
         return getKieContainer();
     }
 

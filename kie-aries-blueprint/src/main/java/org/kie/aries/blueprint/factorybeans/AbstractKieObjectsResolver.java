@@ -29,9 +29,7 @@ import org.kie.api.runtime.StatelessKieSession;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWiring;
 
-import java.util.concurrent.Callable;
-
-public abstract class AbstractKieObjectsResolver implements Callable<Object> {
+public abstract class AbstractKieObjectsResolver implements Initializable {
     private BundleContext bundleContext;
 
     protected final ReleaseId releaseId;
@@ -57,19 +55,21 @@ public abstract class AbstractKieObjectsResolver implements Callable<Object> {
         return kieBase;
     }
 
-    public Object resolveKSession(String id, ReleaseId releaseId) {
-        KieContainer kieContainer = resolveKContainer(releaseId);
+    public Object resolveKSession( String id, ReleaseId releaseId ) {
+        return resolveKSession( id, resolveKContainer(releaseId) );
+    }
 
-        // KieBase kbase = resolveKBase(kbaseName, releaseId);
-        KieProject kProject = ((KieContainerImpl) kieContainer).getKieProject();
+    protected Object resolveKSession( String id, KieContainer kieContainer ) {
+        KieContainerImpl kcontainer = (KieContainerImpl) kieContainer;
+        KieProject kProject = kcontainer.getKieProject();
         KieSessionModel kieSessionModel = kProject.getKieSessionModel( id );
         if ( kieSessionModel == null) {
             return null;
         }
         if (kieSessionModel.getType() == KieSessionModel.KieSessionType.STATEFUL) {
-            return ((KieContainerImpl) kieContainer).getKieSession(id);
+            return kcontainer.getKieSession( id );
         } else if (kieSessionModel.getType() == KieSessionModel.KieSessionType.STATELESS) {
-            return ((KieContainerImpl) kieContainer).getStatelessKieSession(id);
+            return kcontainer.getStatelessKieSession( id );
         }
         return null;
     }

@@ -33,6 +33,12 @@
       <artifactId>org.apache.aries.blueprint.api</artifactId>
       <scope>compile</scope>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.apache.aries.blueprint</groupId>-->
+      <!--<artifactId>org.apache.aries.blueprint.core</artifactId>-->
+      <!--<version>1.4.1</version>-->
+      <!--<scope>compile</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.apache.aries.blueprint</groupId>
       <artifactId>blueprint-parser</artifactId>
@@ -143,6 +149,18 @@
       <scope>test</scope>
     </dependency>-->
 
+    <!-- needed for annotations/releaseId tests-->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

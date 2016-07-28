@@ -15,8 +15,6 @@
  */
 package org.kie.aries.blueprint.namespace;
 
-import java.util.ArrayList;
-
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.aries.blueprint.mutable.MutableCollectionMetadata;
@@ -27,6 +25,10 @@ import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+
+import static org.kie.aries.blueprint.namespace.AbstractElementParser.createValue;
 
 class KieSessionLoggerElementParser {
 
@@ -76,16 +78,16 @@ class KieSessionLoggerElementParser {
                     throw new ComponentDefinitionException(LOGGER_ATTRIBUTE_FILE+" attribute is missing for logger ("+ kieLoggerElementParser.getId(context, element)+")");
                 }
                 fileName =  ExpressionUtils.resolveExpressionInPath(fileName);
-                componentMetadata.addProperty("file", kieLoggerElementParser.createValue(context, fileName));
+                componentMetadata.addProperty("file", createValue(context, fileName));
 
                 String threaded = kieLoggerElementParser.getAttributeValue(loggerNode, LOGGER_ATTRIBUTE_THREADED);
                 if (!StringUtils.isEmpty(LOGGER_ATTRIBUTE_FILE) && "true".equalsIgnoreCase(threaded)){
-                    componentMetadata.addProperty("loggerType", kieLoggerElementParser.createValue(context, KieLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_THREADED_FILE.toString()));
+                    componentMetadata.addProperty("loggerType", createValue(context, KieLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_THREADED_FILE.toString()));
                     String interval = kieLoggerElementParser.getAttributeValue(loggerNode, LOGGER_ATTRIBUTE_INTERVAL);
                     if ( !StringUtils.isEmpty(interval)){
                         try{
                             int nInterval = Integer.parseInt(interval);
-                            componentMetadata.addProperty("interval", kieLoggerElementParser.createValue(context, nInterval));
+                            componentMetadata.addProperty("interval", createValue(context, nInterval));
                         }catch (Exception e){
                             //should never happen, the XSD would prevent non-integers coming this far.
                         }
@@ -95,7 +97,7 @@ class KieSessionLoggerElementParser {
                     }
 
                 } else{
-                    componentMetadata.addProperty("loggerType", kieLoggerElementParser.createValue(context, KieLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_FILE.toString()));
+                    componentMetadata.addProperty("loggerType", createValue(context, KieLoggerAdaptor.KNOWLEDGE_LOGGER_TYPE.LOGGER_TYPE_FILE.toString()));
                 }
 
                 MutableRefMetadata refMetadata = context.createMetadata(MutableRefMetadata.class);

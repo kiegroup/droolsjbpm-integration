@@ -28,7 +28,6 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -103,19 +102,20 @@ public class KieImportFactoryBean
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         kieObjectsResolver = new KieObjectsResolver();
 
-        setKContainer();
+        registerKieContainer(beanFactory);
 
         registerKieBases(beanFactory);
 
         AnnotationsUtil.registerAnnotationConfigProcessors((BeanDefinitionRegistry) beanFactory, releaseId);
     }
 
-    protected void setKContainer() {
+    protected void registerKieContainer(ConfigurableListableBeanFactory configurableListableBeanFactory) {
         if (releaseId != null) {
             kContainer = KieServices.Factory.get().newKieContainer(releaseId);
             if (scannerEnabled){
                 kieScanner = KieServices.Factory.get().newKieScanner(kContainer);
                 kieScanner.start(scannerInterval);
+                configurableListableBeanFactory.registerSingleton(releaseIdName+"#scanner", kieScanner);
             }
         } else {
             kContainer = KieServices.Factory.get().getKieClasspathContainer();
@@ -124,32 +124,16 @@ public class KieImportFactoryBean
 
     protected void registerKieBases(ConfigurableListableBeanFactory configurableListableBeanFactory) {
         for (String kieBaseName : kContainer.getKieBaseNames()) {
-            if ( scannerEnabled ) {
-                registerKieBeanDef((BeanDefinitionRegistry) configurableListableBeanFactory, kieBaseName);
-                configurableListableBeanFactory.registerSingleton(releaseIdName+"#scanner", kieScanner);
-            } else {
-                KieBase kieBase = kContainer.getKieBase(kieBaseName);
-                configurableListableBeanFactory.registerSingleton(kieBaseName, kieBase);
-            }
+            KieBase kieBase = kContainer.getKieBase(kieBaseName);
+            configurableListableBeanFactory.registerSingleton(kieBaseName, kieBase);
             registerKieSessions(kieBaseName, configurableListableBeanFactory);
         }
     }
 
-    private void registerKieBeanDef(BeanDefinitionRegistry beanDefinitionRegistry, String kieBaseName) {
-        BeanDefinitionBuilder factory = BeanDefinitionBuilder.rootBeanDefinition(KBaseFactoryBean.class);
-        factory.addPropertyValue("kBaseName", kieBaseName);
-        factory.addPropertyValue("id", kieBaseName);
-        factory.addPropertyValue("singleton", false);
-        factory.addPropertyValue("kieContainer", kContainer);
-        beanDefinitionRegistry.registerBeanDefinition(kieBaseName, factory.getBeanDefinition());
-    }
-
     protected void registerKieSessions(String kieBaseName, ConfigurableListableBeanFactory configurableListableBeanFactory) {
-
         for (String kieSessionName : kContainer.getKieSessionNamesInKieBase(kieBaseName)) {
             Object ksession = kieObjectsResolver.resolveKSession(kContainer, kieSessionName);
             configurableListableBeanFactory.registerSingleton(kieSessionName, ksession);
         }
-
     }
 }

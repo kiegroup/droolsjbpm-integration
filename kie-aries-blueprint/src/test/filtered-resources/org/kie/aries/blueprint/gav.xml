@@ -7,9 +7,11 @@
 
   <kie:releaseId id="rId" groupId="org.drools" artifactId="named-kiesession" version="${project.version}"/>
 
-  <kie:kbase-ref id="namedkiesession" releaseId="rId"/>
+  <kie:import releaseId-ref="rId"/>
 
-  <kie:ksession-ref id="ksession1" releaseId="rId"/>
+  <!--<kie:kbase-ref id="namedkiesession" releaseId="rId"/>-->
+
+  <!--<kie:ksession-ref id="ksession1" releaseId="rId"/>-->
 
 
 
