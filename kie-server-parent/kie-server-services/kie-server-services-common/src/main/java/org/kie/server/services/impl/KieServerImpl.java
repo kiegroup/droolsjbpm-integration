@@ -15,23 +15,6 @@
 
 package org.kie.server.services.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.naming.InitialContext;
-
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.drools.compiler.kproject.xml.DependencyFilter;
@@ -43,6 +26,7 @@ import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
@@ -51,6 +35,7 @@ import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.Severity;
@@ -68,6 +53,22 @@ import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.naming.InitialContext;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KieServerImpl {
 
@@ -300,20 +301,30 @@ public class KieServerImpl {
 
     }
 
-    public ServiceResponse<KieContainerResourceList> listContainers() {
+    public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
         try {
-            List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
-            for (KieContainerInstanceImpl instance : context.getContainers()) {
-                instance.getResource().setMessages(getMessagesForContainer(instance.getContainerId()));
-                containers.add(instance.getResource());
+            List<KieContainerResource> filteredContainers = new ArrayList<KieContainerResource>();
+            for (KieContainerResource container : getContainersWithMessages()) {
+                if (containerFilter.accept(container)) {
+                    filteredContainers.add(container);
+                }
             }
-            KieContainerResourceList cil = new KieContainerResourceList(containers);
-            return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.SUCCESS, "List of created containers", cil);
+            KieContainerResourceList containerList = new KieContainerResourceList(filteredContainers);
+            return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.SUCCESS, "List of created containers", containerList);
         } catch (Exception e) {
             logger.error("Error retrieving list of containers", e);
             return new ServiceResponse<KieContainerResourceList>(ServiceResponse.ResponseType.FAILURE, "Error listing containers: " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+
+    private List<KieContainerResource> getContainersWithMessages() {
+        List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
+        for (KieContainerInstanceImpl instance : context.getContainers()) {
+            instance.getResource().setMessages(getMessagesForContainer(instance.getContainerId()));
+            containers.add(instance.getResource());
+        }
+        return containers;
     }
 
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {

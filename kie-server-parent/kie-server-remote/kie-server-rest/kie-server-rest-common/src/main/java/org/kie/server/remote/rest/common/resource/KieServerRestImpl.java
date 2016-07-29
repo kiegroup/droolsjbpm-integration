@@ -15,6 +15,18 @@
 
 package org.kie.server.remote.rest.common.resource;
 
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieContainerStatusFilter;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ReleaseIdFilter;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -23,22 +35,16 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
-import org.kie.server.services.impl.marshal.MarshallerHelper;
-
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 
 @Path("server")
 public class KieServerRestImpl {
@@ -75,8 +81,20 @@ public class KieServerRestImpl {
     @GET
     @Path("containers")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response listContainers(@Context HttpHeaders headers) { 
-        return createCorrectVariant(server.listContainers(), headers);
+    public Response listContainers(@Context HttpHeaders headers,
+                                   @QueryParam("groupId") String groupId,
+                                   @QueryParam("artifactId") String artifactId,
+                                   @QueryParam("version") String version,
+                                   @QueryParam("status") String status) {
+        ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter.Builder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .build();
+
+        KieContainerStatusFilter statusFilter = KieContainerStatusFilter.parseFromNullableString(status);
+        KieContainerResourceFilter containerFilter = new KieContainerResourceFilter(releaseIdFilter, statusFilter);
+        return createCorrectVariant(server.listContainers(containerFilter), headers);
     }
 
     @PUT

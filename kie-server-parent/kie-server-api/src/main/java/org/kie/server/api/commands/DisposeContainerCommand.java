@@ -49,4 +49,30 @@ public class DisposeContainerCommand implements KieServerCommand {
         this.containerId = containerId;
     }
 
+    @Override
+    public String toString() {
+        return "DisposeContainerCommand{" +
+                "containerId='" + containerId + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DisposeContainerCommand that = (DisposeContainerCommand) o;
+
+        return containerId != null ? containerId.equals(that.containerId) : that.containerId == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return containerId != null ? containerId.hashCode() : 0;
+    }
 }

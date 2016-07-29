@@ -114,6 +114,11 @@
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+    </dependency>
+
     <!-- log -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -132,11 +137,12 @@
       <scope>test</scope>
     </dependency>
 
-
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
     </dependency>
+
   </dependencies>
 
 </project>

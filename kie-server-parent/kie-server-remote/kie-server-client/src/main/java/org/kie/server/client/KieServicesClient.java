@@ -16,11 +16,12 @@
 package org.kie.server.client;
 
 import org.kie.api.command.Command;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
@@ -35,6 +36,8 @@ public interface KieServicesClient {
     ServiceResponse<KieServerInfo> getServerInfo();
 
     ServiceResponse<KieContainerResourceList> listContainers();
+
+    ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter);
 
     ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource);
 
