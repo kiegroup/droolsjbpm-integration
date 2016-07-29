@@ -40,11 +40,13 @@
     <version.tomcat8>8.0.12</version.tomcat8>
     <version.wildfly81>8.1.0.Final</version.wildfly81>
     <version.wildfly82>8.2.1.Final</version.wildfly82>
-    <!-- The EAP 6.4.x binary can't be anonymously downloaded due to license issues. It can be downloaded manually
-         and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
+    <version.wildfly10>10.0.0.Final</version.wildfly10>
+    <!-- The EAP 6.4.x/7.x binary can't be anonymously downloaded because of licensing. It can be downloaded manually
+         and for free (e.g. from http://jbossas.jboss.org/downloads.html). The zip file location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
     <eap64x.download.url>valid-url-for-eap-6.4.x-needs-to-be-specified-here-or-via-cmd-line</eap64x.download.url>
+    <eap7x.download.url>valid-url-for-eap-7.x-needs-to-be-specified-here-or-via-cmd-line</eap7x.download.url>
   </properties>
 
   <modules>
@@ -77,7 +79,7 @@
               <deployable>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>kie-server</artifactId>
-                <!-- default, may be overriden in container specific profiles -->
+                <!-- default, may be overridden in container specific profiles -->
                 <classifier>ee6</classifier>
                 <type>war</type>
                 <properties>
@@ -374,6 +376,162 @@
         </dependency>
         <dependency>
           <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-controller-client</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>wildfly10x</id>
+      <properties>
+        <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <cargo.container.id>wildfly10x</cargo.container.id>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <type>installed</type>
+                  <artifactInstaller>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-dist</artifactId>
+                    <version>${version.wildfly10}</version>
+                  </artifactInstaller>
+                  <systemProperties>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                  </systemProperties>
+                </container>
+                <configuration>
+                  <properties>
+                    <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                  </properties>
+                </configuration>
+                <deployables>
+                  <deployable>
+                    <classifier>ee7</classifier>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencyManagement>
+        <dependencies>
+          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
+               so this is the closest thing I could find.
+               Important: this overrides lots of the versions coming from kie-p-w-d -->
+          <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-parent</artifactId>
+            <version>${version.wildfly10}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.com.google.guava}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.org.apache.httpcomponents.httpclient}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${version.org.apache.httpcomponents.httpcore}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${version.org.apache.maven}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${version.com.sun.xml.bind}</version>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-jms-client-bom</artifactId>
+          <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
           <artifactId>wildfly-controller-client</artifactId>
           <scope>test</scope>
         </dependency>
@@ -686,6 +844,166 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-controller-client</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>eap7x</id>
+      <properties>
+        <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
+        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <!-- EAP 7 ~= WildFly 10 -->
+        <cargo.container.id>wildfly10x</cargo.container.id>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <configuration>
+                <container>
+                  <type>installed</type>
+                  <zipUrlInstaller>
+                    <url>${eap7x.download.url}</url>
+                  </zipUrlInstaller>
+                  <systemProperties>
+                    <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
+                    <org.kie.executor.jms>false</org.kie.executor.jms>
+                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
+                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+                    <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
+                  </systemProperties>
+                </container>
+                <configuration>
+                  <properties>
+                    <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
+                    <cargo.jvmargs>-XX:MaxPermSize=1024m -Xmx1024m</cargo.jvmargs>
+                  </properties>
+                </configuration>
+                <deployables>
+                  <deployable>
+                    <classifier>ee7</classifier>
+                  </deployable>
+                </deployables>
+              </configuration>
+            </plugin>
+            <plugin>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+      <dependencyManagement>
+        <dependencies>
+          <!-- This is far from ideal, as it is not designed as BOM. However, there is nothing like wildfly-bom,
+               so this is the closest thing I could find.
+               Important: this overrides lots of the versions coming from kie-p-w-d -->
+          <!-- We are using WildFly 10 client libs because they are publicly available. -->
+          <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-parent</artifactId>
+            <version>${version.wildfly10}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.com.google.guava}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>jaxrs-api</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson-provider</artifactId>
+            <version>${version.org.jboss.resteasy}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.org.apache.httpcomponents.httpclient}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${version.org.apache.httpcomponents.httpcore}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-aether-provider</artifactId>
+            <version>${version.org.apache.maven}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-connector-basic</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-file</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-http</artifactId>
+            <version>${version.org.eclipse.aether}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${version.com.sun.xml.bind}</version>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-jms-client-bom</artifactId>
+          <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-controller-client</artifactId>
+          <scope>test</scope>
         </dependency>
       </dependencies>
     </profile>
