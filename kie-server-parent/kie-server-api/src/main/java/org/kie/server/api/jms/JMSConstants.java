@@ -26,4 +26,16 @@ public class JMSConstants {
     public static final String TARGET_CAPABILITY_PROPERTY_NAME = "kie_target_capability";
     public static final String USER_PROPERTY_NAME = "kie_user";
     public static final String PASSWRD_PROPERTY_NAME = "kie_password";
+
+    public static final String INTERACTION_PATTERN_PROPERTY_NAME = "kie_interaction_pattern";
+
+    // from 1 to 99 means response should be sent from the server
+    public static final int UPPER_LIMIT_REPLY_INTERACTION_PATTERNS = 100;
+
+    public static final int REQUEST_REPLY_PATTERN = 1;
+    public static final int ASYNC_REPLY_PATTERN = 2;
+
+    // from 100 up means server should not send any response
+    public static final int FIRE_AND_FORGET_PATTERN = 101;
+
 }

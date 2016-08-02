@@ -398,7 +398,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             contentId = deserialize(response.getResult(), Object.class);
         }
 
@@ -426,7 +428,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             variables = deserialize(response.getResult(), Object.class);
         }
         if (variables instanceof Wrapped) {
@@ -453,6 +457,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             variables = deserialize(response.getResult(), Object.class);
         }
         if (variables instanceof Wrapped) {
@@ -508,7 +515,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             commentId = deserialize(response.getResult(), Object.class);
         }
 
@@ -556,7 +565,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             commentList = deserialize(response.getResult(), TaskCommentList.class);
         }
 
@@ -585,7 +596,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskComment = deserialize(response.getResult(), TaskComment.class);
         }
 
@@ -610,7 +623,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             attachmentId = deserialize(response.getResult(), Object.class);
         }
         if (attachmentId instanceof Wrapped) {
@@ -659,7 +674,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             attachment = deserialize(response.getResult(), TaskAttachment.class);
         }
 
@@ -684,7 +701,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = deserialize(response.getResult(), Object.class);
         }
         if (result instanceof Wrapped) {
@@ -714,7 +733,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             attachmentList = deserialize(response.getResult(), TaskAttachmentList.class);;
         }
 
@@ -742,6 +763,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = deserialize(response.getResult(), TaskInstance.class);
         }
 
@@ -770,6 +794,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = deserialize(response.getResult(), TaskInstance.class);
         }
 
@@ -793,7 +820,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -813,7 +842,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskInstance> response = (ServiceResponse<TaskInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -896,7 +927,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
 
@@ -927,7 +960,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
@@ -955,7 +990,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
@@ -985,7 +1022,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
 
@@ -1017,7 +1056,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
 
@@ -1045,7 +1086,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
@@ -1074,7 +1117,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
@@ -1103,7 +1148,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
@@ -1131,7 +1178,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
 
@@ -1161,7 +1210,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskEventInstanceList> response = (ServiceResponse<TaskEventInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             taskSummaryList = response.getResult();
         }
 
@@ -1194,7 +1245,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -1227,7 +1280,9 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 

@@ -20,6 +20,7 @@ import java.util.List;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.RequestInfoInstanceList;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface JobServicesClient {
 
@@ -38,4 +39,6 @@ public interface JobServicesClient {
     List<RequestInfoInstance> getRequestsByCommand(String command, Integer page, Integer pageSize);
 
     RequestInfoInstance getRequestById(Long requestId, boolean withErrors, boolean withData);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }

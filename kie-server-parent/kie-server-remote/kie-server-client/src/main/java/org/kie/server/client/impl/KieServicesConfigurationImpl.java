@@ -21,14 +21,13 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
+import org.kie.server.client.jms.RequestReplyResponseHandler;
+import org.kie.server.client.jms.ResponseHandler;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +60,8 @@ public final class KieServicesConfigurationImpl
     private ConnectionFactory connectionFactory;
     private Queue             requestQueue;
     private Queue             responseQueue;
+    private ResponseHandler responseHandler = new RequestReplyResponseHandler();
+    private boolean jmsTransactional = false;
 
     private MarshallingFormat format           = MarshallingFormat.JAXB;
     private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
@@ -394,6 +395,27 @@ public final class KieServicesConfigurationImpl
         return this.loadBalancer;
     }
 
+    @Override
+    public void setResponseHandler(ResponseHandler responseHandler) {
+        this.responseHandler = responseHandler;
+    }
+
+    @Override
+    public ResponseHandler getResponseHandler() {
+        return this.responseHandler;
+    }
+
+    @Override
+    public boolean isJmsTransactional() {
+        return jmsTransactional;
+    }
+
+    @Override
+    public void setJmsTransactional(boolean jmsTransactional) {
+        this.jmsTransactional = jmsTransactional;
+    }
+
+
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
         this.connectionFactory = config.connectionFactory;
@@ -411,6 +433,8 @@ public final class KieServicesConfigurationImpl
         this.capabilities = config.capabilities;
         this.credentialsProvider = config.credentialsProvider;
         this.loadBalancer = config.loadBalancer;
+        this.responseHandler = config.responseHandler;
+        this.jmsTransactional = config.jmsTransactional;
     }
 
     @Override
