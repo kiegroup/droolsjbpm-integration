@@ -243,7 +243,7 @@ public class KieServerImpl {
                 if (previous == null) {
                     try {
                         KieServices ks = KieServices.Factory.get();
-                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
+                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
