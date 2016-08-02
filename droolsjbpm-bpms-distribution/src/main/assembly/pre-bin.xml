@@ -42,6 +42,7 @@
         <include>org.jbpm:jbpm-services-ejb-client</include>
         <include>org.jbpm:jbpm-services-ejb-impl</include>
         <include>org.jbpm:jbpm-services-ejb-timer</include>
+        <include>org.jbpm:jbpm-case-mgmt</include>
         <include>org.kie:kie-api</include>
         <include>org.kie:kie-aries-blueprint</include>
         <include>org.kie:kie-internal</include>
@@ -96,6 +97,7 @@
         <exclude>org.jbpm:jbpm-services-ejb-client</exclude>
         <exclude>org.jbpm:jbpm-services-ejb-impl</exclude>
         <exclude>org.jbpm:jbpm-services-ejb-timer</exclude>
+        <exclude>org.jbpm:jbpm-case-mgmt</exclude>
         <exclude>org.kie:kie-api</exclude>
         <exclude>org.kie:kie-aries-blueprint</exclude>
         <exclude>org.kie:kie-internal</exclude>
