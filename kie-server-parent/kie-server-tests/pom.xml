@@ -405,6 +405,7 @@
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
+                    <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                   </systemProperties>
                 </container>
                 <configuration>
@@ -874,6 +875,7 @@
                     <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
                     <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
+                    <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
                   </systemProperties>
                 </container>
                 <configuration>
