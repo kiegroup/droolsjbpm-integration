@@ -76,7 +76,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -121,7 +123,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessDefinition> response = (ServiceResponse<ProcessDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -145,7 +149,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -173,7 +179,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -203,7 +211,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessDefinitionList> response = (ServiceResponse<ProcessDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -276,7 +286,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -306,7 +318,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -336,7 +350,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -366,7 +382,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -397,7 +415,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -426,7 +446,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -457,7 +479,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -489,7 +513,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -521,7 +547,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -548,7 +576,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -571,7 +601,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -594,7 +626,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<ProcessInstance> response = (ServiceResponse<ProcessInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
 
@@ -618,7 +652,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<NodeInstance> response = (ServiceResponse<NodeInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -645,7 +681,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -675,7 +713,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -706,7 +746,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -736,7 +778,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<VariableInstanceList> response = (ServiceResponse<VariableInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -768,7 +812,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<VariableInstanceList> response = (ServiceResponse<VariableInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -856,7 +902,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<QueryDefinition> response = (ServiceResponse<QueryDefinition>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -881,7 +929,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<QueryDefinitionList> response = (ServiceResponse<QueryDefinitionList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -913,7 +963,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -958,7 +1010,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -991,7 +1045,9 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 

@@ -67,6 +67,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = deserialize(response.getResult(), Object.class);
         }
 
@@ -130,6 +133,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             list = response.getResult();
         }
 
@@ -158,6 +164,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             list = response.getResult();
         }
 
@@ -187,6 +196,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             list = response.getResult();
         }
 
@@ -213,6 +225,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return deserialize(response.getResult(), RequestInfoInstance.class);
         }
     }

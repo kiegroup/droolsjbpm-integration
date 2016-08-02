@@ -26,6 +26,7 @@ import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface KieServicesClient {
 
@@ -85,4 +86,6 @@ public interface KieServicesClient {
     String getConversationId();
 
     void completeConversation();
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }

@@ -29,6 +29,7 @@ import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface ProcessServicesClient {
 
@@ -91,4 +92,6 @@ public interface ProcessServicesClient {
     WorkItemInstance getWorkItem(String containerId, Long processInstanceId, Long id);
 
     List<WorkItemInstance> getWorkItemByProcessInstance(String containerId, Long processInstanceId);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }

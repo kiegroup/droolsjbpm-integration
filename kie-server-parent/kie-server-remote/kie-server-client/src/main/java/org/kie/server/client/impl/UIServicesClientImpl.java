@@ -58,6 +58,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -78,6 +81,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -98,6 +104,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -118,6 +127,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -141,6 +153,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }
@@ -164,6 +179,9 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response.getResult();
         }
     }

@@ -25,6 +25,7 @@ import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface QueryServicesClient {
 
@@ -130,4 +131,6 @@ public interface QueryServicesClient {
     <T> List<T> query(String queryName, String mapper, QueryFilterSpec filterSpec, Integer page, Integer pageSize, Class<T> resultType);
 
     <T> List<T> query(String queryName, String mapper, String builder, Map<String, Object> parameters, Integer page, Integer pageSize, Class<T> resultType);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }

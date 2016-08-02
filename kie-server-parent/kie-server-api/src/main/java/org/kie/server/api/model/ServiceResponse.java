@@ -56,7 +56,7 @@ import org.optaplanner.core.api.domain.solution.Solution;
 @XmlAccessorType(XmlAccessType.NONE)
 public class ServiceResponse<T> {
     public static enum ResponseType {
-        SUCCESS, FAILURE;
+        SUCCESS, FAILURE, NO_RESPONSE;
     }
 
     @XmlAttribute
