@@ -94,7 +94,7 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
         }
 
         // EAP 6.4 has some small delay between redeploying of WAR file and its publishing
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         // Process should be deployed.
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
