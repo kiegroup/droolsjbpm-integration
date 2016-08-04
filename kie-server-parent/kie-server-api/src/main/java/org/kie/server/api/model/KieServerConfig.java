@@ -36,7 +36,9 @@ public class KieServerConfig {
     }
 
     public KieServerConfig(List<KieServerConfigItem> configItems) {
-        this.configItems = configItems;
+        if (configItems != null) {
+            this.configItems = configItems;
+        }
     }
 
     public List<KieServerConfigItem> getConfigItems() {
