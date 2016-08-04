@@ -34,6 +34,8 @@ public interface KieContainerInstance {
 
     KieContainerResource getResource();
 
+    KieContainerResource getRefreshedResource();
+
     KieScanner getScanner();
 
     Marshaller getMarshaller(MarshallingFormat format);

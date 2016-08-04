@@ -246,6 +246,7 @@ public class KieServerImpl {
                         InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
+                            ci.getResource().setConfigItems(container.getConfigItems());
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
 
                             KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
@@ -617,7 +618,7 @@ public class KieServerImpl {
         try {
             KieContainerInstanceImpl ci = context.getContainer(id);
             if (ci != null) {
-                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getResource().getReleaseId());
+                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getRefreshedResource().getReleaseId());
             }
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
         } catch (Exception e) {
@@ -671,6 +672,7 @@ public class KieServerImpl {
                     logger.error("Error updating releaseId for container " + id + " to version " + releaseId + "\nMessages: " + results.getMessages());
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Error updating release id on container " + id + " to " + releaseId, kci.getResource().getReleaseId());
                 } else {
+                    kci.updateReleaseId();
                     // once the upgrade was successful, notify all extensions so they can be upgraded (if needed)
                     for (KieServerExtension extension : extensions) {
                         extension.updateContainer(id, kci, parameters);

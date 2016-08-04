@@ -25,6 +25,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
@@ -33,7 +34,11 @@ import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
+import org.kie.server.controller.api.model.spec.Capability;
+import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
+import org.kie.server.controller.api.model.spec.ProcessConfig;
+import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +123,53 @@ public class KieServerInstanceManager {
                 KieContainerResource containerResource = new KieContainerResource();
                 containerResource.setContainerId(containerSpec.getId());
                 containerResource.setReleaseId(containerSpec.getReleasedId());
+
+                if (containerSpec.getConfigs() != null) {
+                    // cover scanner and rules config
+                    ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
+                    if (containerConfig != null) {
+                        RuleConfig ruleConfig = (RuleConfig) containerConfig;
+
+                        KieScannerResource scannerResource = new KieScannerResource();
+                        scannerResource.setPollInterval(ruleConfig.getPollInterval());
+                        scannerResource.setStatus(ruleConfig.getScannerStatus());
+
+                        containerResource.setScanner(scannerResource);
+                    }
+                    // cover process config
+                    containerConfig = containerSpec.getConfigs().get(Capability.PROCESS);
+                    if (containerConfig != null) {
+                        ProcessConfig processConfig = (ProcessConfig) containerConfig;
+
+                        KieServerConfigItem configItem = new KieServerConfigItem();
+                        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+                        configItem.setName("KBase");
+                        configItem.setValue(processConfig.getKBase());
+
+                        containerResource.addConfigItem(configItem);
+
+                        configItem = new KieServerConfigItem();
+                        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+                        configItem.setName("KSession");
+                        configItem.setValue(processConfig.getKSession());
+
+                        containerResource.addConfigItem(configItem);
+
+                        configItem = new KieServerConfigItem();
+                        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+                        configItem.setName("MergeMode");
+                        configItem.setValue(processConfig.getMergeMode());
+
+                        containerResource.addConfigItem(configItem);
+
+                        configItem = new KieServerConfigItem();
+                        configItem.setType(KieServerConstants.CAPABILITY_BPM);
+                        configItem.setName("RuntimeStrategy");
+                        configItem.setValue(processConfig.getRuntimeStrategy());
+
+                        containerResource.addConfigItem(configItem);
+                    }
+                }
 
                 ServiceResponse<KieContainerResource> response = client.createContainer(containerSpec.getId(), containerResource);
                 if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
