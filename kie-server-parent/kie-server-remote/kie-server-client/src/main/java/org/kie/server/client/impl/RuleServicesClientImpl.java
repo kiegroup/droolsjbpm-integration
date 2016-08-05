@@ -55,7 +55,9 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
         } else {
             CommandScript script = new CommandScript( Collections.singletonList((KieServerCommand) new CallContainerCommand(id, payload)) );
             ServiceResponse response = executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             if (response.getResult() instanceof String) {
                 response.setResult(deserialize((String) response.getResult(), (Class) ExecutionResultImpl.class));
             }
@@ -71,7 +73,9 @@ public class RuleServicesClientImpl extends AbstractKieServicesClientImpl implem
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
             ServiceResponse response = executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             if (response.getResult() instanceof String) {
                 response.setResult(deserialize((String) response.getResult(), (Class) ExecutionResultImpl.class));
             }

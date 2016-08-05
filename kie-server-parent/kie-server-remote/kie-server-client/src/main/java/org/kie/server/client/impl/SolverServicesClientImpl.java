@@ -58,6 +58,9 @@ public class SolverServicesClientImpl
             ServiceResponse<SolverInstanceList> response = (ServiceResponse<SolverInstanceList>) executeJmsCommand( script, GetSolversCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }
@@ -77,7 +80,9 @@ public class SolverServicesClientImpl
         } else {
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateSolverCommand( containerId, solverId, configFile ) ) );
             ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, CreateSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
-
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }
@@ -94,6 +99,9 @@ public class SolverServicesClientImpl
             ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }
@@ -110,6 +118,9 @@ public class SolverServicesClientImpl
             ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetBestSolutionCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }
@@ -129,6 +140,9 @@ public class SolverServicesClientImpl
             ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, UpdateSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }
@@ -145,6 +159,9 @@ public class SolverServicesClientImpl
             ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand( script, DisposeSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
 
             throwExceptionOnFailure( response );
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             return response;
         }
     }

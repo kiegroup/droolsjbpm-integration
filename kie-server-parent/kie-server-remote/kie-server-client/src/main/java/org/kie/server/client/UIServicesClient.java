@@ -15,6 +15,8 @@
 
 package org.kie.server.client;
 
+import org.kie.server.client.jms.ResponseHandler;
+
 public interface UIServicesClient {
 
     /**
@@ -67,4 +69,11 @@ public interface UIServicesClient {
      * @return svg (xml) representing process image annotated with active (in red) and completed (in grey) nodes
      */
     String getProcessInstanceImage(String containerId, Long processInstanceId);
+
+    /**
+     * Override default response handler to change interaction pattern. Applies only to JMS
+     * based integration.
+     * @param responseHandler
+     */
+    void setResponseHandler(ResponseHandler responseHandler);
 }

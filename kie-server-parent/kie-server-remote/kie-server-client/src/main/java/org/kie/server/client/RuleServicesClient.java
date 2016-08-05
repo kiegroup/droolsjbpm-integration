@@ -18,6 +18,7 @@ package org.kie.server.client;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface RuleServicesClient {
 
@@ -36,5 +37,7 @@ public interface RuleServicesClient {
     ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, String payload);
 
     ServiceResponse<ExecutionResults> executeCommandsWithResults(String id, Command<?> cmd);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }
 

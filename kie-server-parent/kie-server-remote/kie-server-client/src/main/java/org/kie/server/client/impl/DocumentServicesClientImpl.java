@@ -64,6 +64,9 @@ public class DocumentServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<DocumentInstance> response = (ServiceResponse<DocumentInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 
@@ -86,6 +89,9 @@ public class DocumentServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
         if (result instanceof Wrapped) {
@@ -150,6 +156,9 @@ public class DocumentServicesClientImpl extends AbstractKieServicesClientImpl im
             ServiceResponse<DocumentInstanceList> response = (ServiceResponse<DocumentInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
             result = response.getResult();
         }
 

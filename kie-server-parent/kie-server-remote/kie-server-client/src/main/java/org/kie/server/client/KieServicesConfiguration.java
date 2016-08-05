@@ -17,6 +17,7 @@ package org.kie.server.client;
 
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.jms.ResponseHandler;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
@@ -97,5 +98,13 @@ public interface KieServicesConfiguration {
     void setLoadBalancer(LoadBalancer loadBalancer);
 
     LoadBalancer getLoadBalancer();
+
+    void setResponseHandler(ResponseHandler responseHandler);
+
+    ResponseHandler getResponseHandler();
+
+    void setJmsTransactional(boolean transacted);
+
+    boolean isJmsTransactional();
 
 }

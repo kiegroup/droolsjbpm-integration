@@ -18,6 +18,7 @@ package org.kie.server.client;
 import java.util.List;
 
 import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface DocumentServicesClient {
 
@@ -32,4 +33,6 @@ public interface DocumentServicesClient {
     void deleteDocument(String identifier);
 
     List<DocumentInstance> listDocuments(Integer page, Integer pageSize);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }
