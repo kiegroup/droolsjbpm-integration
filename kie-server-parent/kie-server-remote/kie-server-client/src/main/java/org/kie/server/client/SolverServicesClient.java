@@ -18,7 +18,7 @@ package org.kie.server.client;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
-import org.optaplanner.core.api.domain.solution.Solution;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface SolverServicesClient {
 
@@ -33,6 +33,8 @@ public interface SolverServicesClient {
     ServiceResponse<SolverInstance> updateSolverState(String containerId, String solverId, SolverInstance instance);
 
     ServiceResponse<Void> disposeSolver( String containerId, String solverId );
+
+    void setResponseHandler(ResponseHandler responseHandler);
 
 }
 

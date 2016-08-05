@@ -51,6 +51,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.impl.KieServicesClientImpl;
+import org.kie.server.client.jms.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +70,15 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected KieServicesClientImpl owner;
 
+    // used by JMS to handle response via different interaction patterns
+    private ResponseHandler responseHandler;
+
     public AbstractKieServicesClientImpl(KieServicesConfiguration config) {
         this.config = config.clone();
         this.baseURI = config.getServerUrl();
         this.classLoader = Thread.currentThread().getContextClassLoader() != null ? Thread.currentThread().getContextClassLoader() : CommandScript.class.getClassLoader();
         this.marshaller = MarshallerFactory.getMarshaller(config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader);
+        this.responseHandler = config.getResponseHandler();
     }
 
     public AbstractKieServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
@@ -81,6 +86,7 @@ public abstract class AbstractKieServicesClientImpl {
         this.baseURI = config.getServerUrl();
         this.classLoader = classLoader;
         this.marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader );
+        this.responseHandler = config.getResponseHandler();
     }
 
     /**
@@ -121,11 +127,23 @@ public abstract class AbstractKieServicesClientImpl {
         this.owner = owner;
     }
 
+    public void setResponseHandler(ResponseHandler responseHandler) {
+        this.responseHandler = responseHandler;
+    }
 
     protected void throwExceptionOnFailure(ServiceResponse<?> serviceResponse) {
         if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())){
             throw new KieServicesException(serviceResponse.getMsg());
         }
+    }
+
+    protected boolean shouldReturnWithNullResponse(ServiceResponse<?> serviceResponse) {
+        if (serviceResponse != null && ServiceResponse.ResponseType.NO_RESPONSE.equals(serviceResponse.getType())){
+            logger.debug("Returning null as the response type is NO_RESPONSE");
+            return true;
+        }
+
+        return false;
     }
 
     protected void sendTaskOperation(String containerId, Long taskId, String operation, String queryString) {
@@ -394,16 +412,15 @@ public abstract class AbstractKieServicesClientImpl {
         try {
             // setup
             MessageProducer producer;
-            MessageConsumer consumer;
+
             try {
                 if( config.getPassword() != null ) {
                     connection = factory.createConnection(config.getUserName(), config.getPassword());
                 } else {
                     connection = factory.createConnection();
                 }
-                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                session = connection.createSession(config.isJmsTransactional(), Session.AUTO_ACKNOWLEDGE);
                 producer = session.createProducer(sendQueue);
-                consumer = session.createConsumer(responseQueue, selector);
 
                 connection.start();
             } catch( JMSException jmse ) {
@@ -425,6 +442,7 @@ public abstract class AbstractKieServicesClientImpl {
                 textMsg.setJMSCorrelationID(corrId);
                 // 2. serialization info
                 textMsg.setIntProperty( JMSConstants.SERIALIZATION_FORMAT_PROPERTY_NAME, config.getMarshallingFormat().getId() );
+                textMsg.setIntProperty( JMSConstants.INTERACTION_PATTERN_PROPERTY_NAME, responseHandler.getInteractionPattern() );
                 if (classType != null) {
                     textMsg.setStringProperty(JMSConstants.CLASS_TYPE_PROPERTY_NAME, classType);
                 }
@@ -450,45 +468,11 @@ public abstract class AbstractKieServicesClientImpl {
             }
 
             // receive
-            Message response;
-            try {
-                response = consumer.receive( config.getTimeout() );
-            } catch( JMSException jmse ) {
-                logger.warn("JMS exception while waiting for response - {}", jmse.getMessage());
-                throw new KieServicesException("Unable to receive or retrieve the JMS response.", jmse);
-            }
+            cmdResponse = responseHandler.handleResponse(selector, connection, session, responseQueue, config, marshaller, owner);
 
-            if( response == null ) {
-                logger.warn("Response is empty");
-                // return actual instance to avoid null points on client side
-                List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
-                responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, "Response is empty"));
-                return new ServiceResponsesList(responses);
-            }
-            // extract response
-            assert response != null: "Response is empty.";
-            try {
-                owner.setConversationId(response.getStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME));
-
-                String responseStr = ((TextMessage) response).getText();
-                logger.debug("Received response from server '{}'", responseStr);
-                cmdResponse = marshaller.unmarshall(responseStr, ServiceResponsesList.class);
-                return cmdResponse;
-            } catch( JMSException jmse ) {
-                throw new KieServicesException("Unable to extract " + ServiceResponsesList.class.getSimpleName()
-                        + " instance from JMS response.", jmse);
-            }
+            return cmdResponse;
         } finally {
-            if( connection != null ) {
-                try {
-                    connection.close();
-                    if( session != null ) {
-                        session.close();
-                    }
-                } catch( JMSException jmse ) {
-                    logger.warn("Unable to close connection or session!", jmse);
-                }
-            }
+            responseHandler.dispose(connection, session);
         }
     }
 

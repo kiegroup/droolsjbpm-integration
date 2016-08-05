@@ -23,8 +23,6 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.jms.Connection;
@@ -45,7 +43,6 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
@@ -159,35 +156,11 @@ public class KieServerMDB
                 throw new JMSRuntimeException(errMsg, jmse);
             }
 
-            String targetCapability = "KieServer"; // for backward compatibility default to KieServer
-            try {
-                if (message.propertyExists(TARGET_CAPABILITY_PROPERTY_NAME)) {
-                    targetCapability = message.getStringProperty(TARGET_CAPABILITY_PROPERTY_NAME);
-                }
-            } catch (JMSException jmse) {
-                String errMsg = "Unable to retrieve property '" + TARGET_CAPABILITY_PROPERTY_NAME + "' from message " + msgCorrId + ".";
-                throw new JMSRuntimeException(errMsg, jmse);
-            }
+            String targetCapability = getStringProperty(message, TARGET_CAPABILITY_PROPERTY_NAME, "KieServer"); // for backward compatibility default to KieServer
+            String containerId = getStringProperty(message, CONTAINER_ID_PROPERTY_NAME, null);
+            String conversationId = getStringProperty(message, CONVERSATION_ID_PROPERTY_NAME, null);
 
-            String containerId = null;
-            try {
-                if (message.propertyExists(CONTAINER_ID_PROPERTY_NAME)) {
-                    containerId = message.getStringProperty(CONTAINER_ID_PROPERTY_NAME);
-                }
-            } catch (JMSException jmse) {
-                String logMsg = "Unable to retrieve property '" + CONTAINER_ID_PROPERTY_NAME + "' from message " + msgCorrId + ".";
-                logger.debug(logMsg);
-            }
-
-            String conversationId = null;
-            try {
-                if (message.propertyExists(CONVERSATION_ID_PROPERTY_NAME)) {
-                    conversationId = message.getStringProperty(CONVERSATION_ID_PROPERTY_NAME);
-                }
-            } catch (JMSException jmse) {
-                String logMsg = "Unable to retrieve property '" + CONVERSATION_ID_PROPERTY_NAME + "' from message " + msgCorrId + ".";
-                logger.debug(logMsg);
-            }
+            int interactionPattern = getIntProperty(message, INTERACTION_PATTERN_PROPERTY_NAME, REQUEST_REPLY_PATTERN);
 
             // 1. get marshalling info
             MarshallingFormat format = null;
@@ -237,34 +210,39 @@ public class KieServerMDB
             // 4. process request
             ServiceResponsesList response = executor.executeScript(script, format, classType);
 
-            // 5. serialize response
-            Message msg = marshallResponse(session, msgCorrId, format, marshaller, response);
-            // set conversation id for routing
-            if (containerId != null && (conversationId == null || conversationId.trim().isEmpty())) {
-                try {
-                    KieContainerInstance containerInstance = kieServer.getServerRegistry().getContainer(containerId);
-                    if (containerInstance != null) {
-                        ReleaseId releaseId = containerInstance.getResource().getResolvedReleaseId();
-                        if (releaseId == null) {
-                            releaseId = containerInstance.getResource().getReleaseId();
+            if (interactionPattern < UPPER_LIMIT_REPLY_INTERACTION_PATTERNS) {
+                logger.debug("Response message is about to be sent according to selected interaction pattern {}", interactionPattern);
+                // 5. serialize response
+                Message msg = marshallResponse(session, msgCorrId, format, marshaller, response);
+                // set conversation id for routing
+                if (containerId != null && (conversationId == null || conversationId.trim().isEmpty())) {
+                    try {
+                        KieContainerInstance containerInstance = kieServer.getServerRegistry().getContainer(containerId);
+                        if (containerInstance != null) {
+                            ReleaseId releaseId = containerInstance.getResource().getResolvedReleaseId();
+                            if (releaseId == null) {
+                                releaseId = containerInstance.getResource().getReleaseId();
+                            }
+
+                            conversationId = ConversationId.from(KieServerEnvironment.getServerId(), containerId, releaseId).toString();
                         }
-
-                        conversationId = ConversationId.from(KieServerEnvironment.getServerId(), containerId, releaseId).toString();
+                    } catch (Exception e) {
+                        logger.warn("Unable to build conversation id due to {}", e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    logger.warn("Unable to build conversation id due to {}", e.getMessage(), e);
                 }
-            }
-            try {
-                if (conversationId != null) {
-                    msg.setStringProperty(CONVERSATION_ID_PROPERTY_NAME, conversationId);
+                try {
+                    if (conversationId != null) {
+                        msg.setStringProperty(CONVERSATION_ID_PROPERTY_NAME, conversationId);
+                    }
+                } catch (JMSException e) {
+                    logger.debug("Unable to set conversation id on response message due to {}", e.getMessage());
                 }
-            } catch (JMSException e) {
-                logger.debug("Unable to set conversation id on response message due to {}", e.getMessage());
-            }
 
-            // 6. send response
-            sendResponse(msgCorrId, format, msg);
+                // 6. send response
+                sendResponse(msgCorrId, format, msg);
+            } else {
+                logger.debug("Response message is skipped according to selected interaction pattern {}", FIRE_AND_FORGET_PATTERN);
+            }
 
         } finally {
 
@@ -351,6 +329,32 @@ public class KieServerMDB
         }
 
         return marshallers.get(format);
+    }
+
+    protected String getStringProperty(Message message, String name, String defaultValue) {
+        try {
+            if (message.propertyExists(name)) {
+                return message.getStringProperty(name);
+            }
+        } catch (JMSException jmse) {
+            String errMsg = "Unable to retrieve property '" + name + "' from message " + message + ".";
+            logger.debug(errMsg, jmse);
+        }
+
+        return defaultValue;
+    }
+
+    protected int getIntProperty(Message message, String name, int defaultValue) {
+        try {
+            if (message.propertyExists(name)) {
+                return message.getIntProperty(name);
+            }
+        } catch (JMSException jmse) {
+            String errMsg = "Unable to retrieve property '" + name + "' from message " + message + ".";
+            logger.debug(errMsg, jmse);
+        }
+
+        return defaultValue;
     }
 
 }

@@ -25,6 +25,7 @@ import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.jms.ResponseHandler;
 
 public interface UserTaskServicesClient {
 
@@ -151,4 +152,6 @@ public interface UserTaskServicesClient {
     List<TaskSummary> findTasksByVariable(String userId, String variableName, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findTasksByVariableAndValue(String userId, String variableName, String variableValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    void setResponseHandler(ResponseHandler responseHandler);
 }
