@@ -430,8 +430,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testWorkItemOperations() throws Exception {
 
-        changeUser(USER_JOHN);
-
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         parameters.put("person", createPersonInstance(USER_JOHN));
@@ -449,8 +447,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
-            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN);
-            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN, null);
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, null);
 
             TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);
@@ -503,8 +501,6 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     @Test
     public void testWorkItemOperationComplete() throws Exception {
 
-        changeUser(USER_JOHN);
-
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
@@ -520,8 +516,8 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             assertEquals(1, taskList.size());
             TaskSummary taskSummary = taskList.get(0);
-            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN);
-            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_JOHN, null);
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, null);
 
             TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);

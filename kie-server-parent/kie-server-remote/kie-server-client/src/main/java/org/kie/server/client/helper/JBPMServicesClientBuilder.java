@@ -25,6 +25,8 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.admin.ProcessAdminServicesClient;
+import org.kie.server.client.admin.impl.ProcessAdminServicesClientImpl;
 import org.kie.server.client.impl.DocumentServicesClientImpl;
 import org.kie.server.client.impl.JobServicesClientImpl;
 import org.kie.server.client.impl.ProcessServicesClientImpl;
@@ -48,6 +50,8 @@ public class JBPMServicesClientBuilder implements KieServicesClientBuilder {
         services.put(QueryServicesClient.class, new QueryServicesClientImpl(configuration, classLoader));
         services.put(JobServicesClient.class, new JobServicesClientImpl(configuration, classLoader));
         services.put(DocumentServicesClient.class, new DocumentServicesClientImpl(configuration, classLoader));
+        // admin clients
+        services.put(ProcessAdminServicesClient.class, new ProcessAdminServicesClientImpl(configuration, classLoader));
 
         return services;
     }
