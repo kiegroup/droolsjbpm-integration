@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.shared;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.kie.api.executor.STATUS;
 import org.kie.server.api.model.KieContainerResource;
@@ -27,69 +28,109 @@ import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.QueryServicesClient;
 
 public class KieServerSynchronization {
 
     private static final long SERVICE_TIMEOUT = 30000;
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
-    public static void waitForJobToFinish(JobServicesClient jobServicesClient, Long jobId) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
-        while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
+    public static void waitForJobToFinish(final JobServicesClient jobServicesClient, final Long jobId) throws Exception {
+        waitForCondition(new WaitingCondition() {
 
-            // If job finished (to one of final states) then return.
-            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
-                    STATUS.DONE.toString().equals(result.getStatus()) ||
-                    STATUS.ERROR.toString().equals(result.getStatus())) {
-                return;
+            @Override
+            public boolean conditionPassed() {
+                RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
+
+                // If job finished (to one of final states) then return.
+                if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
+                        STATUS.DONE.toString().equals(result.getStatus()) ||
+                        STATUS.ERROR.toString().equals(result.getStatus())) {
+                    return true;
+                }
+                return false;
             }
-            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
-        }
-        throw new TimeoutException("Timeout while waiting for job executor to finish job.");
+        });
     }
 
-    public static void waitForKieServerSynchronization(KieServicesClient client, int numberOfExpectedContainers) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
-        while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+    public static void waitForKieServerSynchronization(final KieServicesClient client, final int numberOfExpectedContainers) throws Exception {
+        waitForCondition(new WaitingCondition() {
 
-            // If synchronization finished (number of containers same as expected) then return.
-            if (containersList.getResult().getContainers() == null) {
-                if (numberOfExpectedContainers == 0) {
-                    return;
-                }
-            } else if (numberOfExpectedContainers == containersList.getResult().getContainers().size()) {
-                // Check that all containers are created or disposed.
-                boolean containersInitializing = false;
-                for (KieContainerResource container : containersList.getResult().getContainers()) {
-                    if (KieContainerStatus.CREATING.equals(container.getStatus()) ||
-                            KieContainerStatus.DISPOSING.equals(container.getStatus())) {
-                        containersInitializing = true;
+            @Override
+            public boolean conditionPassed() {
+                ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+
+                // If synchronization finished (number of containers same as expected) then return.
+                if (containersList.getResult().getContainers() == null) {
+                    if (numberOfExpectedContainers == 0) {
+                        return true;
+                    }
+                } else if (numberOfExpectedContainers == containersList.getResult().getContainers().size()) {
+                    // Check that all containers are created or disposed.
+                    boolean containersInitializing = false;
+                    for (KieContainerResource container : containersList.getResult().getContainers()) {
+                        if (KieContainerStatus.CREATING.equals(container.getStatus()) ||
+                                KieContainerStatus.DISPOSING.equals(container.getStatus())) {
+                            containersInitializing = true;
+                        }
+                    }
+                    if (!containersInitializing) {
+                        return true;
                     }
                 }
-                if (!containersInitializing) {
-                    return;
-                }
+                return false;
             }
-
-            Thread.sleep(TIMEOUT_BETWEEN_CALLS);
-        }
-        throw new TimeoutException("Timeout while waiting for kie server synchronization.");
+        });
     }
 
-    public static void waitForProcessInstanceToFinish(ProcessServicesClient processClient, String containerId, long processInstanceId) throws Exception {
+    public static void waitForProcessInstanceToFinish(final ProcessServicesClient processClient, final String containerId, final long processInstanceId) throws Exception {
+        waitForCondition(new WaitingCondition() {
+
+            @Override
+            public boolean conditionPassed() {
+                ProcessInstance processInstance = processClient.getProcessInstance(containerId, processInstanceId);
+
+                // If process instance is finished (to one of final states) then return.
+                if(((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED).equals(processInstance.getState()) ||
+                        ((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED).equals(processInstance.getState())) {
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    public static void waitForProcessInstanceStart(final QueryServicesClient queryClient, final String containerId) throws Exception {
+        waitForCondition(new WaitingCondition() {
+
+            @Override
+            public boolean conditionPassed() {
+                List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
+
+                if (processInstances.size() == 1) {
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private static void waitForCondition(WaitingCondition condition) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
-            ProcessInstance processInstance = processClient.getProcessInstance(containerId, processInstanceId);
 
-            // If process instance is finished (to one of final states) then return.
-            if(((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED).equals(processInstance.getState()) ||
-                    ((Integer)org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED).equals(processInstance.getState())) {
+            if (condition.conditionPassed()) {
                 return;
             }
             Thread.sleep(TIMEOUT_BETWEEN_CALLS);
         }
         throw new TimeoutException("Timeout while waiting for process instance to finish.");
+    }
+
+    private interface WaitingCondition {
+        /**
+         * @return True if condition we wait for happened, false otherwise.
+         */
+        boolean conditionPassed();
     }
 }

@@ -38,6 +38,7 @@ import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.control.ContainerRemoteController;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
 
@@ -93,8 +94,8 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
             containerRemoteController.deployWarFile(TestConfig.getKieServerContext(), TestConfig.getKieServerWarPath());
         }
 
-        // EAP 6.4 has some small delay between redeploying of WAR file and its publishing
-        Thread.sleep(1000);
+        // Wait for process instance to start.
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
         // Process should be deployed.
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
@@ -102,6 +103,7 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
         ProcessInstance pi = processInstances.get(0);
         assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, pi.getState().intValue());
+        assertEquals(PROCESS_ID_USERTASK, pi.getProcessId());
 
         processClient.abortProcessInstance(CONTAINER_ID, pi.getId());
     }
