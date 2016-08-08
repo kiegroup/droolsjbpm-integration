@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -32,6 +32,7 @@ import org.jbpm.services.api.query.QueryService;
 import org.junit.Test;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
@@ -62,7 +63,7 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 6;
+        int numComponents = 7;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
@@ -72,6 +73,7 @@ public class JbpmApplicationComponentsServiceTest {
                     || appComponent instanceof UserTaskResource
                     || appComponent instanceof ExecutorResource
                     || appComponent instanceof QueryDataResource
+                    || appComponent instanceof ProcessAdminResource
                     );
         }
     }

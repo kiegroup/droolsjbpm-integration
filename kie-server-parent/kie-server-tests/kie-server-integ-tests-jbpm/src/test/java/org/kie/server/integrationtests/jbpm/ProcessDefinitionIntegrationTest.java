@@ -86,7 +86,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         String[] evaluateItemsEntities = entities.get("Evaluate items");
         assertEquals(2, evaluateItemsEntities.length);
-        assertEquals("john", evaluateItemsEntities[0]);
+        assertEquals(USER_YODA, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
 
         // assert reusable subprocesses
@@ -128,7 +128,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         String[] evaluateItemsEntities = entities.get("Prepare");
         assertEquals(1, evaluateItemsEntities.length);
-        assertEquals("john", evaluateItemsEntities[0]);
+        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
 
         // assert reusable subprocesses
         assertEquals(1, result.getReusableSubProcesses().size());
@@ -199,7 +199,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         String[] evaluateItemsEntities = entities.get("Evaluate items");
 
         assertEquals(2, evaluateItemsEntities.length);
-        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
+        assertEquals(USER_YODA, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
     }
 
@@ -227,7 +227,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         String[] evaluateItemsEntities = task.getAssociatedEntities();
 
         assertEquals(2, evaluateItemsEntities.length);
-        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
+        assertEquals(USER_YODA, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
 
         // assert task inputs and outputs

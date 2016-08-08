@@ -31,6 +31,7 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +49,14 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     private ExecutorServiceBase executorServiceBase;
     private QueryDataServiceBase queryDataServiceBase;
 
+    // admin section
+    private ProcessAdminServiceBase processAdminServiceBase;
+
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
-            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase) {
+            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase,
+            ProcessAdminServiceBase processAdminServiceBase) {
 
         this.context = context;
         this.deploymentService = deploymentService;
@@ -61,6 +66,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
         this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.executorServiceBase = executorServiceBase;
         this.queryDataServiceBase = queryDataServiceBase;
+
+        this.processAdminServiceBase = processAdminServiceBase;
     }
 
     @Override
@@ -101,6 +108,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
                         wrapResults = true;
                     }
+                } else if ("ProcessAdminService".equals(descriptorCommand.getService())) {
+                    handler = processAdminServiceBase;
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }

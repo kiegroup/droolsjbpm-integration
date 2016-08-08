@@ -27,6 +27,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
@@ -62,6 +63,8 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected UserTaskServicesClient taskClient;
     protected QueryServicesClient queryClient;
     protected JobServicesClient jobServicesClient;
+    // admin clients
+    protected ProcessAdminServicesClient processAdminClient;
 
     @Before
     public void cleanup() {
@@ -86,5 +89,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         taskClient = client.getServicesClient(UserTaskServicesClient.class);
         queryClient = client.getServicesClient(QueryServicesClient.class);
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
+
+        processAdminClient = client.getServicesClient(ProcessAdminServicesClient.class);
     }
 }
