@@ -37,9 +37,10 @@ import org.kie.server.integrationtests.category.RemotelyControlled;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.controller.ContainerRemoteController;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 @Category({JMSOnly.class, RemotelyControlled.class})
 public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -92,12 +93,16 @@ public class JmsQueueIntegrationTest extends JbpmKieServerBaseIntegrationTest {
             containerRemoteController.deployWarFile(TestConfig.getKieServerContext(), TestConfig.getKieServerWarPath());
         }
 
+        // Wait for process instance to start.
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
+
         // Process should be deployed.
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertEquals(1, processInstances.size());
 
         ProcessInstance pi = processInstances.get(0);
         assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, pi.getState().intValue());
+        assertEquals(PROCESS_ID_USERTASK, pi.getProcessId());
 
         processClient.abortProcessInstance(CONTAINER_ID, pi.getId());
     }
