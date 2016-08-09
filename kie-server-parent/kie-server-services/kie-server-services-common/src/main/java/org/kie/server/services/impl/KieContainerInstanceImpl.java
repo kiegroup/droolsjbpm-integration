@@ -80,7 +80,15 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     }
 
     public KieContainerResource getResource() {
-        updateReleaseId();
+        return resource;
+    }
+
+    @Override
+    public KieContainerResource getRefreshedResource() {
+        if ( kieContainer != null ) {
+            this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
+            this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
+        }
         return resource;
     }
 
@@ -96,7 +104,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         return this.scanner;
     }
 
-    private void updateReleaseId() {
+    protected void updateReleaseId() {
         if ( kieContainer != null ) {
             this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
             this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );

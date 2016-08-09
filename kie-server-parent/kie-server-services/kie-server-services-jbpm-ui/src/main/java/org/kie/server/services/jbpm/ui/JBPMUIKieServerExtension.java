@@ -23,7 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.jbpm.kie.services.impl.FormManagerService;
+import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.services.api.DefinitionService;
+import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.runtime.KieContainer;
@@ -57,6 +59,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
 
     private FormServiceBase formServiceBase;
     private ImageServiceBase imageServiceBase;
+
+    private DeploymentService deploymentService;
 
     private KieContainerCommandService kieContainerCommandService;
 
@@ -101,6 +105,9 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
             } else if( FormManagerService.class.isAssignableFrom(object.getClass()) ) {
                 formManagerService = (FormManagerService) object;
                 continue;
+            } else if( DeploymentService.class.isAssignableFrom(object.getClass()) ) {
+                deploymentService = (DeploymentService) object;
+                continue;
             }
         }
 
@@ -128,8 +135,11 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
             return;
         }
         try {
+
+            String kieBaseName = ((KModuleDeploymentUnit)deploymentService.getDeployedUnit(id).getDeploymentUnit()).getKbaseName();
+
             KieContainer kieContainer = kieContainerInstance.getKieContainer();
-            imageReferences.putIfAbsent(id, new ImageReference(kieContainer));
+            imageReferences.putIfAbsent(id, new ImageReference(kieContainer, kieBaseName));
         } catch (Exception e) {
             logger.warn("Unable to create image reference for container {} due to {}", id, e.getMessage());
         }

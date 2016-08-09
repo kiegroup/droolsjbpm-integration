@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.shared.basetests;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
@@ -111,8 +113,16 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     protected static void createContainer(String containerId, ReleaseId releaseId) {
+        createContainer(containerId, releaseId, null);
+    }
+
+    protected static void createContainer(String containerId, ReleaseId releaseId, KieServerConfigItem... configItems) {
         KieServicesClient client = createDefaultStaticClient();
-        ServiceResponse<KieContainerResource> reply = client.createContainer(containerId, new KieContainerResource(containerId, releaseId));
+        KieContainerResource containerResource = new KieContainerResource(containerId, releaseId);
+        if (configItems != null && configItems.length > 0) {
+            containerResource.setConfigItems(Arrays.asList(configItems));
+        }
+        ServiceResponse<KieContainerResource> reply = client.createContainer(containerId, containerResource);
         Assume.assumeTrue(reply.getType().equals(ServiceResponse.ResponseType.SUCCESS));
     }
 
