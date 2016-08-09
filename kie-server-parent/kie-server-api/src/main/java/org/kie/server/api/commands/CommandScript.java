@@ -87,4 +87,24 @@ public class CommandScript implements Serializable {
         return "CommandScriptImpl{ commands=" + commands +
                '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CommandScript that = (CommandScript) o;
+
+        return commands != null ? commands.equals(that.commands) : that.commands == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return commands != null ? commands.hashCode() : 0;
+    }
 }
