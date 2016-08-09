@@ -80,7 +80,7 @@ no-loop
     then
         logger.log("Duration for activity " + $name + " is avg: " + $avg + "; min: " + $min + "; max:" + $max + " count " + $count);
     
-        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, ""));
+        simulation.add(new AggregatedActivitySimulationEvent($name, $id, (Number)$min, (Number)$avg, (Number)$max, (Number)$count, ""));
 
 end
 
@@ -119,8 +119,8 @@ no-loop
         + $max + " is avgwt: " + $avgwt + "; minwt: " + $minwt + "; maxwt:" + $maxwt
          + " is avgru: " + $avgru + "; minru: " + $minru + "; maxru:" + $maxru + " count " + $count + " avg cost " + $avgrc + " min cost " + $minrc + " max cost " + $maxrc);
            
-        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Double)$minwt, (Double)$avgwt, (Double)$maxwt, 
-        (Double)$minru, (Double)$avgru, (Double)$maxru, (Long)$count, (Double)$avgrc, (Double)$minrc, (Double)$maxrc, "userTask"));
+        simulation.add(new HTAggregatedSimulationEvent($name, $id, (Number)$min, (Number)$avg, (Number)$max, (Number)$minwt, (Number)$avgwt, (Number)$maxwt,
+        (Number)$minru, (Number)$avgru, (Number)$maxru, (Number)$count, (Number)$avgrc, (Number)$minrc, (Number)$maxrc, "userTask"));
 
 end
 
@@ -138,7 +138,7 @@ no-loop
     then
         logger.log("Duration for end event is avg: " + $avg + "; min: " + $min + "; max:" + $max);
     
-        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Double)$min, (Double)$avg, (Double)$max, (Long)$count, "endEvent");
+        AggregatedEndEventSimulationEvent aggEvent = new AggregatedEndEventSimulationEvent($name, $id, (Number)$min, (Number)$avg, (Number)$max, (Number)$count, "endEvent");
         simulation.add(aggEvent);
 end
 
@@ -157,7 +157,7 @@ no-loop
     then
         logger.log("Duration for processs is avg: " + $avg + "; min: " + $min + "; max:" + $max + " " + $processSet);
     
-        AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Double)$min, (Double)$avg, (Double)$max);
+        AggregatedProcessSimulationEvent aggEvent = new AggregatedProcessSimulationEvent($processSet, (Number)$min, (Number)$avg, (Number)$max);
         aggEvent.calculatePaths($pathIds);
         simulation.add(aggEvent);
        

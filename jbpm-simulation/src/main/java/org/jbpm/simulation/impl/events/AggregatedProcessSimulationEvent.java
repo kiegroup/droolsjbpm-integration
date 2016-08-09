@@ -38,13 +38,13 @@ public class AggregatedProcessSimulationEvent implements AggregatedSimulationEve
     protected Map<String, Integer> pathInstances = new HashMap<String, Integer>();
     
     public AggregatedProcessSimulationEvent(Object processInfo,
-            double minExecutionTime, double avgExecutionTime, double maxExecutionTime) {
+            Number minExecutionTime, Number avgExecutionTime, Number maxExecutionTime) {
         super();
         setProcessInfoValues(processInfo);
         
-        this.minExecutionTime = minExecutionTime;
-        this.avgExecutionTime = avgExecutionTime;
-        this.maxExecutionTime = maxExecutionTime;
+        this.minExecutionTime = minExecutionTime.doubleValue();
+        this.avgExecutionTime = avgExecutionTime.doubleValue();
+        this.maxExecutionTime = maxExecutionTime.doubleValue();
         this.type = "process";
     }
     
