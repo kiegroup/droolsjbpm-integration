@@ -24,8 +24,10 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.services.api.query.QueryService;
 import org.kie.api.executor.ExecutorService;
+import org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
@@ -37,6 +39,7 @@ import org.kie.server.services.jbpm.ProcessServiceBase;
 import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 
 public class JbpmRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -55,6 +58,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         UserTaskService userTaskService = null;
         ExecutorService executorService = null;
         QueryService queryService = null;
+        ProcessInstanceMigrationService processInstanceMigrationService = null;
         KieServerRegistry context = null;
 
         for( Object object : services ) {
@@ -80,6 +84,9 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
             } else if( QueryService.class.isAssignableFrom(object.getClass()) ) {
                 queryService = (QueryService) object;
                 continue;
+            } else if( ProcessInstanceMigrationService.class.isAssignableFrom(object.getClass()) ) {
+                processInstanceMigrationService = (ProcessInstanceMigrationService) object;
+                continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
                 continue;
@@ -94,6 +101,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         ExecutorServiceBase executorServiceBase = new ExecutorServiceBase(executorService, context);
         QueryDataServiceBase queryDataServiceBase = new QueryDataServiceBase(queryService, context);
         DocumentServiceBase documentServiceBase = new DocumentServiceBase(context);
+        ProcessAdminServiceBase processAdminServiceBase = new ProcessAdminServiceBase(processInstanceMigrationService, context);
 
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase, context));
@@ -102,6 +110,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         components.add(new ExecutorResource(executorServiceBase, context));
         components.add(new QueryDataResource(queryDataServiceBase, context));
         components.add(new DocumentResource(documentServiceBase, context));
+        components.add(new ProcessAdminResource(processAdminServiceBase, context));
 
         return components;
     }

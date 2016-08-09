@@ -31,6 +31,7 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +50,14 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
     private QueryDataServiceBase queryDataServiceBase;
     private DocumentServiceBase documentServiceBase;
 
+    // admin section
+    private ProcessAdminServiceBase processAdminServiceBase;
+
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
-            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase, DocumentServiceBase documentServiceBase) {
+            RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase,
+            DocumentServiceBase documentServiceBase, ProcessAdminServiceBase processAdminServiceBase) {
 
         this.context = context;
         this.deploymentService = deploymentService;
@@ -63,6 +68,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
         this.executorServiceBase = executorServiceBase;
         this.queryDataServiceBase = queryDataServiceBase;
         this.documentServiceBase = documentServiceBase;
+        this.processAdminServiceBase = processAdminServiceBase;
     }
 
     @Override
@@ -105,6 +111,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     }
                 } else if ("DocumentService".equals(descriptorCommand.getService())) {
                     handler = documentServiceBase;
+                } else if ("ProcessAdminService".equals(descriptorCommand.getService())) {
+                    handler = processAdminServiceBase;
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }

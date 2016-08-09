@@ -51,6 +51,9 @@ public class RestURI {
     public static final String QUERY_DEF_URI = "queries/definitions";
     public static final String DOCUMENT_URI = "documents";
 
+    // admin URIs
+    public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
+
     // uris
     // process related prefixed by PROCESS_URI
     public static final String START_PROCESS_POST_URI = "{" + PROCESS_ID +"}/instances";
@@ -186,6 +189,10 @@ public class RestURI {
     public static final String DOCUMENT_INSTANCE_CONTENT_GET_URI = "{" + DOCUMENT_ID + "}/content";
     public static final String DOCUMENT_INSTANCE_PUT_URI = "{" + DOCUMENT_ID + "}";
     public static final String DOCUMENT_INSTANCE_DELETE_URI = "{" + DOCUMENT_ID + "}";
+
+    // admin process related
+    public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}";
+    public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

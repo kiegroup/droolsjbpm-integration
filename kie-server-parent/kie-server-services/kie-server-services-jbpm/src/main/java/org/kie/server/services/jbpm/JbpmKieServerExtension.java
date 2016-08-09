@@ -44,6 +44,7 @@ import org.jbpm.kie.services.impl.KModuleDeploymentUnit;
 import org.jbpm.kie.services.impl.ProcessServiceImpl;
 import org.jbpm.kie.services.impl.RuntimeDataServiceImpl;
 import org.jbpm.kie.services.impl.UserTaskServiceImpl;
+import org.jbpm.kie.services.impl.admin.ProcessInstanceMigrationServiceImpl;
 import org.jbpm.kie.services.impl.bpmn2.BPMN2DataServiceImpl;
 import org.jbpm.kie.services.impl.query.QueryServiceImpl;
 import org.jbpm.runtime.manager.impl.RuntimeManagerFactoryImpl;
@@ -56,6 +57,7 @@ import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.query.QueryMapperRegistry;
@@ -87,6 +89,7 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoImpl;
 import org.kie.server.services.jbpm.jpa.PersistenceUnitInfoLoader;
 import org.kie.server.services.jbpm.security.JMSUserGroupAdapter;
@@ -116,6 +119,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private UserTaskService userTaskService;
     private RuntimeDataService runtimeDataService;
     private FormManagerService formManagerService;
+
+    private ProcessInstanceMigrationService processInstanceMigrationService;
 
     private ExecutorService executorService;
 
@@ -230,10 +235,13 @@ public class JbpmKieServerExtension implements KieServerExtension {
             ((KModuleDeploymentService) deploymentService).setExecutorService(executorService);
         }
 
+        // admin services
+        this.processInstanceMigrationService = new ProcessInstanceMigrationServiceImpl();
+
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),
                 new RuntimeDataServiceBase(runtimeDataService, context), new ExecutorServiceBase(executorService, context), new QueryDataServiceBase(queryService, context),
-                new DocumentServiceBase(context));
+                new DocumentServiceBase(context), new ProcessAdminServiceBase(processInstanceMigrationService, context));
 
         if (registry.getKieSessionLookupManager() != null) {
             registry.getKieSessionLookupManager().addHandler(new JBPMKieSessionLookupHandler());
@@ -247,6 +255,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(runtimeDataService);
         services.add(executorService);
         services.add(queryService);
+        services.add(processInstanceMigrationService);
     }
 
     @Override
@@ -425,6 +434,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 executorService,
                 formManagerService,
                 queryService,
+                processInstanceMigrationService,
                 context
         };
         for( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
@@ -448,6 +458,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 executorService,
                 formManagerService,
                 queryService,
+                processInstanceMigrationService,
                 context
         };
 
