@@ -302,7 +302,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 unit.setKsessionName(ksessionNames.iterator().next());
             }
             // override defaults if config options are given
-            KieServerConfig config = context.getConfig();
+            KieServerConfig config = new KieServerConfig(kieContainerInstance.getResource().getConfigItems());
 
             String runtimeStrategy = config.getConfigItemValue("RuntimeStrategy");
             if (runtimeStrategy != null && !runtimeStrategy.isEmpty()) {
