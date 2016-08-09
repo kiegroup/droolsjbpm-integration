@@ -32,15 +32,15 @@ public class AggregatedEndEventSimulationEvent implements
     
     protected long numberOfInstances; 
     
-    public AggregatedEndEventSimulationEvent(String activityName, String activityId, double minProcessDuration,
-            double avgProcessDuration, double maxProcessDuration, long numberOfInstances, String type) {
+    public AggregatedEndEventSimulationEvent(String activityName, String activityId, Number minProcessDuration,
+            Number avgProcessDuration, Number maxProcessDuration, Number numberOfInstances, String type) {
         super();        
         this.activityName = activityName;
         this.activityId = activityId;
-        this.minProcessDuration = minProcessDuration;
-        this.avgProcessDuration = avgProcessDuration;
-        this.maxProcessDuration = maxProcessDuration;
-        this.numberOfInstances = numberOfInstances;
+        this.minProcessDuration = minProcessDuration.doubleValue();
+        this.avgProcessDuration = avgProcessDuration.doubleValue();
+        this.maxProcessDuration = maxProcessDuration.doubleValue();
+        this.numberOfInstances = numberOfInstances.longValue();
         this.type = type;
     }
 
