@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -48,6 +48,9 @@ public class RestURI {
     public static final String FORM_URI = "containers/{" + CONTAINER_ID + "}/forms";
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
+
+    // admin URIs
+    public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -178,6 +181,10 @@ public class RestURI {
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
     public static final String SOLVER_ID_URI = "/{" + SOLVER_ID + "}";
     public static final String SOLVER_BEST_SOLUTION = "/bestsolution";
+
+    // admin process related
+    public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}";
+    public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

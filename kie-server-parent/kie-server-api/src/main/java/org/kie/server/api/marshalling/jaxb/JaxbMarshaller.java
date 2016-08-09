@@ -71,6 +71,8 @@ import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -220,7 +222,11 @@ public class JaxbMarshaller implements Marshaller {
                 GetBestSolutionCommand.class,
                 GetSolversCommand.class,
                 GetSolverStateCommand.class,
-                UpdateSolverStateCommand.class
+                UpdateSolverStateCommand.class,
+
+                // admin section
+                MigrationReportInstance.class,
+                MigrationReportInstanceList.class
         };
     }
 
