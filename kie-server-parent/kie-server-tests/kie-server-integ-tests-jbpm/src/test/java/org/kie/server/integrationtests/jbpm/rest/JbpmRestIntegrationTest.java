@@ -18,10 +18,14 @@ package org.kie.server.integrationtests.jbpm.rest;
 import static org.junit.Assert.*;
 import static org.kie.server.api.rest.RestURI.*;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.junit.Assert;
@@ -31,10 +35,15 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.kie.scanner.KieModuleMetaData;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.api.model.type.JaxbLong;
+import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -187,6 +196,79 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
             JaxbLong pId = response.readEntity(JaxbLong.class);
             valuesMap.put(PROCESS_INST_ID, pId.unwrap());
             clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), PROCESS_URI + "/" + ABORT_PROCESS_INST_DEL_URI, valuesMap));
+            logger.info( "[DELETE] " + clientRequest.getUri());
+
+            response = clientRequest.request(getMediaType()).delete();
+            int noContentStatusCode = Response.Status.NO_CONTENT.getStatusCode();
+            int okStatusCode = Response.Status.OK.getStatusCode();
+            assertTrue("Wrong status code returned: " + response.getStatus(),
+                    response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
+
+        } finally {
+            response.close();
+        }
+
+    }
+
+    @Test
+    public void testUploadListDownloadDocument() throws Exception {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, client.getClassLoader());
+
+        DocumentInstance documentInstance = DocumentInstance.builder().name("test file.txt").size(50).content("test content".getBytes()).lastModified(new Date()).build();
+        String documentEntity = marshaller.marshall(documentInstance);
+
+        Map<String, Object> empty = new HashMap<>();
+        Response response = null;
+        try {
+            // create document
+            WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI, empty));
+            logger.info( "[POST] " + clientRequest.getUri());
+            response = clientRequest.request(acceptHeadersByFormat.get(marshallingFormat)).post(createEntity(documentEntity));
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+
+            String documentId = response.readEntity(JaxbString.class).unwrap();
+            assertNotNull(documentId);
+
+            // list available documents without paging info
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(DOCUMENT_ID, documentId);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI, valuesMap));
+            logger.info( "[GET] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).get();
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            DocumentInstanceList docList = marshaller.unmarshall(response.readEntity(String.class), DocumentInstanceList.class);
+            assertNotNull(docList);
+
+            List<DocumentInstance> docs = docList.getItems();
+            assertNotNull(docs);
+            assertEquals(1, docs.size());
+            DocumentInstance doc = docs.get(0);
+            assertNotNull(doc);
+            assertEquals(documentInstance.getName(), doc.getName());
+            assertEquals(documentId, doc.getIdentifier());
+
+            // download document content
+            valuesMap = new HashMap<String, Object>();
+            valuesMap.put(DOCUMENT_ID, documentId);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI + "/" + DOCUMENT_INSTANCE_CONTENT_GET_URI, valuesMap));
+            logger.info( "[GET] " + clientRequest.getUri());
+            response = clientRequest.request(getMediaType()).accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get();
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+            String contentDisposition = response.getHeaderString("Content-Disposition");
+            assertTrue(contentDisposition.contains(documentInstance.getName()));
+
+            byte[] content = response.readEntity(byte[].class);
+            assertNotNull(content);
+            String stringContent = new String(content);
+            assertEquals("test content", stringContent);
+            response.close();
+
+            // delete document
+            valuesMap = new HashMap<String, Object>();
+            valuesMap.put(DOCUMENT_ID, documentId);
+            clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), DOCUMENT_URI + "/" + DOCUMENT_INSTANCE_DELETE_URI, valuesMap));
             logger.info( "[DELETE] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).delete();

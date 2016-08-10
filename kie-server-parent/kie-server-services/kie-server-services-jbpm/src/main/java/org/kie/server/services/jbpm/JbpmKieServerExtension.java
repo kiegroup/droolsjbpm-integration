@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.naming.InitialContext;
@@ -33,6 +34,7 @@ import javax.persistence.spi.PersistenceProviderResolverHolder;
 import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.jbpm.document.service.impl.DocumentImpl;
 import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.ExecutorImpl;
 import org.jbpm.executor.impl.ExecutorServiceImpl;
@@ -343,7 +345,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
             DeployedUnit deployedUnit = deploymentService.getDeployedUnit(unit.getIdentifier());
-            kieContainerInstance.addJaxbClasses(new HashSet<Class<?>>(deployedUnit.getDeployedClasses()));
+            Set<Class<?>> customClasses = new HashSet<Class<?>>(deployedUnit.getDeployedClasses());
+            // add custom classes that come from extension itself
+            customClasses.add(DocumentImpl.class);
+            kieContainerInstance.addJaxbClasses(customClasses);
 
             // add any query result mappers from kjar
             List<String> addedMappers = QueryMapperRegistry.get().discoverAndAddMappers(kieContainer.getClassLoader());
