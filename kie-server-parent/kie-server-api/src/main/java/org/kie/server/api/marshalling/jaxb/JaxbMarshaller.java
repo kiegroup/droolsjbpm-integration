@@ -61,14 +61,17 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieContainerStatusFilter;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
@@ -84,8 +87,6 @@ import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.model.type.JaxbMap;
-import org.optaplanner.core.api.domain.solution.Solution;
-import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.score.buildin.bendable.BendableScore;
 import org.optaplanner.core.api.score.buildin.bendablebigdecimal.BendableBigDecimalScore;
 import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
@@ -126,6 +127,10 @@ public class JaxbMarshaller implements Marshaller {
                 ServiceResponse.class,
                 ServiceResponsesList.class,
                 KieServerStateInfo.class,
+
+                ReleaseIdFilter.class,
+                KieContainerStatusFilter.class,
+                KieContainerResourceFilter.class,
 
                 BatchExecutionCommandImpl.class,
                 ExecutionResultImpl.class,

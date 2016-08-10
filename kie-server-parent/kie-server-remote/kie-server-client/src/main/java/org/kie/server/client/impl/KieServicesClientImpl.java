@@ -15,14 +15,10 @@
 
 package org.kie.server.client.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-
 import org.kie.api.command.Command;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieContainerStatusFilter;
+import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -50,6 +46,13 @@ import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.helper.KieServicesClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 public class KieServicesClientImpl extends AbstractKieServicesClientImpl implements KieServicesClient {
 
@@ -143,11 +146,18 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     @Override
     public ServiceResponse<KieContainerResourceList> listContainers() {
-        if( config.isRest() ) {
-            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers", KieContainerResourceList.class );
+        return listContainers(KieContainerResourceFilter.ACCEPT_ALL);
+    }
+
+    @Override
+    public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
+        if (config.isRest()) {
+            String queryParams = containerFilter.toURLQueryString();
+            String uri = baseURI + "/containers" + (queryParams.isEmpty() ? "" : "?" + queryParams);
+            return makeHttpGetRequestAndCreateServiceResponse(uri, KieContainerResourceList.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new ListContainersCommand() ) );
-            return (ServiceResponse<KieContainerResourceList>) executeJmsCommand( script ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList( (KieServerCommand) new ListContainersCommand(containerFilter)));
+            return (ServiceResponse<KieContainerResourceList>) executeJmsCommand(script).getResponses().get(0);
         }
     }
 

@@ -23,8 +23,6 @@ import java.util.regex.Pattern;
 
 import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
-import org.kie.api.builder.model.KieSessionModel;
-import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.ExecutionResults;
@@ -139,7 +137,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                 } else if (command instanceof GetServerInfoCommand) {
                     responses.add(this.kieServer.getInfo());
                 } else if (command instanceof ListContainersCommand) {
-                    responses.add(this.kieServer.listContainers());
+                    responses.add(this.kieServer.listContainers(((ListContainersCommand)command).getKieContainerResourceFilter()));
                 } else if (command instanceof CallContainerCommand) {
                     ServiceResponse response = callContainer(((CallContainerCommand) command).getContainerId(), ((CallContainerCommand) command).getPayload(), marshallingFormat, classType, true);
 
