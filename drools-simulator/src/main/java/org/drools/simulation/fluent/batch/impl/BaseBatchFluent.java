@@ -1,9 +1,7 @@
 package org.drools.simulation.fluent.batch.impl;
 
-import org.drools.core.command.EndConversationCommand;
-import org.drools.core.command.JoinConversationCommand;
-import org.drools.core.command.OutCommand;
-import org.drools.core.command.StartConversationCommand;
+import org.drools.core.command.*;
+import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.kie.api.command.Command;
 import org.kie.internal.fluent.ContextFluent;
 import org.kie.internal.fluent.Scope;
@@ -15,19 +13,24 @@ public class BaseBatchFluent<T> implements ContextFluent<T> {
         this.fluentCtx = fluentCtx;
     }
 
+    public FluentContext getFluentContext() {
+        return fluentCtx;
+    }
+
     public T addCommand(Command command) {
         fluentCtx.addCommand(command);
         return (T) this;
     }
 
 
-    public T after(long duration) {
-        return null;
+    public T after(long distance) {
+        fluentCtx.addBatch(new BatchImpl(distance));
+        return (T) this;
     }
 
 
     public T relativeAfter(long duration) {
-        return null;
+        return (T) this;
     }
 
     @Override
@@ -55,15 +58,46 @@ public class BaseBatchFluent<T> implements ContextFluent<T> {
         return (T) this;
     }
 
+    @Override
+    public T get(String name) {
+        fluentCtx.addCommand( new GetCommand(name));
+        return (T) this;
+    }
+
+    @Override
+    public T get(String name, Scope scope) {
+        fluentCtx.addCommand( new GetCommand(name, scope));
+        return (T) this;
+    }
+
+    @Override
+    public <K> K get(String name, Class<K> cls) {
+        String fluentTarget = getFluentContext().getFactory().getFluentTarget(cls.getName());
+        addCommand(new SetVarAsRegistryEntry(fluentTarget, name));
+
+        K object = null;
+        try {
+            // @TODO We really should use a component factory for these, but for now use impl lookup
+            Class imlpCls = getFluentContext().getFactory().getImplClass(cls.getName());
+            object = (K) imlpCls.getDeclaredConstructor(FluentContext.class).newInstance(getFluentContext());
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to instantiate fluent " + cls.getName(), e) ;
+        }
+
+        return object;
+    }
+
 
     @Override
     public T newApplicationContext(String name) {
-        return null;
+        addCommand(new NewContextCommand(name));
+        return (T) this;
     }
 
     @Override
     public T getApplicationContext(String name) {
-        return null;
+        addCommand(new GetContextCommand(name));
+        return (T) this;
     }
 
     @Override
@@ -79,8 +113,8 @@ public class BaseBatchFluent<T> implements ContextFluent<T> {
     }
 
     @Override
-    public T leaveConversation(long id) {
-        //fluentCtx.addCommand(new LeaveConversationCommand(id));
+    public T leaveConversation() {
+        fluentCtx.addCommand(new LeaveConversationCommand());
         return (T) this;
     }
 

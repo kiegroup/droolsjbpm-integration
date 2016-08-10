@@ -2,6 +2,7 @@ package org.drools.simulation.fluent.batch.impl;
 
 import org.drools.core.command.OutCommand;
 import org.drools.core.command.runtime.DisposeCommand;
+import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.simulation.fluent.batch.BatchBuilderFluent;
@@ -21,7 +22,7 @@ public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFl
 
     @Override
     public BatchBuilderFluent end() {
-        return null;
+        return fluentCtx.getBatchBuilderFluent();
     }
 
     public BatchBuilderFluent end(String name) {
@@ -85,6 +86,7 @@ public class KieSessionBatchFluentImpl extends BaseBatchFluent<KieSessionBatchFl
 
     @Override
     public KieSessionBatchFluent getGlobal(String identifier) {
+        fluentCtx.addCommand(new GetGlobalCommand(identifier));
         return this;
     }
 

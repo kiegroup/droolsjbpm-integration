@@ -18,26 +18,35 @@ package org.drools.simulation.fluent.batch.impl;
 
 import org.drools.core.command.ConversationManager;
 import org.drools.core.command.RequestContextImpl;
-import org.drools.core.command.impl.ContextImpl;
 import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.time.SessionPseudoClock;
 import org.drools.core.world.impl.ContextManagerImpl;
 import org.drools.simulation.fluent.batch.Batch;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.KieSession;
 import org.kie.internal.command.Context;
 import org.kie.internal.command.ContextManager;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class PsuedoClockRunner {
-    private Map<String, Context>  appContexts;
+    private PriorityQueue<Batch>          queue = new PriorityQueue<Batch>(BatchSorter.instance);
+    private Set<KieSession>               ksessions = new HashSet<KieSession>();
 
-    private long                   counter;
+    private Map<String, Context>          appContexts;
+    private ConversationManager           cvnManager = new ConversationManager();
+    private long                          counter;
 
-    //private PriorityQueue<Step>           queue;
+    private long                          startTime;
 
     public PsuedoClockRunner() {
-        appContexts = new HashMap<String, Context>();
+        this(System.currentTimeMillis());
+    }
 
+    public PsuedoClockRunner(long startTime) {
+        this.startTime = startTime;
+        appContexts = new HashMap<String, Context>();
     }
 
     public Map<String, Context> getAppContexts() {
@@ -45,69 +54,75 @@ public class PsuedoClockRunner {
     }
 
     public Context execute(List<? extends Batch> batches) {
-        Map<String, Context>  requestContexts = new HashMap<String, Context>();
-        if ( batches.get(0) instanceof AfterBatchCommand ) {
-            List<AfterBatchCommand> clone = new ArrayList<AfterBatchCommand>();
-            for (Batch batch : batches) {
-                clone.add((AfterBatchCommand)batch);
-            }
-            Collections.sort(clone, BatchSorter.instance);
-            batches = clone;
-        }
-
         ContextManager ctxManager = new ContextManagerImpl(appContexts);
-        ConversationManager cvnManager = new ConversationManager();
+
 
         RequestContextImpl requestCtx = new RequestContextImpl(counter++,
                                                                ctxManager,
                                                                cvnManager);
 
         for (Batch batch : batches) {
+            if ( batch.getDistance() == 0 ) {
+                long timeNow = startTime;
+                // anything with a temporal distance of 0 is executed now
+                // everything else must be handled by a priority queue and timer afterwards.
+                for (Command cmd : batch.getCommands() ) {
+                    Object returned = ((GenericCommand)cmd).execute(requestCtx);
+                    if ( returned != null ) {
+                        requestCtx.setLastReturned(returned);
+                        if ( returned instanceof KieSession ) {
+                            KieSession ksession = ( KieSession ) returned;
+                            updateKieSessionTime(timeNow, 0, ksession); // make sure all sessions are set to timeNow
+                            ksessions.add((KieSession)returned);
+                        }
+                    }
+                }
+            } else {
+                queue.add(batch);
+            }
+        }
+
+        while ( !queue.isEmpty() ) {
+            Batch batch = queue.remove();
+            long timeNow = startTime + batch.getDistance();
+            for ( KieSession ksession : ksessions  ) {
+                updateKieSessionTime(timeNow, batch.getDistance(), ksession); // make sure all sessions are set to timeNow
+            }
+
             for (Command cmd : batch.getCommands() ) {
                 Object returned = ((GenericCommand)cmd).execute(requestCtx);
                 if ( returned != null ) {
                     requestCtx.setLastReturned(returned);
+                    if ( returned instanceof KieSession ) {
+                        KieSession ksession = ( KieSession ) returned;
+                        updateKieSessionTime(timeNow, batch.getDistance(), ksession); // make sure all sessions are set to timeNow
+                        ksessions.add((KieSession)returned);
+                    }
                 }
             }
         }
-
-//        for ( String ctxName : batchRuns.getBatches().keySet() ) {
-//            List<Step> steps = new ArrayList<Step>();
-//            Context ctx = requestContexts.get(ctxName);
-//            if (ctx == null) {
-//                ContextImpl requestCtx = new ContextImpl(ctxName, null);
-//                Context appCtx = contexts.get(ctxName);
-//                requestCtx.setParent(appCtx);
-//            }
-//            //Context ctx = contexts.get(ctxName);
-//
-//            //queue.addAll(new Step( ctx, batchRun.getBatches().get(ctxName)));
-//            for ( Batch b : batchRuns.getBatches().get(ctxName) ) {
-//                queue.add(new Step( ctx, b ));
-//            }
-//        }
-
-//        Map<String, Map<String, Object>> results = new HashMap<String, Map<String, Object>>();
-//        for ( Step s = queue.remove(); !queue.isEmpty(); s = queue.remove() ) {
-//            Context ctx = s.getApplicationContext();
-//            Batch b = s.getBatch();
-//            for (Command cmd : b.getCommands() ) {
-//                ((GenericCommand)cmd).execute(ctx);
-//            }
-//        }
 
         return requestCtx;
 
     }
 
+    private void updateKieSessionTime(long timeNow, long distance, KieSession ksession) {SessionPseudoClock clock = (SessionPseudoClock) ksession.getSessionClock();
+
+        if ( clock.getCurrentTime() != timeNow ) {
+            long               newTime     = startTime + distance;
+            long               currentTime = clock.getCurrentTime();
+            clock.advanceTime( newTime - currentTime,
+                               TimeUnit.MILLISECONDS);
+        }
+    }
 
 
-    public static class BatchSorter implements Comparator<AfterBatchCommand> {
+    public static class BatchSorter implements Comparator<Batch> {
         public static BatchSorter instance = new BatchSorter();
 
 
         @Override
-        public int compare(AfterBatchCommand o1, AfterBatchCommand o2) {
+        public int compare(Batch o1, Batch o2) {
             if(o1.getDistance() > o2.getDistance()) {
                 return 1;
             }

@@ -6,8 +6,10 @@ import org.kie.api.command.Command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FluentContext {
+    private BatchFluentComponentFactory factory;
     private BatchBuilderFluent batchBuilderFluent;
 
     private Batch batch;
@@ -15,9 +17,7 @@ public class FluentContext {
     private List<Batch> batches;
 
     public FluentContext() {
-        batch = new BatchImpl();
         batches = new ArrayList<Batch>();
-        batches.add(batch);
     }
 
     public BatchBuilderFluent getBatchBuilderFluent() {
@@ -28,13 +28,28 @@ public class FluentContext {
         this.batchBuilderFluent = batchBuilderFluent;
     }
 
-    public void addCommand(Command cmd) {
-        if( cmd instanceof Batch) {
-            batches.add((Batch)cmd);
-            batch = (Batch) cmd;
+    public BatchFluentComponentFactory getFactory() {
+        if ( factory == null ) {
+            factory = new BatchFluentComponentFactory();
         }
+        return factory;
+    }
 
+    public void setFactory(BatchFluentComponentFactory factory) {
+        this.factory = factory;
+    }
+
+    public void addCommand(Command cmd) {
+        if ( batch == null ) {
+            batch = new BatchImpl();
+            addBatch(batch);
+        }
         batch.addCommand(cmd);
+    }
+
+    public void addBatch(Batch batch) {
+        batches.add(batch);
+        this.batch = batch;
     }
 
     public Batch getBatch() {

@@ -10,9 +10,8 @@ import org.kie.api.builder.ReleaseId;
 public class KieContainerBatchFluentImpl extends BaseBatchFluent<BatchBuilderFluent> implements KieContainerBatchFluent {
 
     private FluentContext ctx;
-    private ReleaseId     releaseId;
 
-    public KieContainerBatchFluentImpl(FluentContext ctx, ReleaseId releaseId) {
+    public KieContainerBatchFluentImpl(FluentContext ctx) {
         super(ctx);
         this.ctx = ctx;
     }
@@ -22,8 +21,8 @@ public class KieContainerBatchFluentImpl extends BaseBatchFluent<BatchBuilderFlu
     }
 
     @Override
-    public KieSessionBatchFluent newSession(String id) {
-        NewKieSessionCommand cmd = new NewKieSessionCommand(releaseId, null);
+    public KieSessionBatchFluent newSession(String sessionId) {
+        NewKieSessionCommand cmd = new NewKieSessionCommand(sessionId);
         ctx.addCommand(cmd);
         return new KieSessionBatchFluentImpl(ctx);
     }
