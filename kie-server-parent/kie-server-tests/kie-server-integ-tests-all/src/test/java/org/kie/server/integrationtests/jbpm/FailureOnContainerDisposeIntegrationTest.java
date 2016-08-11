@@ -38,6 +38,7 @@ public class FailureOnContainerDisposeIntegrationTest extends JbpmKieServerBaseI
     private static final String DISPOSE_FAILURE_MSG = "Container definition-project failed to dispose, exception was raised: java.lang.IllegalStateException:" +
             " Undeploy forbidden - there are active processes instances for deployment definition-project";
 
+    private static final String CONTAINER_ID = "definition-project";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
