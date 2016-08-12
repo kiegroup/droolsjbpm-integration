@@ -21,13 +21,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.KieContainerStatusFilter;
 import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -41,7 +38,6 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
-    private static ReleaseId releaseId3 = new ReleaseId("org.kie.server.testing", "container-crud-tests2", "2.1.2.GA");
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -118,36 +114,6 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         Assert.assertEquals("Number of listed containers!", 2, containers.size());
         assertContainsContainer(containers, "list-containers-c1");
         assertContainsContainer(containers, "list-containers-c2");
-    }
-
-    @Test
-    public void testListContainersWithSpecificStatus() throws Exception {
-        client.createContainer("list-containers-releaseId-c1", new KieContainerResource("list-containers-releaseId-c1", releaseId1));
-        // this will result in container with FAILED status
-        client.createContainer("list-containers-releaseId-c2", new KieContainerResource("list-containers-releaseId-c2", new ReleaseId("non-existing", "non-existing", "just-for-test")));
-
-        KieContainerStatusFilter statusFilter = new KieContainerStatusFilter(KieContainerStatus.FAILED);
-        ServiceResponse<KieContainerResourceList> reply = client.listContainers(new KieContainerResourceFilter(ReleaseIdFilter.ACCEPT_ALL, statusFilter));
-        KieServerAssert.assertSuccess(reply);
-        // there should be exactly one container which has status FAILED at this point
-        List<KieContainerResource> containers = reply.getResult().getContainers();
-        Assert.assertEquals("Number of listed containers!", 1, containers.size());
-        assertContainsContainer(containers, "list-containers-releaseId-c2");
-    }
-
-    @Test
-    public void testListContainersWithCustomKieContainerResourceFilter() {
-        client.createContainer("list-containers-releaseId-c1", new KieContainerResource("list-containers-releaseId-c1", releaseId1));
-        client.createContainer("list-containers-releaseId-c2", new KieContainerResource("list-containers-releaseId-c2", releaseId2));
-        client.createContainer("list-containers-releaseId-c3", new KieContainerResource("list-containers-releaseId-c3", releaseId3));
-        ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter.Builder().groupId(releaseId1.getGroupId()).artifactId(releaseId1.getArtifactId()).build();
-        KieContainerStatusFilter statusFilter = KieContainerStatusFilter.ACCEPT_ALL;
-        ServiceResponse<KieContainerResourceList> reply = client.listContainers(new KieContainerResourceFilter(releaseIdFilter, statusFilter));
-        KieServerAssert.assertSuccess(reply);
-        List<KieContainerResource> containers = reply.getResult().getContainers();
-        Assert.assertEquals("Number of listed containers!", 2, containers.size());
-        assertContainsContainer(containers, "list-containers-releaseId-c1");
-        assertContainsContainer(containers, "list-containers-releaseId-c2");
     }
 
     @Test
