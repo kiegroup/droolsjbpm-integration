@@ -28,25 +28,36 @@ import org.kie.server.integrationtests.shared.filter.Authenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @depracated Use {@link KieServerMgmtControllerClient} instead.
+ */
+@Deprecated
 public class KieServerControllerClient {
 
     private static Logger logger = LoggerFactory.getLogger(KieServerControllerClient.class);
 
     private String controllerBaseUrl;
-    private MarshallingFormat format = MarshallingFormat.JAXB;
+    private static final MarshallingFormat DEFAULT_MARSHALLING_FORMAT = MarshallingFormat.JAXB;
+    private MarshallingFormat format;
     private Client httpClient;
     protected Marshaller marshaller;
 
-    public KieServerControllerClient( String controllerBaseUrl, String login, String password) {
-
+    public KieServerControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format) {
         this.controllerBaseUrl = controllerBaseUrl;
         httpClient = new ResteasyClientBuilder()
                 .establishConnectionTimeout(10, TimeUnit.SECONDS)
                 .socketTimeout(10, TimeUnit.SECONDS)
                 .build();
-        if (login != null) {
-            httpClient.register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()));
+        if (login == null) {
+            login = TestConfig.getUsername();
+            password = TestConfig.getPassword();
         }
+        httpClient.register(new Authenticator(login, password));
+        setMarshallingFormat(format);
+    }
+
+    public KieServerControllerClient(String controllerBaseUrl, String login, String password) {
+        this(controllerBaseUrl, login, password, DEFAULT_MARSHALLING_FORMAT);
     }
 
     public KieServerInstance getKieServerInstance(String kieServerInstanceId) {

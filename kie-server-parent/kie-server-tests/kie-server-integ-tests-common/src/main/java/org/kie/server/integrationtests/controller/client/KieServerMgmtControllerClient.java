@@ -59,20 +59,27 @@ public class KieServerMgmtControllerClient {
     private static final String CONFIG_URI_PART = "/config/";
 
     private String controllerBaseUrl;
-    private MarshallingFormat format = MarshallingFormat.JAXB;
+    private static final MarshallingFormat DEFAULT_MARSHALLING_FORMAT = MarshallingFormat.JAXB;
+    private MarshallingFormat format;
     private Client httpClient;
     protected Marshaller marshaller;
 
     public KieServerMgmtControllerClient(String controllerBaseUrl, String login, String password) {
+        this(controllerBaseUrl, login, password, DEFAULT_MARSHALLING_FORMAT);
+    }
 
+    public KieServerMgmtControllerClient(String controllerBaseUrl, String login, String password, MarshallingFormat format) {
         this.controllerBaseUrl = controllerBaseUrl;
         httpClient = new ResteasyClientBuilder()
                 .establishConnectionTimeout(10, TimeUnit.SECONDS)
                 .socketTimeout(10, TimeUnit.SECONDS)
                 .build();
-        if (login != null) {
-            httpClient.register(new Authenticator(TestConfig.getUsername(), TestConfig.getPassword()));
+        if (login == null) {
+            login = TestConfig.getUsername();
+            password = TestConfig.getPassword();
         }
+        httpClient.register(new Authenticator(login, password));
+        setMarshallingFormat(format);
     }
 
     public ServerTemplate getServerTemplate(String serverTemplateId) {
