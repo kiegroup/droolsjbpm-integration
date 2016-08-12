@@ -6,5 +6,6 @@ import org.kie.internal.fluent.ContextFluent;
 import org.kie.internal.fluent.EndContextFluent;
 
 public interface BatchBuilderFluent extends TimeFluent<BatchBuilderFluent>, ContextFluent<BatchBuilderFluent> {
+
     KieContainerBatchFluent getKieContainer(ReleaseId releaseId);
 }

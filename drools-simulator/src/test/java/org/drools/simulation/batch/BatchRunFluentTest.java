@@ -6,6 +6,7 @@ import org.drools.core.command.impl.ContextImpl;
 import org.drools.core.definitions.rule.impl.RuleImpl;
 import org.drools.simulation.fluent.batch.BatchBuilderFluent;
 import org.drools.simulation.fluent.batch.ContextBatchBuilderFluent;
+import org.drools.simulation.fluent.batch.KieContainerBatchFluent;
 import org.drools.simulation.fluent.batch.KieSessionBatchFluent;
 import org.drools.simulation.fluent.batch.impl.*;
 import org.junit.Test;
@@ -361,7 +362,6 @@ public class BatchRunFluentTest extends CommonTestMethodBase {
         assertEquals("h2", requestContext.getConversationContext().get("outS1") );
         assertEquals("h3", requestContext.get("outS1") );
     }
-
 
 
 
