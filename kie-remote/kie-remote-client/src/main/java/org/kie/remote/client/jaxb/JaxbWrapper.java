@@ -23,7 +23,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.kie.api.task.model.Attachment;
 import org.kie.api.task.model.Comment;
@@ -413,7 +415,17 @@ abstract class JaxbWrapper {
         public long getParentId() {
             return this.taskData.getParentId();
         }
-        
+
+        @Override
+        public Map<String, Object> getTaskInputVariables() {
+            return new HashMap<String, Object>();
+        }
+
+        @Override
+        public Map<String, Object> getTaskOutputVariables() {
+            return new HashMap<String, Object>();
+        }
+
     }
 
     final static class JaxbAttachmentWrapper extends JaxbWrapper implements Attachment {
