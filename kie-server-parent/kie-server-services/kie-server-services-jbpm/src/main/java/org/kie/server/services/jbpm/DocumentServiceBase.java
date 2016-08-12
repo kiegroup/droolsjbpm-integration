@@ -55,7 +55,7 @@ public class DocumentServiceBase {
         if (document == null) {
             throw new KieServerRuntimeException("No document found with id " + documentId);
         }
-        return convertDocument(document);
+        return convertDocument(document, true);
     }
 
     public String storeDocument(String documentPayload, String marshallingType) {
@@ -117,13 +117,13 @@ public class DocumentServiceBase {
 
         List<DocumentInstance> list = new ArrayList<DocumentInstance>();
         for (Document doc : documents) {
-            list.add(convertDocument(doc));
+            list.add(convertDocument(doc, false));
         }
 
         return list;
     }
 
-    protected DocumentInstance convertDocument(Document document) {
+    protected DocumentInstance convertDocument(Document document, boolean withContent) {
         if (document == null) {
             return null;
         }
@@ -135,7 +135,9 @@ public class DocumentServiceBase {
                 .lastModified(document.getLastModified())
                 .content(document.getContent())
                 .build();
-
+        if (!withContent) {
+            documentInstance.setContent(null);
+        }
         return documentInstance;
     }
 }

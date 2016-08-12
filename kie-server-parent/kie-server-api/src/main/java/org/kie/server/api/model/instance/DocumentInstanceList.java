@@ -29,7 +29,7 @@ import org.kie.server.api.model.ItemList;
 @XmlRootElement(name = "document-instance-list")
 public class DocumentInstanceList implements ItemList<DocumentInstance> {
 
-    @XmlElement(name="document-instance")
+    @XmlElement(name="document-instances")
     private DocumentInstance[] documentInstances;
 
     public DocumentInstanceList() {

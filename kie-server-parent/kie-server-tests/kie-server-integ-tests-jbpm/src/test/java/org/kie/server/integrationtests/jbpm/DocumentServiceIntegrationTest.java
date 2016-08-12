@@ -63,7 +63,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
     @Before
     public void createData() {
 
-        File storagePath = new File(System.getProperty(KieServerConstants.CFG_DOCUMENT_STORAGE_PATH));
+        File storagePath = new File(System.getProperty(KieServerConstants.CFG_DOCUMENT_STORAGE_PATH, "target/docs"));
         deleteFolder(storagePath);
 
         content = "just text content";
@@ -105,7 +105,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance fromServer = documentClient.getDocument(documentId);
         assertEquals(documentId, fromServer.getIdentifier());
-        assertDocumentInstances(document, fromServer);
+        assertDocumentInstances(document, fromServer, true);
 
         documentClient.deleteDocument(documentId);
 
@@ -125,7 +125,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance fromServer = documentClient.getDocument(documentId);
         assertEquals(documentId, fromServer.getIdentifier());
-        assertDocumentInstances(document, fromServer);
+        assertDocumentInstances(document, fromServer, true);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance fromServer = documentClient.getDocument(documentId);
         assertEquals(documentId, fromServer.getIdentifier());
-        assertDocumentInstances(document, fromServer);
+        assertDocumentInstances(document, fromServer, true);
     }
 
     @Test(expected = KieServicesException.class)
@@ -160,7 +160,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance fromServer = documentClient.getDocument(documentId);
         assertEquals(documentId, fromServer.getIdentifier());
-        assertDocumentInstances(document, fromServer);
+        assertDocumentInstances(document, fromServer, true);
 
 
         String udpatedDoc = "here comes the update";
@@ -173,7 +173,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance updatedFromServer = documentClient.getDocument(documentId);
         assertEquals(documentId, updatedFromServer.getIdentifier());
-        assertDocumentInstances(fromServer, updatedFromServer);
+        assertDocumentInstances(fromServer, updatedFromServer, true);
     }
 
     @Test
@@ -223,7 +223,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         DocumentInstance fromServer = docs.get(0);
         assertEquals(documentId, fromServer.getIdentifier());
-        assertDocumentInstances(document, fromServer);
+        assertDocumentInstances(document, fromServer, false);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     }
 
-    private void assertDocumentInstances(DocumentInstance expected, DocumentInstance actual) {
+    private void assertDocumentInstances(DocumentInstance expected, DocumentInstance actual, boolean assertContent) {
         assertNotNull(actual);
         assertNotNull(actual.getIdentifier());
         assertNotNull(actual.getName());
@@ -342,7 +342,9 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
         assertNotNull(actual.getSize());
         assertEquals(expected.getName(), actual.getName());
         assertEquals(expected.getSize(), actual.getSize());
-        assertEquals(new String(expected.getContent()), new String(actual.getContent()));
+        if (assertContent) {
+            assertEquals(new String(expected.getContent()), new String(actual.getContent()));
+        }
     }
 
     private void assertDocuments(Document expected, Document actual) {

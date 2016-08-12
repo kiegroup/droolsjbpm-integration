@@ -50,6 +50,5 @@
     <configurations/>
     <required-roles/>
     <remoteable-classes>
-        <remoteable-class>org.jbpm.document.service.impl.DocumentImpl</remoteable-class>
     </remoteable-classes>
 </deployment-descriptor>

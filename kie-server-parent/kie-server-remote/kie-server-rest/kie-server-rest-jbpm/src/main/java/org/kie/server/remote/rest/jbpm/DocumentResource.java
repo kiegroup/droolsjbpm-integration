@@ -17,9 +17,12 @@ package org.kie.server.remote.rest.jbpm;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
+import javax.mail.internet.MimeUtility;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -78,7 +81,7 @@ public class DocumentResource {
             if (document == null) {
                 return notFound("Document with id " + documentId + " not found", v, conversationIdHeader);
             }
-
+            String fileName = MimeUtility.encodeWord(document.getName(), "utf-8", "Q");
             StreamingOutput entity = new StreamingOutput() {
 
                 @Override
@@ -87,10 +90,12 @@ public class DocumentResource {
                 }
             };
             if (conversationIdHeader != null) {
-                return Response.ok().entity(entity).header(conversationIdHeader.getName(), conversationIdHeader.getValue()).build();
+                return Response.ok().entity(entity)
+                        .header(conversationIdHeader.getName(), conversationIdHeader.getValue())
+                        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
             }
 
-            return Response.ok().entity(entity).build();
+            return Response.ok().entity(entity).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
         }  catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -119,7 +124,7 @@ public class DocumentResource {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response listDocuments(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("page") Integer page, @QueryParam("pageSize") Integer pageSize) {
+    public Response listDocuments(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
