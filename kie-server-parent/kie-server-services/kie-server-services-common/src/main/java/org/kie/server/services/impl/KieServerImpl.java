@@ -241,9 +241,7 @@ public class KieServerImpl {
                             ci.setKieContainer(kieContainer);
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
 
-                            KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
-                            Map<String, Object> parameters = new HashMap<String, Object>();
-                            parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+                            Map<String, Object> parameters = getCreateContainerParameters(releaseId);
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
@@ -349,9 +347,12 @@ public class KieServerImpl {
 
                         } catch (Exception e) {
                             logger.warn("Dispose of container {} failed, putting it back to started state by recreating container on {}", containerId, disposedExtensions);
+
                             // since the dispose fail rollback must take place to put it back to running state
+                            org.kie.api.builder.ReleaseId releaseId = kci.getKieContainer().getReleaseId();
+                            Map<String, Object> parameters = getCreateContainerParameters(releaseId);
                             for (KieServerExtension extension : disposedExtensions) {
-                                extension.createContainer(containerId, kci, new HashMap<String, Object>());
+                                extension.createContainer(containerId, kci, parameters);
                                 logger.debug("Container {} (for release id {}) {} restart: DONE", containerId, kci.getResource().getReleaseId(), extension);
                             }
 
@@ -731,6 +732,14 @@ public class KieServerImpl {
             default:
                 return KieScannerStatus.UNKNOWN;
         }
+    }
+
+    private Map<String, Object> getCreateContainerParameters(org.kie.api.builder.ReleaseId releaseId) {
+        KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+        return parameters;
     }
 
     protected KieServerController getController() {
