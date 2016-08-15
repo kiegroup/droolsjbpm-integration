@@ -10,12 +10,11 @@
     <version>6.5.0-SNAPSHOT</version>
   </parent>
 
-  <packaging>jar</packaging>
   <artifactId>kie-remote-ws-common</artifactId>
   <name>KIE Remote Webservices :: Common classes</name>
+  <packaging>bundle</packaging><!-- bundle = jar + OSGi metadata -->
 
   <dependencies>
-
     <!-- generated code -->
     <dependency>
       <groupId>org.jboss.spec.javax.xml.ws</groupId>
@@ -29,5 +28,26 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>org.kie.remote.ws.common</Bundle-SymbolicName>
+            <Export-Package>
+              org.kie.remote.services.ws.common.*
+            </Export-Package>
+            <Import-Package>
+              javax.xml.ws,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

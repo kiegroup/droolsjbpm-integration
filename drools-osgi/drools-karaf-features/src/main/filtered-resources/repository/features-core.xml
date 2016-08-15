@@ -204,10 +204,13 @@
     <feature version="${project.version}">optaplanner-engine</feature>
     <bundle>mvn:org.kie.remote/kie-remote-client/${version.org.drools.droolsjbpm-integration}</bundle>
     <bundle>mvn:org.kie.remote/kie-remote-common/${version.org.drools.droolsjbpm-integration}</bundle>
-    <bundle>wrap:mvn:org.kie.remote.ws/kie-remote-ws-common/${version.org.drools.droolsjbpm-integration}</bundle>
-    <bundle>wrap:mvn:org.kie.remote/kie-remote-jaxb/${version.org.drools.droolsjbpm-integration}</bundle>
+    <bundle>mvn:org.kie.remote.ws/kie-remote-ws-common/${version.org.drools.droolsjbpm-integration}</bundle>
+    <bundle>mvn:org.kie.remote/kie-remote-jaxb/${version.org.drools.droolsjbpm-integration}</bundle>
+    <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
+    <bundle>mvn:org.codehaus.jackson/jackson-xc/${version.org.codehaus.jackson}</bundle>
+    <bundle>mvn:org.codehaus.jackson/jackson-mapper-asl/${version.org.codehaus.jackson}</bundle>
     <bundle>wrap:mvn:org.jboss.resteasy/jaxrs-api/${version.org.jboss.resteasy}</bundle>
-    <bundle>wrap:mvn:org.jsoup/jsoup/${version.org.jsoup}</bundle>
+    <bundle>mvn:org.jsoup/jsoup/${version.org.jsoup}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
   </feature>

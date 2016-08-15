@@ -8,9 +8,9 @@
     <version>6.5.0-SNAPSHOT</version>
   </parent>
 
-  <packaging>jar</packaging>
   <artifactId>kie-remote-ws-impl</artifactId>
   <name>KIE Remote Webservices :: Implementation</name>
+  <packaging>bundle</packaging><!-- bundle = jar + OSGi metadata -->
 
   <dependencies>
     <dependency>
@@ -69,5 +69,25 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle.Symbolic-Name>org.kie.remote.service.ws</Bundle.Symbolic-Name>
+            <Export-Package>
+              org.kie.remote.services.ws.*
+            </Export-Package>
+            <Import-Package>
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

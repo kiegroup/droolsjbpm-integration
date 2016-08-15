@@ -10,7 +10,7 @@
 
   <packaging>jar</packaging>
   <artifactId>kie-remote-ws-wsdl</artifactId>
-  <name>KIE Remote Webservices :: WSDL generated classe </name>
+  <name>KIE Remote Webservices :: WSDL generated classes </name>
 
   <dependencies>
     <dependency>
