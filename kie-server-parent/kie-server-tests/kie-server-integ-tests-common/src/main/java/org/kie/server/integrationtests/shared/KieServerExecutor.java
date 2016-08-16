@@ -50,7 +50,7 @@ public class KieServerExecutor {
         server.setPort(TestConfig.getKieServerAllocatedPort());
         server.start();
 
-        addServerSingltonResources();
+        addServerSingletonResources();
     }
     private void setKieServerProperties() {
         System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
@@ -70,7 +70,7 @@ public class KieServerExecutor {
             KieServerEnvironment.setServerName("KieServer");
         }
     }
-    private void addServerSingltonResources() {
+    private void addServerSingletonResources() {
         kieServer = new KieServerImpl();
         server.getDeployment().getRegistry().addSingletonResource(new KieServerRestImpl(kieServer));
 
