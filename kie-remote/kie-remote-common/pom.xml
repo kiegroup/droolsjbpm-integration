@@ -10,7 +10,7 @@
 
   <artifactId>kie-remote-common</artifactId>
   <name>KIE Remote Services :: Common</name>
-  <packaging>bundle</packaging>
+  <packaging>bundle</packaging><!-- bundle = jar + OSGi metadata -->
 
   <dependencies>
     <!-- REST -->
