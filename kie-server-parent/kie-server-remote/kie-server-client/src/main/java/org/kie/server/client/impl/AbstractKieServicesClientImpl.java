@@ -365,6 +365,13 @@ public abstract class AbstractKieServicesClientImpl {
                 KieRemoteHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
         httpRequest.accept( getMediaType( config.getMarshallingFormat() ) );
         httpRequest.header(KieServerConstants.KIE_CONTENT_TYPE_HEADER, config.getMarshallingFormat().toString());
+
+        if (config.getHeaders() != null) {
+            for (Map.Entry<String, String> header : config.getHeaders().entrySet()) {
+                httpRequest.header(header.getKey(), header.getValue());
+                logger.debug("Adding additional header {} value {}", header.getKey(), header.getValue());
+            }
+        }
         // apply authorization
         if (config.getCredentialsProvider() != null) {
             String authorization = config.getCredentialsProvider().getAuthorization();
@@ -459,6 +466,13 @@ public abstract class AbstractKieServicesClientImpl {
 
                 if (owner.getConversationId() != null) {
                     textMsg.setStringProperty(JMSConstants.CONVERSATION_ID_PROPERTY_NAME, owner.getConversationId());
+                }
+
+                if (config.getHeaders() != null) {
+                    for (Map.Entry<String, String> header : config.getHeaders().entrySet()) {
+                        logger.debug("Adding additional property {} value {}", header.getKey(), header.getValue());
+                        textMsg.setStringProperty(header.getKey(), header.getValue());
+                    }
                 }
 
                 // send
