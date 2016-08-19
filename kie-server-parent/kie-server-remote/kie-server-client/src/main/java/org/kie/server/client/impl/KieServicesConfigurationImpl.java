@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -30,6 +30,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -67,7 +68,10 @@ public final class KieServicesConfigurationImpl
     private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
 
     private CredentialsProvider credentialsProvider;
+
     private LoadBalancer loadBalancer;
+
+    private Map<String, String> headers;
 
     /*
      * Public constructors and setters
@@ -415,6 +419,14 @@ public final class KieServicesConfigurationImpl
         this.jmsTransactional = jmsTransactional;
     }
 
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        return this.headers;
+    }
 
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
@@ -435,6 +447,7 @@ public final class KieServicesConfigurationImpl
         this.loadBalancer = config.loadBalancer;
         this.responseHandler = config.responseHandler;
         this.jmsTransactional = config.jmsTransactional;
+        this.headers = config.headers;
     }
 
     @Override
