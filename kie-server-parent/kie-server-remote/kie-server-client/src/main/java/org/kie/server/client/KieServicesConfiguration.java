@@ -22,6 +22,7 @@ import javax.jms.Queue;
 import javax.naming.InitialContext;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface KieServicesConfiguration {
@@ -92,5 +93,9 @@ public interface KieServicesConfiguration {
     void setCredentialsProvider(CredentialsProvider credentialsProvider);
 
     CredentialsProvider getCredentialsProvider();
+
+    void setHeaders(Map<String, String> headers);
+
+    Map<String, String> getHeaders();
 
 }
