@@ -52,6 +52,7 @@ public class CommandScript implements Serializable {
             @XmlElement(name = "update-release-id", type = UpdateReleaseIdCommand.class),
             @XmlElement(name = "call-container", type = CallContainerCommand.class),
             @XmlElement(name = "descriptor-command", type = DescriptorCommand.class),
+            @XmlElement(name = "get-server-state", type = GetServerStateCommand.class),
 
             // TODO can this be added somewhere else? if not here JAXRS cannot deserialize content
             @XmlElement(name = "kie-server-config", type = KieServerConfig.class),
