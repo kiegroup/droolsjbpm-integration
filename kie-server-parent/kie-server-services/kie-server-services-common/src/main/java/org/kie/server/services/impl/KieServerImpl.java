@@ -240,7 +240,7 @@ public class KieServerImpl {
                 if (previous == null) {
                     try {
                         KieServices ks = KieServices.Factory.get();
-                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(releaseId);
+                        InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
                             ci.getResource().setConfigItems(container.getConfigItems());
