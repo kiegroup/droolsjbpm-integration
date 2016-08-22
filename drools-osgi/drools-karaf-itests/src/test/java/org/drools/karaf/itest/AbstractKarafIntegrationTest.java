@@ -81,6 +81,12 @@ abstract public class AbstractKarafIntegrationTest {
      */
     public static final String PROP_KARAF_FRAMEWORK = "karaf.osgi.framework";
 
+    /**
+     * Additional Maven repositories. Value of this property is added to "org.ops4j.pax.url.mvn.repositories"
+     * property in "org.ops4j.pax.url.mvn.cfg" configuration file.
+     */
+    public static final String PROP_ADDITIONAL_MAVEN_REPOS = "karaf.maven.repos";
+
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
     protected static final String DROOLS_VERSION;
@@ -161,10 +167,17 @@ abstract public class AbstractKarafIntegrationTest {
         }
         
         options.add(localMavenRepoOption());
+
+        /* Add aditional Maven repositories */
+        String additionalMavenRepositories = "";
+        if (System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS) != null) {
+            additionalMavenRepositories = "," + System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS);
+        }
         options.add(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
                         "http://repo1.maven.org/maven2@id=central," +
-                        "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public"
-                ));
+                        "https://repository.jboss.org/nexus/content/groups/public@id=jboss-public" +
+                        additionalMavenRepositories
+            ));
 
         if (System.getProperty(PROP_KARAF_FRAMEWORK) != null) {
             options.add(editConfigurationFilePut(CustomProperties.KARAF_FRAMEWORK, System.getProperty(PROP_KARAF_FRAMEWORK)));
