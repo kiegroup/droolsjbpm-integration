@@ -29,6 +29,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -66,6 +67,8 @@ public final class KieServicesConfigurationImpl
     private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
 
     private CredentialsProvider credentialsProvider;
+
+    private Map<String, String> headers;
     /*
      * Public constructors and setters
      */
@@ -402,6 +405,15 @@ public final class KieServicesConfigurationImpl
         this.jmsTransactional = jmsTransactional;
     }
 
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() {
+        return this.headers;
+    }
+
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
         this.connectionFactory = config.connectionFactory;
@@ -420,6 +432,7 @@ public final class KieServicesConfigurationImpl
         this.credentialsProvider = config.credentialsProvider;
         this.responseHandler = config.responseHandler;
         this.jmsTransactional = config.jmsTransactional;
+        this.headers = config.headers;
     }
 
     @Override
