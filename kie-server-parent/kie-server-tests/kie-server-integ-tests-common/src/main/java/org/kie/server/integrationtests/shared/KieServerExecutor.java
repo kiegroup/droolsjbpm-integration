@@ -19,7 +19,10 @@ import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegration
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import org.drools.compiler.kie.builder.impl.KieServicesImpl;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
+import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -89,6 +92,8 @@ public class KieServerExecutor {
             throw new RuntimeException("Kie execution server is already stopped!");
         }
         kieServer.destroy();
+        // The KieServices instance that was seen by the kieserver, will never be seen again at this point
+        ((KieServicesImpl) KieServices.Factory.get()).nullAllContainerIds();
         server.stop();
         server = null;
     }
