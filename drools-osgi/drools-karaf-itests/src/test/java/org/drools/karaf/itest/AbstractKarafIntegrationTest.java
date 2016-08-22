@@ -84,7 +84,7 @@ abstract public class AbstractKarafIntegrationTest {
      * Additional Maven repositories. Value of this property is added to "org.ops4j.pax.url.mvn.repositories"
      * property in "org.ops4j.pax.url.mvn.cfg" configuration file.
      */
-    public static final String PROP_ADDTITIONAL_MAVEN_REPOS = "karaf.maven.repos";
+    public static final String PROP_ADDITIONAL_MAVEN_REPOS = "karaf.maven.repos";
 
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
@@ -169,8 +169,8 @@ abstract public class AbstractKarafIntegrationTest {
 
         /* Add aditional Maven repositories */
         String additionalMavenRepositories = "";
-        if (System.getProperty(PROP_ADDTITIONAL_MAVEN_REPOS) != null) {
-            additionalMavenRepositories = "," + System.getProperty(PROP_ADDTITIONAL_MAVEN_REPOS);
+        if (System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS) != null) {
+            additionalMavenRepositories = "," + System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS);
         }
         options.add(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
                         "http://repo1.maven.org/maven2@id=central," +
