@@ -15,17 +15,17 @@
  */
 /*
  * Copyright (c) 2014 Kevin Sawicki <kevinsawicki@gmail.com>
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -99,7 +99,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  * This class is only meant to be used internally by the kie-remote-client code! For interacting with the
- * REST API, please use a proper REST framework such as RestEasy or Apache CXF. 
+ * REST API, please use a proper REST framework such as RestEasy or Apache CXF.
  * </p>
  * <b>Using this class to interact with the REST API w<i>ill not be supported</i> and any issues or problems
  * that arise from such use will be dismissed with a referral to this exact text!</b>
@@ -108,8 +108,8 @@ import javax.ws.rs.core.MediaType;
  * A fluid interface for making HTTP requests using an underlying {@link HttpURLConnection} (or sub-class).
  * <p>
  * Each instance supports making a single request and cannot be reused for further requests.
- * 
- * This code was originally copied from Kevin Sawicki's 
+ *
+ * This code was originally copied from Kevin Sawicki's
  * <a href="https://github.com/kevinsawicki/http-request">HttpRequest project</a> * project.
  * </p>
  * However, it has been extensively modified and rewritten to fit the use case in this code.
@@ -139,7 +139,7 @@ public class KieRemoteHttpRequest {
     boolean followRedirects = false;
     String httpProxyHost;
     int httpProxyPort;
-    
+
 
     private KieRemoteHttpResponse response = null;
 
@@ -178,7 +178,7 @@ public class KieRemoteHttpRequest {
             if( headers == null ) {
                 headers = new LinkedHashMap<String, List<String>>();
             }
-            if( headers.get(name) == null ) { 
+            if( headers.get(name) == null ) {
                 return Collections.EMPTY_LIST;
             } else {
                 return headers.get(name);
@@ -887,26 +887,26 @@ public class KieRemoteHttpRequest {
             // timeout
             connection.setReadTimeout(getRequestInfo().timeoutInMilliSecs);
             connection.setConnectTimeout(getRequestInfo().timeoutInMilliSecs);
-          
+
             // various
             RequestInfo requestInfo = getRequestInfo();
             int contentLength = 0;
             if( requestInfo.body != null ) {
-                contentLength = requestInfo.body.toString().getBytes().length;
+                contentLength = requestInfo.body.toString().getBytes(Charset.forName("UTF-8")).length;
                 connection.setFixedLengthStreamingMode(contentLength);
                 List<String> contentTypeList = requestInfo.getHeader(ACCEPT);
-                if( contentTypeList != null && ! contentTypeList.isEmpty() ) { 
+                if( contentTypeList != null && ! contentTypeList.isEmpty() ) {
                    requestInfo.setHeader(CONTENT_TYPE, contentTypeList.get(0));
                 }
             }
             requestInfo.setHeader(CONTENT_LENGTH, contentLength);
             connection.setInstanceFollowRedirects(followRedirects);
-            
+
             // auth
             if( requestInfo.user != null && requestInfo.password != null ) {
                 basicAuthorization(requestInfo.user, requestInfo.password);
             }
-            
+
             // headers
             if( requestInfo.headers != null ) {
                 for( Entry<String, List<String>> entry : requestInfo.headers.entrySet() ) {
@@ -916,7 +916,7 @@ public class KieRemoteHttpRequest {
                     }
                 }
             }
-            
+
             // output: form parameters, body
             addFormParametersToConnection();
             if( requestInfo.body != null ) {
@@ -1085,7 +1085,7 @@ public class KieRemoteHttpRequest {
      */
     public KieRemoteHttpRequest accept( final String accept ) {
         RequestInfo requestInfo = getRequestInfo();
-        if( requestInfo.getHeader(ACCEPT).isEmpty() ) { 
+        if( requestInfo.getHeader(ACCEPT).isEmpty() ) {
            requestInfo.setHeader(ACCEPT, new ArrayList<String>());
         }
         requestInfo.headers.get(ACCEPT).set(0, accept);
@@ -1275,9 +1275,9 @@ public class KieRemoteHttpRequest {
     public KieRemoteHttpResponse response() {
         if( this.response == null ) {
             this.response = new KieRemoteHttpResponse() {
-                
+
                 private String body = null;
-                
+
                 // @formatter:off
                 @Override
                 public InputStream stream() throws KieRemoteHttpRequestException { return responseStream(); }
@@ -1310,10 +1310,10 @@ public class KieRemoteHttpRequest {
                 @Override
                 public BufferedInputStream buffer() throws KieRemoteHttpRequestException { return responseBuffer(); }
                 @Override
-                public String body() throws KieRemoteHttpRequestException { 
-                    if( body == null ) { 
-                        body = responseBody(); 
-                    } 
+                public String body() throws KieRemoteHttpRequestException {
+                    if( body == null ) {
+                        body = responseBody();
+                    }
                     return body;
                 }
                 // @formatter:on
