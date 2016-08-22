@@ -16,6 +16,8 @@
 package org.kie.server.client;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -196,6 +198,32 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
 
         verify(2, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
         verify(0, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
+    }
+
+    @Test
+    public void testAdditionalHeaderViaClient() {
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put("X-KIE-First-Header", "first-value");
+        headers.put("X-KIE-Second-Header", "second value");
+        config.setHeaders(headers);
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1.2.3", response.getResult().getVersion());
+
+        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-First-Header", equalTo("first-value")));
+        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-Second-Header", equalTo("second value")));
     }
 
     // TODO create more tests for other operations
