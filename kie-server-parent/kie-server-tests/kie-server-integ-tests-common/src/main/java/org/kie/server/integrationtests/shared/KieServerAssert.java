@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.shared;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -66,4 +67,5 @@ public class KieServerAssert {
             assertTrue("String is not empty.", result.trim().isEmpty());
         }
     }
+
 }

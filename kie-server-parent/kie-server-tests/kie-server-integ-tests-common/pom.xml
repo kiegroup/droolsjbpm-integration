@@ -66,7 +66,7 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- REST --> 
+    <!-- REST -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>tjws</artifactId>
@@ -80,7 +80,7 @@
       <artifactId>resteasy-client</artifactId>
     </dependency>
 
-   <!--  Stay with httpcomponents: it will save us pain (as opposed to changing from resteasy to cxf to cxf 3.0, etc. --> 
+    <!--  Stay with httpcomponents: it will save us pain (as opposed to changing from resteasy to cxf to cxf 3.0, etc. -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
@@ -137,6 +137,10 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
     </dependency>
 
     <!-- Cargo dependencies -->
