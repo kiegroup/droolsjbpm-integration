@@ -10,6 +10,8 @@
 
   <kie:import releaseId-ref="blueprint-scanner-releaseId" enableScanner="true" scannerInterval="1000"/>
 
+  <kie:import-session name="kie-scanner-test-ksession"/>
+
   <service id="kie-scanner-test-ksession-service" interface="org.kie.api.runtime.KieSession" ref="kie-scanner-test-ksession"/>
 
 </blueprint>

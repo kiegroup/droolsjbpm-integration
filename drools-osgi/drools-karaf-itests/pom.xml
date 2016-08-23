@@ -207,7 +207,9 @@
               <goal>run</goal>
             </goals>
             <configuration>
-              <goals>install</goals>
+              <goals>
+                <goal>install</goal>
+              </goals>
             </configuration>
           </execution>
         </executions>
