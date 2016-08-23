@@ -76,6 +76,7 @@ public class KieImportResolver extends AbstractKieObjectsResolver {
         for (String kieSessionName : kContainer.getKieSessionNamesInKieBase(kieBaseName)) {
             Object ksession = resolveKSession(kieSessionName, kContainer);
             context.registerBean(kieSessionName, ksession);
+            KieObjectsFactoryBean.importInjector.wireSession( kieSessionName, ksession );
         }
     }
 }

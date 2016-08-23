@@ -35,9 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.streamBundle;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
@@ -71,7 +69,7 @@ public class KieBlueprintDependencyKarafIntegrationTest extends AbstractKarafInt
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                //  debugConfiguration("5005", true),
+                // debugConfiguration("5005", true),
 
                 // Load Kie-Aries-Blueprint
                 loadKieFeatures("kie-aries-blueprint"),
