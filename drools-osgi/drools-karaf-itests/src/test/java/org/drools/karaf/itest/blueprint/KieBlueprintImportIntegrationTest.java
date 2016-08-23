@@ -1,21 +1,15 @@
 package org.drools.karaf.itest.blueprint;
 
-import static org.drools.karaf.itest.AbstractKarafIntegrationTest.*;
-import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
-import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
-
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
+import org.drools.karaf.itest.blueprint.domain.Customer;
+import org.drools.karaf.itest.blueprint.domain.Drink;
+import org.drools.karaf.itest.blueprint.domain.Order;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.api.KieBase;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieSession;
-import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -23,7 +17,12 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.Constants;
-import org.osgi.service.blueprint.container.BlueprintContainer;
+
+import javax.inject.Inject;
+
+import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
@@ -34,9 +33,45 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
     @Inject
     KieSession kieSession;
 
+    @Inject
+    KieBase kieBase;
+
+    @Inject
+    KieScanner kieScanner;
+
     @Test
-    public void kieSessionTest() {
+    public void kieElementsExistTest() {
         Assert.assertNotNull(kieSession);
+        Assert.assertNotNull(kieBase);
+        Assert.assertNotNull(kieScanner);
+    }
+
+    @Test
+    public void kieSessionOldPersonTest() {
+        Assert.assertNotNull(kieSession);
+
+        Drink drink = new Drink("whiskey", true);
+        Customer customer = new Customer("Customer", 40);
+        Order order = new Order(customer, drink);
+
+        kieSession.insert(order);
+        kieSession.fireAllRules();
+
+        Assert.assertTrue(order.isApproved());
+    }
+
+    @Test
+    public void kieSessionYoungPersonTest() {
+        Assert.assertNotNull(kieSession);
+
+        Drink drink = new Drink("whiskey", true);
+        Customer customer = new Customer("Customer", 14);
+        Order order = new Order(customer, drink);
+
+        kieSession.insert(order);
+        kieSession.fireAllRules();
+
+        Assert.assertFalse(order.isApproved());
     }
 
     @Configuration
@@ -63,6 +98,9 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                 // (simulates for instance a bundle with domain classes used in rules)
                 wrappedBundle(mavenBundle().groupId("junit").artifactId("junit").versionAsInProject()),
 
+                // Load domain model classes
+                wrappedBundle(mavenBundle().groupId("org.drools").artifactId("drools-karaf-itests-domain-model").versionAsInProject()),
+
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
                         .add("OSGI-INF/blueprint/kie-scanner-import-blueprint.xml",
@@ -70,13 +108,16 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                         .set(Constants.IMPORT_PACKAGE, "org.kie.aries.blueprint," +
                                 "org.osgi.service.blueprint.container," +
+                                "org.drools.karaf.itest.blueprint.domain," +
                                 "org.kie.aries.blueprint.factorybeans," +
                                 "org.kie.aries.blueprint.helpers," +
                                 "org.kie.api," +
                                 "org.kie.api.runtime," +
+                                "org.kie.api.builder," +
                                 // junit is acting as a dependency for the rule
                                 "org.junit," +
                                 "*")
+                        .set(Constants.EXPORT_PACKAGE, "org.drools.karaf.itest.blueprint.domain")
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                         .build()).start()
 

@@ -1,7 +1,6 @@
 package org.drools.karaf.itest.blueprint.domain;
 
 import java.io.Serializable;
-import org.kie.api.definition.type.Modifies;
 
 /**
  * Created by jpetrlik on 8/18/16.
@@ -19,12 +18,10 @@ public class Order implements Serializable {
         this.drink = drink;
     }
 
-    @Modifies("approved")
     public void approve() {
         this.approved = true;
     }
 
-    @Modifies("approved")
     public void disapprove() {
         this.approved = false;
     }

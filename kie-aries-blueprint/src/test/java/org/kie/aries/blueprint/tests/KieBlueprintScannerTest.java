@@ -52,7 +52,7 @@ public class KieBlueprintScannerTest extends AbstractKieBlueprintDynamicModuleTe
 
         reinstallModule( repository, ks );
 
-        KieScanner kscanner = (KieScanner)container.getComponentInstance( "blueprint-scanner-releaseId#scanner" );
+        KieScanner kscanner = (KieScanner)container.getComponentInstance( "blueprint-scanner-releaseId-scanner" );
         kscanner.scanNow();
 
         checkForValue(SECOND_VALUE);
