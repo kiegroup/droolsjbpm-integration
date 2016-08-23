@@ -1,21 +1,10 @@
 package org.drools.karaf.itest.blueprint;
 
-import static org.drools.karaf.itest.AbstractKarafIntegrationTest.*;
-import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
-import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
-
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieSession;
-import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -23,7 +12,12 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import org.osgi.framework.Constants;
-import org.osgi.service.blueprint.container.BlueprintContainer;
+
+import javax.inject.Inject;
+
+import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
+import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
@@ -54,7 +48,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                // debugConfiguration("5005", true),
+                debugConfiguration("5005", true),
 
                 // Load Kie-Aries-Blueprint
                 loadKieFeatures("drools-module", "kie-ci", "kie-aries-blueprint"),

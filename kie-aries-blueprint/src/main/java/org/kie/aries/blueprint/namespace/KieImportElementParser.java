@@ -60,6 +60,7 @@ public class KieImportElementParser extends AbstractElementParser {
         beanMetadata.addArgument(createValue(context, interval), null, 3);
 
         beanMetadata.setActivation(ComponentMetadata.ACTIVATION_EAGER);
+
         return beanMetadata;
     }
 }
