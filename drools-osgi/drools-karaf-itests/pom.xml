@@ -19,6 +19,11 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>drools-karaf-itests-domain-model</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-osgi-integration</artifactId>
       <scope>test</scope>
     </dependency>
@@ -183,26 +188,6 @@
             <goals>
               <goal>generate-depends-file</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <configuration>
-          <cloneProjectsTo>${project.build.directory}/it/drools-karaf-itests-kjar</cloneProjectsTo>
-        </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <goals>
-                <goal>install</goal>
-              </goals>
-            </configuration>
           </execution>
         </executions>
       </plugin>

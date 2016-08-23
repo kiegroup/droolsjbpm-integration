@@ -16,6 +16,8 @@
   <name>Drools :: OSGi Parent project</name>
 
   <modules>
+    <module>drools-karaf-itests-domain-model</module>
+    <module>drools-karaf-itests-kjar</module>
     <module>drools-osgi-integration</module>
     <module>drools-karaf-features</module>
     <module>drools-karaf-itests</module>
