@@ -27,8 +27,6 @@ import java.util.UUID;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
@@ -47,10 +45,8 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
-import org.kie.server.client.impl.KieServicesClientImpl;
 import org.kie.server.client.jms.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +123,15 @@ public abstract class AbstractKieServicesClientImpl {
         this.owner = owner;
     }
 
+    public ResponseHandler getResponseHandler() {
+        return responseHandler;
+    }
+
     public void setResponseHandler(ResponseHandler responseHandler) {
+        if (config.getTransport() == KieServicesConfiguration.Transport.REST) {
+            throw new UnsupportedOperationException("Response handlers can only be configured for JMS client");
+        }
+
         this.responseHandler = responseHandler;
     }
 

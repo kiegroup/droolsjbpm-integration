@@ -17,8 +17,6 @@ package org.kie.server.client.impl;
 
 import org.kie.api.command.Command;
 import org.kie.server.api.model.KieContainerResourceFilter;
-import org.kie.server.api.model.KieContainerStatusFilter;
-import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
@@ -44,6 +42,8 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.helper.KieServicesClientBuilder;
+import org.kie.server.client.jms.RequestReplyResponseHandler;
+import org.kie.server.client.jms.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ import java.util.ServiceLoader;
 
 public class KieServicesClientImpl extends AbstractKieServicesClientImpl implements KieServicesClient {
 
-    private static Logger logger = LoggerFactory.getLogger( KieServicesClientImpl.class );
+    private static Logger logger = LoggerFactory.getLogger(KieServicesClientImpl.class);
 
     private static final ServiceLoader<KieServicesClientBuilder> clientBuilders = ServiceLoader.load(KieServicesClientBuilder.class, KieServicesClientImpl.class.getClassLoader());
     private static List<KieServicesClientBuilder> loadedClientBuilders = loadClientBuilders();   // load it only once to make sure it's thread safe
@@ -81,11 +81,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         List<String> serverCapabilities = config.getCapabilities();
 
         if (serverCapabilities == null) {
-            // no explicit capabilities configuration given fetch them from kieServer
-            kieServerInfo = getServerInfo().getResult();
-            logger.debug("KieServicesClient connected to: {} version {}", kieServerInfo.getServerId(), kieServerInfo.getVersion());
-            serverCapabilities = kieServerInfo.getCapabilities();
-            logger.debug("Supported capabilities by the server: {}", serverCapabilities);
+            serverCapabilities = getCapabilitiesFromServer();
         }
         if (serverCapabilities != null && !serverCapabilities.isEmpty()) {
             // process available client builders
@@ -123,6 +119,26 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     }
 
+    private List<String> getCapabilitiesFromServer() {
+        ResponseHandler responseHandler = getResponseHandler();
+        if (config.isJms() && !(responseHandler instanceof RequestReplyResponseHandler)) {
+            setResponseHandler(new RequestReplyResponseHandler());
+            kieServerInfo = getServerInfo().getResult();
+            setResponseHandler(responseHandler);
+        } else {
+            kieServerInfo = getServerInfo().getResult();
+        }
+
+        logger.debug("KieServicesClient connected to: {} version {}", kieServerInfo.getServerId(), kieServerInfo.getVersion());
+        List<String> capabilities = kieServerInfo.getCapabilities();
+        logger.debug("Supported capabilities by the server: {}", capabilities);
+
+        return capabilities;
+    }
+
+    private KieServerInfo getServerInfoInTransaction() {
+        throw new IllegalStateException("Cannot get capabilities from server in a transaction");
+    }
 
     @Override
     public <T> T getServicesClient(Class<T> serviceClient) {
@@ -136,11 +152,12 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     @Override
     public ServiceResponse<KieServerInfo> getServerInfo() {
-        if( config.isRest() ) {
-            return makeHttpGetRequestAndCreateServiceResponse( baseURI, KieServerInfo.class );
+        if (config.isRest()) {
+            return makeHttpGetRequestAndCreateServiceResponse(baseURI, KieServerInfo.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetServerInfoCommand() ) );
-            return (ServiceResponse<KieServerInfo>) executeJmsCommand( script ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerInfoCommand()));
+            ServiceResponse<KieServerInfo> response = (ServiceResponse<KieServerInfo>) executeJmsCommand(script).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
@@ -156,91 +173,103 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             String uri = baseURI + "/containers" + (queryParams.isEmpty() ? "" : "?" + queryParams);
             return makeHttpGetRequestAndCreateServiceResponse(uri, KieContainerResourceList.class);
         } else {
-            CommandScript script = new CommandScript(Collections.singletonList( (KieServerCommand) new ListContainersCommand(containerFilter)));
-            return (ServiceResponse<KieContainerResourceList>) executeJmsCommand(script).getResponses().get(0);
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new ListContainersCommand(containerFilter)));
+            ServiceResponse<KieContainerResourceList> response = (ServiceResponse<KieContainerResourceList>) executeJmsCommand(script).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource) {
-        if( config.isRest() ) {
-            return makeHttpPutRequestAndCreateServiceResponse( baseURI + "/containers/" + id, resource, KieContainerResource.class );
+        if (config.isRest()) {
+            return makeHttpPutRequestAndCreateServiceResponse(baseURI + "/containers/" + id, resource, KieContainerResource.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateContainerCommand( resource ) ) );
-            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CreateContainerCommand(resource)));
+            ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
-        if( config.isRest() ) {
-            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id, KieContainerResource.class );
+        if (config.isRest()) {
+            return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id, KieContainerResource.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetContainerInfoCommand( id ) ) );
-            return (ServiceResponse<KieContainerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetContainerInfoCommand(id)));
+            ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<Void> disposeContainer(String id) {
-        if( config.isRest() ) {
-            return makeHttpDeleteRequestAndCreateServiceResponse( baseURI + "/containers/" + id, Void.class );
+        if (config.isRest()) {
+            return makeHttpDeleteRequestAndCreateServiceResponse(baseURI + "/containers/" + id, Void.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DisposeContainerCommand( id ) ) );
-            return (ServiceResponse<Void>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DisposeContainerCommand(id)));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponsesList executeScript(CommandScript script) {
-        if( config.isRest() ) {
-            return makeHttpPostRequestAndCreateCustomResponse( baseURI + "/config", script, ServiceResponsesList.class );
+        if (config.isRest()) {
+            return makeHttpPostRequestAndCreateCustomResponse(baseURI + "/config", script, ServiceResponsesList.class);
         } else {
-            return executeJmsCommand( script );
+            ServiceResponsesList responsesList = executeJmsCommand(script);
+            if (!responsesList.getResponses().isEmpty() && shouldReturnWithNullResponse(responsesList.getResponses().get(0))) {
+                return null;
+            }
+            return responsesList;
         }
     }
 
     @Override
     public ServiceResponse<KieScannerResource> getScannerInfo(String id) {
-        if( config.isRest() ) {
-            return makeHttpGetRequestAndCreateServiceResponse( baseURI + "/containers/" + id + "/scanner", KieScannerResource.class );
+        if (config.isRest()) {
+            return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/containers/" + id + "/scanner", KieScannerResource.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetScannerInfoCommand( id ) ) );
-            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetScannerInfoCommand(id)));
+            ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
-        if( config.isRest() ) {
+        if (config.isRest()) {
             return makeHttpPostRequestAndCreateServiceResponse(
                     baseURI + "/containers/" + id + "/scanner", resource,
-                    KieScannerResource.class );
+                    KieScannerResource.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateScannerCommand( id, resource ) ) );
-            return (ServiceResponse<KieScannerResource>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateScannerCommand(id, resource)));
+            ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId) {
-        if( config.isRest() ) {
+        if (config.isRest()) {
             return makeHttpPostRequestAndCreateServiceResponse(
                     baseURI + "/containers/" + id + "/release-id", releaseId,
-                    ReleaseId.class );
+                    ReleaseId.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateReleaseIdCommand( id, releaseId ) ) );
-            return (ServiceResponse<ReleaseId>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateReleaseIdCommand(id, releaseId)));
+            ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     @Override
     public ServiceResponse<KieServerStateInfo> getServerState() {
-        if( config.isRest() ) {
+        if (config.isRest()) {
             return makeHttpGetRequestAndCreateServiceResponse(baseURI + "/state", KieServerStateInfo.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetServerStateCommand() ) );
-            return (ServiceResponse<KieServerStateInfo>) executeJmsCommand( script).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new GetServerStateCommand()));
+            ServiceResponse<KieServerStateInfo> response = (ServiceResponse<KieServerStateInfo>) executeJmsCommand(script).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
@@ -248,33 +277,37 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     /**
      * This method is deprecated on KieServicesClient as it was moved to RuleServicesClient
+     *
      * @see RuleServicesClient#executeCommands(String, String)
      * @deprecated
      */
     @Deprecated
     @Override
     public ServiceResponse<String> executeCommands(String id, String payload) {
-        if( config.isRest() ) {
+        if (config.isRest()) {
             return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, payload, String.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, payload ) ) );
-            return (ServiceResponse<String>) executeJmsCommand( script, null, null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CallContainerCommand(id, payload)));
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
     /**
      * This method is deprecated on KieServicesClient as it was moved to RuleServicesClient
+     *
      * @see RuleServicesClient#executeCommands(String, Command)
      * @deprecated
      */
     @Deprecated
     @Override
     public ServiceResponse<String> executeCommands(String id, Command<?> cmd) {
-        if( config.isRest() ) {
-            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd) );
+        if (config.isRest()) {
+            return makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(baseURI + "/containers/instances/" + id, cmd, String.class, getHeaders(cmd));
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CallContainerCommand( id, serialize(cmd) ) ) );
-            return (ServiceResponse<String>) executeJmsCommand( script, cmd.getClass().getName(), null, id ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CallContainerCommand(id, serialize(cmd))));
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand(script, cmd.getClass().getName(), null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
         }
     }
 
@@ -289,7 +322,7 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     @Override
     public void setClassLoader(ClassLoader classLoader) {
-        this.marshaller.setClassLoader( classLoader );
+        this.marshaller.setClassLoader(classLoader);
     }
 
     @Override
@@ -313,7 +346,6 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         }
     }
 
-
     private synchronized static List<KieServicesClientBuilder> loadClientBuilders() {
         List<KieServicesClientBuilder> builders = new ArrayList<KieServicesClientBuilder>();
         for (KieServicesClientBuilder builder : clientBuilders) {
@@ -322,4 +354,12 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
         return builders;
     }
+
+    private <T> ServiceResponse<T> getResponseOrNullIfNoResponse(ServiceResponse<T> response) {
+        if (shouldReturnWithNullResponse(response)) {
+            return null;
+        }
+        return response;
+    }
+
 }
