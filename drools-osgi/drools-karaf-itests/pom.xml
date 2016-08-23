@@ -193,6 +193,27 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <configuration>
+          <cloneProjectsTo>${project.build.directory}/it/drools-karaf-itests-kjar</cloneProjectsTo>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
