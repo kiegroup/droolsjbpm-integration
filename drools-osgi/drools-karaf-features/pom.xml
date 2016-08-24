@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -235,6 +234,24 @@
         <groupId>org.springframework.osgi</groupId>
         <artifactId>spring-osgi-core</artifactId>
         <version>${version.org.springframework.osgi}</version>
+        <exclusions>
+           <exclusion>
+             <groupId>org.springframework</groupId>
+             <artifactId>org.springframework.aop</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>org.springframework</groupId>
+             <artifactId>org.springframework.beans</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>org.springframework</groupId>
+             <artifactId>org.springframework.context</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>org.springframework</groupId>
+             <artifactId>org.springframework.core</artifactId>
+           </exclusion>
+         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
