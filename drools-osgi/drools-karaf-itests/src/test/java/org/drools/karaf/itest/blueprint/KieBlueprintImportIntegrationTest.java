@@ -1,6 +1,10 @@
 package org.drools.karaf.itest.blueprint;
 
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
+import org.drools.karaf.itest.blueprint.domain.Customer;
+import org.drools.karaf.itest.blueprint.domain.Drink;
+import org.drools.karaf.itest.blueprint.domain.Order;
+import org.drools.karaf.itest.model.Person;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,8 +33,36 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
     KieSession kieSession;
 
     @Test
-    public void kieSessionTest() {
+    public void kieSessionExistsTest() {
         Assert.assertNotNull(kieSession);
+    }
+
+    @Test
+    public void kieSessionOldPersonTest() {
+        Assert.assertNotNull(kieSession);
+
+        Drink drink = new Drink("whiskey", true);
+        Customer customer = new Customer("Customer", 40);
+        Order order = new Order(customer, drink);
+
+        kieSession.insert(order);
+        kieSession.fireAllRules();
+
+        Assert.assertTrue(order.isApproved());
+    }
+
+    @Test
+    public void kieSessionYoungPersonTest() {
+        Assert.assertNotNull(kieSession);
+
+        Drink drink = new Drink("whiskey", true);
+        Customer customer = new Customer("Customer", 14);
+        Order order = new Order(customer, drink);
+
+        kieSession.insert(order);
+        kieSession.fireAllRules();
+
+        Assert.assertFalse(order.isApproved());
     }
 
     @Configuration
@@ -48,7 +80,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                // debugConfiguration("5005", true),
+                 debugConfiguration("5005", true),
 
                 // Load Kie-Aries-Blueprint
                 loadKieFeatures("drools-module", "kie-ci", "kie-aries-blueprint"),
@@ -57,6 +89,9 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                 // (simulates for instance a bundle with domain classes used in rules)
                 wrappedBundle(mavenBundle().groupId("junit").artifactId("junit").versionAsInProject()),
 
+                // Load domain model classes
+                wrappedBundle(mavenBundle().groupId("org.drools").artifactId("drools-karaf-itests-domain-model").versionAsInProject()),
+
                 // Create a bundle with META-INF/spring/kie-beans.xml - this should be processed automatically by Spring
                 streamBundle(bundle()
                         .add("OSGI-INF/blueprint/kie-scanner-import-blueprint.xml",
@@ -64,6 +99,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                         .set(Constants.IMPORT_PACKAGE, "org.kie.aries.blueprint," +
                                 "org.osgi.service.blueprint.container," +
+                                "org.drools.karaf.itest.blueprint.domain," +
                                 "org.kie.aries.blueprint.factorybeans," +
                                 "org.kie.aries.blueprint.helpers," +
                                 "org.kie.api," +
@@ -71,6 +107,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                                 // junit is acting as a dependency for the rule
                                 "org.junit," +
                                 "*")
+                        .set(Constants.EXPORT_PACKAGE, "org.drools.karaf.itest.blueprint.domain")
                         .set(Constants.BUNDLE_SYMBOLICNAME, "Test-Blueprint-Bundle")
                         .build()).start()
 
