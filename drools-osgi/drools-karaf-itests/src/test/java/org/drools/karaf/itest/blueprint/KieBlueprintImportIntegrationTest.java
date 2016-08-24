@@ -80,7 +80,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                 logLevel(LogLevelOption.LogLevel.INFO),
 
                 // Option to be used to do remote debugging
-                 debugConfiguration("5005", true),
+                // debugConfiguration("5005", true),
 
                 // Load Kie-Aries-Blueprint
                 loadKieFeatures("drools-module", "kie-ci", "kie-aries-blueprint"),
