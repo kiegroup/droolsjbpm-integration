@@ -35,6 +35,7 @@ import org.jbpm.process.audit.ProcessInstanceLog;
 import org.jbpm.process.audit.VariableInstanceLog;
 import org.jbpm.process.audit.event.AuditEvent;
 import org.jbpm.services.task.commands.GetContentMapForUserCommand;
+import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
@@ -42,6 +43,7 @@ import org.kie.api.command.Command;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.task.model.Comment;
+import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.services.client.serialization.jaxb.impl.JaxbCommandResponse;
 import org.kie.services.client.serialization.jaxb.impl.JaxbLongListResponse;
@@ -59,11 +61,15 @@ import org.kie.services.client.serialization.jaxb.impl.process.JaxbProcessInstan
 import org.kie.services.client.serialization.jaxb.impl.process.JaxbWorkItemResponse;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskContentResponse;
 import org.kie.services.client.serialization.jaxb.rest.JaxbExceptionResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlRootElement(name = "command-response")
 @XmlAccessorType(XmlAccessType.FIELD)
 @SuppressWarnings("rawtypes")
 public class JaxbCommandsResponse {
+
+    private static final transient Logger logger = LoggerFactory.getLogger(JaxbCommandsResponse.class);
 
     @XmlElement(name = "deployment-id")
     @XmlSchemaType(name = "string")
@@ -162,8 +168,9 @@ public class JaxbCommandsResponse {
         String className = result.getClass().getName();
         if (result instanceof ProcessInstance) {
             this.responses.add(new JaxbProcessInstanceResponse((ProcessInstance) result, i, cmd));
-        } else if (result instanceof JaxbTask) {
-            this.responses.add(new JaxbTaskResponse((JaxbTask) result, i, cmd));
+        } else if (result instanceof JaxbTask
+                || cmd instanceof GetTaskByWorkItemIdCommand) {
+            this.responses.add(new JaxbTaskResponse((Task)result, i, cmd));
         } else if (result instanceof JaxbContent) {
             if (((JaxbContent) result).getId() == -1) {
                 this.responses.add(new JaxbTaskContentResponse(((JaxbContent) result).getContentMap(), i, cmd));
@@ -171,7 +178,7 @@ public class JaxbCommandsResponse {
                 this.responses.add(new JaxbContentResponse((JaxbContent) result, i, cmd));
             }
         } else if (List.class.isInstance(result)) { 
-            // Neccessary to determine return type of empty lists
+            // Necessary to determine return type of empty lists
             Class listType = getListType(cmd);
             if( listType == null ) { 
                 unknownResultType = true;
@@ -225,8 +232,8 @@ public class JaxbCommandsResponse {
         }
         
         if (unknownResultType) {
-            System.out.println( this.getClass().getSimpleName() + ": unknown result type " + result.getClass().getSimpleName() 
-                    + " from command " + cmd.getClass().getSimpleName() + " added.");
+            logger.info( "Unknown result type " + result.getClass().getCanonicalName()
+                    + " from command " + cmd.getClass().getCanonicalName() + ".");
         }
     }
 
