@@ -20,8 +20,32 @@
       </runs-inside>
       
       <plugin-configuration>
-         <c:simple-property name="objectName" readOnly="true" default="org.drools:type=DroolsManagementAgent"/>
+         <c:simple-property name="objectName" readOnly="true" default="org.kie:type=DroolsManagementAgent"/>
       </plugin-configuration>
+      
+     <service name="Kie Containers"
+        description="The Kie Container monitoring service." 
+        discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+        class="org.rhq.plugins.jmx.MBeanResourceComponent">
+    
+          <plugin-configuration>
+             <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId=%kcontainerId%"/>
+             <c:simple-property name="nameTemplate" readOnly="true" default="KieContainer {kcontainerId}"/>
+             <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Container {kcontainerId}"/>
+             <c:simple-property name="kcontainerId" type="string" readOnly="true" description="The Kie Container Id"/>
+          </plugin-configuration>
+  
+        <metric property="ConfiguredReleaseIdStr"
+                description="The RelaseId configured while creating the KieContainer"
+                displayName="Configured ReleaseId"
+                dataType="trait"
+                displayType="summary" />       
+
+        <metric property="ResolvedReleaseIdStr"
+                description="The actual resolved ReleaseId"
+                displayName="Resolved ReleaseId"
+                dataType="trait"
+                displayType="summary" />        
 
        <service name="Kie Bases"
                 description="The Kie Base monitoring service."
@@ -29,7 +53,7 @@
                 class="org.rhq.plugins.jmx.MBeanResourceComponent">
     
           <plugin-configuration>
-             <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%"/>
+             <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId=%kcontainerId%,kbaseId=%kbaseId%"/>
              <c:simple-property name="nameTemplate" readOnly="true" default="KieBase {kbaseId}"/>
              <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}"/>
              <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
@@ -51,7 +75,7 @@
                     class="org.rhq.plugins.jmx.MBeanResourceComponent">
         
               <plugin-configuration>
-                 <c:simple-property name="objectName" readOnly="true" default="org.drools.kbases:type=%kbaseId%,group=Sessions,sessionId=%sessionId%"/>
+                 <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId={kcontainerId},kbaseId={kbaseId},group=Sessions,ksessionId=%sessionId%"/>
                  <c:simple-property name="nameTemplate" readOnly="true" default="KieSession {sessionId}"/>
                  <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}, Kie session {sessionId}"/>
                  <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
@@ -128,9 +152,12 @@
                       displayType="summary" />                       
 
           
-           </service>
-       </service>
-   </service>
+           </service>  <!-- /Kie Session -->
+       </service>  <!-- /Kie Base -->
+       
+     </service>  <!-- /Kie Container -->
+       
+   </service>  <!-- /Kie Service -->
 
 
 </plugin>
