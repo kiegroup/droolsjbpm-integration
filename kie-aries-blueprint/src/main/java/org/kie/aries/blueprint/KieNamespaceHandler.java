@@ -23,7 +23,9 @@ import org.kie.aries.blueprint.namespace.KieBaseElementParser;
 import org.kie.aries.blueprint.namespace.KieContainerElementParser;
 import org.kie.aries.blueprint.namespace.KieEnvironmentElementParser;
 import org.kie.aries.blueprint.namespace.KieEventListenersElementParser;
+import org.kie.aries.blueprint.namespace.KieImportBaseElementParser;
 import org.kie.aries.blueprint.namespace.KieImportElementParser;
+import org.kie.aries.blueprint.namespace.KieImportScannerElementParser;
 import org.kie.aries.blueprint.namespace.KieImportSessionElementParser;
 import org.kie.aries.blueprint.namespace.KieModuleElementParser;
 import org.kie.aries.blueprint.namespace.KieObjectsInjector;
@@ -68,6 +70,8 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
     public static final String ELEMENT_KMODULE = "kmodule";
     public static final String ELEMENT_IMPORT = "import";
     public static final String ELEMENT_IMPORT_SESSION = "import-session";
+    public static final String ELEMENT_IMPORT_BASE = "import-base";
+    public static final String ELEMENT_IMPORT_SCANNER = "import-scanner";
 
     protected static Map<String, AbstractElementParser> droolsElementParserMap = new HashMap<String, AbstractElementParser>();
     static {
@@ -84,6 +88,8 @@ public class KieNamespaceHandler implements org.apache.aries.blueprint.Namespace
         droolsElementParserMap.put(ELEMENT_KMODULE, new KieModuleElementParser());
         droolsElementParserMap.put(ELEMENT_IMPORT, new KieImportElementParser() );
         droolsElementParserMap.put(ELEMENT_IMPORT_SESSION, new KieImportSessionElementParser() );
+        droolsElementParserMap.put(ELEMENT_IMPORT_BASE, new KieImportBaseElementParser() );
+        droolsElementParserMap.put(ELEMENT_IMPORT_SCANNER, new KieImportScannerElementParser() );
     }
 
     public KieNamespaceHandler() {

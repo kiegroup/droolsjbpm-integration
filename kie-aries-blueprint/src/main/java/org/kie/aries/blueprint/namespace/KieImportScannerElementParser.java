@@ -16,10 +16,10 @@
 
 package org.kie.aries.blueprint.namespace;
 
-public class KieImportSessionElementParser extends AbstractImportElementParser {
+public class KieImportScannerElementParser extends AbstractImportElementParser {
 
     @Override
     protected String getFactoryMethodName() {
-        return "createImportedKieSession";
+        return "createImportedKieScanner";
     }
 }

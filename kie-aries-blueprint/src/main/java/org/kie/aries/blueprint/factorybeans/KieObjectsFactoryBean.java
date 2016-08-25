@@ -20,6 +20,8 @@ import org.drools.core.impl.EnvironmentFactory;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
 import org.drools.persistence.jpa.KnowledgeStoreServiceImpl;
 import org.drools.persistence.jpa.marshaller.JPAPlaceholderResolverStrategy;
+import org.kie.api.KieBase;
+import org.kie.api.builder.KieScanner;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
@@ -69,6 +71,18 @@ public class KieObjectsFactoryBean {
         return resolver;
     }
 
+    public static Object createImportedKieBase( String kbaseName ) {
+        KieImportBaseResolver resolver = new KieImportBaseResolver( kbaseName );
+        importInjector.registerBaseResolver( kbaseName, resolver );
+        return resolver;
+    }
+
+    public static Object createImportedKieScanner( String kscannerName ) {
+        KieImportScannerResolver resolver = new KieImportScannerResolver( kscannerName );
+        importInjector.registerScannerResolver( kscannerName, resolver );
+        return resolver;
+    }
+
     public static Environment createEnvironment(String id, HashMap<String, Object> parameters, List<Object> marshallingStrategies){
         Environment environment = EnvironmentFactory.newEnvironment();
         if ( parameters != null) {
@@ -102,15 +116,39 @@ public class KieObjectsFactoryBean {
 
     public static class ImportInjector {
         private Map<String, KieImportSessionResolver> sessionResolvers = new HashMap<String, KieImportSessionResolver>();
+        private Map<String, KieImportBaseResolver> baseResolvers = new HashMap<String, KieImportBaseResolver>();
+        private Map<String, KieImportScannerResolver> scannerResolvers = new HashMap<String, KieImportScannerResolver>();
 
-        public void registerSessionResolver(String name, KieImportSessionResolver resolver) {
+        public void registerSessionResolver( String name, KieImportSessionResolver resolver ) {
             sessionResolvers.put( name, resolver );
+        }
+
+        public void registerBaseResolver( String name, KieImportBaseResolver resolver ) {
+            baseResolvers.put( name, resolver );
+        }
+
+        public void registerScannerResolver( String name, KieImportScannerResolver resolver ) {
+            scannerResolvers.put( name, resolver );
         }
 
         public void wireSession(String name, Object kieSession) {
             KieImportSessionResolver resolver = sessionResolvers.get(name);
             if (resolver != null) {
                 resolver.setSession( kieSession );
+            }
+        }
+
+        public void wireBase(String name, KieBase kieBase ) {
+            KieImportBaseResolver resolver = baseResolvers.get(name);
+            if (resolver != null) {
+                resolver.setBase( kieBase );
+            }
+        }
+
+        public void wireScanner(String name, KieScanner kieScanner ) {
+            KieImportScannerResolver resolver = scannerResolvers.get(name);
+            if (resolver != null) {
+                resolver.setScanner( kieScanner );
             }
         }
     }

@@ -111,6 +111,18 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="import-base">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="import-scanner">
+    <xsd:complexType>
+      <xsd:attribute name="name" use="required" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="kcontainer-ref">
     <xsd:complexType>
       <xsd:attribute name="id" use="required" type="xsd:ID"/>

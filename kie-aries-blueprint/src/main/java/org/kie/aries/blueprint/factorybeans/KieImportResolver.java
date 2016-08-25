@@ -54,10 +54,12 @@ public class KieImportResolver extends AbstractKieObjectsResolver {
                 kieContainer = resolveKContainer( releaseId );
                 if (scannerEnabled) {
                     KieScanner kieScanner = KieServices.Factory.get().newKieScanner( kieContainer );
-                    context.registerBean(releaseIdName+"#scanner", kieScanner);
+                    String scannerName = releaseIdName+"-scanner";
+                    context.registerBean(scannerName, kieScanner);
                     if (scannerInterval > 0) {
                         kieScanner.start( scannerInterval );
                     }
+                    KieObjectsFactoryBean.importInjector.wireScanner( scannerName, kieScanner );
                 }
             }
         }
@@ -69,6 +71,7 @@ public class KieImportResolver extends AbstractKieObjectsResolver {
             KieBase kieBase = kContainer.getKieBase( kieBaseName );
             context.registerBean(kieBaseName, kieBase);
             registerKieSessions(context, kieBaseName, kContainer);
+            KieObjectsFactoryBean.importInjector.wireBase( kieBaseName, kieBase );
         }
     }
 

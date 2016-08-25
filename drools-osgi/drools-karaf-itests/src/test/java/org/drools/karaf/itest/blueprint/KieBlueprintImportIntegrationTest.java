@@ -4,10 +4,11 @@ import org.drools.karaf.itest.AbstractKarafIntegrationTest;
 import org.drools.karaf.itest.blueprint.domain.Customer;
 import org.drools.karaf.itest.blueprint.domain.Drink;
 import org.drools.karaf.itest.blueprint.domain.Order;
-import org.drools.karaf.itest.model.Person;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kie.api.KieBase;
+import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieSession;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -32,9 +33,17 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
     @Inject
     KieSession kieSession;
 
+    @Inject
+    KieBase kieBase;
+
+    @Inject
+    KieScanner kieScanner;
+
     @Test
-    public void kieSessionExistsTest() {
+    public void kieElementsExistTest() {
         Assert.assertNotNull(kieSession);
+        Assert.assertNotNull(kieBase);
+        Assert.assertNotNull(kieScanner);
     }
 
     @Test
@@ -104,6 +113,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                                 "org.kie.aries.blueprint.helpers," +
                                 "org.kie.api," +
                                 "org.kie.api.runtime," +
+                                "org.kie.api.builder," +
                                 // junit is acting as a dependency for the rule
                                 "org.junit," +
                                 "*")
