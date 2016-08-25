@@ -18,4 +18,17 @@
     </dependency>
   </dependencies>
 
+  <packaging>kjar</packaging>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <version>7.0.0-SNAPSHOT</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
