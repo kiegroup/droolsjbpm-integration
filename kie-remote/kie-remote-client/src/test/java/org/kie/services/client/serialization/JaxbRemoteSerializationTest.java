@@ -35,10 +35,9 @@ import org.junit.Test;
 import org.kie.api.task.model.Status;
 import org.kie.internal.task.api.model.SubTasksStrategy;
 import org.kie.remote.client.jaxb.ClientJaxbSerializationProvider;
-import org.kie.services.client.serialization.AbstractRemoteSerializationTest;
-import org.kie.services.client.serialization.JaxbSerializationProvider;
-import org.kie.services.client.serialization.JsonRemoteSerializationTest;
-import org.kie.services.client.serialization.AbstractRemoteSerializationTest.TestType;
+import org.kie.remote.jaxb.gen.JaxbStringObjectPairArray;
+import org.kie.remote.jaxb.gen.StartProcessCommand;
+import org.kie.remote.jaxb.gen.util.JaxbStringObjectPair;
 import org.kie.services.client.serialization.jaxb.impl.task.JaxbTaskSummary;
 import org.kie.test.objects.MyType;
 import org.kie.test.util.compare.ComparePair;
@@ -309,4 +308,20 @@ public class JaxbRemoteSerializationTest extends AbstractRemoteSerializationTest
         ComparePair.compareObjectsViaFields(jaxbTaskSum, jaxbTaskSumCopy, "subTaskStrategy", "potentialOwners");
     }
 
+    @Test
+    public void utf8Test() throws Exception {
+        String testStr =  "あばばば";
+        StartProcessCommand cmd = new StartProcessCommand();
+        JaxbStringObjectPairArray params = new JaxbStringObjectPairArray();
+        cmd.setParameter(params);
+        JaxbStringObjectPair pair = new JaxbStringObjectPair();
+        params.getItems().add(pair);
+        pair.setKey("myVar");
+        pair.setValue(testStr);
+
+        StartProcessCommand copy = testRoundTrip(cmd);
+        String copyStr = (String) copy.getParameter().getItems().iterator().next().getValue();
+        System.out.println( testStr + "/" + copyStr );
+        assertEquals("UTF-8 characters not correctly encoded", testStr, copyStr);
+    }
 }
