@@ -67,6 +67,7 @@ import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
 import org.kie.remote.jaxb.gen.GetTaskCommand;
 import org.kie.remote.jaxb.gen.GetTaskContentCommand;
+import org.kie.remote.jaxb.gen.GetTasksByGroupCommand;
 import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
@@ -678,6 +679,13 @@ public class TaskServiceClientCommandObject extends AbstractRemoteCommandObject 
         GetTasksOwnedCommand cmd = new GetTasksOwnedCommand();
         cmd.setUserId(userId);
         cmd.setFilter(addLanguageFilter(language));
+        return executeCommand(cmd);
+    }
+
+    @Override
+    public List<TaskSummary> getTasksByGroup(List<String> groupIds) {
+        GetTasksByGroupCommand cmd = new GetTasksByGroupCommand();
+        cmd.getGroupIds().addAll(groupIds);
         return executeCommand(cmd);
     }
 
