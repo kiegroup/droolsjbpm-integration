@@ -86,7 +86,6 @@ import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ProcessSubTaskCommand;
@@ -192,10 +191,9 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
-            @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
             @XmlElement(name = "get-tasks-owned", type = GetTasksOwnedCommand.class),
             @XmlElement(name = "task-query-where", type = TaskSummaryQueryCommand.class),
-            
+
             @XmlElement(name = "nominate-task", type = NominateTaskCommand.class),
             @XmlElement(name = "release-task", type = ReleaseTaskCommand.class),
             @XmlElement(name = "resume-task", type = ResumeTaskCommand.class),
