@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -40,6 +40,14 @@ public class RestURI {
     public static final String QUERY_NAME = "queryName";
     public static final String SOLVER_ID = "solverId";
     public static final String DOCUMENT_ID = "documentId";
+    public static final String CASE_ID = "caseId";
+    public static final String CASE_DEF_ID = "caseDefId";
+    public static final String CASE_FILE_ITEM = "dataId";
+    public static final String CASE_STAGE_ID = "caseStageId";
+    public static final String CASE_NODE_NAME = "nodeName";
+    public static final String CASE_COMMENT_ID = "caseCommentId";
+    public static final String CASE_ROLE_NAME = "caseRoleName";
+    public static final String CASE_OWNER = "caseOwner";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
@@ -50,6 +58,8 @@ public class RestURI {
     public static final String IMAGE_URI = "containers/{" + CONTAINER_ID + "}/images";
     public static final String QUERY_DEF_URI = "queries/definitions";
     public static final String DOCUMENT_URI = "documents";
+    public static final String CASE_URI = "containers/{" + CONTAINER_ID + "}/cases";
+    public static final String CASE_QUERY_URI = "queries/cases";
 
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
@@ -193,6 +203,41 @@ public class RestURI {
     // admin process related
     public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}";
     public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
+
+    // case management related
+    public static final String START_CASE_POST_URI = "{" + CASE_DEF_ID +"}/instances";
+    public static final String CASE_GET_URI = "{" + CASE_DEF_ID +"}";
+    public static final String CASE_INSTANCES_GET_URI = "instances";
+    public static final String CASE_INSTANCES_BY_DEF_GET_URI = "{" + CASE_DEF_ID +"}/instances";
+    public static final String CASE_INSTANCE_GET_URI = "instances/{" + CASE_ID + "}";
+    public static final String CASE_INSTANCE_DELETE_URI = "instances/{" + CASE_ID + "}";
+    public static final String CASE_MILESTONES_GET_URI = "instances/{" + CASE_ID + "}/milestones";
+    public static final String CASE_STAGES_GET_URI = "instances/{" + CASE_ID + "}/stages";
+    public static final String CASE_AD_HOC_FRAGMENTS_GET_URI = "instances/{" + CASE_ID + "}/adhocfragmets";
+    public static final String CASE_ROLES_GET_URI = "instances/{" + CASE_ID + "}/roles";
+    public static final String CASE_ROLES_PUT_URI = "instances/{" + CASE_ID + "}/roles/{" + CASE_ROLE_NAME +"}";
+    public static final String CASE_ROLES_DELETE_URI = "instances/{" + CASE_ID + "}/roles/{" + CASE_ROLE_NAME +"}";
+    public static final String CASE_NODE_INSTANCES_GET_URI = "instances/{" + CASE_ID + "}/nodes/instances";
+    public static final String CASE_PROCESS_INSTANCES_GET_URI = "instances/{" + CASE_ID + "}/processes/instances";
+    public static final String CASE_COMMENTS_GET_URI = "instances/{" + CASE_ID + "}/comments";
+    public static final String CASE_COMMENTS_POST_URI = "instances/{" + CASE_ID + "}/comments";
+    public static final String CASE_COMMENTS_PUT_URI = "instances/{" + CASE_ID + "}/comments/{" + CASE_COMMENT_ID + "}";
+    public static final String CASE_COMMENTS_DELETE_URI = "instances/{" + CASE_ID + "}/comments/{" + CASE_COMMENT_ID + "}";
+    public static final String CASE_FILE_GET_URI = "instances/{" + CASE_ID + "}/caseFile";
+    public static final String CASE_FILE_POST_URI = "instances/{" + CASE_ID + "}/caseFile";
+    public static final String CASE_FILE_DELETE_URI = "instances/{" + CASE_ID + "}/caseFile";
+    public static final String CASE_FILE_BY_NAME_GET_URI = "instances/{" + CASE_ID + "}/caseFile/{"+ CASE_FILE_ITEM +"}";
+    public static final String CASE_FILE_BY_NAME_POST_URI = "instances/{" + CASE_ID + "}/caseFile/{"+ CASE_FILE_ITEM +"}";
+    public static final String CASE_DYNAMIC_TASK_POST_URI = "instances/{" + CASE_ID + "}/tasks";
+    public static final String CASE_DYNAMIC_TASK_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks";
+    public static final String CASE_DYNAMIC_PROCESS_POST_URI = "instances/{" + CASE_ID + "}/processes/{" + PROCESS_ID + "}";
+    public static final String CASE_DYNAMIC_PROCESS_IN_STAGE_POST_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/processes/{" + PROCESS_ID + "}";
+    public static final String CASE_DYNAMIC_TASK_PUT_URI = "instances/{" + CASE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
+    public static final String CASE_DYNAMIC_TASK_IN_STAGE_PUT_URI = "instances/{" + CASE_ID + "}/stages/{" + CASE_STAGE_ID + "}/tasks/{" + CASE_NODE_NAME + "}";
+
+    // case queries
+    public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
+
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
         StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");

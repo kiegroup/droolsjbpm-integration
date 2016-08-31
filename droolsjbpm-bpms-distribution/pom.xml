@@ -130,7 +130,11 @@
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-case-mgmt</artifactId>
+      <artifactId>jbpm-case-mgmt-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-case-mgmt-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>

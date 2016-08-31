@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -28,6 +28,7 @@ public class KieServerConstants {
     public static final String KIE_JBPM_SERVER_EXT_DISABLED = "org.jbpm.server.ext.disabled";
     public static final String KIE_JBPM_UI_SERVER_EXT_DISABLED = "org.jbpm.ui.server.ext.disabled";
     public static final String KIE_OPTAPLANNER_SERVER_EXT_DISABLED = "org.optaplanner.server.ext.disabled";
+    public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
 
@@ -86,6 +87,16 @@ public class KieServerConstants {
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
-
+    public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
+    
     public static final String FAILURE_REASON_PROP = "failure-reason";
+
+    // case management constants
+    public static final String CASE_DYNAMIC_NODE_TYPE_PROP = "nodeType";
+    public static final String CASE_DYNAMIC_NAME_PROP = "name";
+    public static final String CASE_DYNAMIC_DATA_PROP = "data";
+    public static final String CASE_DYNAMIC_DESC_PROP = "description";
+    public static final String CASE_DYNAMIC_ACTORS_PROP = "actors";
+    public static final String CASE_DYNAMIC_GROUPS_PROP = "groups";
+
 }

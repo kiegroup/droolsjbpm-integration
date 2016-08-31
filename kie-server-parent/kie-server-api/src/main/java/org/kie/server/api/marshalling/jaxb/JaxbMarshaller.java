@@ -76,6 +76,23 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.cases.CaseAdHocFragment;
+import org.kie.server.api.model.cases.CaseAdHocFragmentList;
+import org.kie.server.api.model.cases.CaseComment;
+import org.kie.server.api.model.cases.CaseCommentList;
+import org.kie.server.api.model.cases.CaseDefinition;
+import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMilestone;
+import org.kie.server.api.model.cases.CaseMilestoneDefinition;
+import org.kie.server.api.model.cases.CaseMilestoneList;
+import org.kie.server.api.model.cases.CaseRoleAssignment;
+import org.kie.server.api.model.cases.CaseRoleAssignmentList;
+import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageDefinition;
+import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -236,7 +253,27 @@ public class JaxbMarshaller implements Marshaller {
 
                 // admin section
                 MigrationReportInstance.class,
-                MigrationReportInstanceList.class
+                MigrationReportInstanceList.class,
+
+                // case management
+                CaseMilestone.class,
+                CaseMilestoneList.class,
+                CaseInstance.class,
+                CaseInstanceList.class,
+                CaseFile.class,
+                CaseStage.class,
+                CaseStageList.class,
+                CaseAdHocFragment.class,
+                CaseAdHocFragmentList.class,
+                CaseComment.class,
+                CaseCommentList.class,
+                CaseRoleAssignment.class,
+                CaseRoleAssignmentList.class,
+                CaseDefinition.class,
+                CaseDefinitionList.class,
+                CaseMilestoneDefinition.class,
+                CaseStageDefinition.class
+
         };
     }
 

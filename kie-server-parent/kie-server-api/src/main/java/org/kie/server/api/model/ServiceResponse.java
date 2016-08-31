@@ -28,6 +28,23 @@ import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.cases.CaseAdHocFragment;
+import org.kie.server.api.model.cases.CaseAdHocFragmentList;
+import org.kie.server.api.model.cases.CaseComment;
+import org.kie.server.api.model.cases.CaseCommentList;
+import org.kie.server.api.model.cases.CaseDefinition;
+import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.cases.CaseMilestone;
+import org.kie.server.api.model.cases.CaseMilestoneDefinition;
+import org.kie.server.api.model.cases.CaseMilestoneList;
+import org.kie.server.api.model.cases.CaseRoleAssignment;
+import org.kie.server.api.model.cases.CaseRoleAssignmentList;
+import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.cases.CaseStageDefinition;
+import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.definition.AssociatedEntitiesDefinition;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -132,7 +149,27 @@ public class ServiceResponse<T> {
 
             // admin section
             @XmlElement(name = "migration-report-instance", type = MigrationReportInstance.class),
-            @XmlElement(name = "migration-report-instance-list", type = MigrationReportInstanceList.class)
+            @XmlElement(name = "migration-report-instance-list", type = MigrationReportInstanceList.class),
+
+            // case management
+            @XmlElement(name = "case-milestone", type = CaseMilestone.class),
+            @XmlElement(name = "case-milestone-list", type = CaseMilestoneList.class),
+            @XmlElement(name = "case-instance", type = CaseInstance.class),
+            @XmlElement(name = "case-instance-list", type = CaseInstanceList.class),
+            @XmlElement(name = "case-file", type = CaseFile.class),
+            @XmlElement(name = "case-adhoc-fragment", type = CaseAdHocFragment.class),
+            @XmlElement(name = "case-adhoc-fragment-list", type = CaseAdHocFragmentList.class),
+            @XmlElement(name = "case-comment", type = CaseComment.class),
+            @XmlElement(name = "case-comment-list", type = CaseCommentList.class),
+            @XmlElement(name = "case-role-assignment", type = CaseRoleAssignment.class),
+            @XmlElement(name = "case-role-assignment-list", type = CaseRoleAssignmentList.class),
+            @XmlElement(name = "case-stage", type = CaseStage.class),
+            @XmlElement(name = "case-stage-list", type = CaseStageList.class),
+            @XmlElement(name = "case-definition", type = CaseDefinition.class),
+            @XmlElement(name = "case-definition-list", type = CaseDefinitionList.class),
+            @XmlElement(name = "case-stage-def", type = CaseStageDefinition.class),
+            @XmlElement(name = "case-milestone-def", type = CaseMilestoneDefinition.class)
+
             })
     private T                            result;
 

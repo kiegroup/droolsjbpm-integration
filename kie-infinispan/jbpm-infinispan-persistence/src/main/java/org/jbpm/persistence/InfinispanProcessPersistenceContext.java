@@ -75,7 +75,7 @@ public class InfinispanProcessPersistenceContext extends InfinispanPersistenceCo
     			}
     		}
     		try {
-	    		java.lang.reflect.Field idField = CorrelationKeyInfo.class.getField("id");
+	    		java.lang.reflect.Field idField = CorrelationKeyInfo.class.getDeclaredField("id");
 	    		idField.setAccessible(true);
 	    		idField.set(info, CORRELATIONKEYINFO_KEY);
     		} catch (Exception e) {
