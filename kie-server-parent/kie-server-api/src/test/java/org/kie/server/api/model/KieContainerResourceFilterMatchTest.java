@@ -39,6 +39,8 @@ public class KieContainerResourceFilterMatchTest {
     private static final KieContainerResource MATCHING_CONTAINER = new KieContainerResource("id1", MATCHING_RELEASE_ID, KieContainerStatus.CREATING);
     private static final KieContainerResource NON_MATCHING_CONTAINER = new KieContainerResource("id2", NON_MATCHING_RELEASE_ID, KieContainerStatus.STOPPED);
 
+    private static final KieContainerResource MISSING_RELEASE_ID = new KieContainerResource();
+
     @Parameterized.Parameters(name = "{index}: filter={0}; MATCHING_RELEASE_ID={1}; expecting to match={2}")
     public static Collection<Object[]> data() {
         Collection<Object[]> data = new ArrayList<Object[]>(Arrays.asList(new Object[][]
@@ -46,7 +48,10 @@ public class KieContainerResourceFilterMatchTest {
                         {RELEASE_ID_FILTER, MATCHING_CONTAINER, true},
                         {RELEASE_ID_FILTER, NON_MATCHING_CONTAINER, false},
                         {STATUS_FILTER, MATCHING_CONTAINER, true},
-                        {STATUS_FILTER, NON_MATCHING_CONTAINER, false}
+                        {STATUS_FILTER, NON_MATCHING_CONTAINER, false},
+                        // the container resource may contain null releaseId and the filter needs to deal with that
+                        {RELEASE_ID_FILTER, MISSING_RELEASE_ID, false},
+                        {KieContainerResourceFilter.ACCEPT_ALL, MISSING_RELEASE_ID, true}
 
                 }
         ));

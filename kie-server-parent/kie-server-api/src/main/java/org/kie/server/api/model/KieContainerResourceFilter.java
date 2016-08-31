@@ -69,12 +69,19 @@ public class KieContainerResourceFilter {
         }
         // in case resolved release id exists, check against that
         ReleaseId resolvedReleaseId = kieContainerResource.getResolvedReleaseId();
+        ReleaseId releaseId = kieContainerResource.getReleaseId();
         if (resolvedReleaseId != null) {
             if (!releaseIdFilter.accept(resolvedReleaseId)) {
                 return false;
             }
+        } else if (releaseId != null) {
+            if (!releaseIdFilter.accept(releaseId)) {
+                return false;
+            }
         } else {
-            if (!releaseIdFilter.accept(kieContainerResource.getReleaseId())) {
+            // both resolvedReleaseId and releaseId are null
+            // null releaseId should be accepted only by the ALL filter
+            if (!ACCEPT_ALL.equals(this)) {
                 return false;
             }
         }
