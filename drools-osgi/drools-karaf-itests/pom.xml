@@ -11,6 +11,21 @@
   <artifactId>drools-karaf-itests</artifactId>
   <name>Drools :: Karaf Integration Tests</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-karaf-itests-domain-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-karaf-itests-kjar</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
@@ -20,6 +35,11 @@
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-karaf-itests-domain-model</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-karaf-itests-kjar</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
