@@ -461,16 +461,41 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(instances);
             assertEquals(1, instances.size());
             assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
-
-            // search for completed only
-            instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, Collections.singletonList(2), 0, 10);
-            assertNotNull(instances);
-            assertEquals(0, instances.size());
-
         } finally {
             abortProcessInstances(processInstanceIds);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesByProcessIdAndStatus() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Integer> abortedStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+        List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        int originalAborted = instances.size();
+
+        instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+        assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(originalAborted + 1, instances.size());
     }
 
     @Test
@@ -519,15 +544,40 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals(1, instances.size());
             assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
 
-            // search for completed only
-            instances = queryClient.findProcessInstancesByProcessName("usertask", Collections.singletonList(2), 0, 10);
-            assertNotNull(instances);
-            assertEquals(0, instances.size());
-
         } finally {
             abortProcessInstances(processInstanceIds);
         }
+    }
 
+    @Test
+    public void testGetProcessInstancesByProcessNameAndStatus() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Integer> abortedStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+        List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByProcessName("usertask", abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        int originalAborted = instances.size();
+
+        instances = queryClient.findProcessInstancesByProcessName("usertask", activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        instances = queryClient.findProcessInstancesByProcessName("usertask", activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+        assertEquals(PROCESS_ID_USERTASK, instances.get(0).getProcessId());
+
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        instances = queryClient.findProcessInstancesByProcessName("usertask", abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(originalAborted + 1, instances.size());
     }
 
     @Test
@@ -557,26 +607,52 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
 
+        List<Integer> abortedStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED);
+        List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+        List<ProcessInstance> instances = queryClient.findProcessInstancesByStatus(abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        int originalAborted = instances.size();
+
+        instances = queryClient.findProcessInstancesByStatus(activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(0, instances.size());
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        instances = queryClient.findProcessInstancesByStatus(activeStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+        instances = queryClient.findProcessInstancesByStatus(abortedStatus, 0, 10000);
+        assertNotNull(instances);
+        assertEquals(originalAborted + 1, instances.size());
+    }
+
+    @Test
+    public void testGetProcessInstancesByStatusPaging() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
         try {
-            List<ProcessInstance> instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 0, 10);
+            List<Integer> activeStatus = Collections.singletonList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByStatus(activeStatus, 0, 10);
             assertNotNull(instances);
             assertEquals(5, instances.size());
 
-            instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 0, 3);
+            instances = queryClient.findProcessInstancesByStatus(activeStatus, 0, 3);
             assertNotNull(instances);
             assertEquals(3, instances.size());
 
-
-            instances = queryClient.findProcessInstancesByStatus(Collections.singletonList(1), 1, 3);
+            instances = queryClient.findProcessInstancesByStatus(activeStatus, 1, 3);
             assertNotNull(instances);
             assertEquals(2, instances.size());
-
-            // search for completed only
-            instances = queryClient.findProcessInstancesByProcessId(PROCESS_ID_USERTASK, Collections.singletonList(2), 0, 10);
-            assertNotNull(instances);
-            assertEquals(0, instances.size());
 
         } finally {
             abortProcessInstances(processInstanceIds);
