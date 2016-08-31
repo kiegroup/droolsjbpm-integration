@@ -26,6 +26,7 @@ import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerConfigItem;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
@@ -120,9 +121,8 @@ public class KieServerInstanceManager {
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
             public Void doOperation(KieServicesClient client, Container container) {
-                KieContainerResource containerResource = new KieContainerResource();
-                containerResource.setContainerId(containerSpec.getId());
-                containerResource.setReleaseId(containerSpec.getReleasedId());
+                KieContainerResource containerResource = new KieContainerResource(containerSpec.getId(), containerSpec.getReleasedId(), container.getResolvedReleasedId(), container.getStatus());
+                containerResource.setMessages((List<Message>) container.getMessages());
 
                 if (containerSpec.getConfigs() != null) {
                     // cover scanner and rules config

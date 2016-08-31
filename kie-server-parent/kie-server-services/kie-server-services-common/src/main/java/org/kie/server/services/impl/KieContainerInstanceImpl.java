@@ -42,13 +42,17 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     private transient Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
-        this( containerId, status, null );
+        this(containerId, status, null);
     }
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer) {
+        this(containerId, status, kieContainer, null);
+    }
+
+    public KieContainerInstanceImpl(String containerId, KieContainerStatus status, InternalKieContainer kieContainer, ReleaseId releaseId) {
         super();
         this.kieContainer = kieContainer;
-        this.resource = new KieContainerResource( containerId, null, status );
+        this.resource = new KieContainerResource(containerId, releaseId, status);
         this.marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>();
         this.serviceContainer = new ConcurrentHashMap<String, Object>();
         updateReleaseId();
