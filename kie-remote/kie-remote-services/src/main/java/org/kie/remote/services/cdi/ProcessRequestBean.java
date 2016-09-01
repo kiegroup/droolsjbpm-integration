@@ -385,15 +385,14 @@ public class ProcessRequestBean {
      */
     @SuppressWarnings("unchecked")
     private <T> T doTaskOperation(Long taskId, String deploymentId, Long processInstanceId, Task task, TaskCommand<T> cmd) {
+        if( emptyDeploymentId(deploymentId) && taskDeploymentIdCommands.contains(cmd.getClass()) ) {
+            deploymentId = getDeploymentId(task,taskId, cmd);
+        }
         // take care of serialization
         if( cmd instanceof GetTaskCommand
                 || cmd instanceof GetContentByIdCommand
                 || cmd instanceof GetTaskContentCommand ) {
-           cmd = new ExecuteAndSerializeCommand(cmd);
-        }
-
-        if( emptyDeploymentId(deploymentId) && taskDeploymentIdCommands.contains(cmd.getClass()) ) {
-            deploymentId = getDeploymentId(task,taskId, cmd);
+           cmd = new ExecuteAndSerializeCommand(cmd, deploymentId);
         }
 
         if( cmd instanceof CompleteTaskCommand ) {

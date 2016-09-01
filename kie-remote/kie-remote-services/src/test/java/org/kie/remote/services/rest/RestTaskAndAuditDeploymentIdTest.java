@@ -15,31 +15,50 @@
 
 package org.kie.remote.services.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_INDEPENDENT_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.FOR_PROCESS_TASKS;
 import static org.kie.remote.services.MockSetupTestHelper.TASK_ID;
 import static org.kie.remote.services.MockSetupTestHelper.setupTaskMocks;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
+import org.drools.core.impl.EnvironmentFactory;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.task.commands.GetContentByIdCommand;
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.impl.TaskContentRegistry;
+import org.jbpm.services.task.impl.model.xml.JaxbContent;
+import org.jbpm.services.task.utils.ContentMarshallerHelper;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.task.model.Content;
+import org.kie.internal.command.Context;
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.internal.task.api.ContentMarshallerContext;
+import org.kie.internal.task.api.model.ContentData;
 import org.kie.remote.services.TaskDeploymentIdTest;
 import org.kie.remote.services.cdi.ProcessRequestBean;
+import org.kie.remote.services.util.ExecuteAndSerializeCommand;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @SuppressWarnings("unchecked")
 public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implements TaskDeploymentIdTest {
@@ -124,6 +143,47 @@ public class RestTaskAndAuditDeploymentIdTest extends TaskResourceImpl implement
         
         // verify
         verify(userTaskServiceMock, times(2)).execute(any(String.class), any(TaskCommand.class));
+    }
+
+    @Test
+    public void testGetTaskContentExecution() {
+        setupTaskMocks(this, FOR_PROCESS_TASKS);
+        
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("test", "test value");
+        
+        final ContentData contentData = ContentMarshallerHelper.marshal(data, null);
+        
+        ContentMarshallerContext contentMarshallerContext = Mockito.mock(ContentMarshallerContext.class);
+        when(contentMarshallerContext.getClassloader()).thenReturn(this.getClass().getClassLoader());
+        when(contentMarshallerContext.getEnvironment()).thenReturn(EnvironmentFactory.newEnvironment());
+        TaskContentRegistry.get().addMarshallerContext("deploymentId", contentMarshallerContext);
+
+        doAnswer(new Answer<JaxbContent>() {
+            public JaxbContent answer(InvocationOnMock invocation) {
+               @SuppressWarnings("rawtypes")
+            ExecuteAndSerializeCommand command = (ExecuteAndSerializeCommand) invocation.getArguments()[1];
+               
+               return (JaxbContent) command.execute(null);
+            }
+        }).when(userTaskServiceMock).execute(any(String.class), any(ExecuteAndSerializeCommand.class));
+
+        TaskCommand<Content> cmd = Mockito.mock(GetContentByIdCommand.class);
+        Content content = Mockito.mock(Content.class);
+        when(content.getId()).thenReturn(1l);
+        when(content.getContent()).thenReturn(contentData.getContent());
+        
+        when(cmd.execute(any(Context.class))).thenReturn(content);
+        JaxbContent result = (JaxbContent) processRequestBean.doRestTaskOperation(-1l, "deploymentId", -1l, null, cmd);
+
+        assertNotNull(result);
+        assertEquals(1l, result.getId().longValue());
+        assertNotNull(result.getContent());
+        assertNotNull(result.getContentMap());
+        assertEquals("test value", result.getContentMap().get("test"));
+        verify(userTaskServiceMock, times(1)).execute(any(String.class), any(ExecuteAndSerializeCommand.class));
+        verify(contentMarshallerContext, times(1)).getClassloader();
+        verify(contentMarshallerContext, times(1)).getEnvironment();
     }
   
 }
