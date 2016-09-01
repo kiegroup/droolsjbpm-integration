@@ -33,6 +33,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.ObjectFilter;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.KieSession.AtomicAction;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItemManager;
 import org.kie.api.runtime.rule.Agenda;
@@ -444,6 +445,11 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     @Override
     public void fireUntilHalt( AgendaFilter agendaFilter ) {
         getKieSession().fireUntilHalt(agendaFilter);
+    }
+    
+    @Override
+    public void submit(AtomicAction action) {
+        getKieSession().submit( action );
     }
 
     @Override
