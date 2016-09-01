@@ -13,5 +13,47 @@
 
   <name>Drools RHQ JMX Plugin</name>
   <description>RHQ/JOPR plugin that monitors Drools defined MBeans</description>
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+         <groupId>org.rhq</groupId>
+         <artifactId>rhq-jmx-plugin</artifactId>
+         <version>${version.org.rhq}</version>
+         <scope>provided</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+      <dependency>
+         <groupId>org.rhq</groupId>
+         <artifactId>rhq-jmx-plugin</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.rhq</groupId>
+         <artifactId>rhq-core-plugin-api</artifactId>
+         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.rhq</groupId>
+        <artifactId>rhq-core-domain</artifactId>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <scope>provided</scope>
+      </dependency>
+   </dependencies>
+   <build>
+   <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+   </plugins>
+   </build>
 </project>
