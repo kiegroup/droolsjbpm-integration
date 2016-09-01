@@ -27,6 +27,7 @@ import org.kie.api.runtime.Channel;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.Globals;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieSession.AtomicAction;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.ObjectFilter;
 import org.kie.api.runtime.StatelessKieSession;
@@ -377,6 +378,11 @@ public class KieImportSessionResolver extends AbstractKieObjectsResolver impleme
     @Override
     public void fireUntilHalt( AgendaFilter agendaFilter ) {
         kieSession.fireUntilHalt( agendaFilter );
+    }
+    
+    @Override
+    public void submit(AtomicAction action) {
+        kieSession.submit( action );
     }
 
     @Override
