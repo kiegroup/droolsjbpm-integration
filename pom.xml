@@ -63,7 +63,7 @@
     <module>drools-jboss-integration</module>
     <module>kie-server-parent</module>
     <module>jbpm-process-svg</module>
-    <module>drools-osgi</module>
+    <module>kie-osgi</module>
     <module>kie-performance-kit</module>
     <module>drools-android</module>
     <module>kie-security</module>
@@ -118,8 +118,8 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>org.drools</groupId>
-        <artifactId>drools-karaf-itests-domain-model</artifactId>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-karaf-itests-domain-model</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

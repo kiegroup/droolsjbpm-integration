@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+  <bean id="kiePostProcessor" class="org.kie.osgi.spring.OsgiKModuleBeanFactoryPostProcessor"/>
+
+  <kie:kmodule id="someid">
+    <kie:kbase name="drl_kiesample" packages="drl_kiesample">
+      <kie:ksession name="ksession9" type="stateless"/>
+      <kie:ksession name="ksession99"/>
+    </kie:kbase>
+  </kie:kmodule>
+
+  <osgi:service ref="ksession99" interface="org.kie.api.runtime.KieSession" />
+
+</beans>
