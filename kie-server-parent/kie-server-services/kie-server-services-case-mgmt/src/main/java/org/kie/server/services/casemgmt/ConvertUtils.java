@@ -203,6 +203,7 @@ public class ConvertUtils {
                 .caseIdPrefix(caseDefinition.getIdentifierPrefix())
                 .name(caseDefinition.getName())
                 .version(caseDefinition.getVersion())
+                .containerId(caseDefinition.getDeploymentId())
                 .roles(caseDefinition.getCaseRoles().stream().collect(toMap(CaseRole::getName, CaseRole::getCardinality)))
                 .adHocFragments(caseDefinition.getAdHocFragments().stream().map(adf -> CaseAdHocFragment.builder()
                         .name(adf.getName())
