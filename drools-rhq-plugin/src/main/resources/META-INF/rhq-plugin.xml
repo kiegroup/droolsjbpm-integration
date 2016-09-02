@@ -9,24 +9,15 @@
         xmlns:c="urn:xmlns:rhq-configuration">
 
    <depends plugin="JMX" useClasses="true"/>
-
-   <service name="Kie Service"
-            description="Kie Service"
-            discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
-            class="org.rhq.plugins.jmx.MBeanResourceComponent">
-
-      <runs-inside>
-         <parent-resource-type name="JMX Server" plugin="JMX"/>
-      </runs-inside>
-      
-      <plugin-configuration>
-         <c:simple-property name="objectName" readOnly="true" default="org.kie:type=DroolsManagementAgent"/>
-      </plugin-configuration>
       
      <service name="Kie Containers"
         description="The Kie Container monitoring service." 
         discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
         class="org.rhq.plugins.jmx.MBeanResourceComponent">
+        
+          <runs-inside>
+             <parent-resource-type name="JMX Server" plugin="JMX"/>
+          </runs-inside>
     
           <plugin-configuration>
              <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId=%kcontainerId%"/>
@@ -43,7 +34,7 @@
 
         <metric property="ResolvedReleaseIdStr"
                 description="The actual resolved ReleaseId"
-                displayName="Resolved ReleaseId"
+                displayName="Resolved ReleaseId"    
                 dataType="trait"
                 displayType="summary" />        
 
@@ -75,7 +66,7 @@
                     class="org.rhq.plugins.jmx.MBeanResourceComponent">
         
               <plugin-configuration>
-                 <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId={kcontainerId},kbaseId={kbaseId},group=Sessions,ksessionId=%sessionId%"/>
+                 <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId={kcontainerId},kbaseId={kbaseId},ksessionType=Stateful,ksessionName=%sessionId%"/>
                  <c:simple-property name="nameTemplate" readOnly="true" default="KieSession {sessionId}"/>
                  <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}, Kie session {sessionId}"/>
                  <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
@@ -153,11 +144,98 @@
 
           
            </service>  <!-- /Kie Session -->
+           
+           <service name="Stateless Kie Sessions"
+                    description="The stateless Kie Session monitoring service."
+                    discovery="org.rhq.plugins.jmx.MBeanResourceDiscoveryComponent"
+                    class="org.rhq.plugins.jmx.MBeanResourceComponent">
+        
+              <plugin-configuration>
+                 <c:simple-property name="objectName" readOnly="true" default="org.kie:kcontainerId={kcontainerId},kbaseId={kbaseId},ksessionType=Stateless,ksessionName=%sessionId%"/>
+                 <c:simple-property name="nameTemplate" readOnly="true" default="KieSession {sessionId}"/>
+                 <c:simple-property name="descriptionTemplate" readOnly="true" default="A JMX bean for Kie Base {kbaseId}, Kie session {sessionId}"/>
+                 <c:simple-property name="kbaseId" type="string" readOnly="true" description="The Kie Base Id"/>
+                 <c:simple-property name="sessionId" type="string" readOnly="true" description="The Kie Session Id"/>
+              </plugin-configuration>
+        
+              <operation name="reset" displayName="Reset Metrics" description="Reset all metric counters."/>
+          
+              <operation name="getStatsForRule"
+                         displayName="Get statistics for rule"
+                         description="Get and return the statistics for a specific rule.">
+                  <parameters>
+                      <c:simple-property name="ruleName" displayName="Rule Name" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+          
+              <operation name="getStatsForProcess"
+                         displayName="Get statistics for process"
+                         description="Get and return the statistics for a specific process.">
+                  <parameters>
+                      <c:simple-property name="processId" displayName="Process ID" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+          
+              <operation name="getStatsForProcessInstance"
+                         displayName="Get statistics for process instance"
+                         description="Get and return the statistics for a specific process instance.">
+                  <parameters>
+                      <c:simple-property name="processInstanceId" displayName="Process Instance ID" required="true"/>
+                  </parameters>    
+                  <results>
+                      <c:simple-property name="stats"/>
+                  </results>
+              </operation>
+        
+              <metric displayName="Total Objects Inserted" property="TotalObjectsInserted"
+                      description="The total number of objects inserted on all sessions"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>
+              <metric displayName="Total Objects Deleted" property="TotalObjectsDeleted"
+                      description="The total number of objects deleted on all sessions"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>    
+              
+              <metric displayName="Total Matches Created" property="TotalMatchesCreated"
+                      description="The total number of matches created since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Matches Fired" property="TotalMatchesFired"
+                      description="The total number of matches fired since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Matches Cancelled" property="TotalMatchesCancelled"
+                      description="The total number of matches cancelled since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Firing Time" property="TotalFiringTime" units="milliseconds"
+                      description="The total time spent firing rules since reset" 
+                      category="performance" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Process Instances Started" property="TotalProcessInstancesStarted"
+                      description="The total number of process instances started since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>      
+        
+              <metric displayName="Total Process Instances Completed" property="TotalProcessInstancesCompleted"
+                      description="The total number of process instances completed since reset"
+                      category="throughput" displayType="summary" measurementType="trendsup"/>     
+                      
+              <metric property="LastReset"
+                      description="The timestamp of the last reset operation"
+                      displayName="Last Reset"
+                      dataType="trait"
+                      displayType="summary" />                       
+
+          
+           </service>  <!-- /Kie Session -->
+           
+           
        </service>  <!-- /Kie Base -->
        
      </service>  <!-- /Kie Container -->
-       
-   </service>  <!-- /Kie Service -->
-
 
 </plugin>
