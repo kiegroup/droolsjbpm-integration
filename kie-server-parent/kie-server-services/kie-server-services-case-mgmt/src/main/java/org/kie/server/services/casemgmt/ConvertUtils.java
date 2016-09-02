@@ -111,6 +111,7 @@ public class ConvertUtils {
         return org.kie.server.api.model.cases.CaseInstance.builder()
                 .caseId(actualCaseInstance.getCaseId())
                 .caseDefinitionId(actualCaseInstance.getCaseDefinitionId())
+                .containerId(actualCaseInstance.getDeploymentId())
                 .caseDescription(actualCaseInstance.getCaseDescription())
                 .caseOwner(actualCaseInstance.getOwner())
                 .caseStatus(actualCaseInstance.getStatus())
