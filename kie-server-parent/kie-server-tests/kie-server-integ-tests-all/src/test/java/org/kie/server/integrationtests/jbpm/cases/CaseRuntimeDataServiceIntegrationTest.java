@@ -420,6 +420,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(caseInstance.getStartedAt());
         assertNull(caseInstance.getCompletedAt());
         assertEquals("", caseInstance.getCompletionMessage());
+        assertEquals(CONTAINER_ID, caseInstance.getContainerId());
     }
 
 }

@@ -42,6 +42,9 @@ public class CaseInstance {
     @XmlElement(name="case-definition-id")
     private String caseDefinitionId;
 
+    @XmlElement(name="container-id")
+    private String containerId;
+
     @XmlElement(name="case-started-at")
     private Date startedAt;
 
@@ -101,6 +104,14 @@ public class CaseInstance {
 
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 
     public Date getStartedAt() {
@@ -196,6 +207,11 @@ public class CaseInstance {
             return this;
         }
 
+        public Builder containerId(String containerId) {
+            caseInstance.setContainerId(containerId);
+            return this;
+        }
+
         public Builder startedAt(Date startedAt) {
             caseInstance.setStartedAt(startedAt);
             return this;
@@ -240,6 +256,7 @@ public class CaseInstance {
                 ", caseOwner='" + caseOwner + '\'' +
                 ", caseStatus=" + caseStatus +
                 ", caseDefinitionId='" + caseDefinitionId + '\'' +
+                ", containerId='" + containerId + '\'' +
                 ", startedAt=" + startedAt +
                 ", completedAt=" + completedAt +
                 ", completionMessage='" + completionMessage + '\'' +

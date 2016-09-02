@@ -84,6 +84,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             assertNotNull(caseInstance.getStartedAt());
             assertNull(caseInstance.getCompletedAt());
             assertEquals("", caseInstance.getCompletionMessage());
+            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
 
             // since roles were not assigned to any users/groups no tasks are available
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
@@ -118,6 +119,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             assertNotNull(caseInstance.getStartedAt());
             assertNull(caseInstance.getCompletedAt());
             assertEquals("", caseInstance.getCompletionMessage());
+            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
 
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertEquals(1, tasks.size());
@@ -234,6 +236,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             assertNotNull(caseInstance.getStartedAt());
             assertNull(caseInstance.getCompletedAt());
             assertEquals("", caseInstance.getCompletionMessage());
+            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
 
             // since roles were not assigned to any users/groups no tasks are available
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
