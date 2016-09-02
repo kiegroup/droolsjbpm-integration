@@ -34,6 +34,8 @@ public class CaseDefinition {
     private String version;
     @XmlElement(name="case-id-prefix")
     private String caseIdPrefix;
+    @XmlElement(name="container-id")
+    private String containerId;
     @XmlElement(name="adhoc-fragments")
     private List<CaseAdHocFragment> adHocFragments;
     @XmlElement(name="roles")
@@ -69,6 +71,14 @@ public class CaseDefinition {
 
     public void setCaseIdPrefix(String caseIdPrefix) {
         this.caseIdPrefix = caseIdPrefix;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 
     public List<CaseAdHocFragment> getAdHocFragments() {
@@ -117,49 +127,54 @@ public class CaseDefinition {
 
     public static class Builder {
 
-        private CaseDefinition stage = new CaseDefinition();
+        private CaseDefinition caseDefinition = new CaseDefinition();
 
         public CaseDefinition build() {
-            return stage;
+            return caseDefinition;
         }
 
         public Builder id(String id) {
-            stage.setIdentifier(id);
+            caseDefinition.setIdentifier(id);
             return this;
         }
 
         public Builder name(String name) {
-            stage.setName(name);
+            caseDefinition.setName(name);
             return this;
         }
 
         public Builder version(String version) {
-            stage.setVersion(version);
+            caseDefinition.setVersion(version);
             return this;
         }
 
         public Builder caseIdPrefix(String caseIdPrefix) {
-            stage.setCaseIdPrefix(caseIdPrefix);
+            caseDefinition.setCaseIdPrefix(caseIdPrefix);
+            return this;
+        }
+
+        public Builder containerId(String containerId) {
+            caseDefinition.setContainerId(containerId);
             return this;
         }
 
         public Builder adHocFragments(List<CaseAdHocFragment> adHocFragments) {
-            stage.setAdHocFragments(adHocFragments);
+            caseDefinition.setAdHocFragments(adHocFragments);
             return this;
         }
 
         public Builder stages(List<CaseStageDefinition> stages) {
-            stage.setCaseStages(stages);
+            caseDefinition.setCaseStages(stages);
             return this;
         }
 
         public Builder roles(Map<String, Integer> roles) {
-            stage.setRoles(roles);
+            caseDefinition.setRoles(roles);
             return this;
         }
 
         public Builder milestones(List<CaseMilestoneDefinition> milestones) {
-            stage.setMilestones(milestones);
+            caseDefinition.setMilestones(milestones);
             return this;
         }
     }
@@ -168,8 +183,10 @@ public class CaseDefinition {
     public String toString() {
         return "CaseDefinition{" +
                 "name='" + name + '\'' +
-                ", id=" + identifier +
-                ", caseIdPrefix=" + caseIdPrefix +
+                ", identifier='" + identifier + '\'' +
+                ", version='" + version + '\'' +
+                ", caseIdPrefix='" + caseIdPrefix + '\'' +
+                ", containerId='" + containerId + '\'' +
                 '}';
     }
 }

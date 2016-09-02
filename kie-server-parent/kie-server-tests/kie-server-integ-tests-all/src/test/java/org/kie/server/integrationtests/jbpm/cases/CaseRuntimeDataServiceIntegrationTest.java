@@ -103,6 +103,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         KieServerAssert.assertNullOrEmpty("Stages should be empty", hrCase.getCaseStages());
         assertEquals(2, hrCase.getMilestones().size());
         assertEquals(3, hrCase.getRoles().size());
+        assertEquals(CONTAINER_ID, hrCase.getContainerId());
 
         definitions = caseClient.getCaseDefinitions("User*", 0, 10);
         assertNotNull(definitions);
