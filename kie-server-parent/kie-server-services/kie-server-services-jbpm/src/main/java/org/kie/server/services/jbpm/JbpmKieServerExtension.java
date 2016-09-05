@@ -357,7 +357,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             Set<Class<?>> customClasses = new HashSet<Class<?>>(deployedUnit.getDeployedClasses());
             // add custom classes that come from extension itself
             customClasses.add(DocumentImpl.class);
-            kieContainerInstance.addJaxbClasses(customClasses);
+            kieContainerInstance.addExtraClasses(customClasses);
 
             // add any query result mappers from kjar
             List<String> addedMappers = QueryMapperRegistry.get().discoverAndAddMappers(kieContainer.getClassLoader());
