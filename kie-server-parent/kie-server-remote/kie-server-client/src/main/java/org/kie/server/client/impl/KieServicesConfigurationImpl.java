@@ -64,7 +64,7 @@ public final class KieServicesConfigurationImpl
     private boolean jmsTransactional = false;
 
     private MarshallingFormat format           = MarshallingFormat.JAXB;
-    private Set<Class<?>>     extraJaxbClasses = new HashSet<Class<?>>();
+    private Set<Class<?>>     extraClasses = new HashSet<Class<?>>();
 
     private CredentialsProvider credentialsProvider;
 
@@ -125,9 +125,9 @@ public final class KieServicesConfigurationImpl
 
     @Override
     public void dispose() {
-        if ( extraJaxbClasses != null ) {
-            extraJaxbClasses.clear();
-            extraJaxbClasses = null;
+        if ( extraClasses != null ) {
+            extraClasses.clear();
+            extraClasses = null;
         }
         if ( connectionFactory != null ) {
             connectionFactory = null;
@@ -270,19 +270,19 @@ public final class KieServicesConfigurationImpl
     }
 
     @Override
-    public boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
-        return this.extraJaxbClasses.addAll( extraJaxbClassList );
+    public boolean addExtraClasses(Set<Class<?>> extraClassList) {
+        return this.extraClasses.addAll( extraClassList );
     }
 
     @Override
-    public KieServicesConfiguration clearJaxbClasses() {
-        this.extraJaxbClasses.clear();
+    public KieServicesConfiguration clearExtraClasses() {
+        this.extraClasses.clear();
         return this;
     }
 
     @Override
-    public Set<Class<?>> getExtraJaxbClasses() {
-        return this.extraJaxbClasses;
+    public Set<Class<?>> getExtraClasses() {
+        return this.extraClasses;
     }
 
     @Override
@@ -333,10 +333,10 @@ public final class KieServicesConfigurationImpl
     }
 
     @Override
-    public KieServicesConfiguration setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses) {
-        this.extraJaxbClasses.clear();
+    public KieServicesConfiguration setExtraClasses(Set<Class<?>> extraJaxbClasses) {
+        this.extraClasses.clear();
         if (extraJaxbClasses != null) {
-            this.extraJaxbClasses.addAll(extraJaxbClasses);
+            this.extraClasses.addAll(extraJaxbClasses);
         }
         return this;
     }
@@ -414,11 +414,12 @@ public final class KieServicesConfigurationImpl
         return this.headers;
     }
 
+
     // Clone ---
     private KieServicesConfigurationImpl(KieServicesConfigurationImpl config) {
         this.connectionFactory = config.connectionFactory;
 
-        this.extraJaxbClasses = config.extraJaxbClasses;
+        this.extraClasses = config.extraClasses;
         this.format = config.format;
         this.requestQueue = config.requestQueue;
         this.password = config.password;
@@ -446,5 +447,32 @@ public final class KieServicesConfigurationImpl
                 "transport=" + transport +
                 ", serverUrl='" + serverUrl + '\'' +
                 '}';
+    }
+
+    /*
+     * Deprecated methods
+     */
+    @Deprecated
+    @Override
+    public Set<Class<?>> getExtraJaxbClasses() {
+        return getExtraClasses();
+    }
+
+    @Deprecated
+    @Override
+    public boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
+        return addExtraClasses(extraJaxbClassList);
+    }
+
+    @Deprecated
+    @Override
+    public KieServicesConfiguration setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses) {
+        return setExtraClasses(extraJaxbClasses);
+    }
+
+    @Deprecated
+    @Override
+    public KieServicesConfiguration clearJaxbClasses() {
+        return clearExtraClasses();
     }
 }

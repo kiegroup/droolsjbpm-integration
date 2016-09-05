@@ -336,7 +336,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
             DeployedUnit deployedUnit = deploymentService.getDeployedUnit(unit.getIdentifier());
-            kieContainerInstance.addJaxbClasses(new HashSet<Class<?>>(deployedUnit.getDeployedClasses()));
+            kieContainerInstance.addExtraClasses(new HashSet<Class<?>>(deployedUnit.getDeployedClasses()));
 
             // add any query result mappers from kjar
             List<String> addedMappers = QueryMapperRegistry.get().discoverAndAddMappers(kieContainer.getClassLoader());

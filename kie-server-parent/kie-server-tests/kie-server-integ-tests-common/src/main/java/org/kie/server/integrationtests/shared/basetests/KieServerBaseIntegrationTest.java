@@ -193,7 +193,7 @@ public abstract class KieServerBaseIntegrationTest {
         configuration.setTimeout(DEFAULT_TIMEOUT);
         configuration.setMarshallingFormat(marshallingFormat);
 
-        configuration.addJaxbClasses(new HashSet<Class<?>>(extraClasses.values()));
+        configuration.addExtraClasses(new HashSet<Class<?>>(extraClasses.values()));
         additionalConfiguration(configuration);
 
         if (extraClasses.size() > 0) {

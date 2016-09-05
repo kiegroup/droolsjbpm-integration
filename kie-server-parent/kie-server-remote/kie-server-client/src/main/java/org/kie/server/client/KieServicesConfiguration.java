@@ -51,13 +51,13 @@ public interface KieServicesConfiguration {
 
     boolean isRest();
 
-    Set<Class<?>> getExtraJaxbClasses();
+    Set<Class<?>> getExtraClasses();
 
-    boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList);
+    boolean addExtraClasses(Set<Class<?>> extraClassList);
 
-    KieServicesConfiguration setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses);
+    KieServicesConfiguration setExtraClasses(Set<Class<?>> extraClasses);
 
-    KieServicesConfiguration clearJaxbClasses();
+    KieServicesConfiguration clearExtraClasses();
 
     Transport getTransport();
 
@@ -106,5 +106,29 @@ public interface KieServicesConfiguration {
     void setHeaders(Map<String, String> headers);
 
     Map<String, String> getHeaders();
+
+    /**
+     * Deprecated use #getExtraClasses instead
+     */
+    @Deprecated
+    Set<Class<?>> getExtraJaxbClasses();
+
+    /**
+     * Deprecated use #addExtraClasses instead
+     */
+    @Deprecated
+    boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList);
+
+    /**
+     * Deprecated use #setExtraClasses instead
+     */
+    @Deprecated
+    KieServicesConfiguration setExtraJaxbClasses(Set<Class<?>> extraJaxbClasses);
+
+    /**
+     * Deprecated use #clearExtraClasses instead
+     */
+    @Deprecated
+    KieServicesConfiguration clearJaxbClasses();
 
 }
