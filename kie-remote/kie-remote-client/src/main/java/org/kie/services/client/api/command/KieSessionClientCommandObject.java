@@ -15,11 +15,6 @@
 
 package org.kie.services.client.api.command;
 
-import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
-
-import java.util.Collection;
-import java.util.Map;
-
 import org.kie.api.KieBase;
 import org.kie.api.command.Command;
 import org.kie.api.event.process.ProcessEventListener;
@@ -31,7 +26,6 @@ import org.kie.api.runtime.Channel;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.Globals;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.KieSession.AtomicAction;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.ObjectFilter;
 import org.kie.api.runtime.process.ProcessInstance;
@@ -63,6 +57,11 @@ import org.kie.remote.jaxb.gen.SetGlobalCommand;
 import org.kie.remote.jaxb.gen.SignalEventCommand;
 import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
 import org.kie.remote.jaxb.gen.StartProcessCommand;
+
+import java.util.Collection;
+import java.util.Map;
+
+import static org.kie.remote.client.jaxb.ConversionUtil.convertMapToJaxbStringObjectPairArray;
 
 public class KieSessionClientCommandObject extends AbstractRemoteCommandObject implements KieSession, CorrelationAwareProcessRuntime {
 
@@ -234,6 +233,11 @@ public class KieSessionClientCommandObject extends AbstractRemoteCommandObject i
 
     @Override
     public void update( FactHandle handle, Object object ) {
+        unsupported(KieSession.class, Void.class);
+    }
+
+    @Override
+    public void update( FactHandle handle, Object object, String... modifiedProperties ) {
         unsupported(KieSession.class, Void.class);
     }
 
