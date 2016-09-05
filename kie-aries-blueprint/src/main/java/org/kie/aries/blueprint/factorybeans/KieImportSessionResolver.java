@@ -27,7 +27,6 @@ import org.kie.api.runtime.Channel;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.Globals;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.KieSession.AtomicAction;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.ObjectFilter;
 import org.kie.api.runtime.StatelessKieSession;
@@ -313,6 +312,11 @@ public class KieImportSessionResolver extends AbstractKieObjectsResolver impleme
     @Override
     public void update( FactHandle factHandle, Object o ) {
         kieSession.update( factHandle, o );
+    }
+
+    @Override
+    public void update( FactHandle factHandle, Object o, String... modifiedProperties ) {
+        kieSession.update( factHandle, o, modifiedProperties );
     }
 
     @Override
