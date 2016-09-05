@@ -80,7 +80,7 @@ public abstract class AbstractKieServicesClientImpl {
         this.config = config.clone();
         this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
         this.classLoader = Thread.currentThread().getContextClassLoader() != null ? Thread.currentThread().getContextClassLoader() : CommandScript.class.getClassLoader();
-        this.marshaller = MarshallerFactory.getMarshaller(config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader);
+        this.marshaller = MarshallerFactory.getMarshaller(config.getExtraClasses(), config.getMarshallingFormat(), classLoader);
         this.responseHandler = config.getResponseHandler();
     }
 
@@ -88,7 +88,7 @@ public abstract class AbstractKieServicesClientImpl {
         this.config = config.clone();
         this.loadBalancer = config.getLoadBalancer() == null ? LoadBalancer.getDefault(config.getServerUrl()) : config.getLoadBalancer();
         this.classLoader = classLoader;
-        this.marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader );
+        this.marshaller = MarshallerFactory.getMarshaller( config.getExtraClasses(), config.getMarshallingFormat(), classLoader );
         this.responseHandler = config.getResponseHandler();
     }
 
@@ -504,7 +504,7 @@ public abstract class AbstractKieServicesClientImpl {
             try {
 
                 // serialize request
-                marshaller = MarshallerFactory.getMarshaller( config.getExtraJaxbClasses(), config.getMarshallingFormat(), classLoader );
+                marshaller = MarshallerFactory.getMarshaller( config.getExtraClasses(), config.getMarshallingFormat(), classLoader );
                 String xmlStr = marshaller.marshall( command );
                 logger.debug("Message content to be sent '{}'", xmlStr);
                 textMsg = session.createTextMessage(xmlStr);

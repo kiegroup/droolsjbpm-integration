@@ -44,11 +44,11 @@ public interface KieContainerInstance {
 
     void addService(Object service);
 
-    boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList);
+    boolean addExtraClasses(Set<Class<?>> extraClassList);
 
-    void clearJaxbClasses();
+    void clearExtraClasses();
 
-    Set<Class<?>> getExtraJaxbClasses();
+    Set<Class<?>> getExtraClasses();
 
     <T> T getService(Class<T> serviceType);
 

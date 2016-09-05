@@ -147,7 +147,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
 
 
         config.setMarshallingFormat(MarshallingFormat.JSON);
-        config.setExtraJaxbClasses(Collections.singleton(KieContainerStatus.class));
+        config.setExtraClasses(Collections.singleton(KieContainerStatus.class));
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);

@@ -112,7 +112,7 @@ public class DroolsKieServerExtension implements KieServerExtension {
             }
         }
 
-        kieContainerInstance.addJaxbClasses(extraClasses);
+        kieContainerInstance.addExtraClasses(extraClasses);
 
     }
 
