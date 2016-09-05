@@ -15,11 +15,8 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,8 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.casemgmt.api.CaseNotFoundException;
-import org.jbpm.services.api.DeploymentNotFoundException;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseCommentList;
@@ -56,25 +51,23 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.casemgmt.Messages.*;
 
 @Path("server/" + CASE_URI)
-public class CaseResource {
+public class CaseResource extends AbstractCaseResource {
 
     private static final Logger logger = LoggerFactory.getLogger(CaseResource.class);
 
     private CaseManagementServiceBase caseManagementServiceBase;
-    private CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataServiceBase;
-    private KieServerRegistry context;
 
     public CaseResource() {
 
     }
 
-    public CaseResource(CaseManagementServiceBase caseManagementServiceBase, CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataServiceBase, KieServerRegistry context) {
+    public CaseResource(final CaseManagementServiceBase caseManagementServiceBase,
+                        final CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataServiceBase,
+                        final KieServerRegistry context) {
+        super(caseManagementRuntimeDataServiceBase, context);
         this.caseManagementServiceBase = caseManagementServiceBase;
-        this.caseManagementRuntimeDataServiceBase = caseManagementRuntimeDataServiceBase;
-        this.context = context;
     }
 
     @POST
@@ -661,31 +654,6 @@ public class CaseResource {
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
                 });
-    }
-
-    /*
-     * internal methods
-     */
-
-    protected Response invokeCaseOperation(HttpHeaders headers, String containerId, String caseId, CaseOperation operation) {
-        Variant v = getVariant(headers);
-        String type = getContentType(headers);
-        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-        try {
-
-            return operation.invoke(v, type, conversationIdHeader);
-
-        } catch (CaseNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CASE_INSTANCE_NOT_FOUND, caseId), v, conversationIdHeader);
-        } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
-        } catch (Exception e) {
-            logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(
-                    MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
-        }
     }
 
 }
