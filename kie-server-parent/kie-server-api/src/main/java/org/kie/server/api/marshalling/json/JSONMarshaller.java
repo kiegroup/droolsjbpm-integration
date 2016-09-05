@@ -71,22 +71,30 @@ public class JSONMarshaller implements Marshaller {
     private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
 
-    private ClassLoader classLoader;
-    private final ObjectMapper objectMapper;
+    protected ClassLoader classLoader;
+    protected ObjectMapper objectMapper;
 
-    private final Set<Class<?>> classesSet;
+    protected Set<Class<?>> classesSet;
 
-    private final ObjectMapper deserializeObjectMapper;
+    protected ObjectMapper deserializeObjectMapper;
 
-    private DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
+    protected DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
+        buildMarshaller(classes, classLoader);
+
+        configureMarshaller(classes, classLoader);
+    }
+
+    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+
         objectMapper = new ObjectMapper();
         deserializeObjectMapper = new ObjectMapper();
+    }
 
+    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         ObjectMapper customSerializationMapper = new ObjectMapper();
-
         if (classes == null) {
             classes = new HashSet<Class<?>>();
         }
@@ -161,7 +169,6 @@ public class JSONMarshaller implements Marshaller {
         }
 
         this.classesSet = classes;
-
     }
 
     protected List<NamedType> prepareCustomClasses(Set<Class<?>> classes) {

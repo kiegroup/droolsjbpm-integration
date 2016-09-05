@@ -100,8 +100,13 @@ import org.optaplanner.core.api.score.buildin.simple.SimpleScore;
 import org.optaplanner.core.api.score.buildin.simplebigdecimal.SimpleBigDecimalScore;
 import org.optaplanner.core.api.score.buildin.simpledouble.SimpleDoubleScore;
 import org.optaplanner.core.api.score.buildin.simplelong.SimpleLongScore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JaxbMarshaller implements Marshaller {
+
+    private static final Logger logger = LoggerFactory.getLogger(JaxbMarshaller.class);
+
     public static final Class<?>[] KIE_SERVER_JAXB_CLASSES;
 
     static {
@@ -235,24 +240,36 @@ public class JaxbMarshaller implements Marshaller {
         };
     }
 
-    private final JAXBContext jaxbContext;
+    protected JAXBContext jaxbContext;
 
-    private ClassLoader classLoader;
+    protected ClassLoader classLoader;
 
     public JaxbMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
+
+        buildMarshaller(classes, classLoader);
+    }
+
+    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+
         try {
+            logger.debug("Additional classes for JAXB context are {}", classes);
             Set<Class<?>> allClasses = new HashSet<Class<?>>();
 
             allClasses.addAll(Arrays.asList(KIE_SERVER_JAXB_CLASSES));
             if (classes != null) {
                 allClasses.addAll(classes);
             }
-
+            logger.debug("All classes for JAXB context are {}", allClasses);
             this.jaxbContext = JAXBContext.newInstance( allClasses.toArray(new Class[allClasses.size()]) );
         } catch ( JAXBException e ) {
+            logger.error("Error while creating JAXB Marshaller due to {}", e.getMessage(), e);
             throw new MarshallingException( "Error while creating JAXB context from default classes! " + e.getMessage(), e );
         }
+    }
+
+    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+        // by default nothing to configure though it might be needed in case of extensions
     }
 
     @Override
