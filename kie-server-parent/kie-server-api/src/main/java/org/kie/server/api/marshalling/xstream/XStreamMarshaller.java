@@ -52,12 +52,19 @@ import org.kie.server.api.model.instance.SolverInstance;
 public class XStreamMarshaller
         implements Marshaller {
 
-    private XStream xstream;
-    private ClassLoader classLoader;
-    private Map<String, Class> classNames = new HashMap<String, Class>();
+    protected XStream xstream;
+    protected ClassLoader classLoader;
+    protected Map<String, Class> classNames = new HashMap<String, Class>();
 
-    public XStreamMarshaller( final Set<Class<?>> classes, final ClassLoader classLoader ) {
+    public XStreamMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.classLoader = classLoader;
+        buildMarshaller(classes, classLoader);
+
+        configureMarshaller(classes, classLoader);
+    }
+
+    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+
         this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) {
 
             protected MapperWrapper wrapMapper(MapperWrapper next) {
@@ -73,6 +80,10 @@ public class XStreamMarshaller
                 };
             }
         });
+
+    }
+
+    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.xstream.setClassLoader( classLoader );
 
         this.xstream.processAnnotations( CommandScript.class );
