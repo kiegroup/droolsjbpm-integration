@@ -684,7 +684,7 @@ public class KieServerImpl {
                     }
                     logger.debug("Container {} (for release id {}) on {} ready to be updated", id, releaseId, extension);
                 }
-                kci.clearJaxbClasses();
+                kci.clearExtraClasses();
                 kci.disposeMarshallers();
                 Results results = kci.getKieContainer().updateToVersion(releaseId);
                 if (results.hasMessages(Level.ERROR)) {

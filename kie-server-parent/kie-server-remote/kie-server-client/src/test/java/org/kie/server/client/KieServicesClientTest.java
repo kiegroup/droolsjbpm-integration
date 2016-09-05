@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -147,7 +147,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
 
 
         config.setMarshallingFormat(MarshallingFormat.JSON);
-        config.setExtraJaxbClasses((Set)Collections.singleton(KieContainerStatus.class));
+        config.setExtraClasses((Set)Collections.singleton(KieContainerStatus.class));
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);

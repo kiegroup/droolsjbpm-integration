@@ -39,7 +39,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
 
     private transient Map<String, Object> serviceContainer;
 
-    private transient Set<Class<?>> extraJaxbClasses = new HashSet<Class<?>>();
+    private transient Set<Class<?>> extraClasses = new HashSet<Class<?>>();
 
     public KieContainerInstanceImpl(String containerId, KieContainerStatus status) {
         this(containerId, status, null);
@@ -120,7 +120,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         synchronized ( marshallers ) {
             Marshaller marshaller = marshallers.get( format );
             if ( marshaller == null ) {
-                marshaller = MarshallerFactory.getMarshaller( getExtraJaxbClasses(), format, this.kieContainer.getClassLoader() );
+                marshaller = MarshallerFactory.getMarshaller( getExtraClasses(), format, this.kieContainer.getClassLoader() );
                 this.marshallers.put( format, marshaller );
             }
             return marshaller;
@@ -148,18 +148,18 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     }
 
     @Override
-    public boolean addJaxbClasses(Set<Class<?>> extraJaxbClassList) {
-        return this.extraJaxbClasses.addAll( extraJaxbClassList );
+    public boolean addExtraClasses(Set<Class<?>> extraJaxbClassList) {
+        return this.extraClasses.addAll( extraJaxbClassList );
     }
 
     @Override
-    public void clearJaxbClasses() {
-        this.extraJaxbClasses.clear();
+    public void clearExtraClasses() {
+        this.extraClasses.clear();
     }
 
     @Override
-    public Set<Class<?>> getExtraJaxbClasses() {
-        return this.extraJaxbClasses;
+    public Set<Class<?>> getExtraClasses() {
+        return this.extraClasses;
     }
 
     @Override
