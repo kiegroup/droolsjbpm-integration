@@ -9,22 +9,12 @@
   <properties>
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
+    <version.org.codehaus.jackson>${version.org.codehaus.jackson}</version.org.codehaus.jackson>
     <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-platform-bom</artifactId>
-        <version>${version.org.kie}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -34,20 +24,6 @@
           <artifactId>kie-maven-plugin</artifactId>
           <version>${version.org.kie}</version>
           <extensions>true</extensions>
-          <dependencies>
-            <!-- needed to compile ruleflow processes -->
-            <dependency>
-              <groupId>org.jbpm</groupId>
-              <artifactId>jbpm-bpmn2</artifactId>
-              <version>${version.org.kie}</version>
-            </dependency>
-            <!-- needed to compile spreadsheet decision tables -->
-            <dependency>
-              <groupId>org.drools</groupId>
-              <artifactId>drools-decisiontables</artifactId>
-              <version>${version.org.kie}</version>
-            </dependency>
-          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
