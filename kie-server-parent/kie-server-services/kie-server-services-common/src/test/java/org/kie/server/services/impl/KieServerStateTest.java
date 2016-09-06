@@ -15,12 +15,13 @@
 
 package org.kie.server.services.impl;
 
+import java.io.File;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfig;
@@ -30,14 +31,14 @@ import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 
 public class KieServerStateTest {
 
-    @BeforeClass
-    public static void setupOnce() {
-        System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
-    }
+    private static final File REPOSITORY_DIR = new File("target/repository-dir");
 
-    @AfterClass
-    public static void cleanupOnce() {
-        System.clearProperty(KieServerConstants.KIE_SERVER_STATE_REPO);
+    @Before
+    public void setup() throws Exception {
+        // make sure we start with an empty repository directory
+        // (just in case the same directory would be used by different test as well)
+        FileUtils.deleteDirectory(REPOSITORY_DIR);
+        FileUtils.forceMkdir(REPOSITORY_DIR);
     }
 
     @After
@@ -49,7 +50,7 @@ public class KieServerStateTest {
 
     @Test
     public void testLoadKieServerState() {
-        KieServerStateRepository repository = new KieServerStateFileRepository();
+        KieServerStateRepository repository = new KieServerStateFileRepository(REPOSITORY_DIR);
 
         String serverId = UUID.randomUUID().toString();
 
@@ -68,7 +69,7 @@ public class KieServerStateTest {
 
         repository.store(serverId, state);
 
-        repository = new KieServerStateFileRepository();
+        repository = new KieServerStateFileRepository(REPOSITORY_DIR);
         state = repository.load(serverId);
         Assert.assertNotNull(state);
 
@@ -81,7 +82,7 @@ public class KieServerStateTest {
 
     @Test
     public void testLoadKieServerStateWithProperties() {
-        KieServerStateFileRepository repository = new KieServerStateFileRepository();
+        KieServerStateFileRepository repository = new KieServerStateFileRepository(REPOSITORY_DIR);
 
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm");
