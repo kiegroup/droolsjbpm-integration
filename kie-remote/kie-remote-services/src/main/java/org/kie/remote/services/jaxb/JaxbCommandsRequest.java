@@ -81,6 +81,7 @@ import org.jbpm.services.task.commands.GetContentByIdForUserCommand;
 import org.jbpm.services.task.commands.GetContentMapForUserCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsBusinessAdminCommand;
 import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
+import org.jbpm.services.task.commands.GetTasksByGroupCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
@@ -190,6 +191,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
+            @XmlElement(name = "get-tasks-by-group-command", type = GetTasksByGroupCommand.class),
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
