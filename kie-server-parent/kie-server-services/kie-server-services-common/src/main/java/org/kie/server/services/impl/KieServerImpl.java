@@ -235,7 +235,7 @@ public class KieServerImpl {
         container.setContainerId(containerId);
         ReleaseId releaseId = container.getReleaseId();
         try {
-            KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING);
+            KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId);
             KieContainerInstanceImpl previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
