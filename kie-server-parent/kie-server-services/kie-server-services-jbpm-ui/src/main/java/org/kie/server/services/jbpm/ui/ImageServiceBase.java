@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,25 +92,24 @@ public class ImageServiceBase {
         byte[] imageSVG = getProcessImageAsBytes(containerId, instance.getProcessId());
         if (imageSVG != null) {
             // find active nodes and modify image
-            Collection<NodeInstanceDesc> logs = dataService.getProcessInstanceFullHistory(procInstId, null);
-            List<String> active = new ArrayList<String>(2);
-            List<String> completed = new ArrayList<String>(logs.size() / 2);
-            for (NodeInstanceDesc nodeLog : logs) {
-                String nodeId = nodeLog.getNodeId();
-                if (NodeInstanceLog.TYPE_ENTER == ((org.jbpm.kie.services.impl.model.NodeInstanceDesc) nodeLog).getType()) {
-                    active.add(nodeId);
-                } else {
-                    completed.add(nodeId);
-                }
+            Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, new QueryContext(0, 1000));
+            Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, new QueryContext(0, 1000));
+            Map<Long, String> active = new HashMap<Long, String>();
+            List<String> completed = new ArrayList<String>();
+
+            for (NodeInstanceDesc activeNode : activeLogs) {
+                active.put(activeNode.getId(), activeNode.getNodeId());
             }
-            // remove completed from active
-            for (String completedNode : completed) {
-                // if it has the exit type it's then not active anymore
-                active.remove(completedNode);
+
+            for (NodeInstanceDesc completeNode : completedLogs) {
+                completed.add(completeNode.getNodeId());
+
+                active.remove(completeNode.getId());
             }
+
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
-            imageSVGString = SVGImageProcessor.transform(svgStream, completed, active);
+            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()));
 
             return imageSVGString;
         }
