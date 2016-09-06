@@ -35,6 +35,8 @@
     <!-- Custom settings.xml used when building the testing kjars. By default there is no additional configuration needed,
          but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
     <kie.server.testing.kjars.build.settings.xml/>
+    <!-- This property can be overriden to exclude specific test category according to specific needs. -->
+    <failsafe.excluded.groups/>
 
     <version.tomcat7>7.0.55</version.tomcat7>
     <version.tomcat8>8.0.12</version.tomcat8>
@@ -123,6 +125,9 @@
                 <goal>integration-test</goal>
                 <goal>verify</goal>
               </goals>
+              <configuration>
+                <excludedGroups>${failsafe.excluded.groups}</excludedGroups>
+              </configuration>
             </execution>
           </executions>
         </plugin>
@@ -175,6 +180,7 @@
       <properties>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly8x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -209,12 +215,6 @@
                 </deployables>
               </configuration>
             </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
-              </configuration>
-            </plugin>
           </plugins>
         </pluginManagement>
       </build>
@@ -225,6 +225,7 @@
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly8x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -257,12 +258,6 @@
                     <classifier>ee7</classifier>
                   </deployable>
                 </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -387,6 +382,7 @@
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly10x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -419,12 +415,6 @@
                     <classifier>ee7</classifier>
                   </deployable>
                 </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -543,6 +533,7 @@
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>tomcat7x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -611,12 +602,6 @@
                 </deployables>
               </configuration>
             </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</excludedGroups>
-              </configuration>
-            </plugin>
           </plugins>
         </pluginManagement>
       </build>
@@ -658,6 +643,7 @@
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>tomcat8x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -724,12 +710,6 @@
                     <classifier>webc</classifier>
                   </deployable>
                 </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.JMSOnly,org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -855,6 +835,7 @@
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <!-- EAP 7 ~= WildFly 10 -->
         <cargo.container.id>wildfly10x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -889,12 +870,6 @@
                     <classifier>ee7</classifier>
                   </deployable>
                 </deployables>
-              </configuration>
-            </plugin>
-            <plugin>
-              <artifactId>maven-failsafe-plugin</artifactId>
-              <configuration>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -1021,6 +996,7 @@
         <kie.server.controller.context>kie-server-controller-${project.version}-ee7</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>weblogic121x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -1118,7 +1094,6 @@
                 <additionalClasspathElements>
                   <additionalClasspathElement>${weblogic.home}/wlserver/server/lib/wljmsclient.jar</additionalClasspathElement>
                 </additionalClasspathElements>
-                <excludedGroups>org.kie.server.integrationtests.category.Email</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
@@ -1148,6 +1123,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>websphere85x</cargo.container.id>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -1255,7 +1231,6 @@
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_8.5.0.jar</additionalClasspathElement>
                   <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</additionalClasspathElement>
                 </additionalClasspathElements>
-                <excludedGroups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</excludedGroups>
               </configuration>
             </plugin>
           </plugins>
