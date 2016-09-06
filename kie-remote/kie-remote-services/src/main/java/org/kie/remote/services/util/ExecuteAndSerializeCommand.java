@@ -18,22 +18,27 @@ package org.kie.remote.services.util;
 import java.util.Map;
 
 import org.jbpm.services.task.commands.TaskCommand;
+import org.jbpm.services.task.impl.TaskContentRegistry;
 import org.jbpm.services.task.impl.model.xml.JaxbContent;
 import org.jbpm.services.task.impl.model.xml.JaxbTask;
+import org.jbpm.services.task.utils.ContentMarshallerHelper;
 import org.kie.api.task.model.Content;
 import org.kie.api.task.model.Task;
 import org.kie.internal.command.Context;
+import org.kie.internal.task.api.ContentMarshallerContext;
 
 public class ExecuteAndSerializeCommand<T> extends TaskCommand<T>{
 
     private TaskCommand<T> command;
+    private String deploymentId;
 
     public ExecuteAndSerializeCommand() {
 
     }
 
-    public ExecuteAndSerializeCommand(TaskCommand<T> command) {
+    public ExecuteAndSerializeCommand(TaskCommand<T> command, String deploymentId) {
         this.command = command;
+        this.deploymentId = deploymentId;
     }
 
     @Override
@@ -45,7 +50,23 @@ public class ExecuteAndSerializeCommand<T> extends TaskCommand<T>{
         if( cmdResult instanceof Task) {
             cmdResult = (T) new JaxbTask((Task) cmdResult);
         } else if( cmdResult instanceof Content) {
-            cmdResult = (T) new JaxbContent((Content) cmdResult);
+            Content content = (Content) cmdResult;
+
+            JaxbContent jaxbContent = new JaxbContent();
+            jaxbContent.setId(content.getId());
+            jaxbContent.setSerializedContent(content.getContent());
+
+            ContentMarshallerContext contentMarshallerContext = TaskContentRegistry.get().getMarshallerContext(deploymentId);
+            Object unmarshalledContent = null;
+            if (contentMarshallerContext != null) {
+                unmarshalledContent = ContentMarshallerHelper.unmarshall(content.getContent(), contentMarshallerContext.getEnvironment(), contentMarshallerContext.getClassloader());
+            } else {
+                unmarshalledContent = ContentMarshallerHelper.unmarshall(content.getContent(), null);
+            }
+            if( unmarshalledContent != null && unmarshalledContent instanceof Map ) {
+                jaxbContent.setContentMap((Map<String, Object>) unmarshalledContent);
+            }
+            cmdResult = (T) jaxbContent;
         } else if (cmdResult instanceof Map) {
             Map output = (Map) cmdResult;
             cmdResult = (T) new JaxbContent();
