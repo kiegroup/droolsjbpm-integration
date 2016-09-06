@@ -996,7 +996,7 @@
         <kie.server.controller.context>kie-server-controller-${project.version}-ee7</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>weblogic121x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -1123,7 +1123,7 @@
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>websphere85x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled</failsafe.excluded.groups>
+        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
