@@ -18,9 +18,7 @@ package org.kie.server.services.impl.storage.file;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -36,22 +34,27 @@ import org.kie.server.services.impl.storage.KieServerStateRepository;
 
 public class KieServerStateFileRepository implements KieServerStateRepository {
 
-    private static final String REPOSITORY_DIR = System.getProperty(KieServerConstants.KIE_SERVER_STATE_REPO, ".");
+    private final File repositoryDir;
 
     private XStream xs = new XStream();
 
     private Map<String, KieServerState> knownStates = new ConcurrentHashMap<String, KieServerState>();
 
-    public KieServerStateFileRepository() {
+    public KieServerStateFileRepository(File repositoryDir) {
+        this.repositoryDir = repositoryDir;
         xs.alias("kie-server-state", KieServerState.class);
         xs.alias("container", KieContainerResource.class);
         xs.alias("config-item", KieServerConfigItem.class);
     }
 
+    public KieServerStateFileRepository() {
+        this(new File(System.getProperty(KieServerConstants.KIE_SERVER_STATE_REPO, ".")));
+    }
+
     public synchronized void store(String serverId, KieServerState kieServerState) {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(REPOSITORY_DIR + File.separator + serverId + ".xml");
+            fos = new FileOutputStream(new File(repositoryDir, serverId + ".xml"));
 
             xs.toXML(kieServerState, fos);
 
@@ -75,7 +78,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
         }
 
         synchronized (knownStates) {
-            File serverStateFile = new File(REPOSITORY_DIR + File.separator + serverId + ".xml");
+            File serverStateFile = new File(repositoryDir, serverId + ".xml");
             KieServerState kieServerState = new KieServerState();
 
             if (serverStateFile.exists()) {
