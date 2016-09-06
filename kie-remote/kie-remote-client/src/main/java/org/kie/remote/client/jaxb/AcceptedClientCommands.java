@@ -86,6 +86,7 @@ public class AcceptedClientCommands {
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
         acceptedCommands.add(GetTaskCommand.class);
+        acceptedCommands.add(GetTasksByGroupCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);

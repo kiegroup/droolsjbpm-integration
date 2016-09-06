@@ -74,6 +74,7 @@ import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
 import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
 import org.kie.remote.jaxb.gen.GetTaskCommand;
 import org.kie.remote.jaxb.gen.GetTaskContentCommand;
+import org.kie.remote.jaxb.gen.GetTasksByGroupCommand;
 import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
 import org.kie.remote.jaxb.gen.GetTasksByVariousFieldsCommand;
@@ -182,6 +183,7 @@ public class JaxbCommandsRequest {
             @XmlElement(name = "get-task-as-potential-owner", type = GetTaskAssignedAsPotentialOwnerCommand.class),
             @XmlElement(name = "get-task-by-workitemid", type = GetTaskByWorkItemIdCommand.class),
             @XmlElement(name = "get-task", type = GetTaskCommand.class),
+            @XmlElement(name = "get-tasks-by-group-command", type = GetTasksByGroupCommand.class),
             @XmlElement(name = "get-tasks-by-processinstanceid", type = GetTasksByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-status-by-processinstanceid", type = GetTasksByStatusByProcessInstanceIdCommand.class),
             @XmlElement(name = "get-tasks-by-various", type = GetTasksByVariousFieldsCommand.class),
