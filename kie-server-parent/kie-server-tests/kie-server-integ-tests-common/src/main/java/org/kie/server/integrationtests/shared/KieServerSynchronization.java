@@ -20,17 +20,30 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
 
+import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
+import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.RuleServicesClient;
+import org.kie.server.client.SolverServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
 
 public class KieServerSynchronization {
 
@@ -42,7 +55,7 @@ public class KieServerSynchronization {
             RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
 
             // If job finished (to one of final states) then return.
-            if(STATUS.CANCELLED.toString().equals(result.getStatus()) ||
+            if (STATUS.CANCELLED.toString().equals(result.getStatus()) ||
                     STATUS.DONE.toString().equals(result.getStatus()) ||
                     STATUS.ERROR.toString().equals(result.getStatus())) {
                 return true;
@@ -97,6 +110,70 @@ public class KieServerSynchronization {
                 return true;
             }
             return false;
+        });
+    }
+
+    public static void waitForContainerWithReleaseId(final KieServicesClient client, final ReleaseId releaseId) throws Exception {
+        waitForCondition(() -> {
+            ReleaseIdFilter releaseIdFilter = new ReleaseIdFilter(releaseId);
+            KieContainerResourceFilter resourceFilter = new KieContainerResourceFilter(releaseIdFilter);
+
+            ServiceResponse<KieContainerResourceList> containersList = client.listContainers(resourceFilter);
+            List<KieContainerResource> containers = containersList.getResult().getContainers();
+            return containers != null && !containers.isEmpty();
+        });
+    }
+
+    public static void waitForContainerWithScannerStatus(final KieServicesClient client, final KieScannerStatus scannerStatus) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+            List<KieContainerResource> containers = containersList.getResult().getContainers();
+            if (containers != null) {
+                for (KieContainerResource container : containers) {
+                    KieScannerResource scanner = container.getScanner();
+                    if (scanner != null && scannerStatus.equals(scanner.getStatus())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
+    }
+
+    public static void waitForSolver(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<SolverInstanceList> solverListResponse = client.getSolvers(containerId);
+            SolverInstanceList solverList = solverListResponse.getResult();
+            for (SolverInstance solver : solverList.getContainers()) {
+                if (solverId.equals(solver.getSolverId())) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public static void waitForSolverStatus(final SolverServicesClient client, final String containerId, final String solverId,
+            final SolverInstance.SolverStatus status) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<SolverInstance> solverResponse = client.getSolverState(containerId, solverId);
+            return status.equals(solverResponse.getResult().getStatus());
+        });
+    }
+
+    public static void waitForCommandResult(final RuleServicesClient client, final String containerId,
+            final Command command, final String identifier, final Object value) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<ExecutionResults> response = client.executeCommandsWithResults(containerId, command);
+            ExecutionResults result = response.getResult();
+            return value.equals(result.getValue(identifier));
+        });
+    }
+
+    public static void waitForTaskStatus(final UserTaskServicesClient client, final Long taskId, final String status) throws Exception {
+        waitForCondition(() -> {
+            TaskInstance task = client.findTaskById(taskId);
+            return status.equals(task.getStatus());
         });
     }
 
