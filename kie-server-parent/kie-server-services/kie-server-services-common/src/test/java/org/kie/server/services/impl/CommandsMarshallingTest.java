@@ -21,6 +21,7 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.AgendaGroupSetFocusCommand;
 import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.drools.core.command.runtime.rule.GetObjectCommand;
 import org.drools.core.command.runtime.rule.GetObjectsCommand;
 import org.drools.core.command.runtime.rule.InsertElementsCommand;
@@ -47,15 +48,6 @@ public class CommandsMarshallingTest {
         assertEquals( "String value", command.getObject().toString() );
 
         assertEquals( xmlCommand, marshaller.marshall( command ) );
-    }
-
-    @Test
-    public void testMarshallRetractCommand() {
-        String xmlCommand = "<retract fact-handle=\"0:234:345:456:567:789\"/>";
-        DeleteCommand command = marshaller.unmarshall( xmlCommand, DeleteCommand.class );
-        assertEquals( "0:234:345:456:567:789:NON_TRAIT:null", command.getFactHandle().toExternalForm() );
-
-        assertEquals( "<retract fact-handle=\"0:234:345:456:567:789:NON_TRAIT:null\"/>", marshaller.marshall( command ) );
     }
 
     @Test
@@ -156,6 +148,22 @@ public class CommandsMarshallingTest {
         assertEquals("my-agenda-group", command.getName());
 
         assertEquals(xmlCommand, marshaller.marshall(command));
+    }
+
+    @Test
+    public void testMarshallDeleteCommand() {
+        String xmlCommand = "<delete fact-handle=\"0:234:345:456:567:789\"/>";
+        DeleteCommand command = marshaller.unmarshall(xmlCommand, DeleteCommand.class);
+
+        assertEquals("<delete fact-handle=\"0:234:345:456:567:789:NON_TRAIT:null\"/>", marshaller.marshall(command));
+    }
+
+    @Test
+    public void testMarshallGetFactHandlesCommand() {
+        String xmlCommand = "<get-fact-handles/>";
+        GetFactHandlesCommand command = marshaller.unmarshall( xmlCommand, GetFactHandlesCommand.class );
+
+        assertEquals("<get-fact-handles disconnected=\"false\"/>", marshaller.marshall(command));
     }
 
     // TODO determine what other commands are supported and add tests for them
