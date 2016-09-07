@@ -73,6 +73,7 @@ import org.jbpm.services.task.commands.GetTaskAssignedAsPotentialOwnerCommand;
 import org.jbpm.services.task.commands.GetTaskByWorkItemIdCommand;
 import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
+import org.jbpm.services.task.commands.GetTasksByGroupCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
@@ -154,6 +155,7 @@ public class AcceptedServerCommands {
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
         acceptedCommands.add(GetTaskContentCommand.class);
         acceptedCommands.add(GetTaskCommand.class);
+        acceptedCommands.add(GetTasksByGroupCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
