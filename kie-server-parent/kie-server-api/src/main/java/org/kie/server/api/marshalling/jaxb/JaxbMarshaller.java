@@ -38,6 +38,7 @@ import org.drools.core.command.runtime.rule.ClearAgendaGroupCommand;
 import org.drools.core.command.runtime.rule.ClearRuleFlowGroupCommand;
 import org.drools.core.command.runtime.rule.DeleteCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
+import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
 import org.drools.core.command.runtime.rule.UpdateCommand;
 import org.drools.core.common.DefaultFactHandle;
@@ -155,6 +156,7 @@ public class JaxbMarshaller implements Marshaller {
                 AgendaGroupSetFocusCommand.class,
                 ClearRuleFlowGroupCommand.class,
                 ClearActivationGroupCommand.class,
+                GetFactHandlesCommand.class,
 
                 KieServerConfig.class,
                 KieServerConfigItem.class,
