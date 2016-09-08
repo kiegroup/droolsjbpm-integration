@@ -16,16 +16,20 @@
 package org.kie.server.integrationtests.drools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
+import org.kie.api.command.Setter;
 import org.kie.api.runtime.ExecutionResults;
 import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResults;
@@ -50,6 +54,9 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
     private static final String PERSON_SURNAME_FIELD = "surname";
     private static final String PERSON_DUPLICATED_FIELD = "duplicated";
     private static final String PERSON_EXPECTED_SURNAME = "Vader";
+    private static final String PERSON_EXPECTED_SURNAME_AFTER_UPDATE = "Lord Vader";
+    private static final String GET_OBJECTS_IDENTIFIER = "get-objects";
+    private static final String GET_FACTS_IDENTIFIER = "facts";
 
     private static ClassLoader kjarClassLoader;
 
@@ -229,5 +236,94 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
             personResult = personFH;
             assertEquals("Expected surname to be null", null, valueOf(personResult, PERSON_SURNAME_FIELD));
         }
+    }
+
+    @Test
+    public void testFactOperationsWithFactHandles() {
+        List<Command<?>> commands = new ArrayList<Command<?>>();
+        BatchExecutionCommand executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        Object person = createInstance(PERSON_CLASS_NAME, PERSON_NAME, "");
+        commands.add(commandsFactory.newInsert(person, PERSON_1_OUT_IDENTIFIER));
+        commands.add(commandsFactory.newFireAllRules());
+
+        ServiceResponse<ExecutionResults> reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        // first call should set the surname for the inserted person
+
+        ExecutionResults actualData = reply.getResult();
+
+        Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
+
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        // and 'duplicated' flag should stay false, as only one person is in working memory
+        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
+
+        // get fact handles
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+        commands.add(commandsFactory.newGetFactHandles(GET_FACTS_IDENTIFIER));
+
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        actualData = reply.getResult();
+
+        Object facts = actualData.getValue(GET_FACTS_IDENTIFIER);
+        assertNotNull(facts);
+        assertTrue(facts instanceof Collection);
+
+        Collection<FactHandle> factHandles = (Collection<FactHandle>) facts;
+        assertEquals(1, factHandles.size());
+
+        FactHandle personFactHandle = factHandles.iterator().next();
+        assertNotNull(personFactHandle);
+
+        // modify object by fact handle
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        List<Setter> setters = Arrays.asList(commandsFactory.newSetter(PERSON_SURNAME_FIELD, "Lord Vader"));
+        commands.add(commandsFactory.newModify(personFactHandle, setters));
+        commands.add(commandsFactory.newGetFactHandles(GET_FACTS_IDENTIFIER));
+        commands.add(commandsFactory.newGetObjects(GET_OBJECTS_IDENTIFIER));
+
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        actualData = reply.getResult();
+
+        facts = actualData.getValue(GET_FACTS_IDENTIFIER);
+        assertNotNull(facts);
+        assertTrue(facts instanceof Collection);
+
+        factHandles = (Collection<FactHandle>) facts;
+        assertEquals(1, factHandles.size());
+
+        List<Object> listOfObjects = (List<Object>) actualData.getValue(GET_OBJECTS_IDENTIFIER);
+        assertEquals(1, listOfObjects.size());
+
+        Object returnedPerson = listOfObjects.get(0);
+        assertEquals("Expected surname to be set to 'Lord Vader'",
+                PERSON_EXPECTED_SURNAME_AFTER_UPDATE, valueOf(returnedPerson, PERSON_SURNAME_FIELD));
+
+        // delete object by fact handle
+        commands = new ArrayList<Command<?>>();
+        executionCommand = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+
+        commands.add(commandsFactory.newDelete(personFactHandle));
+        commands.add(commandsFactory.newGetFactHandles(GET_FACTS_IDENTIFIER));
+
+        reply = ruleClient.executeCommandsWithResults(CONTAINER_ID, executionCommand);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        actualData = reply.getResult();
+
+        facts = actualData.getValue(GET_FACTS_IDENTIFIER);
+        assertNotNull(facts);
+        assertTrue(facts instanceof Collection);
+
+        factHandles = (Collection<FactHandle>) facts;
+        assertEquals(0, factHandles.size());
     }
 }
