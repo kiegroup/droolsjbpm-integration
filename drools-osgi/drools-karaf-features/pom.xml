@@ -63,7 +63,7 @@
     <!-- Overwrites with a servicemix version -->
     <karaf.servicemix.version.com.google.protobuf>2.4.1_1</karaf.servicemix.version.com.google.protobuf>
     <karaf.servicemix.version.com.sun.xml.bind.jaxb>2.2.11_1</karaf.servicemix.version.com.sun.xml.bind.jaxb>
-    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.7_1</karaf.servicemix.version.com.thoughtworks.xstream>
+    <karaf.servicemix.version.com.thoughtworks.xstream>1.4.9_1</karaf.servicemix.version.com.thoughtworks.xstream>
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.2.0</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
