@@ -69,6 +69,7 @@
           <configuration>
             <container>
               <containerId>${cargo.container.id}</containerId>
+              <timeout>600000</timeout>
               <systemProperties>
                 <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
                 <!-- Fixes issue when Tomcat hangs during deployment due to insufficient amount of entropy.
@@ -88,7 +89,7 @@
                   <context>${kie.server.context}</context>
                 </properties>
                 <pingURL>${kie.server.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingTimeout>300000</pingTimeout>
               </deployable>
             </deployables>
             <configuration>
@@ -1011,6 +1012,7 @@
                   <systemProperties>
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WeblogicJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
                     <org.kie.server.domain>OracleDefaultLoginConfiguration</org.kie.server.domain>
                     <org.kie.executor.jms.cf>jms/cf/KIE.SERVER.EXECUTOR</org.kie.executor.jms.cf>
                     <org.kie.executor.jms.queue>jms/KIE.SERVER.EXECUTOR</org.kie.executor.jms.queue>
@@ -1027,6 +1029,10 @@
                     <dependency>
                       <groupId>xerces</groupId>
                       <artifactId>xercesImpl</artifactId>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.postgresql</groupId>
+                      <artifactId>postgresql</artifactId>
                     </dependency>
                   </dependencies>
                 </container>
@@ -1075,14 +1081,14 @@
                       cargo.resource.id=KIE.SERVER.EXECUTOR
                     </cargo.resource.resource.jms.executor.queue.request>
                     <!-- Datasource -->
-                    <cargo.datasource.datasource.h2>
-                      cargo.datasource.driver=org.h2.Driver|
-                      cargo.datasource.url=jdbc:h2:mem:test-db|
+                    <cargo.datasource.datasource.kie.server>
+                      cargo.datasource.driver=org.postgresql.xa.PGXADataSource|
+                      cargo.datasource.url=<URL like jdbc:postgresql://...>|
                       cargo.datasource.jndi=jdbc/jbpm|
-                      cargo.datasource.username=sa|
-                      cargo.datasource.password=|
+                      cargo.datasource.username=<username>|
+                      cargo.datasource.password=<password>|
                       cargo.datasource.transactionsupport=XA_TRANSACTION
-                    </cargo.datasource.datasource.h2>
+                    </cargo.datasource.datasource.kie.server>
                   </properties>
                 </configuration>
               </configuration>
@@ -1109,6 +1115,11 @@
           <groupId>xerces</groupId>
           <artifactId>xercesImpl</artifactId>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>9.3-1102-jdbc41</version>
         </dependency>
       </dependencies>
     </profile>
