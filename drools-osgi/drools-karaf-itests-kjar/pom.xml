@@ -14,12 +14,4 @@
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-itests-domain-model</artifactId>
-      <version>7.0.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-
 </project>
