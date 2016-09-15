@@ -180,12 +180,12 @@ public class KieObjectsInjector implements BeanProcessor {
 
     protected void addKieModuleToRepo(KieModuleModel kieModuleModel) {
         String rootPath = configFilePath;
-        if ( rootPath.lastIndexOf( ':' ) > 0 ) {
+        if ( rootPath.lastIndexOf( ':' ) >= 2 ) {
             rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
         }
 
         KieBuilderImpl.setDefaultsforEmptyKieModule(kieModuleModel);
-        InternalKieModule internalKieModule = ClasspathKieProject.createInternalKieModule(configFileURL, configFilePath, kieModuleModel, releaseId, rootPath);
+        InternalKieModule internalKieModule = ClasspathKieProject.createInternalKieModule(kieModuleModel, releaseId, rootPath);
         if ( internalKieModule != null ) {
             KieServices ks = KieServices.Factory.get();
             ks.getRepository().addKieModule(internalKieModule);
