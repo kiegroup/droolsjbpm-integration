@@ -56,6 +56,11 @@ public class KieContainerResolver extends AbstractKieObjectsResolver implements 
         return kieContainer;
     }
 
+    @Override
+    public void dispose() {
+        getKieContainer().dispose();
+    }
+
     public ReleaseId getReleaseId() {
         return getKieContainer().getReleaseId();
     }
