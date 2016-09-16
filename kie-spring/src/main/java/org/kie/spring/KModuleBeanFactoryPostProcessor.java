@@ -145,7 +145,7 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
         String rootPath = parseKModuleRootPath(kModuleRootUrl);
-        if (rootPath.lastIndexOf(':') >= 2) {
+        if (rootPath.lastIndexOf(':') >= 2) { // avoid to trucate Windows paths like C:\my\folder\...
             rootPath = rootPath.substring(rootPath.lastIndexOf(':') + 1);
         }
         return ClasspathKieProject.createInternalKieModule(kieProject, releaseId, rootPath);

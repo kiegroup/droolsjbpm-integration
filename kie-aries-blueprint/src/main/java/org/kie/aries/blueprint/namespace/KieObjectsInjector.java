@@ -180,7 +180,7 @@ public class KieObjectsInjector implements BeanProcessor {
 
     protected void addKieModuleToRepo(KieModuleModel kieModuleModel) {
         String rootPath = configFilePath;
-        if ( rootPath.lastIndexOf( ':' ) >= 2 ) {
+        if ( rootPath.lastIndexOf( ':' ) >= 2 ) { // avoid to trucate Windows paths like C:\my\folder\...
             rootPath = configFilePath.substring( rootPath.lastIndexOf( ':' ) + 1 );
         }
 
