@@ -145,11 +145,10 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
 
     protected InternalKieModule createKieModule(KieModuleModel kieProject) {
         String rootPath = parseKModuleRootPath(kModuleRootUrl);
-        if (rootPath.lastIndexOf(':') > 0) {
+        if (rootPath.lastIndexOf(':') >= 2) { // avoid to trucate Windows paths like C:\my\folder\...
             rootPath = rootPath.substring(rootPath.lastIndexOf(':') + 1);
         }
-        // TODO passing NULLs is bad, but those two first params are not used anyway. They need to be removed from the method.
-        return ClasspathKieProject.createInternalKieModule(null, null, kieProject, releaseId, rootPath);
+        return ClasspathKieProject.createInternalKieModule(kieProject, releaseId, rootPath);
     }
 
     private KieModuleModel fetchKieModuleModel(ConfigurableListableBeanFactory beanFactory) {
