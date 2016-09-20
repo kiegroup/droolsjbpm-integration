@@ -1,18 +1,19 @@
 /*
- * Copyright 2015 Red Hat
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.drools.karaf.itest.kieserver;
 
 import org.drools.karaf.itest.AbstractKarafIntegrationTest;
@@ -30,30 +31,30 @@ import org.slf4j.LoggerFactory;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
+
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientOnKarafIntegrationJsonTest extends BaseKieServerClientOnKarafIntegrationTest {
+public class KieServerClientKarafIntegrationJaxbIntegrationTest extends BaseKieServerClientOnKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientOnKarafIntegrationJsonTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJaxbIntegrationTest.class);
     public static final String HOST = "localhost";
-    public static final int PORT = 59600;
-    public static final String TYPE = "json";
+    public static final int PORT = 59400;
+    public static final String TYPE = "jaxb";
 
-    public KieServerClientOnKarafIntegrationJsonTest() {
+    public KieServerClientKarafIntegrationJaxbIntegrationTest() {
         serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
     }
 
     @Test
-    public void testListContainersJSON() throws Exception {
-
-        testListContainers(MarshallingFormat.JSON);
+    public void testListContainersJAXB() throws Exception {
+        testListContainers(MarshallingFormat.JAXB);
 
     }
 
     @Test
-    public void testCompleteInteractionWithKieServerJSON() throws Exception {
+    public void testCompleteInteractionWithKieServerJAXB() throws Exception {
 
-        testCompleteInteractionWithKieServer(MarshallingFormat.JSON);
+        testCompleteInteractionWithKieServer(MarshallingFormat.JAXB);
 
     }
 

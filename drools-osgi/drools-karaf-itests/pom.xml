@@ -52,6 +52,11 @@
       <artifactId>kie-remote-client</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Features XML Dependencies used by pax-exam to resolve features to be deployed during test -->
     <dependency>
@@ -114,6 +119,13 @@
     <dependency>
       <groupId>org.ops4j.pax.url</groupId>
       <artifactId>pax-url-aether</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
 
