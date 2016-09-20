@@ -18,9 +18,12 @@ package org.kie.server.api.marshalling;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
+import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.marshalling.objects.AnotherMessage;
 import org.kie.server.api.marshalling.objects.Message;
+import org.kie.server.api.model.KieContainerResourceFilter;
 
 import static org.junit.Assert.*;
 
@@ -61,4 +64,14 @@ public class XstreamMarshallerTest {
 
         assertEquals(expectedXml, testMessageString);
     }
+
+    @Test
+    public void testUnmarshallListContainersCommandWithNoFilter() {
+        String commandString = "<list-containers/>";
+        Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM, getClass().getClassLoader());
+        ListContainersCommand command = marshaller.unmarshall(commandString, ListContainersCommand.class);
+        // the default ACCEPT_ALL filter should be set
+        Assertions.assertThat(command.getKieContainerResourceFilter()).isEqualTo(KieContainerResourceFilter.ACCEPT_ALL);
+    }
+
 }
