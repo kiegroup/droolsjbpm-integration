@@ -16,11 +16,11 @@
 package org.kie.server.api.marshalling.xstream;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
@@ -65,7 +65,7 @@ public class XStreamMarshaller
 
     protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
 
-        this.xstream = XStreamXML.newXStreamMarshaller( new XStream(  ) {
+        this.xstream = XStreamXML.newXStreamMarshaller( new XStream( new PureJavaReflectionProvider() ) {
 
             protected MapperWrapper wrapMapper(MapperWrapper next) {
                 return new MapperWrapper(next) {
