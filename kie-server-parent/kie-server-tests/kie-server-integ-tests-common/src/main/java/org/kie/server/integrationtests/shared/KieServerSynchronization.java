@@ -31,6 +31,7 @@ import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -178,7 +179,7 @@ public class KieServerSynchronization {
     }
 
     public static void waitForSolverStatus(final SolverServicesClient client, final String containerId, final String solverId,
-                                           final SolverInstance.SolverStatus status) throws Exception {
+            final SolverInstance.SolverStatus status) throws Exception {
         waitForCondition(new WaitingCondition() {
             @Override
             public boolean conditionPassed() {
@@ -189,7 +190,7 @@ public class KieServerSynchronization {
     }
 
     public static void waitForCommandResult(final RuleServicesClient client, final String containerId,
-                                            final Command command, final String identifier, final Object value) throws Exception {
+            final Command command, final String identifier, final Object value) throws Exception {
         waitForCondition(new WaitingCondition() {
             @Override
             public boolean conditionPassed() {
@@ -210,6 +211,36 @@ public class KieServerSynchronization {
         });
     }
 
+    public static void waitForQuery(final QueryServicesClient client, final QueryDefinition query) throws Exception {
+        waitForCondition(new WaitingCondition() {
+            @Override
+            public boolean conditionPassed() {
+                List<QueryDefinition> queries = client.getQueries(0, 10);
+                for (QueryDefinition storedQuery : queries) {
+                    if (query.getName().equals(storedQuery.getName()) && query.getExpression().equals(storedQuery.getExpression())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+    public static void waitForQueryRemoval(final QueryServicesClient client, final QueryDefinition query) throws Exception {
+        waitForCondition(new WaitingCondition() {
+            @Override
+            public boolean conditionPassed() {
+                List<QueryDefinition> queries = client.getQueries(0, 10);
+                for (QueryDefinition storedQuery : queries) {
+                    if (query.getName().equals(storedQuery.getName())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+    }
+
     private static void waitForCondition(WaitingCondition condition) throws Exception {
         long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
@@ -223,6 +254,7 @@ public class KieServerSynchronization {
     }
 
     private interface WaitingCondition {
+
         /**
          * @return True if condition we wait for happened, false otherwise.
          */
