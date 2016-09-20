@@ -15,6 +15,8 @@
 
 package org.kie.server.integrationtests.jbpm.jms;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,8 +59,6 @@ import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
-
-import static org.assertj.core.api.Assertions.*;
 
 @Category({JMSOnly.class})
 public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -164,12 +164,12 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
-    public void testQueryRegistrationUseOfFireAndForgetResponseHandler() {
+    public void testQueryRegistrationUseOfFireAndForgetResponseHandler() throws Exception {
         testQueryRegistration(new FireAndForgetResponseHandler());
     }
 
     @Test
-    public void testQueryRegistrationUseOfAsyncResponseHandler() {
+    public void testQueryRegistrationUseOfAsyncResponseHandler() throws Exception {
         ResponseCallback callback = new BlockingResponseCallback(null);
         testQueryRegistration(new AsyncResponseHandler(callback));
     }
@@ -312,7 +312,7 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
     }
 
-    private void testQueryRegistration(ResponseHandler responseHandler) {
+    private void testQueryRegistration(ResponseHandler responseHandler) throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(CONTAINER_ID));
@@ -329,6 +329,8 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         queryClient.registerQuery(query);
 
         queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForQuery(queryClient, query);
+
         List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
         assertThat(tasks).isNotNull().hasSize(1);
         Long taskId = tasks.get(0).getId();
@@ -339,6 +341,8 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         queryClient.replaceQuery(query);
 
         queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForQuery(queryClient, query);
+
         tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
         assertThat(tasks).isNotNull().isEmpty();
 
@@ -353,8 +357,7 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         queryClient.unregisterQuery(query.getName());
 
         queryClient.setResponseHandler(new RequestReplyResponseHandler());
-        List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-        assertThat(queries).isNotNull().isEmpty();
+        KieServerSynchronization.waitForQueryRemoval(queryClient, query);
     }
 
     private void testStartProcessWithGlobalConfiguration(ResponseHandler responseHandler) throws Exception {

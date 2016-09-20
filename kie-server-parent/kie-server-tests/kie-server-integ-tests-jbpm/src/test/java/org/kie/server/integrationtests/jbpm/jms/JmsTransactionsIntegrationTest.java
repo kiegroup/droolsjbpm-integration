@@ -14,17 +14,20 @@
 */
 package org.kie.server.integrationtests.jbpm.jms;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import javax.transaction.UserTransaction;
 
 import bitronix.tm.TransactionManagerServices;
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized;
@@ -44,8 +47,7 @@ import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.category.Transactional;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static org.assertj.core.api.Assertions.*;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 @Category({JMSOnly.class, Transactional.class})
 public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -72,6 +74,8 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
     private PoolingConnectionFactory connectionFactory;
     private UserTransaction transaction;
 
+    private ProcessServicesClient transactionalProcessClient;
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
@@ -80,7 +84,8 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
         createContainer(CONTAINER_ID, RELEASE_ID);
     }
 
-    private ProcessServicesClient createTransactionalProcessClient(List<String> capabilities) throws Exception {
+    @Before
+    public void createTransactionalProcessClient() throws Exception {
         TransactionManagerServices.getConfiguration().setJournal("null").setGracefulShutdownInterval(2);
         transaction = TransactionManagerServices.getTransactionManager();
 
@@ -95,12 +100,15 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
         connectionFactory.init();
         jmsConfiguration.setConnectionFactory(connectionFactory);
 
+        List<String> capabilities = new ArrayList<String>();
+        capabilities.add(KieServerConstants.CAPABILITY_BPM);
         jmsConfiguration.setCapabilities(capabilities);
+
         jmsConfiguration.setJmsTransactional(true);
         jmsConfiguration.setResponseHandler(responseHandler);
 
         KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(jmsConfiguration);
-        return kieServicesClient.getServicesClient(ProcessServicesClient.class);
+        transactionalProcessClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
     }
 
     @After
@@ -113,10 +121,6 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testTransactionCommit() throws Exception {
-        List<String> capabilities = new ArrayList<String>();
-        capabilities.add(KieServerConstants.CAPABILITY_BPM);
-        ProcessServicesClient transactionalProcessClient = createTransactionalProcessClient(capabilities);
-
         transaction.begin();
 
         Long processInstanceId = transactionalProcessClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
@@ -124,17 +128,11 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
         transaction.commit();
 
-        List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 10);
-        assertThat(processInstances).isNotNull().hasSize(1);
-        assertThat(processInstances.get(0).getProcessId()).isEqualTo(PROCESS_ID_USERTASK);
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
     }
 
     @Test
     public void testTransactionRollback() throws Exception {
-        List<String> capabilities = new ArrayList<String>();
-        capabilities.add(KieServerConstants.CAPABILITY_BPM);
-        ProcessServicesClient transactionalProcessClient = createTransactionalProcessClient(capabilities);
-
         transaction.begin();
 
         Long processInstanceId = transactionalProcessClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
