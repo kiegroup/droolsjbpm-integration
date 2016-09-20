@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerConfig;
@@ -36,7 +37,7 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
     private final File repositoryDir;
 
-    private XStream xs = new XStream();
+    private XStream xs = new XStream(new PureJavaReflectionProvider());
 
     private Map<String, KieServerState> knownStates = new ConcurrentHashMap<String, KieServerState>();
 

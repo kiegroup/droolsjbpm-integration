@@ -18,6 +18,7 @@ package org.kie.server.api.marshalling;
 import java.util.Set;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
@@ -32,7 +33,7 @@ public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
             return new XStreamMarshaller(classes, classLoader) {
                 @Override
                 protected void buildMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
-                    xstream = new XStream(new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
+                    xstream = new XStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
                 }
             };
         }
