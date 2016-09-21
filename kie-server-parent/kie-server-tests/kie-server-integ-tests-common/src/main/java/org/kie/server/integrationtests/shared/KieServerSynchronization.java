@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
@@ -32,6 +33,7 @@ import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -175,6 +177,22 @@ public class KieServerSynchronization {
             TaskInstance task = client.findTaskById(taskId);
             return status.equals(task.getStatus());
         });
+    }
+
+    public static void waitForQuery(final QueryServicesClient client, final QueryDefinition query) throws Exception {
+        waitForCondition(() -> !client.getQueries(0, 10).stream()
+                .filter(q -> query.getName().equals(q.getName()) && query.getExpression().equals(q.getExpression()))
+                .collect(Collectors.toList())
+                .isEmpty()
+        );
+    }
+
+    public static void waitForQueryRemoval(final QueryServicesClient client, final QueryDefinition query) throws Exception {
+        waitForCondition(() -> client.getQueries(0, 10).stream()
+                .filter(q -> query.getName().equals(q.getName()))
+                .collect(Collectors.toList())
+                .isEmpty()
+        );
     }
 
     /**
