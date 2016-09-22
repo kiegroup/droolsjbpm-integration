@@ -17,12 +17,15 @@ package org.kie.server.services.impl;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerStatus;
-import org.kie.server.api.model.ReleaseId;
+import org.kie.api.KieServices;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.services.api.KieContainerInstance;
 
 import java.util.HashSet;
@@ -53,9 +56,37 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         super();
         this.kieContainer = kieContainer;
         this.resource = new KieContainerResource(containerId, releaseId, status);
+        // set the default scanner state to DISPOSED (which is the actual default state)
+        // this way we don't need to do null checks all around for the scanner resource
+        this.resource.setScanner(new KieScannerResource(KieScannerStatus.DISPOSED));
         this.marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>();
         this.serviceContainer = new ConcurrentHashMap<String, Object>();
         updateReleaseId();
+    }
+
+    /**
+     * Maps the {@link InternalKieScanner.Status} to a scanner status used by KIE Server.
+     *
+     * @param status {@link InternalKieScanner.Status} to be converted
+     *
+     * @return {@link KieScannerStatus} which maps to the specified {@link InternalKieScanner.Status}
+     */
+    public static KieScannerStatus mapScannerStatus(InternalKieScanner.Status status) {
+        switch (status) {
+            case STARTING:
+                return KieScannerStatus.CREATED;
+            case RUNNING:
+                return KieScannerStatus.STARTED;
+            case SCANNING:
+            case UPDATING:
+                return KieScannerStatus.SCANNING;
+            case STOPPED:
+                return KieScannerStatus.STOPPED;
+            case SHUTDOWN:
+                return KieScannerStatus.DISPOSED;
+            default:
+                return KieScannerStatus.UNKNOWN;
+        }
     }
 
     public String getContainerId() {
@@ -100,20 +131,48 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         this.resource = resource;
     }
 
-    public void setScanner(InternalKieScanner scanner) {
-        this.scanner = scanner;
-    }
-
     public InternalKieScanner getScanner() {
         return this.scanner;
     }
 
-    protected void updateReleaseId() {
-        if ( kieContainer != null ) {
-            this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
-            this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
+    public void createScanner() {
+        this.scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kieContainer);
+        // we also need to update the underlaying scanner resource to avoid inconsistency
+        KieScannerStatus status = KieContainerInstanceImpl.mapScannerStatus(scanner.getStatus());
+        long pollingInterval = scanner.getPollingInterval();
+        resource.setScanner(new KieScannerResource(status, pollingInterval));
+    }
+
+    public void startScanner(long pollingInterval) {
+        if (this.scanner == null) {
+            throw new IllegalStateException("Can not start non-existing (null) scanner!");
         }
-        disposeMarshallers();
+        this.scanner.start(pollingInterval);
+        this.getResource().setScanner(new KieScannerResource(KieScannerStatus.STARTED, pollingInterval));
+    }
+
+    public void scanNow() {
+        if (this.scanner == null) {
+            throw new IllegalStateException("Can not run (scanNow) non-existing (null) scanner!");
+        }
+        this.scanner.scanNow();
+    }
+
+    public void stopScanner() {
+        if (this.scanner == null) {
+            throw new IllegalStateException("Can not stop non-existing (null) scanner!");
+        }
+        this.scanner.stop();
+        this.getResource().getScanner().setStatus(KieScannerStatus.STOPPED);
+    }
+
+    public void disposeScanner() {
+        if (this.scanner == null) {
+            throw new IllegalStateException("Can not dispose non-existing (null) scanner!");
+        }
+        this.scanner.shutdown();
+        this.scanner = null;
+        this.getResource().setScanner(new KieScannerResource(KieScannerStatus.DISPOSED));
     }
 
     public Marshaller getMarshaller(MarshallingFormat format) {
@@ -175,6 +234,14 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     @Override
     public String toString() {
         return resource.toString();
+    }
+
+    protected void updateReleaseId() {
+        if ( kieContainer != null ) {
+            this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
+            this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
+        }
+        disposeMarshallers();
     }
 
 }
