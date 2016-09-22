@@ -260,6 +260,7 @@ public class KieServerImpl {
                                     ci.getResource().setStatus(KieContainerStatus.FAILED);
                                     return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, errorMessage);
                                 }
+                                ci.getResource().setScanner(scannerResponse.getResult());
                             }
 
                             ci.getResource().setStatus(KieContainerStatus.STARTED);
@@ -308,7 +309,7 @@ public class KieServerImpl {
         try {
             List<KieContainerResource> containers = new ArrayList<KieContainerResource>();
             for (KieContainerInstanceImpl instance : context.getContainers()) {
-                instance.getResource().setMessages(getMessagesForContainer(instance.getContainerId()));
+                setKieContainerResource(instance);
                 containers.add(instance.getResource());
             }
             KieContainerResourceList cil = new KieContainerResourceList(containers);
@@ -324,10 +325,7 @@ public class KieServerImpl {
         try {
             KieContainerInstanceImpl ci = context.getContainer(id);
             if (ci != null) {
-                if( ci.getResource().getScanner() == null ) {
-                    ci.getResource().setScanner( getScannerResource( ci ) );
-                }
-                ci.getResource().setMessages(getMessagesForContainer(id));
+                setKieContainerResource(ci);
                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Info for container " + id, ci.getResource());
             }
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
@@ -336,6 +334,13 @@ public class KieServerImpl {
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Error retrieving container info: " +
                     e.getClass().getName() + ": " + e.getMessage());
         }
+    }
+
+    private void setKieContainerResource(KieContainerInstanceImpl kci) {
+        if (kci.getResource().getScanner() == null) {
+            kci.getResource().setScanner(getScannerResource(kci));
+        }
+        kci.getResource().setMessages(getMessagesForContainer(kci.getContainerId()));
     }
 
     public ServiceResponse<Void> disposeContainer(String containerId) {
