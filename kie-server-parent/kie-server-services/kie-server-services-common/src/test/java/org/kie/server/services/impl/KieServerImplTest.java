@@ -106,11 +106,13 @@ public class KieServerImplTest {
         KieContainerResource kieContainerResource = new KieContainerResource(containerId, new ReleaseId(releaseId));
         KieScannerResource kieScannerResource = new KieScannerResource(KieScannerStatus.STARTED, 20000L);
         kieContainerResource.setScanner(kieScannerResource);
-        kieServer.createContainer(containerId, kieContainerResource);
+        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, kieContainerResource);
+        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        Assertions.assertThat(createResponse.getResult().getScanner()).isEqualTo(kieScannerResource);
 
-        ServiceResponse<KieContainerResource> response = kieServer.getContainerInfo(containerId);
-        Assertions.assertThat(response.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
-        Assertions.assertThat(response.getResult().getScanner()).isEqualTo(kieScannerResource);
+        ServiceResponse<KieContainerResource> getResponse = kieServer.getContainerInfo(containerId);
+        Assertions.assertThat(getResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        Assertions.assertThat(getResponse.getResult().getScanner()).isEqualTo(kieScannerResource);
     }
 
     private void createEmptyKjar(String artifactId) {
