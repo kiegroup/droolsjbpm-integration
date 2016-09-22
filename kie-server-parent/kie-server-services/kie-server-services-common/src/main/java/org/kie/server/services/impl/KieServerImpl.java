@@ -16,7 +16,6 @@
 package org.kie.server.services.impl;
 
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
-import org.drools.compiler.kie.builder.impl.InternalKieScanner;
 import org.drools.compiler.kproject.xml.DependencyFilter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
@@ -192,7 +191,6 @@ public class KieServerImpl {
 
     }
 
-
     public List<KieServerExtension> getServerExtensions() {
         return this.context.getServerExtensions();
     }
@@ -339,10 +337,7 @@ public class KieServerImpl {
         try {
             KieContainerInstanceImpl ci = context.getContainer(id);
             if (ci != null) {
-                if( ci.getResource().getScanner() == null ) {
-                    ci.getResource().setScanner( getScannerResource( ci ) );
-                }
-                ci.getResource().setMessages(getMessagesForContainer(id));
+                setMessages(ci);
                 return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Info for container " + id, ci.getResource());
             }
             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
@@ -353,10 +348,14 @@ public class KieServerImpl {
         }
     }
 
+    private void setMessages(KieContainerInstanceImpl kci) {
+        kci.getResource().setMessages(getMessagesForContainer(kci.getContainerId()));
+    }
+
     public ServiceResponse<Void> disposeContainer(String containerId) {
         List<Message> messages = new CopyOnWriteArrayList<Message>();
         try {
-            KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.unregisterContainer(containerId);
+            KieContainerInstanceImpl kci = context.unregisterContainer(containerId);
             if (kci != null) {
                 synchronized (kci) {
                     kci.setStatus(KieContainerStatus.DISPOSING); // just in case
@@ -440,7 +439,6 @@ public class KieServerImpl {
             KieContainerInstanceImpl kci = context.getContainer(id);
             if (kci != null && kci.getKieContainer() != null) {
                 KieScannerResource info = getScannerResource( kci );
-                kci.getResource().setScanner( info );
                 return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS, "Scanner info successfully retrieved", info);
             } else {
                 return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -454,14 +452,7 @@ public class KieServerImpl {
     }
 
     private KieScannerResource getScannerResource(KieContainerInstanceImpl kci) {
-        InternalKieScanner scanner = kci.getScanner();
-        KieScannerResource info = null;
-        if (scanner != null) {
-            info = new KieScannerResource(mapStatus(scanner.getStatus()), scanner.getPollingInterval());
-        } else {
-            info = new KieScannerResource(KieScannerStatus.DISPOSED);
-        }
-        return info;
+        return kci.getResource().getScanner();
     }
 
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
@@ -472,13 +463,11 @@ public class KieServerImpl {
         try {
             KieContainerInstanceImpl kci = context.getContainer(id);
             if (kci != null && kci.getKieContainer() != null) {
-                // synchronize over the container instance to avoid inconsistent sate in case of concurrent updateScanner calls
+                // synchronize over the container instance to avoid inconsistent state in case of concurrent updateScanner calls
                 synchronized (kci) {
-                    ServiceResponse<KieScannerResource> result = configureScanner(id, kci, resource);
-                    KieScannerResource scannerResource = result.getResult();
-                    kci.getResource().setScanner(result.getResult()); // might be null, but that is ok
-                    storeScannerState(kci.getContainerId(), scannerResource);
-                    return result;
+                    ServiceResponse<KieScannerResource> scannerResponse = configureScanner(id, kci, resource);
+                    storeScannerState(kci.getContainerId(), kci.getResource().getScanner());
+                    return scannerResponse;
                 }
             } else {
                 return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
@@ -501,16 +490,16 @@ public class KieServerImpl {
                 result = createScanner(containerId, kci);
                 break;
             case STARTED:
-                result = startScanner(containerId, scannerResource, kci);
+                result = startScanner(containerId, scannerResource.getPollInterval(), kci);
                 break;
             case STOPPED:
-                result = stopScanner(containerId, scannerResource, kci);
+                result = stopScanner(containerId, kci);
                 break;
             case SCANNING:
-                result = scanNow(containerId, scannerResource, kci);
+                result = scanNow(containerId, kci);
                 break;
             case DISPOSED:
-                result = disposeScanner(containerId, scannerResource, kci);
+                result = disposeScanner(containerId, kci);
                 break;
             default:
                 // error
@@ -518,6 +507,7 @@ public class KieServerImpl {
                         "Unknown status '" + scannerStatus + "' for scanner on container " + containerId + ".");
                 break;
         }
+        kci.getResource().setScanner(result.getResult());
         return result;
     }
 
@@ -537,7 +527,7 @@ public class KieServerImpl {
         repository.store(KieServerEnvironment.getServerId(), currentState);
     }
 
-    private ServiceResponse<KieScannerResource> startScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
+    private ServiceResponse<KieScannerResource> startScanner(String id, Long scannerPollInterval, KieContainerInstanceImpl kci) {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
@@ -546,33 +536,33 @@ public class KieServerImpl {
                 return response;
             }
         }
-        if (KieScannerStatus.STOPPED.equals(mapStatus(kci.getScanner().getStatus())) &&
-                resource.getPollInterval() != null) {
-            kci.getScanner().start(resource.getPollInterval());
+        KieScannerStatus scannerStatus = mapScannerStatus(kci);
+        if (KieScannerStatus.STOPPED.equals(scannerStatus) &&
+                scannerPollInterval != null) {
+            kci.startScanner(scannerPollInterval);
 
-            messages.add(new Message(Severity.INFO, "Kie scanner successfully started with interval " + resource.getPollInterval()));
+            messages.add(new Message(Severity.INFO, "Kie scanner successfully started with interval " + scannerPollInterval));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
                     "Kie scanner successfully created.",
                     getScannerResource(kci));
-        } else if (!KieScannerStatus.STOPPED.equals(mapStatus(kci.getScanner().getStatus()))) {
-            KieScannerStatus kss = mapStatus(kci.getScanner().getStatus());
-            messages.add(new Message(Severity.WARN, "Invalid kie scanner status: " + kss));
+        } else if (!KieScannerStatus.STOPPED.equals(scannerStatus)) {
+            messages.add(new Message(Severity.WARN, "Invalid kie scanner status: " + scannerStatus));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid kie scanner status: " + kss,
+                    "Invalid kie scanner status: " + scannerStatus,
                     getScannerResource(kci));
-        } else if (resource.getPollInterval() == null) {
-            messages.add(new Message(Severity.WARN, "Invalid polling interval: " + resource.getPollInterval()));
+        } else if (scannerPollInterval == null) {
+            messages.add(new Message(Severity.WARN, "Invalid polling interval: null"));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid polling interval: " + resource.getPollInterval(),
+                    "Invalid polling interval: null",
                     getScannerResource(kci));
         }
         messages.add(new Message(Severity.ERROR, "Unknown error starting scanner. Scanner was not started."));
         return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                "Unknown error starting scanner. Scanner was not started." + resource,
+                "Unknown error starting scanner. Scanner was not started.",
                 getScannerResource(kci));
     }
 
-    private ServiceResponse<KieScannerResource> stopScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
+    private ServiceResponse<KieScannerResource> stopScanner(String id, KieContainerInstanceImpl kci) {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
@@ -580,74 +570,74 @@ public class KieServerImpl {
                     "Invalid call. Scanner is not instantiated. ",
                     getScannerResource(kci));
         }
-        if (KieScannerStatus.STARTED.equals(mapStatus(kci.getScanner().getStatus())) ||
-                KieScannerStatus.SCANNING.equals(mapStatus(kci.getScanner().getStatus()))) {
-            kci.getScanner().stop();
+        if (KieScannerStatus.STARTED.equals(mapScannerStatus(kci)) ||
+                KieScannerStatus.SCANNING.equals(mapScannerStatus(kci))) {
+            kci.stopScanner();
             messages.add(new Message(Severity.INFO, "Kie scanner successfully stopped."));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
                     "Kie scanner successfully stopped.",
                     getScannerResource(kci));
         } else {
-            KieScannerStatus kss = mapStatus(kci.getScanner().getStatus());
-
-            messages.add(new Message(Severity.WARN, "Invalid kie scanner status: " + kss));
+            KieScannerStatus scannerStatus = mapScannerStatus(kci);
+            messages.add(new Message(Severity.WARN, "Invalid kie scanner status: " + scannerStatus));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid kie scanner status: " + kss,
+                    "Invalid kie scanner status: " + scannerStatus,
                     getScannerResource(kci));
         }
     }
 
-    private ServiceResponse<KieScannerResource> scanNow(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
+    private ServiceResponse<KieScannerResource> scanNow(String id, KieContainerInstanceImpl kci) {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             createScanner( id, kci );
         }
-        KieScannerStatus kss = mapStatus( kci.getScanner().getStatus() );
-        if (KieScannerStatus.STOPPED.equals( kss ) || KieScannerStatus.CREATED.equals( kss ) || KieScannerStatus.STARTED.equals( kss )) {
-            kci.getScanner().scanNow();
+        KieScannerStatus scannerStatus = mapScannerStatus(kci);
+        if (KieScannerStatus.STOPPED.equals( scannerStatus ) || KieScannerStatus.CREATED.equals( scannerStatus ) || KieScannerStatus.STARTED.equals( scannerStatus )) {
+            kci.scanNow();
             messages.add(new Message(Severity.INFO, "Kie scanner successfully invoked."));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
                     "Scan successfully executed.",
                     getScannerResource(kci));
         } else {
-            messages.add(new Message(Severity.WARN,  "Invalid kie scanner status: " + kss));
+            messages.add(new Message(Severity.WARN,  "Invalid kie scanner status: " + scannerStatus));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid kie scanner status: " + kss,
+                    "Invalid kie scanner status: " + scannerStatus,
                     getScannerResource(kci));
         }
     }
 
-    private ServiceResponse<KieScannerResource> disposeScanner(String id, KieScannerResource resource, KieContainerInstanceImpl kci) {
+    private ServiceResponse<KieScannerResource> disposeScanner(String id, KieContainerInstanceImpl kci) {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                    "Invalid call. Scanner already disposed. ",
+                    "Invalid call. Scanner already disposed.",
                     getScannerResource(kci));
         }
-        if (KieScannerStatus.STARTED.equals(mapStatus(kci.getScanner().getStatus())) ||
-                KieScannerStatus.SCANNING.equals(mapStatus(kci.getScanner().getStatus()))) {
-            ServiceResponse<KieScannerResource> response = stopScanner(id, resource, kci);
+        if (KieScannerStatus.STARTED.equals(mapScannerStatus(kci)) ||
+                KieScannerStatus.SCANNING.equals(mapScannerStatus(kci))) {
+            ServiceResponse<KieScannerResource> response = stopScanner(id, kci);
             if (ResponseType.FAILURE.equals(response.getType())) {
                 return response;
             }
         }
-        kci.getScanner().shutdown();
-        kci.setScanner(null);
-        messages.add(new Message(Severity.INFO, "Kie scanner successfully created."));
+        kci.disposeScanner();
+        messages.add(new Message(Severity.INFO, "Kie scanner successfully disposed (shut down)."));
         return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
-                "Kie scanner successfully shutdown.",
+                "Kie scanner successfully disposed (shut down).",
                 getScannerResource(kci));
+    }
+
+    private KieScannerStatus mapScannerStatus(KieContainerInstanceImpl kieContainerInstance) {
+        return KieContainerInstanceImpl.mapScannerStatus(kieContainerInstance.getScanner().getStatus());
     }
 
     private ServiceResponse<KieScannerResource> createScanner(String id, KieContainerInstanceImpl kci) {
         if (kci.getScanner() == null) {
             List<Message> messages = getMessagesForContainer(id);
             messages.clear();
-            InternalKieScanner scanner = (InternalKieScanner) KieServices.Factory.get().newKieScanner(kci.getKieContainer());
-            kci.setScanner(scanner);
-
+            kci.createScanner();
             messages.add(new Message(Severity.INFO, "Kie scanner successfully created."));
             return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
                     "Kie scanner successfully created.",
@@ -774,24 +764,6 @@ public class KieServerImpl {
         } catch (Exception e) {
             logger.error("Error when loading server state due to {}", e.getMessage(), e);
             return new ServiceResponse<KieServerStateInfo>(ResponseType.FAILURE, "Error when loading server state due to " + e.getMessage());
-        }
-    }
-
-    private KieScannerStatus mapStatus(InternalKieScanner.Status status) {
-        switch (status) {
-            case STARTING:
-                return KieScannerStatus.CREATED;
-            case RUNNING:
-                return KieScannerStatus.STARTED;
-            case SCANNING:
-            case UPDATING:
-                return KieScannerStatus.SCANNING;
-            case STOPPED:
-                return KieScannerStatus.STOPPED;
-            case SHUTDOWN:
-                return KieScannerStatus.DISPOSED;
-            default:
-                return KieScannerStatus.UNKNOWN;
         }
     }
 
