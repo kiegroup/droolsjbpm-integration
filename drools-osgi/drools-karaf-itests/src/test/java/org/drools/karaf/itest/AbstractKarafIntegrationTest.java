@@ -167,8 +167,9 @@ abstract public class AbstractKarafIntegrationTest {
         }
         
         options.add(localMavenRepoOption());
+        options.add(propagateSystemProperty("kie.maven.settings.custom"));
 
-        /* Add aditional Maven repositories */
+        /* Add additional Maven repositories */
         String additionalMavenRepositories = "";
         if (System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS) != null) {
             additionalMavenRepositories = "," + System.getProperty(PROP_ADDITIONAL_MAVEN_REPOS);
