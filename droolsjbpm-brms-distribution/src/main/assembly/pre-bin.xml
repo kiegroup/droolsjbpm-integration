@@ -22,11 +22,11 @@
         <include>org.kie.remote:kie-remote-common</include>
         <include>org.kie.server:kie-server-api</include>
         <include>org.kie.server:kie-server-client</include>
+        <include>org.kie:kie-karaf-features</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
-        <include>org.drools:drools-karaf-features</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-pmml</include>
         <include>org.drools:drools-reteoo</include>
@@ -53,11 +53,11 @@
         <exclude>org.kie.remote:kie-remote-common</exclude>
         <exclude>org.kie.server:kie-server-api</exclude>
         <exclude>org.kie.server:kie-server-client</exclude>
+        <exclude>org.kie:kie-karaf-features</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
-        <exclude>org.drools:drools-karaf-features</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-pmml</exclude>
         <exclude>org.drools:drools-reteoo</exclude>

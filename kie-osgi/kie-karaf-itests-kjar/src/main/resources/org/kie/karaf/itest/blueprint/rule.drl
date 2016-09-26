@@ -1,0 +1,26 @@
+package org.kie.karaf.itest.blueprint;
+
+import org.kie.karaf.itest.blueprint.domain.Customer;
+import org.kie.karaf.itest.blueprint.domain.Drink;
+import org.kie.karaf.itest.blueprint.domain.Order;
+
+rule "approve non-alcoholic drink"
+when
+  order: Order(isApproved() == null, drink.containsAlcohol == false)
+then
+  order.approve();
+end
+
+rule "approve alcoholic drink"
+when
+  order: Order(isApproved() == null, drink.containsAlcohol, customer.ageInYears >= 18)
+then
+  order.approve();
+end
+
+rule "disapprove alcoholic drink for too young customer"
+when
+  order: Order(isApproved() == null, drink.containsAlcohol, customer.ageInYears < 18)
+then
+  order.disapprove();
+end

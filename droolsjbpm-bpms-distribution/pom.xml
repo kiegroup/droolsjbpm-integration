@@ -161,8 +161,8 @@
       <artifactId>drools-jsr94</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-features</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-karaf-features</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
