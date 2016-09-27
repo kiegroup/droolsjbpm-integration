@@ -69,8 +69,6 @@
     <module>kie-security</module>
     <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
     <!-- <module>drools-examples-android</module> -->
-    <!-- Temporarily disabled due to nexus-staging-maven-plugin bug of Rule "sources-staging" failures -->
-    <!-- <module>droolsjbpm-integration-tests</module> -->
   </modules>
 
   <dependencyManagement>
