@@ -31,30 +31,30 @@ import org.slf4j.LoggerFactory;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
-
 @RunWith(PaxExamWithWireMock.class)
 @ExamReactorStrategy(PerMethod.class)
-public class KieServerClientKarafIntegrationJaxbTest extends BaseKieServerClientKarafIntegrationTest {
+public class KieServerClientKarafIntegrationJsonIntegrationTest extends BaseKieServerClientKarafIntegrationTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJaxbTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationJsonIntegrationTest.class);
     public static final String HOST = "localhost";
-    public static final int PORT = 59400;
-    public static final String TYPE = "jaxb";
+    public static final int PORT = 59600;
+    public static final String TYPE = "json";
 
-    public KieServerClientKarafIntegrationJaxbTest() {
+    public KieServerClientKarafIntegrationJsonIntegrationTest() {
         serverUrl = System.getProperty("org.kie.server.itest.server.url", "http://" + HOST + ":" + PORT);
     }
 
     @Test
-    public void testListContainersJAXB() throws Exception {
-        testListContainers(MarshallingFormat.JAXB);
+    public void testListContainersJSON() throws Exception {
+
+        testListContainers(MarshallingFormat.JSON);
 
     }
 
     @Test
-    public void testCompleteInteractionWithKieServerJAXB() throws Exception {
+    public void testCompleteInteractionWithKieServerJSON() throws Exception {
 
-        testCompleteInteractionWithKieServer(MarshallingFormat.JAXB);
+        testCompleteInteractionWithKieServer(MarshallingFormat.JSON);
 
     }
 

@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -86,6 +88,15 @@ abstract public class AbstractKarafIntegrationTest {
      * property in "org.ops4j.pax.url.mvn.cfg" configuration file.
      */
     public static final String PROP_ADDITIONAL_MAVEN_REPOS = "karaf.maven.repos";
+
+    /**
+     * Defines location of local Maven settings XML file.
+     */
+    public static final String SYSTEM_PROP_MAVEN_CUSTOM_SETTINGS = "kie.maven.settings.custom";
+
+    public static final String TEST_PROPERTIES_FILE = "test.properties";
+
+    public static final String KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY = "kie.maven.settings.custom";
 
     private static final transient Logger logger = LoggerFactory.getLogger(AbstractKarafIntegrationTest.class);
 
@@ -194,7 +205,8 @@ abstract public class AbstractKarafIntegrationTest {
                 //                systemProperty("org.ops4j.pax.url.mvn.localRepository").value(new File(localRepo).getAbsolutePath()));
                 editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                         "org.ops4j.pax.url.mvn.localRepository",
-                        new File(localRepo).getAbsolutePath()));
+                        new File(localRepo).getAbsolutePath()),
+                systemProperty(SYSTEM_PROP_MAVEN_CUSTOM_SETTINGS).value(kieCustomMavenSettingsXML()));
     }
 
     public static MavenArtifactProvisionOption getFeaturesUrl(String groupId, String artifactId, String version) {
@@ -226,4 +238,14 @@ abstract public class AbstractKarafIntegrationTest {
         return loadKieFeatures(features.toArray(new String[features.size()]));
     }
 
+    private static String kieCustomMavenSettingsXML() {
+        InputStream testPropertiesStream = AbstractKarafIntegrationTest.class.getClassLoader().getResourceAsStream(TEST_PROPERTIES_FILE);
+        Properties testProperties = new Properties();
+        try {
+            testProperties.load(testPropertiesStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read test.properties file", e);
+        }
+        return testProperties.getProperty(KIE_MAVEN_SETTINGS_CUSTOM_PROPERTY);
+    }
 }

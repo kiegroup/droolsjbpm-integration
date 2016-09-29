@@ -11,6 +11,17 @@
   <artifactId>kie-karaf-itests</artifactId>
   <name>KIE :: Karaf Integration Tests</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.drools.testcoverage</groupId>
+        <artifactId>drools-test-suite</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.drools</groupId>
@@ -40,6 +51,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -115,6 +131,20 @@
     <dependency>
       <groupId>org.ops4j.pax.url</groupId>
       <artifactId>pax-url-aether</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.drools.testcoverage</groupId>
+      <artifactId>drools-test-suite</artifactId>
+      <type>test-jar</type>
       <scope>test</scope>
     </dependency>
 
