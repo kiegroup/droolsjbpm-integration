@@ -44,8 +44,11 @@ public class InjectReactiveMojo extends AbstractKieMojo {
     @Parameter(required = true, defaultValue = "${project.build.outputDirectory}")
     private File outputDirectory;
     
+    @Parameter(alias = "instrument-enabled", property = "kie.instrument.enabled", defaultValue = "false")
+    private boolean enabled;
+    
     @Parameter(alias = "instrument-failOnError", property = "kie.instrument.failOnError", defaultValue = "true")
-    private boolean failOnError = true;
+    private boolean failOnError;
     
     /*
      * DO NOT add a default to @Parameter annotation as it buggy to assign it regardless
@@ -55,6 +58,11 @@ public class InjectReactiveMojo extends AbstractKieMojo {
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (!enabled) {
+            getLog().debug("Configuration for instrument-enabled is false, skipping goal 'injectreactive' execute() end.");
+            return;
+        }
+        
         if (instrumentPackages.length == 0) {
             getLog().debug("No configuration passed for instrument-packages, default to '*' .");
             instrumentPackages = new String[]{"*"};

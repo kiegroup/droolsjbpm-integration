@@ -35,6 +35,7 @@
         <version>${it-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
+            <instrument-enabled>true</instrument-enabled>
             <instrument-failOnError>true</instrument-failOnError>
             <instrument-packages>
                 <instrumentPackage>to.instrument</instrumentPackage>
