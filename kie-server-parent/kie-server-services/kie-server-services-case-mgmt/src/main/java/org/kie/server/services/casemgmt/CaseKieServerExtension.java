@@ -56,7 +56,7 @@ public class CaseKieServerExtension implements KieServerExtension {
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_CASE_SERVER_EXT_DISABLED, "false"));
     private static final Boolean jbpmDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
-    private String persistenceUnitName = "org.jbpm.domain";
+    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
 
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;

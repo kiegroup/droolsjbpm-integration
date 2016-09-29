@@ -27,8 +27,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.KieServerEnvironment;
+import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.storage.KieServerState;
@@ -37,6 +39,7 @@ import org.kie.server.services.impl.storage.KieServerStateRepository;
 public class KieServerRegistryImpl implements KieServerRegistry {
 
     private final ConcurrentMap<String, KieContainerInstanceImpl> containers = new ConcurrentHashMap<String, KieContainerInstanceImpl>();
+    private final ConcurrentMap<String, List<KieContainerInstanceImpl>> containersByAlias = new ConcurrentHashMap<String, List<KieContainerInstanceImpl>>();
     private IdentityProvider identityProvider;
     private ConcurrentMap<String, KieServerExtension> serverExtensions = new ConcurrentHashMap<String, KieServerExtension>();
 
@@ -53,20 +56,41 @@ public class KieServerRegistryImpl implements KieServerRegistry {
             if( kci != null && kci.getStatus() == KieContainerStatus.FAILED ) {
                 // if previous container failed, allow override
                 containers.put(id, kieContainerInstance);
+
+                registerWithAlias(kieContainerInstance);
                 return null;
             }
+            registerWithAlias(kieContainerInstance);
             return kci;
         }
     }
 
     @Override
     public KieContainerInstanceImpl unregisterContainer(String id) {
-        return containers.remove(id);
+        KieContainerInstanceImpl containerInstance = containers.remove(id);
+
+        removeFromAlias(containerInstance);
+        return containerInstance;
     }
 
     @Override
     public KieContainerInstanceImpl getContainer(String id) {
         return containers.get(id);
+    }
+
+    @Override
+    public KieContainerInstanceImpl getContainer(String alias, ContainerLocator locator) {
+        KieContainerInstanceImpl containerInstance = getContainer(alias);
+
+        if (containerInstance == null) {
+            String containerId = locator.locateContainer(alias, containersByAlias.getOrDefault(alias, new ArrayList<KieContainerInstanceImpl>()));
+            if (containerId == null) {
+                throw new IllegalArgumentException("Cannot find container for alias '" + alias + "'");
+            }
+
+            return getContainer(containerId);
+        }
+        return containerInstance;
     }
 
     @Override
@@ -149,5 +173,39 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     public KieServerConfig getConfig() {
         KieServerState currentState = repository.load(KieServerEnvironment.getServerId());
         return currentState.getConfiguration();
+    }
+
+    protected void registerWithAlias(KieContainerInstanceImpl kieContainerInstance) {
+        KieContainerResource containerResource = kieContainerInstance.getResource();
+        String alias = getContainerAlias(containerResource);
+
+        List<KieContainerInstanceImpl> byAlias = containersByAlias.get(alias);
+        if (byAlias == null) {
+            byAlias = new ArrayList<>();
+            containersByAlias.put(alias, byAlias);
+        }
+        byAlias.add(kieContainerInstance);
+    }
+
+    protected void removeFromAlias(KieContainerInstanceImpl kieContainerInstance) {
+        if (kieContainerInstance == null) {
+            return;
+        }
+        KieContainerResource containerResource = kieContainerInstance.getResource();
+        String alias = getContainerAlias(containerResource);
+
+        List<KieContainerInstanceImpl> byAlias = containersByAlias.get(alias);
+        if (byAlias != null) {
+            byAlias.remove(kieContainerInstance);
+        }
+    }
+
+    protected String getContainerAlias(KieContainerResource containerResource) {
+        String alias = containerResource.getContainerAlias();
+        if (alias == null || alias.isEmpty()) {
+            alias = containerResource.getReleaseId().getArtifactId();
+        }
+
+        return alias;
     }
 }

@@ -117,8 +117,12 @@ public abstract class KieServerBaseIntegrationTest {
     }
 
     protected static void createContainer(String containerId, ReleaseId releaseId, KieServerConfigItem... configItems) {
+        createContainer(containerId, releaseId, null, configItems);
+    }
+    protected static void createContainer(String containerId, ReleaseId releaseId, String alias, KieServerConfigItem... configItems) {
         KieServicesClient client = createDefaultStaticClient();
         KieContainerResource containerResource = new KieContainerResource(containerId, releaseId);
+        containerResource.setContainerAlias(alias);
         if (configItems != null && configItems.length > 0) {
             containerResource.setConfigItems(Arrays.asList(configItems));
         }

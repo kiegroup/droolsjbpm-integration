@@ -234,6 +234,7 @@ public class KieServerImpl {
         ReleaseId releaseId = container.getReleaseId();
         try {
             KieContainerInstanceImpl ci = new KieContainerInstanceImpl(containerId, KieContainerStatus.CREATING, null, releaseId);
+            ci.getResource().setContainerAlias(container.getContainerAlias());
             KieContainerInstanceImpl previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
@@ -566,8 +567,8 @@ public class KieServerImpl {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
-            return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid call. Scanner is not instantiated. ",
+            return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.SUCCESS,
+                    "Scanner is not started. ",
                     getScannerResource(kci));
         }
         if (KieScannerStatus.STARTED.equals(mapScannerStatus(kci)) ||

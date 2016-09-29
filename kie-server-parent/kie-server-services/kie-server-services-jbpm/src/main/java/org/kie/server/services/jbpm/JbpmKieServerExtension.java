@@ -110,7 +110,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
     private boolean isExecutorAvailable = false;
 
-    private String persistenceUnitName = "org.jbpm.domain";
+    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
 
     private KieServerImpl kieServer;
     private KieServerRegistry context;

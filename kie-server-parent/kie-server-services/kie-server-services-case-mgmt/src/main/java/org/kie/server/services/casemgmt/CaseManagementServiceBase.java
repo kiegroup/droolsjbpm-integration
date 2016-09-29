@@ -39,6 +39,8 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.casemgmt.locator.ByCaseIdContainerLocator;
+import org.kie.server.services.impl.locator.LatestContainerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,8 @@ public class CaseManagementServiceBase {
     private CaseRuntimeDataService caseRuntimeDataService;
     private MarshallerHelper marshallerHelper;
 
+    private KieServerRegistry context;
+
     private TaskModelFactory taskModelFactory;
 
     private boolean bypassAuthUser = false;
@@ -64,6 +68,7 @@ public class CaseManagementServiceBase {
         this.caseRuntimeDataService = caseRuntimeDataService;
         this.marshallerHelper = new MarshallerHelper(context);
         this.identityProvider = context.getIdentityProvider();
+        this.context = context;
 
         this.taskModelFactory = TaskModelProvider.getFactory();
 
@@ -79,6 +84,8 @@ public class CaseManagementServiceBase {
     }
 
     public String startCase(String containerId, String caseDefinitionId, String payload, String marshallingType) {
+        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
+
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
         if( caseDef == null ) {
             throw new IllegalStateException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
@@ -139,7 +146,7 @@ public class CaseManagementServiceBase {
             caseInstance.setRoleAssignments(ConvertUtils.transformRoleAssignment(actualCaseInstance.getCaseRoles()));
         }
         logger.debug("About to marshal case instance with id '{}' {}", caseId, caseInstance);
-        return marshallerHelper.marshal(containerId, marshallingType, caseInstance);
+        return marshallerHelper.marshal(containerId, marshallingType, caseInstance, new ByCaseIdContainerLocator(caseId));
 
     }
 
@@ -158,7 +165,7 @@ public class CaseManagementServiceBase {
 
         Map<String, Object> caseFileData = caseFileInstance.getData();
         logger.debug("About to marshal case file data for case with id '{}' {}", caseId, caseFileData);
-        return marshallerHelper.marshal(containerId, marshallingType, caseFileData);
+        return marshallerHelper.marshal(containerId, marshallingType, caseFileData, new ByCaseIdContainerLocator(caseId));
 
     }
 
@@ -167,20 +174,20 @@ public class CaseManagementServiceBase {
 
         Object caseFileData = caseFileInstance.getData(name);
         logger.debug("About to marshal case file data (name = {}) for case with id '{}' {}", name, caseId, caseFileData);
-        return marshallerHelper.marshal(containerId, marshallingType, caseFileData);
+        return marshallerHelper.marshal(containerId, marshallingType, caseFileData, new ByCaseIdContainerLocator(caseId));
 
     }
 
     public void putCaseFileData(String containerId, String caseId, String payload, String marshallingType) {
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
-        Map<String, Object> caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+        Map<String, Object> caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
         logger.debug("Unmarshalled case file data {} for case with id '{}'", caseFileData, caseId);
         caseService.addDataToCaseFile(caseId, caseFileData);
     }
 
     public void putCaseFileDataByName(String containerId, String caseId, String name, String payload, String marshallingType) {
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
-        Object caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Object.class);
+        Object caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Object.class, new ByCaseIdContainerLocator(caseId));
         logger.debug("Unmarshalled case file data {} for case with id '{}' will be stored under {}", caseFileData, caseId, name);
         caseService.addDataToCaseFile(caseId, name, caseFileData);
     }
@@ -193,7 +200,7 @@ public class CaseManagementServiceBase {
 
     public void addDynamicTask(String containerId, String caseId, String stageId, String payload, String marshallingType) {
         logger.debug("About to unmarshal task specification content from payload: '{}'", payload);
-        Map<String, Object> taskSpecificationMap = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+        Map<String, Object> taskSpecificationMap = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
         TaskSpecification taskSpecification = null;
 
         String nodeType = (String) taskSpecificationMap.get(CASE_DYNAMIC_NODE_TYPE_PROP);
@@ -222,7 +229,7 @@ public class CaseManagementServiceBase {
 
     public void addDynamicSubprocess(String containerId, String caseId, String stageId, String processId, String payload, String marshallingType) {
         logger.debug("About to unmarshal process data from payload: '{}'", payload);
-        Map<String, Object> subProcessParameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+        Map<String, Object> subProcessParameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("SubProcess data '{}'", subProcessParameters);
         if (stageId != null && !stageId.isEmpty()) {
@@ -236,7 +243,7 @@ public class CaseManagementServiceBase {
 
     public void triggerAdHocNode(String containerId, String caseId, String stageId, String adHocName, String payload, String marshallingType) {
         logger.debug("About to unmarshal task data from payload: '{}'", payload);
-        Map<String, Object> adHocTaskData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+        Map<String, Object> adHocTaskData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("AdHoc task {} will be triggered with data = {}", adHocName, adHocTaskData);
         if (stageId != null && !stageId.isEmpty()) {
@@ -287,7 +294,7 @@ public class CaseManagementServiceBase {
 
     public void addCommentToCase(String containerId, String caseId, String author, String comment, String marshallingType) {
         author = getUser(author);
-        String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class);
+        String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("Adding comment to case {} by {} with text '{}'", caseId, author, actualComment);
         caseService.addCaseComment(caseId, author, actualComment);
@@ -295,7 +302,7 @@ public class CaseManagementServiceBase {
 
     public void updateCommentInCase(String containerId, String caseId, String commentId, String author, String comment, String marshallingType) {
         author = getUser(author);
-        String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class);
+        String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("Updating comment {} in case {} by {} with text '{}'", commentId, caseId, author, actualComment);
         caseService.updateCaseComment(caseId, commentId, author, actualComment);

@@ -31,6 +31,9 @@ import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.query.QueryContext;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.locator.LatestContainerLocator;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +45,12 @@ public class ImageServiceBase {
     private RuntimeDataService dataService;
     private Map<String, ImageReference> imageReferenceMap;
 
-    public ImageServiceBase(RuntimeDataService dataService, Map<String, ImageReference> imageReferenceMap) {
+    private KieServerRegistry registry;
+
+    public ImageServiceBase(RuntimeDataService dataService, Map<String, ImageReference> imageReferenceMap, KieServerRegistry registry) {
         this.dataService = dataService;
         this.imageReferenceMap = imageReferenceMap;
+        this.registry = registry;
     }
 
     private byte[] getProcessImageAsBytes(String containerId, String processId) {
@@ -69,6 +75,9 @@ public class ImageServiceBase {
     }
 
     public String getProcessImage(String containerId, String processId) {
+        KieContainerInstanceImpl containerInstance = registry.getContainer(containerId, LatestContainerLocator.get());
+        containerId = containerInstance.getContainerId();
+
         String imageSVGString = null;
         byte[] imageSVG = getProcessImageAsBytes(containerId, processId);
         if (imageSVG != null) {
@@ -89,7 +98,7 @@ public class ImageServiceBase {
         }
         String imageSVGString = null;
         // get SVG String
-        byte[] imageSVG = getProcessImageAsBytes(containerId, instance.getProcessId());
+        byte[] imageSVG = getProcessImageAsBytes(instance.getDeploymentId(), instance.getProcessId());
         if (imageSVG != null) {
             // find active nodes and modify image
             Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, new QueryContext(0, 1000));
