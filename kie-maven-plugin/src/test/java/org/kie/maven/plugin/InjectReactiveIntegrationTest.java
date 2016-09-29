@@ -34,7 +34,6 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         File classDir = new File(basedir, "target/classes");
         
         System.out.println(classDir);
-        System.out.println(classDir.exists());
         
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());
@@ -66,7 +65,6 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         File classDir = new File(basedir, "target/classes");
         
         System.out.println(classDir);
-        System.out.println(classDir.exists());
         
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());
