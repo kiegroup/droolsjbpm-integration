@@ -69,6 +69,9 @@ public class KieSpringTransactionManager
                 // if we didn't begin this transaction, then do nothing
                 this.ptm.commit(currentTransaction);
                 currentTransaction = null;
+                if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
+                    TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
+                }
             } catch (Exception e) {
                 logger.warn("Unable to commit transaction",
                         e);
@@ -83,6 +86,9 @@ public class KieSpringTransactionManager
             if (transactionOwner) {
                 this.ptm.rollback(currentTransaction);
                 currentTransaction = null;
+                if (TransactionSynchronizationManager.hasResource(KieSpringTransactionManager.RESOURCE_CONTAINER)) {
+                    TransactionSynchronizationManager.unbindResource(KieSpringTransactionManager.RESOURCE_CONTAINER);
+                }
             }
         } catch (Exception e) {
             logger.warn("Unable to rollback transaction",
