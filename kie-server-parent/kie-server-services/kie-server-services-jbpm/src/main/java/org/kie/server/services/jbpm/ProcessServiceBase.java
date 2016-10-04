@@ -26,6 +26,7 @@ import org.jbpm.services.api.ProcessService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
@@ -33,7 +34,9 @@ import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.LatestContainerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,7 @@ public class ProcessServiceBase {
     private DefinitionService definitionService;
     private RuntimeDataService runtimeDataService;
     private MarshallerHelper marshallerHelper;
+    private KieServerRegistry context;
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
 
@@ -53,10 +57,11 @@ public class ProcessServiceBase {
         this.definitionService = definitionService;
         this.runtimeDataService = runtimeDataService;
         this.marshallerHelper = new MarshallerHelper(context);
+        this.context = context;
     }
 
     public String startProcess(String containerId, String processId, String marshallingType) {
-
+        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {
@@ -72,7 +77,7 @@ public class ProcessServiceBase {
 
 
     public String startProcess(String containerId, String processId, String payload, String marshallingType) {
-
+        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {
@@ -91,6 +96,7 @@ public class ProcessServiceBase {
     }
 
     public String startProcessWithCorrelation(String containerId, String processId, String correlationKey, String payload, String marshallingType) {
+        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {
@@ -147,7 +153,7 @@ public class ProcessServiceBase {
 
 
         logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
+        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         logger.debug("Calling signal '{}' process instance with id {} on container {} and event {}", signalName, processInstanceId, containerId, event);
         processService.signalProcessInstance(processInstanceId.longValue(), signalName, event);
@@ -163,11 +169,15 @@ public class ProcessServiceBase {
 
     public void signalProcessInstances(String containerId, List<Long> processInstanceIds, String signalName, String eventPayload, String marshallingType) {
 
+        List<Long> ids = convert(processInstanceIds);
+        if (ids.isEmpty()) {
+            return;
+        }
         logger.debug("About to unmarshal event from payload: '{}'", eventPayload);
-        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class);
+        Object event = marshallerHelper.unmarshal(containerId, eventPayload, marshallingType, Object.class, new ByProcessInstanceIdContainerLocator(ids.get(0)));
 
         logger.debug("Calling signal '{}' process instances with id {} on container {} and event {}", signalName, processInstanceIds, containerId, event);
-        processService.signalProcessInstances(convert(processInstanceIds), signalName, event);
+        processService.signalProcessInstances(ids, signalName, event);
 
     }
 
@@ -209,13 +219,13 @@ public class ProcessServiceBase {
                 .correlationKey(instanceDesc.getCorrelationKey())
                 .build();
 
-        if (Boolean.TRUE.equals(withVars)) {
+        if (Boolean.TRUE.equals(withVars) && processInstance.getState().equals(ProcessInstance.STATE_ACTIVE)) {
             Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId.longValue());
             processInstance.setVariables(variables);
         }
 
         logger.debug("About to marshal process instance with id '{}' {}", processInstanceId, processInstance);
-        String response = marshallerHelper.marshal(containerId, marshallingType, processInstance);
+        String response = marshallerHelper.marshal(containerId, marshallingType, processInstance, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         return response;
 
@@ -224,7 +234,7 @@ public class ProcessServiceBase {
     public void setProcessVariable(String containerId, Number processInstanceId, String varName, String variablePayload, String marshallingType) {
 
         logger.debug("About to unmarshal variable from payload: '{}'", variablePayload);
-        Object variable = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Object.class);
+        Object variable = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Object.class, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         logger.debug("Setting variable '{}' on process instance with id {} with value {}", varName, processInstanceId, variable);
         processService.setProcessVariable(processInstanceId.longValue(), varName, variable);
@@ -234,7 +244,7 @@ public class ProcessServiceBase {
     public void setProcessVariables(String containerId, Number processInstanceId, String variablePayload, String marshallingType) {
 
         logger.debug("About to unmarshal variables from payload: '{}'", variablePayload);
-        Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Map.class);
+        Map<String, Object> variables = marshallerHelper.unmarshal(containerId, variablePayload, marshallingType, Map.class, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         logger.debug("Setting variables '{}' on process instance with id {} with value {}", variables.keySet(), processInstanceId, variables.values());
         processService.setProcessVariables(processInstanceId.longValue(), variables);
@@ -250,7 +260,7 @@ public class ProcessServiceBase {
         }
 
         logger.debug("About to marshal process variable with name '{}' {}", varName, variable);
-        String response = marshallerHelper.marshal(containerId, marshallingType, variable);
+        String response = marshallerHelper.marshal(containerId, marshallingType, variable, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         return response;
 
@@ -260,7 +270,7 @@ public class ProcessServiceBase {
         Map<String, Object> variables = processService.getProcessInstanceVariables(processInstanceId.longValue());
 
         logger.debug("About to marshal process variables {}", variables);
-        String response = marshallerHelper.marshal(containerId, marshallingType, variables);
+        String response = marshallerHelper.marshal(containerId, marshallingType, variables, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         return response;
 
@@ -280,7 +290,7 @@ public class ProcessServiceBase {
     public void completeWorkItem(String containerId, Number processInstanceId, Number workItemId, String resultPayload, String marshallingType) {
 
         logger.debug("About to unmarshal work item result from payload: '{}'", resultPayload);
-        Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, marshallingType, Map.class);
+        Map<String, Object> results = marshallerHelper.unmarshal(containerId, resultPayload, marshallingType, Map.class, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         logger.debug("Completing work item '{}' on process instance id {} with value {}", workItemId, processInstanceId, results);
         processService.completeWorkItem(workItemId.longValue(), results);
@@ -314,7 +324,7 @@ public class ProcessServiceBase {
                 .build();
 
         logger.debug("About to marshal work item {}", workItemInstance);
-        String response = marshallerHelper.marshal(containerId, marshallingType, workItemInstance);
+        String response = marshallerHelper.marshal(containerId, marshallingType, workItemInstance, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         return response;
 
@@ -343,7 +353,7 @@ public class ProcessServiceBase {
         }
         WorkItemInstanceList result = new WorkItemInstanceList(instances);
         logger.debug("About to marshal work items {}", result);
-        String response = marshallerHelper.marshal(containerId, marshallingType, result);
+        String response = marshallerHelper.marshal(containerId, marshallingType, result, new ByProcessInstanceIdContainerLocator(processInstanceId.longValue()));
 
         return response;
     }

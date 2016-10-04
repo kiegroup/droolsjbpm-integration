@@ -22,8 +22,10 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.LatestContainerLocator;
 
 public class MarshallerHelper {
 
@@ -40,12 +42,16 @@ public class MarshallerHelper {
     }
 
     public String marshal(String containerId, String marshallingFormat, Object entity) {
+        return marshal(containerId, marshallingFormat, entity, LatestContainerLocator.get());
+    }
+
+    public String marshal(String containerId, String marshallingFormat, Object entity, ContainerLocator locator) {
         MarshallingFormat format = getFormat(marshallingFormat);
         if (format == null) {
             throw new IllegalArgumentException("Unknown marshalling format " + marshallingFormat);
         }
 
-        KieContainerInstance containerInstance = registry.getContainer(containerId);
+        KieContainerInstance containerInstance = registry.getContainer(containerId, locator);
         if (containerInstance == null) {
             throw new IllegalArgumentException("No container found for id " + containerId + " .");
         }
@@ -76,14 +82,17 @@ public class MarshallerHelper {
         return marshaller.marshall(entity);
 
     }
-
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType) {
+        return unmarshal(containerId, data, marshallingFormat, unmarshalType, LatestContainerLocator.get());
+    }
+
+    public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType, ContainerLocator locator) {
         if (data == null || data.isEmpty()) {
             return null;
         }
         MarshallingFormat format = getFormat(marshallingFormat);
 
-        KieContainerInstance containerInstance = registry.getContainer(containerId);
+        KieContainerInstance containerInstance = registry.getContainer(containerId, locator);
 
         if (containerInstance == null || format == null) {
             throw new IllegalArgumentException("No container found for id " + containerId + " or unknown marshalling format " + marshallingFormat);

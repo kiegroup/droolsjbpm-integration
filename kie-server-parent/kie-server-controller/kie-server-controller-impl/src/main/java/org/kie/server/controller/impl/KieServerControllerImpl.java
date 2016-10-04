@@ -88,6 +88,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
                 KieContainerResource containerResource = new KieContainerResource();
                 containerResource.setContainerId(containerSpec.getId());
+                containerResource.setContainerAlias(containerSpec.getContainerName());
                 containerResource.setReleaseId(containerSpec.getReleasedId());
                 containerResource.setStatus(containerSpec.getStatus());
 

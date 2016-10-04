@@ -36,8 +36,10 @@ import org.kie.server.api.model.instance.TaskAttachmentList;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskCommentList;
 import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +90,7 @@ public class UserTaskServiceBase {
 
         userId = getUser(userId);
         
-        logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
+        logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload, new ByTaskIdContainerLocator(taskId.longValue()));
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallerType, Map.class);
 
         logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
@@ -101,7 +103,7 @@ public class UserTaskServiceBase {
         userId = getUser(userId);
         
         logger.debug("About to unmarshal task outcome parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallerType, Map.class);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallerType, Map.class, new ByTaskIdContainerLocator(taskId.longValue()));
 
         logger.debug("About to complete task with id '{}' as user '{}' with data {}", taskId, userId, parameters);
         userTaskService.completeAutoProgress(taskId.longValue(), userId, parameters);
@@ -248,14 +250,14 @@ public class UserTaskServiceBase {
     }
 
     public String saveContent(String containerId, Number taskId, String payload, String marshallingType) {
-
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
         logger.debug("About to unmarshal task content parameters from payload: '{}'", payload);
-        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+        Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, locator);
 
         logger.debug("About to set content of a task with id '{}' with data {}", taskId, parameters);
         Long contentId = userTaskService.saveContent(taskId.longValue(), parameters);
 
-        String response = marshallerHelper.marshal(containerId, marshallingType, contentId);
+        String response = marshallerHelper.marshal(containerId, marshallingType, contentId, locator);
 
         return response;
     }
@@ -265,7 +267,8 @@ public class UserTaskServiceBase {
         Map<String, Object> variables = userTaskService.getTaskOutputContentByTaskId(taskId.longValue());
 
         logger.debug("About to marshal task '{}' output variables {}", taskId, variables);
-        String response = marshallerHelper.marshal(containerId, marshallingType, variables);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, variables, locator);
 
         return response;
     }
@@ -275,7 +278,8 @@ public class UserTaskServiceBase {
         Map<String, Object> variables = userTaskService.getTaskInputContentByTaskId(taskId.longValue());
 
         logger.debug("About to marshal task '{}' input variables {}", taskId, variables);
-        String response = marshallerHelper.marshal(containerId, marshallingType, variables);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, variables, locator);
 
         return response;
 
@@ -287,14 +291,14 @@ public class UserTaskServiceBase {
     }
 
     public String addComment(String containerId, Number taskId, String payload, String marshallingType) {
-
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
         logger.debug("About to unmarshal task comment from payload: '{}'", payload);
-        TaskComment comment = marshallerHelper.unmarshal(containerId, payload, marshallingType, TaskComment.class);
+        TaskComment comment = marshallerHelper.unmarshal(containerId, payload, marshallingType, TaskComment.class, locator);
 
         logger.debug("About to set comment on a task with id '{}' with data {}", taskId, comment);
         Long commentId = userTaskService.addComment(taskId.longValue(), comment.getText(), comment.getAddedBy(), comment.getAddedAt());
 
-        String response = marshallerHelper.marshal(containerId, marshallingType, commentId);
+        String response = marshallerHelper.marshal(containerId, marshallingType, commentId, locator);
 
         return response;
     }
@@ -325,7 +329,8 @@ public class UserTaskServiceBase {
         TaskCommentList result = new TaskCommentList(taskComments);
 
         logger.debug("About to marshal task '{}' comments {}", taskId, result);
-        String response = marshallerHelper.marshal(containerId, marshallingType, result);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, result, locator);
 
         return response;
     }
@@ -346,19 +351,21 @@ public class UserTaskServiceBase {
                 .build();
 
         logger.debug("About to marshal task '{}' comment {}", taskId, taskComment);
-        String response = marshallerHelper.marshal(containerId, marshallingType, taskComment);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, taskComment, locator);
 
         return response;
     }
 
     public String addAttachment(String containerId, Number taskId, String userId, String name, String attachmentPayload, String marshallingType) {
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
         logger.debug("About to unmarshal task attachment from payload: '{}'", attachmentPayload);
-        Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, marshallingType, Object.class);
+        Object attachment = marshallerHelper.unmarshal(containerId, attachmentPayload, marshallingType, Object.class, locator);
 
         logger.debug("About to add attachment on a task with id '{}' with data {}", taskId, attachment);
         Long attachmentId = userTaskService.addAttachment(taskId.longValue(), getUser(userId), name, attachment);
 
-        String response = marshallerHelper.marshal(containerId, marshallingType, attachmentId);
+        String response = marshallerHelper.marshal(containerId, marshallingType, attachmentId, locator);
 
         return response;
     }
@@ -382,8 +389,9 @@ public class UserTaskServiceBase {
                 .size(attachment.getSize())
                 .build();
 
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
         logger.debug("About to marshal task '{}' attachment {} with content {}", taskId, attachmentId, taskAttachment);
-        String response = marshallerHelper.marshal(containerId, marshallingType, taskAttachment);
+        String response = marshallerHelper.marshal(containerId, marshallingType, taskAttachment, locator);
 
         return response;
 
@@ -398,8 +406,8 @@ public class UserTaskServiceBase {
         }
 
         logger.debug("About to marshal task attachment with id '{}' {}", attachmentId, attachment);
-
-        String response = marshallerHelper.marshal(containerId, marshallingType, attachment);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, attachment, locator);
 
         return response;
     }
@@ -428,8 +436,9 @@ public class UserTaskServiceBase {
         }
         TaskAttachmentList result = new TaskAttachmentList(taskComments);
 
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
         logger.debug("About to marshal task '{}' attachments {}", taskId, result);
-        String response = marshallerHelper.marshal(containerId, marshallingType, result);
+        String response = marshallerHelper.marshal(containerId, marshallingType, result, locator);
 
         return response;
     }
@@ -484,7 +493,8 @@ public class UserTaskServiceBase {
 
 
         logger.debug("About to marshal task '{}' representation {}", taskId, taskInstance);
-        String response = marshallerHelper.marshal(containerId, marshallingType, taskInstance);
+        ContainerLocator locator = new ByTaskIdContainerLocator(taskId.longValue());
+        String response = marshallerHelper.marshal(containerId, marshallingType, taskInstance, locator);
 
         return response;
     }

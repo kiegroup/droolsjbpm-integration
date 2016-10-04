@@ -122,6 +122,7 @@ public class KieServerInstanceManager {
             @Override
             public Void doOperation(KieServicesClient client, Container container) {
                 KieContainerResource containerResource = new KieContainerResource(containerSpec.getId(), containerSpec.getReleasedId(), container.getResolvedReleasedId(), container.getStatus());
+                containerResource.setContainerAlias(containerSpec.getContainerName());
                 containerResource.setMessages((List<Message>) container.getMessages());
 
                 if (containerSpec.getConfigs() != null) {
