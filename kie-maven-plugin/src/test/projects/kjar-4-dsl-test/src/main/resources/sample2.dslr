@@ -1,0 +1,9 @@
+package org.drools.sample2
+
+expander hello2.dsl
+
+rule "Hello World2"
+    when
+    then
+		Print hello with decoration
+end

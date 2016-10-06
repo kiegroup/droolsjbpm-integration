@@ -1,0 +1,10 @@
+package org.drools.sample1
+
+expander hello1.dsl
+
+rule "Hello World1"
+    when
+    then
+		Print hello
+end
+
