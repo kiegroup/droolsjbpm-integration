@@ -71,14 +71,14 @@ public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKar
     public void testStartProcessNoEnv() throws Exception {
         assertNotNull(processWithPersistenceNoEnv);
         final ProcessInstance processInstance = processWithPersistenceNoEnv.startProcess(PROCESS_ID);
-        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_ACTIVE, processInstance.getState());
+        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_COMPLETED, processInstance.getState());
     }
 
     @Test
     public void testStartProcessEnv() throws Exception {
         assertNotNull(processWithPersistenceEnv);
         final ProcessInstance processInstance = processWithPersistenceEnv.startProcess(PROCESS_ID);
-        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_ACTIVE, processInstance.getState());
+        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_COMPLETED, processInstance.getState());
     }
 
     @Configuration

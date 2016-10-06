@@ -400,11 +400,6 @@ public class InfPersistentStatefulSessionTest {
 
         ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( id, kbase, null, env );
         processInstance = ksession.getProcessInstance( processInstance.getId() );
-        assertNotNull( processInstance );
-
-        ksession = InfinispanKnowledgeService.loadStatefulKnowledgeSession( id, kbase, null, env );
-        ksession.fireAllRules();
-        processInstance = ksession.getProcessInstance( processInstance.getId() );
         assertNull( processInstance );
     }
     

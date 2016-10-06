@@ -65,7 +65,7 @@ public class KieBlueprintProcessDependencyKarafIntegrationTest extends AbstractK
     public void testStartProcess() throws Exception {
         assertNotNull(kieSession);
         final ProcessInstance processInstance = kieSession.startProcess(PROCESS_ID);
-        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_ACTIVE, processInstance.getState());
+        assertEquals("Unexpected process instance state.", ProcessInstance.STATE_COMPLETED, processInstance.getState());
     }
 
     @Configuration
