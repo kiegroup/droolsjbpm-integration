@@ -206,6 +206,7 @@ public class RestURI {
 
     // case management related
     public static final String START_CASE_POST_URI = "{" + CASE_DEF_ID +"}/instances";
+    public static final String REOPEN_CASE_PUT_URI = "{" + CASE_DEF_ID +"}/instances/{" + CASE_ID + "}";
     public static final String CASE_GET_URI = "{" + CASE_DEF_ID +"}";
     public static final String CASE_INSTANCES_GET_URI = "instances";
     public static final String CASE_INSTANCES_BY_DEF_GET_URI = "{" + CASE_DEF_ID +"}/instances";
@@ -213,7 +214,7 @@ public class RestURI {
     public static final String CASE_INSTANCE_DELETE_URI = "instances/{" + CASE_ID + "}";
     public static final String CASE_MILESTONES_GET_URI = "instances/{" + CASE_ID + "}/milestones";
     public static final String CASE_STAGES_GET_URI = "instances/{" + CASE_ID + "}/stages";
-    public static final String CASE_AD_HOC_FRAGMENTS_GET_URI = "instances/{" + CASE_ID + "}/adhocfragmets";
+    public static final String CASE_AD_HOC_FRAGMENTS_GET_URI = "instances/{" + CASE_ID + "}/adhocfragments";
     public static final String CASE_ROLES_GET_URI = "instances/{" + CASE_ID + "}/roles";
     public static final String CASE_ROLES_PUT_URI = "instances/{" + CASE_ID + "}/roles/{" + CASE_ROLE_NAME +"}";
     public static final String CASE_ROLES_DELETE_URI = "instances/{" + CASE_ID + "}/roles/{" + CASE_ROLE_NAME +"}";

@@ -160,6 +160,32 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
+    public void reopenCase(String caseId, String containerId, String caseDefinitionId) {
+        reopenCase(caseId, containerId, caseDefinitionId, new HashMap<>());
+    }
+
+    @Override
+    public void reopenCase(String caseId, String containerId, String caseDefinitionId, Map<String, Object> data) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(CASE_DEF_ID, caseDefinitionId);
+            valuesMap.put(CASE_ID, caseId);
+
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + REOPEN_CASE_PUT_URI, valuesMap), data, null, new HashMap<String, String>());
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseService", "reopenCase", serialize(safeMap(data)), marshaller.getFormat().getType(), new Object[]{caseId, containerId, caseDefinitionId})) );
+            ServiceResponse<?> response = (ServiceResponse<?>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
     public Map<String, Object> getCaseInstanceData(String containerId, String caseId) {
         Object result = null;
 

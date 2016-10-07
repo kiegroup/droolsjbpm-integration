@@ -43,6 +43,10 @@ public interface CaseServicesClient {
 
     void destroyCaseInstance(String containerId, String caseId);
 
+    void reopenCase(String caseId, String containerId, String caseDefinitionId);
+
+    void reopenCase(String caseId, String containerId, String caseDefinitionId, Map<String, Object> data);
+
     Map<String, Object> getCaseInstanceData(String containerId, String caseId);
 
     Object getCaseInstanceData(String containerId, String caseId, String name);

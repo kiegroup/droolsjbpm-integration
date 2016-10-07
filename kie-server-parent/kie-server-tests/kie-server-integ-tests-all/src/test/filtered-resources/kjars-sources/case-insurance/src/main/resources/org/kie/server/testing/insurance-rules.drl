@@ -1,6 +1,6 @@
 package org.kie.server.testing;
 
-import org.kie.internal.process.CaseData;
+import org.kie.api.runtime.process.CaseData;
 import org.kie.server.testing.ClaimReport;
 
 rule "classify-claim" ruleflow-group "claims"

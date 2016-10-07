@@ -125,6 +125,23 @@ public class CaseResource extends AbstractCaseResource {
                 });
     }
 
+    @PUT
+    @Path(REOPEN_CASE_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response reopenCase(@javax.ws.rs.core.Context HttpHeaders headers,
+            @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_DEF_ID) String caseDefId, @PathParam(CASE_ID) String caseId, String payload) {
+
+        return invokeCaseOperation(headers,
+                containerId,
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+                    caseManagementServiceBase.reopenCase(caseId, containerId, caseDefId, payload, type);
+                    logger.debug("Returning CREATED response for reopen case {}", caseId);
+
+                    return createResponse("", v, Response.Status.CREATED, customHeaders);
+                });
+    }
+
     @GET
     @Path(CASE_FILE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
