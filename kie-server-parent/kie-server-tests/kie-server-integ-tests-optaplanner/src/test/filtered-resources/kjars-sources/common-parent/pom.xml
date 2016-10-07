@@ -10,11 +10,27 @@
     <!-- The version is set during the Maven build (this file is a filtered resource) -->
     <version.org.kie>${version.org.kie}</version.org.kie>
     <version.org.codehaus.jackson>${version.org.codehaus.jackson}</version.org.codehaus.jackson>
+    <version.org.javassist>${version.org.javassist}</version.org.javassist>
     <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <!-- Need to use javassist artifact version provided by jboss-integration-platform-parent.
+           javassist artifact is provided by reflections artifact, which is brought by optaplanner-core.
+           Productized reflections artifact define javassist version, which is missing in product repositories.
+           jboss-integration-platform-parent redefine javassist version to one, which is available in repositories.
+           Because this optaplanner test kjar is independent from jboss-integration-platform-parent then we have to redefine javassist version to be able to run product tests.
+           This could be deleted when product repositories will contain javassist version used in reflections artifact. -->
+      <dependency>
+        <groupId>org.javassist</groupId>
+        <artifactId>javassist</artifactId>
+        <version>${version.org.javassist}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
