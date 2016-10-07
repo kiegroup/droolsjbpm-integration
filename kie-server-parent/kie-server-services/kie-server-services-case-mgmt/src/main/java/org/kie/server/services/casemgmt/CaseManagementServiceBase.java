@@ -160,6 +160,22 @@ public class CaseManagementServiceBase {
         }
     }
 
+    public void reopenCase(String caseId, String containerId, String caseDefinitionId, String payload, String marshallingType) {
+        containerId = context.getContainer(containerId, new ByCaseIdContainerLocator(caseId)).getContainerId();
+
+        CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
+        if( caseDef == null ) {
+            throw new IllegalStateException("Unable to find case '" + caseDefinitionId + "' in container " + containerId);
+        }
+
+        logger.debug("About to unmarshal data from payload: '{}'", payload);
+        Map<String, Object> data = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+
+        caseService.reopenCase(caseId, containerId, caseDefinitionId, data);
+        logger.debug("Case {} successfully reopened", caseId);
+
+    }
+
     public String getCaseFileData(String containerId, String caseId, String marshallingType) {
         CaseFileInstance caseFileInstance = caseService.getCaseFileInstance(caseId);
 

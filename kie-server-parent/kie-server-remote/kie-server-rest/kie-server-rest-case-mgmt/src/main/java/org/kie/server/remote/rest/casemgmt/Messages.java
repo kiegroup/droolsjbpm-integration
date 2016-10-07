@@ -22,5 +22,7 @@ public class Messages {
 
     public static final String CASE_INSTANCE_NOT_FOUND = "Could not find case instance \"{0}\"";
 
+    public static final String CASE_INSTANCE_ACTIVE = "Case with id \"{0}\" is already started/reopened";
+
     public static final String UNEXPECTED_ERROR = "Unexpected error during processing request \"{0}\"";
 }

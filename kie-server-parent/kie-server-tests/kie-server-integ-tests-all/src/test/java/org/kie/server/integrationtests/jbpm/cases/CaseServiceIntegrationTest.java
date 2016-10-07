@@ -259,4 +259,53 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             }
         }
     }
+
+    @Test
+    public void testCreateCaseWithEmptyCaseFileThenReopenIt() {
+        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID);
+        try {
+            assertNotNull(caseId);
+            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
+
+            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+            assertNotNull(caseInstance);
+            assertEquals(caseId, caseInstance.getCaseId());
+            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
+            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
+            assertEquals(USER_YODA, caseInstance.getCaseOwner());
+            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
+            assertNotNull(caseInstance.getStartedAt());
+            assertNull(caseInstance.getCompletedAt());
+            assertEquals("", caseInstance.getCompletionMessage());
+            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+
+            caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+
+            try {
+                // this should throw exception as there is no case any more
+                caseClient.getCaseInstance(CONTAINER_ID, caseId);
+                fail("Case should not exists any more");
+            } catch (KieServicesException e) {
+                // expected
+            }
+            Map<String, Object> data = new HashMap<>();
+            data.put("additionalComment", "reopening the case");
+            caseClient.reopenCase(caseId, CONTAINER_ID, CASE_DEF_ID, data);
+
+            caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+            assertNotNull(caseInstance);
+            assertEquals(caseId, caseInstance.getCaseId());
+
+            Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
+            assertNotNull(additionalComment);
+            assertEquals("reopening the case", additionalComment);
+        } catch (Exception e) {
+            fail("Failed due to " + e.getMessage());
+
+            if (caseId != null) {
+                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+            }
+        }
+    }
+
 }

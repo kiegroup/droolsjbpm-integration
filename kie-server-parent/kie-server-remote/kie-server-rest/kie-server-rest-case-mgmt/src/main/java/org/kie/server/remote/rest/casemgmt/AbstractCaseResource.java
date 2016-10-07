@@ -21,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.casemgmt.api.CaseActiveException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.kie.server.remote.rest.common.Header;
@@ -55,6 +56,9 @@ public abstract class AbstractCaseResource {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             return operation.invoke(v, type, conversationIdHeader);
+        } catch (CaseActiveException e) {
+            return alreadyExists(
+                    MessageFormat.format(CASE_INSTANCE_ACTIVE, caseId), v, conversationIdHeader);
         } catch (CaseNotFoundException e) {
             return notFound(
                     MessageFormat.format(CASE_INSTANCE_NOT_FOUND, caseId), v, conversationIdHeader);
