@@ -27,6 +27,7 @@ public class RuleFlowDelegate implements ConwayRuleDelegate {
         KieServices ks = KieServices.Factory.get();
         KieContainer kc = ks.getKieClasspathContainer();
         session = kc.newKieSession("ConwayRFKS");
+        session.getEnvironment().set("org.jbpm.rule.task.waitstate", "true");
     }
     
     /* (non-Javadoc)
