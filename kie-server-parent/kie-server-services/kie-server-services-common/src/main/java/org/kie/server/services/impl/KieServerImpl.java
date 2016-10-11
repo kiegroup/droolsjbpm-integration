@@ -566,8 +566,8 @@ public class KieServerImpl {
         List<Message> messages = getMessagesForContainer(id);
         messages.clear();
         if (kci.getScanner() == null) {
-            return new ServiceResponse<KieScannerResource>(ServiceResponse.ResponseType.FAILURE,
-                    "Invalid call. Scanner is not instantiated. ",
+            return new ServiceResponse<KieScannerResource>(ResponseType.SUCCESS,
+                    "Scanner is not started.",
                     getScannerResource(kci));
         }
         if (KieScannerStatus.STARTED.equals(mapScannerStatus(kci)) ||
