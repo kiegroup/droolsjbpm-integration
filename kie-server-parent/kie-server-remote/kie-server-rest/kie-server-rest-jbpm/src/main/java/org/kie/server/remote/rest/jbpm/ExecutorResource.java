@@ -77,6 +77,9 @@ public class ExecutorResource {
             logger.debug("Returning CREATED response with content '{}'", response);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
 
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid Command type ", e.getMessage(), e);
+            return internalServerError( e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

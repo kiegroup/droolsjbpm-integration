@@ -73,6 +73,11 @@ public class ExecutorServiceBase {
             jobRequest = marshallerHelper.unmarshal(payload, marshallingType, JobRequestInstance.class);
         }
         Long requestId = null;
+
+        if(!validateCommand(jobRequest.getCommand())){
+            throw new IllegalArgumentException("Invalid command type "+jobRequest.getCommand());
+        }
+
         if (jobRequest.getScheduledDate() != null) {
             logger.debug("Scheduling job at future date '{}' for request {}", jobRequest.getScheduledDate(), jobRequest);
             requestId = executorService.scheduleRequest(jobRequest.getCommand(), jobRequest.getScheduledDate(), new CommandContext(jobRequest.getData()));
@@ -243,5 +248,14 @@ public class ExecutorServiceBase {
 
     protected QueryContext buildQueryContext(Integer page, Integer pageSize) {
         return new QueryContext(page * pageSize, pageSize);
+    }
+
+    protected boolean validateCommand(String command) {
+        try {
+            Class.forName(command);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

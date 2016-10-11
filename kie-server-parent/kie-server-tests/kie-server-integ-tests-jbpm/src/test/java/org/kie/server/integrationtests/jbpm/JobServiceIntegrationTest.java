@@ -32,6 +32,7 @@ import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
@@ -47,6 +48,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     protected static final String BUSINESS_KEY = "test key";
     protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
+    protected static final String LOG_CLEANUP_COMMAND = "org.jbpm.executor.commands.LogCleanupCommand";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -232,10 +234,11 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRequeueJob() throws Exception {
-        String command = "org.jbpm.executor.commands.PrintOutCommand123";
+        String command = "org.jbpm.executor.commands.DelayedPrintOutCommand";
 
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("businessKey", BUSINESS_KEY);
+        data.put("delay", "wrong-value");
         data.put("retries", 0);
 
         JobRequestInstance jobRequestInstance = new JobRequestInstance();
@@ -251,9 +254,9 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertEquals(jobId, jobRequest.getId());
         assertEquals(BUSINESS_KEY, jobRequest.getBusinessKey());
         assertThat(jobRequest.getStatus(),anyOf(
-            equalTo(STATUS.QUEUED.toString()),
-            equalTo(STATUS.RUNNING.toString()),
-            equalTo(STATUS.ERROR.toString())));
+                equalTo(STATUS.QUEUED.toString()),
+                equalTo(STATUS.RUNNING.toString()),
+                equalTo(STATUS.ERROR.toString())));
         assertEquals(command, jobRequest.getCommandName());
 
         KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
@@ -269,8 +272,6 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobRequest = jobServicesClient.getRequestById(jobId, false, false);
         expected.setStatus(STATUS.QUEUED.toString());
         assertRequestInfoInstance(expected, jobRequest);
-
-        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
     }
 
     @Test
@@ -307,7 +308,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
     @Test
     public void testScheduleSearchByCommandCancelJob() throws Exception {
         String firstCommand = PRINT_OUT_COMMAND;
-        String secondCommand = "org.jbpm.executor.commands.PrintOutCommand123";
+        String secondCommand = LOG_CLEANUP_COMMAND;
 
         int originalNumberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, 0, 100).size();
 
@@ -375,5 +376,30 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         jobRequestInstance.setCommand(PRINT_OUT_COMMAND);
         jobRequestInstance.setData(data);
         return jobRequestInstance;
+    }
+
+    @Test
+    public void testExecutorServiceDisabling() throws Exception {
+        String command = "invalidCommand";
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("businessKey", BUSINESS_KEY);
+
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(command);
+        jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
+
+        // Executing fist command.
+        try {
+            jobServicesClient.scheduleRequest(jobRequestInstance);
+        } catch (Exception e){
+            assertTrue(e instanceof KieServicesException);
+            assertTrue(e.getMessage().contains("Invalid command type"));
+        }
+
     }
 }
