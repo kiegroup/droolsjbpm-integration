@@ -37,7 +37,7 @@ public class ByCaseIdContainerLocator implements ContainerLocator {
 
     private static final Logger logger = LoggerFactory.getLogger(ByCaseIdContainerLocator.class);
 
-    private static final String CONTAINER_ID_QUERY = "select log.deploymentId from ProcessInstanceLog log where log.correlationKey = :caseId";
+    private static final String CONTAINER_ID_QUERY = "select log.externalId from ProcessInstanceLog log where log.correlationKey = :caseId";
     private String caseId;
 
     private String containerId;

@@ -50,6 +50,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     private static final String CASE_ID_PREFIX = "CAR_INS";
 
+    private static final String CONTAINER_ALIAS = "ins";
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -58,7 +60,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ALIAS);
     }
 
     @Override
@@ -304,6 +306,37 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
             if (caseId != null) {
                 caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+            }
+        }
+    }
+
+    @Test
+    public void testCreateCaseWithEmptyCaseFileWithContainerAlias() {
+        String caseId = caseClient.startCase(CONTAINER_ALIAS, CASE_DEF_ID);
+        try {
+            assertNotNull(caseId);
+            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
+
+            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ALIAS, caseId);
+            assertNotNull(caseInstance);
+            assertEquals(caseId, caseInstance.getCaseId());
+            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
+            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
+            assertEquals(USER_YODA, caseInstance.getCaseOwner());
+            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
+            assertNotNull(caseInstance.getStartedAt());
+            assertNull(caseInstance.getCompletedAt());
+            assertEquals("", caseInstance.getCompletionMessage());
+            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+
+            // since roles were not assigned to any users/groups no tasks are available
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(0, tasks.size());
+        } catch (Exception e) {
+            fail("Failed due to " + e.getMessage());
+        } finally {
+            if (caseId != null) {
+                caseClient.cancelCaseInstance(CONTAINER_ALIAS, caseId);
             }
         }
     }
