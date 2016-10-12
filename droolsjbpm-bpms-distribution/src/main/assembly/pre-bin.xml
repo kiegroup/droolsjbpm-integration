@@ -8,16 +8,6 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <!-- Following artifacts are _not_ included on purpose, do not add them to the assembly unless absolutely sure! -->
-
-        <!-- Not yet in use, work towards certain features -->
-        <!--<include>org.kie.remote:kie-remote-rest-api</include>-->
-        <!--<include>org.kie.remote.ws:kie-remote-ws-impl</include>-->
-        <!--<include>org.kie.remote.ws:kie-remote-ws-wsdl</include>-->
-
-        <!-- Just a helper module, the generated contents of this one are included in another jar -->
-        <!--<include>org.kie.remote:kie-remote-jaxb-gen</include>-->
-
         <include>org.jbpm:jbpm-flow</include>
         <include>org.jbpm:jbpm-flow-builder</include>
         <include>org.jbpm:jbpm-persistence-jpa</include>
@@ -52,10 +42,7 @@
         <include>org.kie:kie-ci</include>
         <include>org.kie:kie-ci-osgi</include>
         <include>org.kie:kie-spring</include>
-        <include>org.kie.remote:kie-remote-client</include>
-        <include>org.kie.remote:kie-remote-jaxb</include>
-        <include>org.kie.remote:kie-remote-common</include>
-        <include>org.kie.remote.ws:kie-remote-ws-common</include>
+        <include>org.kie.server:kie-server-common</include>
         <include>org.kie.server:kie-server-api</include>
         <include>org.kie.server:kie-server-client</include>
         <include>org.kie:kie-karaf-features</include>
@@ -71,7 +58,7 @@
         <include>org.drools:drools-verifier</include>
         <include>org.drools:drools-pmml</include>
       </includes>
-      <outputDirectory></outputDirectory>
+      <outputDirectory/>
     </dependencySet>
     <dependencySet>
       <excludes>
@@ -109,10 +96,7 @@
         <exclude>org.kie:kie-ci</exclude>
         <exclude>org.kie:kie-ci-osgi</exclude>
         <exclude>org.kie:kie-spring</exclude>
-        <exclude>org.kie.remote:kie-remote-client</exclude>
-        <exclude>org.kie.remote:kie-remote-jaxb</exclude>
-        <exclude>org.kie.remote:kie-remote-common</exclude>
-        <exclude>org.kie.remote.ws:kie-remote-ws-common</exclude>
+        <exclude>org.kie.server:kie-server-common</exclude>
         <exclude>org.kie.server:kie-server-api</exclude>
         <exclude>org.kie.server:kie-server-client</exclude>
         <exclude>org.kie:kie-karaf-features</exclude>

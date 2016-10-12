@@ -8,7 +8,7 @@
   <fileSets>
     <fileSet>
       <directory>target/droolsjbpm-bpms-bin-${project.version}-pre-bin</directory>
-      <outputDirectory></outputDirectory>
+      <outputDirectory/>
     </fileSet>
   </fileSets>  
 </assembly>

@@ -30,8 +30,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.remote.common.rest.KieRemoteHttpResponse;
+import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -294,8 +294,8 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri, user, password ).body(body).put();
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpRequest request = newRequest( uri, user, password ).body(body).put();
+        KieServerHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.CREATED.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -310,8 +310,8 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = newRequest( uri, user, password ).delete();
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpRequest request = newRequest( uri, user, password ).delete();
+        KieServerHttpResponse response = request.response();
 
         if ( response.code() == Response.Status.OK.getStatusCode() ||
                 response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
@@ -323,9 +323,9 @@ public class RestKieServerControllerAdminImpl extends KieServerControllerAdminIm
         }
     }
 
-    private KieRemoteHttpRequest newRequest(String uri, String userName, String password) {
+    private KieServerHttpRequest newRequest(String uri, String userName, String password) {
 
-        KieRemoteHttpRequest httpRequest = KieRemoteHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
+        KieServerHttpRequest httpRequest = KieServerHttpRequest.newRequest(uri).followRedirects(true).timeout(5000);
         httpRequest.accept(MediaType.APPLICATION_JSON);
         httpRequest.basicAuthorization(userName, password);
 

@@ -17,17 +17,14 @@ package org.kie.server.client;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.remote.common.rest.KieRemoteHttpRequestException;
-import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.balancer.BalancerStrategy;
@@ -220,7 +217,7 @@ public class LoadBalancerClientTest {
         try {
             client.getServerInfo();
             fail("No servers available as all of them were stopped");
-        } catch (KieRemoteHttpRequestException e) {
+        } catch (KieServerHttpRequestException e) {
             assertEquals("No available endpoints found", e.getMessage());
         }
 
@@ -230,7 +227,7 @@ public class LoadBalancerClientTest {
         try {
             client.getServerInfo();
             fail("No servers available even though one was started as load balancer was not refreshed");
-        } catch (KieRemoteHttpRequestException e) {
+        } catch (KieServerHttpRequestException e) {
             assertEquals("No available endpoints found", e.getMessage());
         }
         // now let's refresh load balancer info

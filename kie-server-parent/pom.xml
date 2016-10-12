@@ -16,6 +16,7 @@
   <description>KIE Execution Server</description>
 
   <modules>
+    <module>kie-server-common</module>
     <module>kie-server-remote</module>
     <module>kie-server-services</module>
     <module>kie-server-api</module>
