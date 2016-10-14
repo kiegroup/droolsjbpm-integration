@@ -15,7 +15,8 @@
 
 package org.kie.remote.services.rest;
 
-import static org.kie.internal.remote.PermissionConstants.*;
+import static org.kie.internal.remote.PermissionConstants.REST_QUERY_ROLE;
+import static org.kie.internal.remote.PermissionConstants.REST_ROLE;
 import static org.kie.remote.services.rest.query.data.QueryResourceData.isNameValueParam;
 
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
@@ -34,10 +36,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
+import org.jbpm.query.jpa.data.QueryWhere;
+import org.jbpm.services.task.commands.TaskSummaryQueryCommand;
+import org.jbpm.services.task.impl.TaskSummaryQueryBuilderImpl;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
+import org.kie.internal.task.query.TaskSummaryQueryBuilder;
 import org.kie.remote.services.jaxb.JaxbTaskSummaryListResponse;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.data.QueryResourceData;
@@ -115,8 +120,7 @@ public class QueryResourceImpl extends ResourceBase {
         "status",                 // 4
         "taskOwner",              // 5
         "processInstanceId",      // 6
-        "language",               // 7
-        "union"                   // 8
+        "union"                   // 7
     };
 
     @GET
@@ -131,6 +135,18 @@ public class QueryResourceImpl extends ResourceBase {
         return createCorrectVariant(resultList, headers);
     }
 
+    public static long [] getPrimitiveArray(List<Long> list) {
+       if( list == null || list.isEmpty() ) {
+          return new long[0];
+       }
+       int size = list.size();
+       long [] arr = new long[size];
+       for( int i = 0; i < size; ++i ) {
+          arr[i] = list.get(i);
+       }
+       return arr;
+    }
+
     public JaxbTaskSummaryListResponse doTaskSummaryQuery(Map<String, String[]> params, String relativePath) {
         checkIfParametersAreAllowed(params, Arrays.asList(allowedQueryParams), "task query");
 
@@ -140,9 +156,8 @@ public class QueryResourceImpl extends ResourceBase {
         List<String> busAdmins = getStringListParamAsList(allowedQueryParams[2], false, params, "query");
         List<String> potOwners = getStringListParamAsList(allowedQueryParams[3], false, params, "query");
         List<String> taskOwners = getStringListParamAsList(allowedQueryParams[5], false, params, "query");
-        List<String> language = getStringListParamAsList(allowedQueryParams[7], false, params, "query");
 
-        String unionStr = getStringParam(allowedQueryParams[8], false, params, "query");
+        String unionStr = getStringParam(allowedQueryParams[7], false, params, "query");
         boolean union = Boolean.parseBoolean(unionStr); // null, etc == false
 
         List<String> statusStrList = getStringListParamAsList(allowedQueryParams[4], false, params, "query");
@@ -150,11 +165,42 @@ public class QueryResourceImpl extends ResourceBase {
 
         int[] pageInfo = getPageNumAndPageSize(params, relativePath);
         int maxResults = getMaxNumResultsNeeded(pageInfo);
-        GetTasksByVariousFieldsCommand queryCmd = new GetTasksByVariousFieldsCommand(workItemIds, taskIds, procInstIds, busAdmins,
-                potOwners, taskOwners, statuses, language, union, maxResults);
-        queryCmd.setUserId(identityProvider.getName());
 
-        List<TaskSummary> results = doRestTaskOperationWithTaskId((Long) null, queryCmd);
+        // We don't really need to add the user id here (it's not added to the QueryWhere), but it can't hurt..
+        TaskSummaryQueryBuilder builder = new TaskSummaryQueryBuilderImpl(identityProvider.getName(), null);
+        // could do this functionally, but lots of unneccesary object creation then..
+        if( union ) {
+            builder.union();
+        } else {
+            builder.intersect();
+        }
+        if( workItemIds != null && ! workItemIds.isEmpty() ) {
+            builder.workItemId(getPrimitiveArray(workItemIds));
+        }
+        if( taskIds != null && ! taskIds.isEmpty() ) {
+            builder.taskId(getPrimitiveArray(taskIds));
+        }
+        if( procInstIds != null && ! procInstIds.isEmpty() ) {
+            builder.processInstanceId(getPrimitiveArray(procInstIds));
+        }
+        if( busAdmins != null && ! busAdmins.isEmpty() ) {
+            builder.businessAdmin(busAdmins.toArray(new String[busAdmins.size()]));
+        }
+        if( potOwners != null && ! potOwners.isEmpty() ) {
+            builder.potentialOwner(potOwners.toArray(new String[potOwners.size()]));
+        }
+        if( taskOwners != null && ! taskOwners.isEmpty() ) {
+            builder.actualOwner(taskOwners.toArray(new String[taskOwners.size()]));
+        }
+        if( statuses != null && ! statuses.isEmpty() ) {
+            builder.status(statuses.toArray(new Status[statuses.size()]));
+        }
+        builder.maxResults(maxResults);
+        QueryWhere queryWhere = ((TaskSummaryQueryBuilderImpl) builder).getQueryWhere();
+
+        TaskSummaryQueryCommand cmd = new TaskSummaryQueryCommand(queryWhere);
+        cmd.setUserId(identityProvider.getName());
+        List<TaskSummary> results = doRestTaskOperationWithTaskId((Long) null, cmd);
 
         logger.debug("{} results found.", results.size());
         JaxbTaskSummaryListResponse resultList = paginateAndCreateResult(pageInfo, results, new JaxbTaskSummaryListResponse());

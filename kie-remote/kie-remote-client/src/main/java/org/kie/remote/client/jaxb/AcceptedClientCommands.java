@@ -15,13 +15,78 @@
 
 package org.kie.remote.client.jaxb;
 
-import org.kie.remote.jaxb.gen.*;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.kie.remote.jaxb.gen.AbortProcessInstanceCommand;
 import org.kie.remote.jaxb.gen.AbortWorkItemCommand;
+import org.kie.remote.jaxb.gen.ActivateTaskCommand;
+import org.kie.remote.jaxb.gen.AddCommentCommand;
+import org.kie.remote.jaxb.gen.AddContentCommand;
+import org.kie.remote.jaxb.gen.AddContentFromUserCommand;
+import org.kie.remote.jaxb.gen.AddTaskCommand;
+import org.kie.remote.jaxb.gen.CancelDeadlineCommand;
+import org.kie.remote.jaxb.gen.ClaimNextAvailableTaskCommand;
+import org.kie.remote.jaxb.gen.ClaimTaskCommand;
+import org.kie.remote.jaxb.gen.ClearHistoryLogsCommand;
+import org.kie.remote.jaxb.gen.CompleteTaskCommand;
+import org.kie.remote.jaxb.gen.CompleteWorkItemCommand;
+import org.kie.remote.jaxb.gen.DelegateTaskCommand;
+import org.kie.remote.jaxb.gen.DeleteCommand;
+import org.kie.remote.jaxb.gen.DeleteCommentCommand;
+import org.kie.remote.jaxb.gen.ExecuteTaskRulesCommand;
+import org.kie.remote.jaxb.gen.ExitTaskCommand;
+import org.kie.remote.jaxb.gen.FailTaskCommand;
+import org.kie.remote.jaxb.gen.FindActiveProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindNodeInstancesCommand;
+import org.kie.remote.jaxb.gen.FindProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.FindProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindSubProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.FindVariableInstancesByNameCommand;
+import org.kie.remote.jaxb.gen.FindVariableInstancesCommand;
+import org.kie.remote.jaxb.gen.FireAllRulesCommand;
+import org.kie.remote.jaxb.gen.ForwardTaskCommand;
+import org.kie.remote.jaxb.gen.GetAllCommentsCommand;
+import org.kie.remote.jaxb.gen.GetAttachmentCommand;
+import org.kie.remote.jaxb.gen.GetCommentCommand;
+import org.kie.remote.jaxb.gen.GetContentByIdCommand;
+import org.kie.remote.jaxb.gen.GetContentByIdForUserCommand;
+import org.kie.remote.jaxb.gen.GetContentMapForUserCommand;
+import org.kie.remote.jaxb.gen.GetFactCountCommand;
+import org.kie.remote.jaxb.gen.GetGlobalCommand;
+import org.kie.remote.jaxb.gen.GetIdCommand;
+import org.kie.remote.jaxb.gen.GetProcessIdsCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstanceByCorrelationKeyCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstanceCommand;
+import org.kie.remote.jaxb.gen.GetProcessInstancesCommand;
+import org.kie.remote.jaxb.gen.GetTaskAssignedAsBusinessAdminCommand;
+import org.kie.remote.jaxb.gen.GetTaskAssignedAsPotentialOwnerCommand;
+import org.kie.remote.jaxb.gen.GetTaskByWorkItemIdCommand;
+import org.kie.remote.jaxb.gen.GetTaskCommand;
+import org.kie.remote.jaxb.gen.GetTaskContentCommand;
+import org.kie.remote.jaxb.gen.GetTasksByProcessInstanceIdCommand;
+import org.kie.remote.jaxb.gen.GetTasksByStatusByProcessInstanceIdCommand;
+import org.kie.remote.jaxb.gen.GetTasksOwnedCommand;
+import org.kie.remote.jaxb.gen.GetVariableCommand;
+import org.kie.remote.jaxb.gen.GetWorkItemCommand;
+import org.kie.remote.jaxb.gen.InsertObjectCommand;
+import org.kie.remote.jaxb.gen.NominateTaskCommand;
+import org.kie.remote.jaxb.gen.ProcessSubTaskCommand;
+import org.kie.remote.jaxb.gen.ReleaseTaskCommand;
+import org.kie.remote.jaxb.gen.ResumeTaskCommand;
+import org.kie.remote.jaxb.gen.SetGlobalCommand;
+import org.kie.remote.jaxb.gen.SetProcessInstanceVariablesCommand;
+import org.kie.remote.jaxb.gen.SetTaskPropertyCommand;
+import org.kie.remote.jaxb.gen.SignalEventCommand;
+import org.kie.remote.jaxb.gen.SkipTaskCommand;
+import org.kie.remote.jaxb.gen.StartCorrelatedProcessCommand;
+import org.kie.remote.jaxb.gen.StartProcessCommand;
+import org.kie.remote.jaxb.gen.StartTaskCommand;
+import org.kie.remote.jaxb.gen.StopTaskCommand;
+import org.kie.remote.jaxb.gen.SuspendTaskCommand;
+import org.kie.remote.jaxb.gen.TaskSummaryQueryCommand;
+import org.kie.remote.jaxb.gen.UpdateCommand;
 
 @SuppressWarnings("rawtypes")
 public class AcceptedClientCommands {
@@ -88,7 +153,6 @@ public class AcceptedClientCommands {
         acceptedCommands.add(GetTaskCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
-        acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
         acceptedCommands.add(TaskSummaryQueryCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);

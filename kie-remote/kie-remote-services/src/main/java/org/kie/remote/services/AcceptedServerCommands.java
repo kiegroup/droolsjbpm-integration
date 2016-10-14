@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -75,7 +75,6 @@ import org.jbpm.services.task.commands.GetTaskCommand;
 import org.jbpm.services.task.commands.GetTaskContentCommand;
 import org.jbpm.services.task.commands.GetTasksByProcessInstanceIdCommand;
 import org.jbpm.services.task.commands.GetTasksByStatusByProcessInstanceIdCommand;
-import org.jbpm.services.task.commands.GetTasksByVariousFieldsCommand;
 import org.jbpm.services.task.commands.GetTasksOwnedCommand;
 import org.jbpm.services.task.commands.NominateTaskCommand;
 import org.jbpm.services.task.commands.ProcessSubTaskCommand;
@@ -92,10 +91,10 @@ import org.kie.api.command.Command;
 @SuppressWarnings("rawtypes")
 public class AcceptedServerCommands {
 
-    private AcceptedServerCommands() { 
+    private AcceptedServerCommands() {
         // static fields only
     }
-    
+
     private static Set<Class<? extends Command>> acceptedCommands = new HashSet<Class<? extends Command>>();
     static {
         acceptedCommands.add(AbortWorkItemCommand.class);
@@ -113,12 +112,12 @@ public class AcceptedServerCommands {
         acceptedCommands.add(StartProcessCommand.class);
 
         acceptedCommands.add(GetVariableCommand.class);
-        
+
         acceptedCommands.add(GetFactCountCommand.class);
         acceptedCommands.add(GetGlobalCommand.class);
         acceptedCommands.add(GetIdCommand.class);
         acceptedCommands.add(SetGlobalCommand.class);
-        
+
         acceptedCommands.add(DeleteCommand.class);
         acceptedCommands.add(FireAllRulesCommand.class);
         acceptedCommands.add(InsertObjectCommand.class);
@@ -144,11 +143,11 @@ public class AcceptedServerCommands {
         acceptedCommands.add(GetAllCommentsCommand.class);
         acceptedCommands.add(GetCommentCommand.class);
         acceptedCommands.add(SetTaskPropertyCommand.class);
-       
+
         acceptedCommands.add(AddContentFromUserCommand.class);
         acceptedCommands.add(GetContentByIdForUserCommand.class);
         acceptedCommands.add(GetContentMapForUserCommand.class);
-        
+
         acceptedCommands.add(GetTaskAssignedAsBusinessAdminCommand.class);
         acceptedCommands.add(GetTaskAssignedAsPotentialOwnerCommand.class);
         acceptedCommands.add(GetTaskByWorkItemIdCommand.class);
@@ -156,7 +155,6 @@ public class AcceptedServerCommands {
         acceptedCommands.add(GetTaskCommand.class);
         acceptedCommands.add(GetTasksByProcessInstanceIdCommand.class);
         acceptedCommands.add(GetTasksByStatusByProcessInstanceIdCommand.class);
-        acceptedCommands.add(GetTasksByVariousFieldsCommand.class);
         acceptedCommands.add(GetTasksOwnedCommand.class);
         acceptedCommands.add(TaskSummaryQueryCommand.class);
         acceptedCommands.add(NominateTaskCommand.class);
@@ -180,21 +178,21 @@ public class AcceptedServerCommands {
         acceptedCommands.add(FindSubProcessInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesCommand.class);
         acceptedCommands.add(FindVariableInstancesByNameCommand.class);
-        
+
         acceptedCommands = Collections.unmodifiableSet(acceptedCommands);
     }
 
-    public static boolean isAcceptedCommandClass(Class<?> commandClass) { 
+    public static boolean isAcceptedCommandClass(Class<?> commandClass) {
         return acceptedCommands.contains(commandClass);
     }
-    
+
     public static Set<Class<? extends Command>> SEND_OBJECT_PARAMETER_COMMANDS = new HashSet<Class<? extends Command>>();
-    static { 
+    static {
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteWorkItemCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(SignalEventCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(StartCorrelatedProcessCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(StartProcessCommand.class);
-        
+
         SEND_OBJECT_PARAMETER_COMMANDS.add(SetGlobalCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(InsertObjectCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(UpdateCommand.class);
@@ -202,7 +200,7 @@ public class AcceptedServerCommands {
         SEND_OBJECT_PARAMETER_COMMANDS.add(AddTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(CompleteTaskCommand.class);
         SEND_OBJECT_PARAMETER_COMMANDS.add(FailTaskCommand.class);
-        
+
         SEND_OBJECT_PARAMETER_COMMANDS = Collections.unmodifiableSet(SEND_OBJECT_PARAMETER_COMMANDS);
     }
 
