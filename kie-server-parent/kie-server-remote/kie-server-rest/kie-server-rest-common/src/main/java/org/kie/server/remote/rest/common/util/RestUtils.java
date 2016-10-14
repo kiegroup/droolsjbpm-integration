@@ -163,6 +163,10 @@ public class RestUtils {
         return createResponse(message, v, Response.Status.CONFLICT, customHeaders);
     }
 
+    public static Response badRequest(String reason, Variant v, Header... customHeaders) {
+        return createResponse(reason, v, Response.Status.BAD_REQUEST, customHeaders);
+    }
+
     public static Response noContent(Variant v, Header... customHeaders) {
         return createResponse("", v, Response.Status.NO_CONTENT, customHeaders);
     }

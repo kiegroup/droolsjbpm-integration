@@ -32,6 +32,7 @@ import org.kie.server.api.model.Wrapped;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.admin.ProcessAdminServiceBase;
+import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +53,13 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
 
     // admin section
     private ProcessAdminServiceBase processAdminServiceBase;
+    private UserTaskAdminServiceBase userTaskAdminServiceBase;
 
 
     public JBPMKieContainerCommandServiceImpl(KieServerRegistry context, DeploymentService deploymentService,
             DefinitionServiceBase definitionServiceBase, ProcessServiceBase processServiceBase, UserTaskServiceBase userTaskServiceBase,
             RuntimeDataServiceBase runtimeDataServiceBase, ExecutorServiceBase executorServiceBase, QueryDataServiceBase queryDataServiceBase,
-            DocumentServiceBase documentServiceBase, ProcessAdminServiceBase processAdminServiceBase) {
+            DocumentServiceBase documentServiceBase, ProcessAdminServiceBase processAdminServiceBase, UserTaskAdminServiceBase userTaskAdminServiceBase) {
 
         this.context = context;
         this.deploymentService = deploymentService;
@@ -69,6 +71,7 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
         this.queryDataServiceBase = queryDataServiceBase;
         this.documentServiceBase = documentServiceBase;
         this.processAdminServiceBase = processAdminServiceBase;
+        this.userTaskAdminServiceBase = userTaskAdminServiceBase;
     }
 
     @Override
@@ -113,6 +116,8 @@ public class JBPMKieContainerCommandServiceImpl implements KieContainerCommandSe
                     handler = documentServiceBase;
                 } else if ("ProcessAdminService".equals(descriptorCommand.getService())) {
                     handler = processAdminServiceBase;
+                } else if ("UserTaskAdminService".equals(descriptorCommand.getService())) {
+                    handler = userTaskAdminServiceBase;
                 } else {
                     throw new IllegalStateException("Unable to find handler for " + descriptorCommand.getService() + " service");
                 }

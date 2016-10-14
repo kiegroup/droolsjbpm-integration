@@ -30,6 +30,10 @@ public class Messages {
 
     public static final String NODE_INSTANCE_NOT_FOUND = "Could not find node instance with id \"{0}\" within process instance with id \"{1}\"";
 
+    public static final String NODE_NOT_FOUND = "Could not find node with id \"{0}\" within process instance with id \"{1}\"";
+
+    public static final String TIMER_INSTANCE_NOT_FOUND = "Could not find timer instance with id \"{0}\" within process instance with id \"{1}\"";
+
     public static final String VAR_INSTANCE_NOT_FOUND = "Could not find variable instance with name \"{0}\" within process instance with id \"{1}\"";
 
     public static final String VARIABLE_INSTANCE_NOT_FOUND = "Could not find variable \"{0}\" in process instance with id \"{1}\"";

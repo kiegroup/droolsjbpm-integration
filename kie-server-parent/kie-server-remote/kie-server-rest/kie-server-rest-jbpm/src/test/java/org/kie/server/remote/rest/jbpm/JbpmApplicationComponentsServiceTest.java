@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.kie.internal.executor.api.ExecutorService;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource;
+import org.kie.server.remote.rest.jbpm.admin.UserTaskAdminResource;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
@@ -63,7 +64,7 @@ public class JbpmApplicationComponentsServiceTest {
                     SupportedTransports.REST, services));
         }
 
-        int numComponents = 8;
+        int numComponents = 9;
         assertEquals("Unexpected num application components!", numComponents, appComponentsList.size());
         for( Object appComponent : appComponentsList ) {
             assertTrue("Unexpected app component type: " + Object.class.getSimpleName(),
@@ -75,6 +76,7 @@ public class JbpmApplicationComponentsServiceTest {
                     || appComponent instanceof QueryDataResource
                     || appComponent instanceof DocumentResource
                     || appComponent instanceof ProcessAdminResource
+                    || appComponent instanceof UserTaskAdminResource
                     );
         }
     }

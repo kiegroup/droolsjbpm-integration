@@ -41,6 +41,10 @@ public class FixedUserGroupCallbackImpl implements UserGroupCallback {
             groups.add("engineering");
         }
 
+        if (s.equals("yoda")) {
+            groups.add("Administrators");
+        }
+
         return groups;
     }
 }

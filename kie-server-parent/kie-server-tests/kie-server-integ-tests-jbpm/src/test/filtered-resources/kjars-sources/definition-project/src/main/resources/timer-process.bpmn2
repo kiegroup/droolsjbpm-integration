@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:tns="http://www.jboss.org/drools" xmlns="http://www.jboss.org/drools" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd http://www.jboss.org/drools drools.xsd http://www.bpsim.org/schemas/1.0 bpsim.xsd" id="Definition" expressionLanguage="http://www.mvel.org/2.0" targetNamespace="http://www.example.org/MinimalExample" typeLanguage="http://www.java.com/javaTypes">
+  <bpmn2:itemDefinition id="_timerItem" structureRef="String"/>
   <bpmn2:process id="definition-project.timer-process" tns:version="1" tns:packageName="com.sample" tns:adHoc="false" name="Timer Process" isExecutable="true" processType="Private">
+    <bpmn2:property id="timer" itemSubjectRef="_timerItem"/>
     <bpmn2:startEvent id="_1" name="StartProcess">
       <bpmn2:outgoing>_1-_2</bpmn2:outgoing>
     </bpmn2:startEvent>
@@ -8,7 +10,7 @@
       <bpmn2:incoming>_1-_2</bpmn2:incoming>
       <bpmn2:outgoing>_2-_3</bpmn2:outgoing>
       <bpmn2:timerEventDefinition>
-        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">1s</bpmn2:timeDuration>
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">#{timer}</bpmn2:timeDuration>
       </bpmn2:timerEventDefinition>
     </bpmn2:intermediateCatchEvent>
     <bpmn2:endEvent id="_3" name="EndProcess">
