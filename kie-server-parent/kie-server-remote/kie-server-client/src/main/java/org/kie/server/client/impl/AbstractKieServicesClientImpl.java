@@ -35,9 +35,9 @@ import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.remote.common.rest.KieRemoteHttpRequestException;
-import org.kie.remote.common.rest.KieRemoteHttpResponse;
+import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpRequestException;
+import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.jms.JMSConstants;
@@ -170,13 +170,13 @@ public abstract class AbstractKieServicesClientImpl {
     protected <T> ServiceResponse<T> makeHttpGetRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
 
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest(url).get();
             }
         });
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
@@ -190,13 +190,13 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected <T> T makeHttpGetRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation() {
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation() {
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest(url).get();
             }
         });
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
@@ -210,13 +210,13 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected String makeHttpGetRequestAndCreateRawResponse(String uri) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation() {
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation() {
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest(url).get();
             }
         });
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -231,13 +231,13 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected String makeHttpGetRequestAndCreateRawResponse(String uri, Map<String, String> headers) {
         logger.debug("About to send GET request to '{}'", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest( uri ).headers(headers).get();
             }
         });
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -269,14 +269,14 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest( uri ).headers(headers).body(body).post();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -300,14 +300,14 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest(uri ).headers(headers).body(body).post();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -328,14 +328,14 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpPutRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest(uri).body(body).put();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -358,14 +358,14 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest( uri ).headers(headers).body(body).put();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -382,14 +382,14 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> ServiceResponse<T> makeHttpDeleteRequestAndCreateServiceResponse(String uri, Class<T> resultType) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest( uri ).delete();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -405,14 +405,14 @@ public abstract class AbstractKieServicesClientImpl {
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType) {
         logger.debug("About to send DELETE request to '{}' ", uri);
-        KieRemoteHttpRequest request = invoke(uri, new RemoteHttpOperation(){
+        KieServerHttpRequest request = invoke(uri, new RemoteHttpOperation(){
             @Override
-            public KieRemoteHttpRequest doOperation(String url) {
+            public KieServerHttpRequest doOperation(String url) {
                 return newRequest( uri ).delete();
             }
         });
 
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -428,9 +428,9 @@ public abstract class AbstractKieServicesClientImpl {
         }
     }
 
-    protected KieRemoteHttpRequest newRequest(String uri) {
-        KieRemoteHttpRequest httpRequest =
-                KieRemoteHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
+    protected KieServerHttpRequest newRequest(String uri) {
+        KieServerHttpRequest httpRequest =
+                KieServerHttpRequest.newRequest( uri ).followRedirects( true ).timeout( config.getTimeout() );
         httpRequest.accept( getMediaType( config.getMarshallingFormat() ) );
         httpRequest.header(KieServerConstants.KIE_CONTENT_TYPE_HEADER, config.getMarshallingFormat().toString());
 
@@ -608,15 +608,15 @@ public abstract class AbstractKieServicesClientImpl {
     }
 
     protected RuntimeException createExceptionForUnexpectedResponseCode(
-            KieRemoteHttpRequest request,
-            KieRemoteHttpResponse response) {
+            KieServerHttpRequest request,
+            KieServerHttpResponse response) {
         String summaryMessage = "Unexpected HTTP response code when requesting URI '" + request.getUri() + "'! Error code: " +
                 response.code() + ", message: " + response.body();
         logger.debug( summaryMessage + ", response body: " + getMessage(response) );
         return new KieServicesException( summaryMessage );
     }
 
-    protected String getMessage(KieRemoteHttpResponse response) {
+    protected String getMessage(KieServerHttpResponse response) {
         try {
             String body = response.body();
             if (body != null && !body.isEmpty()) {
@@ -746,8 +746,8 @@ public abstract class AbstractKieServicesClientImpl {
  */
     protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, Object body, Class<T> resultType, Map<String, String> headers) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpRequest request = newRequest( uri ).headers(headers).body(serialize( body )).post();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -764,8 +764,8 @@ public abstract class AbstractKieServicesClientImpl {
 
     protected <T> ServiceResponse<T> makeBackwardCompatibleHttpPostRequestAndCreateServiceResponse(String uri, String body, Class<T> resultType) {
         logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
-        KieRemoteHttpRequest request = newRequest( uri ).body( body ).post();
-        KieRemoteHttpResponse response = request.response();
+        KieServerHttpRequest request = newRequest( uri ).body( body ).post();
+        KieServerHttpResponse response = request.response();
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
@@ -784,12 +784,12 @@ public abstract class AbstractKieServicesClientImpl {
         return owner.getConversationId();
     }
 
-    protected KieRemoteHttpRequest invoke(String url, RemoteHttpOperation operation) {
+    protected KieServerHttpRequest invoke(String url, RemoteHttpOperation operation) {
         String nextUrl = null;
         do {
             try {
                 return operation.doOperation(url);
-            } catch (KieRemoteHttpRequestException e) {
+            } catch (KieServerHttpRequestException e) {
                 if (e.getCause() instanceof ConnectException) {
                     logger.debug("Marking endpoint '{}' as failed due to {}", url, e.getCause().getMessage());
                     loadBalancer.markAsFailed(url);
@@ -802,11 +802,11 @@ public abstract class AbstractKieServicesClientImpl {
             }
         } while (nextUrl != null);
 
-        throw new KieRemoteHttpRequestException("Unable to invoke operation " + operation);
+        throw new KieServerHttpRequestException("Unable to invoke operation " + operation);
     }
 
     private abstract class RemoteHttpOperation {
 
-        public abstract KieRemoteHttpRequest doOperation(String url);
+        public abstract KieServerHttpRequest doOperation(String url);
     }
 }

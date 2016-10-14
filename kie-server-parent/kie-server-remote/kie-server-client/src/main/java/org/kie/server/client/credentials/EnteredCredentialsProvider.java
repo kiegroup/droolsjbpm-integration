@@ -15,7 +15,7 @@
 
 package org.kie.server.client.credentials;
 
-import org.kie.remote.common.rest.Base64Util;
+import org.kie.server.common.rest.Base64Util;
 import org.kie.server.client.CredentialsProvider;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;

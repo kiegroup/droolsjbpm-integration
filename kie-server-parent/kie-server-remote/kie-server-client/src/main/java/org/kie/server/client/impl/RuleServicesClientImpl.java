@@ -16,16 +16,10 @@
 package org.kie.server.client.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.Response;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.remote.common.rest.KieRemoteHttpResponse;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieServerCommand;

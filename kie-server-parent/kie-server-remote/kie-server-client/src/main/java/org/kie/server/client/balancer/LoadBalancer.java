@@ -24,8 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.kie.remote.common.rest.KieRemoteHttpRequest;
-import org.kie.remote.common.rest.KieRemoteHttpRequestException;
+import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.client.balancer.impl.RandomBalancerStrategy;
 import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class LoadBalancer {
         this.balancerStrategy = balancerStrategy;
     }
 
-    public String getUrl() throws KieRemoteHttpRequestException{
+    public String getUrl() throws KieServerHttpRequestException {
         String selectedUrl = balancerStrategy.next();
         logger.debug("Load balancer {} selected url '{}'", balancerStrategy, selectedUrl);
         return selectedUrl;
@@ -142,8 +142,8 @@ public class LoadBalancer {
             while(iterator.hasNext()) {
                 String failedEndpoint = iterator.next();
                 try {
-                    KieRemoteHttpRequest httpRequest =
-                            KieRemoteHttpRequest.newRequest(failedEndpoint).followRedirects(true).timeout(1000);
+                    KieServerHttpRequest httpRequest =
+                            KieServerHttpRequest.newRequest(failedEndpoint).followRedirects(true).timeout(1000);
                     httpRequest.get();
 
                     logger.debug("Url '{}' is back online, adding it to load balancer", failedEndpoint);

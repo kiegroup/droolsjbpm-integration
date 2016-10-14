@@ -17,14 +17,14 @@ package org.kie.server.client.balancer.impl;
 
 import java.util.Collection;
 
-import org.kie.remote.common.rest.KieRemoteHttpRequestException;
+import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.client.balancer.BalancerStrategy;
 
 public abstract class AbstractBalancerStrategy implements BalancerStrategy {
 
     protected void checkEmpty(Collection<?> endpoints) {
         if (endpoints.isEmpty()) {
-            throw new KieRemoteHttpRequestException("No available endpoints found");
+            throw new KieServerHttpRequestException("No available endpoints found");
         }
     }
 }

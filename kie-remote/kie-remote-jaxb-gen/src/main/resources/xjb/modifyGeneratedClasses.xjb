@@ -1,9 +1,0 @@
-<jaxb:bindings jaxb:extensionBindingPrefixes="xjc" version="1.0"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
-  <jaxb:globalBindings>
-    <!-- force @XmlRootElement use in generated classes -->
-    <xjc:simple/>
-    <xjc:superInterface name="org.kie.api.command.Command" />
-  </jaxb:globalBindings>
-</jaxb:bindings>

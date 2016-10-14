@@ -55,7 +55,6 @@
     <module>drools-rhq-plugin</module>
     <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
-    <module>kie-remote</module>
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
     <module>kie-eap-integration</module>
