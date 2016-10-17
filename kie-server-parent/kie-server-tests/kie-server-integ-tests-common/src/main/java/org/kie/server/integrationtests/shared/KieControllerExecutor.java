@@ -16,7 +16,6 @@
 package org.kie.server.integrationtests.shared;
 
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
-import org.kie.server.controller.rest.RestKieServerControllerAdminImpl;
 import org.kie.server.controller.rest.RestKieServerControllerImpl;
 import org.kie.server.controller.rest.RestSpecManagementServiceImpl;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -34,7 +33,6 @@ public class KieControllerExecutor {
         controller.setPort(TestConfig.getControllerAllocatedPort());
         controller.start();
         controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerImpl());
-        controller.getDeployment().getRegistry().addSingletonResource(new RestKieServerControllerAdminImpl());
         controller.getDeployment().getRegistry().addSingletonResource(new RestSpecManagementServiceImpl());
     }
 
