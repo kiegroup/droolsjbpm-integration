@@ -41,11 +41,9 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieControllerExecutor;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.slf4j.Logger;
@@ -133,24 +131,8 @@ public abstract class KieServerBaseIntegrationTest {
     protected void disposeAllServerInstances() {
         // Is done just if we run local server (controller always on) or controller is deployed.
         if (TestConfig.isLocalServer() || TestConfig.isControllerProvided()) {
-            disposeServerInstances();
             disposeServerTemplates();
         }
-    }
-
-    private void disposeServerInstances() {
-        KieServerControllerClient controllerClient;
-        if (TestConfig.isLocalServer()) {
-            controllerClient = new KieServerControllerClient(TestConfig.getControllerHttpUrl(), null, null);
-        } else {
-            controllerClient = new KieServerControllerClient(TestConfig.getControllerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
-        }
-        controllerClient.setMarshallingFormat(MarshallingFormat.JAXB);
-        KieServerInstance[] serverInstrances = controllerClient.listKieServerInstances().getKieServerInstances();
-        for (KieServerInstance serverInstance : serverInstrances) {
-            controllerClient.deleteKieServerInstance(serverInstance.getIdentifier());
-        }
-        controllerClient.close();
     }
 
     private void disposeServerTemplates() {

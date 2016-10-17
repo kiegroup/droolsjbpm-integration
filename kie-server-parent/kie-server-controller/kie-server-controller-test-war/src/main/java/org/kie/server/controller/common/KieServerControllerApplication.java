@@ -21,7 +21,6 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import org.kie.server.controller.rest.RestKieServerControllerAdminImpl;
 import org.kie.server.controller.rest.RestKieServerControllerImpl;
 import org.kie.server.controller.rest.RestSpecManagementServiceImpl;
 
@@ -32,7 +31,6 @@ public class KieServerControllerApplication extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(RestKieServerControllerImpl.class);
-        classes.add(RestKieServerControllerAdminImpl.class);
         classes.add(RestSpecManagementServiceImpl.class);
         return classes;
     }
