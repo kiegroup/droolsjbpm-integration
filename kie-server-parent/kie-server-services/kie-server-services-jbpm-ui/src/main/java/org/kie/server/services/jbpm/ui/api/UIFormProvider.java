@@ -57,4 +57,10 @@ public interface UIFormProvider {
      * @return
      */
     int getPriority();
+
+    /**
+     * Returns type of the form that is being returned - depends on form provider impl.
+     * @return type of the content
+     */
+    String getType();
 }
