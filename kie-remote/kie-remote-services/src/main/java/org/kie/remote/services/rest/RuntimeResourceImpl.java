@@ -46,6 +46,7 @@ import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
 import org.drools.core.command.runtime.process.GetProcessIdsCommand;
 import org.drools.core.command.runtime.process.GetProcessInstanceCommand;
 import org.drools.core.command.runtime.process.GetWorkItemCommand;
+import org.drools.core.command.runtime.process.GetWorkItemIdsCommand;
 import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartCorrelatedProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -255,6 +256,24 @@ public class RuntimeResourceImpl extends ResourceBase {
                 (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, requestParams, oper, true));
 
         return createCorrectVariant(new JaxbGenericResponse(getRequestUri()), headers);
+    }
+
+    @GET
+    @Path("/workitem/")
+    @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
+    public Response getWorkItems() {
+        String oper = getRelativePath();
+        Map<String, String[]> requestParams = getRequestParams();
+        List<String> correlationKeyProps = getCorrelationKeyProperties(requestParams);
+
+        List<Long> workItemIds = processRequestBean.doKieSessionOperation(
+                new GetWorkItemIdsCommand(),
+                deploymentId,
+                correlationKeyProps,
+                (Long) getNumberParam(PROC_INST_ID_PARAM_NAME, false, getRequestParams(), oper, true));
+
+
+        return createCorrectVariant(workItemIds, headers);
     }
 
     @GET
