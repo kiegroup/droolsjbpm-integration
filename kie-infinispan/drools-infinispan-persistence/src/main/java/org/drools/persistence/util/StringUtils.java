@@ -30,6 +30,8 @@ import java.io.UnsupportedEncodingException;
  */
 public class StringUtils {
 
+    private StringUtils() {}
+
     /**
      * Encodes the given string into a sequence of bytes using the ISO-8859-1 charset, storing the result into a new
      * byte array.

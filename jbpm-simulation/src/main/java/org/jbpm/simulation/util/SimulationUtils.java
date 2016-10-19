@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 public class SimulationUtils {
-	
+
 	public static final double HUNDRED = 100;
 	public static final  NumberFormat formatter = new DecimalFormat("#0.00");
 	
@@ -38,6 +38,8 @@ public class SimulationUtils {
 	    timeUnitMapping.put("day", "days");
 	    timeUnitMapping.put("year", "years");
 	}
+
+	private SimulationUtils() {}
 
 	public static int asInt(Object value) {
 		if (value == null) {

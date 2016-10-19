@@ -36,7 +36,9 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 public class RestUtils {
 
     private static MarshallerHelper marshallerHelper = new MarshallerHelper(null);
-    
+
+    private RestUtils() {}
+
     public static Response createCorrectVariant(Object responseObj, HttpHeaders headers, Header... customHeaders) {
         return createCorrectVariant(responseObj, headers, null, customHeaders);
     }

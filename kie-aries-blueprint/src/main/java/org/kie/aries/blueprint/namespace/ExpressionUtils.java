@@ -20,6 +20,8 @@ import org.osgi.service.blueprint.container.ComponentDefinitionException;
 import java.io.File;
 
 public class ExpressionUtils {
+    private ExpressionUtils() {}
+
     public static String resolveExpressionInPath(String path){
         //#{ systemProperties['java.io.tmpdir'] }
         String[] pathComponents = path.split("/");

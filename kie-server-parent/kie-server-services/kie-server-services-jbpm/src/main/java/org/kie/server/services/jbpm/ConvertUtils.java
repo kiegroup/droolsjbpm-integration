@@ -45,6 +45,8 @@ import org.kie.server.api.model.instance.VariableInstanceList;
 
 public class ConvertUtils {
 
+    private ConvertUtils() {}
+
     public static ProcessInstanceList convertToProcessInstanceList(Collection<ProcessInstanceDesc> instances) {
         if (instances == null) {
             return new ProcessInstanceList(new org.kie.server.api.model.instance.ProcessInstance[0]);
