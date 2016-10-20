@@ -5,7 +5,7 @@ import org.apache.commons.math3.ml.clustering.Clusterable;
 
 public class UsingADependencyClass {
     private final String name;
-    private final Cluster<Clusterable> aCluster;
+    private Cluster<Clusterable> aCluster;
 
     public UsingADependencyClass(String name) {
         super();
@@ -22,4 +22,7 @@ public class UsingADependencyClass {
         return aCluster;
     }
     
+    public void setACluster(Cluster<Clusterable> aCluster) {
+        this.aCluster = aCluster;
+    }
 }

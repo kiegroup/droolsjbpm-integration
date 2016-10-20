@@ -9,7 +9,7 @@ import java.util.List;
 import org.drools.core.phreak.ReactiveObject;
 import org.junit.Test;
 
-public class MojoConfigTest {
+public class InjectReactiveMojoConfigTest {
 
     @Test
     public void testRegexpForPackagesDefault() {

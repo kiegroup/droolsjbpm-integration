@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.drools.core.phreak.ReactiveList;
 import org.drools.core.phreak.ReactiveObject;
@@ -90,7 +91,7 @@ public class BytecodeInjectReactive {
         this.writeMethods = new HashMap<String, CtMethod>();
     }
     
-    public byte[] test2(String classname) throws Exception {
+    public byte[] injectReactive(String classname) throws Exception {
         init();
         
         CtClass droolsPojo = cp.get(classname);
@@ -130,7 +131,7 @@ public class BytecodeInjectReactive {
                 "}", droolsPojo );
         droolsPojo.addMethod(removeLeftTupleCtMethod);
         
-        for (CtField f : collectReactiveFields(droolsPojo)) {
+        for (CtField f : collectReactiveFields(droolsPojo, cp)) {
             LOG.debug("Preparing field writer method for field: {}.", f);
             writeMethods.put(f.getName(), makeWriter(droolsPojo, f));
         }
@@ -149,7 +150,7 @@ public class BytecodeInjectReactive {
             final MethodInfo methodInfo = (MethodInfo) oMethod;
             final String methodName = methodInfo.getName();
 
-            // skip methods added by enhancement and abstract methods (methods without any code)
+            // skip methods added by enhancement, and abstract methods (methods without any code)
             if ( methodName.startsWith( DROOLS_PREFIX ) || methodInfo.getCodeAttribute() == null ) {
                 continue;
             }
@@ -163,23 +164,19 @@ public class BytecodeInjectReactive {
                         continue;
                     }
 
-//                    // only transform access to fields of the entity being enhanced
-//                    if ( !managedCtClass.getName().equals( constPool.getFieldrefClassName( itr.u16bitAt( index + 1 ) ) ) ) {
-//                        continue;
-//                    }
-
                     final String fieldName = constPool.getFieldrefName( itr.u16bitAt( index + 1 ) );
                     
-                    if (!collectReactiveFields(managedCtClass).stream().map(ct->ct.getName()).filter(n->n.equals(fieldName)).findAny().isPresent() ) {
+                    Optional<CtField> findCtField = collectReactiveFields(managedCtClass, cp).stream().filter(ct->ct.getName().equals(fieldName)).findFirst();
+                    if (!findCtField.isPresent() ) {
+                        continue;
+                    }
+                    CtField ctField = findCtField.get();
+                    
+                    // if we are in constructors, only need to intercept assignment statement for Reactive Collection/List/... (regardless they may be final)
+                    if ( methodInfo.isConstructor() && Modifier.isFinal( ctField.getModifiers()) && !( ctField.getType().subtypeOf( cp.get(List.class.getName()) ) ) ) {
                         continue;
                     }
 
-
-//                    if ( op == Opcode.GETFIELD ) {
-//                        final int methodIndex = MethodWriter.addMethod( constPool, attributeMethods.getReader() );
-//                        itr.writeByte( Opcode.INVOKEVIRTUAL, index );
-//                        itr.write16bit( methodIndex, index + 1 );
-//                    } else
                     if (op == Opcode.PUTFIELD) {
                         // addMethod is a safe add, if constant already present it return the existing value without adding.
                         final int methodIndex = addMethod( constPool, writeMethods.get(fieldName) );
@@ -236,7 +233,7 @@ public class BytecodeInjectReactive {
         
         LOG.debug("buildWriteInterceptionBodyFragment: {} {}", field.getType().getClass(), field.getType());
         
-        if ( field.getType().subtypeOf( cp.get(List.class.getName()) ) ) {
+        if ( isCtFieldReactiveCollection(field, cp) ) {
             return String.format(
                     "  this.%1$s = new "+ReactiveList.class.getName()+"($1); ",
                     field.getName()
@@ -252,16 +249,22 @@ public class BytecodeInjectReactive {
                 );
     }
 
-    private static List<CtField> collectReactiveFields(CtClass managedCtClass) {
+    private static List<CtField> collectReactiveFields(CtClass managedCtClass, ClassPool cp) {
         final List<CtField> persistentFieldList = new ArrayList<CtField>();
         for ( CtField ctField : managedCtClass.getDeclaredFields() ) {
-            // skip static fields and skip fields added by enhancement
+            // skip static fields, skip final fields, and skip fields added by enhancement
             if ( Modifier.isStatic( ctField.getModifiers() ) || ctField.getName().startsWith( DROOLS_PREFIX ) ) {
                 continue;
             }
             // skip outer reference in inner classes
             if ( "this$0".equals( ctField.getName() ) ) {
                 continue;
+            }
+            // optimization: skip final field, unless it is a Reactive Collection/List/... in which case we need to consider anyway:
+            if ( Modifier.isFinal( ctField.getModifiers()) ) {
+                if ( !isCtFieldReactiveCollection(ctField, cp) ) {
+                    continue;
+                }
             }
             persistentFieldList.add( ctField );
         }
@@ -277,5 +280,14 @@ public class BytecodeInjectReactive {
             persistentFieldList.add( ctField );
         }
         return persistentFieldList;
+    }
+
+    private static boolean isCtFieldReactiveCollection(CtField ctField, ClassPool cp) {
+        try {
+            return ctField.getType().subtypeOf( cp.get(List.class.getName()));
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -69,9 +69,9 @@ public class XPathTest {
            hence later in the test there is no way to reload the same class as the bytecode instrumented version
            which is the ultimate intention behind of these tests.
          */
-        byte[] personBytecode = enhancer.test2("org.drools.compiler.xpath.tobeinstrumented.model.Person");
-        byte[] schoolBytecode = enhancer.test2("org.drools.compiler.xpath.tobeinstrumented.model.School");
-        byte[] childBytecode = enhancer.test2("org.drools.compiler.xpath.tobeinstrumented.model.Child");
+        byte[] personBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.Person");
+        byte[] schoolBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.School");
+        byte[] childBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.Child");
         
         ClassPool cp2 = new ClassPool(null);
         cp2.appendSystemPath();

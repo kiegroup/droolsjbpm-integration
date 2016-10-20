@@ -166,11 +166,12 @@
       <scope>runtime</scope>
     </dependency>
 
+<!-- Was added to support log on Maven 3.0.5 but now old; also could be handy for temporarily turn on debug output of the inner classes while performing tests using the Takari framework. But in conclusion, not ideal to depend on logging impl.
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>runtime</scope>
-    </dependency>
+    </dependency> -->
 
     <!-- Testing deps -->
     <dependency>
