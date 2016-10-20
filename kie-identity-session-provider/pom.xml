@@ -11,6 +11,25 @@
   <artifactId>kie-identity-session-provider</artifactId>
   <name>KIE Identity And Session Provider</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.errai.bom</groupId>
+        <artifactId>errai-internal-bom</artifactId>
+        <version>${version.org.jboss.errai}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-bom</artifactId>
+        <version>${version.org.uberfire}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
@@ -29,7 +48,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    
     <!-- specs -->
     <dependency>
       <groupId>javax.enterprise</groupId>
