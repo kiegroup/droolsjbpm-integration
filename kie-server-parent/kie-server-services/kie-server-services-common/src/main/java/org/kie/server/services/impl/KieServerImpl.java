@@ -438,7 +438,7 @@ public class KieServerImpl {
     }
 
     private KieScannerResource getScannerResource(KieContainerInstanceImpl kci) {
-        return kci.getResource().getScanner();
+        return kci.getRefreshedResource().getScanner();
     }
 
     public ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource) {
@@ -691,7 +691,7 @@ public class KieServerImpl {
                     repository.store(KieServerEnvironment.getServerId(), currentState);
 
                     messages.add(new Message(Severity.INFO, "Release id successfully updated for container " + id));
-                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getRefreshedResource().getReleaseId());
                 }
             } else {
                 // no container yet, attempt to create it
@@ -700,7 +700,7 @@ public class KieServerImpl {
                 ServiceResponse<KieContainerResource> response = createContainer(id, containerResource);
                 if (response.getType().equals(ResponseType.SUCCESS)) {
                     kci = context.getContainer(id);
-                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getResource().getReleaseId());
+                    return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "Release id successfully updated.", kci.getRefreshedResource().getReleaseId());
                 } else {
                     return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
                 }
