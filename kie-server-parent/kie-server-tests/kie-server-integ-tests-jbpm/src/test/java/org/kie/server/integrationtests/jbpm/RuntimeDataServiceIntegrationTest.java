@@ -789,7 +789,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertEquals("1.0", instance.getProcessVersion());
             assertEquals(USER_YODA, instance.getInitiator());
             assertEquals(CONTAINER_ID, instance.getContainerId());
-            KieServerAssert.assertNullOrEmpty(instance.getCorrelationKey());
+            assertEquals(processInstanceId.toString(), instance.getCorrelationKey());
             assertEquals("evaluation", instance.getProcessInstanceDescription());
             assertEquals(-1, instance.getParentId().longValue());
         } finally {
