@@ -95,6 +95,10 @@ public class BytecodeInjectReactive {
         init();
         
         CtClass droolsPojo = cp.get(classname);
+        if (collectReactiveFields(droolsPojo).size() == 0) {
+            LOG.info("Skipped bytecode injection in class " + droolsPojo.getName()+ " because no fields candidated for reactivity.");
+            return droolsPojo.toBytecode();
+        }
         
         droolsPojo.addInterface( cp.get(ReactiveObject.class.getName()) );
         
@@ -131,7 +135,7 @@ public class BytecodeInjectReactive {
                 "}", droolsPojo );
         droolsPojo.addMethod(removeLeftTupleCtMethod);
         
-        for (CtField f : collectReactiveFields(droolsPojo, cp)) {
+        for (CtField f : collectReactiveFields(droolsPojo)) {
             LOG.debug("Preparing field writer method for field: {}.", f);
             writeMethods.put(f.getName(), makeWriter(droolsPojo, f));
         }
@@ -166,7 +170,7 @@ public class BytecodeInjectReactive {
 
                     final String fieldName = constPool.getFieldrefName( itr.u16bitAt( index + 1 ) );
                     
-                    Optional<CtField> findCtField = collectReactiveFields(managedCtClass, cp).stream().filter(ct->ct.getName().equals(fieldName)).findFirst();
+                    Optional<CtField> findCtField = collectReactiveFields(managedCtClass).stream().filter(ct->ct.getName().equals(fieldName)).findFirst();
                     if (!findCtField.isPresent() ) {
                         continue;
                     }
@@ -233,7 +237,7 @@ public class BytecodeInjectReactive {
         
         LOG.debug("buildWriteInterceptionBodyFragment: {} {}", field.getType().getClass(), field.getType());
         
-        if ( isCtFieldReactiveCollection(field, cp) ) {
+        if ( isCtFieldReactiveCollection(field) ) {
             return String.format(
                     "  this.%1$s = new "+ReactiveList.class.getName()+"($1); ",
                     field.getName()
@@ -249,7 +253,7 @@ public class BytecodeInjectReactive {
                 );
     }
 
-    private static List<CtField> collectReactiveFields(CtClass managedCtClass, ClassPool cp) {
+    private List<CtField> collectReactiveFields(CtClass managedCtClass) {
         final List<CtField> persistentFieldList = new ArrayList<CtField>();
         for ( CtField ctField : managedCtClass.getDeclaredFields() ) {
             // skip static fields, skip final fields, and skip fields added by enhancement
@@ -262,7 +266,7 @@ public class BytecodeInjectReactive {
             }
             // optimization: skip final field, unless it is a Reactive Collection/List/... in which case we need to consider anyway:
             if ( Modifier.isFinal( ctField.getModifiers()) ) {
-                if ( !isCtFieldReactiveCollection(ctField, cp) ) {
+                if ( !isCtFieldReactiveCollection(ctField) ) {
                     continue;
                 }
             }
@@ -282,7 +286,7 @@ public class BytecodeInjectReactive {
         return persistentFieldList;
     }
 
-    private static boolean isCtFieldReactiveCollection(CtField ctField, ClassPool cp) {
+    private boolean isCtFieldReactiveCollection(CtField ctField) {
         try {
             return ctField.getType().subtypeOf( cp.get(List.class.getName()));
         } catch (NotFoundException e) {

@@ -52,6 +52,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         assertTrue( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.Adult") ) );
         assertTrue( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingADependencyClass") ) );
         assertTrue( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingSpecializedList") ) );
+        assertFalse( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.ImmutablePojo") ) );
     }
     
     @Test
@@ -83,12 +84,15 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.Adult") ) );
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingADependencyClass") ) );
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.UsingSpecializedList") ) );
+        assertFalse( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.ImmutablePojo") ) );
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("to.instrument.Adult") ) );
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("to.instrument.UsingADependencyClass") ) );
         assertTrue ( looksLikeInstrumentedClass( cl.loadClass("to.instrument.UsingSpecializedList") ) );
+        assertFalse( looksLikeInstrumentedClass( cl.loadClass("to.instrument.ImmutablePojo") ) );
         assertFalse( looksLikeInstrumentedClass( cl.loadClass("to.not.instrument.Adult") ) );
         assertFalse( looksLikeInstrumentedClass( cl.loadClass("to.not.instrument.UsingADependencyClass") ) );
         assertFalse( looksLikeInstrumentedClass( cl.loadClass("to.not.instrument.UsingSpecializedList") ) );
+        assertFalse( looksLikeInstrumentedClass( cl.loadClass("to.not.instrument.ImmutablePojo") ) );
     }
 
     private boolean looksLikeInstrumentedClass(Class<?> personClass) {
