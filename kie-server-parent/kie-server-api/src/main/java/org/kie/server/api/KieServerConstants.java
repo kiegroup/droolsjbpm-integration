@@ -101,4 +101,8 @@ public class KieServerConstants {
 
     public static final String KIE_SERVER_PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
 
+    public static final String QUERY_ORDER_BY = "q_order_by";
+    public static final String QUERY_ASCENDING = "q_ascending";
+    public static final String QUERY_COLUMN_MAPPING = "q_column_mapping";
+
 }
