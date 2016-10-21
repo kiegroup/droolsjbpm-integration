@@ -68,6 +68,11 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         templateStorage.update( serverTemplate );
 
         notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+
+        if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
+            List<Container> containers = kieServerInstanceManager.startContainer( serverTemplate, containerSpec );
+            notificationService.notify( serverTemplate, containerSpec, containers );
+        }
     }
 
     @Override
