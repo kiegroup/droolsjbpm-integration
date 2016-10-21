@@ -76,6 +76,35 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
+    public void updateContainerSpec( String serverTemplateId,
+            ContainerSpec containerSpec ) {
+        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
+        if ( serverTemplate == null ) {
+            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+        }
+
+        if (!serverTemplate.hasContainerSpec(containerSpec.getId())) {
+            throw new KieServerControllerNotFoundException( "Server template with id " + serverTemplateId + " has no container with id " + containerSpec.getId());
+        }
+        // make sure correct server template is set
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
+
+        ContainerSpec currentVersion = serverTemplate.getContainerSpec(containerSpec.getId());
+
+        serverTemplate.deleteContainerSpec(currentVersion.getId());
+        serverTemplate.addContainerSpec(containerSpec);
+
+        templateStorage.update( serverTemplate );
+
+        notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        // in case container was started before it was update or update comes with status started update container in running servers
+        if (currentVersion.getStatus().equals(KieContainerStatus.STARTED) || containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
+            List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
+            notificationService.notify(serverTemplate, containerSpec, containers);
+        }
+    }
+
+    @Override
     public void saveServerTemplate( ServerTemplate serverTemplate ) {
         if ( templateStorage.exists( serverTemplate.getId() ) ) {
             templateStorage.update( serverTemplate );

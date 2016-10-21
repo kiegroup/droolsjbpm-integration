@@ -77,6 +77,31 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
         }
     }
 
+    @POST
+    @Path("servers/{id}/containers/{containerId}")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response updateContainerSpec(@Context HttpHeaders headers, @PathParam("id") String serverTemplateId, @PathParam("containerId") String containerId, String containerSpecPayload) {
+
+        String contentType = getContentType(headers);
+        try {
+            logger.debug("Received update container spec request for server template with id {}", serverTemplateId);
+            ContainerSpec containerSpec = unmarshal(containerSpecPayload, contentType, ContainerSpec.class);
+            logger.debug("Container spec is {}", containerSpec);
+
+            super.updateContainerSpec(serverTemplateId, containerSpec);
+            logger.debug("Returning response for update container spec request for server template with id '{}': CREATED", serverTemplateId);
+            return createCorrectVariant("", headers, Response.Status.CREATED);
+        } catch (KieServerControllerNotFoundException e) {
+            return createCorrectVariant(e.getMessage(), headers, Response.Status.NOT_FOUND);
+        } catch (KieServerControllerException e){
+            return createCorrectVariant("Request failed to be processed due to" + e.getMessage(), headers, Response.Status.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Save container spec request for server template id {} failed due to {}", serverTemplateId, e.getMessage(), e);
+            return createCorrectVariant("Unknown error " + e.getMessage(), headers, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PUT
     @Path("servers/{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
