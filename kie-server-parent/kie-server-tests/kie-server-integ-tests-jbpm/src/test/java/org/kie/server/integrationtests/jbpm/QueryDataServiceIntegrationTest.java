@@ -25,6 +25,7 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -38,6 +39,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 
+import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 
@@ -71,6 +73,31 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     }
 
     @Test
+    public void testQueryDefinitionsFromKjar() throws Exception {
+        String expectedResolvedDS = System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds");
+
+        List<QueryDefinition> queries = queryClient.getQueries(0, 10);
+        assertNotNull(queries);
+        assertEquals(2, queries.size());
+
+        Map<String, QueryDefinition> mapped = queries.stream().collect(toMap(QueryDefinition::getName, q -> q));
+
+        QueryDefinition registeredQuery = mapped.get("first-query");
+        assertNotNull(registeredQuery);
+        assertEquals("first-query", registeredQuery.getName());
+        assertEquals(expectedResolvedDS, registeredQuery.getSource());
+        assertEquals("select * from ProcessInstanceLog", registeredQuery.getExpression());
+        assertEquals("PROCESS", registeredQuery.getTarget());
+
+        registeredQuery = mapped.get("second-query");
+        assertNotNull(registeredQuery);
+        assertEquals("second-query", registeredQuery.getName());
+        assertEquals(expectedResolvedDS, registeredQuery.getSource());
+        assertEquals("select * from NodeInstanceLog", registeredQuery.getExpression());
+        assertEquals("CUSTOM", registeredQuery.getTarget());
+    }
+
+    @Test
     public void testCRUDOnQueryDefinition() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
@@ -85,9 +112,9 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 10);
             assertNotNull(queries);
-            assertEquals(1, queries.size());
+            assertEquals(3, queries.size());
 
-            QueryDefinition registeredQuery = queries.get(0);
+            QueryDefinition registeredQuery = queries.stream().filter(q -> q.getName().equals("allProcessInstances")).findFirst().orElse(null);
             assertNotNull(registeredQuery);
             assertEquals(query.getName(), registeredQuery.getName());
             assertEquals(query.getSource(), registeredQuery.getSource());
@@ -108,7 +135,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 10);
             assertNotNull(queries);
-            assertEquals(0, queries.size());
+            assertEquals(2, queries.size());
         }
 
     }
@@ -181,21 +208,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             queryClient.unregisterQuery(query.getName());
         }
 
-    }
-
-    protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
-        final QueryDefinition query = new QueryDefinition();
-        query.setName("allProcessInstancesWithVars");
-        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select pil.*, v.variableId, v.value " +
-                "from ProcessInstanceLog pil " +
-                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
-                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
-                "inner join VariableInstanceLog v " +
-                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
-                "where pil.status = 1");
-        query.setTarget("CUSTOM");
-        return query;
     }
 
     @Test
@@ -399,9 +411,9 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 10);
             assertNotNull(queries);
-            assertEquals(1, queries.size());
+            assertEquals(3, queries.size());
 
-            QueryDefinition registeredQuery = queries.get(0);
+            QueryDefinition registeredQuery = queries.stream().filter(q -> q.getName().equals("allProcessInstances")).findFirst().orElse(null);
             assertNotNull(registeredQuery);
             assertEquals(query.getName(), registeredQuery.getName());
             assertEquals(expectedResolvedDS, registeredQuery.getSource());
@@ -422,7 +434,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             List<QueryDefinition> queries = queryClient.getQueries(0, 10);
             assertNotNull(queries);
-            assertEquals(0, queries.size());
+            assertEquals(2, queries.size());
         }
 
     }
@@ -465,6 +477,106 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             changeUser(TestConfig.getUsername());
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderAndFilterSpec() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(4));
+            params.put("max", processInstanceIds.get(0));
+            params.put(KieServerConstants.QUERY_ORDER_BY, "processInstanceId");
+            params.put(KieServerConstants.QUERY_ASCENDING, false);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 > pi2);
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testGetProcessInstancesWithQueryDataServiceUsingCustomQueryBuilderAndColumnMapping() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = getProcessInstanceWithVariablesQueryDefinition();
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, String> columnMapping = new HashMap<>();
+            columnMapping.put("variableId", "String");
+            columnMapping.put("value", "String");
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(4));
+            params.put("max", processInstanceIds.get(0));
+            params.put(KieServerConstants.QUERY_ORDER_BY, "processInstanceId");
+            params.put(KieServerConstants.QUERY_ASCENDING, false);
+            params.put(KieServerConstants.QUERY_COLUMN_MAPPING, columnMapping);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_CUSTOM_VARS, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 > pi2);
+
+            for (ProcessInstance instance : instances) {
+                final Map<String, Object> variables = instance.getVariables();
+                assertNotNull(variables);
+                assertEquals(2, variables.size());
+
+                assertTrue(variables.containsKey("variableId"));
+                assertTrue(variables.containsKey("value"));
+            }
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+
+    protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
+        final QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstancesWithVars");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select pil.*, v.variableId, v.value " +
+                "from ProcessInstanceLog pil " +
+                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
+                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
+                "inner join VariableInstanceLog v " +
+                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
+                "where pil.status = 1");
+        query.setTarget("CUSTOM");
+        return query;
     }
 
     private QueryDefinition createQueryDefinition(String target) {

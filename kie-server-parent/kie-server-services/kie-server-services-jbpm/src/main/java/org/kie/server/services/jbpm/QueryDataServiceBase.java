@@ -71,7 +71,7 @@ public class QueryDataServiceBase {
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
         queryDefinition.setName(queryName);
 
-        SqlQueryDefinition actualDefinition = build(queryDefinition);
+        SqlQueryDefinition actualDefinition = build(context, queryDefinition);
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
         queryService.registerQuery(actualDefinition);
     }
@@ -82,7 +82,7 @@ public class QueryDataServiceBase {
         QueryDefinition queryDefinition = marshallerHelper.unmarshal(payload, marshallingType, QueryDefinition.class);
         queryDefinition.setName(queryName);
 
-        SqlQueryDefinition actualDefinition = build(queryDefinition);
+        SqlQueryDefinition actualDefinition = build(context, queryDefinition);
         logger.debug("Built sql query definition for {} with content {}", queryName, actualDefinition);
 
         queryService.replaceQuery(actualDefinition);
@@ -157,19 +157,33 @@ public class QueryDataServiceBase {
     }
 
     public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
-        QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, null);
+        Map<String, String> columnMapping = null;
+        QueryContext queryContext = buildQueryContext(page, pageSize);
+
+
+        Map<String, Object> queryParameters = new HashMap<String, Object>();
+        if (payload != null && !payload.isEmpty()) {
+            logger.debug("About to unmarshal query params from payload: '{}'", payload);
+            queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+
+            String orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
+            Boolean ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
+            columnMapping = (Map<String, String> )queryParameters.remove(KieServerConstants.QUERY_COLUMN_MAPPING);
+
+            if (orderBy != null) {
+                queryContext.setOrderBy(orderBy);
+            }
+            if (ascending != null) {
+                queryContext.setAscending(ascending);
+            }
+        }
+        QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, columnMapping);
         QueryParamBuilderFactory paramBuilderFactory = QueryParamBuilderManager.get().find(builder);
 
         if (paramBuilderFactory == null) {
             new RuntimeException("No query param builder found for " + builder);
         }
 
-        QueryContext queryContext = buildQueryContext(page, pageSize);
-        Map<String, Object> queryParameters = new HashMap<String, Object>();
-        if (payload != null && !payload.isEmpty()) {
-            logger.debug("About to unmarshal query params from payload: '{}'", payload);
-            queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
-        }
 
         logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
 
@@ -227,7 +241,7 @@ public class QueryDataServiceBase {
         return actualResult;
     }
 
-    protected SqlQueryDefinition build(QueryDefinition queryDefinition) {
+    protected static SqlQueryDefinition build(KieServerRegistry context, QueryDefinition queryDefinition) {
 
         String dataSource = queryDefinition.getSource();
         Matcher matcher = PARAMETER_MATCHER.matcher(dataSource);

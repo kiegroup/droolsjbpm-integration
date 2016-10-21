@@ -18,7 +18,9 @@ package org.kie.server.services.jbpm;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +35,7 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceProviderResolverHolder;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import org.apache.commons.io.IOUtils;
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.jbpm.document.service.impl.DocumentImpl;
 import org.jbpm.executor.ExecutorServiceFactory;
@@ -63,6 +66,7 @@ import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.services.api.model.DeployedUnit;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.jbpm.services.api.query.QueryMapperRegistry;
+import org.jbpm.services.api.query.QueryNotFoundException;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.task.HumanTaskServiceFactory;
 import org.jbpm.services.task.audit.TaskAuditServiceFactory;
@@ -83,7 +87,10 @@ import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -136,6 +143,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private List<Object> services = new ArrayList<Object>();
 
     private Map<String, List<String>> containerMappers = new ConcurrentHashMap<String, List<String>>();
+    private Map<String, List<String>> containerQueries = new ConcurrentHashMap<String, List<String>>();
 
     @Override
     public boolean isActive() {
@@ -367,9 +375,31 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // add any query param builder factories
             QueryParamBuilderManager.get().discoverAndAddQueryFactories(id, kieContainer.getClassLoader());
 
+            // add any query definition found in kjar
+            Enumeration<URL> queryDefinitionsFiles = kieContainer.getClassLoader().getResources("query-definitions.json");
+            while (queryDefinitionsFiles.hasMoreElements()) {
+
+                URL definitionsURL = queryDefinitionsFiles.nextElement();
+                InputStream qdStream = definitionsURL.openStream();
+                if (qdStream != null) {
+                    String qdString = IOUtils.toString(qdStream);
+
+                    QueryDefinition[] queryDefinitionList = kieContainerInstance.getMarshaller(MarshallingFormat.JSON).unmarshall(qdString, QueryDefinition[].class);
+                    List<String> queries = new ArrayList<>();
+                    Arrays.asList(queryDefinitionList).forEach(qd ->
+                    {
+                        queryService.replaceQuery(QueryDataServiceBase.build(context, qd));
+                        queries.add(qd.getName());
+                        logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), id);
+                    });
+                    containerQueries.put(id, queries);
+
+                }
+            }
+
             logger.debug("Container {} created successfully by extension {}", id, this);
         } catch (Exception e) {
-            logger.error("Error when creating container {} by extension {}", id, this);
+            logger.error("Error when creating container {} by extension {}", id, this, e);
         }
     }
 
@@ -423,6 +453,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
         // remove any query param builder factories
         QueryParamBuilderManager.get().removeQueryFactories(id);
         logger.debug("Container {} disposed successfully by extension {}", id, this);
+
+        // remove any container specific queries
+        List<String> queries = containerQueries.remove(id);
+        if (queries != null) {
+            logger.debug("Removing queries {} that comes from container {} that is being disposed", queries, id);
+            queries.forEach(q -> {
+                try {
+                    queryService.unregisterQuery(q);
+                } catch (QueryNotFoundException e) {
+                    logger.debug("Query {} not found when being removed on container dispose", q);
+                }
+            });
+        }
     }
 
     @Override
