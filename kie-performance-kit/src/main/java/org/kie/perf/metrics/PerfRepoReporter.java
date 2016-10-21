@@ -14,6 +14,7 @@ import org.kie.perf.TestConfig;
 import org.kie.perf.TestConfig.RunType;
 import org.perfrepo.client.PerfRepoClient;
 import org.perfrepo.model.Metric;
+import org.perfrepo.model.MetricComparator;
 import org.perfrepo.model.Test;
 import org.perfrepo.model.TestExecution;
 import org.perfrepo.model.builder.TestExecutionBuilder;
@@ -176,6 +177,11 @@ public class PerfRepoReporter extends ScheduledReporter {
                     Metric m = new Metric();
                     m.setName(getMeterName(ml));
                     m.setDescription("TBD");
+                    if (ml.contains("throughput")) {
+                        m.setComparator(MetricComparator.HB);
+                    } else {
+                        m.setComparator(MetricComparator.LB);
+                    }
                     metrics.add(m);
                 }
 
