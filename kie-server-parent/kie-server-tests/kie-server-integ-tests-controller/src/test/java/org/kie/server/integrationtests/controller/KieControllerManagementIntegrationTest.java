@@ -223,6 +223,33 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     }
 
     @Test
+    public void testCreateContainerAutoStart() throws Exception {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, new HashMap());
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Check that container is deployed.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+
+        // Container is in started state, so it should already be in kie server
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
+        assertEquals(1, containersList.getResult().getContainers().size());
+
+        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        assertEquals(releaseId, containerInfo.getResult().getReleaseId());
+
+    }
+
+    @Test
     public void testCreateContainerOnNotExistingKieServerInstance() {
         // Try to create container using kie controller without created kie server instance.
         ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, new ServerTemplate(), releaseId, KieContainerStatus.STOPPED, new HashMap());
