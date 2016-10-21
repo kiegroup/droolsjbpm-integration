@@ -17,6 +17,7 @@ package org.kie.server.api.rest;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 public class RestURI {
@@ -241,9 +242,28 @@ public class RestURI {
 
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
-        StrSubstitutor sub = new StrSubstitutor(parameters, "{", "}");
+        StrSubstitutor sub = new StrSubstitutor(new SafeMapStrLookup(parameters), "{", "}", '$');
         String resourceUrl = sub.replace(template);
 
         return baseUrl + "/" + resourceUrl;
+    }
+
+    private static class SafeMapStrLookup<V> extends StrLookup {
+        private final Map<String, V> map;
+        SafeMapStrLookup(Map<String, V> map) {
+            this.map = map;
+        }
+
+        @Override
+        public String lookup(String key) {
+            if (map == null) {
+                return null;
+            }
+            Object obj = map.get(key);
+            if (obj == null) {
+                throw new IllegalArgumentException("Missing value for " + key);
+            }
+            return obj.toString();
+        }
     }
 }

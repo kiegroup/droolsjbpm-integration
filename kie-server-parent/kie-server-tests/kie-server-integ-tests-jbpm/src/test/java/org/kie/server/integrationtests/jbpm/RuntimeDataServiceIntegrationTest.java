@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,8 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -1696,6 +1699,19 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
+    }
+
+    @Test
+    public void testFindTasksByStatusByProcessInstanceIdMissingParam() throws Exception {
+        // only applicable for REST
+        assumeFalse(configuration.isJms());
+        try {
+            taskClient.findTasksByStatusByProcessInstanceId(null, Arrays.asList("Ready"), 0, 10);
+            fail("Method should throw missing InstanceId exception");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Missing value for pInstanceId", e.getMessage());
+        }
+
     }
 
     private void checkProcessDefinitions(List<String> processIds) {
