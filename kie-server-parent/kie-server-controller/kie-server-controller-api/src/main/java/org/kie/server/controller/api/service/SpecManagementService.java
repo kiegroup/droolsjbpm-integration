@@ -32,6 +32,8 @@ public interface SpecManagementService {
 
     void saveContainerSpec(final String serverTemplateId, final ContainerSpec containerSpec);
 
+    void updateContainerSpec(final String serverTemplateId, final ContainerSpec containerSpec);
+
     void saveServerTemplate(final ServerTemplate serverTemplate);
 
     ServerTemplate getServerTemplate(final String serverTemplateId);

@@ -90,6 +90,10 @@ public class KieServerMgmtControllerClient {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART +containerSpec.getId(), containerSpec, Object.class);
     }
 
+    public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART +containerSpec.getId(), containerSpec, Object.class);
+    }
+
     public void saveServerTemplate(ServerTemplate serverTemplate) {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplate.getId(), serverTemplate, Object.class);
     }

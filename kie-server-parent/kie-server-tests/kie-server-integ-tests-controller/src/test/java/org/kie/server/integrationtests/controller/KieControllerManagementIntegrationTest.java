@@ -52,6 +52,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 public class KieControllerManagementIntegrationTest extends KieControllerManagementBaseTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
+    private static ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.1.0-SNAPSHOT");
 
     private static final String CONTAINER_ID = "kie-concurrent";
     private static final String CONTAINER_NAME = "containerName";
@@ -313,6 +314,32 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
         checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+    }
+
+    @Test
+    public void testGetAndUpdateContainer() {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, new HashMap());
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+
+        containerToDeploy.setReleasedId(releaseId101);
+        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertNotNull(containerResponseEntity);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId101, containerResponseEntity.getReleasedId());
     }
 
     @Test
