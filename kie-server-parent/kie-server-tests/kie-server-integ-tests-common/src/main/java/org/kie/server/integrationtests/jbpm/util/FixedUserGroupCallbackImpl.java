@@ -33,7 +33,7 @@ public class FixedUserGroupCallbackImpl implements UserGroupCallback {
     }
 
     @Override
-    public List<String> getGroupsForUser(String s, List<String> list, List<String> list1) {
+    public List<String> getGroupsForUser(String s) {
         ArrayList<String> groups = new ArrayList<String>();
 
         // User john is assigned in group engineering
