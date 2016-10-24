@@ -111,6 +111,14 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
     <!-- Include all dependencies needed to support all resource types out-of-the-box -->
     <dependency>
       <groupId>org.drools</groupId>
@@ -158,11 +166,14 @@
       <scope>runtime</scope>
     </dependency>
 
+<!-- Was added to support log on Maven 3.0.5 but now old; if this dep is missing, when running takari for maven 3.0.5 the log might be missing some lines from the internal classes logging.
+     Also could be handy for temporarily turn on debug output of the inner classes while performing tests using the takari framework.
+     But in conclusion, not a good practice to depend on logging implementation.
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>runtime</scope>
-    </dependency>
+    </dependency> -->
 
     <!-- Testing deps -->
     <dependency>

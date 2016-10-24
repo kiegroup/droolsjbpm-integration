@@ -32,7 +32,12 @@ abstract public class KieMavenPluginBaseIntegrationTest {
     public final MavenRuntime mavenRuntime;
 
     public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-        this.mavenRuntime = builder.forkedBuilder().withCliOptions("-X").build();
+        this.mavenRuntime = builder
+                .forkedBuilder()
+                .withCliOptions("-X")
+                // To enable logging using slf4j-simple on the internal classes of the plug-in:
+                //  .withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
+                .build();
     }
 
 }
