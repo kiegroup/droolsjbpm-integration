@@ -16,12 +16,13 @@
 package org.kie.server.services.optaplanner;
 
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
-import org.optaplanner.core.api.domain.solution.Solution;
+import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
 import org.slf4j.Logger;
@@ -150,7 +151,7 @@ public class SolverServiceBase {
             SolverInstanceContext sic = solvers.get( SolverInstance.getSolverInstanceKey( containerId, solverId ) );
             if( sic != null ) {
                 updateSolverInstance( sic );
-                sic.getInstance().setBestSolution((Solution) sic.getSolver().getBestSolution() );
+                sic.getInstance().setBestSolution(sic.getSolver().getBestSolution() );
                 return new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.SUCCESS,
                                                            "Best computed solution for '" + solverId + "' successfully retrieved from container '" + containerId + "'",
                                                             sic.getInstance() );
@@ -289,8 +290,9 @@ public class SolverServiceBase {
     private  void updateSolverInstance(SolverInstanceContext sic) {
         synchronized ( sic ) {
             // We keep track of the solver status ourselves, so there's no need to call buggy updateSolverStatus( sic );
-            Solution bestSolution = (Solution) sic.getSolver().getBestSolution();
-            sic.getInstance().setScore( bestSolution != null ? bestSolution.getScore() : null );
+            Score bestScore = sic.getSolver().getBestScore();
+
+            sic.getInstance().setScoreWrapper( new ScoreWrapper( bestScore ) );
         }
     }
 

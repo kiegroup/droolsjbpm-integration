@@ -6,7 +6,6 @@
 
   <!-- Score configuration -->
   <scoreDirectorFactory>
-    <scoreDefinitionType>HARD_SOFT</scoreDefinitionType>
     <ksessionName>cloudBalancingKsession</ksessionName> <!-- Or delete this line and set a default ksession in kmodule.xml-->
     <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
