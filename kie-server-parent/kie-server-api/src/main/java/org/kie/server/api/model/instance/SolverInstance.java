@@ -1,13 +1,13 @@
 package org.kie.server.api.model.instance;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
-import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.score.Score;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.Arrays;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "solver-instance")
@@ -36,19 +36,17 @@ public class SolverInstance {
 
     @XmlElement(name = "score")
     @XStreamAlias("score")
-    // TODO https://issues.jboss.org/browse/PLANNER-604 this might be corrupted during marshalling and it's not tested
-    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
-    private Score score;
+    private ScoreWrapper scoreWrapper;
 
     @XmlElement(name = "planning-problem")
     @XStreamAlias("planning-problem")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
-    private Solution planningProblem;
+    private Object planningProblem;
 
     @XmlElement(name = "best-solution")
     @XStreamAlias("best-solution")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
-    private Solution bestSolution;
+    private Object bestSolution;
 
     public SolverInstance() {
     }
@@ -85,27 +83,27 @@ public class SolverInstance {
         this.status = status;
     }
 
-    public Score getScore() {
-        return score;
+    public ScoreWrapper getScoreWrapper() {
+        return scoreWrapper;
     }
 
-    public void setScore(Score score) {
-        this.score = score;
+    public void setScoreWrapper( ScoreWrapper scoreWrapper ) {
+        this.scoreWrapper = scoreWrapper;
     }
 
-    public Solution getPlanningProblem() {
+    public Object getPlanningProblem() {
         return planningProblem;
     }
 
-    public void setPlanningProblem(Solution planningProblem) {
+    public void setPlanningProblem(Object planningProblem) {
         this.planningProblem = planningProblem;
     }
 
-    public Solution getBestSolution() {
+    public Object getBestSolution() {
         return bestSolution;
     }
 
-    public void setBestSolution(Solution bestSolution) {
+    public void setBestSolution(Object bestSolution) {
         this.bestSolution = bestSolution;
     }
 
@@ -116,7 +114,7 @@ public class SolverInstance {
                ", solverId='" + solverId + '\'' +
                ", solverConfigFile='" + solverConfigFile + '\'' +
                ", status=" + status +
-               ", score=" + score +
+               ", scoreWrapper=" + scoreWrapper +
                '}';
     }
 

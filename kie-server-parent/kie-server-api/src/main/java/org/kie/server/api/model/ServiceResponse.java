@@ -79,7 +79,6 @@ import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbShort;
 import org.kie.server.api.model.type.JaxbString;
-import org.optaplanner.core.api.domain.solution.Solution;
 
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
