@@ -44,7 +44,6 @@ import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.optaplanner.OptaplannerKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
-import org.optaplanner.core.api.domain.solution.Solution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -174,14 +173,14 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         assertThat(solverList.getContainers()).isNullOrEmpty();
     }
 
-    public Solution loadPlanningProblem(int computerListSize, int processListSize) {
-        Solution problem = null;
+    public Object loadPlanningProblem(int computerListSize, int processListSize) {
+        Object problem = null;
         try {
             Class<?> cbgc = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_GENERATOR);
             Object cbgi = cbgc.newInstance();
 
             Method method = cbgc.getMethod("createCloudBalance", int.class, int.class);
-            problem = (Solution) method.invoke(cbgi, computerListSize, processListSize);
+            problem = method.invoke(cbgi, computerListSize, processListSize);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Exception trying to create cloud balance unsolved problem.");

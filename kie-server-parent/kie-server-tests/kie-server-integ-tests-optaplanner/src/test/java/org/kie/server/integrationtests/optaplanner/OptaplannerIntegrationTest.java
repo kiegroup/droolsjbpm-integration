@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesException;
-import org.optaplanner.core.api.domain.solution.Solution;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import java.lang.Thread;
@@ -140,7 +140,8 @@ public class OptaplannerIntegrationTest
         assertEquals( SOLVER_1_ID, returnedInstance.getSolverId() );
         assertEquals( SolverInstance.getSolverInstanceKey( CONTAINER_1_ID, SOLVER_1_ID ), returnedInstance.getSolverInstanceKey());
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, returnedInstance.getStatus());
-        assertNull( returnedInstance.getScore() );
+        assertNotNull( returnedInstance.getScoreWrapper() );
+        assertNull( returnedInstance.getScoreWrapper().toScore() );
     }
 
     @Test
@@ -171,7 +172,8 @@ public class OptaplannerIntegrationTest
         assertEquals( SOLVER_1_ID, returnedInstance.getSolverId() );
         assertEquals( SolverInstance.getSolverInstanceKey( CONTAINER_1_ID, SOLVER_1_ID ), returnedInstance.getSolverInstanceKey());
         assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, returnedInstance.getStatus());
-        assertNull( returnedInstance.getScore() );
+        assertNotNull( returnedInstance.getScoreWrapper() );
+        assertNull( returnedInstance.getScoreWrapper().toScore() );
     }
 
     @Test
@@ -233,22 +235,31 @@ public class OptaplannerIntegrationTest
         KieServerAssert.assertSuccess( response );
         assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
 
-        Solution solution = null;
+        Object solution = null;
+        HardSoftScore score = null;
         // It can take a while for the Construction Heuristic to initialize the solution
         // The test timeout will interrupt this thread if it takes too long
         while (!Thread.currentThread().isInterrupted()) {
             ServiceResponse<SolverInstance> solutionResponse = solverClient.getSolverBestSolution(CONTAINER_1_ID, SOLVER_1_ID);
             KieServerAssert.assertSuccess(solutionResponse);
             solution = solutionResponse.getResult().getBestSolution();
+
+            ScoreWrapper scoreWrapper = solutionResponse.getResult().getScoreWrapper();
+            assertNotNull( scoreWrapper );
+
+            if ( scoreWrapper.toScore() != null ) {
+                assertEquals( HardSoftScore.class, scoreWrapper.getScoreClass() );
+                score = (HardSoftScore) scoreWrapper.toScore();
+            }
+
             // Wait until the solver finished initializing the solution
-            if (solution != null && solution.getScore() != null && solution.getScore().isSolutionInitialized()) {
+            if (solution != null && score != null && score.isSolutionInitialized()) {
                 break;
             }
             Thread.sleep(1000);
         }
-        HardSoftScore score = (HardSoftScore) solution.getScore();
         assertNotNull(score);
-        assertTrue(solution.getScore().isSolutionInitialized());
+        assertTrue(score.isSolutionInitialized());
         assertTrue(score.getHardScore() <= 0);
         // A soft score of 0 is impossible because we'll always need at least 1 computer
         assertTrue(score.getSoftScore() < 0);
@@ -326,14 +337,14 @@ public class OptaplannerIntegrationTest
         KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
     }
 
-    public Solution loadPlanningProblem( int computerListSize, int processListSize ) {
-        Solution problem = null;
+    public Object loadPlanningProblem( int computerListSize, int processListSize ) {
+        Object problem = null;
         try {
             Class<?> cbgc = kieContainer.getClassLoader().loadClass( CLASS_CLOUD_GENERATOR );
             Object cbgi = cbgc.newInstance();
 
             Method method = cbgc.getMethod( "createCloudBalance", int.class, int.class );
-            problem = (Solution) method.invoke( cbgi, computerListSize, processListSize );
+            problem = method.invoke( cbgi, computerListSize, processListSize );
         } catch ( Exception e ) {
             e.printStackTrace();
             fail( "Exception trying to create cloud balance unsolved problem.");
