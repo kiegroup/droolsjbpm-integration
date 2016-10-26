@@ -26,8 +26,18 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.OrgEntities;
+import org.kie.server.api.model.admin.ProcessNode;
+import org.kie.server.api.model.admin.ProcessNodeList;
+import org.kie.server.api.model.admin.TaskNotification;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignment;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.api.model.admin.TimerInstance;
+import org.kie.server.api.model.admin.TimerInstanceList;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseComment;
@@ -150,6 +160,16 @@ public class ServiceResponse<T> {
             // admin section
             @XmlElement(name = "migration-report-instance", type = MigrationReportInstance.class),
             @XmlElement(name = "migration-report-instance-list", type = MigrationReportInstanceList.class),
+            @XmlElement(name = "email-notification", type = EmailNotification.class),
+            @XmlElement(name = "process-node", type = ProcessNode.class),
+            @XmlElement(name = "process-node-list", type = ProcessNodeList.class),
+            @XmlElement(name = "timer-instance", type = TimerInstance.class),
+            @XmlElement(name = "timer-instance-list", type = TimerInstanceList.class),
+            @XmlElement(name = "org-entities", type = OrgEntities.class),
+            @XmlElement(name = "task-notification", type = TaskNotification.class),
+            @XmlElement(name = "task-notification-list", type = TaskNotificationList.class),
+            @XmlElement(name = "task-reassignment", type = TaskReassignment.class),
+            @XmlElement(name = "task-reassignment-list", type = TaskReassignmentList.class),
 
             // case management
             @XmlElement(name = "case-milestone", type = CaseMilestone.class),

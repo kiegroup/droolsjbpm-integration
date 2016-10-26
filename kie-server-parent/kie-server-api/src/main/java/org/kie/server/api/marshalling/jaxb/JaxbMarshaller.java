@@ -75,8 +75,18 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.OrgEntities;
+import org.kie.server.api.model.admin.ProcessNode;
+import org.kie.server.api.model.admin.ProcessNodeList;
+import org.kie.server.api.model.admin.TaskNotification;
+import org.kie.server.api.model.admin.TaskNotificationList;
+import org.kie.server.api.model.admin.TaskReassignment;
+import org.kie.server.api.model.admin.TaskReassignmentList;
+import org.kie.server.api.model.admin.TimerInstance;
+import org.kie.server.api.model.admin.TimerInstanceList;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseComment;
@@ -261,6 +271,16 @@ public class JaxbMarshaller implements Marshaller {
                 // admin section
                 MigrationReportInstance.class,
                 MigrationReportInstanceList.class,
+                ProcessNode.class,
+                ProcessNodeList.class,
+                TimerInstance.class,
+                TimerInstanceList.class,
+                EmailNotification.class,
+                OrgEntities.class,
+                TaskNotification.class,
+                TaskNotificationList.class,
+                TaskReassignment.class,
+                TaskReassignmentList.class,
 
                 // case management
                 CaseMilestone.class,

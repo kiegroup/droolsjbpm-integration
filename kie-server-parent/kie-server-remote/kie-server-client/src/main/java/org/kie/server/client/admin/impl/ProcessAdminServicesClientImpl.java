@@ -26,6 +26,12 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
+import org.kie.server.api.model.admin.ProcessNode;
+import org.kie.server.api.model.admin.ProcessNodeList;
+import org.kie.server.api.model.admin.TimerInstance;
+import org.kie.server.api.model.admin.TimerInstanceList;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.admin.ProcessAdminServicesClient;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
@@ -107,5 +113,194 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
             return reportInstanceList.getItems();
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<ProcessNode> getProcessNodes(String containerId, Long processInstanceId) {
+        ProcessNodeList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + NODES_PROCESS_INST_GET_URI, valuesMap), ProcessNodeList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getProcessNodes", new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<ProcessNodeList> response = (ServiceResponse<ProcessNodeList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void cancelNodeInstance(String containerId, Long processInstanceId, Long nodeInstanceId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(NODE_INSTANCE_ID, nodeInstanceId);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + CANCEL_NODE_INST_PROCESS_INST_DELETE_URI, valuesMap), null);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "cancelNodeInstance", new Object[]{containerId, processInstanceId, nodeInstanceId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void retriggerNodeInstance(String containerId, Long processInstanceId, Long nodeInstanceId) {
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(NODE_INSTANCE_ID, nodeInstanceId);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI, valuesMap), null, null, headers);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "retriggerNodeInstance", new Object[]{containerId, processInstanceId, nodeInstanceId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public List<NodeInstance> getActiveNodeInstances(String containerId, Long processInstanceId) {
+        NodeInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + NODE_INSTANCES_PROCESS_INST_GET_URI, valuesMap), NodeInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getActiveNodeInstances", new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void updateTimer(String containerId, Long processInstanceId, long timerId, long delay, long period, int repeatLimit) {
+        updateTimer(containerId, processInstanceId, timerId, delay, period, repeatLimit, false);
+    }
+
+    @Override
+    public void updateTimerRelative(String containerId, Long processInstanceId, long timerId, long delay, long period, int repeatLimit) {
+        updateTimer(containerId, processInstanceId, timerId, delay, period, repeatLimit, true);
+    }
+
+    @Override
+    public List<TimerInstance> getTimerInstances(String containerId, Long processInstanceId) {
+        TimerInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + TIMERS_PROCESS_INST_GET_URI, valuesMap), TimerInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getTimerInstances", new Object[]{containerId, processInstanceId}) ) );
+            ServiceResponse<TimerInstanceList> response = (ServiceResponse<TimerInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void triggerNode(String containerId, Long processInstanceId, Long nodeId) {
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(NODE_ID, nodeId);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + TRIGGER_NODE_PROCESS_INST_POST_URI, valuesMap), null, null, headers);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "triggerNode", new Object[]{containerId, processInstanceId, nodeId})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    /*
+     * helper methods
+     */
+    protected void updateTimer(String containerId, Long processInstanceId, long timerId, long delay, long period, int repeatLimit, boolean relative) {
+        Map<String, Number> timerUpdate = new HashMap<>();
+        timerUpdate.put("delay", delay);
+        timerUpdate.put("period", period);
+        timerUpdate.put("repeatLimit", repeatLimit);
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(TIMER_INSTANCE_ID, timerId);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + UPDATE_TIMER_PROCESS_INST_PUT_URI, valuesMap)+ "?relative=" + relative, timerUpdate, null, headers);
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "updateTimer", serialize(timerUpdate), marshaller.getFormat().getType(), new Object[]{containerId, processInstanceId, timerId, relative})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
     }
 }

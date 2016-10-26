@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.server.api.model.admin.MigrationReportInstance;
+import org.kie.server.api.model.admin.ProcessNode;
+import org.kie.server.api.model.admin.TimerInstance;
+import org.kie.server.api.model.instance.NodeInstance;
 
 public interface ProcessAdminServicesClient {
 
@@ -29,4 +32,20 @@ public interface ProcessAdminServicesClient {
     List<MigrationReportInstance> migrateProcessInstances(String containerId, List<Long> processInstancesId, String targetContainerId, String targetProcessId);
 
     List<MigrationReportInstance> migrateProcessInstances(String containerId, List<Long> processInstancesId, String targetContainerId, String targetProcessId, Map<String, String> nodeMapping);
+
+    List<ProcessNode> getProcessNodes(String containerId, Long processInstanceId);
+
+    void cancelNodeInstance(String containerId, Long processInstanceId, Long nodeInstanceId);
+
+    void retriggerNodeInstance(String containerId, Long processInstanceId, Long nodeInstanceId);
+
+    List<NodeInstance> getActiveNodeInstances(String containerId, Long processInstanceId);
+
+    void updateTimer(String containerId, Long processInstanceId, long timerId, long delay, long period, int repeatLimit);
+
+    void updateTimerRelative(String containerId, Long processInstanceId, long timerId, long delay, long period, int repeatLimit);
+
+    List<TimerInstance> getTimerInstances(String containerId, Long processInstanceId);
+
+    void triggerNode(String containerId, Long processInstanceId, Long nodeId);
 }

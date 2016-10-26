@@ -49,6 +49,13 @@ public class RestURI {
     public static final String CASE_COMMENT_ID = "caseCommentId";
     public static final String CASE_ROLE_NAME = "caseRoleName";
     public static final String CASE_OWNER = "caseOwner";
+    public static final String NODE_INSTANCE_ID = "nodeInstanceId";
+    public static final String TIMER_INSTANCE_ID = "timerId";
+    public static final String NODE_ID = "nodeId";
+    public static final String ENTITY_ID = "entityId";
+    public static final String REASSIGNMENT_ID = "reassignmentId";
+    public static final String NOTIFICATION_ID = "notificationId";
+
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";
@@ -64,6 +71,7 @@ public class RestURI {
 
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
+    public static final String ADMIN_TASK_URI = "admin/containers/{" + CONTAINER_ID + "}/tasks";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -204,6 +212,30 @@ public class RestURI {
     // admin process related
     public static final String MIGRATE_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}";
     public static final String MIGRATE_PROCESS_INSTANCES_PUT_URI = "instances";
+    public static final String CANCEL_NODE_INST_PROCESS_INST_DELETE_URI = "instances/{" + PROCESS_INST_ID +"}/nodeinstances/{" + NODE_INSTANCE_ID + "}";
+    public static final String RETRIGGER_NODE_INST_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}/nodeinstances/{" + NODE_INSTANCE_ID + "}";
+    public static final String UPDATE_TIMER_PROCESS_INST_PUT_URI = "instances/{" + PROCESS_INST_ID +"}/timers/{" + TIMER_INSTANCE_ID + "}";
+    public static final String TRIGGER_NODE_PROCESS_INST_POST_URI = "instances/{" + PROCESS_INST_ID +"}/nodes/{" + NODE_ID + "}";
+    public static final String NODES_PROCESS_INST_GET_URI = "instances/{" + PROCESS_INST_ID +"}/nodes";
+    public static final String TIMERS_PROCESS_INST_GET_URI = "instances/{" + PROCESS_INST_ID +"}/timers";
+    public static final String NODE_INSTANCES_PROCESS_INST_GET_URI = "instances/{" + PROCESS_INST_ID +"}/nodeinstances";
+
+    public static final String TASK_INSTANCE_POT_OWNERS_USERS_URI = "{" + TASK_INSTANCE_ID + "}/pot-owners";
+    public static final String TASK_INSTANCE_EXL_OWNERS_USERS_URI = "{" + TASK_INSTANCE_ID + "}/exl-owners";
+    public static final String TASK_INSTANCE_ADMINS_USERS_URI = "{" + TASK_INSTANCE_ID + "}/admins";
+    public static final String TASK_INSTANCE_INPUTS_URI = "{" + TASK_INSTANCE_ID + "}/contents/input";
+    public static final String TASK_INSTANCE_OUTPUTS_URI = "{" + TASK_INSTANCE_ID + "}/contents/output";
+    public static final String TASK_INSTANCE_REASSIGNMENTS_URI = "{" + TASK_INSTANCE_ID + "}/reassignments";
+    public static final String TASK_INSTANCE_NOTIFICATIONS_URI = "{" + TASK_INSTANCE_ID + "}/notifications";
+    public static final String TASK_INSTANCE_REASSIGNMENT_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/reassignments/{" + REASSIGNMENT_ID + "}";
+    public static final String TASK_INSTANCE_NOTIFICATION_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/notifications/{" + NOTIFICATION_ID + "}";
+
+    public static final String TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/pot-owners/users/{" + ENTITY_ID + "}";
+    public static final String TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/pot-owners/groups/{" + ENTITY_ID + "}";
+    public static final String TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/exl-owners/users/{" + ENTITY_ID + "}";
+    public static final String TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/exl-owners/groups/{" + ENTITY_ID + "}";
+    public static final String TASK_INSTANCE_ADMINS_USERS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/admins/users/{" + ENTITY_ID + "}";
+    public static final String TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/admins/groups/{" + ENTITY_ID + "}";
 
     // case management related
     public static final String START_CASE_POST_URI = "{" + CASE_DEF_ID +"}/instances";

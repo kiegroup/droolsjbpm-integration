@@ -688,7 +688,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
     @Test(timeout = 60 * 1000)
     public void testProcessInstanceWithTimer() throws Exception {
-        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("timer", "1s");
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER, parameters);
         assertNotNull(processInstanceId);
         assertTrue(processInstanceId.longValue() > 0);
 
