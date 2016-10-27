@@ -155,6 +155,19 @@ public class KieServerSynchronization {
         });
     }
 
+    public static void waitForSolverDispose(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<SolverInstanceList> solverListResponse = client.getSolvers(containerId);
+            SolverInstanceList solverList = solverListResponse.getResult();
+            for (SolverInstance solver : solverList.getContainers()) {
+                if (solverId.equals(solver.getSolverId())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
     public static void waitForSolverStatus(final SolverServicesClient client, final String containerId, final String solverId,
             final SolverInstance.SolverStatus status) throws Exception {
         waitForCondition(() -> {
