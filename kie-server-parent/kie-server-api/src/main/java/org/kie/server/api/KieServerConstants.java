@@ -74,6 +74,8 @@ public class KieServerConstants {
 
     public static final String CFG_SYNC_DEPLOYMENT = "org.kie.server.sync.deploy";
 
+    public static final String CFG_JBPM_TASK_CLEANUP_LISTENER = "org.jbpm.task.cleanup.enabled";
+
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
 
     public static final String CAPABILITY_BRM = "BRM"; // Business Rules Management
