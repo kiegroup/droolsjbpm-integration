@@ -76,6 +76,7 @@ import org.kie.api.task.UserGroupCallback;
 import org.kie.internal.runtime.conf.DeploymentDescriptor;
 import org.kie.internal.runtime.conf.MergeMode;
 import org.kie.internal.runtime.conf.NamedObjectModel;
+import org.kie.internal.runtime.conf.ObjectModel;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.internal.runtime.conf.RuntimeStrategy;
@@ -333,6 +334,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
             addAsyncHandler(unit, kieContainer);
 
+            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_CLEANUP_LISTENER, "true").equalsIgnoreCase("true")) {
+                logger.debug("Registering TaskCleanUpProcessEventListener");
+                addTaskCleanUpProcessListener(unit, kieContainer);
+            }
+
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
             DeployedUnit deployedUnit = deploymentService.getDeployedUnit(unit.getIdentifier());
@@ -498,17 +504,33 @@ public class JbpmKieServerExtension implements KieServerExtension {
     protected void addAsyncHandler(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
         // add async only when the executor component is not disabled
         if (isExecutorAvailable && executorService != null) {
-            DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
-            if (descriptor == null) {
-                List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
-                descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
-            }
+            final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
             descriptor.getBuilder()
                     .addWorkItemHandler(new NamedObjectModel("mvel", "async",
                             "new org.jbpm.executor.impl.wih.AsyncWorkItemHandler(org.jbpm.executor.ExecutorServiceFactory.newExecutorService(),\"org.jbpm.executor.commands.PrintOutCommand\")"));
 
             unit.setDeploymentDescriptor(descriptor);
         }
+    }
+
+    protected void addTaskCleanUpProcessListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
+        final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
+        descriptor.getBuilder().addEventListener(
+                new ObjectModel(
+                        "mvel",
+                        "new org.jbpm.services.task.admin.listener.TaskCleanUpProcessEventListener(taskService)"
+                )
+        );
+        unit.setDeploymentDescriptor(descriptor);
+    }
+
+    protected DeploymentDescriptor getDeploymentDescriptor(KModuleDeploymentUnit unit, InternalKieContainer kieContainer) {
+        DeploymentDescriptor descriptor = unit.getDeploymentDescriptor();
+        if (descriptor == null) {
+            List<DeploymentDescriptor> descriptorHierarchy = deploymentDescriptorManager.getDeploymentDescriptorHierarchy(kieContainer);
+            descriptor = merger.merge(descriptorHierarchy, MergeMode.MERGE_COLLECTIONS);
+        }
+        return descriptor;
     }
 
     protected boolean isExecutorOnClasspath() {

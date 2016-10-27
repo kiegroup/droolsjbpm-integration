@@ -1152,6 +1152,52 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         }
     }
 
+    @Test
+    public void testProcessWithUserTasksCleanupTasks() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+        try {
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            // startTask and completeTask task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            Map<String, Object> taskOutcome = new HashMap<String, Object>();
+            taskOutcome.put("string_", "my custom data");
+            taskOutcome.put("person_", createPersonInstance(USER_MARY));
+
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, taskOutcome);
+            List<String> statuses = new ArrayList<String>();
+            statuses.add(Status.Ready.toString());
+            statuses.add(Status.Reserved.toString());
+            statuses.add(Status.InProgress.toString());
+            statuses.add(Status.Completed.toString());
+            statuses.add(Status.Exited.toString());
+            List<TaskSummary> processTasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, statuses, 0, 10);
+            assertEquals(2, processTasks.size());
+
+            long searchByPIID = processInstanceId;
+
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            processInstanceId = null;
+
+            processTasks = taskClient.findTasksByStatusByProcessInstanceId(searchByPIID, statuses, 0, 10);
+            assertEquals(0, processTasks.size());
+
+        } finally {
+
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
     private void checkTaskNameAndStatus(TaskSummary taskSummary, String name, Status status) {
         assertNotNull(taskSummary);
         assertEquals(name, taskSummary.getName());
