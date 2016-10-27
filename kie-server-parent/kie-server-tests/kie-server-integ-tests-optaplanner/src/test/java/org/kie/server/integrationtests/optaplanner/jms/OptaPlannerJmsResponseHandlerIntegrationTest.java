@@ -165,6 +165,8 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         assertThat(response);
 
         solverClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForSolverDispose(solverClient, CONTAINER_1_ID, SOLVER_1_ID);
+
         ServiceResponse<SolverInstanceList> solverListResponse = solverClient.getSolvers(CONTAINER_1_ID);
         assertThat(solverListResponse).isNotNull();
         SolverInstanceList solverList = solverListResponse.getResult();
