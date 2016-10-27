@@ -55,7 +55,7 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
     private static final ReleaseId RELEASE_ID = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
-    @Parameterized.Parameters(name = "{index}: {0} {2}")
+    @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 
