@@ -76,7 +76,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
     }
 
     protected void createExtraContainer() {
-        KieContainerResource containerResource = new KieContainerResource(CONTAINER_ID_101, releaseId);
+        KieContainerResource containerResource = new KieContainerResource(CONTAINER_ID_101, releaseId101);
         containerResource.setContainerAlias(CONTAINER_ALIAS);
         client.createContainer(CONTAINER_ID_101, containerResource);
     }
@@ -182,7 +182,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         createExtraContainer();
 
-        Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION, parameters);
+        Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION_2, parameters);
 
         assertNotNull(processInstanceIdV2);
         assertTrue(processInstanceIdV2.longValue() > 0);
@@ -233,7 +233,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         createExtraContainer();
 
-        Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ID_101, PROCESS_ID_EVALUATION, parameters);
+        Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ID_101, PROCESS_ID_EVALUATION_2, parameters);
 
         assertNotNull(processInstanceIdV2);
         assertTrue(processInstanceIdV2.longValue() > 0);
@@ -260,7 +260,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         assertEquals(CONTAINER_ID, processInstance.getContainerId());
 
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        assertEquals(2, tasks.size());
         task = tasks.get(0);
         assertEquals(CONTAINER_ID, task.getContainerId());
 

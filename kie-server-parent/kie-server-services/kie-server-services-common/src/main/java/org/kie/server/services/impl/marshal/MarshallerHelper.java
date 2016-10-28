@@ -25,7 +25,7 @@ import org.kie.server.api.model.Wrapped;
 import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.locator.LatestContainerLocator;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 
 public class MarshallerHelper {
 
@@ -42,7 +42,7 @@ public class MarshallerHelper {
     }
 
     public String marshal(String containerId, String marshallingFormat, Object entity) {
-        return marshal(containerId, marshallingFormat, entity, LatestContainerLocator.get());
+        return marshal(containerId, marshallingFormat, entity, ContainerLocatorProvider.get().getLocator());
     }
 
     public String marshal(String containerId, String marshallingFormat, Object entity, ContainerLocator locator) {
@@ -83,7 +83,7 @@ public class MarshallerHelper {
 
     }
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType) {
-        return unmarshal(containerId, data, marshallingFormat, unmarshalType, LatestContainerLocator.get());
+        return unmarshal(containerId, data, marshallingFormat, unmarshalType, ContainerLocatorProvider.get().getLocator());
     }
 
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType, ContainerLocator locator) {

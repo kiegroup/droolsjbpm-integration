@@ -94,6 +94,16 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     }
 
     @Override
+    public String getContainerId(String alias, ContainerLocator locator) {
+
+        KieContainerInstanceImpl kieContainerInstance = getContainer(alias, locator);
+        if (kieContainerInstance == null) {
+            return alias;
+        }
+        return kieContainerInstance.getContainerId();
+    }
+
+    @Override
     public List<KieContainerInstanceImpl> getContainers() {
         return new ArrayList<KieContainerInstanceImpl>(containers.values());
     }

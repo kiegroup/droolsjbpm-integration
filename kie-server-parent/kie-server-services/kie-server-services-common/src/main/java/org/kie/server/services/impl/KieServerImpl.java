@@ -45,6 +45,7 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.controller.ControllerConnectRunnable;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -96,6 +97,8 @@ public class KieServerImpl {
         this.context = new KieServerRegistryImpl();
         this.context.registerIdentityProvider(new JACCIdentityProvider());
         this.context.registerStateRepository(repository);
+        // load available container locators
+        ContainerLocatorProvider.get();
 
         ContainerManager containerManager = getContainerManager();
 

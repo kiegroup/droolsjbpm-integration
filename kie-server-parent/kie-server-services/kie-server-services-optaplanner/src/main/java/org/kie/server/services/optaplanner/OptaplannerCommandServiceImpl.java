@@ -16,8 +16,16 @@
 
 package org.kie.server.services.optaplanner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.optaplanner.*;
+import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
+import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerCommand;
@@ -27,11 +35,9 @@ import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class OptaplannerCommandServiceImpl
         implements KieContainerCommandService {
@@ -58,35 +64,43 @@ public class OptaplannerCommandServiceImpl
     public ServiceResponsesList executeScript(CommandScript commands, MarshallingFormat marshallingFormat, String classType) {
         List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
 
+
+
         for ( KieServerCommand command : commands.getCommands() ) {
             try {
                 ServiceResponse<?> response = null;
                 logger.debug( "About to execute command: {}", command );
                 if ( command instanceof CreateSolverCommand ) {
                     CreateSolverCommand csc = (CreateSolverCommand) command;
+                    String containerId = context.getContainerId(csc.getContainerId(), ContainerLocatorProvider.get().getLocator());
                     SolverInstance instance = new SolverInstance();
-                    instance.setContainerId( csc.getContainerId() );
+                    instance.setContainerId( containerId );
                     instance.setSolverId( csc.getSolverId() );
                     instance.setSolverConfigFile( csc.getSolverConfigFile() );
-                    response = solverService.createSolver( csc.getContainerId(), csc.getSolverId(), instance );
+                    response = solverService.createSolver( containerId, csc.getSolverId(), instance );
                 } else if (command instanceof GetSolversCommand ) {
                     GetSolversCommand gss = (GetSolversCommand) command;
-                    response = solverService.getSolvers( gss.getContainerId() );
+                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getSolvers( containerId );
                 } else if (command instanceof GetSolverStateCommand) {
                     GetSolverStateCommand gss = (GetSolverStateCommand) command;
-                    response = solverService.getSolverState( gss.getContainerId(), gss.getSolverId() );
+                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getSolverState( containerId, gss.getSolverId() );
                 } else if (command instanceof GetBestSolutionCommand ) {
                     GetBestSolutionCommand gss = (GetBestSolutionCommand) command;
-                    response = solverService.getBestSolution( gss.getContainerId(), gss.getSolverId() );
+                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getBestSolution( containerId, gss.getSolverId() );
                 } else if (command instanceof UpdateSolverStateCommand ) {
                     UpdateSolverStateCommand uss = (UpdateSolverStateCommand) command;
-                    KieContainerInstanceImpl kc = context.getContainer( uss.getContainerId() );
+                    String containerId = context.getContainerId(uss.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    KieContainerInstanceImpl kc = context.getContainer( containerId );
                     Marshaller marshaller = kc.getMarshaller( marshallingFormat );
                     SolverInstance si = marshaller.unmarshall( uss.getInstance(), SolverInstance.class );
-                    response = solverService.updateSolverState( uss.getContainerId(), uss.getSolverId(), si );
+                    response = solverService.updateSolverState( containerId, uss.getSolverId(), si );
                 } else if (command instanceof DisposeSolverCommand ) {
                     DisposeSolverCommand ds = (DisposeSolverCommand) command;
-                    response = solverService.disposeSolver( ds.getContainerId(), ds.getSolverId() );
+                    String containerId = context.getContainerId(ds.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    response = solverService.disposeSolver( containerId, ds.getSolverId() );
                 } else {
                     throw new IllegalStateException( "Unsupported command: " + command );
                 }

@@ -27,6 +27,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerCommandServiceImpl;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandSer
             return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
         }
         try {
-            KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId );
+            KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId, ContainerLocatorProvider.get().getLocator());
 
             if (kci != null && kci.getKieContainer() != null) {
 

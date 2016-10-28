@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jbpm.process.audit.NodeInstanceLog;
 import org.jbpm.process.svg.SVGImageProcessor;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
@@ -33,7 +32,7 @@ import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
-import org.kie.server.services.impl.locator.LatestContainerLocator;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.ui.img.ImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +74,7 @@ public class ImageServiceBase {
     }
 
     public String getProcessImage(String containerId, String processId) {
-        KieContainerInstanceImpl containerInstance = registry.getContainer(containerId, LatestContainerLocator.get());
-        containerId = containerInstance.getContainerId();
+        containerId = registry.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         String imageSVGString = null;
         byte[] imageSVG = getProcessImageAsBytes(containerId, processId);

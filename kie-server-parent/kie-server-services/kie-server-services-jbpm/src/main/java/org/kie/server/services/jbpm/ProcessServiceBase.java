@@ -34,7 +34,7 @@ import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.locator.LatestContainerLocator;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class ProcessServiceBase {
     }
 
     public String startProcess(String containerId, String processId, String marshallingType) {
-        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {
@@ -77,7 +77,7 @@ public class ProcessServiceBase {
 
 
     public String startProcess(String containerId, String processId, String payload, String marshallingType) {
-        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {
@@ -96,7 +96,7 @@ public class ProcessServiceBase {
     }
 
     public String startProcessWithCorrelation(String containerId, String processId, String correlationKey, String payload, String marshallingType) {
-        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         // Check for presence of process id
         ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
         if( procDef == null ) {

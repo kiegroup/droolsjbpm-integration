@@ -44,6 +44,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
             return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Error calling container " + containerId + ". Empty payload. ");
         }
         try {
-            KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId );
+            KieContainerInstanceImpl kci = (KieContainerInstanceImpl) context.getContainer( containerId, ContainerLocatorProvider.get().getLocator() );
             // the following code is subject to a concurrent call to dispose(), but the cost of synchronizing it
             // would likely not be worth it. At this point a decision was made to fail the execution if a concurrent
             // call do dispose() is executed.
