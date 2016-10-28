@@ -40,7 +40,7 @@ import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.locator.ByCaseIdContainerLocator;
-import org.kie.server.services.impl.locator.LatestContainerLocator;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class CaseManagementServiceBase {
     }
 
     public String startCase(String containerId, String caseDefinitionId, String payload, String marshallingType) {
-        containerId = context.getContainer(containerId, LatestContainerLocator.get()).getContainerId();
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
         if( caseDef == null ) {
@@ -161,7 +161,7 @@ public class CaseManagementServiceBase {
     }
 
     public void reopenCase(String caseId, String containerId, String caseDefinitionId, String payload, String marshallingType) {
-        containerId = context.getContainer(containerId, new ByCaseIdContainerLocator(caseId)).getContainerId();
+        containerId = context.getContainerId(containerId, new ByCaseIdContainerLocator(caseId));
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
         if( caseDef == null ) {

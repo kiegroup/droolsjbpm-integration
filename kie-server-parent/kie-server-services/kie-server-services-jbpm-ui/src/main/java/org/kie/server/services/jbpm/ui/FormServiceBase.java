@@ -34,7 +34,7 @@ import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
-import org.kie.server.services.impl.locator.LatestContainerLocator;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +64,7 @@ public class FormServiceBase {
 
 
     public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent) {
-        KieContainerInstanceImpl containerInstance = registry.getContainer(containerId, LatestContainerLocator.get());
-        containerId = containerInstance.getContainerId();
+        containerId = registry.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         ProcessDefinition processDesc = definitionService.getProcessDefinition(containerId, processId);
         if (processDesc == null) {

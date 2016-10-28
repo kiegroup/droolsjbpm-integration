@@ -34,6 +34,8 @@ public interface KieServerRegistry {
 
     KieContainerInstanceImpl getContainer(String alias, ContainerLocator locator);
 
+    String getContainerId(String alias, ContainerLocator locator);
+
     List<KieContainerInstanceImpl> getContainers();
 
     void registerIdentityProvider(IdentityProvider identityProvider);

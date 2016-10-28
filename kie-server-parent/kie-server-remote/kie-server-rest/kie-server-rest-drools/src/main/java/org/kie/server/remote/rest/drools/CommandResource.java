@@ -30,6 +30,7 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class CommandResource {
         Object result = delegate.callContainer(id, cmdPayload, format, classType);
         Header conversationIdHeader = buildConversationIdHeader(id, registry, headers);
         try {
-            String response = marshallerHelper.marshal(id, format.getType(), result);
+            String response = marshallerHelper.marshal(id, format.getType(), result, ContainerLocatorProvider.get().getLocator());
             logger.debug("Returning OK response with content '{}'", response);
 
             return createResponse(response, v, Response.Status.OK, conversationIdHeader);
