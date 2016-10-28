@@ -14,9 +14,12 @@
 */
 package org.kie.server.services.jbpm.ui.img;
 
+import java.io.File;
+
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.definition.process.*;
 import org.kie.api.runtime.KieContainer;
 
 public class ImageReference {
@@ -25,8 +28,11 @@ public class ImageReference {
     private static final String DEFAULT_KBASE_NAME = "defaultKieBase";
 
     private InternalKieModule kieModule;
+    private KieContainer kieContainer;
+    private String kieBaseName;
 
     public ImageReference(KieContainer kieContainer, String kieBaseName) {
+        this.kieContainer = kieContainer;
         if (kieBaseName == null || kieBaseName.isEmpty()) {
             KieBaseModel defaultKBaseModel = ((KieContainerImpl)kieContainer).getKieProject().getDefaultKieBaseModel();
             if (defaultKBaseModel != null) {
@@ -36,10 +42,31 @@ public class ImageReference {
             }
         }
         kieModule = (InternalKieModule) ((KieContainerImpl)kieContainer).getKieModuleForKBase(kieBaseName);
-
+        this.kieBaseName = kieBaseName;
     }
 
     public byte[] getImageContent(String location, String name) {
+
+        org.kie.api.definition.process.Process process = kieContainer.getKieBase(kieBaseName).getProcess(name);
+        if (process != null) {
+            String sourcePath = process.getResource().getSourcePath();
+            if (sourcePath != null) {
+                String processDirectory = new File(sourcePath).getParent();
+                if (processDirectory == null) {
+                    processDirectory = "";
+                } else {
+                    processDirectory += "/";
+                }
+                byte[] data = seek(processDirectory, name, kieModule);
+
+                if (data != null) {
+                    return data;
+                }
+                // set process directory as location in case the main search mechanism did not find the image
+                location = processDirectory;
+            }
+        }
+
         byte[] data = seek(location, name, kieModule);
 
         if (data == null && kieModule.getKieDependencies() != null) {
