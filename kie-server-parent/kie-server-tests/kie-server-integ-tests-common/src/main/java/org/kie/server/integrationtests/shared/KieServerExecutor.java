@@ -66,6 +66,10 @@ public class KieServerExecutor {
         System.setProperty(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, TestConfig.getPassword());
         System.setProperty(KieServerConstants.KIE_SERVER_LOCATION, TestConfig.getEmbeddedKieServerHttpUrl());
         System.setProperty(KieServerConstants.KIE_SERVER_STATE_REPO, "./target");
+
+        // kie server policy settings
+        System.setProperty(KieServerConstants.KIE_SERVER_ACTIVATE_POLICIES, "KeepLatestOnly");
+        System.setProperty("policy.klo.interval", "5000");
     }
     private void registerKieServerId() {
         if (KieServerEnvironment.getServerId() == null) {

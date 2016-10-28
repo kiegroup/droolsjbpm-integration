@@ -57,8 +57,9 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
     @Before
     public void cleanContainers() {
         disposeAllContainers();
-        createContainer(CONTAINER_ID, releaseId);
-        createContainer(CONTAINER_ID_2, releaseId101);
+        // use different aliases to avoid policy based removal - keep latest only
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID);
+        createContainer(CONTAINER_ID_2, releaseId101, CONTAINER_ID_2);
     }
 
     @Test

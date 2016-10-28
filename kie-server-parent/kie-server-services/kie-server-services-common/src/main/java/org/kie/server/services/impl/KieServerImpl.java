@@ -41,11 +41,13 @@ import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
+import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.controller.ControllerConnectRunnable;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.policy.PolicyManager;
 import org.kie.server.services.impl.security.JACCIdentityProvider;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
@@ -69,7 +71,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class KieServerImpl {
+public class KieServerImpl implements KieServer {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerImpl.class);
 
@@ -80,6 +82,7 @@ public class KieServerImpl {
     private String kieServerLocation = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "http://localhost:8230/kie-server/services/rest/server");
 
     private final KieServerRegistry context;
+    private final PolicyManager policyManager;
 
     private final KieServerStateRepository repository;
     private volatile AtomicBoolean kieServerActive = new AtomicBoolean(false);
@@ -121,6 +124,11 @@ public class KieServerImpl {
                 logger.error("Error when initializing server extension of type {}", extension, e);
             }
         }
+
+        // start policy manager
+        policyManager = new PolicyManager();
+        policyManager.start(this, context);
+
         kieServerActive.set(true);
         boolean readyToRun = false;
         KieServerController kieController = getController();
@@ -175,6 +183,7 @@ public class KieServerImpl {
 
     public void destroy() {
         kieServerActive.set(false);
+        policyManager.stop();
         // disconnect from controller
         KieServerController kieController = getController();
         kieController.disconnect(getInfoInternal());
@@ -819,6 +828,11 @@ public class KieServerImpl {
         this.serverMessages.add(message);
     }
 
+    public void addContainerMessage(String containerId, Message message) {
+        List<Message> messages = getMessagesForContainer(containerId);
+        messages.add(message);
+    }
+
     public void addServerStatusMessage(KieServerInfo kieServerInfo) {
         StringBuilder serverInfoMsg = new StringBuilder();
         serverInfoMsg
@@ -839,6 +853,10 @@ public class KieServerImpl {
         }
 
         return messages;
+    }
+
+    public PolicyManager getPolicyManager() {
+        return this.policyManager;
     }
 
     @Override
