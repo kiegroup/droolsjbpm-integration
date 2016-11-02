@@ -1061,13 +1061,23 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             taskList = taskClient.findTasksByVariableAndValue(USER_YODA, "_string", "john is working on it", status, 0, 10, "processInstanceId", true);
             assertEquals(2, taskList.size());
-            assertEquals(processInstanceId, taskList.get(0).getProcessInstanceId());
-            assertEquals(processInstanceId2, taskList.get(1).getProcessInstanceId());
+            if (processInstanceId < processInstanceId2) {
+                assertEquals(processInstanceId, taskList.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId2, taskList.get(1).getProcessInstanceId());
+            } else {
+                assertEquals(processInstanceId2, taskList.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId, taskList.get(1).getProcessInstanceId());
+            }
 
             taskList = taskClient.findTasksByVariableAndValue(USER_YODA, "_string", "john is working on it", status, 0, 10, "processInstanceId", false);
             assertEquals(2, taskList.size());
-            assertEquals(processInstanceId2, taskList.get(0).getProcessInstanceId());
-            assertEquals(processInstanceId, taskList.get(1).getProcessInstanceId());
+            if (processInstanceId < processInstanceId2) {
+                assertEquals(processInstanceId2, taskList.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId, taskList.get(1).getProcessInstanceId());
+            } else {
+                assertEquals(processInstanceId, taskList.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId2, taskList.get(1).getProcessInstanceId());
+            }
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
