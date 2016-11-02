@@ -981,7 +981,7 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             }
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -1016,9 +1016,15 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             result = response.getResult();
         }
 
+        if (result != null) {
 
-        if (result != null && result instanceof ItemList) {
-            return ((ItemList<T>) result).getItems();
+            if (result instanceof ItemList) {
+                return ((ItemList<T>) result).getItems();
+            } else if (result instanceof List) {
+                return (List) result;
+            } else if (result instanceof Wrapped) {
+                return (List)((Wrapped) result).unwrap();
+            }
         }
 
         return Collections.emptyList();
