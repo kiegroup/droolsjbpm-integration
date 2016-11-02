@@ -28,11 +28,15 @@ import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -1192,6 +1196,77 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         } finally {
 
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testProcessWithUserTasksBAM() throws Exception {
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("BAMQuery");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select taskId, taskName, status, processInstanceId from BAMTaskSummary");
+        query.setTarget("CUSTOM");
+
+        try {
+
+            queryClient.registerQuery(query);
+
+            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder().equalsTo("processInstanceId", processInstanceId).get();
+
+            List<List> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, filterSpec, 0, 10, List.class);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            List<?> taskBAM = instances.get(0);
+            assertEquals(4, taskBAM.size());
+            assertEquals(Status.Reserved.toString(), taskBAM.get(2));
+
+            List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertNotNull(taskList);
+
+            assertEquals(1, taskList.size());
+            TaskSummary taskSummary = taskList.get(0);
+            assertEquals("First task", taskSummary.getName());
+
+            // startTask and completeTask task
+            taskClient.startTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
+
+            instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, filterSpec, 0, 10, List.class);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            taskBAM = instances.get(0);
+            assertEquals(4, taskBAM.size());
+            assertEquals(Status.InProgress.toString(), taskBAM.get(2));
+
+            Map<String, Object> taskOutcome = new HashMap<String, Object>();
+            taskOutcome.put("string_", "my custom data");
+            taskOutcome.put("person_", createPersonInstance(USER_MARY));
+
+            taskClient.completeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA, taskOutcome);
+            List<String> statuses = new ArrayList<String>();
+            statuses.add(Status.Ready.toString());
+            statuses.add(Status.Reserved.toString());
+            statuses.add(Status.InProgress.toString());
+            statuses.add(Status.Completed.toString());
+            statuses.add(Status.Exited.toString());
+
+            List<TaskSummary> processTasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, statuses, 0, 10);
+            assertEquals(2, processTasks.size());
+
+            instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, filterSpec, 0, 10, List.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+        } finally {
+            queryClient.unregisterQuery(query.getName());
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             }

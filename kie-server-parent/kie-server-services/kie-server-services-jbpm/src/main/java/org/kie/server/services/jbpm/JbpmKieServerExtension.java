@@ -338,6 +338,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 logger.debug("Registering TaskCleanUpProcessEventListener");
                 addTaskCleanUpProcessListener(unit, kieContainer);
             }
+            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_BAM_LISTENER, "true").equalsIgnoreCase("true")) {
+                logger.debug("Registering BAMTaskEventListener");
+                addTaskBAMEventListener(unit, kieContainer);
+            }
 
             deploymentService.deploy(unit);
             // in case it was deployed successfully pass all known classes to marshallers (jaxb, json etc)
@@ -519,6 +523,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 new ObjectModel(
                         "mvel",
                         "new org.jbpm.services.task.admin.listener.TaskCleanUpProcessEventListener(taskService)"
+                )
+        );
+        unit.setDeploymentDescriptor(descriptor);
+    }
+
+    protected void addTaskBAMEventListener(final KModuleDeploymentUnit unit, final InternalKieContainer kieContainer) {
+        final DeploymentDescriptor descriptor = getDeploymentDescriptor(unit, kieContainer);
+        descriptor.getBuilder().addTaskEventListener(
+                new ObjectModel(
+                        "mvel",
+                        "new org.jbpm.services.task.lifecycle.listeners.BAMTaskEventListener(false)"
                 )
         );
         unit.setDeploymentDescriptor(descriptor);
