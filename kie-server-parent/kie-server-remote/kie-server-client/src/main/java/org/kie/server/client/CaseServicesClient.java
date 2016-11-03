@@ -31,6 +31,15 @@ import org.kie.server.api.model.instance.ProcessInstance;
 
 public interface CaseServicesClient {
 
+    public static final String SORT_BY_CASE_DEFINITION_ID = "CaseId";
+    public static final String SORT_BY_CASE_DEFINITION_NAME = "CaseName";
+    public static final String SORT_BY_CASE_DEFINITION_DEPLOYMENT_ID = "Project";
+
+    public static final String SORT_BY_CASE_INSTANCE_ID = "CorrelationKey";
+    public static final String SORT_BY_CASE_INSTANCE_NAME = "ProcessName";
+
+    public static final String SORT_BY_PROCESS_INSTANCE_ID = "ProcessInstanceId";
+
     String startCase(String containerId, String caseDefinitionId);
 
     String startCase(String containerId, String caseDefinitionId, CaseFile caseFile);
@@ -85,7 +94,11 @@ public interface CaseServicesClient {
 
     List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize);
 
+    List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
     List<ProcessInstance> getProcessInstances(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize);
+
+    List<ProcessInstance> getProcessInstances(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     void assignUserToRole(String containerId, String caseId, String roleName, String user);
 
@@ -107,17 +120,33 @@ public interface CaseServicesClient {
 
     List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize);
 
+    List<CaseInstance> getCaseInstances(Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
     List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize);
+
+    List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize);
 
+    List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
     List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize);
+
+    List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize);
 
-    List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize);
+    List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<CaseDefinition> getCaseDefinitions(Integer page, Integer pageSize);
+
+    List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize);
+
+    List<CaseDefinition> getCaseDefinitions(Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId);
 }

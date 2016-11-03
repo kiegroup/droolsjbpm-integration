@@ -707,6 +707,18 @@ public abstract class AbstractKieServicesClientImpl {
         return queryString.toString();
     }
 
+    protected String getSortingQueryString(String inQueryString, String sort, boolean sortOrder) {
+        StringBuilder queryString = new StringBuilder(inQueryString);
+        if (queryString.length() == 0) {
+            queryString.append("?");
+        } else {
+            queryString.append("&");
+        }
+        queryString.append("sort=" + sort).append("&sortOrder=" + sortOrder);
+
+        return queryString.toString();
+    }
+
     protected String getAdditionalParams(String inQueryString, String name, List<?> values) {
         StringBuilder queryString = new StringBuilder(inQueryString);
 
