@@ -42,13 +42,12 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String PROPERTY_DAMAGE_REPORT_CLASS_NAME = "org.kie.server.testing.PropertyDamageReport";
     private static final String CLAIM_REPORT_CLASS_NAME = "org.kie.server.testing.ClaimReport";
 
-    private static final String CASE_DEF_ID = "insurance-claims.CarInsuranceClaimCase";
-    private static final String CASE_DESCRIPTION = "CarInsuranceClaimCase";
+    private static final String CLAIM_CASE_ID_PREFIX = "CAR_INS";
+    private static final String CLAIM_CASE_DEF_ID = "insurance-claims.CarInsuranceClaimCase";
+    private static final String CLAIM_CASE_DESRIPTION = "CarInsuranceClaimCase";
 
     private static final String CASE_INSURED_ROLE = "insured";
     private static final String CASE_INS_REP_ROLE = "insuranceRepresentative";
-
-    private static final String CASE_ID_PREFIX = "CAR_INS";
 
     private static final String CONTAINER_ALIAS = "ins";
 
@@ -71,33 +70,17 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testCreateCaseWithEmptyCaseFile() {
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID);
-        try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
 
-            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
-            assertEquals(USER_YODA, caseInstance.getCaseOwner());
-            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-            assertNotNull(caseInstance.getStartedAt());
-            assertNull(caseInstance.getCompletedAt());
-            assertEquals("", caseInstance.getCompletionMessage());
-            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
 
-            // since roles were not assigned to any users/groups no tasks are available
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(0, tasks.size());
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-        } finally {
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-            }
-        }
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        // since roles were not assigned to any users/groups no tasks are available
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
     }
 
     @Test
@@ -106,38 +89,22 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                                               .addUserAssignments(CASE_INS_REP_ROLE, USER_JOHN)
                                               .build();
 
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID, caseFile);
-        try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
 
-            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
-            assertEquals(USER_YODA, caseInstance.getCaseOwner());
-            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-            assertNotNull(caseInstance.getStartedAt());
-            assertNull(caseInstance.getCompletedAt());
-            assertEquals("", caseInstance.getCompletionMessage());
-            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
 
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(1, tasks.size());
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
 
-            TaskSummary task = tasks.get(0);
-            assertNotNull(task);
-            assertEquals("Provide accident information", task.getName());
-            assertEquals(null, task.getActualOwner());
-            assertEquals("Ready", task.getStatus());
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-        } finally {
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-            }
-        }
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(1, tasks.size());
+
+        TaskSummary task = tasks.get(0);
+        assertNotNull(task);
+        assertEquals("Provide accident information", task.getName());
+        assertEquals(null, task.getActualOwner());
+        assertEquals("Ready", task.getStatus());
     }
 
     @Test
@@ -150,195 +117,224 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 .data(caseData)
                 .build();
 
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID, caseFile);
-        try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
 
-            caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-            assertNotNull(caseData);
-            assertEquals(1, caseData.size());
-            assertEquals("ford", caseData.get("car"));
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
 
-            caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "car", "fiat");
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(caseData);
+        assertEquals(1, caseData.size());
+        assertEquals("ford", caseData.get("car"));
 
-            Object carCaseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "car");
-            assertNotNull(carCaseData);
-            assertTrue(carCaseData instanceof String);
-            assertEquals("fiat", carCaseData);
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "car", "fiat");
 
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(1, tasks.size());
+        Object carCaseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "car");
+        assertNotNull(carCaseData);
+        assertTrue(carCaseData instanceof String);
+        assertEquals("fiat", carCaseData);
 
-            TaskSummary task = tasks.get(0);
-            assertNotNull(task);
-            assertEquals("Provide accident information", task.getName());
-            assertEquals(null, task.getActualOwner());
-            assertEquals("Ready", task.getStatus());
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(1, tasks.size());
 
-            Map<String, Object> output = new HashMap<>();
-            Object claimReport = createInstance(CLAIM_REPORT_CLASS_NAME);
-            setValue(claimReport, "name", "John Doe");
+        TaskSummary task = tasks.get(0);
+        assertNotNull(task);
+        assertEquals("Provide accident information", task.getName());
+        assertEquals(null, task.getActualOwner());
+        assertEquals("Ready", task.getStatus());
 
-            output.put("claimReport_", claimReport);
-            taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, output);
+        Map<String, Object> output = new HashMap<>();
+        Object claimReport = createInstance(CLAIM_REPORT_CLASS_NAME);
+        setValue(claimReport, "name", "John Doe");
 
-            caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-            assertNotNull(caseData);
-            assertEquals(2, caseData.size());
-            assertEquals("fiat", caseData.get("car"));
+        output.put("claimReport_", claimReport);
+        taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, output);
 
-            Object caseClaimReport = caseData.get("claimReport");
-            assertNotNull(caseClaimReport);
-            assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(caseData);
+        assertEquals(2, caseData.size());
+        assertEquals("fiat", caseData.get("car"));
 
-            caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "claimReport");
-            caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-            assertNotNull(caseData);
-            assertEquals(1, caseData.size());
-            assertEquals("fiat", caseData.get("car"));
+        Object caseClaimReport = caseData.get("claimReport");
+        assertNotNull(caseClaimReport);
+        assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("owner", "john");
-            data.put("report", caseClaimReport);
-            caseClient.putCaseInstanceData(CONTAINER_ID, caseId, data);
+        caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "claimReport");
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(caseData);
+        assertEquals(1, caseData.size());
+        assertEquals("fiat", caseData.get("car"));
 
-            caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-            assertNotNull(caseData);
-            assertEquals(3, caseData.size());
-            assertEquals("fiat", caseData.get("car"));
-            assertEquals("john", caseData.get("owner"));
+        Map<String, Object> data = new HashMap<>();
+        data.put("owner", "john");
+        data.put("report", caseClaimReport);
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseId, data);
 
-            caseClaimReport = caseData.get("report");
-            assertNotNull(caseClaimReport);
-            assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-        } finally {
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-            }
-        }
+        caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertNotNull(caseData);
+        assertEquals(3, caseData.size());
+        assertEquals("fiat", caseData.get("car"));
+        assertEquals("john", caseData.get("owner"));
+
+        caseClaimReport = caseData.get("report");
+        assertNotNull(caseClaimReport);
+        assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
     }
 
     @Test
     public void testCreateCaseWithEmptyCaseFileThenDestroyIt() {
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID);
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        // since roles were not assigned to any users/groups no tasks are available
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
         try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
-
-            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
-            assertEquals(USER_YODA, caseInstance.getCaseOwner());
-            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-            assertNotNull(caseInstance.getStartedAt());
-            assertNull(caseInstance.getCompletedAt());
-            assertEquals("", caseInstance.getCompletionMessage());
-            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
-
-            // since roles were not assigned to any users/groups no tasks are available
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(0, tasks.size());
-
-            caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
-
-            try {
-                // this should throw exception as there is no case any more
-                caseClient.getCaseInstance(CONTAINER_ID, caseId);
-                fail("Case should not exists any more");
-            } catch (KieServicesException e) {
-                // expected
-            }
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-            }
+            // this should throw exception as there is no case any more
+            caseClient.getCaseInstance(CONTAINER_ID, caseId);
+            fail("Case should not exists any more");
+        } catch (KieServicesException e) {
+            // expected
         }
     }
 
     @Test
-    public void testCreateCaseWithEmptyCaseFileThenReopenIt() {
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_DEF_ID);
+    public void testCreateCancelAndReopenCaseWithEmptyCaseFile() {
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+
         try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
-
-            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
-            assertEquals(USER_YODA, caseInstance.getCaseOwner());
-            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-            assertNotNull(caseInstance.getStartedAt());
-            assertNull(caseInstance.getCompletedAt());
-            assertEquals("", caseInstance.getCompletionMessage());
-            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
-
-            caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-
-            try {
-                // this should throw exception as there is no case any more
-                caseClient.getCaseInstance(CONTAINER_ID, caseId);
-                fail("Case should not exists any more");
-            } catch (KieServicesException e) {
-                // expected
-            }
-            Map<String, Object> data = new HashMap<>();
-            data.put("additionalComment", "reopening the case");
-            caseClient.reopenCase(caseId, CONTAINER_ID, CASE_DEF_ID, data);
-
-            caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-
-            Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
-            assertNotNull(additionalComment);
-            assertEquals("reopening the case", additionalComment);
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
-            }
+            // this should throw exception as there is no case any more
+            caseClient.getCaseInstance(CONTAINER_ID, caseId);
+            fail("Case should not exists any more");
+        } catch (KieServicesException e) {
+            // expected
         }
+        Map<String, Object> data = new HashMap<>();
+        data.put("additionalComment", "reopening the case");
+        caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID, data);
+
+        caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertNotNull(caseInstance);
+        assertEquals(caseId, caseInstance.getCaseId());
+
+        Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
+        assertNotNull(additionalComment);
+        assertEquals("reopening the case", additionalComment);
     }
 
     @Test
     public void testCreateCaseWithEmptyCaseFileWithContainerAlias() {
-        String caseId = caseClient.startCase(CONTAINER_ALIAS, CASE_DEF_ID);
+        String caseId = caseClient.startCase(CONTAINER_ALIAS, CLAIM_CASE_DEF_ID);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ALIAS, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        // since roles were not assigned to any users/groups no tasks are available
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
+    }
+
+    @Test
+    public void testCancelCaseInstanceNotExistingContainer() {
         try {
-            assertNotNull(caseId);
-            assertTrue(caseId.startsWith(CASE_ID_PREFIX));
-
-            CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ALIAS, caseId);
-            assertNotNull(caseInstance);
-            assertEquals(caseId, caseInstance.getCaseId());
-            assertEquals(CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-            assertEquals(CASE_DESCRIPTION, caseInstance.getCaseDescription());
-            assertEquals(USER_YODA, caseInstance.getCaseOwner());
-            assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-            assertNotNull(caseInstance.getStartedAt());
-            assertNull(caseInstance.getCompletedAt());
-            assertEquals("", caseInstance.getCompletionMessage());
-            assertEquals(CONTAINER_ID, caseInstance.getContainerId());
-
-            // since roles were not assigned to any users/groups no tasks are available
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(0, tasks.size());
-        } catch (Exception e) {
-            fail("Failed due to " + e.getMessage());
-        } finally {
-            if (caseId != null) {
-                caseClient.cancelCaseInstance(CONTAINER_ALIAS, caseId);
-            }
+            caseClient.cancelCaseInstance("not-existing-container", CLAIM_CASE_DEF_ID);
+            fail("Should have failed because of not existing container.");
+        } catch (KieServicesException e) {
+            // expected
         }
     }
 
+    @Test
+    public void testCancelCaseInstanceNotExistingCase() {
+        try {
+            caseClient.cancelCaseInstance(CONTAINER_ID, "not-existing-case");
+            fail("Should have failed because of not existing case definition Id.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testDestroyCaseInstance() {
+        Map<String, Object> caseData = new HashMap<>();
+        caseData.put("car", "ford");
+        CaseFile caseFile = CaseFile.builder()
+                .data(caseData)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+        try {
+            // this should throw exception as there is no case any more
+            caseClient.getCaseInstance(CONTAINER_ID, caseId);
+            fail("Case should not exists any more");
+        } catch (KieServicesException e) {
+            // expected
+        }
+
+        try {
+            caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID);
+            fail("Should have failed because destroyed case cannot be reopen.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testDestroyCaseInstanceNotExistingContainer() {
+        try {
+            caseClient.destroyCaseInstance("not-existing-container", CLAIM_CASE_DEF_ID);
+            fail("Should have failed because of not existing container.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testDestroyCaseInstanceNotExistingCase() {
+        try {
+            caseClient.destroyCaseInstance(CONTAINER_ID, "not-existing-case");
+            fail("Should have failed because of not existing case definition Id.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
+        assertNotNull(caseInstance);
+        assertEquals(caseId, caseInstance.getCaseId());
+        assertEquals(CLAIM_CASE_DEF_ID, caseInstance.getCaseDefinitionId());
+        assertEquals(CLAIM_CASE_DESRIPTION, caseInstance.getCaseDescription());
+        assertEquals(owner, caseInstance.getCaseOwner());
+        assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
+        assertNotNull(caseInstance.getStartedAt());
+        assertNull(caseInstance.getCompletedAt());
+        assertEquals("", caseInstance.getCompletionMessage());
+        assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+    }
 }

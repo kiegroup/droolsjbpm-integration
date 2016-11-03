@@ -57,7 +57,8 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
             @QueryParam("owner") String owner, @QueryParam("status") List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -67,10 +68,10 @@ public class CaseQueryResource extends AbstractCaseResource {
                     CaseInstanceList responseObject = null;
                     if (owner != null && !owner.isEmpty()) {
                         logger.debug("About to look for case instances owned by {} with status {}", owner, status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner, status, page, pageSize);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner, status, page, pageSize, sort, sortOrder);
                     } else {
                         logger.debug("About to look for case instances with status {}", status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstances(status, page, pageSize);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstances(status, page, pageSize, sort, sortOrder);
                     }
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
@@ -85,7 +86,8 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
             @QueryParam("filter") String filter,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 "",
@@ -93,7 +95,7 @@ public class CaseQueryResource extends AbstractCaseResource {
                 (Variant v, String type, Header... customHeaders) -> {
 
                     logger.debug("About to look for case definitions with filter {}", filter);
-                    CaseDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinitions(filter, page, pageSize);
+                    CaseDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinitions(filter, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);

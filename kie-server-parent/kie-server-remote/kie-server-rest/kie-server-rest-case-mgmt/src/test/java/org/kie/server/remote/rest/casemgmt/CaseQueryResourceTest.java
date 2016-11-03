@@ -60,12 +60,14 @@ public class CaseQueryResourceTest {
         String filter = null;
         Integer page = 0;
         Integer pageSize= 10;
-        when(runtimeDataService.getCaseDefinitions(filter, page, pageSize)).thenReturn(new CaseDefinitionList());
+        String sort = "CaseId";
+        boolean sortOrder = true;
+        when(runtimeDataService.getCaseDefinitions(filter, page, pageSize, sort, sortOrder)).thenReturn(new CaseDefinitionList());
 
-        caseQueryResource.getCaseDefinitions(httpHeaders, filter, page, pageSize);
+        caseQueryResource.getCaseDefinitions(httpHeaders, filter, page, pageSize, sort, sortOrder);
 
         verify(kieServerRegistry).getContainer("");
-        verify(runtimeDataService).getCaseDefinitions(filter, page, pageSize);
+        verify(runtimeDataService).getCaseDefinitions(filter, page, pageSize, sort, sortOrder);
     }
 
     @Test
@@ -73,12 +75,14 @@ public class CaseQueryResourceTest {
         List<Integer> status = null;
         Integer page = 0;
         Integer pageSize= 10;
-        when(runtimeDataService.getCaseInstances(status, page, pageSize)).thenReturn(new CaseInstanceList());
+        String sort = "CorrelationKey";
+        boolean sortOrder = true;
+        when(runtimeDataService.getCaseInstances(status, page, pageSize, sort, sortOrder)).thenReturn(new CaseInstanceList());
 
-        caseQueryResource.getCaseInstances(httpHeaders, null, status, page, pageSize);
+        caseQueryResource.getCaseInstances(httpHeaders, null, status, page, pageSize, sort, sortOrder);
 
         verify(kieServerRegistry).getContainer("");
-        verify(runtimeDataService).getCaseInstances(status, page, pageSize);
+        verify(runtimeDataService).getCaseInstances(status, page, pageSize, sort, sortOrder);
     }
 
 }
