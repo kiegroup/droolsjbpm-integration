@@ -15,11 +15,11 @@
 
 package org.kie.maven.plugin;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.drools.core.phreak.ReactiveList;
 import org.drools.core.phreak.ReactiveObject;
@@ -102,19 +102,19 @@ public class BytecodeInjectReactive {
         
         droolsPojo.addInterface( cp.get(ReactiveObject.class.getName()) );
         
-        CtField ltsCtField = new CtField( cp.get(List.class.getName()), DROOLS_LIST_OF_TUPLES, droolsPojo );
+        CtField ltsCtField = new CtField( cp.get(Collection.class.getName()), DROOLS_LIST_OF_TUPLES, droolsPojo );
         ltsCtField.setModifiers(Modifier.PRIVATE);
-        ClassType listOfTuple = new SignatureAttribute.ClassType(List.class.getName(),
+        ClassType listOfTuple = new SignatureAttribute.ClassType(Collection.class.getName(),
                 new TypeArgument[]{new TypeArgument( new SignatureAttribute.ClassType(Tuple.class.getName()) )});
         ltsCtField.setGenericSignature(
                 listOfTuple.encode()
                 );
         // Do not use the Initializer.byNew... as those method always pass at least 1 parameter which is "this".
-        droolsPojo.addField(ltsCtField, Initializer.byExpr("new java.util.ArrayList();"));
+        droolsPojo.addField(ltsCtField, Initializer.byExpr("new java.util.HashSet();"));
         
         final CtMethod getLeftTuplesCtMethod = CtNewMethod.make(
-                "public java.util.List getLeftTuples() {\n" + 
-                "    return this.$$_drools_lts;\n" + 
+                "public java.util.Collection getLeftTuples() {\n" + 
+                "    return this.$$_drools_lts != null ? this.$$_drools_lts : java.util.Collections.emptyList();\n"+
                 "}", droolsPojo );
         MethodSignature getLeftTuplesSignature = new MethodSignature(null, null, listOfTuple, null);
         getLeftTuplesCtMethod.setGenericSignature(getLeftTuplesSignature.encode());
@@ -123,7 +123,7 @@ public class BytecodeInjectReactive {
         final CtMethod addLeftTupleCtMethod = CtNewMethod.make(
                 "public void addLeftTuple("+Tuple.class.getName()+" leftTuple) {\n" + 
                 "    if ($$_drools_lts == null) {\n" + 
-                "        $$_drools_lts = new java.util.ArrayList();\n" + 
+                "        $$_drools_lts = new java.util.HashSet();\n" + 
                 "    }\n" + 
                 "    $$_drools_lts.add(leftTuple);\n" + 
                 "}", droolsPojo );
