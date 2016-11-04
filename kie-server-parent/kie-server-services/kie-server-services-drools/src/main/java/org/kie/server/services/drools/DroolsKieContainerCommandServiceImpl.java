@@ -15,9 +15,7 @@
 
 package org.kie.server.services.drools;
 
-import java.util.Arrays;
-
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.ExecutionResults;
@@ -30,6 +28,8 @@ import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandServiceImpl {
 
@@ -60,7 +60,7 @@ public class DroolsKieContainerCommandServiceImpl extends KieContainerCommandSer
                 Command<?> cmd = kci.getMarshaller( marshallingFormat ).unmarshall(payload, type);
 
                 if (!(cmd instanceof BatchExecutionCommandImpl)) {
-                    cmd = new BatchExecutionCommandImpl(Arrays.asList(new GenericCommand<?>[]{(GenericCommand<?>) cmd}));
+                    cmd = new BatchExecutionCommandImpl(Arrays.asList(new ExecutableCommand<?>[]{(ExecutableCommand<?>) cmd} ));
                 }
 
                 if (cmd == null || ((BatchExecutionCommandImpl)cmd).getCommands() == null || ((BatchExecutionCommandImpl)cmd).getCommands().isEmpty()) {

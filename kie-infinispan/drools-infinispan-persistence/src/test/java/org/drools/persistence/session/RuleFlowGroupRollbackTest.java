@@ -15,33 +15,33 @@
  */
 package org.drools.persistence.session;
 
-import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
-import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.command.impl.GenericCommand;
-import org.drools.core.command.impl.KnowledgeCommandContext;
+import org.drools.core.command.impl.ExecutableCommand;
+import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.common.InternalAgenda;
 import org.drools.core.io.impl.ClassPathResource;
 import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.KieSession;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.command.Context;
-import org.kie.api.io.ResourceType;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
-import org.kie.api.runtime.Environment;
-import org.kie.api.runtime.KieSession;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
+import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RuleFlowGroupRollbackTest {
     
@@ -99,7 +99,7 @@ public class RuleFlowGroupRollbackTest {
 	}
 	
 	@SuppressWarnings("serial")
-	public class ActivateRuleFlowCommand implements GenericCommand<Object> {
+	public class ActivateRuleFlowCommand implements ExecutableCommand<Object> {
 		
 		private String ruleFlowGroupName;
 		
@@ -108,7 +108,7 @@ public class RuleFlowGroupRollbackTest {
 		}
 
 	    public Void execute(Context context) {
-	        KieSession ksession = ((KnowledgeCommandContext) context).getKieSession();
+	        KieSession ksession = ((RegistryContext) context).lookup( KieSession.class );
 	        ((InternalAgenda) ksession.getAgenda()).activateRuleFlowGroup(ruleFlowGroupName);
 	        return null;
 	    }
@@ -116,7 +116,7 @@ public class RuleFlowGroupRollbackTest {
 	}
 	
 	@SuppressWarnings("serial")
-	public class ExceptionCommand implements GenericCommand<Object> {
+	public class ExceptionCommand implements ExecutableCommand<Object> {
 
 	    public Void execute(Context context) {
 	    	throw new RuntimeException();

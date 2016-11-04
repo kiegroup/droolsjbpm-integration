@@ -15,11 +15,9 @@
 
 package org.jbpm.persistence;
 
-import java.util.Collection;
-
 import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
 import org.drools.core.command.runtime.process.AbortWorkItemCommand;
 import org.drools.core.command.runtime.process.CompleteWorkItemCommand;
@@ -35,6 +33,8 @@ import org.jbpm.process.instance.ProcessInstance;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.command.Context;
+
+import java.util.Collection;
 
 public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 
@@ -83,7 +83,7 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 			   (command instanceof FireAllRulesCommand);
 	}
 	
-	public static class PersistProcessCommand implements GenericCommand<Void> {
+	public static class PersistProcessCommand implements ExecutableCommand<Void> {
 		
 		private final ProcessPersistenceContext persistenceContext;
 		private final KieSession ksession;
