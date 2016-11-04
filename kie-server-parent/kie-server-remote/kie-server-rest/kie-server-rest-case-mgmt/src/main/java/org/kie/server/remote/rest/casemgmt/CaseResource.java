@@ -15,6 +15,7 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.DELETE;
@@ -51,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.remote.rest.casemgmt.Messages.*;
 
 @Path("server/" + CASE_URI)
 public class CaseResource extends AbstractCaseResource {
@@ -413,7 +415,8 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstanceProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_ID) String caseId,
             @QueryParam("status") List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -425,7 +428,7 @@ public class CaseResource extends AbstractCaseResource {
                         actualStatus.add(ProcessInstance.STATE_ACTIVE);
                     }
                     logger.debug("About to look for process instances in case {} with status {}", caseId, actualStatus);
-                    ProcessInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getProcessInstancesForCase(containerId, caseId, actualStatus, page, pageSize);
+                    ProcessInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getProcessInstancesForCase(containerId, caseId, actualStatus, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -591,7 +594,8 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstancesByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId,
             @QueryParam("status") List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -603,7 +607,7 @@ public class CaseResource extends AbstractCaseResource {
                         actualStatus.add(ProcessInstance.STATE_ACTIVE);
                     }
                     logger.debug("About to look for case instances in container {} with status {}", containerId, actualStatus);
-                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByContainer(containerId, actualStatus, page, pageSize);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByContainer(containerId, actualStatus, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -616,7 +620,8 @@ public class CaseResource extends AbstractCaseResource {
     public Response getCaseInstancesByDefinition(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_DEF_ID) String caseDefId,
             @QueryParam("status") List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -628,7 +633,7 @@ public class CaseResource extends AbstractCaseResource {
                         actualStatus.add(ProcessInstance.STATE_ACTIVE);
                     }
                     logger.debug("About to look for case instances with case definition id {} with status {}", caseDefId, actualStatus);
-                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByDefinition(containerId, caseDefId, actualStatus, page, pageSize);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByDefinition(containerId, caseDefId, actualStatus, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -639,7 +644,8 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                 containerId,
@@ -647,7 +653,7 @@ public class CaseResource extends AbstractCaseResource {
                 (Variant v, String type, Header... customHeaders) -> {
 
                     logger.debug("About to look for case definitions in container {}", containerId);
-                    CaseDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinitionsByContainer(containerId, page, pageSize);
+                    CaseDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinitionsByContainer(containerId, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
@@ -666,10 +672,16 @@ public class CaseResource extends AbstractCaseResource {
                 (Variant v, String type, Header... customHeaders) -> {
 
                     logger.debug("About to look for case definition with id {} in container {}", caseDefId, containerId);
-                    CaseDefinition responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinition(containerId, caseDefId);
 
-                    logger.debug("Returning OK response with content '{}'", responseObject);
-                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                    try {
+                        CaseDefinition responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinition(containerId, caseDefId);
+
+                        logger.debug("Returning OK response with content '{}'", responseObject);
+                        return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                    } catch (IllegalStateException e) {
+                        return notFound(
+                                MessageFormat.format(CASE_DEFINITION_NOT_FOUND, caseDefId, containerId), v, customHeaders);
+                    }
                 });
     }
 
