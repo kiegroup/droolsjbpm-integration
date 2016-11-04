@@ -109,6 +109,16 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     }
 
     @Override
+    public List<String> getContainerAliases() {
+        return new ArrayList<String>(containersByAlias.keySet());
+    }
+
+    @Override
+    public List<KieContainerInstanceImpl> getContainersForAlias(String alias) {
+        return new ArrayList<KieContainerInstanceImpl>(containersByAlias.getOrDefault(alias, new ArrayList<KieContainerInstanceImpl>()));
+    }
+
+    @Override
     public void registerIdentityProvider(IdentityProvider identityProvider) {
         this.identityProvider = identityProvider;
     }

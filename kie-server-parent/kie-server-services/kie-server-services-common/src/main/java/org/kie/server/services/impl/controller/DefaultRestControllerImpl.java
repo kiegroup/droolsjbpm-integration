@@ -65,6 +65,23 @@ public class DefaultRestControllerImpl implements KieServerController {
     }
 
     @SuppressWarnings("unchecked")
+    protected <T> T makeHttpPostRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
+        logger.debug("About to send POST request to '{}' with payload '{}'", uri, body);
+        KieServerHttpRequest request = newRequest( uri, user, password, token ).body(body).post();
+        KieServerHttpResponse response = request.response();
+
+        if ( response.code() == Response.Status.CREATED.getStatusCode() ||
+                response.code() == Response.Status.BAD_REQUEST.getStatusCode() ||
+                response.code() == Response.Status.OK.getStatusCode()) {
+            T serviceResponse = deserialize( response.body(), resultType );
+
+            return serviceResponse;
+        } else {
+            throw new IllegalStateException( "Error while sending POST request to " + uri + " response code " + response.code() );
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     protected <T> T makeHttpDeleteRequestAndCreateCustomResponse(String uri, Class<T> resultType, String user, String password, String token) {
         logger.debug("About to send DELETE request to '{}' ", uri);
         KieServerHttpRequest request = newRequest( uri, user, password, token ).delete();
@@ -187,6 +204,67 @@ public class DefaultRestControllerImpl implements KieServerController {
                     logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                 }
 
+            }
+        }
+    }
+
+    public void startContainer(String containerId) {
+
+        KieServerState currentState = context.getStateRepository().load(KieServerEnvironment.getServerId());
+        Set<String> controllers = currentState.getControllers();
+
+        KieServerConfig config = currentState.getConfiguration();
+        if (controllers != null && !controllers.isEmpty()) {
+            for (String controllerUrl : controllers) {
+
+                if (controllerUrl != null && !controllerUrl.isEmpty()) {
+                    String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/started";
+
+                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+                    try {
+                        makeHttpPostRequestAndCreateCustomResponse(connectAndSyncUrl, "", null, userName, password, token);
+                        break;
+                    } catch (Exception e) {
+                        // let's check all other controllers in case of running in cluster of controllers
+                        logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                        logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    public void stopContainer(String containerId) {
+
+        KieServerState currentState = context.getStateRepository().load(KieServerEnvironment.getServerId());
+        Set<String> controllers = currentState.getControllers();
+
+        KieServerConfig config = currentState.getConfiguration();
+        if (controllers != null && !controllers.isEmpty()) {
+            for (String controllerUrl : controllers) {
+
+                if (controllerUrl != null && !controllerUrl.isEmpty()) {
+                    String connectAndSyncUrl = controllerUrl + "/management/servers/" + KieServerEnvironment.getServerId() + "/containers/" + containerId + "/status/stopped";
+
+                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+                    try {
+                        makeHttpPostRequestAndCreateCustomResponse(connectAndSyncUrl, "", null, userName, password, token);
+                        break;
+                    } catch (Exception e) {
+                        // let's check all other controllers in case of running in cluster of controllers
+                        logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+                        logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+                    }
+
+                }
             }
         }
     }

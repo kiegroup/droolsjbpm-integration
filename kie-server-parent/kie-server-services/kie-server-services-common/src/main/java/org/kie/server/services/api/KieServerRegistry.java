@@ -38,6 +38,10 @@ public interface KieServerRegistry {
 
     List<KieContainerInstanceImpl> getContainers();
 
+    List<String> getContainerAliases();
+
+    List<KieContainerInstanceImpl> getContainersForAlias(String alias);
+
     void registerIdentityProvider(IdentityProvider identityProvider);
 
     IdentityProvider unregisterIdentityProvider();
