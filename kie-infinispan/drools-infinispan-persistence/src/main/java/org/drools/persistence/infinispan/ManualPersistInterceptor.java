@@ -17,7 +17,7 @@ package org.drools.persistence.infinispan;
 
 import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.PersistenceContextManager;
@@ -55,7 +55,7 @@ public class ManualPersistInterceptor extends AbstractInterceptor {
 		return result;
 	}
 
-	public static class PersistCommand implements GenericCommand<Void> {
+	public static class PersistCommand implements ExecutableCommand<Void> {
 		
 		private final SessionInfo sessionInfo;
 		private final PersistenceContext persistenceContext;

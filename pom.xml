@@ -51,10 +51,10 @@
          that is about to be build in the same Maven reactor build -->
     <!--<module>kie-maven-plugin-example</module>-->
     <module>drools-benchmark</module>
-    <module>drools-simulator</module>
+    <!--<module>drools-simulator</module>-->
     <module>drools-rhq-plugin</module>
-    <module>droolsjbpm-integration-examples</module>
-    <module>jbpm-simulation</module>
+    <!--<module>droolsjbpm-integration-examples</module>-->
+    <!--<module>jbpm-simulation</module>-->
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
     <module>kie-eap-integration</module>

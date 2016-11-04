@@ -16,12 +16,7 @@
 
 package org.kie.karaf.itest.kieserver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
@@ -45,6 +40,11 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
@@ -130,7 +130,7 @@ public class BaseKieServerClientKarafIntegrationTest extends AbstractKarafIntegr
         taskClient.completeTask(containerId, taskId, user, null);
 
         // work with rules
-        List<GenericCommand<?>> commands = new ArrayList<GenericCommand<?>>();
+        List<ExecutableCommand<?>> commands = new ArrayList<ExecutableCommand<?>>();
         BatchExecutionCommandImpl executionCommand = new BatchExecutionCommandImpl(commands);
         executionCommand.setLookup("defaultKieSession");
 

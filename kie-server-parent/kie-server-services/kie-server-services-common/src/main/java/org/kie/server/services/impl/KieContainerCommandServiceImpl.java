@@ -15,13 +15,7 @@
 
 package org.kie.server.services.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.kie.api.command.Command;
 import org.kie.api.runtime.CommandExecutor;
@@ -47,6 +41,12 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class KieContainerCommandServiceImpl implements KieContainerCommandService<ExecutionResults> {
 
@@ -102,7 +102,7 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                         return new ServiceResponse<ExecutionResults>(ServiceResponse.ResponseType.FAILURE, "Body of in message not of the expected type '" + Command.class.getName() + "'");
                     }
                     if (!(cmd instanceof BatchExecutionCommandImpl)) {
-                        cmd = new BatchExecutionCommandImpl(Arrays.asList(new GenericCommand<?>[]{(GenericCommand<?>) cmd}));
+                        cmd = new BatchExecutionCommandImpl(Arrays.asList(new ExecutableCommand<?>[]{(ExecutableCommand<?>) cmd} ));
                     }
 
                     ExecutionResults results = ks.execute((BatchExecutionCommandImpl) cmd);

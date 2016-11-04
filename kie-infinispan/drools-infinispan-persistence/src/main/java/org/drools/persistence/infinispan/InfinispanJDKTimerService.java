@@ -16,13 +16,8 @@
 
 package org.drools.persistence.infinispan;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.drools.core.command.CommandService;
-import org.drools.core.command.impl.GenericCommand;
+import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.time.InternalSchedulerService;
 import org.drools.core.time.Job;
 import org.drools.core.time.JobContext;
@@ -35,6 +30,11 @@ import org.drools.core.time.impl.TimerJobInstance;
 import org.kie.internal.command.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A default Scheduler implementation that uses the
@@ -117,7 +117,7 @@ public class InfinispanJDKTimerService extends JDKTimerService {
 
     public static class JDKCallableJobCommand
         implements
-        GenericCommand<Void> {
+        ExecutableCommand<Void> {
 
         private static final long serialVersionUID = 4L;
 
