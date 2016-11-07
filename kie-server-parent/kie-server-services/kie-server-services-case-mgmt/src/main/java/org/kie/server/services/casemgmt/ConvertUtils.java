@@ -162,6 +162,14 @@ public class ConvertUtils {
         return new QueryContext(page * pageSize, pageSize);
     }
 
+    public static QueryContext buildQueryContext(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        if (orderBy != null && !orderBy.isEmpty()) {
+            return new QueryContext(page * pageSize, pageSize, orderBy, asc);
+        }
+
+        return new QueryContext(page * pageSize, pageSize);
+    }
+
     public static List<ProcessInstance> transformProcessInstance(Collection<ProcessInstanceDesc> processInstanceDescs) {
         if (processInstanceDescs == null) {
             return Collections.emptyList();

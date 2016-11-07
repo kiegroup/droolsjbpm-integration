@@ -223,7 +223,7 @@ public class CaseInstance {
         }
 
         public Builder completionMessage(String completionMessage) {
-            caseInstance.setCompletionMessage(completionMessage);
+            caseInstance.setCompletionMessage(completionMessage==null?"":completionMessage);
             return this;
         }
 

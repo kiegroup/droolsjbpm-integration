@@ -27,7 +27,6 @@ import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.internal.identity.IdentityProvider;
-import org.kie.internal.query.QueryContext;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
@@ -113,9 +112,11 @@ public class CaseManagementRuntimeDataServiceBase {
         return activeNodesList;
     }
 
-    public ProcessInstanceList getProcessInstancesForCase(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize) {
+    public ProcessInstanceList getProcessInstancesForCase(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         status = safeStatus(status);
-        Collection<ProcessInstanceDesc> processInstanceDescs = caseRuntimeDataService.getProcessInstancesForCase(caseId, status, ConvertUtils.buildQueryContext(page, pageSize));
+        sort = safeProcessInstanceSort(sort);
+
+        Collection<ProcessInstanceDesc> processInstanceDescs = caseRuntimeDataService.getProcessInstancesForCase(caseId, status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<ProcessInstance> processInstances = ConvertUtils.transformProcessInstance(processInstanceDescs);
 
@@ -124,9 +125,11 @@ public class CaseManagementRuntimeDataServiceBase {
         return processInstancesList;
     }
 
-    public CaseInstanceList getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+    public CaseInstanceList getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         status = safeStatus(status);
-        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDeployment(containerId, status, ConvertUtils.buildQueryContext(page, pageSize));
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDeployment(containerId, status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
 
@@ -135,9 +138,11 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
-    public CaseInstanceList getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize) {
+    public CaseInstanceList getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        status = safeStatus(status);
+        sort = safeCaseInstanceSort(sort);
 
-        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDefinition(caseDefinitionId,  status, ConvertUtils.buildQueryContext(page, pageSize));
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDefinition(caseDefinitionId,  status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
 
@@ -146,10 +151,12 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
-    public CaseInstanceList getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize) {
+    public CaseInstanceList getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         status = safeStatus(status);
         owner = getUser(owner);
-        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesOwnedBy(owner, status, ConvertUtils.buildQueryContext(page, pageSize));
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesOwnedBy(owner, status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
 
@@ -158,9 +165,11 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
-    public CaseInstanceList getCaseInstances(List<Integer> status, Integer page, Integer pageSize) {
+    public CaseInstanceList getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         status = safeStatus(status);
-        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstances(status, ConvertUtils.buildQueryContext(page, pageSize));
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstances(status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
 
@@ -169,9 +178,10 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
-    public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize) {
+    public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        sort = safeCaseDefinitionSort(sort);
 
-        Collection<CaseDefinition> caseDescs = caseRuntimeDataService.getCasesByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize));
+        Collection<CaseDefinition> caseDescs = caseRuntimeDataService.getCasesByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<org.kie.server.api.model.cases.CaseDefinition> cases = ConvertUtils.transformCases(caseDescs);
 
@@ -180,13 +190,15 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseList;
     }
 
-    public CaseDefinitionList getCaseDefinitions(String filter, Integer page, Integer pageSize) {
+    public CaseDefinitionList getCaseDefinitions(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
 
         Collection<CaseDefinition> caseDescs = null;
+        sort = safeCaseDefinitionSort(sort);
+
         if (filter != null && !filter.isEmpty()) {
-            caseDescs = caseRuntimeDataService.getCases(filter, ConvertUtils.buildQueryContext(page, pageSize));
+            caseDescs = caseRuntimeDataService.getCases(filter, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
         } else {
-            caseDescs = caseRuntimeDataService.getCases(ConvertUtils.buildQueryContext(page, pageSize));
+            caseDescs = caseRuntimeDataService.getCases(ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
         }
 
         List<org.kie.server.api.model.cases.CaseDefinition> cases = ConvertUtils.transformCases(caseDescs);
@@ -199,6 +211,10 @@ public class CaseManagementRuntimeDataServiceBase {
     public org.kie.server.api.model.cases.CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId) {
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
+
+        if (caseDef == null) {
+            throw new IllegalStateException("Case definition " + containerId + " : " + caseDefinitionId + " not found");
+        }
 
         org.kie.server.api.model.cases.CaseDefinition caseDefinition = ConvertUtils.transformCase(caseDef);
 
@@ -213,5 +229,32 @@ public class CaseManagementRuntimeDataServiceBase {
         }
 
         return actualStatus;
+    }
+
+    protected String safeCaseInstanceSort(String sort) {
+        String actualSort = sort;
+        if (sort == null || sort.isEmpty()) {
+            actualSort = "CorrelationKey";
+        }
+
+        return actualSort;
+    }
+
+    protected String safeCaseDefinitionSort(String sort) {
+        String actualSort = sort;
+        if (sort == null || sort.isEmpty()) {
+            actualSort = "CaseId";
+        }
+
+        return actualSort;
+    }
+
+    protected String safeProcessInstanceSort(String sort) {
+        String actualSort = sort;
+        if (sort == null || sort.isEmpty()) {
+            actualSort = "ProcessInstanceId";
+        }
+
+        return actualSort;
     }
 }

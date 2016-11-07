@@ -120,6 +120,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         ((CaseServiceImpl) caseService).setProcessService(processService);
         ((CaseServiceImpl) caseService).setDeploymentService(deploymentService);
         ((CaseServiceImpl) caseService).setRuntimeDataService(runtimeDataService);
+        ((CaseServiceImpl) caseService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
 
         // build case configuration on deployment listener
         CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener();

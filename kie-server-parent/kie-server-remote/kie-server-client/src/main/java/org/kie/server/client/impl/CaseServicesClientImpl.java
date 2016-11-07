@@ -535,7 +535,17 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
+    public List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        return getProcessInstances(containerId, caseId, null, page, pageSize, sort, sortOrder);
+    }
+
+    @Override
     public List<ProcessInstance> getProcessInstances(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize) {
+        return getProcessInstances(containerId, caseId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> getProcessInstances(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         ProcessInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -544,13 +554,14 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
             String queryString = getPagingQueryString("", page, pageSize);
             queryString = getAdditionalParams(queryString, "status", status);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_PROCESS_INSTANCES_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getProcessInstancesForCase", new Object[]{containerId, caseId, safeList(status), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getProcessInstancesForCase", new Object[]{containerId, caseId, safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -687,24 +698,35 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseInstance> getCaseInstances(Integer page, Integer pageSize) {
-        return getCaseInstances(null, page, pageSize);
+        return getCaseInstances(null, page, pageSize, "", true);
     }
 
     @Override
     public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize) {
+        return getCaseInstances(status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstances(Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        return getCaseInstances(null, page, pageSize, sort, sortOrder);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String queryString = getPagingQueryString("", page, pageSize);
             queryString = getAdditionalParams(queryString, "status", status);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_QUERY_URI + "/" + CASE_ALL_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstances", new Object[]{safeList(status), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstances", new Object[]{safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -724,19 +746,25 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize) {
+        return getCaseInstancesOwnedBy(owner, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
             String queryString = getPagingQueryString("?owner="+owner, page, pageSize);
             queryString = getAdditionalParams(queryString, "status", status);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_QUERY_URI + "/" + CASE_ALL_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesOwnedBy", new Object[]{owner, safeList(status), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesOwnedBy", new Object[]{owner, safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -756,6 +784,11 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+        return getCaseInstancesByContainer(containerId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -763,13 +796,14 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
             String queryString = getPagingQueryString("", page, pageSize);
             queryString = getAdditionalParams(queryString, "status", status);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesByContainer", new Object[]{containerId, safeList(status), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesByContainer", new Object[]{containerId, safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -789,6 +823,11 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize) {
+        return getCaseInstancesByDefinition(containerId, caseDefinitionId, status, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -797,13 +836,14 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
             String queryString = getPagingQueryString("", page, pageSize);
             queryString = getAdditionalParams(queryString, "status", status);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_INSTANCES_BY_DEF_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesByDefinition", new Object[]{containerId, caseDefinitionId, safeList(status), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesByDefinition", new Object[]{containerId, caseDefinitionId, safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -823,17 +863,25 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize) {
+        return getCaseDefinitionsByContainer(containerId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseDefinitionList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
 
+            String queryString = getPagingQueryString("", page, pageSize);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
+
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI, valuesMap), CaseDefinitionList.class);
+                    build(loadBalancer.getUrl(), CASE_URI, valuesMap) + queryString, CaseDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseDefinitionsByContainer", new Object[]{containerId, page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseDefinitionsByContainer", new Object[]{containerId, page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseDefinitionList> response = (ServiceResponse<CaseDefinitionList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -852,22 +900,24 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize) {
+    public List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseDefinitionList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
 
-            String queryString = "";
+            String filterQueryString = "";
             if (filter != null) {
-                queryString = "?filter=" + emptyIfNull(filter);
+                filterQueryString = "?filter=" + emptyIfNull(filter);
             }
+            String queryString = getPagingQueryString(filterQueryString, page, pageSize);
+            queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_QUERY_URI, valuesMap) + queryString, CaseDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseDefinitions", new Object[]{emptyIfNull(filter), page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseDefinitions", new Object[]{emptyIfNull(filter), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseDefinitionList> response = (ServiceResponse<CaseDefinitionList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 
@@ -887,7 +937,17 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
     @Override
     public List<CaseDefinition> getCaseDefinitions(Integer page, Integer pageSize) {
-        return getCaseDefinitions(null, page, pageSize);
+        return getCaseDefinitions(null, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize) {
+        return getCaseDefinitions(filter, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<CaseDefinition> getCaseDefinitions(Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        return getCaseDefinitions(null, page, pageSize, sort, sortOrder);
     }
 
     @Override
