@@ -8,7 +8,7 @@
       <bpmn2:incoming>_1-_2</bpmn2:incoming>
       <bpmn2:outgoing>_2-_3</bpmn2:outgoing>
       <bpmn2:timerEventDefinition>
-        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">1s</bpmn2:timeDuration>
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">5s</bpmn2:timeDuration>
       </bpmn2:timerEventDefinition>
     </bpmn2:intermediateCatchEvent>
     <bpmn2:endEvent id="_3" name="EndProcess">

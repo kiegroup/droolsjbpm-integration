@@ -84,7 +84,7 @@
                   <context>${kie.server.context}</context>
                 </properties>
                 <pingURL>${kie.server.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingTimeout>2400000</pingTimeout>
               </deployable>
             </deployables>
             <configuration>
@@ -582,7 +582,7 @@
       <id>eap64x</id>
       <properties>
         <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
-        <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
+        <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
       </properties>
       <build>
         <pluginManagement>
@@ -604,7 +604,15 @@
                     <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
                     <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
+                    <org.kie.server.persistence.ds>java:/jdbc/jbpm</org.kie.server.persistence.ds>
+                    <org.kie.server.persistence.dialect>org.hibernate.dialect.PostgreSQL82Dialect</org.kie.server.persistence.dialect>
                   </systemProperties>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.postgresql</groupId>
+                      <artifactId>postgresql</artifactId>
+                    </dependency>
+                  </dependencies>
                 </container>
                 <configuration>
                   <properties>
@@ -616,6 +624,15 @@
                        cargo.resource.id=mail|
                        cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
                     </cargo.resource.resource.mail>
+                    <!-- Datasource -->
+                    <cargo.datasource.datasource.postgre>
+                      cargo.datasource.driver=org.postgresql.xa.PGXADataSource|
+                      cargo.datasource.url=<postgre datasource URL>|
+                      cargo.datasource.jndi=java:/jdbc/jbpm|
+                      cargo.datasource.username=<postgre datasource username>|
+                      cargo.datasource.password=<postgre datasource password>|
+                      cargo.datasource.transactionsupport=XA_TRANSACTION
+                    </cargo.datasource.datasource.postgre>
                   </properties>
                 </configuration>
                 <deployables>
@@ -645,6 +662,11 @@
           <artifactId>jboss-as-jms-client-bom</artifactId>
           <type>pom</type>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>9.3-1102-jdbc4</version>
         </dependency>
       </dependencies>
     </profile>
