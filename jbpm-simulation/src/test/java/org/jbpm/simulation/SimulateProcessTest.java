@@ -15,12 +15,6 @@
 
 package org.jbpm.simulation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,13 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.core.command.runtime.rule.InsertElementsCommand;
-import org.drools.simulation.fluent.simulation.SimulationFluent;
-import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
-import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
-import org.jbpm.simulation.helper.TestUtils;
-import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
-import org.jbpm.simulation.impl.SimulateProcessPathCommand;
-import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.jbpm.simulation.impl.events.ActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedEndEventSimulationEvent;
@@ -47,10 +34,8 @@ import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.api.builder.ReleaseId;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.command.World;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+
+import static org.junit.Assert.*;
 
 public class SimulateProcessTest {
 
@@ -58,50 +43,6 @@ public class SimulateProcessTest {
     public void configure() {
         // enable logging
         //System.setProperty("jbpm.simulation.log.enabled", "true");
-    }
-    
-    @Test
-    public void testSimpleExclusiveGatewayTest() throws Exception {
-        
-        PathFinder finder = PathFinderFactory.getInstance(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2"));
-        
-        List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter());
-        assertEquals(2, paths.size());
-        
-        SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(this.getClass().getResourceAsStream("/BPMN-SimpleExclusiveGatewayProcess.bpmn2")));
-        
-        ReleaseId releaseId = TestUtils.createKJarWithMultipleResources("TestKbase",
-                new String[]{"BPMN-SimpleExclusiveGatewayProcess.bpmn2"}, new ResourceType[]{ResourceType.BPMN2});
-        
-        SimulationDataProvider provider = context.getDataProvider();
-        
-        SimulationFluent f = new DefaultSimulationFluent();
-        // @formatter:off
-        // FIXME why building knowledge base on this level does not work??
-        int numberOfAllInstances = 10;
-        int counter = 0;
-        // default interval 2 seconds, meaning each step in a path will be started after 2 seconds
-        long interval = 2*1000*60;
-        for (SimulationPath path : paths) {
-            
-            double probability = provider.calculatePathProbability(path);
-            f.newPath("path" + counter);
-            
-            // count how many instances/steps should current path have
-            int instancesOfPath = (int) (numberOfAllInstances * probability);
-            
-            for (int i = 0; i < instancesOfPath; i++) {
-                f.newStep( interval * i )
-                    .newKieSession( releaseId, "TestKbase.KSession1" )
-                        .end(World.ROOT, StatefulKnowledgeSession.class.getName())
-                    .addCommand(new SimulateProcessPathCommand("defaultPackage.test", context, path));
-            }
-            
-            counter++;
-        }
-        f.runSimulation();
-        // @formatter:on
-        
     }
     
     @Test
