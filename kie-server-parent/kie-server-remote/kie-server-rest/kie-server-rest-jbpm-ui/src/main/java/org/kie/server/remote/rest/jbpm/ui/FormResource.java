@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,29 +71,27 @@ public class FormResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId,
-            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
-        Variant v = getVariant(headers);
+            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
+            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") boolean marshallContent) {
+
+        Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = formServiceBase.getFormDisplayProcess(containerId, processId, language, filter);
-            if (response != null && !response.isEmpty()) {
+            String response = formServiceBase.getFormDisplayProcess(containerId, processId, language, filter, formType);
 
-                if (v.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-                    JSONObject json = XML.toJSONObject(response);
-                    formatJSONResponse(json);
-                    response = json.toString(PRETTY_PRINT_INDENT_FACTOR);
-                }
+            if ( marshallContent ) {
+                response = marshallFormContent( response, formType, variant);
             }
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
+            return createResponse(response, variant, Response.Status.OK, conversationIdHeader);
 
         } catch (IllegalStateException e) {
-            return notFound("Form for process id " + processId + " not found", v, conversationIdHeader);
+            return notFound("Form for process id " + processId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
         }
     }
 
@@ -101,27 +100,66 @@ public class FormResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
-        Variant v = getVariant(headers);
+            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
+            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") boolean marshallContent ) {
+
+        Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = formServiceBase.getFormDisplayTask(taskId, language, filter);
-            if (v.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
-                JSONObject json = XML.toJSONObject(response);
-                formatJSONResponse(json);
-                response = json.toString(PRETTY_PRINT_INDENT_FACTOR);
+            String response = formServiceBase.getFormDisplayTask(taskId, language, filter, formType);
+
+            if ( marshallContent ) {
+                response = marshallFormContent( response, formType, variant);
             }
 
             logger.debug("Returning OK response with content '{}'", response);
-            return createResponse(response, v, Response.Status.OK, conversationIdHeader);
+            return createResponse(response, variant, Response.Status.OK, conversationIdHeader);
 
         } catch (IllegalStateException e) {
-            return notFound("Form for task id " + taskId + " not found", v, conversationIdHeader);
+            return notFound("Form for task id " + taskId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);
+            return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), variant, conversationIdHeader);
         }
+    }
+
+    protected String marshallFormContent( String formContent, String formType, Variant variant ) throws Exception {
+
+        if ( StringUtils.isEmpty( formContent ) ) {
+            return formContent;
+        }
+
+        FormServiceBase.FormType actualFormType = FormServiceBase.FormType.fromName(formType);
+
+        String actualContentType = actualFormType.getContentType();
+
+        if ( actualContentType == null ) {
+            actualContentType = getMediaTypeForFormContent( formContent );
+        }
+
+        if (variant.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE) && !MediaType.APPLICATION_JSON_TYPE.getSubtype().equals( actualContentType )) {
+            JSONObject json = XML.toJSONObject(formContent);
+            formatJSONResponse(json);
+            formContent = json.toString(PRETTY_PRINT_INDENT_FACTOR);
+        } else if (variant.getMediaType().equals(MediaType.APPLICATION_XML_TYPE) && !MediaType.APPLICATION_XML_TYPE.getSubtype().equals( actualContentType )) {
+            Object json = parseToJSON(formContent);
+            formContent = XML.toString(json);
+        }
+
+        return formContent;
+    }
+
+    protected String getMediaTypeForFormContent( String contentType ) {
+        if ( contentType != null ) {
+            if ( contentType.startsWith( "{" ) || contentType.startsWith( "[" ) ) {
+                return MediaType.APPLICATION_JSON_TYPE.getSubtype();
+            }
+            if ( contentType.startsWith( "<" ) ) {
+                return MediaType.APPLICATION_XML_TYPE.getSubtype();
+            }
+        }
+        return null;
     }
 
     private void formatJSONResponse(JSONObject json) {
@@ -138,7 +176,7 @@ public class FormResource {
                 putPropertyArrayToObject((JSONObject)fields);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            logger.debug("exception while formatting :: {}", e.getMessage(), e);
         }
     }
 
@@ -151,4 +189,11 @@ public class FormResource {
         obj.remove("property");
     }
 
+    private Object parseToJSON(String content) throws JSONException{
+        try {
+            return new JSONArray(content);
+        } catch (JSONException e) {
+            return new JSONObject(content);
+        }
+    }
 }

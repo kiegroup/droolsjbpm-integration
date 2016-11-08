@@ -43,7 +43,7 @@ public class FormFilterTest {
         formManagerService.registerForm("test", "PurchaseHeader.form", headerFormContent);
         formManagerService.registerForm("test", "PurchaseLine.form", orderLineFormContent);
 
-        InMemoryFormProvider formProvider = new InMemoryFormProvider();
+        RemoteFormModellerFormProvider formProvider = new RemoteFormModellerFormProvider();
         formProvider.configure(formManagerService);
 
         // setup some test data

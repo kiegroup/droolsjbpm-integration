@@ -15,7 +15,9 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,6 +26,9 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesException;
 
 import static org.junit.Assert.*;
+
+import org.kie.server.client.UIServicesClient;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -60,21 +65,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetTaskFormViaUIClientTest() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
-        assertTrue(processInstanceId > 0);
-        try {
-            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
-            assertNotNull(tasks);
-            assertEquals(1, tasks.size());
-
-            Long taskId = tasks.get(0).getId();
-
-            String result = uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
-            logger.debug("Form content is '{}'", result);
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
+        runGetTaskFormTest( processInstanceId );
     }
 
     @Test(expected = KieServicesException.class)
@@ -93,6 +84,10 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     @Test
     public void testGetTaskFormInPackageViaUIClientTest() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        runGetTaskFormTest( processInstanceId );
+    }
+
+    protected void runGetTaskFormTest( long processInstanceId ) {
         assertTrue(processInstanceId > 0);
         try {
             List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
@@ -107,6 +102,97 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             assertFalse(result.isEmpty());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testGetTaskRawFormViaUIClient() throws Exception {
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            Long taskId = tasks.get(0).getId();
+
+            String result = uiServicesClient.getTaskRawForm( CONTAINER_ID, taskId );
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testGetProcessFormViaUIClientTestByType() throws Exception {
+        String result = uiServicesClient.getProcessFormByType(CONTAINER_ID, HIRING_PROCESS_ID, "en", UIServicesClient.FORM_TYPE);
+        logger.debug("Form content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertTrue(result.contains("hiring-taskform.frm"));
+    }
+
+    @Test
+    public void testGetProcessRawFormViaUIClient() throws Exception {
+        String result = uiServicesClient.getProcessRawForm( CONTAINER_ID, HIRING_PROCESS_ID );
+        logger.debug("Form content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    public void testGetTaskFormInPackageViaUIClientTestByType() throws Exception {
+        changeUser(USER_JOHN);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "john");
+        parameters.put("age", 33);
+        parameters.put("mail", "john@doe.org");
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID, parameters);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            Long taskId = tasks.get(0).getId();
+
+            String result = uiServicesClient.getTaskFormByType(CONTAINER_ID, taskId, "en", UIServicesClient.FORM_MODELLER_TYPE);
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+
+            parameters.put("out_age", 33);
+            parameters.put("out_mail", "john@doe.org");
+            taskClient.completeAutoProgress(CONTAINER_ID, taskId, USER_JOHN, parameters);
+
+            tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            taskId = tasks.get(0).getId();
+
+            result = uiServicesClient.getTaskFormByType(CONTAINER_ID, taskId, "en", UIServicesClient.FREE_MARKER_TYPE);
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+
+            taskClient.completeAutoProgress(CONTAINER_ID, taskId, USER_JOHN, parameters);
+
+            tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            taskId = tasks.get(0).getId();
+
+            result = uiServicesClient.getTaskFormByType(CONTAINER_ID, taskId, "en", UIServicesClient.FORM_TYPE);
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            changeUser(TestConfig.getUsername());
         }
     }
 }

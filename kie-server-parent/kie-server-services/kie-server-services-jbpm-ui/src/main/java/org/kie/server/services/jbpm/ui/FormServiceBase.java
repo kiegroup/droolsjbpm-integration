@@ -53,6 +53,45 @@ public class FormServiceBase {
 
     private Set<UIFormProvider> providers = new LinkedHashSet<UIFormProvider>();
 
+
+    public enum FormType {
+
+        FORM_MODELLER_TYPE("FORM", "xml"),
+        FORM_TYPE("FRM", "json"),
+        FREE_MARKER_TYPE("FTL", "xml"),
+        ANY( "ANY", null );
+
+        private String name;
+        private String contentType;
+
+        private FormType(String name, String contentType) {
+            this.name = name;
+            this.contentType = contentType;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public static FormType fromName(String name) {
+            if (FORM_MODELLER_TYPE.getName().equals(name)) {
+                return FORM_MODELLER_TYPE;
+            } else if (FORM_TYPE.getName().equals(name)) {
+                return FORM_TYPE;
+            } else if (FREE_MARKER_TYPE.getName().equals(name)) {
+                return FREE_MARKER_TYPE;
+            } else if ( ANY.getName().equals( name ) ) {
+                return ANY;
+            } else {
+                throw new IllegalArgumentException("No FormType enum value for " + name);
+            }
+        }
+    }
+
     public FormServiceBase(DefinitionService definitionService, RuntimeDataService dataService, UserTaskService userTaskService, FormManagerService formManagerService, KieServerRegistry registry) {
         this.definitionService = definitionService;
         this.dataService = dataService;
@@ -63,7 +102,7 @@ public class FormServiceBase {
     }
 
 
-    public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent) {
+    public String getFormDisplayProcess(String containerId, String processId, String lang, boolean filterContent, String formType) {
         containerId = registry.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         ProcessDefinition processDesc = definitionService.getProcessDefinition(containerId, processId);
@@ -73,18 +112,25 @@ public class FormServiceBase {
         Map<String, String> processData = definitionService.getProcessVariables(containerId, processId);
 
         if (processData == null) {
-            processData = new HashMap<String, String>();
+            processData = new HashMap<>();
         }
 
-        Map<String, Object> renderContext = new HashMap<String, Object>();
+        Map<String, Object> renderContext = new HashMap<>();
         renderContext.put("process", processDesc);
         renderContext.put("outputs", processData);
         renderContext.put("lang", lang);
         renderContext.put("filterForm", filterContent);
 
         for (UIFormProvider provider : providers) {
+
+            // if there's no formType or formType is ANY the first provider able to generate the formContent wins
+            if ( !FormType.ANY.getName().equals( formType ) && !provider.getType().equals( formType ) ) {
+                logger.debug( "Provider {} does not support {} form type", provider, formType );
+                continue;
+            }
             String template = provider.render(processDesc.getName(), processDesc, renderContext);
             if (!StringUtils.isEmpty(template)) {
+
                 return template;
             }
         }
@@ -93,7 +139,7 @@ public class FormServiceBase {
         throw new IllegalStateException("No form for process with id " + processDesc.getName() + " found");
     }
 
-    public String getFormDisplayTask(long taskId, String lang, boolean filterContent) {
+    public String getFormDisplayTask(long taskId, String lang, boolean filterContent, String formType) {
         Task task = userTaskService.getTask(taskId);
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
@@ -101,17 +147,37 @@ public class FormServiceBase {
         String name = task.getName();
         ProcessDefinition processDesc = dataService.getProcessesByDeploymentIdProcessId(task.getTaskData()
                 .getDeploymentId(), task.getTaskData().getProcessId());
-        Map<String, Object> renderContext = new HashMap<String, Object>();
+        Map<String, Object> renderContext = new HashMap<>();
         renderContext.put("filterForm", filterContent);
 
         Map<String, Object> input = userTaskService.getTaskInputContentByTaskId(taskId);
         renderContext.put("inputs", input);
-        for (Map.Entry<String, Object> inputVar : ((Map<String, Object>) input).entrySet()) {
+        for (Map.Entry<String, Object> inputVar : input.entrySet()) {
             renderContext.put(inputVar.getKey(), inputVar.getValue());
         }
+
+        Map<String, String> outputDef = definitionService.getTaskOutputMappings(task.getTaskData().getDeploymentId(), task.getTaskData().getProcessId(), task.getName());
+        Map<String, Object> output = userTaskService.getTaskOutputContentByTaskId(taskId);
+        renderContext.put("outputs", output);
+        for (Map.Entry<String, Object> outputVar : output.entrySet()) {
+            renderContext.put(outputVar.getKey(), outputVar.getValue());
+        }
+        outputDef.forEach((k, v) -> {
+            if ( !renderContext.containsKey( k ) ) {
+                renderContext.put(k, "");
+            }
+        });
+
         renderContext.put("lang", lang);
+        renderContext.put("task", task);
 
         for (UIFormProvider provider : providers) {
+            // if there's no formType or formType is ANY the first provider able to generate the formContent wins
+            if ( !FormType.ANY.getName().equals( formType ) && !provider.getType().equals( formType ) ) {
+                logger.debug( "Provider {} does not support {} form type", provider, formType );
+                continue;
+            }
+
             String template = provider.render(name, task, processDesc, renderContext);
             if (!StringUtils.isEmpty(template)) {
                 return template;

@@ -136,7 +136,7 @@
               <properties>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>
                 <!-- kie-server role for REST tests; guest for JMS tests -->
-                <cargo.servlet.users>yoda:usetheforce123@:kie-server,guest|Administrator:usetheforce123@:kie-server,guest,Administrators|john:usetheforce123@:kie-server,guest,engineering</cargo.servlet.users>
+                <cargo.servlet.users>yoda:usetheforce123@:kie-server,guest|Administrator:usetheforce123@:kie-server,guest,Administrators|john:usetheforce123@:kie-server,guest,engineering,HR,IT,Accounting</cargo.servlet.users>
               </properties>
             </configuration>
           </configuration>

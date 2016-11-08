@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.model.KieServerCommand;
@@ -41,43 +42,54 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
         super(config, classLoader);
     }
 
-
     @Override
     public String getProcessForm(String containerId, String processId, String language) {
-        if( config.isRest() ) {
-            Map<String, Object> valuesMap = new HashMap<String, Object>();
-            valuesMap.put(RestURI.CONTAINER_ID, containerId);
-            valuesMap.put(RestURI.PROCESS_ID, processId);
+        return getProcessFormByType( containerId, processId, language, ANY_FORM );
+    }
 
-            return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?lang=" + language + "&filter=true");
+    @Override
+    public String getProcessFormByType(String containerId, String processId, String language, String formType) {
+        return getProcessFormByType( containerId, processId, language, formType, true );
+    }
 
-        } else {
-            CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayProcess", new Object[]{containerId, processId, language, true} )) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
-
-            throwExceptionOnFailure(response);
-            if (shouldReturnWithNullResponse(response)) {
-                return null;
-            }
-            return response.getResult();
-        }
+    @Override
+    public String getProcessRawForm( String containerId, String processId ) {
+        return getProcessFormByType( containerId, processId, null, ANY_FORM, false );
     }
 
     @Override
     public String getProcessForm(String containerId, String processId) {
+        return getProcessFormByType( containerId, processId, ANY_FORM );
+    }
+
+    @Override
+    public String getProcessFormByType(String containerId, String processId, String formType) {
+        return getProcessFormByType( containerId, processId, null, formType, true );
+    }
+
+    private String getProcessFormByType(String containerId, String processId, String language, String formType, boolean marshallContent ) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.PROCESS_ID, processId);
 
+            StringBuffer params = new StringBuffer();
+
+            params.append( "type=" ).append( formType );
+            params.append( "&marshallContent=" ).append( marshallContent );
+            boolean filter = false;
+            if ( !StringUtils.isEmpty( language ) ) {
+                params.append( "&lang=" ).append( language );
+                filter = true;
+            }
+            params.append( "&filter=" ).append( filter );
+
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?filter=false");
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap) + "?" + params.toString() );
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayProcess", new Object[]{containerId, processId, "", false} )) );
+                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayProcess", new Object[]{containerId, processId, StringUtils.defaultString( language ), !StringUtils.isEmpty( language ), formType } )) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -90,17 +102,37 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
     @Override
     public String getTaskForm(String containerId, Long taskId, String language) {
+        return getTaskFormByType(containerId, taskId, language, ANY_FORM);
+    }
+
+    @Override
+    public String getTaskFormByType(String containerId, Long taskId, String language, String formType) {
+        return getTaskFormByType( containerId, taskId, language, formType, true );
+    }
+
+    private String getTaskFormByType( String containerId, Long taskId, String language, String formType, boolean marshallContent ) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(RestURI.CONTAINER_ID, containerId);
             valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
 
+            StringBuffer params = new StringBuffer();
+
+            params.append( "type=" ).append( formType );
+            params.append( "&marshallContent=" ).append( marshallContent );
+            boolean filter = false;
+            if ( !StringUtils.isEmpty( language ) ) {
+                params.append( "&lang=" ).append( language );
+                filter = true;
+            }
+            params.append( "&filter=" ).append( filter );
+
             return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?lang=" + language + "&filter=true");
+                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?" + params.toString());
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, language, true} )) );
+                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, StringUtils.defaultString( language ), !StringUtils.isEmpty( language ), formType } )) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -113,25 +145,17 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
     @Override
     public String getTaskForm(String containerId, Long taskId) {
-        if( config.isRest() ) {
-            Map<String, Object> valuesMap = new HashMap<String, Object>();
-            valuesMap.put(RestURI.CONTAINER_ID, containerId);
-            valuesMap.put(RestURI.TASK_INSTANCE_ID, taskId);
+        return getTaskFormByType(containerId, taskId, ANY_FORM);
+    }
 
-            return makeHttpGetRequestAndCreateRawResponse(
-                    build(loadBalancer.getUrl(), FORM_URI + "/" + TASK_FORM_GET_URI, valuesMap) + "?filter=false");
+    @Override
+    public String getTaskFormByType(String containerId, Long taskId, String formType) {
+        return getTaskFormByType( containerId, taskId, null, formType, true );
+    }
 
-        } else {
-            CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, "", false} )) );
-            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
-
-            throwExceptionOnFailure(response);
-            if (shouldReturnWithNullResponse(response)) {
-                return null;
-            }
-            return response.getResult();
-        }
+    @Override
+    public String getTaskRawForm( String containerId, Long taskId ) {
+        return getTaskFormByType( containerId, taskId, null, ANY_FORM, false );
     }
 
     @Override

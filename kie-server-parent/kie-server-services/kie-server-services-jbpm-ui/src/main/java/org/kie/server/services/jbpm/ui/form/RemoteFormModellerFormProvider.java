@@ -38,12 +38,13 @@ import org.jbpm.kie.services.impl.form.provider.AbstractFormProvider;
 import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.task.model.Task;
+import org.kie.server.services.jbpm.ui.FormServiceBase;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class InMemoryFormProvider extends AbstractFormProvider implements UIFormProvider {
+public class RemoteFormModellerFormProvider extends AbstractFormProvider implements UIFormProvider {
 
     public static final String NODE_FORM = "form";
     public static final String NODE_FIELD = "field";
@@ -58,7 +59,7 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
     public static final String SUB_FORM_TYPE = "Subform";
     public static final String MULTI_SUB_FORM_TYPE = "MultipleSubform";
 
-    public InMemoryFormProvider() {
+    public RemoteFormModellerFormProvider() {
     }
 
     @Override
@@ -385,5 +386,10 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
         }
 
         return null;
+    }
+
+    @Override
+    public String getType() {
+        return FormServiceBase.FormType.FORM_MODELLER_TYPE.getName();
     }
 }
