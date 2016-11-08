@@ -24,5 +24,7 @@ public class Messages {
 
     public static final String CASE_INSTANCE_ACTIVE = "Case with id \"{0}\" is already started/reopened";
 
+    public static final String CASE_COMMENT_NOT_FOUND = "Could not find case comment with id \"{0}\" in case \"{1}\"";
+
     public static final String UNEXPECTED_ERROR = "Unexpected error during processing request \"{0}\"";
 }

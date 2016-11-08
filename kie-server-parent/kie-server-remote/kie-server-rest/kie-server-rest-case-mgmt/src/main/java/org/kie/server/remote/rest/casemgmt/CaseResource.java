@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseCommentList;
@@ -559,10 +560,16 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to update comment {} in case {}", commentId, caseId);
-                    this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, payload, type);
 
-                    logger.debug("Returning CREATED response");
-                    return createResponse("", v, Response.Status.CREATED, customHeaders);
+                    try {
+                        this.caseManagementServiceBase.updateCommentInCase(containerId, caseId, commentId, author, payload, type);
+
+                        logger.debug("Returning CREATED response");
+                        return createResponse("", v, Response.Status.CREATED, customHeaders);
+                    } catch(CaseCommentNotFoundException e) {
+                        return notFound(
+                                MessageFormat.format(CASE_COMMENT_NOT_FOUND, commentId, caseId), v, customHeaders);
+                    }
                 });
     }
 
@@ -577,10 +584,16 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to remove comment {} from case {}", commentId, caseId);
-                    this.caseManagementServiceBase.removeCommentFromCase(containerId, caseId, commentId);
 
-                    logger.debug("Returning NO_CONTENT response");
-                    return noContent(v, customHeaders);
+                    try {
+                        this.caseManagementServiceBase.removeCommentFromCase(containerId, caseId, commentId);
+
+                        logger.debug("Returning NO_CONTENT response");
+                        return noContent(v, customHeaders);
+                    } catch(CaseCommentNotFoundException e) {
+                        return notFound(
+                                MessageFormat.format(CASE_COMMENT_NOT_FOUND, commentId, caseId), v, customHeaders);
+                    }
                 });
     }
 
