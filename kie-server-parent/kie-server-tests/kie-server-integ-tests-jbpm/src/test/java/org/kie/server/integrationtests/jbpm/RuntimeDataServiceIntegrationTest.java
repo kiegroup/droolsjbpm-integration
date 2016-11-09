@@ -927,12 +927,20 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             List<ProcessInstance> returnedProcessInstances = queryClient.findProcessInstancesByCorrelationKey(partKey, 0, 10, SORT_BY_INSTANCE_PROCESS_ID, false);
             assertNotNull(returnedProcessInstances);
 
-            assertEquals(PROCESS_ID_SIGNAL_PROCESS, returnedProcessInstances.get(0).getProcessId());
-            assertEquals(processInstanceSignalId, returnedProcessInstances.get(0).getId());
-            assertEquals(secondBusinessKey, returnedProcessInstances.get(0).getCorrelationKey());
-            assertEquals(PROCESS_ID_EVALUATION, returnedProcessInstances.get(1).getProcessId());
-            assertEquals(processInstanceEvalutionId, returnedProcessInstances.get(1).getId());
-            assertEquals(firstBusinessKey, returnedProcessInstances.get(1).getCorrelationKey());
+            ProcessInstance resturnedSignalProcess, returnedEvaluation;
+            if (processInstanceEvalutionId < processInstanceSignalId) {
+                resturnedSignalProcess = returnedProcessInstances.get(0);
+                returnedEvaluation = returnedProcessInstances.get(1);
+            } else {
+                resturnedSignalProcess = returnedProcessInstances.get(1);
+                returnedEvaluation = returnedProcessInstances.get(0);
+            }
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, resturnedSignalProcess.getProcessId());
+            assertEquals(processInstanceSignalId, resturnedSignalProcess.getId());
+            assertEquals(secondBusinessKey, resturnedSignalProcess.getCorrelationKey());
+            assertEquals(PROCESS_ID_EVALUATION, returnedEvaluation.getProcessId());
+            assertEquals(processInstanceEvalutionId, returnedEvaluation.getId());
+            assertEquals(firstBusinessKey, returnedEvaluation.getCorrelationKey());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceEvalutionId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceSignalId);
@@ -1042,7 +1050,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         }
 
         try {
-            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10);
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 50);
             assertNotNull(instances);
             assertEquals(5, instances.size());
 
@@ -1085,7 +1093,8 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         }
 
         try {
-            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 3, SORT_BY_PROCESS_ID, true);
+            List status = Arrays.asList(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+            List<ProcessInstance> instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", status, 0, 3, SORT_BY_PROCESS_ID, true);
             assertNotNull(instances);
             assertEquals(3, instances.size());
             for (ProcessInstance instance : instances) {
@@ -1093,7 +1102,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                 assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
             }
 
-            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 1, 3, SORT_BY_PROCESS_ID, true);
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", status, 1, 3, SORT_BY_PROCESS_ID, true);
             assertNotNull(instances);
             assertEquals(2, instances.size());
             for (ProcessInstance instance : instances) {
@@ -1101,7 +1110,7 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
                 assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
             }
 
-            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", null, 0, 10, SORT_BY_PROCESS_ID, false);
+            instances = queryClient.findProcessInstancesByVariableAndValue("stringData", "waiting%", status, 0, 10, SORT_BY_PROCESS_ID, false);
             assertNotNull(instances);
             assertEquals(5, instances.size());
             for (int i = 0; i < instances.size(); i++) {
@@ -1358,13 +1367,22 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
             //latest task is from second process
             TaskSummary task = tasks.get(0);
-            TaskSummary expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
+            TaskSummary expectedTaskSummary;
+            if (processInstanceId2 > processInstanceId) {
+                expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
+            } else {
+                expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
+            }
             assertTaskSummary(expectedTaskSummary, task);
 
             task = tasks.get(1);
-            expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
+            expectedTaskSummary = null;
+            if (processInstanceId2 > processInstanceId) {
+                expectedTaskSummary = createDefaultTaskSummary(processInstanceId);
+            } else {
+                expectedTaskSummary = createDefaultTaskSummary(processInstanceId2);
+            }
             assertTaskSummary(expectedTaskSummary, task);
-
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);

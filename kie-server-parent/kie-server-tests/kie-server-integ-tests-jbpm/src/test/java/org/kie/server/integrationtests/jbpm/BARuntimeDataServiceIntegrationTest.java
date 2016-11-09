@@ -114,8 +114,13 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10, "t.taskData.processInstanceId", true);
             assertNotNull(tasks);
             assertEquals(2, tasks.size());
-            assertEquals(processInstanceId, tasks.get(0).getProcessInstanceId());
-            assertEquals(processInstanceId2, tasks.get(1).getProcessInstanceId());
+            if (processInstanceId < processInstanceId2) {
+                assertEquals(processInstanceId, tasks.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId2, tasks.get(1).getProcessInstanceId());
+            } else {
+                assertEquals(processInstanceId2, tasks.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId, tasks.get(1).getProcessInstanceId());
+            }
 
             List<String> status = new ArrayList<>();
             status.add(Status.Reserved.toString());
@@ -123,8 +128,13 @@ public class BARuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegr
             tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, status, 0, 10, "t.taskData.processInstanceId", false);
             assertNotNull(tasks);
             assertEquals(2, tasks.size());
-            assertEquals(processInstanceId2, tasks.get(0).getProcessInstanceId());
-            assertEquals(processInstanceId, tasks.get(1).getProcessInstanceId());
+            if (processInstanceId < processInstanceId2) {
+                assertEquals(processInstanceId2, tasks.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId, tasks.get(1).getProcessInstanceId());
+            } else {
+                assertEquals(processInstanceId, tasks.get(0).getProcessInstanceId());
+                assertEquals(processInstanceId2, tasks.get(1).getProcessInstanceId());
+            }
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId2);
