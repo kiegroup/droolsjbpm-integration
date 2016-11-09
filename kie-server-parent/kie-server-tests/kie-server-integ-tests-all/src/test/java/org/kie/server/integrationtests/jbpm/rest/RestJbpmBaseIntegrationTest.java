@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.server.integrationtests.jbpm.cases.rest;
+package org.kie.server.integrationtests.jbpm.rest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
-public abstract class RestJbpmCaseBaseIntegrationTest extends RestOnlyBaseIntegrationTest {
+public abstract class RestJbpmBaseIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
