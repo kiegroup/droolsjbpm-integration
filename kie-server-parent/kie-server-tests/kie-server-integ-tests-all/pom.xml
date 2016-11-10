@@ -12,6 +12,11 @@
   <name>KIE :: Execution Server :: Tests :: Drools and jBPM Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
+  <properties>
+    <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
+    <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

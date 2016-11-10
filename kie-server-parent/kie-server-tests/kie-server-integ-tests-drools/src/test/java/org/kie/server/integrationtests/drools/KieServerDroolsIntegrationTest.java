@@ -49,6 +49,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
+    private static ReleaseId releaseIdScript = new ReleaseId("foo.bar", "baz-script", "2.1.0.GA");
 
     private static final String CONTAINER_ID = "kie1";
     private static final String KIE_SESSION = "defaultKieSession";
@@ -65,6 +66,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId);
+        KieServerDeployer.createAndDeployKJar(releaseIdScript);
 
         File jar = KieServerDeployer.getRepository().resolveArtifact(releaseId).getFile();
         kjarClassLoader = new URLClassLoader(new URL[]{jar.toURI().toURL()});
@@ -132,7 +134,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         String payload = marshaller.marshall(batch);
 
         String containerId = "command-script-container";
-        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseId, null));
+        KieServerCommand create = new CreateContainerCommand(new KieContainerResource( containerId, releaseIdScript, null));
         KieServerCommand call = new CallContainerCommand(containerId, payload);
         KieServerCommand dispose = new DisposeContainerCommand(containerId);
 
