@@ -14,16 +14,14 @@
 */
 
 package org.jbpm.simulation;
+
 import java.util.List;
 
-import org.drools.core.command.NewKieSessionCommand;
 import org.drools.core.command.SetVariableCommandFromLastReturn;
-import org.drools.core.command.impl.GenericCommand;
 import org.drools.core.command.runtime.DisposeCommand;
-import org.drools.simulation.fluent.session.KieSessionSimulationFluent;
-import org.drools.simulation.fluent.session.impl.DefaultStatefulKnowledgeSessionSimFluent;
-import org.drools.simulation.fluent.simulation.SimulationFluent;
-import org.drools.simulation.fluent.simulation.impl.DefaultSimulationFluent;
+import org.drools.core.fluent.impl.BaseBatchFluent;
+import org.drools.core.fluent.impl.FluentBuilderImpl;
+import org.drools.core.fluent.impl.PseudoClockRunner;
 import org.jbpm.process.core.validation.ProcessValidatorRegistry;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
@@ -44,10 +42,9 @@ import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.internal.command.Context;
+import org.kie.internal.fluent.runtime.FluentBuilder;
+import org.kie.internal.fluent.runtime.KieSessionFluent;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
@@ -87,28 +84,9 @@ public class SimulationRunner {
         
         final ReleaseId releaseId = createKJarWithMultipleResources(processId,
                 new String[]{bpmn2Container}, new ResourceType[]{ResourceType.BPMN2});
-        
-        SimulationFluent f = new DefaultSimulationFluent(){
 
-            final KieServices kieServices = KieServices.Factory.get();
-            final KieContainer kieContainer = kieServices.newKieContainer( releaseId );
-
-            @Override
-            public KieSessionSimulationFluent newKieSession(final ReleaseId releaseId, final String id) {
-                assureActiveStep();
-                activeKieSessionId = id == null ? DEFAULT_ID : id;
-                addCommand( new NewKieSessionCommand(null, null) {
-
-                    @Override
-                    public KieSession execute(Context context) {
-                        return id != null ? kieContainer.newKieSession( id ) : kieContainer.newKieSession();
-                    }
-                });
-                addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ) );
-
-                return new DefaultStatefulKnowledgeSessionSimFluent( this );
-            }
-        };
+        PseudoClockRunner runner = new PseudoClockRunner();
+        FluentBuilder f = new FluentBuilderImpl();
 
         // @formatter:off        
         int counter = 0;
@@ -119,7 +97,7 @@ public class SimulationRunner {
                 continue;
             }
             double probability = path.getProbability();
-            f.newPath("path" + counter);
+            f.newApplicationContext("path" + counter);
 
             int instancesOfPath = 1;
             // count how many instances/steps should current path have
@@ -134,20 +112,21 @@ public class SimulationRunner {
                 remainingInstances -= instancesOfPath;
                         
                 for (int i = 0; i < instancesOfPath; i++) {
-                    f.newStep( interval * i )
-                        .newKieSession( releaseId, null)
-                            .end()
-                        .addCommand(new SimulateProcessPathCommand(processId, context, path))
-                        .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
-                        .addCommand(new DisposeCommand());
+                    KieSessionFluent sessionFluent = f.after(interval * i)
+                        .getKieContainer(releaseId)
+                        .newSession();
+
+                        ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
+//                        ((BaseBatchFluent) sessionFluent).addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
+                        ((BaseBatchFluent) sessionFluent).addCommand(new DisposeCommand());
                 }
             } else {
-                f.newStep(interval)
-                .newKieSession(releaseId, null)
-                    .end()
-                .addCommand(new SimulateProcessPathCommand(processId, context, path))
-                .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
-                .addCommand(new DisposeCommand());
+                KieSessionFluent sessionFluent = f.after(interval)
+                .getKieContainer(releaseId)
+                .newSession();
+                ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
+//                ((BaseBatchFluent) sessionFluent).addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
+                ((BaseBatchFluent) sessionFluent).addCommand(new DisposeCommand());
                 break;
             }
             
@@ -159,7 +138,7 @@ public class SimulationRunner {
 //                remainingInstances = numberOfAllInstances;
 //            }
         }
-        f.runSimulation();
+        runner.execute(f.getExecutable());
         // @formatter:on
         
         context.getRepository().getSimulationInfo().setEndTime(context.getMaxEndTime());

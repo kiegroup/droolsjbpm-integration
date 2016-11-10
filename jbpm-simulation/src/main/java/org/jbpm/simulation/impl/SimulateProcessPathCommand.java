@@ -18,8 +18,8 @@ package org.jbpm.simulation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.drools.core.command.impl.GenericCommand;
-import org.drools.core.command.impl.KnowledgeCommandContext;
+import org.drools.core.command.impl.ExecutableCommand;
+import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.event.DefaultProcessEventListener;
 import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.SimulationContext;
@@ -30,7 +30,7 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.internal.command.Context;
 
-public class SimulateProcessPathCommand implements GenericCommand<KieSession> {
+public class SimulateProcessPathCommand implements ExecutableCommand<KieSession> {
 
     private static final long serialVersionUID = 3485947845100224769L;
 
@@ -46,7 +46,7 @@ public class SimulateProcessPathCommand implements GenericCommand<KieSession> {
     
     public KieSession execute(Context context) {
         
-        KieSession session = ((KnowledgeCommandContext)context).getKieSession();
+        KieSession session = ((RegistryContext)context).lookup(KieSession.class);
 
         session.getEnvironment().set("NodeInstanceFactoryRegistry", SimulationNodeInstanceFactoryRegistry.getInstance());
         simContext.setClock((SessionPseudoClock) session.getSessionClock());
