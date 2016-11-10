@@ -666,7 +666,7 @@ public class KieServerImpl implements KieServer {
         try {
             KieContainerInstanceImpl ci = context.getContainer(id);
             if (ci != null) {
-                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getRefreshedResource().getReleaseId());
+                return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.SUCCESS, "ReleaseId for container " + id, ci.getResource().getReleaseId());
             }
             return new ServiceResponse<ReleaseId>(ServiceResponse.ResponseType.FAILURE, "Container " + id + " is not instantiated.");
         } catch (Exception e) {

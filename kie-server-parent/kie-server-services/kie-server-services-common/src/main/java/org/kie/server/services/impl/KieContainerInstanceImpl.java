@@ -114,16 +114,9 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
         this.resource.setStatus( status );
     }
 
-    public KieContainerResource getResource() {
-        return resource;
-    }
-
     @Override
-    public KieContainerResource getRefreshedResource() {
-        if ( kieContainer != null ) {
-            this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
-            this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
-        }
+    public KieContainerResource getResource() {
+        updateReleaseId();
         return resource;
     }
 
@@ -237,11 +230,37 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
     }
 
     protected void updateReleaseId() {
+        ReleaseId oldReleaseId = this.resource.getReleaseId();
+        ReleaseId oldResolvedReleaseId = this.resource.getResolvedReleaseId();
         if ( kieContainer != null ) {
             this.resource.setReleaseId( new ReleaseId( kieContainer.getContainerReleaseId() ) );
             this.resource.setResolvedReleaseId( new ReleaseId( kieContainer.getReleaseId() ) );
         }
-        disposeMarshallers();
+        // marshallers need to disposed in case the container was updated with different releaseId
+        // proper solution is to attach listener directly to the KieScanner and dispose the marshallers,
+        // but those listeners are not (yet) available, so this is a temporary hackish "solution"
+        if (releaseIdUpdated(oldReleaseId, this.resource.getReleaseId())
+                || releaseIdUpdated(oldResolvedReleaseId, this.resource.getResolvedReleaseId())) {
+            disposeMarshallers();
+        }
+    }
+
+    /**
+     * Checks whether the releaseId was updated (i.e. the old one is different from the new one).
+     *
+     * @param oldReleaseId old ReleaseId
+     * @param newReleaseId new releaseId
+     * @return true if the second (new) releaseId is different and thus was updated; otherwise false
+     */
+    private boolean releaseIdUpdated(ReleaseId oldReleaseId, ReleaseId newReleaseId) {
+        if (oldReleaseId == null && newReleaseId == null) {
+            return false;
+        }
+        if (oldReleaseId == null && newReleaseId != null) {
+            return true;
+        }
+        // now both releaseIds are non-null, so it is safe to call equals()
+        return oldReleaseId.equals(newReleaseId);
     }
 
 }
