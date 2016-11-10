@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.drools;
+package org.kie.server.integrationtests.policy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
 
-public class KieServerPolicyIntegrationTest extends DroolsKieServerBaseIntegrationTest {
+public class KieServerPolicyDroolsIntegrationTest extends KieServerPolicyBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
             "1.0.0.Final");
     private static final ReleaseId kjar101 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
@@ -107,12 +107,6 @@ public class KieServerPolicyIntegrationTest extends DroolsKieServerBaseIntegrati
         assertEquals(1, containerResources.size());
 
         createExtraContainer();
-
-        containersResponse = client.listContainers();
-        KieServerAssert.assertSuccess(containersResponse);
-
-        containerResources = containersResponse.getResult().getContainers();
-        assertEquals(2, containerResources.size());
 
         person = createInstance(PERSON_CLASS_NAME);
         commands = new ArrayList<Command<?>>();

@@ -58,6 +58,7 @@
     <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
+    <module>kie-server-integ-tests-policy</module>
   </modules>
 
   <dependencyManagement>
