@@ -12,6 +12,10 @@
   <name>KIE :: Execution Server :: Tests :: jBPM Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
+  <properties>
+    <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>

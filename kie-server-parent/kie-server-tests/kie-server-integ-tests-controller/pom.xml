@@ -188,7 +188,6 @@
                 <org.kie.server.controller.pwd>usetheforce123@</org.kie.server.controller.pwd>
                 <org.kie.server.user>yoda</org.kie.server.user>
                 <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
-                <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               </systemProperties>
             </container>
             <deployables combine.children="append">

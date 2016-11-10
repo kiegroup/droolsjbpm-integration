@@ -12,6 +12,11 @@
   <name>KIE :: Execution Server :: Tests :: OptaPlanner Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration options to run on different containers.</description>
 
+  <properties>
+    <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
+    <org.optaplanner.server.ext.disabled>false</org.optaplanner.server.ext.disabled>
+  </properties>
+
   <dependencies>
    <dependency>
       <groupId>org.kie.server</groupId>
