@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.server.integrationtests.jbpm.cases.rest;
+package org.kie.server.integrationtests.jbpm.rest.cases;
 
 import static org.junit.Assert.assertNotNull;
 import static org.kie.server.api.rest.RestURI.build;
@@ -34,9 +34,10 @@ import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.jbpm.rest.RestJbpmBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-public class CaseServiceRestOnlyIntegrationTest extends RestJbpmCaseBaseIntegrationTest {
+public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "case-insurance",
             "1.0.0.Final");

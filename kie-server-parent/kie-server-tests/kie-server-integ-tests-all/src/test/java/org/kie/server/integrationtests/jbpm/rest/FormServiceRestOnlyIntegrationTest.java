@@ -26,11 +26,8 @@ import javax.ws.rs.core.Response;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.ReleaseId;
@@ -39,11 +36,9 @@ import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
-public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationTest {
+public class FormServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
@@ -53,9 +48,6 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
 
     private Response response = null;
 
-    @ClassRule
-    public static ExternalResource StaticResource = new DBExternalResource();
-
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -63,12 +55,6 @@ public class FormServiceRestOnlyIntegrationTest extends RestOnlyBaseIntegrationT
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         createContainer(CONTAINER_ID, releaseId);
-    }
-
-    @Before
-    public void cleanup() {
-        cleanupSingletonSessionId();
-
     }
 
     @After
