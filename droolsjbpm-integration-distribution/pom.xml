@@ -43,43 +43,24 @@
   <dependencies>
     <!-- Binaries and sources -->
     <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-spring</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-spring</artifactId>
-        <classifier>sources</classifier>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-spring</artifactId>
+      <classifier>sources</classifier>
     </dependency>
     <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-aries-blueprint</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-aries-blueprint</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-aries-blueprint</artifactId>
-        <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-simulator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-simulator</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-aries-blueprint</artifactId>
       <classifier>sources</classifier>
     </dependency>
 
-    <!-- Examples -->
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>droolsjbpm-integration-examples</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>droolsjbpm-integration-examples</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
   </dependencies>
 
 </project>
