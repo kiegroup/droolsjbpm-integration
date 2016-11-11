@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.integrationtests.jbpm;
+package org.kie.server.integrationtests.policy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +31,13 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
 
-public class KieServerPolicyIntegrationTest extends JbpmKieServerBaseIntegrationTest {
+public class KieServerPolicyJbpmIntegrationTest extends KieServerPolicyBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
@@ -117,11 +116,8 @@ public class KieServerPolicyIntegrationTest extends JbpmKieServerBaseIntegration
 
         createExtraContainer();
 
-        containersResponse = client.listContainers();
-        KieServerAssert.assertSuccess(containersResponse);
-
-        containerResources = containersResponse.getResult().getContainers();
-        assertEquals(2, containerResources.size());
+        // wait for sync
+        KieServerSynchronization.waitForKieServerSynchronization(client, 2);
 
         Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION_2, parameters);
 
@@ -137,6 +133,14 @@ public class KieServerPolicyIntegrationTest extends JbpmKieServerBaseIntegration
 
         // there are instances in both containers thus the older one cannot be disposed
         processClient.abortProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
+
+        // In case of race condition when we abort process instance on container 
+        // which is in process of dispose try by policy, we will wait and synchronize again.
+        containersResponse = client.listContainers();
+        KieServerAssert.assertSuccess(containersResponse);
+        if(containersResponse.getResult().getContainers().size() == 1) {
+            Thread.sleep(1000);
+        }
 
         // wait for policy to be activated
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);

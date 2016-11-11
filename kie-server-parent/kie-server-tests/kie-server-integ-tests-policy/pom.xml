@@ -7,12 +7,13 @@
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-server-integ-tests-jbpm</artifactId>
+  <artifactId>kie-server-integ-tests-policy</artifactId>
 
-  <name>KIE :: Execution Server :: Tests :: jBPM Integration Tests</name>
+  <name>KIE :: Execution Server :: Tests :: Policies Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS) with configuration to run on different supported containers.</description>
 
   <properties>
+    <org.drools.server.ext.disabled>false</org.drools.server.ext.disabled>
     <org.jbpm.server.ext.disabled>false</org.jbpm.server.ext.disabled>
   </properties>
 
@@ -48,6 +49,11 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-drools</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-jbpm</artifactId>
       <scope>test</scope>
     </dependency>
@@ -60,6 +66,11 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-common</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-drools</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -183,34 +194,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.dashbuilder</groupId>
-      <artifactId>dashbuilder-dataset-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.subethamail</groupId>
-      <artifactId>subethasmtp-wiser</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
          parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-integ-tests-drools</artifactId>
+      <artifactId>kie-server-integ-tests-controller</artifactId>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -218,12 +206,6 @@
           <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -248,24 +230,22 @@
               <kie.server.jndi.request.queue>${kie.server.jndi.request.queue}</kie.server.jndi.request.queue>
               <kie.server.jndi.response.queue>${kie.server.jndi.response.queue}</kie.server.jndi.response.queue>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
-              <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
               <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
+              <!-- policy based configuration -->
+              <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
+              <policy.klo.interval>5000</policy.klo.interval>
             </systemPropertyVariables>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <configuration>
-            <nonFilteredFileExtensions>
-              <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-            </nonFilteredFileExtensions>
-          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -287,10 +267,13 @@
           <container>
             <systemProperties>
               <org.jbpm.server.ext.disabled>${org.jbpm.server.ext.disabled}</org.jbpm.server.ext.disabled>
+              <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <org.jbpm.ui.server.ext.disabled>true</org.jbpm.ui.server.ext.disabled>
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
-              <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <!-- policy based configuration -->
+              <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
+              <policy.klo.interval>5000</policy.klo.interval>
             </systemProperties>
           </container>
         </configuration>

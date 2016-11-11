@@ -205,9 +205,6 @@
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
-              <!-- policy based configuration -->
-              <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
-              <policy.klo.interval>5000</policy.klo.interval>
             </systemPropertyVariables>
           </configuration>
         </plugin>
@@ -244,10 +241,6 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.drools.server.ext.disabled>${org.drools.server.ext.disabled}</org.drools.server.ext.disabled>
-
-              <!-- policy based configuration -->
-              <org.kie.server.policy.activate>KeepLatestOnly</org.kie.server.policy.activate>
-              <policy.klo.interval>5000</policy.klo.interval>
             </systemProperties>
           </container>
         </configuration>

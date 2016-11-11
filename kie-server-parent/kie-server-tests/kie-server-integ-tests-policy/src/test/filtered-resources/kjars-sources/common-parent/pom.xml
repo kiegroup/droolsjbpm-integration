@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.kie.server.testing</groupId>
+  <artifactId>common-parent</artifactId>
+  <version>1.0.0.Final</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <!-- The version is set during the Maven build (this file is a filtered resource) -->
+    <version.org.kie>${version.org.kie}</version.org.kie>
+    <drools.compiler.lnglevel>1.6</drools.compiler.lnglevel>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.kie</groupId>
+          <artifactId>kie-maven-plugin</artifactId>
+          <version>${version.org.kie}</version>
+          <extensions>true</extensions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <repositories>
+    <repository>
+      <!-- Needed to download the Drools/jBPM SNAPSHOTs during build -->
+      <id>jboss-public-repo</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <!-- Needed to download the kie-maven-plugin SNAPSHOT during build -->
+      <id>jboss-public-repo</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>remote-testing-repo</id>
+      <url>${kie.server.testing.remote.repo.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>remote-testing-repo</id>
+      <url>${kie.server.testing.remote.repo.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
