@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -88,6 +89,13 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         createContainer(CONTAINER_ID, RELEASE_ID);
     }
 
+    @After
+    public void resetResponseHandler() {
+        processClient.setResponseHandler(new RequestReplyResponseHandler());
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+    }
+
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
@@ -109,7 +117,7 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         assertThat(response.getResponses()).isNotNull().hasSize(1);
         KieServerAssert.assertSuccess(response.getResponses().get(0));
 
-        ServiceResponse serviceResponse = response.getResponses().get(0);
+        ServiceResponse<? extends Object> serviceResponse = response.getResponses().get(0);
         Object result = serviceResponse.getResult();
         assertThat(result).isNotNull();
     }
@@ -202,7 +210,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         // since we use fire and forget there will always be null response
         assertThat(processInstanceId).isNull();
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
         // Process should be started completely async - fire and forget.
@@ -211,10 +218,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
         ProcessInstance pi = processInstances.get(0);
         assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-
-        // set to reqreply so it finishes the test properly
-        processClient.setResponseHandler(new RequestReplyResponseHandler());
-        processClient.abortProcessInstance(CONTAINER_ID, pi.getId());
     }
 
     private void testGetProcessInstancesResponseHandler(ResponseHandler responseHandler) throws Exception {
@@ -227,7 +230,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         // since we use fire and forget there will always be null response
         assertThat(processInstanceId).isNull();
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
         // change response handler for queryClient others are not affected
@@ -244,10 +246,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
         ProcessInstance pi = processInstances.get(0);
         assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-
-        // set to reqreply so it finishes the test properly
-        processClient.setResponseHandler(new RequestReplyResponseHandler());
-        processClient.abortProcessInstance(CONTAINER_ID, pi.getId());
     }
 
     private void testGetTaskResponseHandler(ResponseHandler responseHandler) throws Exception {
@@ -260,8 +258,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         // since we use fire and forget there will always be null response
         assertThat(processInstanceId).isNull();
 
-        // set it back for the sake of verification
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
         // Process should be started completely async - fire and forget.
@@ -275,10 +271,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         taskClient.setResponseHandler(responseHandler);
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).isNull();
-
-        // set to reqreply so it finishes the test properly
-        processClient.setResponseHandler(new RequestReplyResponseHandler());
-        processClient.abortProcessInstance(CONTAINER_ID, pi.getId());
     }
 
     private void testStartAndCompleteTask(ResponseHandler responseHandler) throws Exception {
@@ -296,6 +288,11 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         Long taskId = tasks.get(0).getId();
         taskClient.setResponseHandler(responseHandler);
         taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
+
+        taskClient.setResponseHandler(responseHandler);
         taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
 
         taskClient.setResponseHandler(new RequestReplyResponseHandler());
@@ -307,6 +304,11 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         taskId = tasks.get(0).getId();
         taskClient.setResponseHandler(responseHandler);
         taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
+
+        taskClient.setResponseHandler(responseHandler);
         taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
 
         KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
@@ -348,7 +350,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
         taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
         tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
         assertThat(tasks).isNotNull().hasSize(1);
         assertThat(tasks.get(0).getId()).isEqualTo(taskId);
@@ -371,7 +372,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         Long processInstanceId = fireAndForgetProcessClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertThat(processInstanceId).isNull();
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
         abortAllProcesses();

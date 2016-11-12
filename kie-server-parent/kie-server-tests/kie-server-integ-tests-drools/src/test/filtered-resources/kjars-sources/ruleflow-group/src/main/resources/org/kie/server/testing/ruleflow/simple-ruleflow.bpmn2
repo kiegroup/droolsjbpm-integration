@@ -20,7 +20,7 @@
     <bpmn2:sequenceFlow id="_F5DFD241-55FF-4B1C-A222-83324B00AD74" drools:bgcolor="#000000" drools:selectable="true" sourceRef="processStartEvent" targetRef="_4FB32225-80BB-4DE7-A53E-CDC0130BC58F"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="_vy35sT5OEeSwdN7EN_fB6A">
-    <bpmndi:BPMNPlane id="_vy35sj5OEeSwdN7EN_fB6A" bpmnElement="project1.simple-ruleflow">
+    <bpmndi:BPMNPlane id="_vy35sj5OEeSwdN7EN_fB6A" bpmnElement="simple-ruleflow">
       <bpmndi:BPMNShape id="_vy35sz5OEeSwdN7EN_fB6A" bpmnElement="processStartEvent">
         <dc:Bounds height="30.0" width="30.0" x="120.0" y="165.0"/>
       </bpmndi:BPMNShape>
