@@ -1,0 +1,97 @@
+{
+  "type" : "SUCCESS",
+  "msg" : "List of created containers",
+  "result" : {
+    "kie-containers" : {
+      "kie-container" : [ {
+        "status" : "STARTED",
+        "scanner" : {
+          "status" : "DISPOSED",
+          "poll-interval" : null
+        },
+        "messages" : [ {
+          "severity" : "INFO",
+          "timestamp" : 1481024271713,
+          "content" : [ "Container dhfl successfully created with module DHFL-iDecimal:Decimal-DHFL:9.99.999." ]
+        } ],
+        "container-id" : "dhfl",
+        "release-id" : {
+          "version" : "9.99.999",
+          "group-id" : "DHFL-iDecimal",
+          "artifact-id" : "Decimal-DHFL"
+        },
+        "resolved-release-id" : {
+          "version" : "9.99.999",
+          "group-id" : "DHFL-iDecimal",
+          "artifact-id" : "Decimal-DHFL"
+        },
+        "config-items" : [ {
+          "itemName" : "KBase",
+          "itemValue" : "",
+          "itemType" : "BPM"
+        }, {
+          "itemName" : "KSession",
+          "itemValue" : "",
+          "itemType" : "BPM"
+        }, {
+          "itemName" : "MergeMode",
+          "itemValue" : "MERGE_COLLECTIONS",
+          "itemType" : "BPM"
+        }, {
+          "itemName" : "RuntimeStrategy",
+          "itemValue" : "SINGLETON",
+          "itemType" : "BPM"
+        } ],
+        "container-alias" : "dhfl"
+      }, {
+        "status" : "STARTED",
+        "scanner" : {
+          "status" : "DISPOSED",
+          "poll-interval" : null
+        },
+        "messages" : [ {
+          "severity" : "INFO",
+          "timestamp" : 1481024272618,
+          "content" : [ "Container project-two_1.0 successfully created with module org.jbpm.demo:project-two:1.0." ]
+        } ],
+        "container-id" : "project-two_1.0",
+        "release-id" : {
+          "version" : "1.0",
+          "group-id" : "org.jbpm.demo",
+          "artifact-id" : "project-two"
+        },
+        "resolved-release-id" : {
+          "version" : "1.0",
+          "group-id" : "org.jbpm.demo",
+          "artifact-id" : "project-two"
+        },
+        "config-items" : [ ],
+        "container-alias" : "project-two"
+      }, {
+        "status" : "STARTED",
+        "scanner" : {
+          "status" : "DISPOSED",
+          "poll-interval" : null
+        },
+        "messages" : [ {
+          "severity" : "INFO",
+          "timestamp" : 1481026078757,
+          "content" : [ "Container evaluation_3.4 successfully created with module org.jbpm:evaluation:3.4." ]
+        } ],
+        "container-id" : "evaluation_3.4",
+        "release-id" : {
+          "version" : "3.4",
+          "group-id" : "org.jbpm",
+          "artifact-id" : "evaluation"
+        },
+        "resolved-release-id" : {
+          "version" : "3.4",
+          "group-id" : "org.jbpm",
+          "artifact-id" : "evaluation"
+        },
+        "config-items" : [ ],
+        "container-alias" : "evaluation"
+      } ]
+    }
+  }
+}

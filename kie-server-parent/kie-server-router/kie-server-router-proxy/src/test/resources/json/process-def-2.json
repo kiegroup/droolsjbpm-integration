@@ -1,0 +1,28 @@
+{
+    "processes": 
+    [
+        {
+            "process-id": "6",
+            "container-id": "async2",
+            "package": "org.jbpm.examples2",
+            "process-name": "Async process with custom data2",
+            "process-version": "2"
+        },
+
+        {
+            "process-id": "7",
+            "container-id": "async2",
+            "package": "org.jbpm.example2",
+            "process-name": "Check weather process2",
+            "process-version": "2"
+        },
+
+        {
+            "process-id": "8",
+            "container-id": "async2",
+            "package": "org.jbpm.example2",
+            "process-name": "Simple async execution Process2",
+            "process-version": "2"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+<org.kie.server.api.model.definition.ProcessDefinitionList>
+  <processes>
+    <org.kie.server.api.model.definition.ProcessDefinition>
+      <id>1</id>
+      <name>Evaluation updated</name>
+      <version>3</version>
+      <packageName>org.jbpm</packageName>
+      <containerId>evaluation_3.4</containerId>
+    </org.kie.server.api.model.definition.ProcessDefinition>
+    <org.kie.server.api.model.definition.ProcessDefinition>
+      <id>2</id>
+      <name>rewards-multi-approval</name>
+      <version>2.0</version>
+      <packageName>com.redhat.jboss.hr.rewards</packageName>
+      <containerId>evaluation_3.4</containerId>
+    </org.kie.server.api.model.definition.ProcessDefinition>
+  </processes>
+</org.kie.server.api.model.definition.ProcessDefinitionList>

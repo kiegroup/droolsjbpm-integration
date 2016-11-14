@@ -62,6 +62,7 @@
         <include>org.kie.server:kie-server-rest-jbpm-ui</include>
         <include>org.kie.server:kie-server-rest-optaplanner</include>
         <include>org.kie.server:kie-server-rest-case-mgmt</include>
+        <include>org.kie.server:kie-server-router-client</include>
         <include>org.kie:jbpm-process-svg</include>
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>

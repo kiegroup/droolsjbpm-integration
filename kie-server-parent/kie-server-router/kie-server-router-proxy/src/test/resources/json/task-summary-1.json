@@ -1,0 +1,52 @@
+{
+    "task-summary": 
+    [
+        {
+            "task-activation-time": 1479901817587,
+            "task-actual-owner": "maciek",
+            "task-container-id": "evaluation_3.4",
+            "task-created-by": "maciek",
+            "task-created-on": 1479901817587,
+            "task-description": "",
+            "task-id": 17,
+            "task-name": "Evaluate Award",
+            "task-parent-id": -1,
+            "task-priority": 0,
+            "task-proc-def-id": "rewards.rewards-multi-approval",
+            "task-proc-inst-id": 8,
+            "task-status": "Reserved"
+        },
+
+        {
+            "task-activation-time": 1479901817580,
+            "task-actual-owner": "maciek",
+            "task-container-id": "evaluation_3.4",
+            "task-created-by": "maciek",
+            "task-created-on": 1479901817580,
+            "task-description": "",
+            "task-id": 16,
+            "task-name": "Evaluate Award",
+            "task-parent-id": -1,
+            "task-priority": 0,
+            "task-proc-def-id": "rewards.rewards-multi-approval",
+            "task-proc-inst-id": 8,
+            "task-status": "Reserved"
+        },
+
+        {
+            "task-activation-time": 1479901817573,
+            "task-actual-owner": "maciek",
+            "task-container-id": "evaluation_3.4",
+            "task-created-by": "maciek",
+            "task-created-on": 1479901817573,
+            "task-description": "",
+            "task-id": 15,
+            "task-name": "Evaluate Award",
+            "task-parent-id": -1,
+            "task-priority": 0,
+            "task-proc-def-id": "rewards.rewards-multi-approval",
+            "task-proc-inst-id": 8,
+            "task-status": "Reserved"
+        }
+    ]
+}

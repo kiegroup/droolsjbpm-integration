@@ -1,0 +1,49 @@
+<org.kie.server.api.model.instance.TaskSummaryList>
+  <tasks>
+    <org.kie.server.api.model.instance.TaskSummary>
+      <id>17</id>
+      <name>Evaluate Award</name>
+      <description />
+      <status>Reserved</status>
+      <priority>0</priority>
+      <actualOwner>maciek</actualOwner>
+      <createdBy>maciek</createdBy>
+      <createdOn>2016-11-23 11:50:17.587 UTC</createdOn>
+      <activationTime>2016-11-23 11:50:17.587 UTC</activationTime>
+      <processInstanceId>8</processInstanceId>
+      <processId>rewards.rewards-multi-approval</processId>
+      <containerId>evaluation_3.4</containerId>
+      <parentId>-1</parentId>
+    </org.kie.server.api.model.instance.TaskSummary>
+    <org.kie.server.api.model.instance.TaskSummary>
+      <id>16</id>
+      <name>Evaluate Award</name>
+      <description />
+      <status>Reserved</status>
+      <priority>0</priority>
+      <actualOwner>maciek</actualOwner>
+      <createdBy>maciek</createdBy>
+      <createdOn>2016-11-23 11:50:17.580 UTC</createdOn>
+      <activationTime>2016-11-23 11:50:17.580 UTC</activationTime>
+      <processInstanceId>8</processInstanceId>
+      <processId>rewards.rewards-multi-approval</processId>
+      <containerId>evaluation_3.4</containerId>
+      <parentId>-1</parentId>
+    </org.kie.server.api.model.instance.TaskSummary>
+    <org.kie.server.api.model.instance.TaskSummary>
+      <id>16</id>
+      <name>Evaluate Award</name>
+      <description />
+      <status>Reserved</status>
+      <priority>0</priority>
+      <actualOwner>maciek</actualOwner>
+      <createdBy>maciek</createdBy>
+      <createdOn>2016-11-23 11:50:17.580 UTC</createdOn>
+      <activationTime>2016-11-23 11:50:17.580 UTC</activationTime>
+      <processInstanceId>8</processInstanceId>
+      <processId>rewards.rewards-multi-approval</processId>
+      <containerId>evaluation_3.4</containerId>
+      <parentId>-1</parentId>
+    </org.kie.server.api.model.instance.TaskSummary>
+  </tasks>
+</org.kie.server.api.model.instance.TaskSummaryList>

@@ -1,0 +1,15 @@
+<process-instance-list>
+  <process-instance>
+    <process-instance-id>8</process-instance-id>
+    <process-id>rewards.rewards-multi-approval</process-id>
+    <process-name>rewards-multi-approval</process-name>
+    <process-version>2.0</process-version>
+    <process-instance-state>1</process-instance-state>
+    <container-id>evaluation_3.4</container-id>
+    <initiator>maciek</initiator>
+    <start-date>2016-11-23T12:49:54.327+01:00</start-date>
+    <process-instance-desc>rewards-multi-approval</process-instance-desc>
+    <correlation-key>8</correlation-key>
+    <parent-instance-id>-1</parent-instance-id>
+  </process-instance>
+</process-instance-list>

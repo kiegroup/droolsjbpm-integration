@@ -1,0 +1,44 @@
+{
+    "processes": 
+    [
+        {
+            "process-id": "1",
+            "container-id": "async",
+            "package": "org.jbpm.examples",
+            "process-name": "Async process with custom data",
+            "process-version": "1"
+        },
+
+        {
+            "process-id": "2",
+            "container-id": "async",
+            "package": "org.jbpm.example",
+            "process-name": "Check weather process",
+            "process-version": "1"
+        },
+
+        {
+            "process-id": "3",
+            "container-id": "async",
+            "package": "org.jbpm.example",
+            "process-name": "Simple async execution Process",
+            "process-version": "1"
+        },
+
+        {
+            "process-id": "4",
+            "container-id": "itorders_3.0",
+            "package": "org.jbpm.demo.itorders",
+            "process-name": "orderhardware",
+            "process-version": "1.0"
+        },
+
+        {
+            "process-id": "5",
+            "container-id": "itorders_3.0",
+            "package": "org.jbpm.demo.itorders",
+            "process-name": "place-order",
+            "process-version": "1.0"
+        }
+    ]
+}

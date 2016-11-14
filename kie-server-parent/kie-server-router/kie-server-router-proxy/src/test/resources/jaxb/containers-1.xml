@@ -1,0 +1,78 @@
+<response type="SUCCESS" msg="List of created containers">
+  <kie-containers>
+    <kie-container container-alias="dhfl" container-id="dhfl" status="STARTED">
+      <config-items>
+        <itemName>KBase</itemName>
+        <itemValue></itemValue>
+        <itemType>BPM</itemType>
+      </config-items>
+      <config-items>
+        <itemName>KSession</itemName>
+        <itemValue></itemValue>
+        <itemType>BPM</itemType>
+      </config-items>
+      <config-items>
+        <itemName>MergeMode</itemName>
+        <itemValue>MERGE_COLLECTIONS</itemValue>
+        <itemType>BPM</itemType>
+      </config-items>
+      <config-items>
+        <itemName>RuntimeStrategy</itemName>
+        <itemValue>SINGLETON</itemValue>
+        <itemType>BPM</itemType>
+      </config-items>
+      <messages>
+        <content>Container dhfl successfully created with module DHFL-iDecimal:Decimal-DHFL:9.99.999.</content>
+        <severity>INFO</severity>
+        <timestamp>2016-12-06T12:37:51.713+01:00</timestamp>
+      </messages>
+      <release-id>
+        <artifact-id>Decimal-DHFL</artifact-id>
+        <group-id>DHFL-iDecimal</group-id>
+        <version>9.99.999</version>
+      </release-id>
+      <resolved-release-id>
+        <artifact-id>Decimal-DHFL</artifact-id>
+        <group-id>DHFL-iDecimal</group-id>
+        <version>9.99.999</version>
+      </resolved-release-id>
+      <scanner status="DISPOSED"/>
+    </kie-container>
+    <kie-container container-alias="project-two" container-id="project-two_1.0" status="STARTED">
+      <messages>
+        <content>Container project-two_1.0 successfully created with module org.jbpm.demo:project-two:1.0.</content>
+        <severity>INFO</severity>
+        <timestamp>2016-12-06T12:37:52.618+01:00</timestamp>
+      </messages>
+      <release-id>
+        <artifact-id>project-two</artifact-id>
+        <group-id>org.jbpm.demo</group-id>
+        <version>1.0</version>
+      </release-id>
+      <resolved-release-id>
+        <artifact-id>project-two</artifact-id>
+        <group-id>org.jbpm.demo</group-id>
+        <version>1.0</version>
+      </resolved-release-id>
+      <scanner status="DISPOSED"/>
+    </kie-container>
+    <kie-container container-alias="evaluation" container-id="evaluation_3.4" status="STARTED">
+      <messages>
+        <content>Container evaluation_3.4 successfully created with module org.jbpm:evaluation:3.4.</content>
+        <severity>INFO</severity>
+        <timestamp>2016-12-06T13:07:58.757+01:00</timestamp>
+      </messages>
+      <release-id>
+        <artifact-id>evaluation</artifact-id>
+        <group-id>org.jbpm</group-id>
+        <version>3.4</version>
+      </release-id>
+      <resolved-release-id>
+        <artifact-id>evaluation</artifact-id>
+        <group-id>org.jbpm</group-id>
+        <version>3.4</version>
+      </resolved-release-id>
+      <scanner status="DISPOSED"/>
+    </kie-container>
+  </kie-containers>
+</response>

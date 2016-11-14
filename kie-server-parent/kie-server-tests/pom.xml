@@ -39,6 +39,7 @@
          but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
     <kie.server.testing.kjars.build.settings.xml/>
     <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
+    <kie.server.router.url>http://localhost:${router.port}</kie.server.router.url>
     <!-- This property can be overriden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
 
@@ -59,6 +60,7 @@
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
     <module>kie-server-integ-tests-policy</module>
+    <module>kie-server-integ-tests-router</module>
   </modules>
 
   <dependencyManagement>
@@ -86,6 +88,11 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-integ-tests-controller</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-policy</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>
@@ -202,6 +209,18 @@
             <configuration>
               <portNames>
                 <portName>container.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+          <execution>
+            <id>reserve-network-port-router</id>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <portNames>
+                <portName>router.port</portName>
               </portNames>
             </configuration>
           </execution>
