@@ -71,15 +71,15 @@
     <!--</dependency>-->
 
     <!-- Examples -->
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>droolsjbpm-integration-examples</artifactId>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>droolsjbpm-integration-examples</artifactId>-->
-      <!--<classifier>sources</classifier>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>droolsjbpm-integration-examples</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>droolsjbpm-integration-examples</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
   </dependencies>
 
 </project>
