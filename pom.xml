@@ -53,7 +53,7 @@
     <module>drools-benchmark</module>
     <!--<module>drools-simulator</module>-->
     <module>drools-rhq-plugin</module>
-    <!--<module>droolsjbpm-integration-examples</module>-->
+    <module>droolsjbpm-integration-examples</module>
     <module>jbpm-simulation</module>
     <module>kie-spring</module>
     <module>kie-aries-blueprint</module>
