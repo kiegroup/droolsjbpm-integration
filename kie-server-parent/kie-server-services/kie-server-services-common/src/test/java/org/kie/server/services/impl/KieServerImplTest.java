@@ -16,18 +16,18 @@
 package org.kie.server.services.impl;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
 import org.kie.scanner.MavenRepository;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
@@ -38,6 +38,7 @@ import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 public class KieServerImplTest {
@@ -45,7 +46,7 @@ public class KieServerImplTest {
     private static final File REPOSITORY_DIR = new File("target/repository-dir");
     private static final String KIE_SERVER_ID = "kie-server-impl-test";
     private static final String GROUP_ID = "org.kie.server.test";
-    private static final String VERSION = "1.0.0.Final";
+    private static final String DEFAULT_VERSION = "1.0.0.Final";
 
     private KieServerImpl kieServer;
     private org.kie.api.builder.ReleaseId releaseId;
@@ -115,17 +116,63 @@ public class KieServerImplTest {
         Assertions.assertThat(getResponse.getResult().getScanner()).isEqualTo(kieScannerResource);
     }
 
+    @Test
+    public void testReturnRefreshedResolvedReleaseIdAfterUpdateFromScanner() throws Exception {
+        // first create a simple container with fixed kjar version
+        String artifactId = "refreshed-resource-test";
+        String version1 = "1.0.0.Final";
+        createEmptyKjar(artifactId, version1);
+        ReleaseId releaseId1 = new ReleaseId(GROUP_ID, artifactId, version1);
+        String containerId = "refreshed-resource-container";
+        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, new KieContainerResource(containerId, releaseId1));
+        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+        Assertions.assertThat(createResponse.getResult().getReleaseId()).isEqualTo(releaseId1);
+        Assertions.assertThat(createResponse.getResult().getResolvedReleaseId()).isEqualTo(releaseId1);
+        // now update the version to LATEST and start the scanner
+        ReleaseId latestReleaseId = new ReleaseId(GROUP_ID, artifactId, "LATEST");
+        kieServer.updateContainerReleaseId(containerId, latestReleaseId);
+        kieServer.updateScanner(containerId, new KieScannerResource(KieScannerStatus.STARTED, 200L));
+        // deploy newer version of the kjar; it should get picked up by the scanner
+        String version2 = "1.0.1.Final";
+        createEmptyKjar(artifactId, version2);
+        // the scanner operation is async, so it will take some time until the releaseId gets updated
+        assertReleaseIds(containerId, latestReleaseId, new ReleaseId(GROUP_ID, artifactId, version2), 10000L);
+    }
+
+    private void assertReleaseIds(String containerId, ReleaseId configuredReleaseId, ReleaseId resolvedReleaseId, long timeoutMillis) throws InterruptedException {
+        long timeSpentWaiting = 0;
+        while (timeSpentWaiting < timeoutMillis) {
+            ServiceResponse<KieContainerResourceList> listResponse = kieServer.listContainers(KieContainerResourceFilter.ACCEPT_ALL);
+            Assertions.assertThat(listResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
+            List<KieContainerResource> containers = listResponse.getResult().getContainers();
+            for (KieContainerResource container : containers) {
+                if (configuredReleaseId.equals(container.getReleaseId())
+                        && resolvedReleaseId.equals(container.getResolvedReleaseId())) {
+                    return;
+                }
+            }
+            Thread.sleep(200);
+            timeSpentWaiting += 200L;
+        }
+        Assertions.fail("Waiting too long for container " + containerId + " to have expected releaseIds updated! " +
+                "expected: releaseId=" + configuredReleaseId + ", resolvedReleaseId=" + resolvedReleaseId);
+    }
+
+
     private void createEmptyKjar(String artifactId) {
+        createEmptyKjar(artifactId, DEFAULT_VERSION);
+    }
+    private void createEmptyKjar(String artifactId, String version) {
         // create empty kjar; content does not matter
         KieServices kieServices = KieServices.Factory.get();
         KieFileSystem kfs = kieServices.newKieFileSystem();
-        releaseId = kieServices.newReleaseId(GROUP_ID, artifactId, VERSION);
+        releaseId = kieServices.newReleaseId(GROUP_ID, artifactId, version);
         KieModule kieModule = kieServices.newKieBuilder( kfs ).buildAll().getKieModule();
-        MavenRepository.getMavenRepository().installArtifact(releaseId, (InternalKieModule)kieModule, createPomFile(artifactId));
+        MavenRepository.getMavenRepository().installArtifact(releaseId, (InternalKieModule)kieModule, createPomFile(artifactId, version));
         kieServices.getRepository().addKieModule(kieModule);
     }
 
-    private File createPomFile(String artifactId) {
+    private File createPomFile(String artifactId, String version) {
         String pomContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
                 "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" +
@@ -133,7 +180,7 @@ public class KieServerImplTest {
                 "\n" +
                 "  <groupId>org.kie.server.test</groupId>\n" +
                 "  <artifactId>" + artifactId + "</artifactId>\n" +
-                "  <version>1.0.0.Final</version>\n" +
+                "  <version>" + version + "</version>\n" +
                 "  <packaging>pom</packaging>\n" +
                 "</project>";
         try {
