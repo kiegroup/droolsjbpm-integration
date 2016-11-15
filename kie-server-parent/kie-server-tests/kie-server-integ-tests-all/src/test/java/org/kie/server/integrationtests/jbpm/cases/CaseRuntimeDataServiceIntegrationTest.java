@@ -334,7 +334,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         // Assert milestones
         assertNotNull(caseInstance.getMilestones());
-        assertEquals(1, caseInstance.getMilestones().size());
+        assertEquals(2, caseInstance.getMilestones().size());
 
         CaseMilestone milestone = caseInstance.getMilestones().get(0);
         assertEquals("2", milestone.getIdentifier());
@@ -342,6 +342,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals("Completed", milestone.getStatus());
         assertNotNull(milestone.getAchievedAt());
         assertTrue(milestone.isAchieved());
+
+        milestone = caseInstance.getMilestones().get(1);
+        assertNotNull(milestone.getIdentifier());
+        assertEquals("Milestone2", milestone.getName());
+        assertEquals("Available", milestone.getStatus());
+        assertNull(milestone.getAchievedAt());
+        assertFalse(milestone.isAchieved());
     }
 
     @Test
