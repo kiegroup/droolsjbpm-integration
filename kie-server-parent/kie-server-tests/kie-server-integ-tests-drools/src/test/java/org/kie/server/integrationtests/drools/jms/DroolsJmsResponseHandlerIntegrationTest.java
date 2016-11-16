@@ -43,6 +43,7 @@ import org.kie.server.client.jms.ResponseCallback;
 import org.kie.server.client.jms.ResponseHandler;
 import org.kie.server.integrationtests.category.JMSOnly;
 import org.kie.server.integrationtests.drools.DroolsKieServerBaseIntegrationTest;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -93,7 +94,6 @@ public class DroolsJmsResponseHandlerIntegrationTest extends DroolsKieServerBase
         List<Command<?>> commands = new ArrayList<Command<?>>();
         commands.add(commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME));
         commands.add(commandsFactory.newStartProcess(PROCESS_ID));
-        commands.add(commandsFactory.newFireAllRules());
         commands.add(commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME));
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
 
@@ -109,19 +109,25 @@ public class DroolsJmsResponseHandlerIntegrationTest extends DroolsKieServerBase
 
     @Test
     public void testExecuteSimpleRuleFlowProcessWithFireAndForgetResponseHandler() throws Exception {
-        List<Command<?>> commands = new ArrayList<Command<?>>();
-        commands.add(commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME));
-        commands.add(commandsFactory.newStartProcess(PROCESS_ID));
-        commands.add(commandsFactory.newFireAllRules());
+        // First command in this test needs to be executed with RequestReplyResponseHandler.
+        // If there would be used FireAndForgetResponseHandler then following request could reach Kie server in same time
+        // causing stateful kie session for this container to be created concurrently.
+        // Concurrent creation of same stateful kie session leads to overriding one kie session with another,
+        // causing inconsistency and data loss.
+        Command<?> initializeList = commandsFactory.newSetGlobal(LIST_NAME, new ArrayList<String>(), LIST_OUTPUT_NAME);
+        ServiceResponse<ExecutionResults> response =  ruleClient.executeCommandsWithResults(CONTAINER_ID, initializeList);
+        KieServerAssert.assertSuccess(response);
 
-        BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
+        try {
+            ruleClient.setResponseHandler(new FireAndForgetResponseHandler());
+            Command<?> startProcess = commandsFactory.newStartProcess(PROCESS_ID);
+            response = ruleClient.executeCommandsWithResults(CONTAINER_ID, startProcess);
+            assertThat(response).isNull();
+        } finally {
+            ruleClient.setResponseHandler(new RequestReplyResponseHandler());
+        }
 
-        ruleClient.setResponseHandler(new FireAndForgetResponseHandler());
-        ServiceResponse<?> response = ruleClient.executeCommandsWithResults(CONTAINER_ID, batchExecution);
-        assertThat(response).isNull();
-
-        ruleClient.setResponseHandler(new RequestReplyResponseHandler());
-        Command getGlobalCommand = commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME);
+        Command<?> getGlobalCommand = commandsFactory.newGetGlobal(LIST_NAME, LIST_OUTPUT_NAME);
         List<String> value = new ArrayList<String>();
         value.add("Rule from first ruleflow group executed");
         value.add("Rule from second ruleflow group executed");
