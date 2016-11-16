@@ -1,0 +1,38 @@
+{
+  "revapi": {
+    "java": {
+      "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
+      "filter": {
+        "packages": {
+          "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+          "regex": true,
+          "include": [
+            "org\\.kie\\.server\\.remote\\.rest\\.jbpm\\.ui.*"
+          ]
+        },
+        "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
+        "classes": {
+          "regex": false,
+          "exclude": [
+            "org.kie.server.remote.rest.jbpm.ui.JbpmUIRestApplicationComponentsService"
+          ]
+        }
+      }
+    },
+    "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
+    "ignore": [
+      {
+        "code": "java.method.numberOfParametersChanged",
+        "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.FormResource::getProcessForm(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean)",
+        "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.FormResource::getProcessForm(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, boolean, java.lang.String, boolean)",
+        "justification": "Support multiple formats of forms"
+      },
+      {
+        "code": "java.method.numberOfParametersChanged",
+        "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.FormResource::getTaskForm(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, boolean)",
+        "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ui.FormResource::getTaskForm(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Long, java.lang.String, boolean, java.lang.String, boolean)",
+        "justification": "Support multiple formats of forms"
+      }
+    ]
+  }
+}
