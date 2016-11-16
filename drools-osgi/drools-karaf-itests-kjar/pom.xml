@@ -11,7 +11,6 @@
     <version>6.5.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.drools</groupId>
   <artifactId>drools-karaf-itests-kjar</artifactId>
   <name>Drools :: Karaf Integration Tests Kjar</name>
 
