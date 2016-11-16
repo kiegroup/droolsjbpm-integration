@@ -260,7 +260,7 @@ public class KieContainerInstanceImpl implements KieContainerInstance {
             return true;
         }
         // now both releaseIds are non-null, so it is safe to call equals()
-        return oldReleaseId.equals(newReleaseId);
+        return !oldReleaseId.equals(newReleaseId);
     }
 
 }
