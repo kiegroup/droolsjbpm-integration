@@ -29,7 +29,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.util.Filter;
 import org.osgi.framework.Constants;
 
@@ -45,7 +45,7 @@ import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
  * Tests starting a jBPM process using RuntimeManager with persistence enabled in Blueprint environment.
  */
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class KieBlueprintjBPMPersistenceKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String BLUEPRINT_XML_LOCATION = "/org/kie/karaf/itest/blueprint/processpersistence/kie-beans-blueprint-process-persistence.xml";
