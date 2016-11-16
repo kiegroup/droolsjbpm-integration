@@ -14,7 +14,6 @@
   <groupId>org.drools</groupId>
   <artifactId>drools-karaf-itests-kjar</artifactId>
   <name>Drools :: Karaf Integration Tests Kjar</name>
-  <version>6.5.1-SNAPSHOT</version>
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
