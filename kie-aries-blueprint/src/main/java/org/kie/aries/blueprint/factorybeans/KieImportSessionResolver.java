@@ -390,6 +390,11 @@ public class KieImportSessionResolver extends AbstractKieObjectsResolver impleme
     }
 
     @Override
+    public <T> T getKieRuntime(Class<T> cls) {
+        return kieSession.getKieRuntime( cls );
+    }
+
+    @Override
     public void execute( Object o ) {
         statelessKieSession.execute( o );
     }

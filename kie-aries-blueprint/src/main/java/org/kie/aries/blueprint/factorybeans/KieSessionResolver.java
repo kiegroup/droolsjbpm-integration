@@ -457,6 +457,11 @@ public class KieSessionResolver extends AbstractKieObjectsResolver implements Ki
     }
 
     @Override
+    public <T> T getKieRuntime(Class<T> cls) {
+        return getKieSession().getKieRuntime( cls );
+    }
+
+    @Override
     public void execute( Object object ) {
         getStatelessKieSession().execute( object );
     }
