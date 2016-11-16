@@ -25,7 +25,7 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 
 @RunWith(PaxExamWithWireMock.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class KieServerClientKarafIntegrationXstreamIntegrationTest extends BaseKieServerClientKarafIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(KieServerClientKarafIntegrationXstreamIntegrationTest.class);

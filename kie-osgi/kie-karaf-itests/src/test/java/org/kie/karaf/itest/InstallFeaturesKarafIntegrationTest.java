@@ -17,6 +17,7 @@
 package org.kie.karaf.itest;
 
 import org.apache.karaf.features.FeaturesService;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExamParameterized;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
  * Serves as a quick smoke test to verify that all the supported KIE features can be successfully installed.
  */
 @RunWith(PaxExamParameterized.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private String featureName;
@@ -97,6 +98,14 @@ public class InstallFeaturesKarafIntegrationTest extends AbstractKarafIntegratio
     public void testInstallFeature() throws Exception {
         featuresService.installFeature(featureName);
         Assert.assertTrue("Feature " + featureName + " not installed!",
+                featuresService.isInstalled(featuresService.getFeature(featureName)));
+
+    }
+
+    @After
+    public void removeInstalledFeature() throws Exception {
+        featuresService.uninstallFeature(featureName);
+        Assert.assertFalse("Feature " + featureName + " is still installed, even after explicit call to uninstallFeature()!",
                 featuresService.isInstalled(featuresService.getFeature(featureName)));
     }
 

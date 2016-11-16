@@ -31,6 +31,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
@@ -38,7 +39,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRunti
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class WorkbenchModelsKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String SIMPLE_GDST_LOCATION = "/wb-models/simple-guided-dtable.gdst";

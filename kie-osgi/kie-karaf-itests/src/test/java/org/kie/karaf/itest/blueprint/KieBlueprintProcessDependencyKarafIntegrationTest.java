@@ -26,7 +26,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Constants;
 
 import javax.inject.Inject;
@@ -43,7 +43,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 import static org.ops4j.pax.tinybundles.core.TinyBundles.bundle;
 
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class KieBlueprintProcessDependencyKarafIntegrationTest extends AbstractKarafIntegrationTest {
 
     private static final String BLUEPRINT_XML_LOCATION = "/org/kie/karaf/itest/blueprint/kie-beans-blueprint-process-dep.xml";

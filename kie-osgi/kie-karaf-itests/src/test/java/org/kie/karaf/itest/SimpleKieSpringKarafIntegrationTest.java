@@ -27,7 +27,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import static org.junit.Assert.assertNotNull;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 @RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
+@ExamReactorStrategy(PerClass.class)
 public class SimpleKieSpringKarafIntegrationTest extends AbstractKieSpringKarafIntegrationTest {
 
     @Before
