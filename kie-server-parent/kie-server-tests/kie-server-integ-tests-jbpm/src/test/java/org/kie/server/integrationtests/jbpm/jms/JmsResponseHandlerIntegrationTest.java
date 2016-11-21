@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -86,6 +87,13 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         kieContainer = KieServices.Factory.get().newKieContainer(RELEASE_ID);
 
         createContainer(CONTAINER_ID, RELEASE_ID);
+    }
+
+    @After
+    public void resetResponseHandler() {
+        processClient.setResponseHandler(new RequestReplyResponseHandler());
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
     }
 
     @Override
@@ -196,87 +204,73 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertThat(processInstances).isEmpty();
 
-        try {
-            // change response handler for processClient others are not affected
-            processClient.setResponseHandler(responseHandler);
-            Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-            // since we use fire and forget there will always be null response
-            assertThat(processInstanceId).isNull();
+        // change response handler for processClient others are not affected
+        processClient.setResponseHandler(responseHandler);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        // since we use fire and forget there will always be null response
+        assertThat(processInstanceId).isNull();
 
-            KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
-            // Process should be started completely async - fire and forget.
-            processInstances = queryClient.findProcessInstances(0, 100);
-            assertThat(processInstances).hasSize(1);
+        // Process should be started completely async - fire and forget.
+        processInstances = queryClient.findProcessInstances(0, 100);
+        assertThat(processInstances).hasSize(1);
 
-            ProcessInstance pi = processInstances.get(0);
-            assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        } finally {
-            processClient.setResponseHandler(new RequestReplyResponseHandler());
-        }
+        ProcessInstance pi = processInstances.get(0);
+        assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
     }
 
     private void testGetProcessInstancesResponseHandler(ResponseHandler responseHandler) throws Exception {
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertThat(processInstances).isEmpty();
 
-        try {
-            // change response handler for processClient others are not affected
-            processClient.setResponseHandler(responseHandler);
-            Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-            // since we use fire and forget there will always be null response
-            assertThat(processInstanceId).isNull();
+        // change response handler for processClient others are not affected
+        processClient.setResponseHandler(responseHandler);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        // since we use fire and forget there will always be null response
+        assertThat(processInstanceId).isNull();
 
-            KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
-            // change response handler for queryClient others are not affected
-            queryClient.setResponseHandler(responseHandler);
-            // Process should be started completely async - fire and forget.
-            processInstances = queryClient.findProcessInstances(0, 100);
-            assertThat(processInstances).isNull();
+        // change response handler for queryClient others are not affected
+        queryClient.setResponseHandler(responseHandler);
+        // Process should be started completely async - fire and forget.
+        processInstances = queryClient.findProcessInstances(0, 100);
+        assertThat(processInstances).isNull();
 
-            // set it back for the sake of verification
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-            // Process should be started completely async - fire and forget.
-            processInstances = queryClient.findProcessInstances(0, 100);
-            assertThat(processInstances).isNotNull().hasSize(1);
+        // set it back for the sake of verification
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        // Process should be started completely async - fire and forget.
+        processInstances = queryClient.findProcessInstances(0, 100);
+        assertThat(processInstances).isNotNull().hasSize(1);
 
-            ProcessInstance pi = processInstances.get(0);
-            assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
-        } finally {
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-            processClient.setResponseHandler(new RequestReplyResponseHandler());
-        }
+        ProcessInstance pi = processInstances.get(0);
+        assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
     }
 
     private void testGetTaskResponseHandler(ResponseHandler responseHandler) throws Exception {
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertThat(processInstances).isEmpty();
 
-        try {
-            // change response handler for processClient others are not affected
-            processClient.setResponseHandler(responseHandler);
-            Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-            // since we use fire and forget there will always be null response
-            assertThat(processInstanceId).isNull();
+        // change response handler for processClient others are not affected
+        processClient.setResponseHandler(responseHandler);
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
+        // since we use fire and forget there will always be null response
+        assertThat(processInstanceId).isNull();
 
-            KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
-            // Process should be started completely async - fire and forget.
-            processInstances = queryClient.findProcessInstances(0, 100);
-            assertThat(processInstances).isNotNull().hasSize(1);
+        // Process should be started completely async - fire and forget.
+        processInstances = queryClient.findProcessInstances(0, 100);
+        assertThat(processInstances).isNotNull().hasSize(1);
 
-            ProcessInstance pi = processInstances.get(0);
-            assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
+        ProcessInstance pi = processInstances.get(0);
+        assertThat(pi.getState()).isEqualTo(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);
 
-            // change response handler for taskClient others are not affected
-            taskClient.setResponseHandler(responseHandler);
-            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertThat(tasks).isNull();
-        } finally {
-            processClient.setResponseHandler(new RequestReplyResponseHandler());
-            taskClient.setResponseHandler(new RequestReplyResponseHandler());
-        }
+        // change response handler for taskClient others are not affected
+        taskClient.setResponseHandler(responseHandler);
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertThat(tasks).isNull();
     }
 
     private void testStartAndCompleteTask(ResponseHandler responseHandler) throws Exception {
@@ -291,37 +285,33 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         assertThat(tasks).hasSize(1);
 
-        try {
-            Long taskId = tasks.get(0).getId();
-            taskClient.setResponseHandler(responseHandler);
-            taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+        Long taskId = tasks.get(0).getId();
+        taskClient.setResponseHandler(responseHandler);
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
 
-            taskClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
 
-            taskClient.setResponseHandler(responseHandler);
-            taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
+        taskClient.setResponseHandler(responseHandler);
+        taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
 
-            taskClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.Completed.name());
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.Completed.name());
 
-            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertThat(tasks).hasSize(1);
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertThat(tasks).hasSize(1);
 
-            taskId = tasks.get(0).getId();
-            taskClient.setResponseHandler(responseHandler);
-            taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+        taskId = tasks.get(0).getId();
+        taskClient.setResponseHandler(responseHandler);
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
 
-            taskClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
+        taskClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForTaskStatus(taskClient, taskId, Status.InProgress.name());
 
-            taskClient.setResponseHandler(responseHandler);
-            taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
+        taskClient.setResponseHandler(responseHandler);
+        taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, new HashMap<String, Object>());
 
-            KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
-        } finally {
-            taskClient.setResponseHandler(new RequestReplyResponseHandler());
-        }
+        KieServerSynchronization.waitForProcessInstanceToFinish(processClient, CONTAINER_ID, processInstanceId);
     }
 
     private void testQueryRegistration(ResponseHandler responseHandler) throws Exception {
@@ -337,42 +327,38 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         query.setExpression("select * from AuditTaskImpl where status = 'Reserved'");
         query.setTarget("CUSTOM");
 
-        try {
-            queryClient.setResponseHandler(responseHandler);
-            queryClient.registerQuery(query);
+        queryClient.setResponseHandler(responseHandler);
+        queryClient.registerQuery(query);
 
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForQuery(queryClient, query);
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForQuery(queryClient, query);
 
-            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-            assertThat(tasks).isNotNull().hasSize(1);
-            Long taskId = tasks.get(0).getId();
+        List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+        assertThat(tasks).isNotNull().hasSize(1);
+        Long taskId = tasks.get(0).getId();
 
-            query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
+        query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
 
-            queryClient.setResponseHandler(responseHandler);
-            queryClient.replaceQuery(query);
+        queryClient.setResponseHandler(responseHandler);
+        queryClient.replaceQuery(query);
 
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForQuery(queryClient, query);
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForQuery(queryClient, query);
 
-            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-            assertThat(tasks).isNotNull().isEmpty();
+        tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+        assertThat(tasks).isNotNull().isEmpty();
 
-            taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
 
-            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-            assertThat(tasks).isNotNull().hasSize(1);
-            assertThat(tasks.get(0).getId()).isEqualTo(taskId);
+        tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+        assertThat(tasks).isNotNull().hasSize(1);
+        assertThat(tasks.get(0).getId()).isEqualTo(taskId);
 
-            queryClient.setResponseHandler(responseHandler);
-            queryClient.unregisterQuery(query.getName());
+        queryClient.setResponseHandler(responseHandler);
+        queryClient.unregisterQuery(query.getName());
 
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-            KieServerSynchronization.waitForQueryRemoval(queryClient, query);
-        } finally {
-            queryClient.setResponseHandler(new RequestReplyResponseHandler());
-        }
+        queryClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForQueryRemoval(queryClient, query);
     }
 
     private void testStartProcessWithGlobalConfiguration(ResponseHandler responseHandler) throws Exception {
