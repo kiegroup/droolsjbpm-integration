@@ -19,6 +19,7 @@ import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
@@ -28,6 +29,7 @@ import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
@@ -102,4 +104,49 @@ public class CaseQueryResource extends AbstractCaseResource {
                 });
     }
 
+    /*
+     * Case tasks
+     */
+
+    @GET
+    @Path(CASE_TASKS_AS_POT_OWNER_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCaseInstanceTasksAsPotentialOwner(@javax.ws.rs.core.Context HttpHeaders headers,
+            @PathParam(CASE_ID) String caseId,
+            @QueryParam("user") String user, @QueryParam("status") List<String> status,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        return invokeCaseOperation(headers,
+                "",
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+                    logger.debug("About to look for case instance {} tasks with status {} assigned to potential owner {}", caseId, status, user);
+                    TaskSummaryList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseTasks(caseId, user, status, page, pageSize, sort, sortOrder);
+
+                    logger.debug("Returning OK response with content '{}'", responseObject);
+                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
+
+    @GET
+    @Path(CASE_TASKS_AS_ADMIN_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCaseInstanceTasksAsAdmin(@javax.ws.rs.core.Context HttpHeaders headers,
+            @PathParam(CASE_ID) String caseId,
+            @QueryParam("user") String user, @QueryParam("status") List<String> status,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        return invokeCaseOperation(headers,
+                "",
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+                    logger.debug("About to look for case instance {} tasks with status {} assigned to business admin {}", caseId, status, user);
+                    TaskSummaryList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseTasksAsBusinessAdmin(caseId, user, status, page, pageSize, sort, sortOrder);
+
+                    logger.debug("Returning OK response with content '{}'", responseObject);
+                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
 }

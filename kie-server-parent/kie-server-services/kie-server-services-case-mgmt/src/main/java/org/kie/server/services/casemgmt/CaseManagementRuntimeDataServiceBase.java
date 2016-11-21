@@ -26,6 +26,8 @@ import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
+import org.kie.api.task.model.Status;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
@@ -41,6 +43,7 @@ import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.services.api.KieServerRegistry;
 
 import static java.util.stream.Collectors.*;
@@ -221,6 +224,30 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseDefinition;
     }
 
+    public TaskSummaryList getCaseTasks(String caseId, String user, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        List<Status> actualStatus = safeTaskStatus(status);
+        user = getUser(user);
+        sort = safeTaskSummarySort(sort);
+
+        Collection<TaskSummary> taskSummaries = caseRuntimeDataService.getCaseTasksAssignedAsPotentialOwner(caseId, user, actualStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+
+        TaskSummaryList tasks = ConvertUtils.convertToTaskSummaryList(taskSummaries);
+
+        return tasks;
+    }
+
+    public TaskSummaryList getCaseTasksAsBusinessAdmin(String caseId, String user, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        List<Status> actualStatus = safeTaskStatus(status);
+        user = getUser(user);
+        sort = safeTaskSummarySort(sort);
+
+        Collection<TaskSummary> taskSummaries = caseRuntimeDataService.getCaseTasksAssignedAsBusinessAdmin(caseId, user, actualStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+
+        TaskSummaryList tasks = ConvertUtils.convertToTaskSummaryList(taskSummaries);
+
+        return tasks;
+    }
+
     protected List<Integer> safeStatus(List<Integer> status) {
         List<Integer> actualStatus = status;
         if (status == null || status.isEmpty()) {
@@ -231,10 +258,33 @@ public class CaseManagementRuntimeDataServiceBase {
         return actualStatus;
     }
 
+    protected List<Status> safeTaskStatus(List<String> status) {
+        List<Status> actualStatus;
+        if (status == null || status.isEmpty()) {
+            actualStatus = new ArrayList<Status>();
+            actualStatus.add(Status.Ready);
+            actualStatus.add(Status.Reserved);
+            actualStatus.add(Status.InProgress);
+        } else {
+            actualStatus = status.stream().map(s -> Status.valueOf(s)).collect(toList());
+        }
+
+        return actualStatus;
+    }
+
     protected String safeCaseInstanceSort(String sort) {
         String actualSort = sort;
         if (sort == null || sort.isEmpty()) {
             actualSort = "CorrelationKey";
+        }
+
+        return actualSort;
+    }
+
+    protected String safeTaskSummarySort(String sort) {
+        String actualSort = sort;
+        if (sort == null || sort.isEmpty()) {
+            actualSort = "t.id";
         }
 
         return actualSort;
