@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.drools.core.runtime.impl.ExecutionResultImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -81,6 +82,11 @@ public class DroolsJmsResponseHandlerIntegrationTest extends DroolsKieServerBase
     public void cleanContainers() {
         disposeAllContainers();
         createContainer(CONTAINER_ID, releaseId);
+    }
+
+    @After
+    public void resetResponseHandler() {
+        ruleClient.setResponseHandler(new RequestReplyResponseHandler());
     }
 
     @Test
