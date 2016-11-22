@@ -68,6 +68,7 @@ public class Broker implements EventReceiver, BrokerServices {
         KieServices ks = KieServices.Factory.get();
         KieContainer kc = ks.getKieClasspathContainer();
         session = kc.newKieSession("BrokerKS");
+        session.getEnvironment().set("org.jbpm.rule.task.waitstate", "true");
 
         session.setGlobal( "services", this );
         for( Company company : this.companies.getCompanies() ) {
