@@ -31,6 +31,7 @@ import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 import org.kie.internal.query.QueryContext;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
@@ -42,6 +43,7 @@ import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummaryList;
 
 import static java.util.stream.Collectors.*;
 
@@ -242,5 +244,42 @@ public class ConvertUtils {
             return Collections.emptyList();
         }
         return caseDescs.stream().map(c -> transformCase(c)).collect(toList());
+    }
+
+    public static TaskSummaryList convertToTaskSummaryList(Collection<TaskSummary> tasks) {
+        if (tasks == null) {
+            return new TaskSummaryList(new org.kie.server.api.model.instance.TaskSummary[0]);
+        }
+        org.kie.server.api.model.instance.TaskSummary[] instances = new org.kie.server.api.model.instance.TaskSummary[tasks.size()];
+        int counter = 0;
+        for (TaskSummary taskSummary : tasks) {
+
+            instances[counter] = convertToTaskSummary(taskSummary);
+            counter++;
+        }
+
+        return new TaskSummaryList(instances);
+    }
+
+    public static org.kie.server.api.model.instance.TaskSummary convertToTaskSummary(TaskSummary taskSummary) {
+        org.kie.server.api.model.instance.TaskSummary task = org.kie.server.api.model.instance.TaskSummary.builder()
+                .id(taskSummary.getId())
+                .name(taskSummary.getName())
+                .description(taskSummary.getDescription())
+                .subject(taskSummary.getSubject())
+                .taskParentId(taskSummary.getParentId())
+                .activationTime(taskSummary.getActivationTime())
+                .actualOwner(taskSummary.getActualOwnerId())
+                .containerId(taskSummary.getDeploymentId())
+                .createdBy(taskSummary.getCreatedById())
+                .createdOn(taskSummary.getCreatedOn())
+                .expirationTime(taskSummary.getExpirationTime())
+                .priority(taskSummary.getPriority())
+                .processId(taskSummary.getProcessId())
+                .processInstanceId(taskSummary.getProcessInstanceId())
+                .status(taskSummary.getStatusId())
+                .skipable(taskSummary.isSkipable())
+                .build();
+        return task;
     }
 }

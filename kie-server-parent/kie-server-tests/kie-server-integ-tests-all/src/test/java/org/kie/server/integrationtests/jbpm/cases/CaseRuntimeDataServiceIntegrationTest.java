@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -94,6 +95,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(CLAIM_REPORT_CLASS_NAME, Class.forName(CLAIM_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
         extraClasses.put(PROPERTY_DAMAGE_REPORT_CLASS_NAME, Class.forName(PROPERTY_DAMAGE_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
+    }
+
+    @After
+    public void resetUser() throws Exception {
+        changeUser(TestConfig.getUsername());
     }
 
     @Test
@@ -1165,6 +1171,65 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         } catch (KieServicesException e) {
             // expected
         }
+    }
+
+    @Test
+    public void testGetCaseTasksAsPotOwner() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        String caseId2 = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId2);
+        assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId2, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId2);
+    }
+
+    @Test
+    public void testGetCaseTasksAsBusinessAdmin() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        changeUser(USER_ADMINISTRATOR);
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, 0, 10);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        changeUser(USER_YODA);
+        String caseId2 = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId2);
+        assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
+
+        changeUser(USER_ADMINISTRATOR);
+        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId, USER_ADMINISTRATOR, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        instances = caseClient.findCaseTasksAssignedAsBusinessAdministrator(caseId2, USER_ADMINISTRATOR, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId2);
     }
 
     private String startUserTaskCase(String owner, String contact) {

@@ -271,6 +271,8 @@ public class RestURI {
 
     // case queries
     public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
+    public static final String CASE_TASKS_AS_POT_OWNER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/pot-owners";
+    public static final String CASE_TASKS_AS_ADMIN_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/admins";
 
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {

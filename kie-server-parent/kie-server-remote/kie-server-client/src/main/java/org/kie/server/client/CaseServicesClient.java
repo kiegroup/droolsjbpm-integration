@@ -28,6 +28,7 @@ import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskSummary;
 
 public interface CaseServicesClient {
 
@@ -149,4 +150,20 @@ public interface CaseServicesClient {
     List<CaseDefinition> getCaseDefinitions(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId);
+
+    List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, Integer page, Integer pageSize);
+
+    List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, List<String> status, Integer page, Integer pageSize);
+
+    List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, Integer page, Integer pageSize);
+
+    List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, List<String> status, Integer page, Integer pageSize);
+
+    List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }
