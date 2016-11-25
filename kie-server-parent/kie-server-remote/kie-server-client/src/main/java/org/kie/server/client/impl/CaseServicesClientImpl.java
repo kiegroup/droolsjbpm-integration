@@ -1000,6 +1000,16 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
+    public List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, Integer page, Integer pageSize) {
+        return findCaseTasksAssignedAsStakeholder(caseId, userId, null, page, pageSize, "", false);
+    }
+
+    @Override
+    public List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, List<String> status, Integer page, Integer pageSize) {
+        return findCaseTasksAssignedAsStakeholder(caseId, userId, status, page, pageSize, "", false);
+    }
+
+    @Override
     public List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         return findCaseTasksAssignedAsBusinessAdministrator(caseId, userId, null, page, pageSize, sort, sortOrder);
     }
@@ -1060,6 +1070,45 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseTasks", new Object[]{caseId, userId, safeList(status), page, pageSize, sort, sortOrder})) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getTasks() != null) {
+            return Arrays.asList(result.getTasks());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        return findCaseTasksAssignedAsStakeholder(caseId, userId, null, page, pageSize, sort, sortOrder);
+    }
+
+    @Override
+    public List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        TaskSummaryList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CASE_ID, caseId);
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder;
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_QUERY_URI + "/" + CASE_TASKS_AS_STAKEHOLDER_GET_URI, valuesMap) + queryString, TaskSummaryList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseTasksAsStakeholder", new Object[]{caseId, userId, safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 

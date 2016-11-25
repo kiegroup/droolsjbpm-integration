@@ -159,6 +159,10 @@ public interface CaseServicesClient {
 
     List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, List<String> status, Integer page, Integer pageSize);
 
+    List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, Integer page, Integer pageSize);
+
+    List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, List<String> status, Integer page, Integer pageSize);
+
     List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findCaseTasksAssignedAsBusinessAdministrator(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
@@ -166,4 +170,8 @@ public interface CaseServicesClient {
     List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findCaseTasksAssignedAsPotentialOwner(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }

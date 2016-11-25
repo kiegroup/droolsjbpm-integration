@@ -273,6 +273,7 @@ public class RestURI {
     public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
     public static final String CASE_TASKS_AS_POT_OWNER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/pot-owners";
     public static final String CASE_TASKS_AS_ADMIN_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/admins";
+    public static final String CASE_TASKS_AS_STAKEHOLDER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/stakeholders";
 
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {

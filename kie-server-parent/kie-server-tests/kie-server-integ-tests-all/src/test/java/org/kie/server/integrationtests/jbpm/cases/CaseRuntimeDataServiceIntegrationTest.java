@@ -1232,6 +1232,48 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId2);
     }
 
+    @Test
+    public void testGetCaseTasksAsStakeholder() {
+        String caseId = startUserTaskCase(USER_JOHN, USER_YODA);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("input", "text data");
+        parameters.put("TaskStakeholderId", USER_YODA);
+
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "dynamic task", "simple description", USER_JOHN, null, parameters);
+
+        List<String> statuses = Arrays.asList(Status.Ready.toString(), Status.Reserved.toString());
+
+        List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, 0, 10);
+        assertEquals(1, tasks.size());
+        TaskSummary task = tasks.get(0);
+        assertEquals("dynamic task", task.getName());
+        assertEquals("simple description", task.getDescription());
+        assertEquals(Status.Reserved.toString(), task.getStatus());
+        assertEquals(USER_JOHN, task.getActualOwner());
+
+        // start another case
+        String caseId2 = startUserTaskCase(USER_JOHN, USER_YODA);
+        assertNotNull(caseId2);
+        assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId2, "dynamic task", "simple description", USER_JOHN, null, parameters);
+
+
+        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+
+        tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId2, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", true);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+    }
+
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
