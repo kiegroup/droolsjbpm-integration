@@ -145,7 +145,7 @@ public class CaseManagementRuntimeDataServiceBase {
         status = safeStatus(status);
         sort = safeCaseInstanceSort(sort);
 
-        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDefinition(caseDefinitionId,  status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDefinition(caseDefinitionId, status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
 
@@ -242,6 +242,18 @@ public class CaseManagementRuntimeDataServiceBase {
         sort = safeTaskSummarySort(sort);
 
         Collection<TaskSummary> taskSummaries = caseRuntimeDataService.getCaseTasksAssignedAsBusinessAdmin(caseId, user, actualStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+
+        TaskSummaryList tasks = ConvertUtils.convertToTaskSummaryList(taskSummaries);
+
+        return tasks;
+    }
+
+    public TaskSummaryList getCaseTasksAsStakeholder(String caseId, String user, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        List<Status> actualStatus = safeTaskStatus(status);
+        user = getUser(user);
+        sort = safeTaskSummarySort(sort);
+
+        Collection<TaskSummary> taskSummaries = caseRuntimeDataService.getCaseTasksAssignedAsStakeholder(caseId, user, actualStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
         TaskSummaryList tasks = ConvertUtils.convertToTaskSummaryList(taskSummaries);
 
