@@ -65,7 +65,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         KieScannerResource info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
         
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
@@ -75,7 +75,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
         
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
@@ -85,7 +85,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
         
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
@@ -103,7 +103,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         KieScannerResource info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
 
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.SCANNING, 0l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.SCANNING, 0L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
@@ -113,7 +113,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
 
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
@@ -132,7 +132,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         KieContainerResource kci = reply.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, kci.getScanner().getStatus() );
 
-        ServiceResponse<KieScannerResource> si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 10000l));
+        ServiceResponse<KieScannerResource> si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         KieScannerResource info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STARTED, info.getStatus() );
@@ -141,7 +141,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         Assert.assertEquals( KieScannerStatus.STARTED, kci.getScanner().getStatus() );
         Assert.assertEquals( 10000, kci.getScanner().getPollInterval().longValue() );
 
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, info.getStatus() );
@@ -149,7 +149,7 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         kci = client.getContainerInfo( CONTAINER_ID ).getResult();
         Assert.assertEquals( KieScannerStatus.STOPPED, kci.getScanner().getStatus() );
 
-        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000l));
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000L));
         Assert.assertEquals( si.getMsg(), ResponseType.SUCCESS, si.getType() );
         info = si.getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, info.getStatus() );
