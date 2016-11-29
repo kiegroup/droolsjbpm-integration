@@ -1154,6 +1154,50 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    public void testGetCaseStages() {
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseClaimId);
+
+        List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(2, stages.size());
+        assertBuildClaimReportCaseStage(stages.get(0), "Completed");
+        assertClaimAssesmentCaseStage(stages.get(1), "Active");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
+    }
+
+    @Test
+    public void testCompleteCaseStageAndAbort() {
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
+
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseClaimId);
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(1, tasks.size());
+
+        caseClient.cancelCaseInstance(CONTAINER_ID, caseClaimId);
+
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
+    }
+
+    @Test
     public void testGetCaseStagesNotExistingContainer() {
         try {
             caseClient.getStages("not-existing-container", CASE_HR_DEF_ID, false, 0, 10);
@@ -1244,8 +1288,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         parameters.put("TaskStakeholderId", USER_YODA);
 
         caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "dynamic task", "simple description", USER_JOHN, null, parameters);
-
-        List<String> statuses = Arrays.asList(Status.Ready.toString(), Status.Reserved.toString());
 
         List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, 0, 10);
         assertEquals(1, tasks.size());
@@ -1433,5 +1475,37 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(-1L, processInstance.getParentId().longValue());
         assertNotNull(processInstance.getCorrelationKey());
         assertNotNull(processInstance.getDate());
+    }
+
+    private void assertBuildClaimReportCaseStage(CaseStage stage, String status) {
+        assertEquals("Build claim report", stage.getName());
+        assertNotNull(stage.getIdentifier());
+        assertEquals(status, stage.getStatus());
+
+        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+
+        List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
+        assertEquals(2, adHocFragments.size());
+        assertEquals("Provide accident information", adHocFragments.get(0).getName());
+        assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
+        assertEquals("Submit police report", adHocFragments.get(1).getName());
+        assertEquals("HumanTaskNode", adHocFragments.get(1).getType());
+    }
+
+    private void assertClaimAssesmentCaseStage(CaseStage stage, String status) {
+        assertEquals("Claim assesment", stage.getName());
+        assertNotNull(stage.getIdentifier());
+        assertEquals(status, stage.getStatus());
+
+        // TODO: what should be stored in active nodes?
+        // According to CaseRuntimeDataServiceImpl.internalGetCaseStages() it seems to be always empty.
+        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+
+        List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
+        assertEquals(2, adHocFragments.size());
+        assertEquals("Classify claim", adHocFragments.get(0).getName());
+        assertEquals("RuleSetNode", adHocFragments.get(0).getType());
+        assertEquals("Calculate claim", adHocFragments.get(1).getName());
+        assertEquals("WorkItemNode", adHocFragments.get(1).getType());
     }
 }
