@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.kie</groupId>
     <artifactId>kie-osgi</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.0.0.Beta4</version>
   </parent>
 
   <artifactId>kie-karaf-features</artifactId>
