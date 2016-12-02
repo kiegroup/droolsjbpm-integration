@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015-2016 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.kie.server.api.model.type;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,7 +31,7 @@ import org.kie.server.api.model.Wrapped;
 
 @XmlRootElement(name = "map-type")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class JaxbMap implements Wrapped<Map<String, Object>>{
+public class JaxbMap implements Wrapped<Map<String, Object>> {
 
     @XmlElements({
 
@@ -48,16 +48,16 @@ public class JaxbMap implements Wrapped<Map<String, Object>>{
             @XmlElement(name = "map-type", type = JaxbMap.class),
             @XmlElement(name = "list-type", type = JaxbList.class)
     })
-    @XmlElementWrapper(name="entries")
-    private Map<String, Object> entries;
+    @XmlElementWrapper(name = "entries")
+    private Map<String, Object> entries = new HashMap<>();
 
     public JaxbMap() {
     }
 
     public JaxbMap(Map<String, Object> entries) {
-        this.entries = entries;
         if (entries != null && !entries.isEmpty()) {
-            for (Map.Entry<String, Object> entry : entries.entrySet()) {
+            this.entries.putAll(entries);
+            for (Map.Entry<String, Object> entry : this.entries.entrySet()) {
                 entry.setValue(ModelWrapper.wrapSkipPrimitives(entry.getValue()));
             }
         }
