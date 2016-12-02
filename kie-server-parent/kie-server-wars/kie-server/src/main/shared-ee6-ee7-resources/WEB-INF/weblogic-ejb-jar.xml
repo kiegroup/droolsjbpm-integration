@@ -27,8 +27,8 @@
   <weblogic-enterprise-bean>
     <ejb-name>JMSSignalReceiver</ejb-name>
     <message-driven-descriptor>
-      <destination-jndi-name>jms/KIE.SIGNAL</destination-jndi-name>
-      <connection-factory-jndi-name>jms/cf/KIE.SIGNAL</connection-factory-jndi-name>
+      <destination-jndi-name>jms/KIE.SERVER.SIGNAL</destination-jndi-name>
+      <connection-factory-jndi-name>jms/cf/KIE.SERVER.SIGNAL</connection-factory-jndi-name>
     </message-driven-descriptor>
   </weblogic-enterprise-bean>
   -->
