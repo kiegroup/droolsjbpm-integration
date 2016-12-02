@@ -35,6 +35,7 @@ import javax.jms.TextMessage;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.kie.server.client.KieServicesHttpException;
 import org.kie.server.common.rest.KieServerHttpRequest;
 import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.common.rest.KieServerHttpResponse;
@@ -613,7 +614,7 @@ public abstract class AbstractKieServicesClientImpl {
         String summaryMessage = "Unexpected HTTP response code when requesting URI '" + request.getUri() + "'! Error code: " +
                 response.code() + ", message: " + response.body();
         logger.debug( summaryMessage + ", response body: " + getMessage(response) );
-        return new KieServicesException( summaryMessage );
+        return new KieServicesHttpException( summaryMessage, response.code(), request.getUri().toString(), response.body() );
     }
 
     protected String getMessage(KieServerHttpResponse response) {

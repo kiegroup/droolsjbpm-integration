@@ -29,6 +29,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.endsWith;
 
 public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTest {
 
@@ -50,8 +53,11 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
 
     @Test
     public void testError404Handling() {
-        expectedEx.expect( KieServicesException.class );
+        expectedEx.expect( KieServicesHttpException.class );
         expectedEx.expectMessage( "Error code: 404" );
+        expectedEx.expect(hasProperty("httpCode", is(404)));
+        expectedEx.expect(hasProperty("url", endsWith("/containers")));
+        expectedEx.expect(hasProperty("responseBody", is("Resource not found!")));
         stubFor(get(urlEqualTo("/"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
@@ -75,9 +81,41 @@ public class KieServicesClientErrorHandlingTest extends BaseKieServicesClientTes
     }
 
     @Test
+    public void testError401Handling() {
+        expectedEx.expect( KieServicesHttpException.class );
+        expectedEx.expectMessage( "Error code: 401" );
+        expectedEx.expect(hasProperty("httpCode", is(401)));
+        expectedEx.expect(hasProperty("url", endsWith("/containers")));
+        expectedEx.expect(hasProperty("responseBody", is("Unauthorized!")));
+        stubFor(get(urlEqualTo("/"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
+        stubFor(
+                get( urlEqualTo( "/containers" ) )
+                        .withHeader( "Accept", equalTo( "application/xml" ) )
+                        .willReturn(
+                                aResponse()
+                                        .withStatus( 401 )
+                                        .withBody( "Unauthorized!" )
+                        ) );
+        KieServicesClient client = new KieServicesClientImpl( config );
+        client.listContainers();
+    }
+
+    @Test
     public void testError500Handling() {
-        expectedEx.expect( KieServicesException.class );
+        expectedEx.expect( KieServicesHttpException.class );
         expectedEx.expectMessage( "Error code: 500");
+        expectedEx.expect(hasProperty("httpCode", is(500)));
+        expectedEx.expect(hasProperty("url", endsWith("/containers")));
+        expectedEx.expect(hasProperty("responseBody", is("Internal server error!")));
         stubFor(get(urlEqualTo("/"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
