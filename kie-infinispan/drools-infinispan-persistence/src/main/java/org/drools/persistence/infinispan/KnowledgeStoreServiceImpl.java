@@ -15,17 +15,13 @@
  */
  package org.drools.persistence.infinispan;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Properties;
-
 import org.drools.core.SessionConfiguration;
-import org.drools.core.command.CommandService;
-import org.drools.core.command.Interceptor;
+import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.process.instance.WorkItemManagerFactory;
+import org.drools.core.runtime.ChainableRunner;
 import org.drools.core.time.TimerService;
-import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.TransactionManagerFactory;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
 import org.kie.api.KieBase;
@@ -33,9 +29,14 @@ import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
+import org.kie.api.runtime.ExecutableRunner;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
 
 public class KnowledgeStoreServiceImpl
     implements
@@ -51,7 +52,7 @@ public class KnowledgeStoreServiceImpl
     }
 
     protected void setDefaultImplementations() {
-        setCommandServiceClass( SingleSessionCommandService.class );
+        setCommandServiceClass( PersistableRunner.class );
         setProcessInstanceManagerFactoryClass( "org.jbpm.persistence.processinstance.InfinispanProcessInstanceManagerFactory" );
         setWorkItemManagerFactoryClass( InfinispanWorkItemManagerFactory.class );
         setProcessSignalManagerFactoryClass( "org.jbpm.persistence.processinstance.InfinispanSignalManagerFactory" );
@@ -69,16 +70,15 @@ public class KnowledgeStoreServiceImpl
             throw new IllegalArgumentException( "Environment cannot be null" );
         }
 
-        
-        CommandService commandService = (CommandService) buildCommandService( kbase, mergeConfig( configuration ), environment );
+
+        CommandExecutor commandService = buildCommandService( kbase, mergeConfig( configuration ), environment );
         if (commandService instanceof SingleSessionCommandService) {
-        	((SingleSessionCommandService) commandService).
-        		addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
+        	((PersistableRunner) commandService).addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
         	try {
         		Class<?> clazz = Class.forName("org.jbpm.persistence.ManualPersistProcessInterceptor");
         		Constructor<?> c = clazz.getConstructor(SingleSessionCommandService.class);
-        		Interceptor interceptor = (Interceptor) c.newInstance(commandService);
-        		((SingleSessionCommandService) commandService).addInterceptor(interceptor);
+                ChainableRunner interceptor = (ChainableRunner) c.newInstance( commandService );
+        		((PersistableRunner) commandService).addInterceptor((ChainableRunner) interceptor );
         	} catch (ClassNotFoundException e) {
         		//Expected of non-jbpm based projects
         	} catch (Exception e) {
@@ -87,7 +87,7 @@ public class KnowledgeStoreServiceImpl
         	}
         }
         
-        return new CommandBasedStatefulKnowledgeSession( commandService );
+        return new CommandBasedStatefulKnowledgeSession( (ExecutableRunner) commandService );
     }
 
     public StatefulKnowledgeSession loadKieSession(int id,
@@ -102,15 +102,14 @@ public class KnowledgeStoreServiceImpl
             throw new IllegalArgumentException( "Environment cannot be null" );
         }
 
-        CommandService commandService = (CommandService) buildCommandService( new Long(id), kbase, mergeConfig( configuration ), environment );
+        CommandExecutor commandService = buildCommandService( new Long(id), kbase, mergeConfig( configuration ), environment );
         if (commandService instanceof SingleSessionCommandService) {
-        	((SingleSessionCommandService) commandService).
-        		addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
+        	((PersistableRunner) commandService).addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
         	try {
         		Class<?> clazz = Class.forName("org.jbpm.persistence.ManualPersistProcessInterceptor");
-        		Constructor<?> c = clazz.getConstructor(SingleSessionCommandService.class);
-        		Interceptor interceptor = (Interceptor) c.newInstance(commandService);
-        		((SingleSessionCommandService) commandService).addInterceptor(interceptor);
+        		Constructor<?> c = clazz.getConstructor(PersistableRunner.class);
+                ChainableRunner interceptor = (ChainableRunner) c.newInstance(commandService);
+        		((PersistableRunner) commandService).addInterceptor(interceptor);
         	} catch (ClassNotFoundException e) {
         		//Expected of non-jbpm based projects
         	} catch (Exception e) {
@@ -119,7 +118,7 @@ public class KnowledgeStoreServiceImpl
         	}
         }
         
-        return new CommandBasedStatefulKnowledgeSession( commandService );
+        return new CommandBasedStatefulKnowledgeSession( (ExecutableRunner) commandService );
     }
 
     public StatefulKnowledgeSession loadKieSession(Long id,
@@ -134,15 +133,14 @@ public class KnowledgeStoreServiceImpl
             throw new IllegalArgumentException( "Environment cannot be null" );
         }
 
-        CommandService commandService = (CommandService) buildCommandService( id, kbase, mergeConfig( configuration ), environment );
+        CommandExecutor commandService = buildCommandService( id, kbase, mergeConfig( configuration ), environment );
         if (commandService instanceof SingleSessionCommandService) {
-            ((SingleSessionCommandService) commandService).
-                    addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
+            ((PersistableRunner) commandService).addInterceptor(new ManualPersistInterceptor((SingleSessionCommandService) commandService));
             try {
                 Class<?> clazz = Class.forName("org.jbpm.persistence.ManualPersistProcessInterceptor");
                 Constructor<?> c = clazz.getConstructor(SingleSessionCommandService.class);
-                Interceptor interceptor = (Interceptor) c.newInstance(commandService);
-                ((SingleSessionCommandService) commandService).addInterceptor(interceptor);
+                ChainableRunner interceptor = (ChainableRunner) c.newInstance(commandService);
+                ((PersistableRunner) commandService).addInterceptor(interceptor);
             } catch (ClassNotFoundException e) {
                 //Expected of non-jbpm based projects
             } catch (Exception e) {
@@ -151,7 +149,7 @@ public class KnowledgeStoreServiceImpl
             }
         }
 
-        return new CommandBasedStatefulKnowledgeSession( commandService );
+        return new CommandBasedStatefulKnowledgeSession( (ExecutableRunner) commandService );
     }
 
     private CommandExecutor buildCommandService(Long sessionId,
@@ -245,7 +243,7 @@ public class KnowledgeStoreServiceImpl
 
     public long getStatefulKnowledgeSessionId(StatefulKnowledgeSession ksession) {
         if ( ksession instanceof CommandBasedStatefulKnowledgeSession ) {
-            SingleSessionCommandService commandService = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) ksession).getCommandService();
+            SingleSessionCommandService commandService = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) ksession).getRunner();
             return commandService.getSessionId();
         }
         throw new IllegalArgumentException( "StatefulKnowledgeSession must be an a CommandBasedStatefulKnowledgeSession" );

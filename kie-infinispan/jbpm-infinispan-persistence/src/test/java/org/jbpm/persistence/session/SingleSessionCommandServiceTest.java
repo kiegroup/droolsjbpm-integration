@@ -29,7 +29,7 @@ import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.process.core.Work;
 import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.time.SessionPseudoClock;
-import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.infinispan.InfinispanTimeJobFactoryManager;
 import org.drools.persistence.infinispan.ManualPersistInterceptor;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
@@ -126,7 +126,7 @@ public class SingleSessionCommandServiceTest {
 
         Properties properties = new Properties();
         properties.setProperty( "drools.commandService",
-                                SingleSessionCommandService.class.getName() );
+                                PersistableRunner.class.getName() );
         properties.setProperty( "drools.processInstanceManagerFactory",
                                 InfinispanProcessInstanceManagerFactory.class.getName() );
         properties.setProperty( "drools.workItemManagerFactory",
@@ -137,9 +137,7 @@ public class SingleSessionCommandServiceTest {
                                 JpaJDKTimerService.class.getName() );
         SessionConfiguration config = SessionConfiguration.newInstance( properties );
 
-        SingleSessionCommandService service = createSingleSessionCommandService( kbase,
-                                                                               config,
-                                                                               env );
+        PersistableRunner service = createSingleSessionCommandService( kbase, config, env );
         long sessionId = service.getSessionId();
 
         registerWorkItemHandlers(service);
@@ -257,7 +255,7 @@ public class SingleSessionCommandServiceTest {
 
         Properties properties = new Properties();
         properties.setProperty( "drools.commandService",
-                                SingleSessionCommandService.class.getName() );
+                                PersistableRunner.class.getName() );
         properties.setProperty( "drools.processInstanceManagerFactory",
                                 InfinispanProcessInstanceManagerFactory.class.getName() );
         properties.setProperty( "drools.workItemManagerFactory",
@@ -268,9 +266,7 @@ public class SingleSessionCommandServiceTest {
                                 JpaJDKTimerService.class.getName() );
         SessionConfiguration config = SessionConfiguration.newInstance( properties );
 
-        SingleSessionCommandService service = createSingleSessionCommandService( kbase,
-                                                                               config,
-                                                                               env );
+        PersistableRunner service = createSingleSessionCommandService( kbase, config, env );
         long sessionId = service.getSessionId();
 
         UserTransaction ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
@@ -455,7 +451,7 @@ public class SingleSessionCommandServiceTest {
         
         Properties properties = new Properties();
         properties.setProperty( "drools.commandService",
-                                SingleSessionCommandService.class.getName() );
+                                PersistableRunner.class.getName() );
         properties.setProperty( "drools.processInstanceManagerFactory",
                                 InfinispanProcessInstanceManagerFactory.class.getName() );
         properties.setProperty( "drools.workItemManagerFactory",
@@ -470,9 +466,7 @@ public class SingleSessionCommandServiceTest {
         InternalKnowledgePackage pkg = getProcessSubProcess();
         ((KnowledgeBaseImpl)ruleBase).addPackage( pkg );
 
-        SingleSessionCommandService service = createSingleSessionCommandService( ruleBase,
-                                                                               config,
-                                                                               env );
+        PersistableRunner service = createSingleSessionCommandService( ruleBase, config, env );
         long sessionId = service.getSessionId();
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
@@ -642,7 +636,7 @@ public class SingleSessionCommandServiceTest {
         
         Properties properties = new Properties();
         properties.setProperty( "drools.commandService",
-                                SingleSessionCommandService.class.getName() );
+                                PersistableRunner.class.getName() );
         properties.setProperty( "drools.processInstanceManagerFactory",
                                 InfinispanProcessInstanceManagerFactory.class.getName() );
         properties.setProperty( "drools.workItemManagerFactory",
@@ -659,9 +653,7 @@ public class SingleSessionCommandServiceTest {
         Collection<KnowledgePackage> kpkgs = getProcessTimer();
         kbase.addKnowledgePackages( kpkgs );
 
-        SingleSessionCommandService service = createSingleSessionCommandService( kbase,
-                                                                               config,
-                                                                               env );
+        PersistableRunner service = createSingleSessionCommandService( kbase, config, env );
         long sessionId = service.getSessionId();
         StartProcessCommand startProcessCommand = new StartProcessCommand();
         startProcessCommand.setProcessId( "org.drools.test.TestProcess" );
@@ -748,7 +740,7 @@ public class SingleSessionCommandServiceTest {
         
         Properties properties = new Properties();
         properties.setProperty( "drools.commandService",
-                                SingleSessionCommandService.class.getName() );
+                                PersistableRunner.class.getName() );
         properties.setProperty( "drools.processInstanceManagerFactory",
                                 InfinispanProcessInstanceManagerFactory.class.getName() );
         properties.setProperty( "drools.workItemManagerFactory",
@@ -763,7 +755,7 @@ public class SingleSessionCommandServiceTest {
         Collection<KnowledgePackage> kpkgs = getProcessTimer2();
         kbase.addKnowledgePackages( kpkgs );
 
-        SingleSessionCommandService service = createSingleSessionCommandService( kbase,
+        PersistableRunner service = createSingleSessionCommandService( kbase,
                                                                                config,
                                                                                env );
         long sessionId = service.getSessionId();
@@ -835,39 +827,39 @@ public class SingleSessionCommandServiceTest {
         return list;
     }
 
-	private SingleSessionCommandService createSingleSessionCommandService(KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
-		SingleSessionCommandService service = new SingleSessionCommandService(kbase, conf, env);
+	private PersistableRunner createSingleSessionCommandService(KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
+        PersistableRunner service = new PersistableRunner(kbase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));
 		KnowledgeRuntimeLoggerFactory.newConsoleLogger((KnowledgeRuntimeEventManager) service.getKieSession());
 		return service;
 	}
 
-	private SingleSessionCommandService createSingleSessionCommandService(long sessionId, KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
-		SingleSessionCommandService service = new SingleSessionCommandService(sessionId, kbase, conf, env);
+	private PersistableRunner createSingleSessionCommandService(long sessionId, KnowledgeBase kbase, SessionConfiguration conf, Environment env) {
+        PersistableRunner service = new PersistableRunner( sessionId, kbase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));
 		new KnowledgeLogger(service.getKieSession());
 		return service;
 	}
 
-	private SingleSessionCommandService createSingleSessionCommandService(KieBase ruleBase, SessionConfiguration conf, Environment env) {
-		SingleSessionCommandService service = new SingleSessionCommandService(ruleBase, conf, env);
+	private PersistableRunner createSingleSessionCommandService(KieBase ruleBase, SessionConfiguration conf, Environment env) {
+        PersistableRunner service = new PersistableRunner(ruleBase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));
 		new KnowledgeLogger(service.getKieSession());
 		return service;
 	}
 
-	private SingleSessionCommandService createSingleSessionCommandService(long sessionId, KieBase ruleBase, SessionConfiguration conf, Environment env) {
-		SingleSessionCommandService service = new SingleSessionCommandService(sessionId, ruleBase, conf, env);
+	private PersistableRunner createSingleSessionCommandService(long sessionId, KieBase ruleBase, SessionConfiguration conf, Environment env) {
+        PersistableRunner service = new PersistableRunner(sessionId, ruleBase, conf, env);
 		service.addInterceptor(new ManualPersistInterceptor(service));
 		service.addInterceptor(new ManualPersistProcessInterceptor(service));
 		new KnowledgeLogger(service.getKieSession());
 		return service;
 	}
 	
-	private void registerWorkItemHandlers(SingleSessionCommandService service) {
+	private void registerWorkItemHandlers(PersistableRunner service) {
 		RegisterWorkItemHandlerCommand registerCommand1 = new RegisterWorkItemHandlerCommand();
 		registerCommand1.setWorkItemName("MyWork");
         registerCommand1.setHandler(TestWorkItemHandler.getInstance());

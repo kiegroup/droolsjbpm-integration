@@ -15,27 +15,12 @@
  */
 package org.drools.persistence.kie.persistence.session;
 
-import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
-import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
-
 import org.drools.compiler.Person;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.core.command.impl.FireAllRulesInterceptor;
 import org.drools.core.command.impl.LoggingInterceptor;
-import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -52,6 +37,20 @@ import org.kie.internal.command.CommandFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.naming.InitialContext;
+import javax.transaction.UserTransaction;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
+import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 public class InfinispanPersistentStatefulSessionTest {
 
@@ -280,7 +279,7 @@ public class InfinispanPersistentStatefulSessionTest {
         KieBase kbase = ks.newKieContainer(ks.getRepository().getDefaultReleaseId()).getKieBase();
 
         KieSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        SingleSessionCommandService sscs = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) ksession).getCommandService();
+        PersistableRunner sscs = (PersistableRunner) ((CommandBasedStatefulKnowledgeSession) ksession).getRunner();
         sscs.addInterceptor(new LoggingInterceptor());
         sscs.addInterceptor(new FireAllRulesInterceptor());
         sscs.addInterceptor(new LoggingInterceptor());

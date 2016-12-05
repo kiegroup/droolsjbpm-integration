@@ -16,7 +16,6 @@
 
 package org.drools.persistence.infinispan;
 
-import org.drools.core.command.CommandService;
 import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.time.InternalSchedulerService;
 import org.drools.core.time.Job;
@@ -27,7 +26,8 @@ import org.drools.core.time.Trigger;
 import org.drools.core.time.impl.DefaultTimerJobInstance;
 import org.drools.core.time.impl.JDKTimerService;
 import org.drools.core.time.impl.TimerJobInstance;
-import org.kie.internal.command.Context;
+import org.kie.api.runtime.Context;
+import org.kie.api.runtime.ExecutableRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +45,11 @@ public class InfinispanJDKTimerService extends JDKTimerService {
 
     private static Logger logger = LoggerFactory.getLogger( InfinispanTimerJobInstance.class );
     
-    private CommandService              commandService;
+    private ExecutableRunner commandService;
 
     private Map<Long, TimerJobInstance> timerInstances;
 
-    public void setCommandService(CommandService commandService) {
+    public void setCommandService(ExecutableRunner commandService) {
         this.commandService = commandService;
     }
 
@@ -127,7 +127,7 @@ public class InfinispanJDKTimerService extends JDKTimerService {
             this.job = job;
         }
 
-        public Void execute(Context context) {
+        public Void execute(Context context ) {
             try {
                 return job.internalCall();
             } catch ( Exception e ) {

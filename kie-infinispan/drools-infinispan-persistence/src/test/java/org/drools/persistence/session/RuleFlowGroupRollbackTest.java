@@ -25,13 +25,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.KnowledgeBase;
 import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.command.Context;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class RuleFlowGroupRollbackTest {
 			this.ruleFlowGroupName = ruleFlowGroupName;
 		}
 
-	    public Void execute(Context context) {
+	    public Void execute(Context context ) {
 	        KieSession ksession = ((RegistryContext) context).lookup( KieSession.class );
 	        ((InternalAgenda) ksession.getAgenda()).activateRuleFlowGroup(ruleFlowGroupName);
 	        return null;

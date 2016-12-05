@@ -15,10 +15,33 @@
  */
 package org.drools.persistence.session;
 
-import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
-import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
-import static org.junit.Assert.*;
+import org.drools.compiler.Person;
+import org.drools.core.SessionConfiguration;
+import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.core.command.impl.FireAllRulesInterceptor;
+import org.drools.core.command.impl.LoggingInterceptor;
+import org.drools.persistence.PersistableRunner;
+import org.drools.persistence.util.PersistenceUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.Environment;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.KnowledgeBaseFactory;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.command.CommandFactory;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.naming.InitialContext;
+import javax.transaction.UserTransaction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,33 +49,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
-
-import org.drools.compiler.Person;
-import org.drools.core.SessionConfiguration;
-import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.core.command.impl.FireAllRulesInterceptor;
-import org.drools.core.command.impl.LoggingInterceptor;
-import org.drools.persistence.SingleSessionCommandService;
-import org.drools.persistence.util.PersistenceUtil;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.command.CommandFactory;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
-import org.kie.api.runtime.Environment;
-import org.kie.api.runtime.KieSessionConfiguration;
-import org.kie.api.runtime.rule.FactHandle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
+import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
+import static org.junit.Assert.*;
 
 public class InfinispanPersistentStatefulSessionTest {
 
@@ -296,7 +295,7 @@ public class InfinispanPersistentStatefulSessionTest {
         kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        SingleSessionCommandService sscs = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) ksession).getCommandService();
+        PersistableRunner sscs = (PersistableRunner) ((CommandBasedStatefulKnowledgeSession) ksession).getRunner();
         sscs.addInterceptor(new LoggingInterceptor());
         sscs.addInterceptor(new FireAllRulesInterceptor());
         sscs.addInterceptor(new LoggingInterceptor());
