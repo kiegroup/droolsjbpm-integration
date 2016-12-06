@@ -15,10 +15,7 @@
 
 package org.jbpm.simulation;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -85,6 +82,7 @@ public class PathContext {
     }
     
     public Set<FlowElement> getPathElements() {
+        this.pathElements.removeIf(Objects::isNull);
         return this.pathElements;
     }
 

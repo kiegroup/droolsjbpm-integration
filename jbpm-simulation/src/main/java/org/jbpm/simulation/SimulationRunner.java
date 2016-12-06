@@ -17,10 +17,8 @@ package org.jbpm.simulation;
 
 import java.util.List;
 
-import org.drools.core.command.SetVariableCommandFromLastReturn;
 import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.fluent.impl.BaseBatchFluent;
-import org.drools.core.fluent.impl.FluentBuilderImpl;
 import org.drools.core.fluent.impl.PseudoClockRunner;
 import org.jbpm.process.core.validation.ProcessValidatorRegistry;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
@@ -42,11 +40,10 @@ import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.builder.ExecutableBuilder;
+import org.kie.api.runtime.builder.KieSessionFluent;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.internal.fluent.runtime.FluentBuilder;
-import org.kie.internal.fluent.runtime.KieSessionFluent;
 import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationRunner {
     
@@ -86,7 +83,7 @@ public class SimulationRunner {
                 new String[]{bpmn2Container}, new ResourceType[]{ResourceType.BPMN2});
 
         PseudoClockRunner runner = new PseudoClockRunner();
-        FluentBuilder f = new FluentBuilderImpl();
+        ExecutableBuilder f = ExecutableBuilder.create();
 
         // @formatter:off        
         int counter = 0;
