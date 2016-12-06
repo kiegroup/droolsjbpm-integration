@@ -19,7 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SequenceFlow;
 
@@ -85,6 +84,7 @@ public class PathContext {
     }
     
     public Set<FlowElement> getPathElements() {
+        this.pathElements.remove(null);
         return this.pathElements;
     }
 

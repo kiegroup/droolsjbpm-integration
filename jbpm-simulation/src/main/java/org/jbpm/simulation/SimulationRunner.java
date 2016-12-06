@@ -52,42 +52,42 @@ import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationRunner {
-    
+
     static {
         ProcessValidatorRegistry.getInstance().registerAdditonalValidator(new SimulationProcessValidator());
     }
 
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, String... rules) {
-        
-        
+
+
         return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, false, rules);
     }
-    
+
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, String... rules) {
-        
+
         Resource[] resources = new Resource[rules.length];
         for (int i = 0; i < rules.length; i++) {
             resources[i] = ResourceFactory.newClassPathResource(rules[i]);
         }
-        
+
         return runSimulation(processId, bpmn2Container, numberOfAllInstances, interval, runRules, resources);
     }
-    
+
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, Resource... rules) {
-        
+
         SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(runRules, rules));
         SimulationDataProvider provider = context.getDataProvider();
-        
+
         PathFinder finder = PathFinderFactory.getInstance(bpmn2Container);
-        
+
         List<SimulationPath> paths = finder.findPaths(new SimulationFilterPathFormatConverter(provider));
-        
+
         // TODO when introduced configurable start time that should be used instead of currentTimeMillis
         context.getRepository().setSimulationInfo(new SimulationInfo(System.currentTimeMillis(), processId, numberOfAllInstances, interval));
-        
+
         final ReleaseId releaseId = createKJarWithMultipleResources(processId,
                 new String[]{bpmn2Container}, new ResourceType[]{ResourceType.BPMN2});
-        
+
         SimulationFluent f = new DefaultSimulationFluent(){
 
             final KieServices kieServices = KieServices.Factory.get();
@@ -125,32 +125,32 @@ public class SimulationRunner {
             // count how many instances/steps should current path have
             if (numberOfAllInstances > 1) {
                 instancesOfPath = (int) Math.round((numberOfAllInstances * probability));
-                
+
                 // ensure that we won't exceed total number of instance due to rounding
                 if (instancesOfPath > remainingInstances) {
                     instancesOfPath = remainingInstances;
                 }
-                
+
                 remainingInstances -= instancesOfPath;
-                        
+
                 for (int i = 0; i < instancesOfPath; i++) {
                     f.newStep( interval * i )
-                        .newKieSession( releaseId, null)
+                            .newKieSession( releaseId, null)
                             .end()
-                        .addCommand(new SimulateProcessPathCommand(processId, context, path))
-                        .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
-                        .addCommand(new DisposeCommand());
+                            .addCommand(new SimulateProcessPathCommand(processId, context, path))
+                            .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
+                            .addCommand(new DisposeCommand());
                 }
             } else {
                 f.newStep(interval)
-                .newKieSession(releaseId, null)
-                    .end()
-                .addCommand(new SimulateProcessPathCommand(processId, context, path))
-                .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
-                .addCommand(new DisposeCommand());
+                        .newKieSession(releaseId, null)
+                        .end()
+                        .addCommand(new SimulateProcessPathCommand(processId, context, path))
+                        .addCommand( new SetVariableCommandFromLastReturn( StatefulKnowledgeSession.class.getName() ))
+                        .addCommand(new DisposeCommand());
                 break;
             }
-            
+
             counter++;
 // currently standalone paths within single definition are not supported
 //            if (probability == 1) {
@@ -161,12 +161,12 @@ public class SimulationRunner {
         }
         f.runSimulation();
         // @formatter:on
-        
+
         context.getRepository().getSimulationInfo().setEndTime(context.getMaxEndTime());
 
         return context.getRepository();
     }
-    
+
     protected static ReleaseId createKJarWithMultipleResources(String id, String[] resources, ResourceType[] types) {
         KieServices ks = KieServices.Factory.get();
         KieModuleModel kproj = ks.newKieModuleModel();
