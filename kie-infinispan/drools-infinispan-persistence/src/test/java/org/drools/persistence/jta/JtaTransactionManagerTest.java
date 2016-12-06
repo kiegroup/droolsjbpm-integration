@@ -15,23 +15,8 @@
  */
 package org.drools.persistence.jta;
 
-import static org.drools.persistence.util.PersistenceUtil.DROOLS_PERSISTENCE_UNIT_NAME;
-import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
-import static org.drools.persistence.util.PersistenceUtil.getValueOfField;
-import static org.drools.persistence.util.PersistenceUtil.setupWithPoolingDataSource;
-import static org.junit.Assert.fail;
-import static org.kie.api.runtime.EnvironmentName.ENTITY_MANAGER_FACTORY;
-
-import java.io.Serializable;
-import java.util.HashMap;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
-
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
-import org.drools.persistence.SingleSessionCommandService;
+import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.TransactionManager;
 import org.drools.persistence.infinispan.InfinispanPersistenceContextManager;
 import org.drools.persistence.infinispan.marshaller.InfinispanPlaceholderResolverStrategy;
@@ -55,7 +40,15 @@ import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.TransactionManagerServices;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.transaction.UserTransaction;
+import java.io.Serializable;
+import java.util.HashMap;
+
+import static org.drools.persistence.util.PersistenceUtil.*;
+import static org.junit.Assert.fail;
+import static org.kie.api.runtime.EnvironmentName.ENTITY_MANAGER_FACTORY;
 
 public class JtaTransactionManagerTest {
 
@@ -208,7 +201,7 @@ public class JtaTransactionManagerTest {
         Environment env = createEnvironment(context);
         KnowledgeBase kbase = initializeKnowledgeBase(simpleRule);
         StatefulKnowledgeSession commandKSession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
-        SingleSessionCommandService commandService = (SingleSessionCommandService) ((CommandBasedStatefulKnowledgeSession) commandKSession).getCommandService();
+        PersistableRunner commandService = (PersistableRunner) ((CommandBasedStatefulKnowledgeSession) commandKSession).getRunner();
         InfinispanPersistenceContextManager jpm = (InfinispanPersistenceContextManager) getValueOfField("jpm", commandService);
 
         jpm.getApplicationScopedPersistenceContext();

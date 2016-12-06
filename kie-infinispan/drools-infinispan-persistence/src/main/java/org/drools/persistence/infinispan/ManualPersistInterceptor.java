@@ -15,44 +15,45 @@
 
 package org.drools.persistence.infinispan;
 
-import org.drools.core.command.CommandService;
+import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
 import org.drools.core.command.impl.ExecutableCommand;
-import org.drools.core.command.runtime.DisposeCommand;
+import org.drools.core.fluent.impl.InternalExecutable;
+import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.PersistenceContextManager;
 import org.drools.persistence.SessionMarshallingHelper;
-import org.drools.persistence.SingleSessionCommandService;
 import org.drools.persistence.info.SessionInfo;
-import org.kie.api.command.Command;
+import org.kie.api.runtime.Context;
+import org.kie.api.runtime.Executable;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.command.Context;
+import org.kie.api.runtime.RequestContext;
 
 public class ManualPersistInterceptor extends AbstractInterceptor {
 
 	private final SingleSessionCommandService interceptedService;
 	
-	public ManualPersistInterceptor(SingleSessionCommandService decorated) {
+	public ManualPersistInterceptor(SingleSessionCommandService decorated ) {
 		this.interceptedService = decorated;
 	}
-	
-	public <T> T execute(Command<T> command) {
-		T result = executeNext(command);
+
+	public RequestContext execute( Executable executable, RequestContext ctx ) {
+		executeNext(executable, ctx);
 		try {
 	    	KieSession ksession = interceptedService.getKieSession();
-	    	java.lang.reflect.Field sessionInfoField = SingleSessionCommandService.class.getDeclaredField("sessionInfo");
+	    	java.lang.reflect.Field sessionInfoField = PersistableRunner.class.getDeclaredField( "sessionInfo" );
 	    	sessionInfoField.setAccessible(true);
-	    	java.lang.reflect.Field jpmField = SingleSessionCommandService.class.getDeclaredField("jpm");
+	    	java.lang.reflect.Field jpmField = PersistableRunner.class.getDeclaredField("jpm");
 	    	jpmField.setAccessible(true);
 	    	Object jpm = jpmField.get(interceptedService);
 	    	Object sessionInfo = sessionInfoField.get(interceptedService);
-	    	if (!(command instanceof DisposeCommand)) {
-	    		executeNext(new PersistCommand(sessionInfo, jpm, ksession));
+	    	if ( ( (InternalExecutable) executable ).canRunInTransaction() ) {
+	    		executeNext(new SingleCommandExecutable( new PersistCommand(sessionInfo, jpm, ksession) ), ctx);
 	    	}
 		} catch (Exception e) {
 			throw new RuntimeException("Couldn't force persistence of session info", e);
 		}
-		return result;
+		return ctx;
 	}
 
 	public static class PersistCommand implements ExecutableCommand<Void> {
@@ -68,7 +69,7 @@ public class ManualPersistInterceptor extends AbstractInterceptor {
 		}
 		
 		@Override
-		public Void execute(Context context) {
+		public Void execute(Context context ) {
 			/*if (sessionInfo.getId() == null || sessionInfo.getId() <= 0) {
 				sessionInfo.setJPASessionMashallingHelper(new SessionMarshallingHelper(
 						ksession, ksession.getSessionConfiguration()));
@@ -88,7 +89,7 @@ public class ManualPersistInterceptor extends AbstractInterceptor {
 		}
 	}
 
-	public CommandService getInterceptedService() {
+	public SingleSessionCommandService getInterceptedService() {
 		return interceptedService;
 	}
 	

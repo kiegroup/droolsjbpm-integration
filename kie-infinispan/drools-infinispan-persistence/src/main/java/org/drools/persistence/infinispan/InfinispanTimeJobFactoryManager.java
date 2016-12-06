@@ -15,12 +15,6 @@
 
 package org.drools.persistence.infinispan;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.drools.core.command.CommandService;
 import org.drools.core.time.InternalSchedulerService;
 import org.drools.core.time.Job;
 import org.drools.core.time.JobContext;
@@ -30,16 +24,22 @@ import org.drools.core.time.SelfRemovalJobContext;
 import org.drools.core.time.Trigger;
 import org.drools.core.time.impl.TimerJobFactoryManager;
 import org.drools.core.time.impl.TimerJobInstance;
+import org.kie.api.runtime.ExecutableRunner;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InfinispanTimeJobFactoryManager
     implements
     TimerJobFactoryManager {
 
-    private CommandService commandService;
+    private ExecutableRunner commandService;
     private Map<Integer, Map<Long, TimerJobInstance>> timerInstances;
     private Map<Long, TimerJobInstance> singleTimerInstances;
     
-    public void setCommandService(CommandService commandService) {
+    public void setCommandService(ExecutableRunner commandService) {
         this.commandService = commandService;
     }
     
@@ -130,7 +130,7 @@ public class InfinispanTimeJobFactoryManager
         return sessionTimerJobs.values();
     }
     
-    public CommandService getCommandService() {
+    public ExecutableRunner getCommandService() {
         return this.commandService;
     }
     

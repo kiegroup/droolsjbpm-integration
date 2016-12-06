@@ -15,7 +15,7 @@
 
 package org.jbpm.persistence;
 
-import org.drools.core.command.CommandService;
+import org.drools.core.command.SingleSessionCommandService;
 import org.drools.core.command.impl.AbstractInterceptor;
 import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.runtime.process.AbortProcessInstanceCommand;
@@ -27,12 +27,15 @@ import org.drools.core.command.runtime.process.SignalEventCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
-import org.drools.persistence.SingleSessionCommandService;
+import org.drools.core.fluent.impl.InternalExecutable;
+import org.drools.persistence.PersistableRunner;
 import org.jbpm.persistence.processinstance.ProcessInstanceInfo;
 import org.jbpm.process.instance.ProcessInstance;
 import org.kie.api.command.Command;
+import org.kie.api.runtime.Context;
+import org.kie.api.runtime.Executable;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.command.Context;
+import org.kie.api.runtime.RequestContext;
 
 import java.util.Collection;
 
@@ -45,22 +48,21 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 	}
 
 	@Override
-	public <T> T execute(Command<T> command) {
+	public RequestContext execute( Executable executable, RequestContext ctx ) {
 		RuntimeException error = null;
-		T result = null;
 		try {
-			result = executeNext(command);
+			executeNext(executable,ctx);
 		} catch (RuntimeException e) {
 			//still try to save
 			error = e;
 		}
     	KieSession ksession = interceptedService.getKieSession();
     	try {
-    		java.lang.reflect.Field jpmField = SingleSessionCommandService.class.getDeclaredField("jpm");
+    		java.lang.reflect.Field jpmField = PersistableRunner.class.getDeclaredField( "jpm" );
     		jpmField.setAccessible(true);
     		Object jpm = jpmField.get(interceptedService);
-    		if (error == null && isValidCommand(command)) {
-    			executeNext(new PersistProcessCommand(jpm, ksession));
+    		if (error == null && isValidCommand( ( (InternalExecutable) executable ).getBatches().get(0).getCommands().get(0))) {
+    			executeNext(new SingleCommandExecutable( new PersistProcessCommand(jpm, ksession) ), ctx);
     		}
     	} catch (Exception e) {
 			throw new RuntimeException("Couldn't force persistence of process instance infos", e);
@@ -68,7 +70,7 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 		if (error != null) {
 			throw error;
 		}
-		return result;
+		return ctx;
 	}
 	
 	protected boolean isValidCommand(Command<?> command) {
@@ -94,7 +96,7 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 		}
 		
 		@Override
-		public Void execute(Context context) {
+		public Void execute(Context context ) {
 			Collection<?> processInstances = ksession.getProcessInstances();
 			for (Object obj : processInstances) {
 				ProcessInstance instance = (ProcessInstance) obj;
@@ -112,7 +114,7 @@ public class ManualPersistProcessInterceptor extends AbstractInterceptor {
 		}
 	}
 
-	public CommandService getInterceptedService() {
+	public SingleSessionCommandService getInterceptedService() {
 		return interceptedService;
 	}
 }
