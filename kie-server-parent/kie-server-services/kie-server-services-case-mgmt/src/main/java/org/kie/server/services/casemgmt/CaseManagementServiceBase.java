@@ -219,6 +219,10 @@ public class CaseManagementServiceBase {
         Map<String, Object> taskSpecificationMap = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
         TaskSpecification taskSpecification = null;
 
+        if (taskSpecificationMap == null || taskSpecificationMap.isEmpty()) {
+            throw new IllegalArgumentException("Task specification must be given");
+        }
+
         String nodeType = (String) taskSpecificationMap.get(CASE_DYNAMIC_NODE_TYPE_PROP);
         if (nodeType != null) {
             logger.debug("Creating dynamic task of typ {} within case {}", nodeType, caseId);

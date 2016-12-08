@@ -65,6 +65,9 @@ public abstract class AbstractCaseResource {
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (IllegalArgumentException e) {
+           return badRequest(
+                   e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(

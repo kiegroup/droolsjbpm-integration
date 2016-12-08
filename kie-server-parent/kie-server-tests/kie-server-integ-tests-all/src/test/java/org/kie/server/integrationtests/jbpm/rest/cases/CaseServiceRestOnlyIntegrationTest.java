@@ -131,7 +131,7 @@ public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
         logger.debug("Add dynamic work item: [POST] " + clientRequest.getUri());
 
         response = clientRequest.request(getMediaType()).post(Entity.entity("", getMediaType()));
-        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
         logger.debug("Add dynamic work item: [POST] " + clientRequest.getUri());
 
         response = clientRequest.request(getMediaType()).post(createEntity(marshaller.marshall(taskSpecMap)));
-        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     private String startUserTaskCase(String owner, String contact) {
