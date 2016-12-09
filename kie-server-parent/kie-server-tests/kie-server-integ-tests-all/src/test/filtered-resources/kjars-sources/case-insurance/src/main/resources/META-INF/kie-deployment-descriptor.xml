@@ -22,6 +22,12 @@
             <parameters/>
             <name>Service Task</name>
         </work-item-handler>
+        <work-item-handler>
+            <resolver>mvel</resolver>
+            <identifier>new org.kie.server.workitem.ContactCarProducerWorkItemHandler()</identifier>
+            <parameters/>
+            <name>ContactCarProducer</name>
+        </work-item-handler>
     </work-item-handlers>
     <environment-entries/>
     <configurations/>

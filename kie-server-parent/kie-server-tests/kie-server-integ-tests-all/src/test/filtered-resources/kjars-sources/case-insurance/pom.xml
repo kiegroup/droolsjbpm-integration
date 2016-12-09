@@ -13,6 +13,15 @@
   <version>1.0.0.Final</version>
   <name>case-insurance</name>
 
+  <dependencies>
+    <dependency>
+     <groupId>org.kie</groupId>
+     <artifactId>kie-api</artifactId>
+     <version>${version.org.kie}</version>
+     <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
