@@ -51,7 +51,6 @@
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
         <include>org.drools:drools-persistence-jpa</include>
-        <include>org.drools:drools-reteoo</include>
         <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
@@ -105,7 +104,6 @@
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
-        <exclude>org.drools:drools-reteoo</exclude>
         <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
