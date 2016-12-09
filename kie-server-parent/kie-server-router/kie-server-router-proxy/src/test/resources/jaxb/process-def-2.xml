@@ -1,0 +1,23 @@
+<process-definitions>
+  <processes>
+    <process-id>1</process-id>
+    <process-name>Evaluation updated</process-name>
+    <process-version>3</process-version>
+    <package>org.jbpm</package>
+    <container-id>evaluation_3.4</container-id>
+  </processes>
+  <processes>
+    <process-id>2</process-id>
+    <process-name>rewards-multi-approval</process-name>
+    <process-version>2.0</process-version>
+    <package>com.redhat.jboss.hr.rewards</package>
+    <container-id>evaluation_3.4</container-id>
+  </processes>
+  <processes>
+    <process-id>3</process-id>
+    <process-name>rewards-multi-approval</process-name>
+    <process-version>2.0</process-version>
+    <package>com.redhat.jboss.hr.rewards</package>
+    <container-id>evaluation_3.4</container-id>
+  </processes>
+</process-definitions>

@@ -42,6 +42,7 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServer;
+import org.kie.server.services.api.KieServerEventListener;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.controller.ControllerConnectRunnable;
@@ -90,6 +91,8 @@ public class KieServerImpl implements KieServer {
     private List<Message> serverMessages = new ArrayList<Message>();
     private Map<String, List<Message>> containerMessages = new ConcurrentHashMap<String, List<Message>>();
 
+    private KieServerEventSupport eventSupport = new KieServerEventSupport();
+
     public KieServerImpl() {
         this(new KieServerStateFileRepository());
     }
@@ -130,6 +133,8 @@ public class KieServerImpl implements KieServer {
         policyManager.start(this, context);
 
         kieServerActive.set(true);
+        eventSupport.fireBeforeServerStarted(this);
+
         boolean readyToRun = false;
         KieServerController kieController = getController();
         // try to load container information from available controllers if any...
@@ -175,6 +180,7 @@ public class KieServerImpl implements KieServer {
                 containerManager.installContainers(this, containers, currentState, kieServerSetup);
             }
         }
+        eventSupport.fireAfterServerStarted(this);
     }
 
     public KieServerRegistry getServerRegistry() {
@@ -182,6 +188,7 @@ public class KieServerImpl implements KieServer {
     }
 
     public void destroy() {
+        eventSupport.fireBeforeServerStopped(this);
         kieServerActive.set(false);
         policyManager.stop();
         // disconnect from controller
@@ -200,7 +207,7 @@ public class KieServerImpl implements KieServer {
                 logger.error("Error when destroying server extension of type {}", extension, e);
             }
         }
-
+        eventSupport.fireAfterServerStopped(this);
     }
 
     public List<KieServerExtension> getServerExtensions() {
@@ -250,9 +257,11 @@ public class KieServerImpl implements KieServer {
             KieContainerInstanceImpl previous = null;
             // have to synchronize on the ci or a concurrent call to dispose may create inconsistencies
             synchronized (ci) {
+
                 previous = context.registerContainer(containerId, ci);
                 if (previous == null) {
                     try {
+                        eventSupport.fireBeforeContainerStarted(this, ci);
                         KieServices ks = KieServices.Factory.get();
                         InternalKieContainer kieContainer = (InternalKieContainer) ks.newKieContainer(containerId, releaseId);
                         if (kieContainer != null) {
@@ -289,6 +298,7 @@ public class KieServerImpl implements KieServer {
                             repository.store(KieServerEnvironment.getServerId(), currentState);
 
                             messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully created with module " + releaseId + "."));
+                            eventSupport.fireAfterContainerStarted(this, ci);
 
                             return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                         } else {
@@ -371,6 +381,7 @@ public class KieServerImpl implements KieServer {
             KieContainerInstanceImpl kci = context.unregisterContainer(containerId);
             if (kci != null) {
                 synchronized (kci) {
+                    eventSupport.fireBeforeContainerStopped(this, kci);
                     kci.setStatus(KieContainerStatus.DISPOSING); // just in case
                     if (kci.getKieContainer() != null) {
                         List<KieServerExtension> disposedExtensions = new ArrayList<KieServerExtension>();
@@ -424,6 +435,8 @@ public class KieServerImpl implements KieServer {
 
                         repository.store(KieServerEnvironment.getServerId(), currentState);
                         messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully stopped."));
+
+                        eventSupport.fireAfterContainerStopped(this, kci);
 
                         return new ServiceResponse<Void>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully disposed.");
                     } else {

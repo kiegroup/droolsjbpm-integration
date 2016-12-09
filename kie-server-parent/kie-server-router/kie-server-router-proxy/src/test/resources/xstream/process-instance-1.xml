@@ -1,0 +1,17 @@
+<org.kie.server.api.model.instance.ProcessInstanceList>
+  <processInstances>
+    <org.kie.server.api.model.instance.ProcessInstance>
+      <id>8</id>
+      <processId>rewards.rewards-multi-approval</processId>
+      <processName>rewards-multi-approval</processName>
+      <processVersion>2.0</processVersion>
+      <state>1</state>
+      <containerId>evaluation_3.4</containerId>
+      <initiator>maciek</initiator>
+      <date>2016-11-23 11:49:54.327 UTC</date>
+      <processInstanceDescription>rewards-multi-approval</processInstanceDescription>
+      <correlationKey>8</correlationKey>
+      <parentId>-1</parentId>
+    </org.kie.server.api.model.instance.ProcessInstance>
+  </processInstances>
+</org.kie.server.api.model.instance.ProcessInstanceList>

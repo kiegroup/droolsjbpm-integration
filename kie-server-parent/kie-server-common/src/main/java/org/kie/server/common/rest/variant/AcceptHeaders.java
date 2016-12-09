@@ -137,7 +137,7 @@ public class AcceptHeaders
             }
             else
             {
-               logger.warn("Ignoring unsupported locale: " + value);
+               logger.debug("Ignoring unsupported locale: " + value);
                continue;
             }
          }
@@ -301,7 +301,7 @@ public class AcceptHeaders
          {
             if (i.hasNext())
             {
-               logger.warn("Accept extensions not supported.");
+               logger.debug("Accept extensions not supported.");
                i.remove();
                do
                {

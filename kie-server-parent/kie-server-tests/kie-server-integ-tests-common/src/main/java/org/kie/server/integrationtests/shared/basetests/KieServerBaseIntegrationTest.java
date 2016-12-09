@@ -46,6 +46,7 @@ import org.kie.server.integrationtests.controller.client.KieServerMgmtController
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieControllerExecutor;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
+import org.kie.server.integrationtests.shared.KieServerRouterExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,11 +57,14 @@ public abstract class KieServerBaseIntegrationTest {
     protected KieServicesClient client;
     protected static KieControllerExecutor controller;
     protected static KieServerExecutor server;
+    protected static KieServerRouterExecutor router;
 
     protected static final long DEFAULT_TIMEOUT = 60000;
 
     @BeforeClass
     public static void setupClass() throws Exception {
+        router = new KieServerRouterExecutor();
+        router.startKieRouter();
         if (TestConfig.isLocalServer()) {
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
             controller = new KieControllerExecutor();
@@ -96,6 +100,7 @@ public abstract class KieServerBaseIntegrationTest {
             controller.stopKieController();
             System.clearProperty(Context.INITIAL_CONTEXT_FACTORY);
         }
+        router.stopKieRouter();
     }
 
     protected static void disposeAllContainers() {

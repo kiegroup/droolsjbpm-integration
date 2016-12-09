@@ -20,6 +20,7 @@
     <module>kie-server-remote</module>
     <module>kie-server-services</module>
     <module>kie-server-api</module>
+    <module>kie-server-router</module>
     <module>kie-server-wars</module>
     <module>kie-server-controller</module>
     <module>kie-server-tests</module>

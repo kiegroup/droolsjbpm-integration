@@ -48,6 +48,10 @@ public class TestConfig {
      * Property holding port number of embedded REST server controller.
      */
     private static Integer CONTROLLER_ALLOCATED_PORT;
+    /**
+     * Property holding port number of embedded REST server router.
+     */
+    private static Integer ROUTER_ALLOCATED_PORT;
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
     private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
@@ -172,11 +176,44 @@ public class TestConfig {
     }
 
     /**
+     * Get allocated port of embedded REST server.
+     *
+     * @return HTTP port number.
+     */
+    public static Integer getRouterAllocatedPort() {
+        if(ROUTER_ALLOCATED_PORT == null) {
+            try {
+                ServerSocket server = new ServerSocket(0);
+                ROUTER_ALLOCATED_PORT = server.getLocalPort();
+                server.close();
+            } catch (IOException e) {
+                // failed to dynamically allocate port, try to use hard coded one
+                ROUTER_ALLOCATED_PORT = 9765;
+            }
+            LOGGER.debug("Allocating port for router {}.", +ROUTER_ALLOCATED_PORT);
+        }
+
+        return ROUTER_ALLOCATED_PORT;
+    }
+
+    /**
      * Allows to skip JMS tests by placing on the classpath empty file 'jms.skip'
      * @return
      */
     public static boolean skipJMS() {
         if (TestConfig.class.getResource("/jms.skip") != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Allows to start router by placing on the classpath empty file 'router.start'
+     * @return
+     */
+    public static boolean startRouter() {
+        if (TestConfig.class.getResource("/router.start") != null) {
             return true;
         }
 
