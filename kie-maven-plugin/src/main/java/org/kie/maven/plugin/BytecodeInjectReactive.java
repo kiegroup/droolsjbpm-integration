@@ -20,10 +20,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.drools.core.phreak.ReactiveCollection;
 import org.drools.core.phreak.ReactiveList;
 import org.drools.core.phreak.ReactiveObject;
 import org.drools.core.phreak.ReactiveObjectUtil;
+import org.drools.core.phreak.ReactiveSet;
 import org.drools.core.spi.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,7 +179,7 @@ public class BytecodeInjectReactive {
                     }
                     
                     // if we are in constructors, only need to intercept assignment statement for Reactive Collection/List/... (regardless they may be final)
-                    if ( methodInfo.isConstructor() && Modifier.isFinal( ctField.getModifiers()) && !( ctField.getType().subtypeOf( cp.get(List.class.getName()) ) ) ) {
+                    if ( methodInfo.isConstructor() && Modifier.isFinal( ctField.getModifiers()) && !( isCtFieldACollection(ctField) ) ) {
                         continue;
                     }
 
@@ -236,11 +239,31 @@ public class BytecodeInjectReactive {
         
         LOG.debug("buildWriteInterceptionBodyFragment: {} {}", field.getType().getClass(), field.getType());
         
-        if ( isCtFieldReactiveCollection(field) ) {
-            return String.format(
-                    "  this.%1$s = new "+ReactiveList.class.getName()+"($1); ",
-                    field.getName()
-                    );
+        if ( isCtFieldACollection(field) ) {
+            // if ctField is a collection we may need to wrap..
+            if ( field.getType().subtypeOf(cp.get(ReactiveCollection.class.getName())) ) {
+                // it already extends ReactiveCollection, do nothing:
+                return String.format(
+                        "  this.%1$s = $1; ",
+                        field.getName()
+                        );
+            }
+            
+            if ( field.getType().subtypeOf(cp.get(Set.class.getName())) ) {
+                // it implements Set, so wrap accordingly with ReactiveSet:
+                return String.format(
+                        "  this.%1$s = new "+ReactiveSet.class.getName()+"($1); ",
+                        field.getName()
+                        );
+            }
+            
+            if ( field.getType().subtypeOf(cp.get(List.class.getName())) ) {
+                // it implements List, so wrap accordingly with ReactiveList:
+                return String.format(
+                        "  this.%1$s = new "+ReactiveList.class.getName()+"($1); ",
+                        field.getName()
+                        );
+            }
         }
         
         // 2nd line will result in: ReactiveObjectUtil.notifyModification((ReactiveObject) this);
@@ -265,7 +288,7 @@ public class BytecodeInjectReactive {
             }
             // optimization: skip final field, unless it is a Reactive Collection/List/... in which case we need to consider anyway:
             if ( Modifier.isFinal( ctField.getModifiers()) ) {
-                if ( !isCtFieldReactiveCollection(ctField) ) {
+                if ( !isCtFieldACollection(ctField) ) {
                     continue;
                 }
             }
@@ -285,9 +308,10 @@ public class BytecodeInjectReactive {
         return persistentFieldMap;
     }
 
-    private boolean isCtFieldReactiveCollection(CtField ctField) {
+    private boolean isCtFieldACollection(CtField ctField) {
         try {
-            return ctField.getType().subtypeOf( cp.get(List.class.getName()));
+            return ctField.getType().subtypeOf(cp.get(List.class.getName()))
+                    || ctField.getType().subtypeOf(cp.get(Set.class.getName())) ;
         } catch (NotFoundException e) {
             e.printStackTrace();
             return false;
