@@ -51,6 +51,9 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     private static final String CONTAINER_ALIAS = "ins";
 
+    private static final String CAR_PRODUCER_REPORT_PARAMETER = "carId";
+    private static final String CAR_PRODUCER_REPORT_OUTPUT = "carProducerReport";
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -320,6 +323,43 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         try {
             caseClient.destroyCaseInstance(CONTAINER_ID, "not-existing-case");
             fail("Should have failed because of not existing case definition Id.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testAddDynamicWorkItemTask() {
+        String carId = "Ford Mustang";
+        String producerReportResponse = carId + " was regularly maintained and checked.";
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(CAR_PRODUCER_REPORT_PARAMETER, carId);
+
+        caseClient.addDynamicTask(CONTAINER_ID, caseId, "ContactCarProducer", "Contact car producer", data);
+
+        Map<String, Object> caseInstanceData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
+        assertTrue(caseInstanceData.containsKey(CAR_PRODUCER_REPORT_OUTPUT));
+        assertEquals(producerReportResponse, caseInstanceData.get(CAR_PRODUCER_REPORT_OUTPUT));
+    }
+
+    @Test
+    public void testAddDynamicWorkItemTaskNotExistingContainer() {
+        try {
+            caseClient.addDynamicTask("not-existing-container", "not-existing-case", "ContactCarProducer", "Contact car producer", null);
+            fail("Should have failed because of not existing container.");
+        } catch (KieServicesException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testAddDynamicWorkItemTaskNotExistingCase() {
+        try {
+            caseClient.addDynamicTask(CONTAINER_ID, "not-existing-case", "ContactCarProducer", "Contact car producer", null);
+            fail("Should have failed because of not existing case case Id.");
         } catch (KieServicesException e) {
             // expected
         }

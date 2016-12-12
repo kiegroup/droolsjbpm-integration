@@ -29,6 +29,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.type.JaxbString;
@@ -114,6 +117,40 @@ public class CaseServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
 
         response = clientRequest.request(getMediaType()).delete();
         Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testAddDynamicWorkItemTaskNoTaskSpec() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
+        valuesMap.put(RestURI.CASE_ID, caseId);
+
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), RestURI.CASE_URI + "/" + RestURI.CASE_DYNAMIC_TASK_POST_URI, valuesMap));
+        logger.debug("Add dynamic work item: [POST] " + clientRequest.getUri());
+
+        response = clientRequest.request(getMediaType()).post(Entity.entity("", getMediaType()));
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testAddDynamicWorkItemTaskNotExistingContainer() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(marshallingFormat, ClassLoader.getSystemClassLoader());
+
+        Map<String, Object> valuesMap = new HashMap<String, Object>();
+        valuesMap.put(RestURI.CONTAINER_ID, "not-existing-id");
+        valuesMap.put(RestURI.CASE_ID, "not-existing-id");
+
+        Map<String, Object> taskSpecMap = new HashMap<String, Object>();
+        taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_NAME_PROP, "Contact car producer");
+        taskSpecMap.put(KieServerConstants.CASE_DYNAMIC_NODE_TYPE_PROP, "ContactCarProducer");
+
+        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), RestURI.CASE_URI + "/" + RestURI.CASE_DYNAMIC_TASK_POST_URI, valuesMap));
+        logger.debug("Add dynamic work item: [POST] " + clientRequest.getUri());
+
+        response = clientRequest.request(getMediaType()).post(createEntity(marshaller.marshall(taskSpecMap)));
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     private String startUserTaskCase(String owner, String contact) {

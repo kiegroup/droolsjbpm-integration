@@ -370,8 +370,7 @@ public abstract class AbstractKieServicesClientImpl {
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
 
-        if ( response.code() == Response.Status.CREATED.getStatusCode() ||
-                response.code() == Response.Status.BAD_REQUEST.getStatusCode() ) {
+        if ( response.code() == Response.Status.CREATED.getStatusCode() ) {
             T serviceResponse = deserialize( response.body(), resultType );
 
             return serviceResponse;

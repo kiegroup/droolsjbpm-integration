@@ -359,7 +359,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
     @Test
     public void testGetCaseInstanceCarInsuranceClaimCaseWithData() {
-        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String caseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId, true, true, true, true);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
@@ -382,7 +382,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         CaseRoleAssignment assessorRole = caseInstance.getRoleAssignments().get(1);
         assertEquals("assessor", assessorRole.getName());
-        KieServerAssert.assertNullOrEmpty("Users should be empty.", assessorRole.getUsers());
+        assertEquals(USER_YODA, assessorRole.getUsers().get(0));
         KieServerAssert.assertNullOrEmpty("Groups should be empty.", assessorRole.getGroups());
 
         CaseRoleAssignment insuranceRepresentativeRole = caseInstance.getRoleAssignments().get(2);
@@ -410,7 +410,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(0, caseInstances.size());
 
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         assertNotEquals(caseId, caseId2);
 
         caseInstances = caseClient.getCaseInstances(0, 10);
@@ -432,7 +432,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetCaseInstancesSorting() {
         String hrCaseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String claimCaseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String claimCaseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         assertNotEquals(hrCaseId, claimCaseId);
 
         List<CaseInstance> caseInstances = caseClient.getCaseInstances(0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
@@ -471,7 +471,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetCaseInstancesByStatusSorting() {
         String hrCaseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String claimCaseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String claimCaseId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         assertNotEquals(hrCaseId, claimCaseId);
 
         List<CaseInstance> caseInstances = caseClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
@@ -502,7 +502,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(0, caseInstances.size());
 
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
 
         caseInstances = caseClient.getCaseInstancesByContainer(CONTAINER_ID, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1);
         assertNotNull(caseInstances);
@@ -518,7 +518,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetCaseInstancesByContainerSorting() {
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN);
+        String caseId2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
 
         List<CaseInstance> caseInstances = caseClient.getCaseInstancesByContainer(CONTAINER_ID, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
         assertNotNull(caseInstances);
@@ -558,7 +558,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(0, caseInstances.size());
 
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String caseId2 = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String caseId2 = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
         caseInstances = caseClient.getCaseInstancesByDefinition(CONTAINER_ID, CASE_HR_DEF_ID, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1);
         assertNotNull(caseInstances);
@@ -617,7 +617,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
             changeUser(USER_YODA);
             String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
             changeUser(USER_JOHN);
-            String caseId2 = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+            String caseId2 = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
             changeUser(USER_YODA);
             caseInstances = caseClient.getCaseInstancesOwnedBy(USER_YODA, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1);
@@ -642,7 +642,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetCaseInstancesOwnedBySorting() throws Exception {
         String hrCaseId = startUserTaskCase(USER_YODA, USER_JOHN);
-        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
         List<CaseInstance> caseInstances = caseClient.getCaseInstancesOwnedBy(USER_YODA, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
         assertNotNull(caseInstances);
@@ -700,7 +700,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetProcessInstances() {
         String userTaskCase = startUserTaskCase(USER_YODA, USER_JOHN);
-        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
         List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1);
         assertNotNull(processInstances);
@@ -744,7 +744,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
     @Test
     public void testGetProcessInstancesSorting() {
-        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
         caseClient.addDynamicSubProcess(CONTAINER_ID, carInsuranceClaimCase, DATA_VERIFICATION_DEF_ID, new HashMap<>());
 
         List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(ProcessInstance.STATE_ACTIVE, ProcessInstance.STATE_COMPLETED), 0, 1, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
@@ -767,7 +767,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     @Test
     public void testGetActiveProcessInstances() {
         String userTaskCase = startUserTaskCase(USER_YODA, USER_JOHN);
-        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
         List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, userTaskCase, 0, 1);
         assertNotNull(processInstances);
@@ -1086,7 +1086,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     public void testCreateDifferentTypesCases() {
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
 
-        String caseClaimId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA);
+        String caseClaimId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
         assertNotNull(caseId);
         assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
@@ -1127,7 +1127,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         KieServerAssert.assertNullOrEmpty("Groups should be empty", insRepRole.getGroups());
 
         CaseRoleAssignment assessorRole = mappedRoles.get(CASE_ASSESSOR_ROLE);
-        KieServerAssert.assertNullOrEmpty("Users should be empty", assessorRole.getUsers());
+        assertTrue(assessorRole.getUsers().contains(USER_YODA));
         KieServerAssert.assertNullOrEmpty("Groups should be empty", assessorRole.getGroups());
 
         caseClient.assignUserToRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, USER_MARY);
@@ -1142,6 +1142,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(assessorRole.getGroups().contains("managers"));
 
         caseClient.removeUserFromRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, USER_MARY);
+        caseClient.removeUserFromRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, USER_YODA);
         caseClient.removeGroupFromRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, "managers");
 
         roles = caseClient.getRoleAssignments(CONTAINER_ID, caseClaimId);
@@ -1151,6 +1152,51 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assessorRole = mappedRoles.get(CASE_ASSESSOR_ROLE);
         KieServerAssert.assertNullOrEmpty("Users should be empty", assessorRole.getUsers());
         KieServerAssert.assertNullOrEmpty("Groups should be empty", assessorRole.getGroups());
+    }
+
+    @Test
+    public void testGetCaseStages() {
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseClaimId);
+
+        List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(3, stages.size());
+        assertBuildClaimReportCaseStage(stages.get(0), "Completed");
+        assertClaimAssesmentCaseStage(stages.get(1), "Active");
+        assertEscalateRejectedClaimCaseStage(stages.get(2), "Available");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
+    }
+
+    @Test
+    public void testCompleteCaseStageAndAbort() {
+        List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
+
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseClaimId);
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(1, tasks.size());
+
+        caseClient.cancelCaseInstance(CONTAINER_ID, caseClaimId);
+
+        tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertEquals(0, tasks.size());
     }
 
     @Test
@@ -1245,8 +1291,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "dynamic task", "simple description", USER_JOHN, null, parameters);
 
-        List<String> statuses = Arrays.asList(Status.Ready.toString(), Status.Reserved.toString());
-
         List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, 0, 10);
         assertEquals(1, tasks.size());
         TaskSummary task = tasks.get(0);
@@ -1288,12 +1332,13 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         return caseId;
     }
 
-    private String startCarInsuranceClaimCase(String insured, String insuranceRep) {
+    private String startCarInsuranceClaimCase(String insured, String insuranceRep, String assessor) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
         CaseFile caseFile = CaseFile.builder()
                 .addUserAssignments(CASE_INSURED_ROLE, insured)
                 .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
+                .addUserAssignments(CASE_ASSESSOR_ROLE, assessor)
                 .data(data)
                 .build();
 
@@ -1433,5 +1478,52 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(-1L, processInstance.getParentId().longValue());
         assertNotNull(processInstance.getCorrelationKey());
         assertNotNull(processInstance.getDate());
+    }
+
+    private void assertBuildClaimReportCaseStage(CaseStage stage, String status) {
+        assertEquals("Build claim report", stage.getName());
+        assertNotNull(stage.getIdentifier());
+        assertEquals(status, stage.getStatus());
+
+        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+
+        List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
+        assertEquals(2, adHocFragments.size());
+        assertEquals("Provide accident information", adHocFragments.get(0).getName());
+        assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
+        assertEquals("Submit police report", adHocFragments.get(1).getName());
+        assertEquals("HumanTaskNode", adHocFragments.get(1).getType());
+    }
+
+    private void assertClaimAssesmentCaseStage(CaseStage stage, String status) {
+        assertEquals("Claim assesment", stage.getName());
+        assertNotNull(stage.getIdentifier());
+        assertEquals(status, stage.getStatus());
+
+        // TODO: what should be stored in active nodes?
+        // According to CaseRuntimeDataServiceImpl.internalGetCaseStages() it seems to be always empty.
+        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+
+        List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
+        assertEquals(2, adHocFragments.size());
+        assertEquals("Classify claim", adHocFragments.get(0).getName());
+        assertEquals("RuleSetNode", adHocFragments.get(0).getType());
+        assertEquals("Calculate claim", adHocFragments.get(1).getName());
+        assertEquals("WorkItemNode", adHocFragments.get(1).getType());
+    }
+
+    private void assertEscalateRejectedClaimCaseStage(CaseStage stage, String status) {
+        assertEquals("Escalate rejected claim", stage.getName());
+        assertNotNull(stage.getIdentifier());
+        assertEquals(status, stage.getStatus());
+
+        // TODO: what should be stored in active nodes?
+        // According to CaseRuntimeDataServiceImpl.internalGetCaseStages() it seems to be always empty.
+        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+
+        List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
+        assertEquals(1, adHocFragments.size());
+        assertEquals("Negotiation meeting", adHocFragments.get(0).getName());
+        assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
     }
 }
