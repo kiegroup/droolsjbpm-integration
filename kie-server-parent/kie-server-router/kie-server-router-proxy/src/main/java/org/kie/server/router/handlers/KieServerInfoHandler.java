@@ -21,12 +21,10 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
+import org.kie.server.router.KieServerRouterConstants;
 
 
 public class KieServerInfoHandler implements HttpHandler {
-    
-    private static final String HOST = System.getProperty("org.kie.server.router.host");
-    private static final String PORT = System.getProperty("org.kie.server.router.port");
 
     private static final String JAXB_RESPONSE = "<response type=\"SUCCESS\" msg=\"Kie Server info\">\n"+
             "<kie-server-info>\n"+
@@ -37,7 +35,7 @@ public class KieServerInfoHandler implements HttpHandler {
             "<capabilities>BPM-UI</capabilities>\n"+
             "<capabilities>BRP</capabilities>\n"+
             "<location>\n"+
-            "http://" + HOST +":" + PORT + "/\n"+
+            getLocationUrl() + "\n"+
             "</location>\n"+
             "<messages/>\n"+            
             "<name>KIE Server Router</name>\n"+
@@ -53,7 +51,7 @@ public class KieServerInfoHandler implements HttpHandler {
             "    \"kie-server-info\" : {\n"+
             "      \"version\" : \"LATEST\",\n"+
             "      \"name\" : \"KIE Server Router\",\n"+
-            "      \"location\" : \"" + HOST +":" + PORT + "\",\n"+
+            "      \"location\" : \"" + getLocationUrl() + "\",\n"+
             "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n"+     
             "      \"id\" : \"kie-server-router\"\n"+
             "    }\n"+
@@ -68,7 +66,7 @@ public class KieServerInfoHandler implements HttpHandler {
                            "<version>LATEST</version>\n"+
                            "<name>KIE Server Router</name>\n"+
                            "<location>\n"+
-                           "http://" + HOST +":" + PORT + "\n"+
+                           getLocationUrl() + "\n"+
                            "</location>\n"+
                            "<capabilities>\n"+
                            "<string>KieServer</string>\n"+
@@ -113,4 +111,19 @@ public class KieServerInfoHandler implements HttpHandler {
 
     }
 
+    protected static String getLocationUrl() {
+        String externalUrl = System.getProperty(KieServerRouterConstants.ROUTER_EXTERNAL_URL);
+
+        if(externalUrl == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("http://");
+            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_HOST));
+            sb.append(":");
+            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_PORT));
+            sb.append("/");
+            externalUrl = sb.toString();
+        }
+
+        return externalUrl;
+    }
 }
