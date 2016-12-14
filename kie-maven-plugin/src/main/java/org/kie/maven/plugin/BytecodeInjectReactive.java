@@ -179,7 +179,7 @@ public class BytecodeInjectReactive {
                     }
                     
                     // if we are in constructors, only need to intercept assignment statement for Reactive Collection/List/... (regardless they may be final)
-                    if ( methodInfo.isConstructor() && Modifier.isFinal( ctField.getModifiers()) && !( isCtFieldACollection(ctField) ) ) {
+                    if ( methodInfo.isConstructor() && !( isCtFieldACollection(ctField) ) ) {
                         continue;
                     }
 
@@ -308,10 +308,13 @@ public class BytecodeInjectReactive {
         return persistentFieldMap;
     }
 
+    /**
+     * Verify that CtField is exactly the java.util.List or java.util.Set, otherwise cannot instrument the class' field
+     */
     private boolean isCtFieldACollection(CtField ctField) {
         try {
-            return ctField.getType().subtypeOf(cp.get(List.class.getName()))
-                    || ctField.getType().subtypeOf(cp.get(Set.class.getName())) ;
+            return ctField.getType().equals(cp.get(List.class.getName()))
+                    || ctField.getType().equals(cp.get(Set.class.getName())) ;
         } catch (NotFoundException e) {
             e.printStackTrace();
             return false;

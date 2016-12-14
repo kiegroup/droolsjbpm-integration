@@ -55,6 +55,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         assertTrue( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.TMFile") ) );
         assertTrue( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.TMFileSet") ) );
         assertFalse( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.ImmutablePojo") ) );
+        assertFalse( looksLikeInstrumentedClass( cl.loadClass("org.drools.compiler.xpath.tobeinstrumented.model.FieldIsNotListInterface") ) );
     }
     
     @Test
