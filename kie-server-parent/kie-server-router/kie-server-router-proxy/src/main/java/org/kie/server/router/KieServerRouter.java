@@ -35,8 +35,8 @@ import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.kie.server.router.repository.FileRepository;
 
 public class KieServerRouter {
-    private static final String HOST = System.getProperty("org.kie.server.router.host", "localhost");
-    private static final String PORT = System.getProperty("org.kie.server.router.port", "9000");
+    private static final String HOST = System.getProperty(KieServerRouterConstants.ROUTER_HOST, "localhost");
+    private static final String PORT = System.getProperty(KieServerRouterConstants.ROUTER_PORT, "9000");
     
     private static final Logger log = Logger.getLogger(KieServerRouter.class);
     
@@ -49,8 +49,8 @@ public class KieServerRouter {
     }
     
     public void start(String host, Integer port) {
-        System.setProperty("org.kie.server.router.host", host);
-        System.setProperty("org.kie.server.router.port", port.toString());
+        System.setProperty(KieServerRouterConstants.ROUTER_HOST, host);
+        System.setProperty(KieServerRouterConstants.ROUTER_PORT, port.toString());
         final KieServerProxyClient proxyClient = new KieServerProxyClient();
         
         HttpHandler notFoundHandler = ResponseCodeHandler.HANDLE_404;        
@@ -83,7 +83,7 @@ public class KieServerRouter {
             if (clean) {
                 repository.clean();
             }
-            log.infof("KieServerRouter stopped on %s:%s at %s", System.getProperty("org.kie.server.router.host"), System.getProperty("org.kie.server.router.port"), new Date());
+            log.infof("KieServerRouter stopped on %s:%s at %s", System.getProperty(KieServerRouterConstants.ROUTER_HOST), System.getProperty(KieServerRouterConstants.ROUTER_PORT), new Date());
         } else {
             log.error("KieServerRouter was not started");
         }

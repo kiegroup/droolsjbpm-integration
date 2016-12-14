@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.kie.server.router.Configuration;
+import org.kie.server.router.KieServerRouterConstants;
 
 public class FileRepository {
     
@@ -29,7 +30,7 @@ public class FileRepository {
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
     
     public FileRepository() {
-        this(new File(System.getProperty("org.kie.server.router.repo", ".")));
+        this(new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, ".")));
     }
     
     public FileRepository(File repositoryDir) {
