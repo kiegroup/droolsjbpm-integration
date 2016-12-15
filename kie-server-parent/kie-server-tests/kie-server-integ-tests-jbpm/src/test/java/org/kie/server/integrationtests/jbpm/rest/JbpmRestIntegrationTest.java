@@ -128,7 +128,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
 
     }
@@ -172,7 +174,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
 
     }
@@ -205,7 +209,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
 
     }
@@ -278,7 +284,9 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
                     response.getStatus() == noContentStatusCode || response.getStatus() == okStatusCode);
 
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
 
     }

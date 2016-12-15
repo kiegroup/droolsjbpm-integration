@@ -46,7 +46,9 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
                     "Unexpected exception creating container: " + resource.getContainerId() + " with release-id " + resource.getReleaseId(),
                     e);
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
     }
 
@@ -61,7 +63,9 @@ public class RestMalformedRequestIntegrationTest extends RestOnlyBaseIntegration
         } catch (Exception e) {
             throw new RuntimeException("Unexpected exception on empty body", e);
         } finally {
-            response.close();
+            if(response != null) {
+                response.close();
+            }
         }
     }
     
