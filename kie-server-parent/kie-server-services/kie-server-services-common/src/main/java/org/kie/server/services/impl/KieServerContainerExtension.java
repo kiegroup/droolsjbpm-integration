@@ -33,6 +33,12 @@ public class KieServerContainerExtension implements KieServerExtension {
     private KieContainerCommandService batchCommandService;
 
     private List<Object> services = new ArrayList<Object>();
+    private boolean initialized = false;
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     @Override
     public boolean isActive() {
@@ -44,6 +50,8 @@ public class KieServerContainerExtension implements KieServerExtension {
         this.batchCommandService = new KieContainerCommandServiceImpl(kieServer, registry);
 
         services.add(batchCommandService);
+
+        initialized = true;
     }
 
     @Override

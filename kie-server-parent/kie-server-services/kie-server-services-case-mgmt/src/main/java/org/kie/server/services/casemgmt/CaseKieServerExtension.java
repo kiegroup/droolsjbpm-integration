@@ -69,6 +69,11 @@ public class CaseKieServerExtension implements KieServerExtension {
     private KieContainerCommandService kieContainerCommandService;
 
     @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    @Override
     public boolean isActive() {
         return disabled == false && jbpmDisabled == false;
     }
