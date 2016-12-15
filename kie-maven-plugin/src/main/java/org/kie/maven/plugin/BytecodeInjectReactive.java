@@ -240,7 +240,7 @@ public class BytecodeInjectReactive {
         LOG.debug("buildWriteInterceptionBodyFragment: {} {}", field.getType().getClass(), field.getType());
         
         if ( isCtFieldACollection(field) ) {
-            if ( field.getType().subtypeOf(cp.get(Set.class.getName())) ) {
+            if ( field.getType().equals(cp.get(Set.class.getName())) ) {
                 // it implements Set, so wrap accordingly with ReactiveSet:
                 return String.format(
                         "  this.%1$s = new "+ReactiveSet.class.getName()+"($1); ",
@@ -248,7 +248,7 @@ public class BytecodeInjectReactive {
                         );
             }
             
-            if ( field.getType().subtypeOf(cp.get(List.class.getName())) ) {
+            if ( field.getType().equals(cp.get(List.class.getName())) ) {
                 // it implements List, so wrap accordingly with ReactiveList:
                 return String.format(
                         "  this.%1$s = new "+ReactiveList.class.getName()+"($1); ",
