@@ -240,15 +240,6 @@ public class BytecodeInjectReactive {
         LOG.debug("buildWriteInterceptionBodyFragment: {} {}", field.getType().getClass(), field.getType());
         
         if ( isCtFieldACollection(field) ) {
-            // if ctField is a collection we may need to wrap..
-            if ( field.getType().subtypeOf(cp.get(ReactiveCollection.class.getName())) ) {
-                // it already extends ReactiveCollection, do nothing:
-                return String.format(
-                        "  this.%1$s = $1; ",
-                        field.getName()
-                        );
-            }
-            
             if ( field.getType().subtypeOf(cp.get(Set.class.getName())) ) {
                 // it implements Set, so wrap accordingly with ReactiveSet:
                 return String.format(
@@ -264,6 +255,11 @@ public class BytecodeInjectReactive {
                         field.getName()
                         );
             }
+            
+            return String.format(
+                    "  this.%1$s = new "+ReactiveCollection.class.getName()+"($1); ",
+                    field.getName()
+                    );
         }
         
         // 2nd line will result in: ReactiveObjectUtil.notifyModification((ReactiveObject) this);
@@ -309,11 +305,12 @@ public class BytecodeInjectReactive {
     }
 
     /**
-     * Verify that CtField is exactly the java.util.List or java.util.Set, otherwise cannot instrument the class' field
+     * Verify that CtField is exactly the java.util.Collection, java.util.List or java.util.Set, otherwise cannot instrument the class' field
      */
     private boolean isCtFieldACollection(CtField ctField) {
         try {
-            return ctField.getType().equals(cp.get(List.class.getName()))
+            return ctField.getType().equals(cp.get(Collection.class.getName()))
+                    || ctField.getType().equals(cp.get(List.class.getName()))
                     || ctField.getType().equals(cp.get(Set.class.getName())) ;
         } catch (NotFoundException e) {
             e.printStackTrace();

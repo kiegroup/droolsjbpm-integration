@@ -8,7 +8,10 @@ import org.drools.compiler.xpath.tobeinstrumented.model.*;
 import org.drools.core.base.ClassObjectType;
 import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.phreak.ReactiveCollection;
+import org.drools.core.phreak.ReactiveList;
 import org.drools.core.phreak.ReactiveObject;
+import org.drools.core.phreak.ReactiveSet;
 import org.drools.core.reteoo.BetaMemory;
 import org.drools.core.reteoo.EntryPointNode;
 import org.drools.core.reteoo.LeftInputAdapterNode;
@@ -29,6 +32,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
@@ -75,6 +79,7 @@ public class XPathTest {
         byte[] tmfileBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMFile");
         byte[] tmfilesetBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMFileSet");
         byte[] tmdirectoryBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMDirectory");
+        byte[] pojoWithCollectionsBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.PojoWithCollections");
         
         ClassPool cp2 = new ClassPool(null);
         cp2.appendSystemPath();
@@ -86,6 +91,7 @@ public class XPathTest {
         loadClassAndUtils(cp2, tmfileBytecode);
         loadClassAndUtils(cp2, tmfilesetBytecode); 
         loadClassAndUtils(cp2, tmdirectoryBytecode);
+        loadClassAndUtils(cp2, pojoWithCollectionsBytecode);
     }
     
     private static void loadClassAndUtils(ClassPool cp, byte[] bytecode) throws Exception {
@@ -107,6 +113,17 @@ public class XPathTest {
         fos.write(bytecode);
         fos.close();
         LOG.info("Written bytecode for {} in file: {}.", theCtClass.getName(), bytecodeFile);
+    }
+    
+    @Test
+    public void testPojoWithCollectionsBytecode() {
+        PojoWithCollections pojo = new PojoWithCollections(new ArrayList(), new ArrayList(), new HashSet());
+        
+        LOG.info("testPojoWithCollectionsBytecode(): {}", pojo);
+        
+        assertEquals(pojo.getFieldCollection().getClass(), ReactiveCollection.class);
+        assertEquals(pojo.getFieldList().getClass(), ReactiveList.class);
+        assertEquals(pojo.getFieldSet().getClass(), ReactiveSet.class);
     }
     
     /**

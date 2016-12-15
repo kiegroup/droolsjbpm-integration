@@ -16,12 +16,14 @@
 package org.drools.compiler.xpath.tobeinstrumented.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FieldsSomeInterfacesSomeNot {
 
     private ArrayList myField = new ArrayList();
     private List myField2 = new ArrayList();
+    private Collection myField3 = new ArrayList();
 
     public FieldsSomeInterfacesSomeNot() {
         myField = new ArrayList();
@@ -41,6 +43,14 @@ public class FieldsSomeInterfacesSomeNot {
     
     public void setMyField2(List myField2) {
         this.myField2 = myField2;
+    }
+
+    public Collection getMyField3() {
+        return myField3;
+    }
+    
+    public void setMyField3(Collection myField3) {
+        this.myField3 = myField3;
     }
 
 }
