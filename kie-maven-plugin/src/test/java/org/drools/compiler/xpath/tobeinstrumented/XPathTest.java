@@ -8,7 +8,10 @@ import org.drools.compiler.xpath.tobeinstrumented.model.*;
 import org.drools.core.base.ClassObjectType;
 import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.phreak.ReactiveCollection;
+import org.drools.core.phreak.ReactiveList;
 import org.drools.core.phreak.ReactiveObject;
+import org.drools.core.phreak.ReactiveSet;
 import org.drools.core.reteoo.BetaMemory;
 import org.drools.core.reteoo.EntryPointNode;
 import org.drools.core.reteoo.LeftInputAdapterNode;
@@ -29,6 +32,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Before;
@@ -72,6 +76,10 @@ public class XPathTest {
         byte[] personBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.Person");
         byte[] schoolBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.School");
         byte[] childBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.Child");
+        byte[] tmfileBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMFile");
+        byte[] tmfilesetBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMFileSet");
+        byte[] tmdirectoryBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.TMDirectory");
+        byte[] pojoWithCollectionsBytecode = enhancer.injectReactive("org.drools.compiler.xpath.tobeinstrumented.model.PojoWithCollections");
         
         ClassPool cp2 = new ClassPool(null);
         cp2.appendSystemPath();
@@ -80,6 +88,10 @@ public class XPathTest {
         loadClassAndUtils(cp2, personBytecode);
         loadClassAndUtils(cp2, childBytecode);
         loadClassAndUtils(cp2, schoolBytecode);
+        loadClassAndUtils(cp2, tmfileBytecode);
+        loadClassAndUtils(cp2, tmfilesetBytecode); 
+        loadClassAndUtils(cp2, tmdirectoryBytecode);
+        loadClassAndUtils(cp2, pojoWithCollectionsBytecode);
     }
     
     private static void loadClassAndUtils(ClassPool cp, byte[] bytecode) throws Exception {
@@ -101,6 +113,17 @@ public class XPathTest {
         fos.write(bytecode);
         fos.close();
         LOG.info("Written bytecode for {} in file: {}.", theCtClass.getName(), bytecodeFile);
+    }
+    
+    @Test
+    public void testPojoWithCollectionsBytecode() {
+        PojoWithCollections pojo = new PojoWithCollections(new ArrayList(), new ArrayList(), new HashSet());
+        
+        LOG.info("testPojoWithCollectionsBytecode(): {}", pojo);
+        
+        assertEquals(pojo.getFieldCollection().getClass(), ReactiveCollection.class);
+        assertEquals(pojo.getFieldList().getClass(), ReactiveList.class);
+        assertEquals(pojo.getFieldSet().getClass(), ReactiveSet.class);
     }
     
     /**
@@ -400,5 +423,170 @@ public class XPathTest {
         ksession.fireAllRules();
         assertTrue(ksession.getObjects().contains(charlie));
         assertFalse(ksession.getObjects().contains(debbie));
+    }
+    
+    private List<?> factsCollection(KieSession ksession) {
+        List<Object> res = new ArrayList<>();
+        res.addAll(ksession.getObjects());
+        return res;
+    }
+    
+    /**
+     * Copied from drools-compiler
+     */
+    @Test
+    public void testMiscSetMethods() {
+        String drl =
+                "import org.drools.compiler.xpath.tobeinstrumented.model.*;\n" +
+                "\n" +
+                "rule R2 when\n" +
+                "  TMFileSet( $id: name, $p: /files{size >= 100} )\n" +
+                "then\n" +
+                "  System.out.println( $id + \".\" + $p.getName() );\n" +
+                "  insertLogical(      $id + \".\" + $p.getName() );\n" +
+                "end\n";
+
+        KieSession ksession = new KieHelper().addContent( drl, ResourceType.DRL )
+                                             .build()
+                                             .newKieSession();
+        
+        TMFileSet x = new TMFileSet("X");
+        TMFileSet y = new TMFileSet("Y");
+        ksession.insert( x );
+        ksession.insert( y );
+        ksession.fireAllRules();
+        assertFalse (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        
+        TMFile file0 = new TMFile("File0", 47);
+        TMFile file1 = new TMFile("File1", 47);
+        TMFile file2 = new TMFile("File2", 47);
+        x.getFiles().add(file2);
+        x.getFiles().addAll(Arrays.asList(new TMFile[]{file0, file1}));
+        y.getFiles().add(file2);
+        y.getFiles().add(file0);
+        y.getFiles().add(file1);
+        ksession.fireAllRules();
+        assertFalse (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertFalse (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+
+        file0.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+        
+        y.getFiles().remove( file1 ); // removing File1 from Y
+        file1.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertTrue  (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+        
+        file2.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertTrue  (factsCollection(ksession).contains("X.File1"));
+        assertTrue  (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertTrue  (factsCollection(ksession).contains("Y.File2"));
+    }
+    
+    /**
+     * Copied from drools-compiler
+     */
+    @Test
+    public void testMiscListMethods() {
+        String drl =
+                "import org.drools.compiler.xpath.tobeinstrumented.model.*;\n" +
+                "\n" +
+                "rule R2 when\n" +
+                "  TMDirectory( $id: name, $p: /files{size >= 100} )\n" +
+                "then\n" +
+                "  System.out.println( $id + \".\" + $p.getName() );\n" +
+                "  insertLogical(      $id + \".\" + $p.getName() );\n" +
+                "end\n";
+
+        KieSession ksession = new KieHelper().addContent( drl, ResourceType.DRL )
+                                             .build()
+                                             .newKieSession();
+        
+        TMDirectory x = new TMDirectory("X");
+        TMDirectory y = new TMDirectory("Y");
+        ksession.insert( x );
+        ksession.insert( y );
+        ksession.fireAllRules();
+        assertFalse (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        
+        TMFile file0 = new TMFile("File0", 47);
+        TMFile file1 = new TMFile("File1", 47);
+        TMFile file2 = new TMFile("File2", 47);
+        x.getFiles().add(file2);
+        x.getFiles().addAll(0, Arrays.asList(new TMFile[]{file0, file1}));
+        y.getFiles().add(0, file2);
+        y.getFiles().add(0, file0);
+        y.getFiles().add(1, file1);
+        ksession.fireAllRules();
+        assertFalse (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertFalse (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+
+        file0.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertFalse (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+        
+        y.getFiles().remove(1); // removing File1 from Y
+        file1.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertTrue  (factsCollection(ksession).contains("X.File1"));
+        assertFalse (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertFalse (factsCollection(ksession).contains("Y.File2"));
+        
+        file2.setSize( 999 );        
+        ksession.fireAllRules();
+        assertTrue  (factsCollection(ksession).contains("X.File0"));
+        assertTrue  (factsCollection(ksession).contains("X.File1"));
+        assertTrue  (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertTrue  (factsCollection(ksession).contains("Y.File2"));
+        
+        TMFile file0R = new TMFile("File0R", 999);
+        x.getFiles().set(0, file0R);
+        ksession.fireAllRules();
+        assertFalse (factsCollection(ksession).contains("X.File0"));
+        assertTrue  (factsCollection(ksession).contains("X.File0R"));
+        assertTrue  (factsCollection(ksession).contains("X.File1"));
+        assertTrue  (factsCollection(ksession).contains("X.File2"));
+        assertTrue  (factsCollection(ksession).contains("Y.File0"));
+        assertFalse (factsCollection(ksession).contains("Y.File1"));
+        assertTrue  (factsCollection(ksession).contains("Y.File2"));
     }
 }
