@@ -15,10 +15,13 @@
 
 package org.kie.remote.services.rest.api;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -48,6 +51,7 @@ public interface DeploymentResource {
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @ApiOperation(
             value="Retrieve basic information, including the status, of a deployment unit",
             position=0,
@@ -58,13 +62,54 @@ public interface DeploymentResource {
     /**
      * Queues a request to deploy the given deployment unit. If the deployment already exist, this
      * operation will fail.
-     * 
-     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
+     *
      * the deployment unit should be deployed.
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
     @POST
     @Path("/deploy")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @ApiOperation(
+            value="Deploy a deployment unit",
+            notes="Submits an asynchronous request",
+            position=1,
+            produces="application/xml, application/json",
+            response=JaxbDeploymentJobResult.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name="strategy",
+                    value="The runtime strategy for process instances from the deployment unit",
+                    allowableValues="SINGLETON, PER_REQUEST, PER_PROCESS_INSTANCE (case is ignored)",
+                    allowMultiple=false,
+                    paramType="query",
+                    required=false,
+                    defaultValue="SINGLETON"),
+            @ApiImplicitParam(
+                    name="mergemode",
+                    value="The merging strategy used when deploying the deployment unit",
+                    allowableValues="KEEP_ALL, OVERRIDE_ALL, OVERRIDE_EMPTY, MERGE_COLLECTIONS (case is ignored)",
+                    allowMultiple=false,
+                    paramType="query",
+                    required=false,
+                    defaultValue="MERGE_COLLECTIONS")
+    })
+    @ApiResponses({
+            @ApiResponse(code=202, message="Request accepted")
+    })
+    public Response deploy();
+
+    /**
+     * Queues a request to deploy the given deployment unit. If the deployment already exist, this
+     * operation will fail.
+     * 
+     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
+     * the deployment unit should be deployed.
+     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+     */
+    @PUT
+    @Path("/deploy")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @ApiOperation(
             value="Deploy a deployment unit",
             notes="Submits an asynchronous request; takes an optional JaxbDeploymentDescriptor argument for more fine-grained configuration of the configuration",
@@ -102,6 +147,7 @@ public interface DeploymentResource {
      */
     @POST
     @Path("/undeploy")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @ApiOperation(
             value="Undeploy a deployment unit",
             notes="Submits an asynchronous request",
@@ -115,6 +161,7 @@ public interface DeploymentResource {
 
     @GET
     @Path("/processes")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @ApiOperation(
             value="Retrieve a list of process definition info for a deployment unit",
             notes="The list is sorted alphabetically by process id",

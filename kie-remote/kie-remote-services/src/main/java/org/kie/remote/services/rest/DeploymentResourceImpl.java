@@ -23,12 +23,16 @@ import java.util.Map;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -72,6 +76,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      * @return A {@link JaxbDeploymentUnit} instance
      */
     @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response getConfig() {
         JaxbDeploymentUnit jaxbDepUnit = deployResourceBase.determineStatus(deploymentId, true);
@@ -83,12 +88,29 @@ public class DeploymentResourceImpl extends ResourceBase {
      * Queues a request to deploy the given deployment unit. If the deployment already exist, this
      * operation will fail.
      *
-     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
-     * the deployment unit should be deployed.
      * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
      */
     @POST
     @Path("/deploy")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
+    public Response deploy() {
+        // deploy with default deployment descriptor
+        return deploy(new JaxbDeploymentDescriptor());
+    }
+
+    /**
+     * Queues a request to deploy the given deployment unit. If the deployment already exist, this
+     * operation will fail.
+     *
+     * @param deployDescriptor An optional {@link DeploymentDescriptor} instance specifying additional information about how
+     * the deployment unit should be deployed.
+     * @return A {@link JaxbDeploymentJobResult} instance with the initial status of the job
+     */
+    @PUT
+    @Path("/deploy")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deploy(JaxbDeploymentDescriptor deployDescriptor) {
         JaxbDeploymentJobResult jobResult = doDeployOperation(deployDescriptor);
@@ -114,6 +136,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @POST
     @Path("/undeploy")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response undeploy() {
         JaxbDeploymentJobResult jobResult = deployResourceBase.submitUndeployJob(deploymentId);
@@ -127,6 +150,7 @@ public class DeploymentResourceImpl extends ResourceBase {
      */
     @GET
     @Path("/processes")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response listProcessDefinitions() {
         String oper = getRelativePath();
@@ -143,6 +167,7 @@ public class DeploymentResourceImpl extends ResourceBase {
 
     @POST
     @Path("/activate")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response activate() {
         deployResourceBase.activate(deploymentId);
@@ -152,6 +177,7 @@ public class DeploymentResourceImpl extends ResourceBase {
 
     @POST
     @Path("/deactivate")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @RolesAllowed({REST_ROLE, REST_DEPLOYMENT_ROLE})
     public Response deactivate() {
         deployResourceBase.deactivate(deploymentId);
