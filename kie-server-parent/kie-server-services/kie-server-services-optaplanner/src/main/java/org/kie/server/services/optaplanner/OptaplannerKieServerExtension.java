@@ -50,7 +50,13 @@ public class OptaplannerKieServerExtension
     private ExecutorService threadPool = null;
 
     private List<Object> services = new ArrayList<Object>();
+    private boolean initialized = false;
     private OptaplannerCommandServiceImpl optaplannerCommandService;
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     @Override
     public boolean isActive() {
@@ -83,6 +89,8 @@ public class OptaplannerKieServerExtension
         this.optaplannerCommandService = new OptaplannerCommandServiceImpl(registry, solverServiceBase);
 
         this.services.add( solverServiceBase );
+
+        initialized = true;
     }
 
     @Override

@@ -148,9 +148,15 @@ public class JbpmKieServerExtension implements KieServerExtension {
     private DeploymentDescriptorMerger merger = new DeploymentDescriptorMerger();
 
     private List<Object> services = new ArrayList<Object>();
+    private boolean initialized = false;
 
     private Map<String, List<String>> containerMappers = new ConcurrentHashMap<String, List<String>>();
     private Map<String, List<String>> containerQueries = new ConcurrentHashMap<String, List<String>>();
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     @Override
     public boolean isActive() {
@@ -284,6 +290,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(processInstanceMigrationService);
         services.add(processInstanceAdminService);
         services.add(userTaskAdminService);
+
+        initialized = true;
     }
 
     @Override

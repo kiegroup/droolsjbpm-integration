@@ -121,7 +121,11 @@ public class KieServerImpl implements KieServer {
 
                 this.context.registerServerExtension(extension);
 
-                logger.info("{} has been successfully registered as server extension", extension);
+                if(extension.isInitialized()) {
+                    logger.info("{} has been successfully registered as server extension", extension);
+                } else {
+                    logger.warn("{} has not been registered as server extension", extension);
+                }
             } catch (Exception e) {
                 serverMessages.add(new Message(Severity.ERROR, "Error when initializing server extension of type " + extension + " due to " + e.getMessage()));
                 logger.error("Error when initializing server extension of type {}", extension, e);
