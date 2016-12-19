@@ -325,11 +325,11 @@ public class ProcessRequestBean {
         // process instance
         if( processInstanceId == null && cmd instanceof ProcessInstanceIdCommand ) {
             processInstanceId = ((ProcessInstanceIdCommand) cmd).getProcessInstanceId();
-            if( processInstanceId != null ) {
+            if( processInstanceId != null && processInstanceId != -1L) {
                return ProcessInstanceIdContext.get(processInstanceId);
             }
         }
-        if( processInstanceId != null ) {
+        if( processInstanceId != null && processInstanceId != -1L) {
             return ProcessInstanceIdContext.get(processInstanceId);
         }
 
