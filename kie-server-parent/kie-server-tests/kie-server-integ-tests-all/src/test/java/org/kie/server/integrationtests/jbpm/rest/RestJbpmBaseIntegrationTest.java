@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.jbpm.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
@@ -46,7 +47,7 @@ public abstract class RestJbpmBaseIntegrationTest extends RestOnlyBaseIntegratio
         cleanupSingletonSessionId();
     }
 
-    @Before
+    @After
     public void abortAllProcesses() {
         List<Integer> status = new ArrayList<Integer>();
         status.add(ProcessInstance.STATE_ACTIVE);
