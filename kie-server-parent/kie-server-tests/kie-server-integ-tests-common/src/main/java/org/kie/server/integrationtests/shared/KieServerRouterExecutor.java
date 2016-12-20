@@ -20,8 +20,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.stream.Stream;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.router.KieServerRouter;
+import org.kie.server.router.KieServerRouterConstants;
 
 public class KieServerRouterExecutor {
 
@@ -39,13 +41,13 @@ public class KieServerRouterExecutor {
         // setup repository for config of router
         repository = new File("target/router-repo");
         repository.mkdirs();
-        System.setProperty("org.kie.server.router.repo", repository.getAbsolutePath());
+        System.setProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, repository.getAbsolutePath());
         // setup and start router
         Integer port = getRouterPort();
         router = new KieServerRouter();
         router.start("localhost", port);
-        if (System.getProperty("org.kie.server.router") == null) {
-            System.setProperty("org.kie.server.router", "http://localhost:" + port);
+        if (System.getProperty(KieServerConstants.KIE_SERVER_ROUTER) == null) {
+            System.setProperty(KieServerConstants.KIE_SERVER_ROUTER, "http://localhost:" + port);
         }
     }
 
@@ -57,7 +59,7 @@ public class KieServerRouterExecutor {
             throw new RuntimeException("Kie execution controller is already stopped!");
         }
         // stop router and remove its config
-        System.clearProperty("org.kie.server.router.repo");
+        System.clearProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR);
         router.stop(true);
         router = null;
         Stream.of(repository.listFiles()).forEach(f-> f.delete());
@@ -65,7 +67,7 @@ public class KieServerRouterExecutor {
     }
 
     protected Integer getRouterPort() {
-        String routerUrl = System.getProperty("org.kie.server.router");
+        String routerUrl = System.getProperty(KieServerConstants.KIE_SERVER_ROUTER);
         if (routerUrl == null) {
             return TestConfig.getRouterAllocatedPort();
         }

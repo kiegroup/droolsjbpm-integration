@@ -85,6 +85,8 @@ public class KieServerConstants {
 
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
 
+    public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
+
     public static final String CAPABILITY_BRM = "BRM"; // Business Rules Management
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI

@@ -18,6 +18,7 @@ package org.kie.server.router.client;
 import java.util.Arrays;
 import java.util.List;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -36,9 +37,9 @@ public class KieServerRouterEventListener implements KieServerEventListener {
     
     private static final Logger logger = LoggerFactory.getLogger(KieServerRouterEventListener.class);
     
-    private String serverId = System.getProperty("org.kie.server.id");
-    private String serverURL = System.getProperty("org.kie.server.location");
-    private String routerURL = System.getProperty("org.kie.server.router");
+    private String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
+    private String serverURL = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION);
+    private String routerURL = System.getProperty(KieServerConstants.KIE_SERVER_ROUTER);
     
     private KieContainerResourceFilter activeOnly = new KieContainerResourceFilter(ReleaseIdFilter.ACCEPT_ALL, KieContainerStatusFilter.parseFromNullableString("STARTED"));
 
