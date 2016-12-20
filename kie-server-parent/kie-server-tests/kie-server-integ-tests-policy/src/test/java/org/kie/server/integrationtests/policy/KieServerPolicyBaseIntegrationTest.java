@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.policy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -72,7 +73,7 @@ public abstract class KieServerPolicyBaseIntegrationTest extends RestJmsSharedBa
         cleanupSingletonSessionId();
     }
 
-    @Before
+    @After
     public void abortAllProcesses() {
         List<Integer> status = new ArrayList<Integer>();
         status.add(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE);

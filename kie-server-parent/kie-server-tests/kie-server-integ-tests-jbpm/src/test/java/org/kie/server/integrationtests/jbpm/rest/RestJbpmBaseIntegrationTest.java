@@ -1,9 +1,10 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2016 JBoss by Red Hat.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ * You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,56 +12,30 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
-package org.kie.server.integrationtests.jbpm;
+ */
+package org.kie.server.integrationtests.jbpm.rest;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
-import org.kie.api.KieServices;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.server.client.CaseServicesClient;
-import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
-import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.UIServicesClient;
-import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
+import org.kie.server.integrationtests.jbpm.DBExternalResource;
+import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
-public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
+public abstract class RestJbpmBaseIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
 
-    protected static final String USER_YODA = "yoda";
-    protected static final String USER_JOHN = "john";
-    protected static final String USER_ADMINISTRATOR = "Administrator";
-    protected static final String USER_MARY = "mary";
-
-    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
-    protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
-    protected static final String PROCESS_ID_GROUPTASK = "definition-project.grouptask";
-
     protected ProcessServicesClient processClient;
-    protected UserTaskServicesClient taskClient;
     protected QueryServicesClient queryClient;
-    protected JobServicesClient jobServicesClient;
-    protected RuleServicesClient ruleClient;
-    protected UIServicesClient uiServicesClient;
-    protected CaseServicesClient caseClient;
-
-    @BeforeClass
-    public static void setupFactory() throws Exception {
-        commandsFactory = KieServices.Factory.get().getCommands();
-    }
 
     @Before
     public void cleanup() {
@@ -82,11 +57,6 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     @Override
     protected void setupClients(KieServicesClient client) {
         processClient = client.getServicesClient(ProcessServicesClient.class);
-        taskClient = client.getServicesClient(UserTaskServicesClient.class);
         queryClient = client.getServicesClient(QueryServicesClient.class);
-        jobServicesClient = client.getServicesClient(JobServicesClient.class);
-        ruleClient = client.getServicesClient(RuleServicesClient.class);
-        uiServicesClient = client.getServicesClient(UIServicesClient.class);
-        caseClient = client.getServicesClient(CaseServicesClient.class);
     }
 }

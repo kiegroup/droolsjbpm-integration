@@ -29,11 +29,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -45,14 +42,12 @@ import org.kie.server.api.model.instance.DocumentInstanceList;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
+public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "rest-processes", "1.0.0.Final");
    
@@ -60,9 +55,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
 
     private static Map<MarshallingFormat, String> acceptHeadersByFormat = new HashMap<MarshallingFormat, String>();
 
-    @ClassRule
-    public static ExternalResource StaticResource = new DBExternalResource();
-    
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
@@ -72,12 +64,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
 
         createContainer(CONTAINER, releaseId);
-    }
-
-
-    @Before
-    public void cleanup() {
-        cleanupSingletonSessionId();
     }
 
     /**

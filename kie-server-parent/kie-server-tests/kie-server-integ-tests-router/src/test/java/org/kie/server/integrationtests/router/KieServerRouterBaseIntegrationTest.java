@@ -18,6 +18,7 @@ package org.kie.server.integrationtests.router;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -93,7 +94,7 @@ public abstract class KieServerRouterBaseIntegrationTest extends RestJmsSharedBa
     }
 
 
-    @Before
+    @After
     public void abortAllProcesses() {
 
         // make sure we run via router
