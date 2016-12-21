@@ -17,7 +17,9 @@ package org.kie.server.services.jbpm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
@@ -171,11 +173,33 @@ public class ConvertUtils {
     }
 
     public static QueryFilter buildQueryFilter(Integer page, Integer pageSize, String orderBy, boolean asc) {
+        QueryFilter queryFilter = null;
         if (orderBy != null && !orderBy.isEmpty()) {
-            return new QueryFilter(page * pageSize, pageSize, orderBy, asc);
+            queryFilter = new QueryFilter(page * pageSize, pageSize, orderBy, asc);
+        } else {
+            queryFilter = new QueryFilter(page * pageSize, pageSize);
         }
 
-        return new QueryFilter(page * pageSize, pageSize);
+        return queryFilter;
+    }
+
+    public static QueryFilter buildTaskByNameQueryFilter(Integer page, Integer pageSize, String orderBy, boolean asc, String filter) {
+        QueryFilter queryFilter = null;
+        if (orderBy != null && !orderBy.isEmpty()) {
+            queryFilter = new QueryFilter(page * pageSize, pageSize, orderBy, asc);
+        } else {
+            queryFilter = new QueryFilter(page * pageSize, pageSize);
+        }
+
+        if (filter != null && !filter.isEmpty()) {
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("taskName", filter);
+
+            queryFilter.setFilterParams("t.name like :taskName");
+            queryFilter.setParams(params);
+        }
+
+        return queryFilter;
     }
 
     public static List<Status> buildTaskStatuses(List<String> status) {

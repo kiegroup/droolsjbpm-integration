@@ -870,6 +870,11 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
     }
 
     @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, String filter, List<String> status, Integer page, Integer pageSize) {
+        return findTasksAssignedAsPotentialOwner(userId, filter, status, page, pageSize, "", true);
+    }
+
+    @Override
     public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize) {
         return findTasksAssignedAsPotentialOwner(userId, groups, status, page, pageSize, "", true);
     }
@@ -1028,6 +1033,37 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
             taskSummaryList = response.getResult();
         }
 
+        if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
+            return Arrays.asList(taskSummaryList.getTasks());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, String filter, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        TaskSummaryList taskSummaryList = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+            String userQuery = getUserQueryStr(userId);
+            String statusQuery = getAdditionalParams(userQuery, "status", status);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize)+"&sort="+sort+"&sortOrder="+sortOrder+"&filter="+filter;
+
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), QUERY_URI + "/" + TASKS_ASSIGN_POT_OWNERS_GET_URI, valuesMap) + queryString , TaskSummaryList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTasksAssignedAsPotentialOwner", new Object[]{safeList(status), new ArrayList(), userId, page, pageSize, sort, sortOrder, filter}) ) );
+            ServiceResponse<TaskSummaryList> response = (ServiceResponse<TaskSummaryList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            taskSummaryList = response.getResult();
+        }
         if (taskSummaryList != null && taskSummaryList.getTasks() != null) {
             return Arrays.asList(taskSummaryList.getTasks());
         }

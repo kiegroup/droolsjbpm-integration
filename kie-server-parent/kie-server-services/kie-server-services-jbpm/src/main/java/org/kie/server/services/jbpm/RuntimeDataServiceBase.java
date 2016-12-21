@@ -36,6 +36,7 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.internal.query.QueryFilter;
 import org.kie.internal.task.api.AuditTask;
 import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.KieServerConstants;
@@ -379,25 +380,29 @@ public class RuntimeDataServiceBase {
     }
 
     public TaskSummaryList getTasksAssignedAsPotentialOwner(List<String> status,  List<String> groupIds, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        return getTasksAssignedAsPotentialOwner(status, groupIds, userId, page, pageSize, sort, sortOrder, null);
+    }
+
+    public TaskSummaryList getTasksAssignedAsPotentialOwner(List<String> status,  List<String> groupIds, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder, String filter) {
 
         List<Status> taskStatuses = buildTaskStatuses(status);
 
         userId = getUser(userId);
         logger.debug("About to search for task assigned as potential owner for user '{}'", userId);
         List<TaskSummary> tasks;
-
+        QueryFilter queryFilter = buildTaskByNameQueryFilter(page, pageSize, sort, sortOrder, filter);
         if (groupIds != null && !groupIds.isEmpty()) {
 
             if (taskStatuses == null) {
-                tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, groupIds, buildQueryFilter(page, pageSize, sort, sortOrder));
+                tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, groupIds, queryFilter);
             } else {
-                tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, groupIds, taskStatuses, buildQueryFilter(page, pageSize, sort, sortOrder));
+                tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, groupIds, taskStatuses, queryFilter);
             }
         } else if (taskStatuses != null) {
-            tasks = runtimeDataService.getTasksAssignedAsPotentialOwnerByStatus(userId, taskStatuses, buildQueryFilter(page, pageSize, sort, sortOrder));
+            tasks = runtimeDataService.getTasksAssignedAsPotentialOwnerByStatus(userId, taskStatuses, queryFilter);
         } else {
 
-            tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, buildQueryFilter(page, pageSize, sort, sortOrder));
+            tasks = runtimeDataService.getTasksAssignedAsPotentialOwner(userId, queryFilter);
         }
 
         logger.debug("Found {} tasks for user '{}' assigned as potential owner", tasks.size(), userId);

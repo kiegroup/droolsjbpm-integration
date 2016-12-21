@@ -370,7 +370,8 @@ public class RuntimeDataResource {
             @QueryParam("status") List<String> status,  @QueryParam("groups") List<String> groupIds,
             @QueryParam("user") String userId,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder,
+            @QueryParam("filter") String filter) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -378,7 +379,7 @@ public class RuntimeDataResource {
 
         try {
 
-            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsPotentialOwner(status, groupIds, userId, page, pageSize, sort, sortOrder);
+            TaskSummaryList result = runtimeDataServiceBase.getTasksAssignedAsPotentialOwner(status, groupIds, userId, page, pageSize, sort, sortOrder, filter);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 
