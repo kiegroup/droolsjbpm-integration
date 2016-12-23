@@ -50,13 +50,15 @@ public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
 
 	@Override
 	public RuntimeManager newPerRequestRuntimeManager(RuntimeEnvironment environment, String identifier) {
-		adjustEnvironment(environment);
+        disallowSharedTaskService(environment);
+        adjustEnvironment(environment);
 		return super.newPerRequestRuntimeManager(environment, identifier);
 	}
 
 	@Override
 	public RuntimeManager newPerProcessInstanceRuntimeManager(RuntimeEnvironment environment, String identifier) {
-		adjustEnvironment(environment);
+        disallowSharedTaskService(environment);
+        adjustEnvironment(environment);
 		return super.newPerProcessInstanceRuntimeManager(environment, identifier);
 	}
 
@@ -130,5 +132,12 @@ public class SpringRuntimeManagerFactoryImpl extends RuntimeManagerFactoryImpl {
             ((SimpleRuntimeEnvironment)environment).getEnvironmentTemplate().set(EnvironmentName.USE_PESSIMISTIC_LOCKING, true);
         }
 	}
+
+    protected void disallowSharedTaskService(RuntimeEnvironment environment) {
+
+        if (((SimpleRuntimeEnvironment)environment).getEnvironmentTemplate().get("org.kie.api.task.TaskService") != null) {
+            throw new IllegalStateException("Per process instance and per request runtime manager do not support shared task service");
+        }
+    }
 
 }
