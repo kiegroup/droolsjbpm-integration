@@ -39,6 +39,8 @@ public class IntegrationSpringBase {
     //xml paths for UserManagedSharedTaskServiceSpringTest 
     public static final String SHARED_TASKSERVICE_JTA_EM_SINGLETON_PATH = "jbpm/shared-taskservice/jta-em-singleton.xml";
     public static final String SHARED_TASKSERVICE_JTA_EMF_SINGLETON_PATH = "jbpm/shared-taskservice/jta-emf-singleton.xml";
+    public static final String SHARED_TASKSERVICE_PER_PROCESS_INSTANCE_PATH = "jbpm/shared-taskservice/jta-emf-per-process-instance.xml";
+    public static final String SHARED_TASKSERVICE_PER_REQUEST_PATH = "jbpm/shared-taskservice/jta-emf-per-request.xml";
     //xml path for MultipleRuntimeManagersTest
     public static final String MULTIPLE_RUNTIME_MANAGERS_LOCAL_EMF_SINGLETON_PATH = "jbpm/multiple-runtime-managers/local-emf-singleton.xml";
     //xml paths for PessimisticLockingSpringTest

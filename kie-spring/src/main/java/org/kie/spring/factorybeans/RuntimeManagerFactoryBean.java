@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jbpm.runtime.manager.impl.SimpleRuntimeEnvironment;
 import org.kie.api.runtime.manager.RuntimeEnvironment;
 import org.kie.api.runtime.manager.RuntimeManager;
 import org.kie.api.runtime.manager.RuntimeManagerFactory;
@@ -67,8 +68,10 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
         else {
             RuntimeManager manager = null;
             if ("PER_REQUEST".equalsIgnoreCase(type)) {
+                disallowSharedTaskService(runtimeEnvironment);
                 manager = factory.newPerRequestRuntimeManager(runtimeEnvironment, identifier);
             } else if ("PER_PROCESS_INSTANCE".equalsIgnoreCase(type)) {
+                disallowSharedTaskService(runtimeEnvironment);
                 manager = factory.newPerProcessInstanceRuntimeManager(runtimeEnvironment, identifier);
             } else {
                 manager = factory.newSingletonRuntimeManager(runtimeEnvironment, identifier);
@@ -139,6 +142,13 @@ public class RuntimeManagerFactoryBean implements FactoryBean, InitializingBean,
                     ((ApplicationContextAware) resolver).setApplicationContext(applicationContext);
                 }
             }
+        }
+    }
+
+    protected void disallowSharedTaskService(RuntimeEnvironment environment) {
+
+        if (((SimpleRuntimeEnvironment)environment).getEnvironmentTemplate().get("org.kie.api.task.TaskService") != null) {
+            throw new IllegalStateException("Per process instance and per request runtime manager do not support shared task service");
         }
     }
 }

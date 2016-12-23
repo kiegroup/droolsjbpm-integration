@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+  <import resource="classpath:jbpm/configuration-template/jta-emf-spring.xml" />
+
+  <bean id="taskService" class="org.kie.spring.factorybeans.TaskServiceFactoryBean" destroy-method="close">
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
+    <property name="transactionManager" ref="jbpmTxManager"/>
+    <property name="listeners">
+      <list>
+        <bean class="org.jbpm.services.task.audit.JPATaskLifeCycleEventListener">
+          <constructor-arg value="true"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="sharedTaskServiceRuntimeEnvironment" parent="runtimeEnvironment">
+    <property name="taskService" ref="taskService"/>
+  </bean>
+
+  <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+    <property name="identifier" value="spring-rm"/>
+    <property name="runtimeEnvironment" ref="sharedTaskServiceRuntimeEnvironment"/>
+    <property name="type" value="PER_REQUEST"/>
+  </bean>
+</beans>
