@@ -29,7 +29,6 @@ import static org.junit.Assert.assertNotNull;
  * One way of listeners configuration require specific order of elements, another one does not.
  * Probably because of <xsd:all> vs. <xsd:sequence> in drools-spring.xsd
  *
- * @author rsynek
  */
 public class KieSpringListenersOrderTest {
     private static ApplicationContext ctx;

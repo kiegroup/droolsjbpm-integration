@@ -32,7 +32,6 @@ import javax.ws.rs.core.Variant;
  *  
  * {@link Variant} selection.
  *
- * @author Pascal S. de Kloe
  * @see "RFC 2296"
  */
 public class ServerDrivenNegotiation

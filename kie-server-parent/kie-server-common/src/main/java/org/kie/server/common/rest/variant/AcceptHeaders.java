@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
  * Copied from RestEasy 2.3.6.Final with very minor modifications (RestOperationException)
  * Can be deleted when RESTEASY-960 is fixed
  * 
- * @author Pascal S. de Kloe
  */
 public class AcceptHeaders
 {
