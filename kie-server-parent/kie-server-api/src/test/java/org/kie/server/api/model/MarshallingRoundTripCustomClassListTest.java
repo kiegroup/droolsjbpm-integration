@@ -91,7 +91,34 @@ public class MarshallingRoundTripCustomClassListTest {
     private void verifyMarshallingRoundTrip( Marshaller marshaller, Object inputObject ) {
         String rawContent = marshaller.marshall( inputObject );
         Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall( rawContent, inputObject.getClass() );
-        Assertions.assertThat( inputObject ).isEqualTo( testObjectAfterMarshallingTurnAround );
+        Assertions.assertThat( testObjectAfterMarshallingTurnAround ).isEqualTo( inputObject );
     }
 
+    @Test
+    public void testJSONTypeInfoTopLevelOnly() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller( getCustomClasses(), MarshallingFormat.JSON, getClass().getClassLoader() );
+        String rawContent = "{\"org.kie.server.api.marshalling.objects.PojoA\": "
+                + "{\"name\": \"A\","
+                + " \"pojoBList\":"
+                + " [{\"name\": \"B1\","
+                + "   \"pojoCList\":"
+                + "    ["
+                + "      {\"name\": \"C1\"}, "
+                + "      {\"name\": \"C2\"}"
+                + "    ]"
+                + "  },"
+                + "  {\"name\": \"B2\","
+                + "   \"pojoCList\":"
+                + "    ["
+                + "     {\"name\": \"C3\"}"
+                + "    ]"
+                + "  }"
+                + " ],"
+                + " \"stringList\":"
+                + "  [\"Hello\", \"Bye\"]"
+                + "}}";
+
+        Object unmarshalledObject = marshaller.unmarshall( rawContent, PojoA.class );
+        Assertions.assertThat( unmarshalledObject ).isEqualTo( createTestObject() );
+    }
 }
