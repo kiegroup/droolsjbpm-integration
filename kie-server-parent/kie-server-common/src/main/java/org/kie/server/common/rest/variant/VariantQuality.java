@@ -25,7 +25,6 @@ import java.math.MathContext;
  * 
  * A individual variant quality bean for the <span title="Remote Variant Selection Algorithm">RVSA</span>.
  *
- * @author Pascal S. de Kloe
  * @see "RFC 2296"
  */
 public class VariantQuality

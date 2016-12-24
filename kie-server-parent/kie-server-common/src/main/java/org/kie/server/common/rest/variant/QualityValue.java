@@ -21,7 +21,6 @@ package org.kie.server.common.rest.variant;
  * Copied from RestEasy 2.3.6.Final with very minor modifications (RestOperationException)
  * Can be deleted when RESTEASY-960 is fixed
  *  
- * @author Pascal S. de Kloe
  * @see "RFC2616 3.9 Quality Values"
  */
 public final class QualityValue extends Number implements Comparable<QualityValue>

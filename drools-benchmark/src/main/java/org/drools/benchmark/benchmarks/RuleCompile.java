@@ -24,9 +24,6 @@ import org.kie.api.io.*;
 import java.io.*;
 import java.util.*;
 
-/**
- * @author Mario Fusco
- */
 public class RuleCompile extends AbstractBenchmark {
 
     private String[] drlFiles;

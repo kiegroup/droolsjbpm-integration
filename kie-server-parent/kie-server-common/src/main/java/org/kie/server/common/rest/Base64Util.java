@@ -27,8 +27,6 @@ import java.io.UnsupportedEncodingException;
  * periodically to check for updates or to contribute improvements.
  * </p>
  *
- * @author Robert Harder
- * @author rob@iharder.net
  * @version 2.3.7
  */
 public class Base64Util {
