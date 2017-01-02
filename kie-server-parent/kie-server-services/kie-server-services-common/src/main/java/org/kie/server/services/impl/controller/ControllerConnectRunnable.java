@@ -18,6 +18,7 @@ package org.kie.server.services.impl.controller;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.KieServerController;
@@ -70,7 +71,7 @@ public class ControllerConnectRunnable implements Runnable {
                 break;
 
             } catch (KieControllerNotConnectedException e) {
-                long waitTime = Long.parseLong(System.getProperty("org.kie.server.controller.connect", "10000"));
+                long waitTime = Long.parseLong(System.getProperty(KieServerConstants.CFG_KIE_SERVER_CONTROLLER_CONNECT_INTERVAL, "10000"));
                 logger.debug("Still cannot connect to any controllers, waiting for {} before next attempt", waitTime);
                 try {
                     Thread.sleep(waitTime);

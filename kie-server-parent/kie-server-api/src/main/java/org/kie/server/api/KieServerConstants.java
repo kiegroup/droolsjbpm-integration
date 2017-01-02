@@ -49,6 +49,10 @@ public class KieServerConstants {
 
     public static final String CFG_BYPASS_AUTH_USER = "org.kie.server.bypass.auth.user";
 
+    public static final String CFG_KIE_SERVER_RESPONSE_QUEUE = "kie.server.jms.queues.response";
+
+    public static final String CFG_KIE_SERVER_CONTROLLER_CONNECT_INTERVAL = "org.kie.server.controller.connect";
+
     /**
      * security settings used to connect to KIE Server
      */
@@ -71,6 +75,7 @@ public class KieServerConstants {
     public static final String CFG_EXECUTOR_POOL = "org.kie.executor.pool.size";
     public static final String CFG_EXECUTOR_RETRIES = "org.kie.executor.retry.count";
     public static final String CFG_EXECUTOR_TIME_UNIT = "org.kie.executor.timeunit";
+    public static final String CFG_EXECUTOR_JMS_QUEUE = "org.kie.executor.jms.queue";
     public static final String CFG_EXECUTOR_DISABLED = "org.kie.executor.disabled";
 
     public static final String CFG_DOCUMENT_STORAGE_PATH = "org.jbpm.document.storage";

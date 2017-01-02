@@ -242,7 +242,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
         ((KModuleDeploymentService) deploymentService).addListener(((QueryServiceImpl) queryService));
 
         if (config.getConfigItemValue(KieServerConstants.CFG_EXECUTOR_DISABLED, "false").equalsIgnoreCase("false")) {
-            String executorQueueName = System.getProperty("org.kie.executor.jms.queue", "queue/KIE.SERVER.EXECUTOR");
+            String executorQueueName = System.getProperty(KieServerConstants.CFG_EXECUTOR_JMS_QUEUE, "queue/KIE.SERVER.EXECUTOR");
 
             // build executor service
             executorService = ExecutorServiceFactory.newExecutorService(emf);
