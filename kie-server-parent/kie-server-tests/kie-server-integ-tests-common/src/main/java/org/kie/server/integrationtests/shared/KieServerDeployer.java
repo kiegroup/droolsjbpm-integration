@@ -72,11 +72,13 @@ public class KieServerDeployer {
             mvnArgs.add(kjarsBuildSettingsXml);
         }
         int mvnRunResult = cli.doMain(mvnArgs.toArray(new String[mvnArgs.size()]), basedir, System.out, System.err);
+
+        Thread.currentThread().setContextClassLoader(classLoaderBak);
+
         if (mvnRunResult != 0) {
             throw new RuntimeException("Error while building Maven project from basedir " + basedir +
                     ". Return code=" + mvnRunResult);
         }
-        Thread.currentThread().setContextClassLoader(classLoaderBak);
         logger.debug("Maven project successfully built and deployed!");
     }
 
