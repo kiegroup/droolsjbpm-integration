@@ -454,6 +454,11 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
         taskClient.getTaskInstance(CONTAINER_ID, -9999l);
     }
 
+    @Test (expected = KieServicesException.class)
+    public void testNotExistingUserTaskFindById() throws Exception {
+        taskClient.findTaskById(-9999l);
+    }
+
     @Test
     public void testUserTaskByIdWithDetails() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
