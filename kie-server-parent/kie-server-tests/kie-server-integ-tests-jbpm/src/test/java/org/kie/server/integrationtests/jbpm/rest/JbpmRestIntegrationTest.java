@@ -23,38 +23,28 @@ import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ClientResponseFailure;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.integrationtests.config.TestConfig;
-import org.kie.server.integrationtests.jbpm.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertTrue;
 import static org.kie.server.api.rest.RestURI.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 
-public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
+public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "rest-processes", "1.0.0.Final");
 
     private static Logger logger = LoggerFactory.getLogger(JbpmRestIntegrationTest.class);
 
     private static Map<MarshallingFormat, String> acceptHeadersByFormat = new HashMap<MarshallingFormat, String>();
-
-    @ClassRule
-    public static ExternalResource StaticResource = new DBExternalResource();
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -65,12 +55,6 @@ public class JbpmRestIntegrationTest extends RestOnlyBaseIntegrationTest {
         acceptHeadersByFormat.put(MarshallingFormat.JSON, "application/json;q=0.9,application/xml;q=0.3");// json is preferred over xml
 
         createContainer(CONTAINER, releaseId);
-    }
-
-
-    @Before
-    public void cleanup() {
-        cleanupSingletonSessionId();
     }
 
     /**

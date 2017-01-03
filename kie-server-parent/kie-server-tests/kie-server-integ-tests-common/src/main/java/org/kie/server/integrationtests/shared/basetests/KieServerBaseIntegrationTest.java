@@ -47,6 +47,7 @@ import org.kie.server.integrationtests.controller.client.KieServerMgmtController
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.controller.client.KieServerControllerClient;
 import org.kie.server.integrationtests.shared.KieControllerExecutor;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +108,7 @@ public abstract class KieServerBaseIntegrationTest {
         List<KieContainerResource> containers = response.getResult().getContainers();
         if (containers != null) {
             for (KieContainerResource container : containers) {
-                client.disposeContainer(container.getContainerId());
+                KieServerAssert.assertSuccess(client.disposeContainer(container.getContainerId()));
             }
         }
     }
