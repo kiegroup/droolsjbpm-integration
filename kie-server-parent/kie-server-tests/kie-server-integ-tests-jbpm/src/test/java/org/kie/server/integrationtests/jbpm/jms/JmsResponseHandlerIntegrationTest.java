@@ -138,9 +138,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
         testGetProcessInstancesResponseHandler(new AsyncResponseHandler(callback));
         // now let's check if response has arrived
-        Long processInstanceId = callback.get(Long.class);
-        assertThat(processInstanceId).isNotNull().isPositive();
-
         ProcessInstanceList processInstanceList = callback.get(ProcessInstanceList.class);
         assertThat(processInstanceList).isNotNull();
         assertThat(processInstanceList.getItems()).isNotNull().hasSize(1);
@@ -152,9 +149,6 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
 
         testGetTaskResponseHandler(new AsyncResponseHandler(callback));
         // now let's check if response has arrived
-        Long processInstanceId = callback.get(Long.class);
-        assertThat(processInstanceId).isNotNull().isPositive();
-
         TaskSummaryList taskSummaryList = callback.get(TaskSummaryList.class);
         assertThat(taskSummaryList).isNotNull();
         assertThat(taskSummaryList.getItems()).isNotNull().hasSize(1);
@@ -224,11 +218,8 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertThat(processInstances).isEmpty();
 
-        // change response handler for processClient others are not affected
-        processClient.setResponseHandler(responseHandler);
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-        // since we use fire and forget there will always be null response
-        assertThat(processInstanceId).isNull();
+        assertThat(processInstanceId).isNotNull();
 
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
@@ -252,11 +243,8 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
         assertThat(processInstances).isEmpty();
 
-        // change response handler for processClient others are not affected
-        processClient.setResponseHandler(responseHandler);
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
-        // since we use fire and forget there will always be null response
-        assertThat(processInstanceId).isNull();
+        assertThat(processInstanceId).isNotNull();
 
         KieServerSynchronization.waitForProcessInstanceStart(queryClient, CONTAINER_ID);
 
