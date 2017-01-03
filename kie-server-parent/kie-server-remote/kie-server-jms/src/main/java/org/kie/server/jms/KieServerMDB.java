@@ -38,6 +38,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.kie.server.api.ConversationId;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.marshalling.Marshaller;
@@ -69,7 +70,6 @@ public class KieServerMDB
 
     // Constants / properties
     private              String RESPONSE_QUEUE_NAME          = null;
-    private static final String RESPONSE_QUEUE_NAME_PROPERTY = "kie.server.jms.queues.response";
     private static final String DEFAULT_RESPONSE_QUEUE_NAME  = "queue/KIE.SERVER.RESPONSE";
 
     private static final String ID_NECESSARY = "This id is needed to be able to match a request to a response message.";
@@ -90,7 +90,7 @@ public class KieServerMDB
 
     @PostConstruct
     public void init() {
-        RESPONSE_QUEUE_NAME = System.getProperty( RESPONSE_QUEUE_NAME_PROPERTY, DEFAULT_RESPONSE_QUEUE_NAME );
+        RESPONSE_QUEUE_NAME = System.getProperty( KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE, DEFAULT_RESPONSE_QUEUE_NAME );
 
         try {
             connection = factory.createConnection();
@@ -302,7 +302,7 @@ public class KieServerMDB
             producer.send(msg);
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId
-                            + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
+                            + " (Is " + KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE + " incorrect?).";
             logger.error(errMsg, ne);
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
