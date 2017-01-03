@@ -7,7 +7,6 @@
   <bean id="runtimeEnvironment" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean" primary="false">
     <property name="entityManagerFactory" ref="jbpmEMF" />
     <property name="transactionManager" ref="jbpmTxManager" />
-    <property name="taskService" ref="taskService" />
     <property name="assets" ref="assets"/>
   </bean>
 
