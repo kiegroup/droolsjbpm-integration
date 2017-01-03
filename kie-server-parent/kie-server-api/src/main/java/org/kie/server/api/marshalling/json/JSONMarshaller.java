@@ -39,6 +39,7 @@ import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.BeanProperty;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
@@ -47,11 +48,19 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.TypeDeserializer;
+import org.codehaus.jackson.map.deser.BeanDeserializer;
+import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.deser.std.UntypedObjectDeserializer;
 import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
+import org.codehaus.jackson.map.jsontype.TypeIdResolver;
 import org.codehaus.jackson.map.jsontype.TypeResolverBuilder;
+import org.codehaus.jackson.map.jsontype.impl.AsArrayTypeDeserializer;
+import org.codehaus.jackson.map.jsontype.impl.AsExternalTypeDeserializer;
+import org.codehaus.jackson.map.jsontype.impl.AsPropertyTypeDeserializer;
+import org.codehaus.jackson.map.jsontype.impl.AsWrapperTypeDeserializer;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -70,6 +79,13 @@ public class JSONMarshaller implements Marshaller {
 
     private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+
+    private ThreadLocal<Boolean> stripped = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
 
     protected ClassLoader classLoader;
     protected ObjectMapper objectMapper;
@@ -149,6 +165,139 @@ public class JSONMarshaller implements Marshaller {
             }
 
             objectMapper.registerModule(mod);
+            TypeResolverBuilder<?> typer2 = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL){
+                @Override
+                public boolean useForType(JavaType t) {
+                    if (classesSet.contains(t.getRawClass())) {
+                        return true;
+                    }
+                    return false;
+                }
+                @Override
+                public TypeDeserializer buildTypeDeserializer(DeserializationConfig config,
+                        JavaType baseType, Collection<NamedType> subtypes, BeanProperty property) {
+                    if (useForType(baseType)) {
+                        if (_idType == JsonTypeInfo.Id.NONE) {
+                            return null;
+                        }
+
+                        TypeIdResolver idRes = idResolver(config, baseType, subtypes, false, true);
+                        switch (_includeAs) {
+                            case WRAPPER_OBJECT:
+                                return new AsWrapperTypeDeserializer(baseType, idRes, property, _defaultImpl){
+                                    @Override
+                                    public Object deserializeTypedFromArray(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                                        ClassLoader current = Thread.currentThread().getContextClassLoader();
+                                        try {
+                                            Thread.currentThread().setContextClassLoader(baseType.getRawClass().getClassLoader());
+                                            JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                            Object value = deser.deserialize(jp, ctxt);
+                                            return value;
+                                        } finally {
+                                            Thread.currentThread().setContextClassLoader(current);
+                                        }
+                                    }
+
+                                    @Override
+                                    public Object deserializeTypedFromObject(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                                        ClassLoader current = Thread.currentThread().getContextClassLoader();
+                                        try {
+                                            Thread.currentThread().setContextClassLoader(baseType.getRawClass().getClassLoader());
+                                            if (classesSet.contains(baseType.getRawClass()) && !stripped.get()) {
+
+                                                try {
+                                                    return super.deserializeTypedFromObject(jp, ctxt);
+                                                } catch (Exception e) {
+                                                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                                    Object value = deser.deserialize(jp, ctxt);
+                                                    return value;
+                                                }
+                                            }
+                                            stripped.set(false);
+                                            JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                            Object value = deser.deserialize(jp, ctxt);
+                                            return value;
+                                        } finally {
+                                            Thread.currentThread().setContextClassLoader(current);
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public Object deserializeTypedFromScalar(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                                        ClassLoader current = Thread.currentThread().getContextClassLoader();
+                                        try {
+                                            Thread.currentThread().setContextClassLoader(baseType.getRawClass().getClassLoader());
+                                            if (classesSet.contains(baseType.getRawClass())) {
+                                                return super.deserializeTypedFromScalar(jp, ctxt);
+                                            }
+                                            JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                            Object value = deser.deserialize(jp, ctxt);
+                                            return value;
+                                        } finally {
+                                            Thread.currentThread().setContextClassLoader(current);
+                                        }
+                                    }
+
+                                    @Override
+                                    public Object deserializeTypedFromAny(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                                        ClassLoader current = Thread.currentThread().getContextClassLoader();
+                                        try {
+                                            Thread.currentThread().setContextClassLoader(baseType.getRawClass().getClassLoader());
+                                            if (classesSet.contains(baseType.getRawClass())) {
+                                                try {
+                                                    return super.deserializeTypedFromAny(jp, ctxt);
+                                                } catch (Exception e) {
+                                                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                                    Object value = deser.deserialize(jp, ctxt);
+                                                    return value;
+                                                }
+                                            }
+
+                                            if (baseType.isMapLikeType() && jp.getCurrentToken() == JsonToken.START_ARRAY) {
+
+                                                LinkedHashMap<Object, Object> data = new LinkedHashMap<Object, Object>();
+                                                jp.nextToken();
+
+                                                if (jp.getCurrentToken() == JsonToken.END_ARRAY) {
+                                                    return data;
+                                                }
+                                                JsonDeserializer<Object> deser = _findDeserializer(ctxt, LinkedHashMap.class.getName());
+                                                Map<Object, Object> value = (Map) deser.deserialize(jp, ctxt);
+                                                jp.nextToken();
+
+                                                if (value != null) {
+                                                    Collection<Object> values = value.values();
+                                                    if (values.size() == 2) {
+
+                                                        Iterator<Object> it = values.iterator();
+                                                        data.put(it.next(), it.next());
+
+                                                        return data;
+                                                    }
+                                                }
+                                                return value;
+
+                                            } else {
+                                                JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                                Object value = deser.deserialize(jp, ctxt);
+
+                                                return value;
+                                            }
+                                        } finally {
+                                            Thread.currentThread().setContextClassLoader(current);
+                                        }
+                                    }
+                                };
+                        }
+                    }
+
+                    return super.buildTypeDeserializer(config, baseType, subtypes, property);
+                }
+            };
+            typer2 = typer2.init(JsonTypeInfo.Id.CLASS, null);
+            typer2 = typer2.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
+            deserializeObjectMapper.setDefaultTyping(typer2);
 
             SimpleModule modDeser = new SimpleModule("custom-object-unmapper", Version.unknownVersion());
             modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
@@ -194,11 +343,14 @@ public class JSONMarshaller implements Marshaller {
 
     @Override
     public <T> T unmarshall(String serializedInput, Class<T> type) {
+
         try {
             Class actualType = classesSet.contains(type) ? Object.class : type;
             return (T) unwrap(deserializeObjectMapper.readValue(serializedInput, actualType));
         } catch (IOException e) {
             throw new MarshallingException("Error unmarshalling input", e);
+        } finally {
+            stripped.set(false);
         }
     }
 
@@ -449,6 +601,7 @@ public class JSONMarshaller implements Marshaller {
             String field1 = jp.getText();
             jp.nextToken();
             if (classes.containsKey(field1)) {
+                stripped.set(true);
                 Object value = deserializeObjectMapper.readValue(jp, classes.get(field1));
                 jp.nextToken();
 
