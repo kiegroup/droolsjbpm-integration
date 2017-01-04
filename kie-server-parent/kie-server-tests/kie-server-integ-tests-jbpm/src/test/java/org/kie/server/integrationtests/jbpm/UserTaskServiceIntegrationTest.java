@@ -38,6 +38,8 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -246,9 +248,10 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertNotNull(taskList);
-            if (taskList.size() > 0) {
-                fail("Should not be any tasks for yoda as potential owner");
-            }
+            assertEquals(1, taskList.size());
+            taskSummary = taskList.get(0);
+            checkTaskNameAndStatus(taskSummary, "First task", Status.Suspended);
+
 
             taskClient.resumeTask(CONTAINER_ID, taskSummary.getId(), USER_YODA);
 
@@ -884,6 +887,8 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testGroupUserTask() throws Exception {
+        // don't run the test on local server as it does not properly support authentication
+        assumeFalse(TestConfig.isLocalServer());
         String taskName = "Group task";
 
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_GROUPTASK);
