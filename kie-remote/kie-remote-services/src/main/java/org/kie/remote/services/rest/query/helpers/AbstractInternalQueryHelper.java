@@ -136,11 +136,11 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
         }
 
         // 0. Retrieve *all* variable log values, or just the most recent?
-        boolean onlyRetrieveLastVarLogs = true;
-        String [] paramVals = queryParams.remove("all");
-        if( paramVals != null ) {
-           onlyRetrieveLastVarLogs = false;
+        boolean onlyRetrieveLastVarLogs = false;
+        if( !queryParams.containsKey("all") ) {
+            onlyRetrieveLastVarLogs = true;
         }
+        queryParams.remove("all");
 
         // Hold the information for parameters like "var_myVar=myVal" or "varregex_myVar=my*"
         Map<String, String> varValueMap = new HashMap<String, String>();
