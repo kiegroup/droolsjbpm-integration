@@ -18,6 +18,7 @@
       </includes>
       <outputDirectory/>
       <useStrictFiltering>true</useStrictFiltering>
+      <useTransitiveFiltering>false</useTransitiveFiltering>
     </dependencySet>
   </dependencySets>
 
