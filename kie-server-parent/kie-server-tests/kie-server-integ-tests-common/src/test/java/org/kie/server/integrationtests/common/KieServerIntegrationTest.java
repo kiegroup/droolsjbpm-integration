@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.KieServerEnvironment;
@@ -41,8 +42,6 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     @BeforeClass
     public static void initialize() throws Exception {
         KieServerDeployer.createAndDeployKJar(releaseId1);
-
-        createContainer(CONTAINER_ID, releaseId1);
     }
 
     @Test
@@ -56,6 +55,12 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private String getServerVersion() {
         // use the property if specified and fallback to KieServerEnvironment if no property set
         return System.getProperty("kie.server.version", KieServerEnvironment.getVersion().toString());
+    }
+
+    @Before
+    public void setupKieServer() {
+        disposeAllContainers();
+        createContainer(CONTAINER_ID, releaseId1);
     }
 
     @Test
@@ -156,6 +161,41 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
         kci = client.getContainerInfo( CONTAINER_ID ).getResult();
         Assert.assertEquals( KieScannerStatus.DISPOSED, kci.getScanner().getStatus() );
+    }
+
+    @Test
+    public void testScannerStartAndStop() throws Exception {
+        ServiceResponse<KieContainerResource> reply = client.getContainerInfo(CONTAINER_ID);
+        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
+        KieContainerResource kci = reply.getResult();
+        Assert.assertEquals(KieScannerStatus.DISPOSED, kci.getScanner().getStatus());
+
+        ServiceResponse<KieScannerResource> si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 20L));
+        Assert.assertEquals(si.getMsg(), ResponseType.SUCCESS, si.getType());
+        KieScannerResource info = si.getResult();
+        Assert.assertEquals(KieScannerStatus.STARTED, info.getStatus());
+
+        kci = client.getContainerInfo(CONTAINER_ID).getResult();
+        Assert.assertEquals(KieScannerStatus.STARTED, kci.getScanner().getStatus());
+        Assert.assertEquals(20L, kci.getScanner().getPollInterval().longValue());
+
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 20L));
+        Assert.assertEquals(si.getMsg(), ResponseType.SUCCESS, si.getType());
+        info = si.getResult();
+        Assert.assertEquals(KieScannerStatus.STOPPED, info.getStatus());
+
+        kci = client.getContainerInfo(CONTAINER_ID).getResult();
+        Assert.assertEquals(KieScannerStatus.STOPPED, kci.getScanner().getStatus());
+
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STARTED, 20L));
+        Assert.assertEquals(si.getMsg(), ResponseType.SUCCESS, si.getType());
+        info = si.getResult();
+        Assert.assertEquals(KieScannerStatus.STARTED, info.getStatus());
+
+        kci = client.getContainerInfo(CONTAINER_ID).getResult();
+        Assert.assertEquals(KieScannerStatus.STARTED, kci.getScanner().getStatus());
+        Assert.assertEquals(20L, kci.getScanner().getPollInterval().longValue());
     }
 
     @Test
