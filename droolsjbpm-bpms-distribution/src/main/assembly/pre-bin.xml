@@ -58,6 +58,7 @@
         <include>org.drools:drools-pmml</include>
       </includes>
       <outputDirectory/>
+      <useTransitiveFiltering>false</useTransitiveFiltering>
     </dependencySet>
     <dependencySet>
       <excludes>
@@ -111,6 +112,7 @@
         <exclude>org.drools:drools-pmml</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
+      <useTransitiveFiltering>false</useTransitiveFiltering>
     </dependencySet>
   </dependencySets>
 </assembly>
