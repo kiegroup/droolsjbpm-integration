@@ -15,9 +15,7 @@
 
 package org.kie.remote.services.rest.query.helpers;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.jbpm.process.audit.JPAAuditLogService;
 import org.jbpm.process.audit.ProcessInstanceLog;
@@ -64,13 +62,6 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         setPaginationParameters(pageInfo, procInstLogQueryBuilder);
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = getQueryBuilders()[1];
         RemoteServicesQueryJPAService jpaService = resourceBase.getJPAService();
-      
-        if( onlyRetrieveLastVarLogs ) { 
-            if( variableCriteriaInQuery(procInstLogQueryBuilder.getQueryWhere().getCriteria()) ) { 
-                procInstLogQueryBuilder.last();
-            }
-            varInstLogQueryBuilder.last();
-        }
        
         // process instance queries
         procInstLogQueryBuilder.ascending(OrderBy.processInstanceId);
@@ -89,6 +80,10 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
         List<VariableInstanceLog> varLogs = jpaService.doQuery(
                 varInstLogQueryBuilder.getQueryWhere(),
                 VariableInstanceLog.class);
+
+        if( onlyRetrieveLastVarLogs  && varLogs != null) {
+            varLogs = filterLastVarInstanceLogs( varLogs );
+        }
         
         // UNFINISHED FEATURE: using in-memory/proces instance variabels instead of audit/history logs
         List<JaxbVariableInfo> procVars = null;
@@ -189,5 +184,45 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
     public static void badParameter(String paramName) { 
        throw KieRemoteRestOperationException.badRequest("'" + paramName 
                + "' is not an accepted parameter for the rich process instance query operation" );
+    }
+
+    private List<VariableInstanceLog> filterLastVarInstanceLogs(List<VariableInstanceLog> varLogs) {
+        // RHBPMS-4445 - doing this in memory rather than query
+        List<VariableInstanceLog> retVarLogs = new ArrayList<>();
+        Map<String, List<VariableInstanceLog>> varlogsMap = new HashMap<String, List<VariableInstanceLog>>();
+        for( VariableInstanceLog vlog : varLogs ) {
+            if( !varlogsMap.containsKey(vlog.getVariableId()) ) {
+                ArrayList<VariableInstanceLog> varlogsList = new ArrayList<VariableInstanceLog>();
+                varlogsList.add( vlog );
+                varlogsMap.put( vlog.getVariableId(), varlogsList );
+            } else {
+                varlogsMap.get( vlog.getVariableId() ).add( vlog );
+            }
+        }
+
+        // sort the vlogs by id (descending) and remove all but first
+        for( Map.Entry<String, List<VariableInstanceLog>> entry : varlogsMap.entrySet() ) {
+            List<VariableInstanceLog> value = entry.getValue();
+            if(value != null && value.size() > 0) {
+                Collections.sort(value, Collections.reverseOrder(new VariableInstanceLogIDComparator()));
+                retVarLogs.add(value.get(0));
+            }
+        }
+
+        return retVarLogs;
+    }
+
+    static class VariableInstanceLogIDComparator implements Comparator<VariableInstanceLog> {
+        public int compare(VariableInstanceLog v1, VariableInstanceLog v2) {
+            long id1 = v1.getId();
+            long id2 = v2.getId();
+
+            if (id1 == id2)
+                return 0;
+            else if (id1 > id2)
+                return 1;
+            else
+                return -1;
+        }
     }
 }

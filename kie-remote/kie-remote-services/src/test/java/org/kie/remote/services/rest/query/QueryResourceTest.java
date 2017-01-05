@@ -168,6 +168,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
     public void queryTaskRestCallTest() throws Exception  {
         int [] pageInfo = { 0, 0 };
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "all", "true");
 
         // simple (everything)
         JaxbQueryTaskResult result = queryTaskHelper.queryTaskOrProcInstAndAssociatedVariables(USER_ID, queryParams, pageInfo);
@@ -252,6 +253,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
         assertTrue( numProcesses > pageSize );
         int [] pageInfo = { 0, pageSize };
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "all", "true");
 
         // simple (everything)
         JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
@@ -278,7 +280,7 @@ public class QueryResourceTest extends AbstractQueryResourceTest {
                String varName = varInfo.getName();
                // test object
                assertTrue( procId + ": var value [" + varVal + "]", varVal.contains("{") || ! myType );
-               assertTrue( procInstId + ": var [" + varVal + "]", varVal.contains("check") || ! varName.equals("inputStr") );
+               assertTrue( procInstId + ": var [" + varVal + "]", varVal.contains("check") || varName.equals("inputStr") || varName.equals("otherStr")  || varName.equals("secondStr"));
            }
         }
 

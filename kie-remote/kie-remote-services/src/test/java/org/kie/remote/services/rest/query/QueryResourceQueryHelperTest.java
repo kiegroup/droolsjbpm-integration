@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.api.runtime.process.WorkflowProcessInstance;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.InternalTaskService;
@@ -46,10 +47,7 @@ import org.kie.remote.services.rest.QueryResourceImpl;
 import org.kie.remote.services.rest.exception.KieRemoteRestOperationException;
 import org.kie.remote.services.rest.query.helpers.InternalProcInstQueryHelper;
 import org.kie.remote.services.rest.query.helpers.InternalTaskQueryHelper;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceInfo;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryProcessInstanceResult;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskInfo;
-import org.kie.services.client.serialization.jaxb.impl.query.JaxbQueryTaskResult;
+import org.kie.services.client.serialization.jaxb.impl.query.*;
 
 /**
  * This tests Internal*QueryHelper logic
@@ -134,6 +132,16 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
         return pids;
     }
 
+    protected void runObjectVarSingleProcess (KieSession ksession ) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("myobject", "first");
+        ProcessInstance p1 = ksession.startProcess(OBJECT_VARIABLE_PROCESS_ID, params); // completed
+        ((WorkflowProcessInstance) p1).setVariable("myobject", "second");
+        ((WorkflowProcessInstance) p1).setVariable("myobject", "third");
+        ((WorkflowProcessInstance) p1).setVariable("myobject", "last");
+    }
+
+
     @Test
     public void notBeingFilteredTest() {
         // setup
@@ -143,11 +151,12 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
         Map<String, String[]> queryParams = new HashMap<String, String[]>();
         addParams(queryParams, "processinstancestatus", "2");
         addParams(queryParams, "varregex_myobject", "Hello .*");
+        addParams(queryParams, "all", "true");
 
         JaxbQueryProcessInstanceResult result = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
-        assertNotNull( "Null result", result );
-        assertFalse( "Empty result (all)", result.getProcessInstanceInfoList().isEmpty() );
-        assertEquals( "Process instance info results", 2, result.getProcessInstanceInfoList().size() );
+        assertNotNull("Null result", result);
+        assertFalse("Empty result (all)", result.getProcessInstanceInfoList().isEmpty());
+        assertEquals("Process instance info results", 2, result.getProcessInstanceInfoList().size());
         for( JaxbQueryProcessInstanceInfo queryInfo : result.getProcessInstanceInfoList() ) {
            assertNotNull( "No process instance info!", queryInfo.getProcessInstance() );
            assertEquals( "No variable info!", 1, queryInfo.getVariables().size() );
@@ -211,4 +220,39 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
            }
         }
     }
+
+    @Test
+    public void filteredTest() {
+        runObjectVarSingleProcess(ksession);
+        int [] pageInfo = { 0, 0 };
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+
+        addParams(queryParams, "all", "true");
+        JaxbQueryProcessInstanceResult result1 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertNotNull(result1);
+        assertFalse(result1.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList1 = result1.getProcessInstanceInfoList();
+        assertEquals(processInfoList1.size(), 1);
+        assertEquals(processInfoList1.get(0).getVariables().size(), 5); // 4 "myobject" + 1 "type"
+
+        // with filtering
+        queryParams.remove("all");
+        JaxbQueryProcessInstanceResult result2 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+        assertNotNull(result2);
+        assertFalse(result2.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList2 = result2.getProcessInstanceInfoList();
+        assertEquals(processInfoList2.size(), 1);
+        assertEquals(processInfoList2.get(0).getVariables().size(), 2); // 1 "myobject" (latest only) + 1 "type"
+        List<JaxbVariableInfo> varList = processInfoList2.get(0).getVariables();
+        boolean foundMyObject = false;
+        for(JaxbVariableInfo varInfo : varList) {
+            if(varInfo.getName().equals("myobject")) {
+                foundMyObject = true;
+                assertEquals(varInfo.getValue(), "last");
+            }
+        }
+        assertTrue(foundMyObject);
+
+    }
+
 }
