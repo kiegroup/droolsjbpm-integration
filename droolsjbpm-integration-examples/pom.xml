@@ -13,20 +13,6 @@
   <name>Drools and jBPM examples</name>
   <description>Examples for Drools Expert, Fusion and/or jBPM.</description>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <configuration>
-          <additionalBuildcommands>
-            <buildcommand>org.kie.eclipse.droolsbuilder</buildcommand>
-          </additionalBuildcommands>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
     <!-- Internal dependencies -->
     <dependency>
