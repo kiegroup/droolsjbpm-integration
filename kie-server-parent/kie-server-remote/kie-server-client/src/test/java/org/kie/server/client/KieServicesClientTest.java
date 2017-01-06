@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.kie.server.client;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -35,19 +34,24 @@ import static org.junit.Assert.*;
 
 public class KieServicesClientTest extends BaseKieServicesClientTest {
 
+    private static final String CONTAINER_ID = "mycontainer";
+
+    private static final String ARTIFACT_ID = "myproject";
+    private static final String GROUP_ID = "org.kie";
+    private static final String VERSION = "1.2.3";
+
     @Test
     public void testGetServerInfo() {
         stubFor(get(urlEqualTo("/"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
-                                .withStatus(200)
-                                .withHeader("Content-Type", "application/xml")
-                                .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
-                                        "  <kie-server-info>\n" +
-                                        "    <version>1.2.3</version>\n" +
-                                        "  </kie-server-info>\n" +
-                                        "</response>")));
-
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server info\">\n" +
+                                "  <kie-server-info>\n" +
+                                "    <version>1.2.3</version>\n" +
+                                "  </kie-server-info>\n" +
+                                "</response>")));
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
@@ -70,14 +74,14 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         stubFor(get(urlEqualTo("/containers"))
                 .withHeader("Accept", equalTo("application/xml"))
                 .willReturn(aResponse()
-                                .withStatus(200)
-                                .withHeader("Content-Type", "application/xml")
-                                .withBody("<response type=\"SUCCESS\" msg=\"List of created containers\">\n" +
-                                        "  <kie-containers>\n" +
-                                        "    <kie-container container-id=\"kjar1\" status=\"FAILED\"/>\n" +
-                                        "    <kie-container container-id=\"kjar2\" status=\"FAILED\"/>" +
-                                        "  </kie-containers>" +
-                                        "</response>")));
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"List of created containers\">\n" +
+                                "  <kie-containers>\n" +
+                                "    <kie-container container-id=\"kjar1\" status=\"FAILED\"/>\n" +
+                                "    <kie-container container-id=\"kjar2\" status=\"FAILED\"/>" +
+                                "  </kie-containers>" +
+                                "</response>")));
 
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
@@ -136,15 +140,14 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{\n" +
-                                    "  \"type\" : \"SUCCESS\",\n" +
-                                    "  \"msg\" : \"Kie Server info\",\n" +
-                                    "  \"result\" : {\n" +
-                                    "    \"kie-server-info\" : {\n" +
-                                    "      \"version\" : \"1.2.3\"\n" +
-                                    "    }\n" +
-                                    "  }\n" +
-                                    "}")));
-
+                                "  \"type\" : \"SUCCESS\",\n" +
+                                "  \"msg\" : \"Kie Server info\",\n" +
+                                "  \"result\" : {\n" +
+                                "    \"kie-server-info\" : {\n" +
+                                "      \"version\" : \"1.2.3\"\n" +
+                                "    }\n" +
+                                "  }\n" +
+                                "}")));
 
         config.setMarshallingFormat(MarshallingFormat.JSON);
         config.setExtraClasses(Collections.singleton(KieContainerStatus.class));
@@ -167,13 +170,12 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
                                 "  </kie-server-info>\n" +
                                 "</response>")));
 
-
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
 
-        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
+        verify(1, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
         verify(0, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
     }
 
@@ -196,7 +198,7 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
 
-        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
+        verify(1, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Bearer abcdefghijk")));
         verify(0, getRequestedFor(urlEqualTo("/")).withHeader("Authorization", equalTo("Basic bnVsbDpudWxs")));
     }
 
@@ -222,8 +224,34 @@ public class KieServicesClientTest extends BaseKieServicesClientTest {
         assertSuccess(response);
         assertEquals("Server version", "1.2.3", response.getResult().getVersion());
 
-        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-First-Header", equalTo("first-value")));
-        verify(2, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-Second-Header", equalTo("second value")));
+        verify(1, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-First-Header", equalTo("first-value")));
+        verify(1, getRequestedFor(urlEqualTo("/")).withHeader("X-KIE-Second-Header", equalTo("second value")));
+    }
+
+    @Test
+    public void testGetReleaseId() {
+        stubFor(get(urlEqualTo("/containers/" + CONTAINER_ID + "/release-id"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Release ID for " + CONTAINER_ID + "\">\n" +
+                                "  <release-id>\n" +
+                                "    <artifact-id>" + ARTIFACT_ID + "</artifact-id>\n" +
+                                "    <group-id>" + GROUP_ID + "</group-id>\n" +
+                                "    <version>" + VERSION + "</version>\n" +
+                                "  </release-id>\n" +
+                                "</response>")));
+
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        ServiceResponse<ReleaseId> response = client.getReleaseId(CONTAINER_ID);
+        assertSuccess(response);
+
+        ReleaseId releaseId = response.getResult();
+        assertNotNull(releaseId);
+        assertEquals("Artifact ID", ARTIFACT_ID, releaseId.getArtifactId());
+        assertEquals("Group ID", GROUP_ID, releaseId.getGroupId());
+        assertEquals("Version", VERSION, releaseId.getVersion());
     }
 
     // TODO create more tests for other operations

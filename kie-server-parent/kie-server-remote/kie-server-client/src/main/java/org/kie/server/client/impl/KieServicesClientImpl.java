@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.kie.server.client.impl;
 
 import org.kie.api.command.Command;
+import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -245,6 +246,17 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
         } else {
             CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new UpdateScannerCommand(id, resource)));
             ServiceResponse<KieScannerResource> response = (ServiceResponse<KieScannerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
+        }
+    }
+
+    @Override
+    public ServiceResponse<ReleaseId> getReleaseId(String containerId) {
+        if (config.isRest()) {
+            return makeHttpGetRequestAndCreateServiceResponse(loadBalancer.getUrl() + "/containers/" + containerId + "/release-id", ReleaseId.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new GetReleaseIdCommand(containerId)));
+            ServiceResponse<ReleaseId> response = (ServiceResponse<ReleaseId>) executeJmsCommand(script).getResponses().get(0);
             return getResponseOrNullIfNoResponse(response);
         }
     }

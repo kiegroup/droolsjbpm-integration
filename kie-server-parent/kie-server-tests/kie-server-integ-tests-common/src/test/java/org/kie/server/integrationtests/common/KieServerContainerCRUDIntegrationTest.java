@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,19 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         Assert.assertEquals("Number of listed containers!", 2, containers.size());
         assertContainsContainer(containers, "list-containers-c1");
         assertContainsContainer(containers, "list-containers-c2");
+    }
+
+    @Test
+    public void testGetReleaseId() throws Exception {
+        String containerId = "get-releaseId";
+        client.createContainer(containerId, new KieContainerResource(containerId, releaseId1));
+
+        ServiceResponse<ReleaseId> reply = client.getReleaseId(containerId);
+        KieServerAssert.assertSuccess(reply);
+        Assert.assertEquals(releaseId1, reply.getResult());
+
+        ServiceResponse<Void> disposeReply = client.disposeContainer(containerId);
+        KieServerAssert.assertSuccess(disposeReply);
     }
 
     @Test
