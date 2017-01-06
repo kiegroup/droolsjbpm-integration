@@ -13,7 +13,6 @@
 
   <properties>
     <version.org.wildfly>10.0.0.Final</version.org.wildfly>
-    <version.org.wildfly.arquillian.container>1.0.0.Final</version.org.wildfly.arquillian.container>
   </properties>
 
   <build>
@@ -81,16 +80,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.wildfly.arquillian</groupId>
-        <artifactId>wildfly-arquillian-container-managed</artifactId>
-        <version>${version.org.wildfly.arquillian.container}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
