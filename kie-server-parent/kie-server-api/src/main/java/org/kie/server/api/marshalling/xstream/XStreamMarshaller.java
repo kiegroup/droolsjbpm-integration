@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
@@ -120,6 +121,7 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( GetContainerInfoCommand.class );
         this.xstream.processAnnotations( GetScannerInfoCommand.class );
         this.xstream.processAnnotations( UpdateScannerCommand.class );
+        this.xstream.processAnnotations( GetReleaseIdCommand.class );
         this.xstream.processAnnotations( UpdateReleaseIdCommand.class );
         this.xstream.processAnnotations( GetServerInfoCommand.class );
         this.xstream.processAnnotations( ListContainersCommand.class );

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.GetServerStateCommand;
@@ -151,6 +152,8 @@ public class KieContainerCommandServiceImpl implements KieContainerCommandServic
                     responses.add(this.kieServer.getScannerInfo(((GetScannerInfoCommand) command).getContainerId()));
                 } else if (command instanceof UpdateScannerCommand) {
                     responses.add(this.kieServer.updateScanner(((UpdateScannerCommand) command).getContainerId(), ((UpdateScannerCommand) command).getScanner()));
+                } else if (command instanceof GetReleaseIdCommand) {
+                    responses.add(this.kieServer.getContainerReleaseId(((GetReleaseIdCommand) command).getContainerId()));
                 } else if (command instanceof UpdateReleaseIdCommand) {
                     responses.add(this.kieServer.updateContainerReleaseId(((UpdateReleaseIdCommand) command).getContainerId(), ((UpdateReleaseIdCommand) command).getReleaseId()));
                 } else if (command instanceof GetServerStateCommand) {

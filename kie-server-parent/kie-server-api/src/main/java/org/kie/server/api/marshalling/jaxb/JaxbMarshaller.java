@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.commands.DisposeContainerCommand;
 import org.kie.server.api.commands.GetContainerInfoCommand;
+import org.kie.server.api.commands.GetReleaseIdCommand;
 import org.kie.server.api.commands.GetScannerInfoCommand;
 import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.GetServerStateCommand;
@@ -135,6 +136,7 @@ public class JaxbMarshaller implements Marshaller {
                 GetScannerInfoCommand.class,
                 GetServerInfoCommand.class,
                 UpdateScannerCommand.class,
+                GetReleaseIdCommand.class,
                 UpdateReleaseIdCommand.class,
                 DescriptorCommand.class,
                 GetServerStateCommand.class,

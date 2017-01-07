@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Collections;
 
 public abstract class BaseKieServicesClientTest {
     private static Logger logger = LoggerFactory.getLogger(BaseKieServicesClientTest.class);
@@ -33,6 +34,8 @@ public abstract class BaseKieServicesClientTest {
     public BaseKieServicesClientTest() {
         try {
             config = KieServicesFactory.newRestConfiguration( mockServerBaseUri, null, null );
+            // set capabilities so the client will not to try to get them from the server
+            config.setCapabilities(Collections.emptyList());
         } catch ( Exception e ) {
             // nothing to do.
             throw new RuntimeException( "Error instantiating configuration", e );

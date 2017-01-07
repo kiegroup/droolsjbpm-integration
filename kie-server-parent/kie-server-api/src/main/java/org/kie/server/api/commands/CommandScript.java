@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2010 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ public class CommandScript implements Serializable {
             @XmlElement(name = "dispose-container", type = DisposeContainerCommand.class),
             @XmlElement(name = "get-scanner-info", type = GetScannerInfoCommand.class),
             @XmlElement(name = "update-scanner", type = UpdateScannerCommand.class),
+            @XmlElement(name = "get-release-id", type = GetReleaseIdCommand.class),
             @XmlElement(name = "update-release-id", type = UpdateReleaseIdCommand.class),
             @XmlElement(name = "call-container", type = CallContainerCommand.class),
             @XmlElement(name = "descriptor-command", type = DescriptorCommand.class),

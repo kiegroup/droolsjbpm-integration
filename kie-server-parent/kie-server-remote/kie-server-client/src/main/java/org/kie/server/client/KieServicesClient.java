@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2015 - 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 package org.kie.server.client;
 
 import org.kie.api.command.Command;
-import org.kie.server.api.model.KieContainerResourceFilter;
-import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieServerInfo;
@@ -51,10 +50,11 @@ public interface KieServicesClient {
 
     ServiceResponse<KieScannerResource> updateScanner(String id, KieScannerResource resource);
 
+    ServiceResponse<ReleaseId> getReleaseId(String containerId);
+
     ServiceResponse<ReleaseId> updateReleaseId(String id, ReleaseId releaseId);
 
     ServiceResponse<KieServerStateInfo> getServerState();
-
 
     // for backward compatibility reason
 
