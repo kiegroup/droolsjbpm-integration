@@ -23,6 +23,7 @@ import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.deployable.DeployableType;
 import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.deployer.Deployer;
+import org.codehaus.cargo.container.property.RemotePropertySet;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.weblogic.WebLogicPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
@@ -45,6 +46,14 @@ public class ContainerRemoteController {
         deployer = new DefaultDeployerFactory().createDeployer(container);
 
         configuration.setProperty(ServletPropertySet.PORT, containerPort);
+
+        if(TestConfig.isCargoRemoteUsernameProvided()) {
+            configuration.setProperty(RemotePropertySet.USERNAME, TestConfig.getCargoRemoteUsername());
+        }
+        if(TestConfig.isCargoRemotePasswordProvided()) {
+            configuration.setProperty(RemotePropertySet.PASSWORD, TestConfig.getCargoRemotePassword());
+        }
+
         // WLS remote configuration
         if (TestConfig.isWebLogicHomeProvided()) {
             String wlserverHome = TestConfig.getWebLogicHome().matches(".*/wlserver") ?

@@ -70,6 +70,8 @@ public class TestConfig {
 
     private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
     private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
+    private static final StringTestParameter CARGO_REMOTE_USERNAME = new StringTestParameter("cargo.remote.username");
+    private static final StringTestParameter CARGO_REMOTE_PASSWORD = new StringTestParameter("cargo.remote.password");
     private static final StringTestParameter KIE_SERVER_WAR_PATH = new StringTestParameter("kie.server.war.path");
 
     private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
@@ -364,6 +366,34 @@ public class TestConfig {
      */
     public static boolean isWebLogicHomeProvided() {
         return TestConfig.WEBLOGIC_HOME.isParameterConfigured();
+    }
+
+    /**
+     * @return Username for Cargo remote deployment.
+     */
+    public static String getCargoRemoteUsername() {
+        return TestConfig.CARGO_REMOTE_USERNAME.getParameterValue();
+    }
+
+    /**
+     * @return True if username for Cargo remote deployment defined.
+     */
+    public static boolean isCargoRemoteUsernameProvided() {
+        return TestConfig.CARGO_REMOTE_USERNAME.isParameterConfigured();
+    }
+
+    /**
+     * @return Password for Cargo remote deployment.
+     */
+    public static String getCargoRemotePassword() {
+        return TestConfig.CARGO_REMOTE_PASSWORD.getParameterValue();
+    }
+
+    /**
+     * @return True if password for Cargo remote deployment defined.
+     */
+    public static boolean isCargoRemotePasswordProvided() {
+        return TestConfig.CARGO_REMOTE_PASSWORD.isParameterConfigured();
     }
 
     /**
