@@ -1732,6 +1732,34 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     }
 
+    @Test
+    public void testFindTasksWithNameFilter() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, "First%", null, 0, 10, "Status", false);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+
     private void checkProcessDefinitions(List<String> processIds) {
         assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_EVALUATION));

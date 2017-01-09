@@ -113,6 +113,8 @@ public interface UserTaskServicesClient {
 
     List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize);
 
+    List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, String filter, List<String> status, Integer page, Integer pageSize);
+
     List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize);
 
     List<TaskSummary> findTasksOwned(String userId, Integer page, Integer pageSize);
@@ -136,6 +138,8 @@ public interface UserTaskServicesClient {
     List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, String filter, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findTasksAssignedAsPotentialOwner(String userId, List<String> groups, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
