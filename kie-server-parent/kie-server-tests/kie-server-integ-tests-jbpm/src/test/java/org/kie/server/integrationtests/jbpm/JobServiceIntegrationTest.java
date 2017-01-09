@@ -402,4 +402,32 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         }
 
     }
+
+    @Test
+    public void testScheduleAndRunJobWithoutData() throws Exception {
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(PRINT_OUT_COMMAND);
+
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        assertNotNull(jobRequest);
+        assertEquals(jobId, jobRequest.getId());
+        assertThat(jobRequest.getStatus(),anyOf(
+                equalTo(STATUS.QUEUED.toString()),
+                equalTo(STATUS.RUNNING.toString()),
+                equalTo(STATUS.DONE.toString())));
+        assertEquals(PRINT_OUT_COMMAND, jobRequest.getCommandName());
+
+        KieServerSynchronization.waitForJobToFinish(jobServicesClient, jobId);
+
+        jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        assertNotNull(jobRequest);
+        assertEquals(jobId, jobRequest.getId());
+        assertEquals(STATUS.DONE.toString(), jobRequest.getStatus());
+        assertEquals(PRINT_OUT_COMMAND, jobRequest.getCommandName());
+
+    }
 }

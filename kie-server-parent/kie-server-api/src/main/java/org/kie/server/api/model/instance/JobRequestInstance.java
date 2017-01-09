@@ -16,6 +16,7 @@
 package org.kie.server.api.model.instance;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -59,7 +60,10 @@ public class JobRequestInstance {
     }
 
     public Map<String, Object> getData() {
-        return data;
+        if (this.data == null) {
+            this.data = new HashMap<String, Object>();
+        }
+        return this.data;
     }
 
     public void setData(Map<String, Object> data) {
