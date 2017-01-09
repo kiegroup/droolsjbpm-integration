@@ -42,8 +42,15 @@ public class JMSSecurityAdapter implements SecurityAdapter {
     private static final Logger logger = LoggerFactory.getLogger(JMSSecurityAdapter.class);
 
     private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
+    private static List<SecurityAdapter> adapters = new ArrayList<>();
 
     private static ThreadLocal<UserDetails> currentUser = new ThreadLocal<UserDetails>();
+
+    static  {
+        for (SecurityAdapter adapter : securityAdapters) {
+            adapters.add(adapter);
+        }
+    }
 
     @Override
     public String getUser(Object ... params) {
@@ -177,7 +184,7 @@ public class JMSSecurityAdapter implements SecurityAdapter {
     protected static List<String> getRolesFromAdapter(Subject subject) {
         List<String> roles = new ArrayList<String>();
 
-        for (SecurityAdapter adapter : securityAdapters) {
+        for (SecurityAdapter adapter : adapters) {
             List<String> adapterRoles = adapter.getRoles(subject);
             if (adapterRoles != null && !adapterRoles.isEmpty()) {
                 roles.addAll(adapterRoles);

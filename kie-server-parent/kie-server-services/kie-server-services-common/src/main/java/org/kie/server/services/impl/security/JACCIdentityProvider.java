@@ -32,6 +32,14 @@ public class JACCIdentityProvider implements IdentityProvider {
 
     private static final ServiceLoader<SecurityAdapter> securityAdapters = ServiceLoader.load(SecurityAdapter.class);
 
+    private List<SecurityAdapter> adapters = new ArrayList<>();
+
+    public JACCIdentityProvider() {
+        for (SecurityAdapter adapter : securityAdapters) {
+            adapters.add(adapter);
+        }
+    }
+
     @Override
     public String getName() {
         Subject subject = getSubjectFromContainer();
@@ -95,7 +103,7 @@ public class JACCIdentityProvider implements IdentityProvider {
     }
 
     protected String getNameFromAdapter() {
-        for (SecurityAdapter adapter : securityAdapters) {
+        for (SecurityAdapter adapter : adapters) {
             String name = adapter.getUser();
             if (name != null && !name.isEmpty()) {
                 return name;
@@ -108,7 +116,7 @@ public class JACCIdentityProvider implements IdentityProvider {
     protected List<String> getRolesFromAdapter() {
         List<String> roles = new ArrayList<String>();
 
-        for (SecurityAdapter adapter : securityAdapters) {
+        for (SecurityAdapter adapter : adapters) {
             List<String> adapterRoles = adapter.getRoles();
             if (adapterRoles != null && !adapterRoles.isEmpty()) {
                 roles.addAll(adapterRoles);
