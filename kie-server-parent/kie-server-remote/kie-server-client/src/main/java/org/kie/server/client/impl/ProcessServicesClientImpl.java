@@ -196,7 +196,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_ID, processId);
-            valuesMap.put(TASK_NAME, taskName);
+            valuesMap.put(TASK_NAME, encode(taskName));
 
             return makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_INPUT_GET_URI, valuesMap),
@@ -220,7 +220,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(PROCESS_ID, processId);
-            valuesMap.put(TASK_NAME, taskName);
+            valuesMap.put(TASK_NAME, encode(taskName));
 
             return makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), PROCESS_DEF_URI + "/" + PROCESS_DEF_USER_TASK_OUTPUT_GET_URI, valuesMap),

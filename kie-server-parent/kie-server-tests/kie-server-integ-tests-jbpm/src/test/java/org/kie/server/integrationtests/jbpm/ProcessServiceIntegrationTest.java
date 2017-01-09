@@ -452,7 +452,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);
-            assertEquals("Evaluate items", userTask.getName());
+            assertEquals("Evaluate items?", userTask.getName());
             assertEquals(Status.Completed.toString(), userTask.getStatus());
 
             List<WorkItemInstance> workItems = processClient.getWorkItemByProcessInstance(CONTAINER_ID, processInstanceId);
@@ -521,7 +521,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             TaskInstance userTask = taskClient.findTaskById(taskSummary.getId());
             assertNotNull(userTask);
-            assertEquals("Evaluate items", userTask.getName());
+            assertEquals("Evaluate items?", userTask.getName());
             assertEquals(Status.Completed.toString(), userTask.getStatus());
 
             List<WorkItemInstance> workItems = processClient.getWorkItemByProcessInstance(CONTAINER_ID, processInstanceId);

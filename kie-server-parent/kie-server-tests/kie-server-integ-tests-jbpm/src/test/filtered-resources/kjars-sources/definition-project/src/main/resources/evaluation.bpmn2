@@ -17,7 +17,7 @@
     <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="">
       <bpmn2:outgoing>_17C173D0-DC0B-4B5D-BF4B-E5F8FA9E03D6</bpmn2:outgoing>
     </bpmn2:startEvent>
-    <bpmn2:userTask id="_4E8E7545-FB70-494E-9136-2B9ABE655889" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="Evaluate items">
+    <bpmn2:userTask id="_4E8E7545-FB70-494E-9136-2B9ABE655889" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="Evaluate items?">
       <bpmn2:incoming>_17C173D0-DC0B-4B5D-BF4B-E5F8FA9E03D6</bpmn2:incoming>
       <bpmn2:outgoing>_5F738344-23B6-4308-908B-2141A1660CCD</bpmn2:outgoing>
       <bpmn2:ioSpecification id="_lYPTwPMtEeSoD-9HcIhmjA">
