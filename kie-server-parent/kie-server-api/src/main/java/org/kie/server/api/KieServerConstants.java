@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -68,6 +68,7 @@ public class KieServerConstants {
     public static final String CFG_EXECUTOR_POOL = "org.kie.executor.pool.size";
     public static final String CFG_EXECUTOR_RETRIES = "org.kie.executor.retry.count";
     public static final String CFG_EXECUTOR_TIME_UNIT = "org.kie.executor.timeunit";
+    public static final String CFG_EXECUTOR_JMS_QUEUE = "org.kie.executor.jms.queue";
     public static final String CFG_EXECUTOR_DISABLED = "org.kie.executor.disabled";
 
     public static final String CFG_KIE_MVN_SETTINGS = "kie.maven.settings.custom";
