@@ -70,7 +70,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertEquals(1, tasks.size());
             TaskSummary task = tasks.get(0);
-            assertEquals("Evaluate items", tasks.get(0).getName());
+            assertEquals("Evaluate items?", tasks.get(0).getName());
 
             assertEquals(CONTAINER_ID, task.getContainerId());
             assertEquals(PROCESS_ID_EVALUATION, task.getProcessId());
@@ -86,7 +86,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             assertEquals(1, tasks.size());
 
             task = tasks.get(0);
-            assertEquals("Evaluate items", task.getName());
+            assertEquals("Evaluate items?", task.getName());
             assertEquals(CONTAINER_ID_2, task.getContainerId());
             assertEquals(PROCESS_ID_EVALUATION_2, task.getProcessId());
             assertEquals(processInstanceId, task.getProcessInstanceId());
@@ -121,7 +121,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
             assertEquals(1, tasks.size());
             TaskSummary task = tasks.get(0);
-            assertEquals("Evaluate items", tasks.get(0).getName());
+            assertEquals("Evaluate items?", tasks.get(0).getName());
 
             assertEquals(CONTAINER_ID, task.getContainerId());
             assertEquals(PROCESS_ID_EVALUATION, task.getProcessId());
@@ -169,7 +169,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             assertEquals(5, tasks.size());
 
             for (TaskSummary task : tasks) {
-                assertEquals("Evaluate items", tasks.get(0).getName());
+                assertEquals("Evaluate items?", tasks.get(0).getName());
 
                 assertEquals(CONTAINER_ID, task.getContainerId());
                 assertEquals(PROCESS_ID_EVALUATION, task.getProcessId());
@@ -189,7 +189,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             assertEquals(5, tasks.size());
 
             for (TaskSummary task : tasks) {
-                assertEquals("Evaluate items", tasks.get(0).getName());
+                assertEquals("Evaluate items?", tasks.get(0).getName());
 
                 assertEquals(CONTAINER_ID_2, task.getContainerId());
                 assertEquals(PROCESS_ID_EVALUATION_2, task.getProcessId());
@@ -232,7 +232,7 @@ public class ProcessInstanceMigrationIntegrationTest extends JbpmKieServerBaseIn
             assertEquals(5, tasks.size());
 
             for (TaskSummary task : tasks) {
-                assertEquals("Evaluate items", tasks.get(0).getName());
+                assertEquals("Evaluate items?", tasks.get(0).getName());
 
                 assertEquals(CONTAINER_ID, task.getContainerId());
                 assertEquals(PROCESS_ID_EVALUATION, task.getProcessId());

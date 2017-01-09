@@ -82,9 +82,9 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         Map<String, String[]> entities = result.getAssociatedEntities();
         assertNotNull(entities);
 
-        assertTrue(entities.containsKey("Evaluate items"));
+        assertTrue(entities.containsKey("Evaluate items?"));
 
-        String[] evaluateItemsEntities = entities.get("Evaluate items");
+        String[] evaluateItemsEntities = entities.get("Evaluate items?");
         assertEquals(2, evaluateItemsEntities.length);
         assertEquals(USER_YODA, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
@@ -195,8 +195,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         Map<String, String[]> entities = result.getAssociatedEntities();
         assertNotNull(entities);
 
-        assertTrue(entities.containsKey("Evaluate items"));
-        String[] evaluateItemsEntities = entities.get("Evaluate items");
+        assertTrue(entities.containsKey("Evaluate items?"));
+        String[] evaluateItemsEntities = entities.get("Evaluate items?");
 
         assertEquals(2, evaluateItemsEntities.length);
         assertEquals(USER_YODA, evaluateItemsEntities[0]);
@@ -217,7 +217,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         UserTaskDefinition task = tasks[0];
 
         assertNotNull(task);
-        assertEquals("Evaluate items", task.getName());
+        assertEquals("Evaluate items?", task.getName());
         assertEquals("", task.getComment());
         assertEquals("", task.getCreatedBy());
         assertEquals(0, task.getPriority().intValue());
@@ -259,7 +259,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testUserTaskInputDefinition() {
-        TaskInputsDefinition result = processClient.getUserTaskInputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items");
+        TaskInputsDefinition result = processClient.getUserTaskInputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items?");
 
         assertNotNull(result);
         // assert task inputs and outputs
@@ -282,7 +282,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
     @Test
     public void testTaskOutputsDefinition() {
-        TaskOutputsDefinition result = processClient.getUserTaskOutputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items");
+        TaskOutputsDefinition result = processClient.getUserTaskOutputDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION, "Evaluate items?");
 
         assertNotNull(result);
         // assert task inputs and outputs

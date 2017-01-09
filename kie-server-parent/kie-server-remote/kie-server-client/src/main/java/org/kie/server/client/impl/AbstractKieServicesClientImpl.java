@@ -15,10 +15,12 @@
 
 package org.kie.server.client.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -815,6 +817,14 @@ public abstract class AbstractKieServicesClientImpl {
         } while (nextUrl != null);
 
         throw new KieServerHttpRequestException("Unable to invoke operation " + operation);
+    }
+
+    protected String encode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Unexpected error while encoding string '" + value + "'", e);
+        }
     }
 
     private abstract class RemoteHttpOperation {

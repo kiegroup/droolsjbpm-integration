@@ -15,6 +15,7 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import java.net.URLDecoder;
 import java.text.MessageFormat;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -179,7 +180,8 @@ public class DefinitionResource {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            TaskInputsDefinition taskInputsDefinition = definitionServiceBase.getTaskInputMappings(containerId, processId, taskName);
+
+            TaskInputsDefinition taskInputsDefinition = definitionServiceBase.getTaskInputMappings(containerId, processId, URLDecoder.decode(taskName, "UTF-8"));
 
             return createCorrectVariant(taskInputsDefinition, headers, Response.Status.OK, conversationIdHeader);
         } catch (IllegalStateException e) {
@@ -198,7 +200,7 @@ public class DefinitionResource {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            TaskOutputsDefinition taskOutputsDefinition = definitionServiceBase.getTaskOutputMappings(containerId, processId, taskName);
+            TaskOutputsDefinition taskOutputsDefinition = definitionServiceBase.getTaskOutputMappings(containerId, processId, URLDecoder.decode(taskName, "UTF-8"));
 
             return createCorrectVariant(taskOutputsDefinition, headers, Response.Status.OK, conversationIdHeader);
         } catch (IllegalStateException e) {

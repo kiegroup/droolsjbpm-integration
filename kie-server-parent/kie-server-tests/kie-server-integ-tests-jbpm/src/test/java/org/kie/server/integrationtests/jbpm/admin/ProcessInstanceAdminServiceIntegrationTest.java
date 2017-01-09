@@ -72,7 +72,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             assertEquals(1, activeNodeInstances.size());
 
             NodeInstance active = activeNodeInstances.get(0);
-            assertEquals("Evaluate items", active.getName());
+            assertEquals("Evaluate items?", active.getName());
 
             processAdminClient.cancelNodeInstance(CONTAINER_ID, processInstanceId, active.getId());
 
@@ -81,7 +81,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             assertEquals(0, activeNodeInstances.size());
 
             List<ProcessNode> processNodes = processAdminClient.getProcessNodes(CONTAINER_ID, processInstanceId);
-            ProcessNode first = processNodes.stream().filter(pn -> pn.getNodeName().equals("Evaluate items")).findFirst().orElse(null);
+            ProcessNode first = processNodes.stream().filter(pn -> pn.getNodeName().equals("Evaluate items?")).findFirst().orElse(null);
             assertNotNull(first);
 
             processAdminClient.triggerNode(CONTAINER_ID, processInstanceId, first.getNodeId());
@@ -91,7 +91,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             assertEquals(1, activeNodeInstances.size());
 
             NodeInstance activeTriggered = activeNodeInstances.get(0);
-            assertEquals("Evaluate items", activeTriggered.getName());
+            assertEquals("Evaluate items?", activeTriggered.getName());
 
             assertFalse(activeTriggered.getId().longValue() == active.getId().longValue());
 
@@ -120,7 +120,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             assertEquals(1, activeNodeInstances.size());
 
             NodeInstance active = activeNodeInstances.get(0);
-            assertEquals("Evaluate items", active.getName());
+            assertEquals("Evaluate items?", active.getName());
 
             processAdminClient.retriggerNodeInstance(CONTAINER_ID, processInstanceId, active.getId());
 
@@ -129,7 +129,7 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             assertEquals(1, activeNodeInstances.size());
 
             NodeInstance activeTriggered = activeNodeInstances.get(0);
-            assertEquals("Evaluate items", activeTriggered.getName());
+            assertEquals("Evaluate items?", activeTriggered.getName());
 
             assertFalse(activeTriggered.getId().longValue() == active.getId().longValue());
 
