@@ -112,10 +112,14 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
         Properties systemProperties = System.getProperties();
         for (String property : systemProperties.stringPropertyNames()) {
 
-            if (property.startsWith("org.kie.server")) {
+            if (property.startsWith("org.kie.server") || property.startsWith("org.kie.executor")) {
                 KieServerConfigItem configItem = new KieServerConfigItem(property, systemProperties.getProperty(property), String.class.getName());
                 config.addConfigItem(configItem);
             }
         }
+    }
+
+    public void clearCache() {
+        this.knownStates.clear();
     }
 }
