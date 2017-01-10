@@ -486,9 +486,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             processClient.abortWorkItem(CONTAINER_ID, processInstanceId, workItemInstance.getId());
 
-            workItems = processClient.getWorkItemByProcessInstance(CONTAINER_ID, processInstanceId);
-            assertNotNull(workItems);
-            assertEquals(0, workItems.size());
+            ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
         } catch (Exception e){
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -533,9 +533,9 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             processClient.completeWorkItem(CONTAINER_ID, processInstanceId, workItemInstance.getId(), parameters);
 
-            workItems = processClient.getWorkItemByProcessInstance(CONTAINER_ID, processInstanceId);
-            assertNotNull(workItems);
-            assertEquals(0, workItems.size());
+            ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED, processInstance.getState().intValue());
 
         } catch (Exception e){
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);

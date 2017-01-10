@@ -34,6 +34,8 @@ public abstract class RestJbpmBaseIntegrationTest extends RestOnlyBaseIntegratio
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
 
+    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
+
     protected ProcessServicesClient processClient;
     protected QueryServicesClient queryClient;
 
