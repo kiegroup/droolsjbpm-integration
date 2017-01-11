@@ -136,7 +136,7 @@ public class ProcessResource  {
             processServiceBase.abortProcessInstance(containerId, processInstanceId);
             // produce 204 NO_CONTENT response code
             return noContent(v, conversationIdHeader);
-        } catch (ProcessInstanceNotFoundException e) {
+        } catch (ProcessInstanceNotFoundException | IllegalArgumentException e) {
             return notFound(
                     MessageFormat.format(PROCESS_INSTANCE_NOT_FOUND, processInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
