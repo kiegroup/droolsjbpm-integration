@@ -392,6 +392,17 @@
                 </configuration>
               </configuration>
             </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <!-- Reuse yoda user for deploying and undeploying Kie server from within the test -->
+                  <cargo.remote.username>yoda</cargo.remote.username>
+                  <cargo.remote.password>usetheforce123@</cargo.remote.password>
+                </systemPropertyVariables>
+              </configuration>
+            </plugin>
           </plugins>
         </pluginManagement>
       </build>
@@ -531,6 +542,17 @@
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
                   </properties>
                 </configuration>
+              </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemPropertyVariables>
+                  <!-- Reuse yoda user for deploying and undeploying Kie server from within the test -->
+                  <cargo.remote.username>yoda</cargo.remote.username>
+                  <cargo.remote.password>usetheforce123@</cargo.remote.password>
+                </systemPropertyVariables>
               </configuration>
             </plugin>
           </plugins>
