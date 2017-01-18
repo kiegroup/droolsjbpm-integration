@@ -141,10 +141,40 @@
               </deployable>
             </deployables>
             <configuration>
+              <users>
+                <!-- kie-server role for REST tests; guest for JMS tests -->
+                <user>
+                  <name>yoda</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                  </roles>
+                </user>
+                <user>
+                  <name>Administrator</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                    <role>Administrators</role>
+                  </roles>
+                </user>
+                <user>
+                  <name>john</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                    <role>engineering</role>
+                    <role>HR</role>
+                    <role>IT</role>
+                    <role>Accounting</role>
+                  </roles>
+                </user>
+              </users>
               <properties>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>
-                <!-- kie-server role for REST tests; guest for JMS tests -->
-                <cargo.servlet.users>yoda:usetheforce123@:kie-server,guest|Administrator:usetheforce123@:kie-server,guest,Administrators|john:usetheforce123@:kie-server,guest,engineering,HR,IT,Accounting</cargo.servlet.users>
               </properties>
             </configuration>
           </configuration>
@@ -362,7 +392,6 @@
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly10x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -382,12 +411,22 @@
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
+                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+                    <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.resource.resource.mail>
+                       cargo.resource.name=mail/Session|
+                       cargo.resource.type=javax.mail.Session|
+                       cargo.resource.id=mail|
+                       cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
+                    </cargo.resource.resource.mail>
                   </properties>
                 </configuration>
               </configuration>
@@ -502,11 +541,6 @@
           <type>pom</type>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.wildfly.core</groupId>
-          <artifactId>wildfly-controller-client</artifactId>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -516,7 +550,6 @@
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <!-- eap7 is basically wildfly10; until there is a EAP 7 specific containerId, 'wildfly10x' should work just fine -->
         <cargo.container.id>wildfly10x</cargo.container.id>
-        <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email</failsafe.excluded.groups>
       </properties>
       <build>
         <pluginManagement>
@@ -534,12 +567,22 @@
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
+                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
+                    <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jboss.configuration>standalone-full</cargo.jboss.configuration>
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.resource.resource.mail>
+                       cargo.resource.name=mail/Session|
+                       cargo.resource.type=javax.mail.Session|
+                       cargo.resource.id=mail|
+                       cargo.resource.parameters=mail.smtp.host=localhost;mail.smtp.port=2525;mail.smtp.from=kie-server-test@domain.com
+                    </cargo.resource.resource.mail>
                   </properties>
                 </configuration>
               </configuration>
@@ -654,11 +697,6 @@
           <type>pom</type>
           <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.wildfly.core</groupId>
-          <artifactId>wildfly-controller-client</artifactId>
-          <scope>test</scope>
-        </dependency>
       </dependencies>
     </profile>
     <profile>
@@ -669,8 +707,6 @@
         <kie.server.jndi.request.queue>jms/KIE.SERVER.REQUEST</kie.server.jndi.request.queue>
         <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
-        <kie.server.context>kie-server-${project.version}-${kie.server.classifier}</kie.server.context>
-        <kie.server.controller.context>kie-server-controller-${project.version}-${kie.server.classifier}</kie.server.controller.context>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>weblogic122x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
