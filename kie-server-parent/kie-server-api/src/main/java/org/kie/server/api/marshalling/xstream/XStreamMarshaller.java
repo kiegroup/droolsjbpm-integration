@@ -49,6 +49,7 @@ import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.instance.SolverInstance;
+import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConverter;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendablebigdecimal.BendableBigDecimalScoreXStreamConverter;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendablelong.BendableLongScoreXStreamConverter;
@@ -100,19 +101,7 @@ public class XStreamMarshaller
     protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.xstream.setClassLoader( classLoader );
 
-        this.xstream.registerConverter(new BendableScoreXStreamConverter());
-        this.xstream.registerConverter(new BendableLongScoreXStreamConverter());
-        this.xstream.registerConverter(new BendableBigDecimalScoreXStreamConverter());
-        this.xstream.registerConverter(new HardMediumSoftScoreXStreamConverter());
-        this.xstream.registerConverter(new HardMediumSoftLongScoreXStreamConverter());
-        this.xstream.registerConverter(new HardSoftScoreXStreamConverter());
-        this.xstream.registerConverter(new HardSoftLongScoreXStreamConverter());
-        this.xstream.registerConverter(new HardSoftDoubleScoreXStreamConverter());
-        this.xstream.registerConverter(new HardSoftBigDecimalScoreXStreamConverter());
-        this.xstream.registerConverter(new SimpleScoreXStreamConverter());
-        this.xstream.registerConverter(new SimpleLongScoreXStreamConverter());
-        this.xstream.registerConverter(new SimpleDoubleScoreXStreamConverter());
-        this.xstream.registerConverter(new SimpleBigDecimalScoreXStreamConverter());
+        AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 
         this.xstream.processAnnotations( CommandScript.class );
         this.xstream.processAnnotations( CallContainerCommand.class );
