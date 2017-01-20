@@ -35,7 +35,11 @@ import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
@@ -687,6 +691,177 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
 
         if (list != null && list.getWorkItems() != null) {
             return Arrays.asList(list.getWorkItems());
+        }
+
+        return Collections.emptyList();
+    }
+
+
+    @Override
+    public List<NodeInstance> findActiveNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize) {
+        NodeInstanceList result = null;
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("?activeOnly=true", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getProcessInstanceHistory", new Object[]{processInstanceId, true, false, page, pageSize}) ) );
+            ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getNodeInstances() != null) {
+            return Arrays.asList(result.getNodeInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<NodeInstance> findCompletedNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize) {
+        NodeInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("?completedOnly=true", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getProcessInstanceHistory", new Object[]{processInstanceId, false, true, page, pageSize}) ) );
+            ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+
+        if (result != null && result.getNodeInstances() != null) {
+            return Arrays.asList(result.getNodeInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<NodeInstance> findNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize) {
+        NodeInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getProcessInstanceHistory", new Object[]{processInstanceId, true, true, page, pageSize}) ) );
+            ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getNodeInstances() != null) {
+            return Arrays.asList(result.getNodeInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<VariableInstance> findVariablesCurrentState(String containerId, Long processInstanceId) {
+        VariableInstanceList result = null;
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + VAR_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap), VariableInstanceList.class);
+
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getVariablesCurrentState", new Object[]{processInstanceId}) ) );
+            ServiceResponse<VariableInstanceList> response = (ServiceResponse<VariableInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getVariableInstances() != null) {
+            return Arrays.asList(result.getVariableInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<VariableInstance> findVariableHistory(String containerId, Long processInstanceId, String variableName, Integer page, Integer pageSize) {
+        VariableInstanceList result = null;
+
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+            valuesMap.put(VAR_NAME, variableName);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
+
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getVariableHistory", new Object[]{processInstanceId, variableName, page, pageSize}) ) );
+            ServiceResponse<VariableInstanceList> response = (ServiceResponse<VariableInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+
+        if (result != null && result.getVariableInstances() != null) {
+            return Arrays.asList(result.getVariableInstances());
         }
 
         return Collections.emptyList();

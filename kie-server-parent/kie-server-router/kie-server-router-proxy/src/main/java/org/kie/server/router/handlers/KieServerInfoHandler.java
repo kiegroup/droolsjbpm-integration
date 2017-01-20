@@ -111,16 +111,15 @@ public class KieServerInfoHandler implements HttpHandler {
 
     }
 
-    protected static String getLocationUrl() {
+    public static String getLocationUrl() {
         String externalUrl = System.getProperty(KieServerRouterConstants.ROUTER_EXTERNAL_URL);
 
         if(externalUrl == null) {
             StringBuilder sb = new StringBuilder();
             sb.append("http://");
-            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_HOST));
+            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_HOST, "localhost"));
             sb.append(":");
-            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_PORT));
-            sb.append("/");
+            sb.append(System.getProperty(KieServerRouterConstants.ROUTER_PORT, "9000"));
             externalUrl = sb.toString();
         }
 

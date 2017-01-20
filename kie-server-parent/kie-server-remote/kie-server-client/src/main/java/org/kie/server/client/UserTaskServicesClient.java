@@ -100,6 +100,10 @@ public interface UserTaskServicesClient {
 
     TaskInstance getTaskInstance(String containerId, Long taskId, boolean withInputs, boolean withOutputs, boolean withAssignments);
 
+    List<TaskEventInstance> findTaskEvents(String containerId, Long taskId, Integer page, Integer pageSize);
+
+    List<TaskEventInstance> findTaskEvents(String containerId, Long taskId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
     // task searches
     TaskInstance findTaskByWorkItemId(Long workItemId);
 

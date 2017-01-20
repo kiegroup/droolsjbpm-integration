@@ -589,5 +589,47 @@ public class XstreamAggregatorTest extends AbstractAggregateTest {
         assertNotNull(processDefs);
         assertEquals(6, processDefs.getLength());
     }
+
+    @Test
+    public void testAggregateRawList() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/xstream/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/xstream/raw-list-2.xml"));
+        XstreamXMLResponseAggregator aggregate = new XstreamXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        NodeList processes = xml.getElementsByTagName("sql-timestamp");
+        assertNotNull(processes);
+        assertEquals(5, processes.getLength());
+    }
+
+    @Test
+    public void testAggregateRawListWithPaging() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/xstream/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/xstream/raw-list-2.xml"));
+        XstreamXMLResponseAggregator aggregate = new XstreamXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data, null, true, 1, 2);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        NodeList processes = xml.getElementsByTagName("sql-timestamp");
+        assertNotNull(processes);
+        assertEquals(2, processes.getLength());
+    }
 }
 

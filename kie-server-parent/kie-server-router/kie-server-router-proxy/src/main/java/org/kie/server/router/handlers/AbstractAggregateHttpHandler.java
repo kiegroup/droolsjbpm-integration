@@ -40,15 +40,15 @@ import io.undertow.util.HttpString;
 
 public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
-    private static final Logger log = Logger.getLogger(AbstractAggregateHttpHandler.class);
+    protected static final Logger log = Logger.getLogger(AbstractAggregateHttpHandler.class);
 
-    private static final String REPLACE_PAGE =      "page=[^&]*";
-    private static final String REPLACE_PAGE_SIZE = "pageSize=[^&]*";
+    protected static final String REPLACE_PAGE =      "page=[^&]*";
+    protected static final String REPLACE_PAGE_SIZE = "pageSize=[^&]*";
 
-    private static final String DEFAULT_ACCEPT = "application/xml";
+    protected static final String DEFAULT_ACCEPT = "application/xml";
 
-    private HttpHandler httpHandler;
-    private AdminHttpHandler adminHandler;
+    protected HttpHandler httpHandler;
+    protected AdminHttpHandler adminHandler;
 
     private RoundRobinHostSelector selector = new RoundRobinHostSelector();
 
@@ -174,8 +174,8 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
         return adminHandler.getHostsPerServer().values().stream().map(hosts -> {
             return selector.selectHost(hosts.toArray(new String[hosts.size()]));
-        })
-                .collect(Collectors.toSet());
+        }).filter(host -> host != null)
+         .collect(Collectors.toSet());
     }
 
     protected boolean supportAdvancedAggregate() {
@@ -188,6 +188,9 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
 
         public String selectHost(String[] availableHosts) {
+            if (availableHosts.length == 0) {
+                return null;
+            }
             int hostIndex = currentHost.incrementAndGet() % availableHosts.length;
 
             return availableHosts[hostIndex];

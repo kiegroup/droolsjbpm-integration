@@ -28,3 +28,4 @@ bitronix-default-config.properties
 jdbc_driver.jar
 db-settings.xml
 kie-server-router.json
+dependency-reduced-pom.xml

@@ -520,5 +520,49 @@ public class JAXBAggregatorTest extends AbstractAggregateTest {
         assertNotNull(containers);
         assertEquals(6, containers.getLength());
     }
+
+    @Test
+    public void testAggregateRawList() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-2.xml"));
+        JaxbXMLResponseAggregator aggregate = new JaxbXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        NodeList processes = xml.getElementsByTagName("value");
+        assertNotNull(processes);
+        assertEquals(5, processes.getLength());
+
+    }
+
+    @Test
+    public void testAggregateRawListWithPaging() throws Exception {
+        String xml1 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-1.xml"));
+        String xml2 = read(this.getClass().getResourceAsStream("/jaxb/raw-list-2.xml"));
+        JaxbXMLResponseAggregator aggregate = new JaxbXMLResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(xml1);
+        data.add(xml2);
+
+        String result = aggregate.aggregate(data, null, true, 1, 2);
+        logger.debug(result);
+
+        Document xml = toXml(result);
+        assertNotNull(xml);
+
+        NodeList processes = xml.getElementsByTagName("value");
+        assertNotNull(processes);
+        assertEquals(2, processes.getLength());
+
+    }
 }
 

@@ -61,7 +61,8 @@ public class XstreamXMLResponseAggregator extends XMLResponseAggregator {
             "tasks",
             "variableInstances",
             "workItems",
-            "result");
+            "result",
+            "list");
 
 
 
@@ -79,7 +80,11 @@ public class XstreamXMLResponseAggregator extends XMLResponseAggregator {
 
         for (int j = 0; j < children.getLength(); j++) {
             Node existing = children.item(j);
-            if (!nodes.contains(existing.getNodeName()) && existing.hasChildNodes()) {
+
+            if (existing.getNodeName().equals("list") && existing.hasChildNodes()) {
+                Node imported = target.importNode(existing, true);
+                targetNode.appendChild(imported);
+            } else if (!nodes.contains(existing.getNodeName()) && existing.hasChildNodes()) {
                 Node imported = target.importNode(existing, true);
                 targetNode.appendChild(imported);
             }
@@ -92,8 +97,10 @@ public class XstreamXMLResponseAggregator extends XMLResponseAggregator {
     }
 
     @Override
-    protected String getElementLevel() {
-
+    protected String getElementLevel(String rootNode) {
+        if ("list".equals(rootNode)) {
+            return "1";
+        }
         return "2";
     }
 

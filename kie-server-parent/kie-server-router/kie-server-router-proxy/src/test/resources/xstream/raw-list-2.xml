@@ -1,0 +1,34 @@
+<list>
+  <list>
+    <double>4.0</double>
+    <string>hiring</string>
+    <sql-timestamp>2017-01-20 12:17:07.101</sql-timestamp>
+    <null/>
+    <double>1.0</double>
+    <double>-1.0</double>
+    <null/>
+    <null/>
+    <string>maciek</string>
+    <string>1</string>
+    <string>Hiring a Developer</string>
+    <string>2</string>
+    <string>hr1.0</string>
+    <string>Hiring a Developer</string>
+  </list>
+  <list>
+    <double>5.0</double>
+    <string>hiring</string>
+    <sql-timestamp>2017-01-20 12:22:45.066</sql-timestamp>
+    <null/>
+    <double>1.0</double>
+    <double>-1.0</double>
+    <null/>
+    <null/>
+    <string>maciek</string>
+    <string>1</string>
+    <string>Hiring a Developer</string>
+    <string>3</string>
+    <string>hr1.0</string>
+    <string>Hiring a Developer</string>
+  </list>
+</list>

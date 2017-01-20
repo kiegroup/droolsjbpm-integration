@@ -5,11 +5,12 @@
 
   <xsl:template match="node() | @*">
     <xsl:copy>
+      <xsl:copy-of select="@*" />
       <xsl:apply-templates />
     </xsl:copy>
   </xsl:template>
 
-   <xsl:template match="//*[count(ancestor::*) = LEVEL][not(position() &gt; START)] | //*[count(ancestor::*) = LEVEL][not(position() &lt;= SIZE)]">
+   <xsl:template match="//*[count(ancestor::*) = LEVEL][position() &lt;= START] | //*[count(ancestor::*) = LEVEL][position() &gt; SIZE]">
   </xsl:template>
 
 </xsl:stylesheet>

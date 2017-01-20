@@ -21,4 +21,9 @@ public class KieServerRouterConstants {
     public static final String ROUTER_EXTERNAL_URL = "org.kie.server.router.url.external";
 
     public static final String ROUTER_REPOSITORY_DIR = "org.kie.server.router.repo";
+
+    public static final String CONTROLLER = "org.kie.server.controller";
+    public static final String KIE_CONTROLLER_USER = "org.kie.server.controller.user";
+    public static final String KIE_CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
+    public static final String KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
 }
