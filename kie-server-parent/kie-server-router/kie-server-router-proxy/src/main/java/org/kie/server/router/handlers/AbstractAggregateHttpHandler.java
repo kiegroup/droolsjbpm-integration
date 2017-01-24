@@ -107,6 +107,11 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
                 .filter(msg -> msg != null && !msg.trim().isEmpty())
                 .collect(Collectors.toList());
 
+        if (returnResponses.isEmpty()) {
+            ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
+            return;
+        }
+
         HeaderValues accept = exchange.getRequestHeaders().get(Headers.ACCEPT);
         HeaderValues kieContentType = exchange.getRequestHeaders().get("X-KIE-ContentType");
 
@@ -125,10 +130,6 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
         responseHeaders.forEach((name, value) -> {
             exchange.getResponseHeaders().putAll(HttpString.tryFromString(name), value);
         });
-        if (response == null) {
-            ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
-            return;
-        }
 
         exchange.getResponseHeaders().put(Headers.CONTENT_LENGTH, response.getBytes("UTF-8").length);
         exchange.getResponseSender().send(response);
