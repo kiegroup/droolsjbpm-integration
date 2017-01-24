@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.RuntimeDataService;
+import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -346,12 +347,20 @@ public class RuntimeDataServiceBase {
 
         UserTaskInstanceDesc userTaskDesc = runtimeDataService.getTaskByWorkItemId(workItemId);
 
+        if (userTaskDesc == null) {
+            throw new TaskNotFoundException("No task found with work item id " + workItemId);
+        }
+
         return convertToTask(userTaskDesc);
     }
 
     public TaskInstance getTaskById(long taskId) {
 
         UserTaskInstanceDesc userTaskDesc = runtimeDataService.getTaskById(taskId);
+
+        if (userTaskDesc == null) {
+            throw new TaskNotFoundException("No task found with id " + taskId);
+        }
 
         return convertToTask(userTaskDesc);
     }

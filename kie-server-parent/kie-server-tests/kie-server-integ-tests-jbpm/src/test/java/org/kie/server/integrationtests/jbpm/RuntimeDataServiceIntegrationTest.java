@@ -1246,6 +1246,17 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
 
     }
 
+    @Test (expected = KieServicesException.class)
+    public void testNotExistingUserTaskFindByWorkItemId() throws Exception {
+        taskClient.findTaskByWorkItemId(-9999l);
+    }
+
+    @Test (expected = KieServicesException.class)
+    public void testNotExistingUserTaskFindById() throws Exception {
+        taskClient.findTaskById(-9999l);
+    }
+
+
     @Test
     public void testFindTasks() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
