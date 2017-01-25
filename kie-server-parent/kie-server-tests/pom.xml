@@ -411,9 +411,6 @@
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
-                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
-                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
-                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
                 </container>
@@ -564,12 +561,9 @@
                     <url>${eap7.download.url}</url>
                   </zipUrlInstaller>
                   <systemProperties>
-                    <!-- disable JMS support for executor touse same tests for all containers for jbpm executor -->
+                    <!-- disable JMS support for executor to use same tests for all containers for jbpm executor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
-                    <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
-                    <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
-                    <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
                     <org.kie.mail.session>java:/mail/Session</org.kie.mail.session>
                   </systemProperties>
                 </container>
