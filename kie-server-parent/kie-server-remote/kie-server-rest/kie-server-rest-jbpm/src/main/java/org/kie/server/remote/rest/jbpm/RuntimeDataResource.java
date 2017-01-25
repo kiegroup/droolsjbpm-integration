@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
@@ -317,12 +318,17 @@ public class RuntimeDataResource {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-        TaskInstance userTaskDesc = runtimeDataServiceBase.getTaskByWorkItemId(workItemId);
-        if (userTaskDesc == null) {
+        TaskInstance userTaskDesc = null;
+        try {
+            userTaskDesc = runtimeDataServiceBase.getTaskByWorkItemId(workItemId);
+            return createCorrectVariant(userTaskDesc, headers, Response.Status.OK, conversationIdHeader);
 
+        } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM, workItemId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
-        return createCorrectVariant(userTaskDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
     @GET
@@ -333,12 +339,17 @@ public class RuntimeDataResource {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
 
-        TaskInstance userTaskDesc = runtimeDataServiceBase.getTaskById(taskId);
-        if (userTaskDesc == null) {
+        TaskInstance userTaskDesc = null;
+        try {
+            userTaskDesc = runtimeDataServiceBase.getTaskById(taskId);
+            return createCorrectVariant(userTaskDesc, headers, Response.Status.OK, conversationIdHeader);
 
+        } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
-        return createCorrectVariant(userTaskDesc, headers, Response.Status.OK, conversationIdHeader);
     }
 
 
