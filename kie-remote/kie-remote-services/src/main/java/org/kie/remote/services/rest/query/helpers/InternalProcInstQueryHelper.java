@@ -55,14 +55,21 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
      * @see org.kie.remote.services.rest.query.AbstractInternalQueryHelper#doQueryAndCreateResultObjects(boolean, boolean)
      */
     @Override
-    public JaxbQueryProcessInstanceResult doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo) { 
+    public JaxbQueryProcessInstanceResult doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean filterLastVarInstanceLogs, boolean workFlowInstanceVariables, int [] pageInfo) {
 
         // setup
         RemoteServicesQueryCommandBuilder procInstLogQueryBuilder = getQueryBuilders()[0];
         setPaginationParameters(pageInfo, procInstLogQueryBuilder);
         RemoteServicesQueryCommandBuilder varInstLogQueryBuilder = getQueryBuilders()[1];
         RemoteServicesQueryJPAService jpaService = resourceBase.getJPAService();
-       
+
+        if( onlyRetrieveLastVarLogs && !filterLastVarInstanceLogs ) {
+            if( variableCriteriaInQuery(procInstLogQueryBuilder.getQueryWhere().getCriteria()) ) {
+                procInstLogQueryBuilder.last();
+            }
+            varInstLogQueryBuilder.last();
+        }
+
         // process instance queries
         procInstLogQueryBuilder.ascending(OrderBy.processInstanceId);
         List<ProcessInstanceLog> procLogs = jpaService.doQuery(
@@ -81,7 +88,7 @@ public class InternalProcInstQueryHelper extends AbstractInternalQueryHelper<Jax
                 varInstLogQueryBuilder.getQueryWhere(),
                 VariableInstanceLog.class);
 
-        if( onlyRetrieveLastVarLogs  && varLogs != null) {
+        if( onlyRetrieveLastVarLogs && filterLastVarInstanceLogs && varLogs != null) {
             varLogs = filterLastVarInstanceLogs( varLogs );
         }
         

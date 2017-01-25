@@ -94,13 +94,14 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
      * <li>Create and fill a result instance (a {@link JaxbQueryProcessInstanceResult} or {@link JaxbQueryTaskResult}) with the
      * information from the results of the queries
      *
-     * @param onlyRetrieveLastVarLogs Whether to
+     * @param onlyRetrieveLastVarLogs Whether to only retrieve last varlogs
+     * @param filterLastVarInstanceLogs whether to filter var instane logs outside the query or not
      * @param workFlowInstanceVariables (UNFINISHED FEATURE) whether to use the information from variable instance logs
      *        or from the process instance variables themselves.
      * @param pageInfo pagination information
      * @return
      */
-    protected abstract R doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo);
+    protected abstract R doQueryAndCreateResultObjects(boolean onlyRetrieveLastVarLogs, boolean filterLastVarInstanceLogs, boolean workFlowInstanceVariables, int [] pageInfo);
 
     /**
      * This method is the internal logic that
@@ -137,8 +138,12 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
 
         // 0. Retrieve *all* variable log values, or just the most recent?
         boolean onlyRetrieveLastVarLogs = false;
+        boolean filterLastVarInstanceLogs = true;
         if( !queryParams.containsKey("all") ) {
             onlyRetrieveLastVarLogs = true;
+            if( queryParams.containsKey("varvalue") || queryParams.containsKey("vv")) {
+                filterLastVarInstanceLogs = false;
+            }
         }
         queryParams.remove("all");
 
@@ -156,7 +161,7 @@ abstract class AbstractInternalQueryHelper<R> extends InternalQueryBuilderMethod
         processQueryActionQueue(queryActionQueue, varValueMap, varRegexMap, workFlowInstanceVariables);
 
         // 4. execute the query via the backend, which uses the creatd {@link QueryData} instance
-        return doQueryAndCreateResultObjects(onlyRetrieveLastVarLogs, workFlowInstanceVariables, pageInfo);
+        return doQueryAndCreateResultObjects(onlyRetrieveLastVarLogs, filterLastVarInstanceLogs, workFlowInstanceVariables, pageInfo);
     }
 
     public R queryTasksOrProcInstsAndVariables( Map<String, String[]> queryParams, int[] pageInfo) {
