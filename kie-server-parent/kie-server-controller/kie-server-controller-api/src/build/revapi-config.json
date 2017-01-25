@@ -1,0 +1,38 @@
+{
+  "revapi": {
+    "java": {
+      "filter": {
+        "_comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+        "packages": {
+          "regex": true,
+          "include": [
+            "org\\.kie\\.server\\.controller\\.api.*"
+          ]
+        }
+      }
+    },
+    "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
+    "ignore": [
+      {
+        "code": "java.class.removed",
+        "old": "interface org.kie.server.controller.api.KieServerControllerAdmin",
+        "justification": "Removed deprecated class"
+      },
+      {
+        "code": "java.method.addedToInterface",
+        "new": "method void org.kie.server.controller.api.service.NotificationService::notify(org.kie.server.controller.api.model.events.ServerInstanceConnected)",
+        "justification": "Allow fine grained notification"
+      },
+      {
+        "code": "java.method.addedToInterface",
+        "new": "method void org.kie.server.controller.api.service.NotificationService::notify(org.kie.server.controller.api.model.events.ServerInstanceDisconnected)",
+        "justification": "Allow fine grained notification"
+      },
+      {
+        "code": "java.method.addedToInterface",
+        "new": "method void org.kie.server.controller.api.service.SpecManagementService::updateContainerSpec(java.lang.String, org.kie.server.controller.api.model.spec.ContainerSpec)",
+        "justification": "Allow to update existing container specification"
+      }
+    ]
+  }
+}
