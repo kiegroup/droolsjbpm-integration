@@ -291,6 +291,9 @@
               <org.optaplanner.server.ext.disabled>true</org.optaplanner.server.ext.disabled>
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <org.drools.server.ext.disabled>true</org.drools.server.ext.disabled>
+              <!-- UserInfo properties for UserTaskEscalationIntegrationTest-->
+              <org.jbpm.ht.userinfo>props</org.jbpm.ht.userinfo>
+              <jbpm.user.info.properties>file://${project.build.testOutputDirectory}/userinfo.properties</jbpm.user.info.properties>
             </systemProperties>
           </container>
         </configuration>
