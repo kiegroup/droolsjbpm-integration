@@ -255,4 +255,66 @@ public class QueryResourceQueryHelperTest extends AbstractQueryResourceTest {
 
     }
 
+    @Test
+    public void testAllUsingVariableValue() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("myobject", "first");
+        ProcessInstance p1 = ksession.startProcess(OBJECT_VARIABLE_PROCESS_ID, params); // completed
+        ((WorkflowProcessInstance) p1).setVariable("myobject", "second");
+
+        params = new HashMap<String, Object>();
+        params.put("myobject", "first");
+        ProcessInstance p2 = ksession.startProcess(OBJECT_VARIABLE_PROCESS_ID, params); // completed
+
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "varvalue", "first");
+
+        int [] pageInfo = { 0, 0 };
+        JaxbQueryProcessInstanceResult result1 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        assertNotNull(result1);
+        assertFalse(result1.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList1 = result1.getProcessInstanceInfoList();
+        assertEquals(1, processInfoList1.size());
+
+        addParams(queryParams, "all", "true");
+        JaxbQueryProcessInstanceResult result2 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        assertNotNull(result2);
+        assertFalse(result2.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList2 = result2.getProcessInstanceInfoList();
+        assertEquals(2, processInfoList2.size());
+    }
+
+    @Test
+    public void testAllUsingVariableValueShortForm() {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("myobject", "first");
+        ProcessInstance p1 = ksession.startProcess(OBJECT_VARIABLE_PROCESS_ID, params); // completed
+        ((WorkflowProcessInstance) p1).setVariable("myobject", "second");
+
+        params = new HashMap<String, Object>();
+        params.put("myobject", "first");
+        ProcessInstance p2 = ksession.startProcess(OBJECT_VARIABLE_PROCESS_ID, params); // completed
+
+        Map<String, String[]> queryParams = new HashMap<String, String[]>();
+        addParams(queryParams, "vv", "first");
+
+        int [] pageInfo = { 0, 0 };
+        JaxbQueryProcessInstanceResult result1 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        assertNotNull(result1);
+        assertFalse(result1.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList1 = result1.getProcessInstanceInfoList();
+        assertEquals(1, processInfoList1.size());
+
+        addParams(queryParams, "all", "true");
+        JaxbQueryProcessInstanceResult result2 = queryProcInstHelper.queryTasksOrProcInstsAndVariables(queryParams, pageInfo);
+
+        assertNotNull(result2);
+        assertFalse(result2.getProcessInstanceInfoList().isEmpty());
+        List<JaxbQueryProcessInstanceInfo> processInfoList2 = result2.getProcessInstanceInfoList();
+        assertEquals(2, processInfoList2.size());
+    }
+
 }

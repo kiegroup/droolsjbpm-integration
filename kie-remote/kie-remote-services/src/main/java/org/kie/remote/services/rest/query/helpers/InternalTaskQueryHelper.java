@@ -72,7 +72,7 @@ public class InternalTaskQueryHelper extends AbstractInternalQueryHelper<JaxbQue
      * @see org.kie.remote.services.rest.query.AbstractInternalQueryHelper#doQueryAndCreateResultObjects(boolean, boolean)
      */
     @Override
-    public JaxbQueryTaskResult doQueryAndCreateResultObjects( boolean onlyRetrieveLastVarLogs, boolean workFlowInstanceVariables, int [] pageInfo) {
+    public JaxbQueryTaskResult doQueryAndCreateResultObjects( boolean onlyRetrieveLastVarLogs, boolean filterLastVarInstanceLogs, boolean workFlowInstanceVariables, int [] pageInfo) {
 
         // setup
         RemoteServicesQueryCommandBuilder [] queryBuilders = getQueryBuilders();
