@@ -61,6 +61,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
     public void handleRequest(final HttpServerExchange exchange) throws Exception {
         if (!exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))) {
             httpHandler.handleRequest(exchange);
+            return;
         }
         Map<String, Deque<String>> queryParams = exchange.getQueryParameters();
         // collect and alter paging
