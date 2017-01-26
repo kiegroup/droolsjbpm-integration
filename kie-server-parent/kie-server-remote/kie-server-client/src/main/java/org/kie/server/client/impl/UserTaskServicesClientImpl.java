@@ -1328,4 +1328,43 @@ public class UserTaskServicesClientImpl extends AbstractKieServicesClientImpl im
 
         return Collections.emptyList();
     }
+
+
+    @Override
+    public List<TaskEventInstance> findTaskEvents(String containerId, Long taskId, Integer page, Integer pageSize) {
+        return findTaskEvents(containerId, taskId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<TaskEventInstance> findTaskEvents(String containerId, Long taskId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        TaskEventInstanceList taskSummaryList = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            String queryString = getPagingQueryString("?sort="+sort+"&sortOrder="+sortOrder, page, pageSize);
+
+            taskSummaryList = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), TASK_URI + "/" + TASK_INSTANCE_EVENTS_GET_URI, valuesMap) + queryString , TaskEventInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "QueryService", "getTaskEvents", new Object[]{taskId, page, pageSize, sort, sortOrder}) ) );
+            ServiceResponse<TaskEventInstanceList> response = (ServiceResponse<TaskEventInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            taskSummaryList = response.getResult();
+        }
+
+
+        if (taskSummaryList != null && taskSummaryList.getTaskEvents() != null) {
+            return Arrays.asList(taskSummaryList.getTaskEvents());
+        }
+
+        return Collections.emptyList();
+    }
 }

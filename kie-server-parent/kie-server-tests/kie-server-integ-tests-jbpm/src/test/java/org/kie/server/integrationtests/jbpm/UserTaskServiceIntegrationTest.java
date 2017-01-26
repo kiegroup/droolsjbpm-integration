@@ -30,6 +30,7 @@ import org.kie.api.task.model.Status;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesException;
@@ -1162,6 +1163,36 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             afterNextCallConversationId = ((AbstractKieServicesClientImpl)taskClient).getConversationId();
             assertEquals(conversationId, afterNextCallConversationId);
 
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testFindTaskEvents() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            TaskSummary taskInstance = tasks.get(0);
+
+            List<TaskEventInstance> events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 10);
+            assertNotNull(events);
+            assertEquals(1, events.size());
+
+            // now let's start it
+            taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
+            events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 10);
+            assertNotNull(events);
+            assertEquals(2, events.size());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }

@@ -31,6 +31,7 @@ import org.kie.internal.executor.api.STATUS;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
@@ -707,6 +708,75 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         }
     }
 
+    @Test
+    public void testGetNodeInstances() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<NodeInstance> instances = processClient.findActiveNodeInstances(CONTAINER_ID, processInstanceId, 0, 10);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            NodeInstance expectedFirstTask = NodeInstance
+                    .builder()
+                    .name("First task")
+                    .containerId(CONTAINER_ID)
+                    .nodeType("HumanTaskNode")
+                    .completed(false)
+                    .processInstanceId(processInstanceId)
+                    .build();
+
+            NodeInstance nodeInstance = instances.get(0);
+            assertNodeInstance(expectedFirstTask, nodeInstance);
+            assertNotNull(nodeInstance.getWorkItemId());
+            assertNotNull(nodeInstance.getDate());
+
+            instances = processClient.findCompletedNodeInstances(CONTAINER_ID, processInstanceId, 0, 10);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            NodeInstance expectedStart = NodeInstance
+                    .builder()
+                    .name("start")
+                    .containerId(CONTAINER_ID)
+                    .nodeType("StartNode")
+                    .completed(true)
+                    .processInstanceId(processInstanceId)
+                    .build();
+
+            nodeInstance = instances.get(0);
+            assertNodeInstance(expectedStart, nodeInstance);
+            assertNull(nodeInstance.getWorkItemId());
+            assertNotNull(nodeInstance.getDate());
+
+            instances = processClient.findNodeInstances(CONTAINER_ID, processInstanceId, 0, 10);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+
+            nodeInstance = instances.get(0);
+            assertNodeInstance(expectedStart, nodeInstance);
+            assertNull(nodeInstance.getWorkItemId());
+            assertNotNull(nodeInstance.getDate());
+
+            nodeInstance = instances.get(1);
+            assertNodeInstance(expectedFirstTask, nodeInstance);
+            assertNotNull(nodeInstance.getWorkItemId());
+            assertNotNull(nodeInstance.getDate());
+
+            nodeInstance = instances.get(2);
+            expectedStart.setCompleted(false);
+            assertNodeInstance(expectedStart, nodeInstance);
+            assertNull(nodeInstance.getWorkItemId());
+            assertNotNull(nodeInstance.getDate());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
     private ProcessInstance createSignalProcessInstance(Long processInstanceId) {
         return ProcessInstance.builder()
                 .id(processInstanceId)
@@ -748,6 +818,15 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
         assertEquals(expected.getParentId(), actual.getParentId());
         assertNotNull(actual.getCorrelationKey());
         assertNotNull(actual.getDate());
+    }
+
+    private void assertNodeInstance(NodeInstance expected, NodeInstance actual) {
+        assertNotNull(actual);
+        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getContainerId(), actual.getContainerId());
+        assertEquals(expected.getNodeType(), actual.getNodeType());
+        assertEquals(expected.getCompleted(), actual.getCompleted());
+        assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
     }
 
     private void checkAvailableSignals(String containerId, Long processInstanceId) {

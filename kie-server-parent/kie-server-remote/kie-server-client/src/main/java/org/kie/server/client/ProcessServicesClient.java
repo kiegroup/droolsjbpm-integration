@@ -27,7 +27,9 @@ import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.client.jms.ResponseHandler;
 
@@ -92,6 +94,16 @@ public interface ProcessServicesClient {
     WorkItemInstance getWorkItem(String containerId, Long processInstanceId, Long id);
 
     List<WorkItemInstance> getWorkItemByProcessInstance(String containerId, Long processInstanceId);
+
+    List<NodeInstance> findActiveNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize);
+
+    List<NodeInstance> findCompletedNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize);
+
+    List<NodeInstance> findNodeInstances(String containerId, Long processInstanceId, Integer page, Integer pageSize);
+
+    List<VariableInstance> findVariablesCurrentState(String containerId, Long processInstanceId);
+
+    List<VariableInstance> findVariableHistory(String containerId, Long processInstanceId, String variableName, Integer page, Integer pageSize);
 
     void setResponseHandler(ResponseHandler responseHandler);
 }

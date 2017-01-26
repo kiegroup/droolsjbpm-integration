@@ -41,7 +41,7 @@ public class KieServerInfoHandlerTest {
     @Test
     public void testGetLocationUrl() {
         String locationUrl = KieServerInfoHandler.getLocationUrl();
-        assertEquals("http://localhost:9000/", locationUrl);
+        assertEquals("http://localhost:9000", locationUrl);
     }
 
     @Test

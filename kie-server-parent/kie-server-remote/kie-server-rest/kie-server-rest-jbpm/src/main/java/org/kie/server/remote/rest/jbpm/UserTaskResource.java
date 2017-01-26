@@ -18,6 +18,7 @@ package org.kie.server.remote.rest.jbpm;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -32,8 +33,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.TaskNotFoundException;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.kie.server.services.jbpm.UserTaskServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,14 +51,16 @@ public class UserTaskResource {
     public static final Logger logger = LoggerFactory.getLogger(UserTaskResource.class);
 
     private UserTaskServiceBase userTaskServiceBase;
+    private RuntimeDataServiceBase runtimeDataServiceBase;
     private KieServerRegistry context;
 
     public UserTaskResource() {
 
     }
 
-    public UserTaskResource(UserTaskServiceBase userTaskServiceBase, KieServerRegistry context) {
+    public UserTaskResource(UserTaskServiceBase userTaskServiceBase, RuntimeDataServiceBase runtimeDataServiceBase, KieServerRegistry context) {
         this.userTaskServiceBase = userTaskServiceBase;
+        this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.context = context;
     }
 
@@ -756,6 +761,28 @@ public class UserTaskResource {
 
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(TASK_INSTANCE_EVENTS_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getTaskEvents(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+        Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        try {
+
+            TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
+
+            return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
+
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

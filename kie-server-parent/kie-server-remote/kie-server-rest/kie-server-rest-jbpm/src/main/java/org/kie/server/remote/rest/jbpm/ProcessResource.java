@@ -28,6 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,6 +39,10 @@ import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.WorkItemNotFoundException;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
@@ -485,5 +490,81 @@ public class ProcessResource  {
         }
     }
 
+    @GET
+    @Path(PROCESS_INSTANCES_BY_CONTAINER_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessInstancesByDeploymentId(@Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("status")List<Integer> status,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
+        logger.debug("Returning result of process instance search: {}", processInstanceList);
+
+        return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
+    }
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessesByDeploymentId(@Context HttpHeaders headers, @PathParam("id") String containerId,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
+        logger.debug("Returning result of process definition search: {}", processDefinitionList);
+
+        return createCorrectVariant(processDefinitionList, headers, Response.Status.OK, conversationIdHeader);
+
+    }
+
+    @GET
+    @Path(NODE_INSTANCES_BY_INSTANCE_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessInstanceHistory(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId,
+            @QueryParam("activeOnly")Boolean active, @QueryParam("completedOnly")Boolean completed,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        NodeInstanceList nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
+        logger.debug("Returning result of node instances search: {}", nodeInstanceList);
+        return createCorrectVariant(nodeInstanceList, headers, Response.Status.OK, conversationIdHeader);
+    }
+
+    @GET
+    @Path(VAR_INSTANCES_BY_INSTANCE_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getVariablesCurrentState(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariablesCurrentState(processInstanceId);
+        logger.debug("Returning result of variables search: {}", variableInstanceList);
+
+        return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+    }
+
+    @GET
+    @Path(VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getVariableHistory(@Context HttpHeaders headers,  @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId,
+            @PathParam("varName") String variableName,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+
+        VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariableHistory(processInstanceId, variableName, page, pageSize);
+        logger.debug("Returning result of variable '{}; history search: {}", variableName, variableInstanceList);
+
+        return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+    }
 
 }

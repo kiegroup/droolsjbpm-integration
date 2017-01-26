@@ -27,8 +27,12 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.definition.QueryDefinition;
+import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.util.QueryFilterSpecBuilder;
+import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -114,5 +118,109 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
         assertEquals(1, tasks.size());
 
         processClient.abortProcessInstance(CONTAINER_ID, processInstanceIdV1);
+    }
+
+    @Test
+    public void testStartProcessAndQueryViaAdvancedQueries() throws Exception {
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstances");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
+        query.setTarget("PROCESS");
+
+        queryClient.registerQuery(query);
+        try {
+            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
+            assertNotNull(queries);
+            assertEquals(1, queries.size());
+
+            Object person = createPersonInstance(USER_JOHN);
+
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("test", USER_MARY);
+            parameters.put("number", new Integer(12345));
+            List<Object> list = new ArrayList<Object>();
+            list.add("item");
+            parameters.put("list", list);
+            parameters.put("person", person);
+
+            Long processInstanceIdV1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+
+            assertNotNull(processInstanceIdV1);
+            assertTrue(processInstanceIdV1.longValue() > 0);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            queryClient.replaceQuery(query);
+
+            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder()
+                    .greaterThan("processinstanceid", 0)
+                    .get();
+
+
+            instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, filterSpec, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceIdV1);
+        } catch (Exception e){
+          e.printStackTrace();
+          fail(e.getMessage());
+        } finally {
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testStartProcessAndQueryViaAdvancedQueriesRawContent() throws Exception {
+
+        QueryDefinition query = new QueryDefinition();
+        query.setName("allProcessInstances");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from ProcessInstanceLog where status = 1");
+        query.setTarget("PROCESS");
+
+        queryClient.registerQuery(query);
+        try {
+            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
+            assertNotNull(queries);
+            assertEquals(1, queries.size());
+
+            Object person = createPersonInstance(USER_JOHN);
+
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("test", USER_MARY);
+            parameters.put("number", new Integer(12345));
+            List<Object> list = new ArrayList<Object>();
+            list.add("item");
+            parameters.put("list", list);
+            parameters.put("person", person);
+
+            Long processInstanceIdV1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+
+            assertNotNull(processInstanceIdV1);
+            assertTrue(processInstanceIdV1.longValue() > 0);
+
+            List<List> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_RAW, 0, 10, List.class);
+            assertNotNull(instances);
+            assertEquals(1, instances.size());
+
+            for (List row : instances) {
+                assertEquals(16, row.size());
+            }
+
+
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceIdV1);
+        } catch (Exception e){
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            queryClient.unregisterQuery(query.getName());
+        }
+
     }
 }

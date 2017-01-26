@@ -87,6 +87,7 @@ public class RestURI {
     public static final String PROCESS_INSTANCE_VAR_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
     public static final String PROCESS_INSTANCE_VARS_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variables";
     public static final String PROCESS_INSTANCE_SIGNALS_GET_URI = "instances/{" + PROCESS_INST_ID + "}/signals";
+    public static final String PROCESS_INSTANCES_BY_CONTAINER_GET_URI = "processes/instances";
 
     public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/completed";
     public static final String PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/aborted";
@@ -174,6 +175,8 @@ public class RestURI {
     public static final String TASK_INSTANCE_ATTACHMENT_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/attachments/{" + ATTACHMENT_ID + "}";
 
     public static final String TASK_INSTANCE_GET_URI = "{" + TASK_INSTANCE_ID + "}";
+
+    public static final String TASK_INSTANCE_EVENTS_GET_URI = "{" + TASK_INSTANCE_ID + "}/events";
 
     // job executor prefixed by JOB_URI
     public static final String CANCEL_JOB_DEL_URI = "{" + JOB_ID + "}";

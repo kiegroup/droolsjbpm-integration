@@ -119,7 +119,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase, context));
         components.add(new DefinitionResource(definitionServiceBase, context));
-        components.add(new UserTaskResource(userTaskServiceBase, context));
+        components.add(new UserTaskResource(userTaskServiceBase, runtimeDataServiceBase, context));
         components.add(new ExecutorResource(executorServiceBase, context));
         components.add(new QueryDataResource(queryDataServiceBase, context));
         components.add(new DocumentResource(documentServiceBase, context));

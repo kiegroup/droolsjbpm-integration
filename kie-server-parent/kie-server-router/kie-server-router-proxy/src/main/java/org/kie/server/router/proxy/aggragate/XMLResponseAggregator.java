@@ -112,7 +112,7 @@ public abstract class XMLResponseAggregator implements ResponseAggregator {
             Transformer transformer = null;
 
             String root = document.getDocumentElement().getNodeName();
-            String sortNode = getElementLevel();
+            String sortNode = getElementLevel(root);
             if (sortBy != null && !sortBy.trim().isEmpty()) {
 
                 transformer = sort(getRootNode(root), sortNode, sortBy, ascending, document);
@@ -209,7 +209,7 @@ public abstract class XMLResponseAggregator implements ResponseAggregator {
 
     protected abstract List<String> knownNames();
 
-    protected abstract String getElementLevel();
+    protected abstract String getElementLevel(String rootNode);
 
     protected abstract String getRootNode(String rootNode);
 

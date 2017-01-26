@@ -37,7 +37,17 @@
         "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
         "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, java.lang.String)",
         "justification": "Add filter by task name"
-      }
+      },
+      {
+       "code": "java.method.numberOfParametersChanged",
+       "old": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.api.KieServerRegistry)",
+       "new": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+       "package": "org.kie.server.remote.rest.jbpm",
+       "classSimpleName": "UserTaskResource",
+       "methodName": "<init>",
+       "elementKind": "constructor",
+       "justification": "Required to be able to use runtime data service from within UserTaskServiceResource"
+       }
     ]
   }
 }

@@ -505,5 +505,43 @@ public class JSONAggregatorTest extends AbstractAggregateTest {
         JSONArray processDefs = (JSONArray) containers;
         assertEquals(6, processDefs.length());
     }
+
+    @Test
+    public void testAggregateRawList() throws Exception {
+        String json1 = read(this.getClass().getResourceAsStream("/json/raw-list-1.json"));
+        String json2 = read(this.getClass().getResourceAsStream("/json/raw-list-2.json"));
+
+        JSONResponseAggregator aggregate = new JSONResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(json1);
+        data.add(json2);
+
+        String result = aggregate.aggregate(data);
+        logger.debug(result);
+
+        JSONArray aggregated = new JSONArray(result);
+        assertNotNull(aggregated);
+        assertEquals(5, aggregated.length());
+    }
+
+    @Test
+    public void testAggregateRawListWithPaging() throws Exception {
+        String json1 = read(this.getClass().getResourceAsStream("/json/raw-list-1.json"));
+        String json2 = read(this.getClass().getResourceAsStream("/json/raw-list-2.json"));
+
+        JSONResponseAggregator aggregate = new JSONResponseAggregator();
+
+        List<String> data = new ArrayList<>();
+        data.add(json1);
+        data.add(json2);
+
+        String result = aggregate.aggregate(data, null, true, 1, 2);
+        logger.debug(result);
+
+        JSONArray aggregated = new JSONArray(result);
+        assertNotNull(aggregated);
+        assertEquals(2, aggregated.length());
+    }
 }
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<list-type>
+  <items>
+    <items xsi:type="jaxbList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">3.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">3</items>
+        <items xsi:nil="true"/>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">query-definition-project</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">yoda</items>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">-1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">definition-project.signalprocess</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">signalprocess</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">3.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">signalprocess</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="jaxbDate">
+          <value>2017-01-20T17:56:02.079+01:00</value>
+        </items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+      </items>
+    </items>
+    <items xsi:type="jaxbList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">4.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">4</items>
+        <items xsi:nil="true"/>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">query-definition-project</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">yoda</items>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">-1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">definition-project.usertask</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">usertask</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">4.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">usertask</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="jaxbDate">
+          <value>2017-01-20T17:56:02.113+01:00</value>
+        </items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+      </items>
+    </items>
+    <items xsi:type="jaxbList" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">5.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">5</items>
+        <items xsi:nil="true"/>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">query-definition-project</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">yoda</items>
+        <items xsi:nil="true"/>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">-1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">definition-project.signalprocess</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">signalprocess</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">5.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">signalprocess</items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="xs:string" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+        <items xsi:type="jaxbDate">
+          <value>2017-01-20T17:56:02.174+01:00</value>
+        </items>
+        <items xsi:type="xs:double" xmlns:xs="http://www.w3.org/2001/XMLSchema">1.0</items>
+      </items>
+    </items>
+  </items>
+</list-type>

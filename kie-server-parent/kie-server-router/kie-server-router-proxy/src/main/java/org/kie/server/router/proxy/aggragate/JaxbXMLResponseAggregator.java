@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -78,7 +79,12 @@ public class JaxbXMLResponseAggregator extends XMLResponseAggregator {
 
         for (int j = 0; j < children.getLength(); j++) {
             Node existing = children.item(j);
-            if (nodes.contains(existing.getNodeName()) && existing.hasChildNodes()) {
+
+            // special handling for raw list
+            if (existing.getNodeName().equals("items") && existing.hasChildNodes() && hasType(existing)) {
+                Node imported = target.importNode(existing, true);
+                targetNode.appendChild(imported);
+            } else if (nodes.contains(existing.getNodeName()) && existing.hasChildNodes()) {
                 Node imported = target.importNode(existing, true);
                 targetNode.appendChild(imported);
             }
@@ -91,8 +97,10 @@ public class JaxbXMLResponseAggregator extends XMLResponseAggregator {
     }
 
     @Override
-    protected String getElementLevel() {
-
+    protected String getElementLevel(String rootNode) {
+        if ("list-type".equals(rootNode)) {
+            return "2";
+        }
         return "1";
     }
 
@@ -105,6 +113,18 @@ public class JaxbXMLResponseAggregator extends XMLResponseAggregator {
     protected String sortBy(String fieldName) {
 
         return sortByMapping.getProperty(fieldName, fieldName);
+    }
+
+    protected boolean hasType(Node node) {
+        if (node instanceof Element) {
+            Object value = ((Element) node).getAttribute("xsi:type");
+
+            if (value != null && value.equals("jaxbList")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
