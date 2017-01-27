@@ -73,8 +73,29 @@ public class CaseQueryResource extends AbstractCaseResource {
                         responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner, status, page, pageSize, sort, sortOrder);
                     } else {
                         logger.debug("About to look for case instances with status {}", status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstances(status, page, pageSize, sort, sortOrder);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);
                     }
+
+                    logger.debug("Returning OK response with content '{}'", responseObject);
+                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
+
+    @GET
+    @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCaseInstancesByRole(@javax.ws.rs.core.Context HttpHeaders headers,
+            @PathParam(CASE_ROLE_NAME) String roleName, @QueryParam("status") List<Integer> status,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        return invokeCaseOperation(headers,
+                "",
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+
+                    logger.debug("About to look for case instances with status {}", status);
+                    CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByRole(roleName, status, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);

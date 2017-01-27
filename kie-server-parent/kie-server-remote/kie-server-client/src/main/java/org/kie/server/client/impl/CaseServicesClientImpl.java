@@ -728,7 +728,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstances", new Object[]{safeList(status), page, pageSize, sort, sortOrder})) );
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesAnyRole", new Object[]{safeList(status), page, pageSize, sort, sortOrder})) );
             ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 

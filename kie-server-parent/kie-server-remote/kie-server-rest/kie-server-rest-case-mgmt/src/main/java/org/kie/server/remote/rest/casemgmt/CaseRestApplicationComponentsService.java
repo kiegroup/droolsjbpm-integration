@@ -62,6 +62,7 @@ public class CaseRestApplicationComponentsService implements KieServerApplicatio
 
         components.add(new CaseResource(caseManagementServiceBase, caseManagementRuntimeDataServiceBase, context));
         components.add(new CaseQueryResource(caseManagementRuntimeDataServiceBase, context));
+        components.add(new CaseAdminResource(caseManagementRuntimeDataServiceBase, context));
 
         return components;
     }
