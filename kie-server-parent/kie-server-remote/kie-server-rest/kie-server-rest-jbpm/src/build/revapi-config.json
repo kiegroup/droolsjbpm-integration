@@ -47,7 +47,17 @@
        "methodName": "<init>",
        "elementKind": "constructor",
        "justification": "Required to be able to use runtime data service from within UserTaskServiceResource"
-       }
+       },
+       {
+        "code": "java.method.numberOfParametersChanged",
+        "old": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.DefinitionServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+        "new": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+        "package": "org.kie.server.remote.rest.jbpm",
+        "classSimpleName": "ProcessResource",
+        "methodName": "<init>",
+        "elementKind": "constructor",
+        "justification": "Removed unused parameters. Change in this constructor does not break backward compatibility of REST API"
+        }
     ]
   }
 }

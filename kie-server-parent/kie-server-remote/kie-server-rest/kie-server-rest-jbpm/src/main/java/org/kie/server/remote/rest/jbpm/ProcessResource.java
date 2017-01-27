@@ -45,8 +45,6 @@ import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.jbpm.DefinitionServiceBase;
 import org.kie.server.services.jbpm.ProcessServiceBase;
 import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
@@ -62,9 +60,7 @@ public class ProcessResource  {
     public static final Logger logger = LoggerFactory.getLogger(ProcessResource.class);
 
     private ProcessServiceBase processServiceBase;
-    private DefinitionServiceBase definitionServiceBase;
     private RuntimeDataServiceBase runtimeDataServiceBase;
-    private MarshallerHelper marshallerHelper;
     private KieServerRegistry context;
 
     private CorrelationKeyFactory correlationKeyFactory = KieInternalServices.Factory.get().newCorrelationKeyFactory();
@@ -73,12 +69,10 @@ public class ProcessResource  {
 
     }
 
-    public ProcessResource(ProcessServiceBase processServiceBase, DefinitionServiceBase definitionService, RuntimeDataServiceBase runtimeDataServiceBase, KieServerRegistry context) {
+    public ProcessResource(ProcessServiceBase processServiceBase, RuntimeDataServiceBase runtimeDataServiceBase, KieServerRegistry context) {
         this.processServiceBase = processServiceBase;
-        this.definitionServiceBase = definitionServiceBase;
         this.runtimeDataServiceBase = runtimeDataServiceBase;
         this.context = context;
-        this.marshallerHelper = new MarshallerHelper(context);
     }
 
     protected static String getRelativePath(HttpServletRequest httpRequest) {

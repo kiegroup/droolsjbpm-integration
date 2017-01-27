@@ -143,7 +143,7 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
     @Override
     public void unregisterServerExtension(KieServerExtension kieServerExtension) {
-        this.serverExtensions.remove(kieServerExtension);
+        this.serverExtensions.remove(kieServerExtension.getExtensionName());
     }
 
     @Override

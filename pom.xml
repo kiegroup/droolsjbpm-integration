@@ -22,6 +22,7 @@
 
   <properties>
     <enforcer.failOnDuplicatedClasses>true</enforcer.failOnDuplicatedClasses>
+    <findbugs.failOnViolation>true</findbugs.failOnViolation>
   </properties>
 
   <repositories>
