@@ -21,6 +21,7 @@
     <module>kie-server-rest-jbpm-ui</module>
     <module>kie-server-rest-optaplanner</module>
     <module>kie-server-rest-case-mgmt</module>
+    <module>kie-server-rest-dmn</module>
   </modules>
 
 </project>
