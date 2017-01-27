@@ -33,7 +33,7 @@ public class ServerTemplateUpdated {
     }
 
     public void setServerInstance(ServerTemplate serverInstance) {
-        this.serverTemplate = serverTemplate;
+        this.serverTemplate = serverInstance;
     }
 
     @Override

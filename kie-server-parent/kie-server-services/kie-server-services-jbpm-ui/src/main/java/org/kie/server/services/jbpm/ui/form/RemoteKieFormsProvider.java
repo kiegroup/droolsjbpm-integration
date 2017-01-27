@@ -46,8 +46,6 @@ public class RemoteKieFormsProvider extends AbstractFormProvider implements UIFo
     public static final String MULTIPLE_SUBFORM_CREATION_FORM_PROPERTY = "creationForm";
     public static final String MULTIPLE_SUBFORM_EDITION_FORM_PROPERTY = "editionForm";
 
-    protected FormManagerService formManagerService;
-
     protected JsonParser parser = new JsonParser();
 
     protected Gson gson = new Gson();

@@ -181,7 +181,7 @@ public class QueryDataServiceBase {
         QueryParamBuilderFactory paramBuilderFactory = QueryParamBuilderManager.get().find(builder);
 
         if (paramBuilderFactory == null) {
-            new RuntimeException("No query param builder found for " + builder);
+            throw new RuntimeException("No query param builder found for " + builder);
         }
 
 

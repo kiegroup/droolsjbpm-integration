@@ -116,7 +116,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         ProcessAdminServiceBase processAdminServiceBase = new ProcessAdminServiceBase(processInstanceMigrationService, processInstanceAdminService, context);
         UserTaskAdminServiceBase userTaskAdminServiceBase = new UserTaskAdminServiceBase(userTaskAdminService, context);
 
-        components.add(new ProcessResource(processServiceBase, definitionServiceBase, runtimeDataServiceBase, context));
+        components.add(new ProcessResource(processServiceBase, runtimeDataServiceBase, context));
         components.add(new RuntimeDataResource(runtimeDataServiceBase, context));
         components.add(new DefinitionResource(definitionServiceBase, context));
         components.add(new UserTaskResource(userTaskServiceBase, runtimeDataServiceBase, context));

@@ -38,7 +38,7 @@ public class ShadowMultiDexClassLoader extends ShadowDexClassLoader {
 
     @Implementation
     public Class defineClass(String name, byte[] bytes) {
-        System.out.println(String.format("Shadow defineClass(%s, %s)", name, bytes));
+        System.out.println(String.format("Shadow defineClass(%s, %s)", name, new String(bytes)));
         return super.defineClass(name, bytes, 0, bytes.length);
     }
 
@@ -51,7 +51,7 @@ public class ShadowMultiDexClassLoader extends ShadowDexClassLoader {
 
     @Implementation
     public Class defineClassX(String className, byte[] b, int start, int len) {
-        System.out.println(String.format("Shadow defineClass(%s, %s)", className, b));
+        System.out.println(String.format("Shadow defineClass(%s, %s)", className, new String(b)));
         return super.defineClass(className, b, start, len);
     }
 }
