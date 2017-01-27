@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.dmn.ModelEvaluatorServiceBase;
@@ -60,11 +61,11 @@ public class ModelEvaluatorResource {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getSolvers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
+    public Response getEvaluators(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
         try {
-            ServiceResponse<List<String>> result = solverService.getEvaluators( containerId );
+            ServiceResponse<JaxbList> result = solverService.getEvaluators( containerId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }

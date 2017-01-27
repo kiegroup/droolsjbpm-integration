@@ -33,14 +33,34 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
     </dependency>
-
-
+    
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-backend</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-core</artifactId>
+    </dependency>
 
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+
 
   </dependencies>
 </project>

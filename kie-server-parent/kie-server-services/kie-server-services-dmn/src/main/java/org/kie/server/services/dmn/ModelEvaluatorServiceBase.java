@@ -19,6 +19,7 @@ import org.kie.server.api.model.*;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
@@ -44,18 +45,18 @@ public class ModelEvaluatorServiceBase {
         this.context = context;
     }
 
-    public ServiceResponse<List<String>> getEvaluators(String containerId) {
+    public ServiceResponse<JaxbList> getEvaluators(String containerId) {
         try {
-            List<String> result = new ArrayList<>();
+            List<Object> result = new ArrayList<>();
             result.add("abc");
             result.add("def");
-            return new ServiceResponse<List<String>>(
+            return new ServiceResponse<JaxbList>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK list successfully retrieved from container '" + containerId + "'",
-                    result );
+                    new JaxbList(result) );
         } catch ( Exception e ) {
             LOG.error( "Error retrieving list from container '" + containerId + "'", e );
-            return new ServiceResponse<List<String>>(
+            return new ServiceResponse<JaxbList>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
                     null );
