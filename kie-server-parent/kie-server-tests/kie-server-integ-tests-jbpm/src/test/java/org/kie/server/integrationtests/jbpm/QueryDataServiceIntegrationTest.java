@@ -39,7 +39,6 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 
-import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 
@@ -76,20 +75,14 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     public void testQueryDefinitionsFromKjar() throws Exception {
         String expectedResolvedDS = System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds");
 
-        List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-        assertNotNull(queries);
-        assertEquals(2, queries.size());
-
-        Map<String, QueryDefinition> mapped = queries.stream().collect(toMap(QueryDefinition::getName, q -> q));
-
-        QueryDefinition registeredQuery = mapped.get("first-query");
+        QueryDefinition registeredQuery = queryClient.getQuery("first-query");
         assertNotNull(registeredQuery);
         assertEquals("first-query", registeredQuery.getName());
         assertEquals(expectedResolvedDS, registeredQuery.getSource());
         assertEquals("select * from ProcessInstanceLog", registeredQuery.getExpression());
         assertEquals("PROCESS", registeredQuery.getTarget());
 
-        registeredQuery = mapped.get("second-query");
+        registeredQuery = queryClient.getQuery("second-query");
         assertNotNull(registeredQuery);
         assertEquals("second-query", registeredQuery.getName());
         assertEquals(expectedResolvedDS, registeredQuery.getSource());
@@ -110,9 +103,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             queryClient.registerQuery(query);
 
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(3, queries.size());
+            List<QueryDefinition> queries = queryClient.getQueries(0, 100);
 
             QueryDefinition registeredQuery = queries.stream().filter(q -> q.getName().equals("allProcessInstances")).findFirst().orElse(null);
             assertNotNull(registeredQuery);
@@ -132,10 +123,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         } finally {
             abortProcessInstances(processInstanceIds);
             queryClient.unregisterQuery(query.getName());
-
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(2, queries.size());
         }
 
     }
@@ -409,9 +396,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             queryClient.registerQuery(query);
 
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(3, queries.size());
+            List<QueryDefinition> queries = queryClient.getQueries(0, 100);
 
             QueryDefinition registeredQuery = queries.stream().filter(q -> q.getName().equals("allProcessInstances")).findFirst().orElse(null);
             assertNotNull(registeredQuery);
@@ -431,12 +416,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         } finally {
             abortProcessInstances(processInstanceIds);
             queryClient.unregisterQuery(query.getName());
-
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(2, queries.size());
         }
-
     }
 
     @Test

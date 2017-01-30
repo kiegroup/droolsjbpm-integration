@@ -131,10 +131,6 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
 
         queryClient.registerQuery(query);
         try {
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(1, queries.size());
-
             Object person = createPersonInstance(USER_JOHN);
 
             Map<String, Object> parameters = new HashMap<String, Object>();
@@ -186,10 +182,6 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
 
         queryClient.registerQuery(query);
         try {
-            List<QueryDefinition> queries = queryClient.getQueries(0, 10);
-            assertNotNull(queries);
-            assertEquals(1, queries.size());
-
             Object person = createPersonInstance(USER_JOHN);
 
             Map<String, Object> parameters = new HashMap<String, Object>();
