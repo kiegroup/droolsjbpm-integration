@@ -52,7 +52,75 @@
         "old": "field org.kie.server.api.commands.CommandScript.commands",
         "new": "field org.kie.server.api.commands.CommandScript.commands",
         "justification": "Because of getReleaseId method in KieServicesClient"
-      }
+      },
+      {
+       "code": "java.annotation.added",
+       "old": "field org.kie.server.api.commands.CommandScript.commands",
+       "new": "field org.kie.server.api.commands.CommandScript.commands",
+       "annotationType": "com.fasterxml.jackson.annotation.JsonTypeInfo",
+       "elementKind": "annotation",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.annotation.removed",
+       "old": "field org.kie.server.api.commands.CommandScript.commands",
+       "new": "field org.kie.server.api.commands.CommandScript.commands",
+       "annotationType": "org.codehaus.jackson.annotate.JsonTypeInfo",
+       "elementKind": "annotation",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.field.typeChanged",
+       "old": "field org.kie.server.api.marshalling.json.JSONMarshaller.deserializeObjectMapper",
+       "new": "field org.kie.server.api.marshalling.json.JSONMarshaller.deserializeObjectMapper",
+       "oldType": "org.codehaus.jackson.map.ObjectMapper",
+       "newType": "com.fasterxml.jackson.databind.ObjectMapper",
+       "package": "org.kie.server.api.marshalling.json",
+       "classSimpleName": "JSONMarshaller",
+       "fieldName": "deserializeObjectMapper",
+       "elementKind": "field",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.field.typeChanged",
+       "old": "field org.kie.server.api.marshalling.json.JSONMarshaller.objectMapper",
+       "new": "field org.kie.server.api.marshalling.json.JSONMarshaller.objectMapper",
+       "oldType": "org.codehaus.jackson.map.ObjectMapper",
+       "newType": "com.fasterxml.jackson.databind.ObjectMapper",
+       "package": "org.kie.server.api.marshalling.json",
+       "classSimpleName": "JSONMarshaller",
+       "fieldName": "objectMapper",
+       "elementKind": "field",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.method.returnTypeTypeParametersChanged",
+       "old": "method java.util.List<org.codehaus.jackson.map.jsontype.NamedType> org.kie.server.api.marshalling.json.JSONMarshaller::prepareCustomClasses(java.util.Set<java.lang.Class<?>>)",
+       "new": "method java.util.List<com.fasterxml.jackson.databind.jsontype.NamedType> org.kie.server.api.marshalling.json.JSONMarshaller::prepareCustomClasses(java.util.Set<java.lang.Class<?>>)",
+       "oldType": "java.util.List<org.codehaus.jackson.map.jsontype.NamedType>",
+       "newType": "java.util.List<com.fasterxml.jackson.databind.jsontype.NamedType>",
+       "package": "org.kie.server.api.marshalling.json",
+       "classSimpleName": "JSONMarshaller",
+       "methodName": "prepareCustomClasses",
+       "elementKind": "method",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.annotation.added",
+       "old": "class org.kie.server.api.model.ReleaseId",
+       "new": "class org.kie.server.api.model.ReleaseId",
+       "annotationType": "com.fasterxml.jackson.annotation.JsonIgnoreProperties",
+       "elementKind": "annotation",
+       "justification": "Upgrade Jackson library to version 2"
+       },
+       {
+       "code": "java.annotation.removed",
+       "old": "class org.kie.server.api.model.ReleaseId",
+       "new": "class org.kie.server.api.model.ReleaseId",
+       "annotationType": "org.codehaus.jackson.annotate.JsonIgnoreProperties",
+       "elementKind": "annotation",
+       "justification": "Upgrade Jackson library to version 2"
+       }
     ]
   }
 }
