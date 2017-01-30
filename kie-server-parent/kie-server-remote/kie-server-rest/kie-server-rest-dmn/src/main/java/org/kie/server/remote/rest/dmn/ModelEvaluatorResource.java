@@ -48,24 +48,24 @@ public class ModelEvaluatorResource {
 
     public static final Logger logger = LoggerFactory.getLogger( ModelEvaluatorResource.class );
 
-    private ModelEvaluatorServiceBase solverService;
+    private ModelEvaluatorServiceBase modelEvaluatorService;
     private MarshallerHelper  marshallerHelper;
 
     public ModelEvaluatorResource() {
     }
 
-    public ModelEvaluatorResource(ModelEvaluatorServiceBase solverServiceBase) {
-        this.solverService = solverServiceBase;
-        this.marshallerHelper = new MarshallerHelper(solverService.getKieServerRegistry());
+    public ModelEvaluatorResource(ModelEvaluatorServiceBase modelEvaluatorService) {
+        this.modelEvaluatorService = modelEvaluatorService;
+        this.marshallerHelper = new MarshallerHelper(modelEvaluatorService.getKieServerRegistry());
     }
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getEvaluators(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
         Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
-            ServiceResponse<JaxbList> result = solverService.getEvaluators( containerId );
+            ServiceResponse<JaxbList> result = modelEvaluatorService.getEvaluators( containerId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }

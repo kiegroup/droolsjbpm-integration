@@ -38,7 +38,7 @@ public class DMNRestApplicationComponentsService
             return Collections.emptyList();
         }
 
-        ModelEvaluatorServiceBase solverServiceBase = null;
+        ModelEvaluatorServiceBase modelEvaluatorService = null;
         KieServerRegistry context = null;
 
         for ( Object object : services ) {
@@ -47,7 +47,7 @@ public class DMNRestApplicationComponentsService
                 continue;
             }
             if ( ModelEvaluatorServiceBase.class.isAssignableFrom( object.getClass() ) ) {
-                solverServiceBase = (ModelEvaluatorServiceBase) object;
+                modelEvaluatorService = (ModelEvaluatorServiceBase) object;
                 continue;
             } else if ( KieServerRegistry.class.isAssignableFrom( object.getClass() ) ) {
                 context = (KieServerRegistry) object;
@@ -56,7 +56,7 @@ public class DMNRestApplicationComponentsService
         }
 
         List<Object> components = new ArrayList<Object>( 1 );
-        components.add( new ModelEvaluatorResource( solverServiceBase ) );
+        components.add( new ModelEvaluatorResource( modelEvaluatorService ) );
 
         return components;
     }
