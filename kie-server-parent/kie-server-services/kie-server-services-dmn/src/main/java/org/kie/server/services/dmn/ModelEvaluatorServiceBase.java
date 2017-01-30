@@ -15,6 +15,8 @@
 
 package org.kie.server.services.dmn;
 
+import org.kie.api.runtime.KieSession;
+import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -54,6 +56,25 @@ public class ModelEvaluatorServiceBase {
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK list successfully retrieved from container '" + containerId + "'",
                     new JaxbList(result) );
+        } catch ( Exception e ) {
+            LOG.error( "Error retrieving list from container '" + containerId + "'", e );
+            return new ServiceResponse<JaxbList>(
+                    ServiceResponse.ResponseType.FAILURE,
+                    "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
+                    null );
+        }
+    }
+    
+    public ServiceResponse<JaxbList> getModels(String containerId) {
+        try {
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId);
+            KieSession kieSession = kContainer.getKieContainer().newKieSession();
+            DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+            List result = kieRuntime.getModels();
+            return new ServiceResponse<JaxbList>(
+                    ServiceResponse.ResponseType.SUCCESS,
+                    "OK list successfully retrieved from container '" + containerId + "'",
+                    new JaxbList( result ) );
         } catch ( Exception e ) {
             LOG.error( "Error retrieving list from container '" + containerId + "'", e );
             return new ServiceResponse<JaxbList>(

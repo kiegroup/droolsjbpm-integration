@@ -65,7 +65,7 @@ public class ModelEvaluatorResource {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
-            ServiceResponse<JaxbList> result = modelEvaluatorService.getEvaluators( containerId );
+            ServiceResponse<JaxbList> result = modelEvaluatorService.getModels( containerId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }
