@@ -11,6 +11,15 @@
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 
+  <dependencies>
+    <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-dmn-core</artifactId>
+        <scope>provided</scope>
+        <version>${version.org.kie}</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
