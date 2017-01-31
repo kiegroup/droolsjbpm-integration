@@ -15,7 +15,6 @@
 
 package org.kie.server.integrationtests.jbpm;
 
-import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
-import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -37,6 +35,7 @@ import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerUtil;
 
 public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -63,8 +62,7 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
     @Before
     public void createData() {
 
-        File storagePath = new File(System.getProperty(KieServerConstants.CFG_DOCUMENT_STORAGE_PATH, "target/docs"));
-        deleteFolder(storagePath);
+        KieServerUtil.deleteDocumentStorageFolder();
 
         content = "just text content";
         contentBytes = content.getBytes();
@@ -76,19 +74,6 @@ public class DocumentServiceIntegrationTest extends JbpmKieServerBaseIntegration
                 .content(contentBytes)
                 .build();
     }
-
-    protected void deleteFolder(File path) {
-        File[] directories = path.listFiles();
-        if (directories != null) {
-            for (File file : directories) {
-                if (file.isDirectory()) {
-                    deleteFolder(file);
-                }
-                file.delete();
-            }
-        }
-    }
-
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
