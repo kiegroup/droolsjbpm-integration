@@ -33,6 +33,7 @@
       <artifactId>kie-ci</artifactId>
       <scope>test</scope>
     </dependency>
+
     
     <!-- kie server deps -->
     <dependency>
