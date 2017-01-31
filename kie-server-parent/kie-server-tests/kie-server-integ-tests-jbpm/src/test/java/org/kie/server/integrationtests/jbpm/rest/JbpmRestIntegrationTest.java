@@ -43,6 +43,7 @@ import org.kie.server.api.model.type.JaxbLong;
 import org.kie.server.api.model.type.JaxbString;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,6 +205,8 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
 
     @Test
     public void testUploadListDownloadDocument() throws Exception {
+        KieServerUtil.deleteDocumentStorageFolder();
+
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), marshallingFormat, client.getClassLoader());
 
         DocumentInstance documentInstance = DocumentInstance.builder().name("test file.txt").size(50).content("test content".getBytes()).lastModified(new Date()).build();
@@ -274,6 +277,5 @@ public class JbpmRestIntegrationTest extends RestJbpmBaseIntegrationTest {
                 response.close();
             }
         }
-
     }
 }
