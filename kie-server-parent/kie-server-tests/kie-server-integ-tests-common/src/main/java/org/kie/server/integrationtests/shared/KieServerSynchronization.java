@@ -19,7 +19,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 
 import org.kie.api.command.Command;
 import org.kie.api.executor.STATUS;
@@ -41,6 +40,7 @@ import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.client.KieServicesException;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
@@ -193,19 +193,27 @@ public class KieServerSynchronization {
     }
 
     public static void waitForQuery(final QueryServicesClient client, final QueryDefinition query) throws Exception {
-        waitForCondition(() -> !client.getQueries(0, 10).stream()
-                .filter(q -> query.getName().equals(q.getName()) && query.getExpression().equals(q.getExpression()))
-                .collect(Collectors.toList())
-                .isEmpty()
-        );
+        waitForCondition(() -> {
+            try {
+                QueryDefinition q = client.getQuery(query.getName());
+                return q != null;
+            } catch (KieServicesException e) {
+                // Query isn't created yet
+                return false;
+            }
+        });
     }
 
     public static void waitForQueryRemoval(final QueryServicesClient client, final QueryDefinition query) throws Exception {
-        waitForCondition(() -> client.getQueries(0, 10).stream()
-                .filter(q -> query.getName().equals(q.getName()))
-                .collect(Collectors.toList())
-                .isEmpty()
-        );
+        waitForCondition(() -> {
+            try {
+                client.getQuery(query.getName());
+                return false;
+            } catch (KieServicesException e) {
+                // Query doesn't exist any more
+                return true;
+            }
+        });
     }
 
     /**
