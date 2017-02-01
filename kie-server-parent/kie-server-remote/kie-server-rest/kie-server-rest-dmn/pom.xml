@@ -19,6 +19,18 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-internal</artifactId>
     </dependency>
+    <!-- TODO Review
+[INFO] maven-enforcer-plugin:1.4.1:enforce (enforce-direct-dependencies) @ kie-server-rest-dmn 
+[INFO] Flag 'useClassesFromLastBuild' is set. Try to use existing output folder.
+[INFO] Analyze dependencies of artifact 'org.kie.server:kie-server-rest-dmn:jar:7.0.0-SNAPSHOT'.
+[WARNING] Rule 0: de.is24.maven.enforcer.rules.IllegalTransitiveDependencyCheck failed with message:
+Found 1 illegal transitive type dependencies in artifact 'org.kie.server:kie-server-rest-dmn:jar:7.0.0-SNAPSHOT':
+1.) org.kie.dmn.core.api.DMNResult
+     -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-core</artifactId>
+    </dependency>
   
     <dependency>
       <groupId>org.kie.server</groupId>

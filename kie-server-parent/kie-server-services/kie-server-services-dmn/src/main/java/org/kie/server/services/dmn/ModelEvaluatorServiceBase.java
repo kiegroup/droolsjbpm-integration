@@ -16,15 +16,22 @@
 package org.kie.server.services.dmn;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.dmn.core.api.DMNContext;
+import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.api.DMNModel;
+import org.kie.dmn.core.api.DMNResult;
 import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
+import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.type.JaxbList;
+import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
@@ -34,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -42,12 +51,14 @@ public class ModelEvaluatorServiceBase {
     private static final Logger LOG = LoggerFactory.getLogger( ModelEvaluatorServiceBase.class );
 
     private KieServerRegistry context;
+    private MarshallerHelper marshallerHelper;
 
     public ModelEvaluatorServiceBase(KieServerRegistry context) {
         this.context = context;
+        this.marshallerHelper = new MarshallerHelper(context);
     }
 
-    public ServiceResponse<JaxbList> getEvaluators(String containerId) {
+    public ServiceResponse<JaxbList> getDummy(String containerId) {
         try {
             List<Object> result = new ArrayList<>();
             result.add("abc");
@@ -78,6 +89,50 @@ public class ModelEvaluatorServiceBase {
         } catch ( Exception e ) {
             LOG.error( "Error retrieving list from container '" + containerId + "'", e );
             return new ServiceResponse<JaxbList>(
+                    ServiceResponse.ResponseType.FAILURE,
+                    "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
+                    null );
+        }
+    }
+    
+    public ServiceResponse<String> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
+        try {
+            KieContainerInstanceImpl kContainer = context.getContainer(containerId);
+            KieSession kieSession = kContainer.getKieContainer().newKieSession();
+            DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+            
+            if ( kieRuntime.getModels().size() > 1 ) {
+                throw new RuntimeException("more than one (default) model");
+            }
+            
+            DMNModel defaultModel = kieRuntime.getModels().get(0);
+            LOG.info("Will use model: {}", defaultModel);
+            
+            LOG.info("Will deserialize ctx entry from payload: {}", contextPayload);
+            @SuppressWarnings("unchecked")
+            Map<String, Object> ctxEntriesMap = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, Map.class);
+            
+            DMNContext dmnContext = DMNFactory.newContext();
+            for ( Entry<String, Object> e : ctxEntriesMap.entrySet() ) {
+                dmnContext.set(e.getKey(), e.getValue());
+            }
+            LOG.info("Will use dmnContext: {}", dmnContext);
+            
+            DMNResult result = kieRuntime.evaluateAll(defaultModel, dmnContext);
+            
+            LOG.info("Result:");
+            LOG.info("{}",result);
+            LOG.info("{}",result.getContext());
+            LOG.info("{}",result.getDecisionResults());
+            LOG.info("{}",result.getMessages());
+            
+            return new ServiceResponse<String>(
+                    ServiceResponse.ResponseType.SUCCESS,
+                    "OK list successfully retrieved from container '" + containerId + "'",
+                    result.toString() );
+        } catch ( Exception e ) {
+            LOG.error( "Error retrieving list from container '" + containerId + "'", e );
+            return new ServiceResponse<String>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
                     null );

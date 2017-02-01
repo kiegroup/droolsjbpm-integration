@@ -7,7 +7,7 @@
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>flight-rebooking</artifactId>
+  <artifactId>function-definition</artifactId>
   <version>1.0.0.Final</version>
   <packaging>kjar</packaging>
 

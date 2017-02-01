@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.rest.RestURI;
@@ -46,7 +47,7 @@ import static org.kie.server.remote.rest.common.util.RestUtils.*;
 @Path("server/"+ RestURI.DMN_URI )
 public class ModelEvaluatorResource {
 
-    public static final Logger logger = LoggerFactory.getLogger( ModelEvaluatorResource.class );
+    public static final Logger LOG = LoggerFactory.getLogger( ModelEvaluatorResource.class );
 
     private ModelEvaluatorServiceBase modelEvaluatorService;
     private MarshallerHelper  marshallerHelper;
@@ -60,8 +61,9 @@ public class ModelEvaluatorResource {
     }
 
     @GET
+    // TODO if model should get its own sub-URI
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getEvaluators(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
+    public Response getModels(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
@@ -71,12 +73,32 @@ public class ModelEvaluatorResource {
             }
             return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
         }  catch (Exception e) {
-            logger.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
+            LOG.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
             return internalServerError(MessageFormat.format( "ERROR", e.getMessage()), v, conversationIdHeader);
         }
     }
 
-
+    @POST
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response evaluateAllDecisions(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId, String payload) {
+        LOG.info( "About to evaluateAllDecisions on container {}", containerId );
+        Variant v = getVariant( headers );
+        Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
+        try {
+            String contentType = getContentType( headers );
+            
+            LOG.info( "Payload received: {}", payload);
+            ServiceResponse<String> result = modelEvaluatorService.evaluateAllDecisions(containerId, payload, contentType);
+            if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
+            }
+            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
+        }  catch (Exception e) {
+            LOG.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
+            return internalServerError(MessageFormat.format( "ERROR", e.getMessage()), v, conversationIdHeader);
+        }
+    }
 
 
 }

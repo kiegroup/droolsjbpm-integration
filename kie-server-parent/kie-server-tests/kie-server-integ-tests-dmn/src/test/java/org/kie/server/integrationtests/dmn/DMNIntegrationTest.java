@@ -18,6 +18,9 @@ package org.kie.server.integrationtests.dmn;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.dmn.core.api.DMNContext;
+import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ScoreWrapper;
@@ -37,20 +40,17 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 public class DMNIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "flight-rebooking",
+            "org.kie.server.testing", "function-definition",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "flight-rebooking";
+    private static final String CONTAINER_1_ID  = "function-definition";
 
     @BeforeClass
     public static void deployArtifacts() {
-        System.err.println("1.");
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        System.err.println("2.");
-        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/flight-rebooking" ).getFile() );
+        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/function-definition" ).getFile() );
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
-        System.err.println("3.");
         createContainer(CONTAINER_1_ID, kjar1);
     }
 
@@ -63,7 +63,13 @@ public class DMNIntegrationTest
 
     @Test
     public void testHelloWorld() {
-        System.err.println("Do nothing.");
+        System.err.println("1+1:");
+        DMNContext dmnContext = DMNFactory.newContext();
+        dmnContext.set( "a", 10 );
+        dmnContext.set( "b", 5 );
+        ServiceResponse<String> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
+        
+        System.out.println("FROM THE TEST:"+evaluateAllDecisions);
     }
     
     /*
