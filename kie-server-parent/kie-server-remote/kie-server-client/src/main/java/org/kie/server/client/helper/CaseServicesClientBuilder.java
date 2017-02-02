@@ -21,6 +21,8 @@ import java.util.Map;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
+import org.kie.server.client.admin.CaseAdminServicesClient;
+import org.kie.server.client.admin.impl.CaseAdminServicesClientImpl;
 import org.kie.server.client.impl.CaseServicesClientImpl;
 
 public class CaseServicesClientBuilder implements KieServicesClientBuilder {
@@ -36,6 +38,8 @@ public class CaseServicesClientBuilder implements KieServicesClientBuilder {
         Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
 
         services.put(CaseServicesClient.class, new CaseServicesClientImpl(configuration, classLoader));
+        // admin clients
+        services.put(CaseAdminServicesClient.class, new CaseAdminServicesClientImpl(configuration, classLoader));
 
         return services;
     }

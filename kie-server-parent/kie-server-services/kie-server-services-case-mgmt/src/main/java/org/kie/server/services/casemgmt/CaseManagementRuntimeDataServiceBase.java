@@ -181,6 +181,32 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
+    public CaseInstanceList getCaseInstancesByRole(String roleName, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        status = safeStatus(status);
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByRole(roleName, status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+
+        List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
+
+        CaseInstanceList caseInstancesList = new CaseInstanceList(caseInstances);
+
+        return caseInstancesList;
+    }
+
+    public CaseInstanceList getCaseInstancesAnyRole(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        status = safeStatus(status);
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = caseRuntimeDataService.getCaseInstancesAnyRole(status, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+
+        List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
+
+        CaseInstanceList caseInstancesList = new CaseInstanceList(caseInstances);
+
+        return caseInstancesList;
+    }
+
     public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         sort = safeCaseDefinitionSort(sort);
 

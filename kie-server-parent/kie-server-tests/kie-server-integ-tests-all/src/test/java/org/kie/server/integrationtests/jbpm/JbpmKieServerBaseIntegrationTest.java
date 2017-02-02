@@ -33,6 +33,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.admin.CaseAdminServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
@@ -56,6 +57,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected RuleServicesClient ruleClient;
     protected UIServicesClient uiServicesClient;
     protected CaseServicesClient caseClient;
+    protected CaseAdminServicesClient caseAdminClient;
 
     @BeforeClass
     public static void setupFactory() throws Exception {
@@ -88,5 +90,6 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
         ruleClient = client.getServicesClient(RuleServicesClient.class);
         uiServicesClient = client.getServicesClient(UIServicesClient.class);
         caseClient = client.getServicesClient(CaseServicesClient.class);
+        caseAdminClient = client.getServicesClient(CaseAdminServicesClient.class);
     }
 }

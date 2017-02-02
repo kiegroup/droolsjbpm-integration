@@ -82,7 +82,7 @@ public class CaseQueryResourceTest {
         caseQueryResource.getCaseInstances(httpHeaders, null, status, page, pageSize, sort, sortOrder);
 
         verify(kieServerRegistry).getContainer("");
-        verify(runtimeDataService).getCaseInstances(status, page, pageSize, sort, sortOrder);
+        verify(runtimeDataService).getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);
     }
 
 }

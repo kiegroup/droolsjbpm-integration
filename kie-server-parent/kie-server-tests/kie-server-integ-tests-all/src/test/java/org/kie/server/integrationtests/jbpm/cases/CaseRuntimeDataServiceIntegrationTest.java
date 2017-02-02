@@ -1274,12 +1274,15 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
+        changeUser(USER_YODA);
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId2);
     }
 
     @Test
-    public void testGetCaseTasksAsStakeholder() {
+    public void testGetCaseTasksAsStakeholder() throws Exception {
+        // Test is using user authentication, isn't available for local execution(which has mocked authentication info).
+        Assume.assumeFalse(TestConfig.isLocalServer());
         String caseId = startUserTaskCase(USER_JOHN, USER_YODA);
 
         assertNotNull(caseId);
@@ -1314,8 +1317,24 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
 
+        changeUser(USER_JOHN);
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
+    }
+
+    @Test
+    public void testAdminGetCaseInstances() {
+        String caseId = startUserTaskCase(USER_JOHN, USER_MARY);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        // yoda is not involved in case at all so should not see case at all
+        List<CaseInstance> caseInstances = caseClient.getCaseInstances(Arrays.asList(1), 0, 10);
+        assertEquals(0, caseInstances.size());
+
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(1), 0, 10);
+        assertEquals(1, caseInstances.size());
     }
 
     private String startUserTaskCase(String owner, String contact) {

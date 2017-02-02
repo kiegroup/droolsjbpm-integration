@@ -72,6 +72,7 @@ public class RestURI {
     // admin URIs
     public static final String ADMIN_PROCESS_URI = "admin/containers/{" + CONTAINER_ID + "}/processes";
     public static final String ADMIN_TASK_URI = "admin/containers/{" + CONTAINER_ID + "}/tasks";
+    public static final String ADMIN_CASE_URI = "admin/cases";
 
     // uris
     // process related prefixed by PROCESS_URI
@@ -277,6 +278,7 @@ public class RestURI {
     public static final String CASE_TASKS_AS_POT_OWNER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/pot-owners";
     public static final String CASE_TASKS_AS_ADMIN_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/admins";
     public static final String CASE_TASKS_AS_STAKEHOLDER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/stakeholders";
+    public static final String CASE_INSTANCES_BY_ROLE_GET_URI = "{" + CASE_ROLE_NAME + "}/instances";
 
 
     public static String build(String baseUrl, String template, Map<String, Object> parameters) {
