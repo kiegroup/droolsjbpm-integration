@@ -15,6 +15,7 @@
  */
 package org.kie.server.integrationtests.shared;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -105,10 +106,14 @@ public class KieServerSynchronization {
     }
 
     public static void waitForProcessInstanceStart(final QueryServicesClient queryClient, final String containerId) throws Exception {
-        waitForCondition(() -> {
-            List<ProcessInstance> processInstances = queryClient.findProcessInstances(0, 100);
+        waitForProcessInstanceStart(queryClient, containerId, 1, Arrays.asList(1));
+    }
 
-            if (processInstances.size() == 1) {
+    public static void waitForProcessInstanceStart(final QueryServicesClient queryClient, final String containerId, int expectedInstances, List<Integer> statuses) throws Exception {
+        waitForCondition(() -> {
+            List<ProcessInstance> processInstances = queryClient.findProcessInstancesByStatus(statuses, 0, 100);
+
+            if (processInstances.size() == expectedInstances) {
                 return true;
             }
             return false;
