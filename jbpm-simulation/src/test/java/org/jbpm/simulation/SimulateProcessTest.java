@@ -30,6 +30,7 @@ import org.jbpm.simulation.impl.events.AggregatedEndEventSimulationEvent;
 import org.jbpm.simulation.impl.events.AggregatedProcessSimulationEvent;
 import org.jbpm.simulation.impl.events.EndSimulationEvent;
 import org.jbpm.simulation.impl.events.GenericSimulationEvent;
+import org.jbpm.simulation.impl.events.HTAggregatedSimulationEvent;
 import org.jbpm.simulation.impl.events.HumanTaskActivitySimulationEvent;
 import org.jbpm.simulation.impl.events.ProcessInstanceEndSimulationEvent;
 import org.junit.Before;
@@ -397,5 +398,35 @@ public class SimulateProcessTest {
         assertEquals(50, wmRepo.getAggregatedEvents().size());
         assertEquals(80, wmRepo.getEvents().size());
         wmRepo.close();
+    }
+
+    @Test
+    public void testSimulationRunnerWithNestedFork() throws IOException {
+
+        InputStreamReader in = new InputStreamReader(this.getClass().getResourceAsStream("/fork-process.bpmn2"));
+
+        String out = new String();
+        BufferedReader br = new BufferedReader(in);
+        for(String line = br.readLine(); line != null; line = br.readLine())
+            out += line;
+
+        Integer intervalInt = 8*1000*60*60;
+
+        SimulationRepository repo = SimulationRunner.runSimulation("simulation.fork-process", out, 40, intervalInt, true, "onevent.simulation.rules.drl");
+        assertNotNull(repo);
+
+        WorkingMemorySimulationRepository wmRepo = (WorkingMemorySimulationRepository) repo;
+        wmRepo.getSession().execute(new InsertElementsCommand((Collection)wmRepo.getAggregatedEvents()));
+        wmRepo.fireAllRules();
+
+        List<AggregatedSimulationEvent> aggEvents = (List<AggregatedSimulationEvent>) wmRepo.getGlobal("summary");
+
+        for (AggregatedSimulationEvent event : aggEvents) {
+            if (event instanceof HTAggregatedSimulationEvent) {
+                assertEquals(0.0, ((HTAggregatedSimulationEvent) event).getAvgWaitTime(), 0);
+            }
+        }
+        wmRepo.close();
+
     }
 }
