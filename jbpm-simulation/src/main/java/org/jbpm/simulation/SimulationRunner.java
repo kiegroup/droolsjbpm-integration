@@ -15,11 +15,14 @@
 
 package org.jbpm.simulation;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.fluent.impl.BaseBatchFluent;
 import org.drools.core.fluent.impl.PseudoClockRunner;
+import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.process.core.validation.ProcessValidatorRegistry;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
@@ -68,7 +71,7 @@ public class SimulationRunner {
     }
     
     public static SimulationRepository runSimulation(String processId, String bpmn2Container, int numberOfAllInstances, long interval, boolean runRules, Resource... rules) {
-        
+
         SimulationContext context = SimulationContextFactory.newContext(new BPMN2SimulationDataProvider(bpmn2Container), new WorkingMemorySimulationRepository(runRules, rules));
         SimulationDataProvider provider = context.getDataProvider();
         
@@ -85,6 +88,8 @@ public class SimulationRunner {
         PseudoClockRunner runner = new PseudoClockRunner();
         ExecutableBuilder f = ExecutableBuilder.create();
 
+        List<Long> startTimes = generateStartTimes(interval, numberOfAllInstances);
+        int startIndex = 0;
         // @formatter:off        
         int counter = 0;
         int remainingInstances = numberOfAllInstances;
@@ -100,18 +105,22 @@ public class SimulationRunner {
             // count how many instances/steps should current path have
             if (numberOfAllInstances > 1) {
                 instancesOfPath = (int) Math.round((numberOfAllInstances * probability));
-                
+
                 // ensure that we won't exceed total number of instance due to rounding
                 if (instancesOfPath > remainingInstances) {
                     instancesOfPath = remainingInstances;
                 }
-                
+
+                List<Long> pathStartTimes = startTimes.subList(startIndex, startIndex + instancesOfPath);
+                Collections.sort(pathStartTimes);
+                startIndex = pathStartTimes.size();
+
                 remainingInstances -= instancesOfPath;
-                        
+
                 for (int i = 0; i < instancesOfPath; i++) {
-                    KieSessionFluent sessionFluent = f.after(interval * i)
+                    KieSessionFluent sessionFluent = f.after(pathStartTimes.get(i))
                         .getKieContainer(releaseId)
-                        .newSession();
+                            .newSession();
 
                         ((BaseBatchFluent) sessionFluent).addCommand(new SimulateProcessPathCommand(processId, context, path));
 //                        ((BaseBatchFluent) sessionFluent).addCommand(new SetVariableCommandFromLastReturn(StatefulKnowledgeSession.class.getName()));
@@ -196,5 +205,16 @@ public class SimulationRunner {
                         "\n";
         pom += "</project>";
         return pom;
+    }
+
+    protected static List<Long> generateStartTimes(long interval, int numberOfInstances) {
+        List<Long> startTimes = new ArrayList<Long>();
+
+        for (int i = 0; i < numberOfInstances; i++) {
+            startTimes.add(interval * i);
+        }
+        Collections.shuffle(startTimes);
+
+        return startTimes;
     }
 }

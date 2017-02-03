@@ -102,30 +102,7 @@ public class StaffPoolImpl implements StaffPool {
 	
 	
 	protected long allocate(long startTime, long duration) {
-//		long waitTime = 0;
 		performedWork += duration;
-//		
-//		List<Long> allocatedTill = findAllocatedRange(startTime);
-//		if(allocatedTill.size() < poolSize) {
-//		
-//			allocatedTill.add(startTime + duration);
-//		
-//			return waitTime;
-//		 } else {
-//			 Collections.sort(allocatedTill);
-//		
-//			 long allocated = allocatedTill.get(0);
-//			 if (allocated >= startTime) {
-//				 waitTime = allocated - startTime;
-//				 allocated += duration;
-//		
-//			 } else {
-//				 allocated = startTime + duration;
-//			 }
-//			 allocatedTill.set(0, allocated);
-//		
-//			 return waitTime;
-//		}
 	    
 	    return rangeChain.allocateWork(startTime, duration);
 	}
