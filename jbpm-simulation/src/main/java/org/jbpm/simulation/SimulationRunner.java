@@ -14,6 +14,9 @@
 */
 
 package org.jbpm.simulation;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.drools.core.command.NewKieSessionCommand;
@@ -110,6 +113,8 @@ public class SimulationRunner {
             }
         };
 
+        List<Long> startTimes = generateStartTimes(interval, numberOfAllInstances);
+        int startIndex = 0;
         // @formatter:off        
         int counter = 0;
         int remainingInstances = numberOfAllInstances;
@@ -131,10 +136,14 @@ public class SimulationRunner {
                     instancesOfPath = remainingInstances;
                 }
 
+                List<Long> pathStartTimes = startTimes.subList(startIndex, startIndex + instancesOfPath);
+                Collections.sort(pathStartTimes);
+                startIndex = pathStartTimes.size();
+
                 remainingInstances -= instancesOfPath;
 
                 for (int i = 0; i < instancesOfPath; i++) {
-                    f.newStep( interval * i )
+                    f.newStep( pathStartTimes.get(i) )
                             .newKieSession( releaseId, null)
                             .end()
                             .addCommand(new SimulateProcessPathCommand(processId, context, path))
@@ -220,5 +229,16 @@ public class SimulationRunner {
                         "\n";
         pom += "</project>";
         return pom;
+    }
+
+    protected static List<Long> generateStartTimes(long interval, int numberOfInstances) {
+        List<Long> startTimes = new ArrayList<Long>();
+
+        for (int i = 0; i < numberOfInstances; i++) {
+            startTimes.add(interval * i);
+        }
+        Collections.shuffle(startTimes);
+
+        return startTimes;
     }
 }
