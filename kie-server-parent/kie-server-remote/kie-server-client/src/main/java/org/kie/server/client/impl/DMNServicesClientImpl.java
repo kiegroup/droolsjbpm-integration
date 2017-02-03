@@ -4,22 +4,13 @@ import static org.kie.server.api.rest.RestURI.DMN_URI;
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.build;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.dmn.core.api.DMNContext;
-import org.kie.dmn.core.api.DMNResult;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.commands.CommandScript;
-import org.kie.server.api.commands.DescriptorCommand;
-import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
-import org.kie.server.api.model.cases.CaseFile;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.type.JaxbMap;
-import org.kie.server.client.CaseServicesClient;
+import org.kie.server.api.model.dmn.DMNEvaluationContext;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
@@ -40,8 +31,10 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
                 valuesMap.put(CONTAINER_ID, containerId);
 
+                DMNEvaluationContext payload = new DMNEvaluationContext( dmnContext.getAll() ); 
+                
                 return makeHttpPostRequestAndCreateServiceResponse(
-                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), dmnContext.getAll(), String.class);
+                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, String.class);
 
             } else {
 //                CommandScript script = new CommandScript( Collections.singletonList(

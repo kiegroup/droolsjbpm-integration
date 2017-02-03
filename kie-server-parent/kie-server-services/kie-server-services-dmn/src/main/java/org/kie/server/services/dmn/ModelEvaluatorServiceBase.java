@@ -23,6 +23,7 @@ import org.kie.dmn.core.api.DMNResult;
 import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.dmn.DMNEvaluationContext;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
@@ -99,26 +100,33 @@ public class ModelEvaluatorServiceBase {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId);
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
-            DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
+            DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             
-            if ( kieRuntime.getModels().size() > 1 ) {
-                throw new RuntimeException("more than one (default) model");
+            LOG.info("Will deserialize payload: {}", contextPayload);
+            DMNEvaluationContext evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNEvaluationContext.class);
+            
+            DMNModel model;
+            if ( evalCtx.getModelName() == null ) {
+                if ( dmnRuntime.getModels().size() > 1 ) {
+                    throw new RuntimeException("more than one (default) model");
+                }
+                
+                model = dmnRuntime.getModels().get(0);
+            } else {
+                model = dmnRuntime.getModel(evalCtx.getNamespace(), evalCtx.getModelName());
             }
-            
-            DMNModel defaultModel = kieRuntime.getModels().get(0);
-            LOG.info("Will use model: {}", defaultModel);
-            
-            LOG.info("Will deserialize ctx entry from payload: {}", contextPayload);
-            @SuppressWarnings("unchecked")
-            Map<String, Object> ctxEntriesMap = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, Map.class);
+            if ( model == null ) {
+                throw new RuntimeException("Unable to locate DMN Model to evaluate");
+            }
+            LOG.info("Will use model: {}", model);
             
             DMNContext dmnContext = DMNFactory.newContext();
-            for ( Entry<String, Object> e : ctxEntriesMap.entrySet() ) {
+            for ( Entry<String, Object> e : evalCtx.getDmnContext().entrySet() ) {
                 dmnContext.set(e.getKey(), e.getValue());
             }
             LOG.info("Will use dmnContext: {}", dmnContext);
             
-            DMNResult result = kieRuntime.evaluateAll(defaultModel, dmnContext);
+            DMNResult result = dmnRuntime.evaluateAll(model, dmnContext);
             
             LOG.info("Result:");
             LOG.info("{}",result);

@@ -111,6 +111,7 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.api.model.dmn.DMNEvaluationContext;
 import org.kie.server.api.model.instance.*;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
@@ -273,7 +274,10 @@ public class JaxbMarshaller implements Marshaller {
                 CaseDefinition.class,
                 CaseDefinitionList.class,
                 CaseMilestoneDefinition.class,
-                CaseStageDefinition.class
+                CaseStageDefinition.class,
+                
+                // Kie DMN
+                DMNEvaluationContext.class
 
         };
     }
