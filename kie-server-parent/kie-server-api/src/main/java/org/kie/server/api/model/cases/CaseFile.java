@@ -86,13 +86,13 @@ public class CaseFile {
             return this;
         }
 
-        public Builder addUserAssignments(String user, String role) {
-            caseFile.getUserAssignments().put(user, role);
+        public Builder addUserAssignments(String role, String user) {
+            caseFile.getUserAssignments().put(role, user);
             return this;
         }
 
-        public Builder addGroupAssignments(String group, String role) {
-            caseFile.getGroupAssignments().put(group, role);
+        public Builder addGroupAssignments(String role, String group) {
+            caseFile.getGroupAssignments().put(role, group);
             return this;
         }
     }
