@@ -82,6 +82,7 @@
         <exclude>org.jboss.spec.javax.annotation:*</exclude>
         <exclude>org.jboss.spec.javax.ejb:*</exclude>
         <exclude>org.jboss.spec.javax.interceptor:*</exclude>
+        <exclude>org.jboss.spec.javax.ws.rs:*</exclude>
         <exclude>javax.enterprise:cdi-api</exclude>
         <exclude>javax.inject:javax.inject</exclude>
         <exclude>javax.validation:validation-api</exclude>
