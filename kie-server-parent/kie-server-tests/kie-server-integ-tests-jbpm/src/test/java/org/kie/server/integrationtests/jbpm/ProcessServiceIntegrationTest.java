@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -774,6 +775,56 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertNotNull(nodeInstance.getDate());
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testCallActivityProcess() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_CALL_EVALUATION, parameters);
+        try {
+            assertNotNull(processInstanceId);
+            assertTrue(processInstanceId.longValue() > 0);
+
+            // Process instance is running and is active.
+            ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
+
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+            assertEquals(1, tasks.size());
+
+            taskClient.completeAutoProgress(CONTAINER_ID, tasks.get(0).getId(), USER_YODA, null);
+
+            List<ProcessInstance> instances = processClient.findProcessInstancesByParent(CONTAINER_ID, processInstanceId, 0, 10);
+            assertEquals(1, instances.size());
+
+            ProcessInstance childInstance = instances.get(0);
+            assertNotNull(childInstance);
+            assertEquals(PROCESS_ID_EVALUATION, childInstance.getProcessId());
+            assertEquals(processInstanceId, childInstance.getParentId());
+
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+
+            // Process instance is now aborted.
+            processInstance = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED, processInstance.getState().intValue());
+
+            processInstance = processClient.getProcessInstance(CONTAINER_ID, childInstance.getId());
+            assertNotNull(processInstance);
+            assertEquals(org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED, processInstance.getState().intValue());
+
+            // no more active instances
+            instances = processClient.findProcessInstancesByParent(CONTAINER_ID, processInstanceId, 0, 10);
+            assertEquals(0, instances.size());
+
+            instances = processClient.findProcessInstancesByParent(CONTAINER_ID, processInstanceId, Arrays.asList(3), 0, 10);
+            assertEquals(1, instances.size());
+        } catch (Exception e) {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            fail(e.getMessage());
         }
     }
 

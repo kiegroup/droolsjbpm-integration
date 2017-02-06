@@ -54,6 +54,9 @@ public class ProcessDefinition {
     @XmlElementWrapper(name="process-subprocesses")
     private Collection<String> reusableSubProcesses;
 
+    @XmlElement(name="dynamic")
+    private boolean dynamic;
+
     public ProcessDefinition() {
     }
 
@@ -133,6 +136,14 @@ public class ProcessDefinition {
         this.reusableSubProcesses = reusableSubProcesses;
     }
 
+    public boolean isDynamic() {
+        return dynamic;
+    }
+
+    public void setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
@@ -140,6 +151,7 @@ public class ProcessDefinition {
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
                 ", containerId='" + containerId + '\'' +
+                ", dynamic='" + dynamic + '\'' +
                 '}';
     }
 
@@ -214,6 +226,12 @@ public class ProcessDefinition {
 
         public Builder subprocesses(Collection<String> subprocesses) {
             definition.setReusableSubProcesses(subprocesses);
+
+            return this;
+        }
+
+        public Builder dynamic(boolean dynamic) {
+            definition.setDynamic(dynamic);
 
             return this;
         }

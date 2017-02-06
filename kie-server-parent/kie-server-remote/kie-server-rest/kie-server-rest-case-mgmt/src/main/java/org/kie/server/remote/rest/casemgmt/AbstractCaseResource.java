@@ -56,6 +56,8 @@ public abstract class AbstractCaseResource {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             return operation.invoke(v, type, conversationIdHeader);
+        } catch (SecurityException e) {
+            return forbidden(e.getMessage(), v, conversationIdHeader);
         } catch (CaseActiveException e) {
             return alreadyExists(
                     MessageFormat.format(CASE_INSTANCE_ACTIVE, caseId), v, conversationIdHeader);

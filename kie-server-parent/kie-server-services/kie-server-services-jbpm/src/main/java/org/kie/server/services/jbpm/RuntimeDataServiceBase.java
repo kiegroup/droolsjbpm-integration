@@ -51,6 +51,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.api.model.instance.VariableInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public class RuntimeDataServiceBase {
 
     private RuntimeDataService runtimeDataService;
     private IdentityProvider identityProvider;
+    private KieServerRegistry context;
 
     private boolean bypassAuthUser;
 
@@ -70,6 +72,7 @@ public class RuntimeDataServiceBase {
     public RuntimeDataServiceBase(RuntimeDataService delegate, KieServerRegistry context) {
         this.runtimeDataService = delegate;
         this.identityProvider = context.getIdentityProvider();
+        this.context = context;
 
         this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
@@ -287,7 +290,7 @@ public class RuntimeDataServiceBase {
 
 
     public ProcessDefinitionList getProcessesByDeploymentId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         logger.debug("About to search for process definitions within container '{}' with page {} and page size {}", containerId, page, pageSize);
         if (sort == null || sort.isEmpty()) {
             sort = "ProcessName";
@@ -337,6 +340,7 @@ public class RuntimeDataServiceBase {
     }
 
     public org.kie.server.api.model.definition.ProcessDefinition getProcessesByDeploymentIdProcessId(String containerId, String processId) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         ProcessDefinition processDesc = runtimeDataService.getProcessesByDeploymentIdProcessId(containerId, processId);
         if (processDesc == null) {
             throw new IllegalArgumentException("Could not find process definition \""+processId+"\" in container \""+containerId +"\"");

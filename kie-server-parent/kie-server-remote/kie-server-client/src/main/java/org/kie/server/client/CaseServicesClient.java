@@ -26,6 +26,7 @@ import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
@@ -37,7 +38,10 @@ public interface CaseServicesClient {
     public static final String SORT_BY_CASE_DEFINITION_DEPLOYMENT_ID = "Project";
 
     public static final String SORT_BY_CASE_INSTANCE_ID = "CorrelationKey";
-    public static final String SORT_BY_CASE_INSTANCE_NAME = "ProcessName";
+
+    public static final String SORT_BY_PROCESS_NAME = "ProcessName";
+    public static final String SORT_BY_PROCESS_VERSION = "ProcessVersion";
+    public static final String SORT_BY_PROCESS_PROJECT = "Project";
 
     public static final String SORT_BY_PROCESS_INSTANCE_ID = "ProcessInstanceId";
 
@@ -174,4 +178,16 @@ public interface CaseServicesClient {
     List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<TaskSummary> findCaseTasksAssignedAsStakeholder(String caseId, String userId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessDefinition> findProcesses(Integer page, Integer pageSize);
+
+    List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize);
+
+    List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize);
+
+    List<ProcessDefinition> findProcesses(Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }

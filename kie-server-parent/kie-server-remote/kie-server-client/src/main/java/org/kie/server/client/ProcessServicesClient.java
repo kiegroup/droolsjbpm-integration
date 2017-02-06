@@ -106,4 +106,10 @@ public interface ProcessServicesClient {
     List<VariableInstance> findVariableHistory(String containerId, Long processInstanceId, String variableName, Integer page, Integer pageSize);
 
     void setResponseHandler(ResponseHandler responseHandler);
+
+    List<ProcessInstance> findProcessInstancesByParent(String containerId, Long parentProcessInstanceId, Integer page, Integer pageSize);
+
+    List<ProcessInstance> findProcessInstancesByParent(String containerId, Long parentProcessInstanceId, List<Integer> status, Integer page, Integer pageSize);
+
+    List<ProcessInstance> findProcessInstancesByParent(String containerId, Long parentProcessInstanceId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }

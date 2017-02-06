@@ -151,6 +151,7 @@ public class ConvertUtils {
                 .packageName(processDesc.getPackageName())
                 .version(processDesc.getVersion())
                 .containerId(processDesc.getDeploymentId())
+                .dynamic(processDesc.isDynamic())
                 .build();
 
         return processDefinition;

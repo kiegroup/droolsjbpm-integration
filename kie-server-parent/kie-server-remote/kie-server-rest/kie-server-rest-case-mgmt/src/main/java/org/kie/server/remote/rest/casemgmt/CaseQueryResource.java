@@ -29,6 +29,7 @@ import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseInstanceList;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
@@ -119,6 +120,50 @@ public class CaseQueryResource extends AbstractCaseResource {
 
                     logger.debug("About to look for case definitions with filter {}", filter);
                     CaseDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseDefinitions(filter, page, pageSize, sort, sortOrder);
+
+                    logger.debug("Returning OK response with content '{}'", responseObject);
+                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
+
+    /*
+     * process definition methods
+     */
+    @GET
+    @Path(CASE_ALL_PROCESSES_INSTANCES_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessDefinitions(@javax.ws.rs.core.Context HttpHeaders headers,
+            @QueryParam("filter") String filter,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        return invokeCaseOperation(headers,
+                "",
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+
+                    logger.debug("About to look for process definitions with filter {}", filter);
+                    ProcessDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getProcessDefinitions(filter, null, page, pageSize, sort, sortOrder);
+
+                    logger.debug("Returning OK response with content '{}'", responseObject);
+                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
+
+    @GET
+    @Path(CASE_PROCESSES_BY_CONTAINER_INSTANCES_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        return invokeCaseOperation(headers,
+                "",
+                null,
+                (Variant v, String type, Header... customHeaders) -> {
+
+                    logger.debug("About to look for process definitions with container id {}", containerId);
+                    ProcessDefinitionList responseObject = this.caseManagementRuntimeDataServiceBase.getProcessDefinitions(null, containerId, page, pageSize, sort, sortOrder);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);

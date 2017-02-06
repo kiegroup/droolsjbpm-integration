@@ -497,8 +497,7 @@ public class ProcessResource  {
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
-        // no container id available so only used to transfer conversation id if given by client
-        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         ProcessInstanceList processInstanceList = runtimeDataServiceBase.getProcessInstancesByDeploymentId(containerId, status, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process instance search: {}", processInstanceList);
@@ -512,8 +511,7 @@ public class ProcessResource  {
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
-        // no container id available so only used to transfer conversation id if given by client
-        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         ProcessDefinitionList processDefinitionList = runtimeDataServiceBase.getProcessesByDeploymentId(containerId, page, pageSize, sort, sortOrder);
         logger.debug("Returning result of process definition search: {}", processDefinitionList);
@@ -529,8 +527,7 @@ public class ProcessResource  {
             @QueryParam("activeOnly")Boolean active, @QueryParam("completedOnly")Boolean completed,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
-        // no container id available so only used to transfer conversation id if given by client
-        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         NodeInstanceList nodeInstanceList = runtimeDataServiceBase.getProcessInstanceHistory(processInstanceId, active, completed, page, pageSize);
         logger.debug("Returning result of node instances search: {}", nodeInstanceList);
@@ -542,8 +539,7 @@ public class ProcessResource  {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getVariablesCurrentState(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId) {
 
-        // no container id available so only used to transfer conversation id if given by client
-        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariablesCurrentState(processInstanceId);
         logger.debug("Returning result of variables search: {}", variableInstanceList);
@@ -558,13 +554,27 @@ public class ProcessResource  {
             @PathParam("varName") String variableName,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
-        // no container id available so only used to transfer conversation id if given by client
-        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
         VariableInstanceList variableInstanceList = runtimeDataServiceBase.getVariableHistory(processInstanceId, variableName, page, pageSize);
         logger.debug("Returning result of variable '{}; history search: {}", variableName, variableInstanceList);
 
         return createCorrectVariant(variableInstanceList, headers, Response.Status.OK, conversationIdHeader);
+    }
+
+    @GET
+    @Path(PROCESS_INSTANCES_BY_PARENT_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getProcessInstances(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long parentProcessInstanceId,
+            @QueryParam("status") List<Integer> status,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        ProcessInstanceList processInstanceList = processServiceBase.getProcessInstancesByParent(parentProcessInstanceId, status, page, pageSize, sort, sortOrder);
+        logger.debug("Returning result of process instance search: {}", processInstanceList);
+
+        return createCorrectVariant(processInstanceList, headers, Response.Status.OK, conversationIdHeader);
     }
 
 }

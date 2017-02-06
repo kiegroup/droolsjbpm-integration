@@ -128,7 +128,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
 
         String[] evaluateItemsEntities = entities.get("Prepare");
         assertEquals(1, evaluateItemsEntities.length);
-        assertEquals(USER_JOHN, evaluateItemsEntities[0]);
+        assertEquals(USER_YODA, evaluateItemsEntities[0]);
 
         // assert reusable subprocesses
         assertEquals(1, result.getReusableSubProcesses().size());
