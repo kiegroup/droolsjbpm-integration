@@ -24,6 +24,7 @@ import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.dmn.DMNEvaluationContext;
+import org.kie.server.api.model.dmn.DMNEvaluationResult;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
@@ -96,7 +97,7 @@ public class ModelEvaluatorServiceBase {
         }
     }
     
-    public ServiceResponse<String> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
+    public ServiceResponse<DMNEvaluationResult> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId);
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
@@ -134,15 +135,17 @@ public class ModelEvaluatorServiceBase {
             LOG.info("{}",result.getDecisionResults());
             LOG.info("{}",result.getMessages());
             
-            return new ServiceResponse<String>(
+            DMNEvaluationResult res = new DMNEvaluationResult(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
+            
+            return new ServiceResponse<DMNEvaluationResult>(
                     ServiceResponse.ResponseType.SUCCESS,
-                    "OK list successfully retrieved from container '" + containerId + "'",
-                    result.toString() );
+                    "OK from container '" + containerId + "'",
+                    res );
         } catch ( Exception e ) {
-            LOG.error( "Error retrieving list from container '" + containerId + "'", e );
-            return new ServiceResponse<String>(
+            LOG.error( "Error from container '" + containerId + "'", e );
+            return new ServiceResponse<DMNEvaluationResult>(
                     ServiceResponse.ResponseType.FAILURE,
-                    "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
+                    "Error from container '" + containerId + "'" + e.getMessage(),
                     null );
         }
     }

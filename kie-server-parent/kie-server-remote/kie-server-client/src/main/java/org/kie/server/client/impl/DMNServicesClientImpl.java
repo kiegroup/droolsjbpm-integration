@@ -11,6 +11,7 @@ import org.kie.dmn.core.api.DMNContext;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNEvaluationContext;
+import org.kie.server.api.model.dmn.DMNEvaluationResult;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
@@ -25,7 +26,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         }
 
         @Override
-        public ServiceResponse<String> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
+        public ServiceResponse<DMNEvaluationResult> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
             Object result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -34,7 +35,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 DMNEvaluationContext payload = new DMNEvaluationContext( dmnContext.getAll() ); 
                 
                 return makeHttpPostRequestAndCreateServiceResponse(
-                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, String.class);
+                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, DMNEvaluationResult.class);
 
             } else {
 //                CommandScript script = new CommandScript( Collections.singletonList(
@@ -50,8 +51,8 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
 
             if (result instanceof Wrapped) {
-                return (ServiceResponse<String>) ((Wrapped) result).unwrap();
+                return (ServiceResponse<DMNEvaluationResult>) ((Wrapped) result).unwrap();
             }
-            return (ServiceResponse<String>) result;
+            return (ServiceResponse<DMNEvaluationResult>) result;
         }
 }

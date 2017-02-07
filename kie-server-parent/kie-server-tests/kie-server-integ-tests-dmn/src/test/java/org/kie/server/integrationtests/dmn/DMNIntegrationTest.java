@@ -23,6 +23,7 @@ import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.dmn.DMNEvaluationResult;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
@@ -67,9 +68,12 @@ public class DMNIntegrationTest
         DMNContext dmnContext = DMNFactory.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
-        ServiceResponse<String> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
+        ServiceResponse<DMNEvaluationResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
         
         System.out.println("FROM THE TEST:"+evaluateAllDecisions);
+//        DO NOT CALL: System.out.println(evaluateAllDecisions.getResult().getContext());
+        System.out.println(evaluateAllDecisions.getResult().getMessages());
+        System.out.println(evaluateAllDecisions.getResult().getDecisionResults());
     }
     
     /*
