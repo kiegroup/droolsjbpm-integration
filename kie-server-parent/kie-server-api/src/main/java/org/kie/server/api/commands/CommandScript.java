@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.kie.server.api.commands.optaplanner.*;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerConfig;

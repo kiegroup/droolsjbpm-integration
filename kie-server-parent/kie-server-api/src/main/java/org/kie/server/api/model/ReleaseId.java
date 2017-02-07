@@ -18,8 +18,8 @@ package org.kie.server.api.model;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 /**
  * This is a JAXB friendly ReleaseId implementation

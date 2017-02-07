@@ -3,7 +3,8 @@
 <weblogic-web-app xmlns="http://www.bea.com/ns/weblogic/90" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <container-descriptor>
     <prefer-application-packages>
-      <package-name>org.codehaus.jackson.*</package-name>
+      <package-name>com.fasterxml.jackson.*</package-name>
+      <package-name>org.jboss.logging.*</package-name>
     </prefer-application-packages>
   </container-descriptor>
   <security-role-assignment>
