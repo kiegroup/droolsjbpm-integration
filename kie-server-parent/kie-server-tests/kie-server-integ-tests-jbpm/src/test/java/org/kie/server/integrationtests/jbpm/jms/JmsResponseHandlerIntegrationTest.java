@@ -318,29 +318,36 @@ public class JmsResponseHandlerIntegrationTest extends JbpmKieServerBaseIntegrat
         queryClient.setResponseHandler(responseHandler);
         queryClient.registerQuery(query);
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
-        KieServerSynchronization.waitForQuery(queryClient, query);
+        try {
+            queryClient.setResponseHandler(new RequestReplyResponseHandler());
+            KieServerSynchronization.waitForQuery(queryClient, query);
 
-        List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-        assertThat(tasks).isNotNull().hasSize(1);
-        Long taskId = tasks.get(0).getId();
+            List<TaskInstance> tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertThat(tasks).isNotNull().hasSize(1);
+            Long taskId = tasks.get(0).getId();
 
-        query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
+            query.setExpression("select * from AuditTaskImpl where status = 'InProgress'");
 
-        queryClient.setResponseHandler(responseHandler);
-        queryClient.replaceQuery(query);
+            queryClient.setResponseHandler(responseHandler);
+            queryClient.replaceQuery(query);
 
-        queryClient.setResponseHandler(new RequestReplyResponseHandler());
-        KieServerSynchronization.waitForQuery(queryClient, query);
+            queryClient.setResponseHandler(new RequestReplyResponseHandler());
+            KieServerSynchronization.waitForQuery(queryClient, query);
 
-        tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-        assertThat(tasks).isNotNull().isEmpty();
+            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertThat(tasks).isNotNull().isEmpty();
 
-        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+            taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
 
-        tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
-        assertThat(tasks).isNotNull().hasSize(1);
-        assertThat(tasks.get(0).getId()).isEqualTo(taskId);
+            tasks = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_TASK, 0, 10, TaskInstance.class);
+            assertThat(tasks).isNotNull().hasSize(1);
+            assertThat(tasks.get(0).getId()).isEqualTo(taskId);
+
+        } catch (Exception e) {
+            queryClient.setResponseHandler(new RequestReplyResponseHandler());
+            queryClient.unregisterQuery(query.getName());
+            throw e;
+        }
 
         queryClient.setResponseHandler(responseHandler);
         queryClient.unregisterQuery(query.getName());
