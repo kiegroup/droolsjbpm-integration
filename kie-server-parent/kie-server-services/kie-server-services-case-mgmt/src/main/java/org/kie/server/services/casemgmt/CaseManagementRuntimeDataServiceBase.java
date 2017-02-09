@@ -39,19 +39,22 @@ import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneList;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageList;
+import org.kie.server.api.model.definition.ProcessDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.NodeInstanceList;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskSummaryList;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 
 import static java.util.stream.Collectors.*;
 
 public class CaseManagementRuntimeDataServiceBase {
 
     private CaseRuntimeDataService caseRuntimeDataService;
-
+    private KieServerRegistry context;
     private IdentityProvider identityProvider;
 
     private boolean bypassAuthUser = false;
@@ -59,6 +62,7 @@ public class CaseManagementRuntimeDataServiceBase {
     public CaseManagementRuntimeDataServiceBase(CaseRuntimeDataService caseRuntimeDataService, KieServerRegistry context) {
         this.caseRuntimeDataService = caseRuntimeDataService;
         this.identityProvider = context.getIdentityProvider();
+        this.context = context;
 
         this.bypassAuthUser = Boolean.parseBoolean(context.getConfig().getConfigItemValue(KieServerConstants.CFG_BYPASS_AUTH_USER, "false"));
     }
@@ -209,6 +213,7 @@ public class CaseManagementRuntimeDataServiceBase {
 
     public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         sort = safeCaseDefinitionSort(sort);
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
 
         Collection<CaseDefinition> caseDescs = caseRuntimeDataService.getCasesByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
 
@@ -237,8 +242,27 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseList;
     }
 
-    public org.kie.server.api.model.cases.CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId) {
+    public ProcessDefinitionList getProcessDefinitions(String filter, String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
 
+        Collection<org.jbpm.services.api.model.ProcessDefinition> processDescs = null;
+        sort = safeCaseDefinitionSort(sort);
+
+        if (containerId != null && !containerId.isEmpty()) {
+            containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+            processDescs = caseRuntimeDataService.getProcessDefinitionsByDeployment(containerId, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        } else if (filter != null && !filter.isEmpty()) {
+            processDescs = caseRuntimeDataService.getProcessDefinitions(filter, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        } else {
+            processDescs = caseRuntimeDataService.getProcessDefinitions(ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        }
+
+        ProcessDefinitionList processDefinitions = ConvertUtils.transformProcesses(processDescs);
+
+        return processDefinitions;
+    }
+
+    public org.kie.server.api.model.cases.CaseDefinition getCaseDefinition(String containerId, String caseDefinitionId) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
 
         if (caseDef == null) {

@@ -31,6 +31,7 @@ import org.kie.api.runtime.process.WorkItem;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
+import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
@@ -39,6 +40,8 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByProcessInstanceIdContainerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 public class ProcessServiceBase {
 
@@ -358,5 +361,22 @@ public class ProcessServiceBase {
         return response;
     }
 
+    public ProcessInstanceList getProcessInstancesByParent(long parentProcessInstanceId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        if (sort == null || sort.isEmpty()) {
+            sort = "ProcessInstanceId";
+        }
+        if (status == null || status.isEmpty()) {
+            status = new ArrayList<Integer>();
+            status.add(ProcessInstance.STATE_ACTIVE);
+        }
+        Collection<ProcessInstanceDesc> instances = runtimeDataService.getProcessInstancesByParent(parentProcessInstanceId, status, buildQueryContext(page, pageSize, sort, sortOrder));
+
+        logger.debug("Found {} process instances , statuses '{}'", instances.size(), status);
+
+        ProcessInstanceList processInstanceList = convertToProcessInstanceList(instances);
+        logger.debug("Returning result of process instance search: {}", processInstanceList);
+
+        return processInstanceList;
+    }
 
 }

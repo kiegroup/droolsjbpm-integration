@@ -28,6 +28,7 @@ import org.jbpm.casemgmt.api.model.instance.CaseRoleInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
+import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
@@ -41,6 +42,7 @@ import org.kie.server.api.model.cases.CaseMilestoneDefinition;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.cases.CaseStageDefinition;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummaryList;
@@ -281,5 +283,37 @@ public class ConvertUtils {
                 .skipable(taskSummary.isSkipable())
                 .build();
         return task;
+    }
+
+    public static ProcessDefinitionList transformProcesses(Collection<ProcessDefinition> definitions) {
+        if (definitions == null) {
+            return new ProcessDefinitionList(new org.kie.server.api.model.definition.ProcessDefinition[0]);
+        }
+
+        List<org.kie.server.api.model.definition.ProcessDefinition> processes = new ArrayList<org.kie.server.api.model.definition.ProcessDefinition>(definitions.size());
+        for (ProcessDefinition pd : definitions) {
+            org.kie.server.api.model.definition.ProcessDefinition definition = transformProcess(pd);
+
+            processes.add(definition);
+        }
+
+        return new ProcessDefinitionList(processes);
+    }
+
+    public static org.kie.server.api.model.definition.ProcessDefinition transformProcess(ProcessDefinition processDesc) {
+        if (processDesc == null) {
+            return null;
+        }
+
+        org.kie.server.api.model.definition.ProcessDefinition processDefinition = org.kie.server.api.model.definition.ProcessDefinition.builder()
+                .id(processDesc.getId())
+                .name(processDesc.getName())
+                .packageName(processDesc.getPackageName())
+                .version(processDesc.getVersion())
+                .containerId(processDesc.getDeploymentId())
+                .dynamic(processDesc.isDynamic())
+                .build();
+
+        return processDefinition;
     }
 }

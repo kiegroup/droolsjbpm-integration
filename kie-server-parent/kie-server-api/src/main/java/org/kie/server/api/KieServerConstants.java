@@ -108,6 +108,8 @@ public class KieServerConstants {
     public static final String CASE_DYNAMIC_ACTORS_PROP = "actors";
     public static final String CASE_DYNAMIC_GROUPS_PROP = "groups";
 
+    public static final String CFG_CASE_ID_GENERATOR = "org.kie.server.cases.generator";
+
     public static final String KIE_SERVER_PERSISTENCE_UNIT_NAME = "org.jbpm.domain";
 
     public static final String QUERY_ORDER_BY = "q_order_by";

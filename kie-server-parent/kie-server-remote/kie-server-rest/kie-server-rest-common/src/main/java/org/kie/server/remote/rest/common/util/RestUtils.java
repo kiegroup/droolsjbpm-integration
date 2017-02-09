@@ -152,19 +152,23 @@ public class RestUtils {
     }
 
     public static Response notFound(String message, Variant v, Header... customHeaders) {
-        return createResponse(message, v, Response.Status.NOT_FOUND, customHeaders);
+        return createResponse("\"" +message + "\"", v, Response.Status.NOT_FOUND, customHeaders);
     }
 
     public static Response internalServerError(String message, Variant v, Header... customHeaders) {
-        return createResponse(message, v, Response.Status.INTERNAL_SERVER_ERROR, customHeaders);
+        return createResponse("\"" +message + "\"", v, Response.Status.INTERNAL_SERVER_ERROR, customHeaders);
     }
 
     public static Response alreadyExists(String message, Variant v, Header... customHeaders) {
-        return createResponse(message, v, Response.Status.CONFLICT, customHeaders);
+        return createResponse("\"" +message + "\"", v, Response.Status.CONFLICT, customHeaders);
     }
 
     public static Response badRequest(String reason, Variant v, Header... customHeaders) {
-        return createResponse(reason, v, Response.Status.BAD_REQUEST, customHeaders);
+        return createResponse("\"" +reason + "\"", v, Response.Status.BAD_REQUEST, customHeaders);
+    }
+
+    public static Response forbidden(String reason, Variant v, Header... customHeaders) {
+        return createResponse("\"" +reason + "\"", v, Response.Status.FORBIDDEN, customHeaders);
     }
 
     public static Response noContent(Variant v, Header... customHeaders) {

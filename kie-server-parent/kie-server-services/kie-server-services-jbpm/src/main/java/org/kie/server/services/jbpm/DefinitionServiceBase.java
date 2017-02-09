@@ -54,6 +54,7 @@ public class DefinitionServiceBase {
                 .serviceTasks(procDef.getServiceTasks())
                 .subprocesses(procDef.getReusableSubProcesses())
                 .variables(procDef.getProcessVariables())
+                .dynamic(procDef.isDynamic())
                 .build();
         return responseObject;
 
