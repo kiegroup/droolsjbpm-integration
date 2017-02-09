@@ -97,6 +97,8 @@ public interface CaseServicesClient {
 
     List<NodeInstance> getActiveNodes(String containerId, String caseId, Integer page, Integer pageSize);
 
+    List<NodeInstance> getCompletedNodes(String containerId, String caseId, Integer page, Integer pageSize);
+
     List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize);
 
     List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize, String sort, boolean sortOrder);

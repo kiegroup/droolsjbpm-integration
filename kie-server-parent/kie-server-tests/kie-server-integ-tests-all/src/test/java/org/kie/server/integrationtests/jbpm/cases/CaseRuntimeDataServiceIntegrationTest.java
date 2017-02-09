@@ -899,6 +899,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(activeNode);
         assertEquals("Hello1", activeNode.getName());
 
+        List<NodeInstance> completedNodes = caseClient.getCompletedNodes(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(completedNodes);
+        assertEquals(0, completedNodes.size());
+
         List<org.kie.server.api.model.instance.ProcessInstance> instances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10);
         assertNotNull(instances);
         assertEquals(1, instances.size());
@@ -928,6 +932,15 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(nodeNames.contains("[Dynamic] dynamic task"));
         assertTrue(nodeNames.contains("Hello1"));
 
+        taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, null);
+
+        completedNodes = caseClient.getCompletedNodes(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(completedNodes);
+        assertEquals(1, completedNodes.size());
+
+        NodeInstance completedNode = activeNodes.get(0);
+        assertNotNull(completedNode);
+        assertEquals("Hello1", completedNode.getName());
 
         caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, "DataVerification", parameters);
 
