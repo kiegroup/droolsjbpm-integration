@@ -201,7 +201,7 @@ public class KieServerSynchronization {
         waitForCondition(() -> {
             try {
                 QueryDefinition q = client.getQuery(query.getName());
-                return q != null;
+                return query.getExpression().equals(q.getExpression());
             } catch (KieServicesException e) {
                 // Query isn't created yet
                 return false;
