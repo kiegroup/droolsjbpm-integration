@@ -534,6 +534,39 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
+    public List<NodeInstance> getCompletedNodes(String containerId, String caseId, Integer page, Integer pageSize) {
+        NodeInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(CASE_ID, caseId);
+
+            String queryString = getPagingQueryString("?completed=true", page, pageSize);
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_NODE_INSTANCES_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCompletedNodes", new Object[]{containerId, caseId, page, pageSize})) );
+            ServiceResponse<NodeInstanceList> response = (ServiceResponse<NodeInstanceList>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null) {
+            return list.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<ProcessInstance> getActiveProcessInstances(String containerId, String caseId, Integer page, Integer pageSize) {
         return getProcessInstances(containerId, caseId, null, page, pageSize);
     }

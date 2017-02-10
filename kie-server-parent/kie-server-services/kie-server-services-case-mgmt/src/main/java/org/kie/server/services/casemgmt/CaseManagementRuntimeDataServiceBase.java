@@ -119,6 +119,17 @@ public class CaseManagementRuntimeDataServiceBase {
         return activeNodesList;
     }
 
+    public NodeInstanceList getCompletedNodes(String containerId, String caseId, Integer page, Integer pageSize) {
+
+        Collection<NodeInstanceDesc> completedNodeInstances = caseRuntimeDataService.getCompletedNodesForCase(caseId, ConvertUtils.buildQueryContext(page, pageSize));
+
+        List<NodeInstance> completedNodes = ConvertUtils.transformNodeInstance(completedNodeInstances);
+
+        NodeInstanceList completedNodesList = new NodeInstanceList(completedNodes);
+
+        return completedNodesList;
+    }
+
     public ProcessInstanceList getProcessInstancesForCase(String containerId, String caseId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         status = safeStatus(status);
         sort = safeProcessInstanceSort(sort);

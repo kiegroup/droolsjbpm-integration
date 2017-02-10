@@ -440,7 +440,7 @@ public class CaseResource extends AbstractCaseResource {
     @Path(CASE_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceActiveNodes(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_ID) String caseId,
+            @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_ID) String caseId, @QueryParam("completed") @DefaultValue("false") Boolean completed,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         return invokeCaseOperation(headers,
@@ -448,8 +448,13 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to look for active nodes in case {}", caseId);
-                    NodeInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getActiveNodes(containerId, caseId, page, pageSize);
+                    NodeInstanceList responseObject = null;
 
+                    if (completed) {
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCompletedNodes(containerId, caseId, page, pageSize);
+                    } else {
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getActiveNodes(containerId, caseId, page, pageSize);
+                    }
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
                 });
