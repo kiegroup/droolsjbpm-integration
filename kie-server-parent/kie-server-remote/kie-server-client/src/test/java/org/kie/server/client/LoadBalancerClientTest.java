@@ -239,6 +239,33 @@ public class LoadBalancerClientTest {
         assertEquals("Server version", "1", response.getResult().getVersion());
     }
 
+    @Test
+    public void testDefaultLoadBalancerNotValidHost() throws Exception {
+
+        config = KieServicesFactory.newRestConfiguration( "http://not-existing-host.com:8080/server", null, null );
+        // set capabilities upfront to avoid additional request to server info to make the tests more determinable
+        config.setCapabilities(Arrays.asList("KieServer"));
+
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+        try {
+            client.getServerInfo();
+            fail("There is no valid kie server url");
+        } catch (KieServerHttpRequestException e) {
+            // expected since no valid endpoint was found
+        }
+
+        List<String> failed = ((AbstractKieServicesClientImpl)client).getLoadBalancer().getFailedEndpoints();
+        assertEquals(1, failed.size());
+
+        ((AbstractKieServicesClientImpl)client).getLoadBalancer().activate(mockServerBaseUri1);
+
+        ServiceResponse<KieServerInfo> response = client.getServerInfo();
+        assertSuccess(response);
+        assertEquals("Server version", "1", response.getResult().getVersion());
+    }
+
+
+
     private void assertSuccess(ServiceResponse<?> response) {
         assertEquals("Response type", ServiceResponse.ResponseType.SUCCESS, response.getType());
     }
