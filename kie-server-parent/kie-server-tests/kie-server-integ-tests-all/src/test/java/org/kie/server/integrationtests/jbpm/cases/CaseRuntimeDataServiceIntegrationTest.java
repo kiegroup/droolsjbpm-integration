@@ -1337,23 +1337,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
-    public void testAdminGetCaseInstances() {
-        // Test is using user authentication, isn't available for local execution(which has mocked authentication info).
-        Assume.assumeFalse(TestConfig.isLocalServer());
-        String caseId = startUserTaskCase(USER_JOHN, USER_MARY);
-
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
-
-        // yoda is not involved in case at all so should not see case at all
-        List<CaseInstance> caseInstances = caseClient.getCaseInstances(Arrays.asList(1), 0, 10);
-        assertEquals(0, caseInstances.size());
-
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(1), 0, 10);
-        assertEquals(1, caseInstances.size());
-    }
-
-    @Test
     public void testCaseInstanceAuthorization() throws Exception {
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
 
