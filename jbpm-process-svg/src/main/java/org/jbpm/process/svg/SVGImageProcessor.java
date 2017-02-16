@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -33,6 +34,7 @@ import org.jbpm.process.svg.model.NodeSummary;
 import org.jbpm.process.svg.model.SVGSummary;
 import org.jbpm.process.svg.model.SetBackgroundColorTransformation;
 import org.jbpm.process.svg.model.SetBorderColorTransformation;
+import org.jbpm.process.svg.model.SetSubProcessLinkTransformation;
 import org.jbpm.process.svg.model.Transformation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,6 +66,10 @@ public class SVGImageProcessor {
     }
 
     public static String transform(InputStream svg, List<String> completed, List<String> active) {
+        return transform(svg, completed, active, null);
+    }
+
+    public static String transform(InputStream svg, List<String> completed, List<String> active, Map<String, String> subProcessLinks) {
         SVGImageProcessor processor = new SVGImageProcessor(svg);
         for (String nodeId : completed) {
             if (!active.contains(nodeId)) {
@@ -72,6 +78,13 @@ public class SVGImageProcessor {
         }
         for (String nodeId : active) {
             processor.defaultActiveTransformation(nodeId);
+        }
+
+        if (subProcessLinks != null) {
+
+            for (Map.Entry<String, String> subProcessLink : subProcessLinks.entrySet()) {
+                processor.defaultSubProcessLinkTransformation(subProcessLink.getKey(), subProcessLink.getValue());
+            }
         }
         return processor.getSVG();
     }
@@ -102,6 +115,10 @@ public class SVGImageProcessor {
         transform(new SetBorderColorTransformation(nodeId, "#FF0000"));
     }
 
+    public void defaultSubProcessLinkTransformation(String nodeId, String link) {
+        transform(new SetSubProcessLinkTransformation(nodeId, link));
+    }
+
     public String getSVG() {
         try {
             DOMSource domSource = new DOMSource(svgDocument.getFirstChild());
@@ -130,10 +147,14 @@ public class SVGImageProcessor {
                             String nodeId = nodeIdNode.getNodeValue();
                             Element border = null;
                             Element background = null;
+                            Element subProcessLink = null;
                             if (nodeId != null) {
                                 background = svgDocument.getElementById(svgId + "fill_el");
                                 border = svgDocument.getElementById(svgId + "bg_frame");
-                                summary.addNode(new NodeSummary(nodeId, border, background));
+                                Element borderSubProcess = svgDocument.getElementById(svgId + "frame");
+
+                                subProcessLink = svgDocument.getElementById(svgId + "pimg");
+                                summary.addNode(new NodeSummary(nodeId, border, background, borderSubProcess, subProcessLink));
                             }
                         }
                     } else {
@@ -152,7 +173,10 @@ public class SVGImageProcessor {
                             if (!name.trim().isEmpty()) {
                                 Element background = svgDocument.getElementById(svgId + "fill_el");
                                 Element border = svgDocument.getElementById(svgId + "bg_frame");
-                                summary.addNode(new NodeSummary(name, border, background));
+                                Element borderSubProcess = svgDocument.getElementById(svgId + "frame");
+
+                                Element subProcessLink = svgDocument.getElementById(svgId + "pimg");
+                                summary.addNode(new NodeSummary(name, border, background, borderSubProcess, subProcessLink));
                             }
                         }
                     }

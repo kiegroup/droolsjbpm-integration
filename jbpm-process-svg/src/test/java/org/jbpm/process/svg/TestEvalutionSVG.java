@@ -18,7 +18,9 @@ package org.jbpm.process.svg;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -90,6 +92,22 @@ public class TestEvalutionSVG {
         validateNodesMarkedAsCompleted(svgDocument, completed);
     }
 
+    @Test
+    public void testSubProcessLink() throws Exception {
+        List<String> completed = new ArrayList<String>();
+        List<String> active = new ArrayList<String>();
+        active.add("_35262208-8B3E-457E-8D8A-798E70CC280D");
+
+        Map<String, String> links = new HashMap<>();
+        links.put("_35262208-8B3E-457E-8D8A-798E70CC280D", "http://localhost/processes/1");
+        String svg = SVGImageProcessor.transform(TestEvalutionSVG.class.getResourceAsStream("/call-activity-svg.svg"), completed, active, links);
+
+        // verify transformation
+        Document svgDocument = readSVG(svg);
+        validateNodesMarkedAsActive(svgDocument, active);
+        validateCallActivityLinked(svgDocument, active, links);
+    }
+
     // helper methods for verifying svg transformation
 
     private void validateNodesMarkedAsActive(Document svgDocument, List<String> activeNodes) throws XPathExpressionException {
@@ -130,6 +148,32 @@ public class TestEvalutionSVG {
             String marker = background.getAttribute("stop-color");
             assertNotNull(marker);
             assertEquals("#C0C0C0", marker);
+
+        }
+    }
+
+    private void validateCallActivityLinked(Document svgDocument, List<String> activeNodes, Map<String, String> links) throws XPathExpressionException {
+        for (String activeNode : activeNodes) {
+
+            XPathExpression expr = xpath.compile("//*[@bpmn2nodeid='" + activeNode + "']");
+            Element element = (Element) expr.evaluate(svgDocument, XPathConstants.NODE);
+
+            if (element == null) {
+                fail("Active element " + activeNode + " not found in the document");
+            }
+            String svgId = element.getAttribute("id");
+
+            Element border = svgDocument.getElementById(svgId + "pimg");
+
+            String onclick = border.getAttribute("onclick");
+            assertNotNull(onclick);
+            assertEquals("", onclick);
+            String link = border.getAttributeNS("http://www.w3.org/1999/xlink", "href");
+            assertNotNull(link);
+            assertEquals(links.get(activeNode), link);
+            String target = border.getAttribute("target");
+            assertNotNull(target);
+            assertEquals("_blank", target);
 
         }
     }

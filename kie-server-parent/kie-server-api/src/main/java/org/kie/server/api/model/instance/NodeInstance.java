@@ -45,6 +45,8 @@ public class NodeInstance {
     private String connection;
     @XmlElement(name="node-completed")
     private Boolean completed;
+    @XmlElement(name="reference-id")
+    private Long referenceId;
 
     public NodeInstance() {
     }
@@ -133,6 +135,14 @@ public class NodeInstance {
         this.completed = completed;
     }
 
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
+    }
+
     @Override
     public String toString() {
         return "NodeInstance{" +
@@ -202,6 +212,11 @@ public class NodeInstance {
 
         public Builder completed(Boolean completed) {
             processInstance.setCompleted(completed);
+            return this;
+        }
+
+        public Builder referenceId(Long referenceId) {
+            processInstance.setReferenceId(referenceId);
             return this;
         }
 

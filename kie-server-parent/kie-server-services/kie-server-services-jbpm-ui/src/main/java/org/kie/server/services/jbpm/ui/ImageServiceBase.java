@@ -17,6 +17,7 @@ package org.kie.server.services.jbpm.ui;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import org.jbpm.services.api.model.NodeInstanceDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
 import org.kie.api.runtime.query.QueryContext;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
@@ -44,12 +46,20 @@ public class ImageServiceBase {
     private RuntimeDataService dataService;
     private Map<String, ImageReference> imageReferenceMap;
 
+    private String kieServerLocation;
+    private String processInstanceImageLink = "containers/{0}/images/processes/instances/{1}";
+
     private KieServerRegistry registry;
 
     public ImageServiceBase(RuntimeDataService dataService, Map<String, ImageReference> imageReferenceMap, KieServerRegistry registry) {
         this.dataService = dataService;
         this.imageReferenceMap = imageReferenceMap;
         this.registry = registry;
+
+        this.kieServerLocation = this.registry.getConfig().getConfigItemValue(KieServerConstants.KIE_SERVER_LOCATION, System.getProperty(KieServerConstants.KIE_SERVER_LOCATION, "unknown"));
+        if (!this.kieServerLocation.endsWith("/")) {
+            this.kieServerLocation = kieServerLocation + "/";
+        }
     }
 
     private byte[] getProcessImageAsBytes(String containerId, String processId) {
@@ -99,6 +109,7 @@ public class ImageServiceBase {
         byte[] imageSVG = getProcessImageAsBytes(instance.getDeploymentId(), instance.getProcessId());
         if (imageSVG != null) {
             // find active nodes and modify image
+            Map<String, String> subProcessLinks = new HashMap<>();
             Collection<NodeInstanceDesc> activeLogs = dataService.getProcessInstanceHistoryActive(procInstId, new QueryContext(0, 1000));
             Collection<NodeInstanceDesc> completedLogs = dataService.getProcessInstanceHistoryCompleted(procInstId, new QueryContext(0, 1000));
             Map<Long, String> active = new HashMap<Long, String>();
@@ -106,20 +117,32 @@ public class ImageServiceBase {
 
             for (NodeInstanceDesc activeNode : activeLogs) {
                 active.put(activeNode.getId(), activeNode.getNodeId());
+
+                populateSubProcessLink(containerId, activeNode, subProcessLinks);
             }
 
             for (NodeInstanceDesc completeNode : completedLogs) {
                 completed.add(completeNode.getNodeId());
 
                 active.remove(completeNode.getId());
+
+                populateSubProcessLink(containerId, completeNode, subProcessLinks);
             }
 
             ByteArrayInputStream svgStream = new ByteArrayInputStream(imageSVG);
 
-            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()));
+            imageSVGString = SVGImageProcessor.transform(svgStream, completed, new ArrayList<String>(active.values()), subProcessLinks);
 
             return imageSVGString;
         }
         throw new IllegalArgumentException("No process found for " + instance.getProcessId() + " within container " + containerId);
+    }
+
+    protected void populateSubProcessLink(String containerId, NodeInstanceDesc node, Map<String, String> subProcessLinks) {
+        if (node.getReferenceId() != null && node.getNodeType().endsWith("SubProcessNode")) {
+
+            String link = kieServerLocation + MessageFormat.format(processInstanceImageLink, containerId, node.getReferenceId());
+            subProcessLinks.put(node.getNodeId(), link);
+        }
     }
 }

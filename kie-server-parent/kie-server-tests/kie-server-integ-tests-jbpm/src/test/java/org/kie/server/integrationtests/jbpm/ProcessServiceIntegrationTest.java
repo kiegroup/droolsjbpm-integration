@@ -805,6 +805,14 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals(PROCESS_ID_EVALUATION, childInstance.getProcessId());
             assertEquals(processInstanceId, childInstance.getParentId());
 
+            List<NodeInstance> activeNodes = queryClient.findActiveNodeInstances(processInstanceId, 0, 10);
+            assertEquals(1, activeNodes.size());
+
+            NodeInstance active = activeNodes.get(0);
+            assertEquals("Call Evaluation", active.getName());
+            assertEquals("SubProcessNode", active.getNodeType());
+            assertEquals(childInstance.getId(), active.getReferenceId());
+
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
 
             // Process instance is now aborted.

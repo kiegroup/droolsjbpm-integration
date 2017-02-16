@@ -231,6 +231,7 @@ public class ConvertUtils {
                 .completed(nodeInstanceDesc.isCompleted())
                 .connection(nodeInstanceDesc.getConnection())
                 .date(nodeInstanceDesc.getDataTimeStamp())
+                .referenceId(nodeInstanceDesc.getReferenceId())
                 .build();
 
         return nodeInstance;
