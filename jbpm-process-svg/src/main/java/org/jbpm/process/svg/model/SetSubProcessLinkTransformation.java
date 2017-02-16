@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,27 @@ package org.jbpm.process.svg.model;
 
 import org.w3c.dom.Element;
 
-public class SetBorderColorTransformation extends NodeTransformation {
+public class SetSubProcessLinkTransformation extends NodeTransformation {
 
-    private String color;
+    private String link;
 
-    public SetBorderColorTransformation(String nodeId, String color) {
+    public SetSubProcessLinkTransformation(String nodeId, String link) {
         super(nodeId);
-        this.color = color;
+        this.link = link;
     }
 
-    public String getColor() {
-        return color;
+    public String getLink() {
+        return link;
     }
 
     public void transform(SVGSummary summary) {
         NodeSummary node = summary.getNode(getNodeId());
         if (node != null) {
-            Element border = node.getBorder();
-            if (border != null) {
-                border.setAttribute("stroke", color);
-                border.setAttribute("stroke-width", "2");
-            }
-
-            Element borderSubProcess = node.getBorderSubProcess();
-            if (borderSubProcess != null) {
-                borderSubProcess.setAttribute("stroke", color);
-                borderSubProcess.setAttribute("stroke-width", "2");
+            Element linkNode = node.getSubProcessLink();
+            if (linkNode != null) {
+                linkNode.setAttribute("onclick", "");
+                linkNode.setAttribute("xlink:href", link);
+                linkNode.setAttribute("target", "_blank");
             }
         }
     }

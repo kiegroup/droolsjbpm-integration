@@ -157,6 +157,7 @@ public class ConvertUtils {
                         .nodeId(an.getNodeId())
                         .processInstanceId(an.getProcessInstanceId())
                         .workItemId(an.getWorkItemId())
+                        .referenceId(an.getReferenceId())
                         .build())
                 .collect(toList());
     }

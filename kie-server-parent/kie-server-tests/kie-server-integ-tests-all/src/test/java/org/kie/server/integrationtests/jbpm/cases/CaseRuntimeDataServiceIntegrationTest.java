@@ -400,7 +400,12 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(stage.getIdentifier());
         assertEquals("Build claim report", stage.getName());
         assertEquals("Active", stage.getStatus());
-        KieServerAssert.assertNullOrEmpty("Active nodes should be empty.", stage.getActiveNodes());
+
+        List<NodeInstance> activeNodes = stage.getActiveNodes();
+        assertEquals(1, activeNodes.size());
+        assertEquals("Provide accident information", activeNodes.get(0).getName());
+        assertEquals("HumanTaskNode", activeNodes.get(0).getNodeType());
+
         assertEquals(2, stage.getAdHocFragments().size());
     }
 
@@ -1598,7 +1603,14 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(stage.getIdentifier());
         assertEquals(status, stage.getStatus());
 
-        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+        if (status.endsWith("Active")) {
+            List<NodeInstance> activeNodes = stage.getActiveNodes();
+            assertEquals(1, activeNodes.size());
+            assertEquals("Provide accident information", activeNodes.get(0).getName());
+            assertEquals("HumanTaskNode", activeNodes.get(0).getNodeType());
+        } else {
+            KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+        }
 
         List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
         assertEquals(2, adHocFragments.size());
@@ -1613,9 +1625,14 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(stage.getIdentifier());
         assertEquals(status, stage.getStatus());
 
-        // TODO: what should be stored in active nodes?
-        // According to CaseRuntimeDataServiceImpl.internalGetCaseStages() it seems to be always empty.
-        KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+        if (status.endsWith("Active")) {
+            List<NodeInstance> activeNodes = stage.getActiveNodes();
+            assertEquals(1, activeNodes.size());
+            assertEquals("Assessor evaluation", activeNodes.get(0).getName());
+            assertEquals("HumanTaskNode", activeNodes.get(0).getNodeType());
+        } else {
+            KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
+        }
 
         List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
         assertEquals(2, adHocFragments.size());
@@ -1630,8 +1647,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(stage.getIdentifier());
         assertEquals(status, stage.getStatus());
 
-        // TODO: what should be stored in active nodes?
-        // According to CaseRuntimeDataServiceImpl.internalGetCaseStages() it seems to be always empty.
         KieServerAssert.assertNullOrEmpty("Active nodes should be null or empty.", stage.getActiveNodes());
 
         List<CaseAdHocFragment> adHocFragments = stage.getAdHocFragments();
