@@ -64,7 +64,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
     private NotificationService notificationService = LoggingNotificationService.getInstance();
 
     @Override
-    public KieServerSetup connect(KieServerInfo serverInfo) {
+    public synchronized KieServerSetup connect(KieServerInfo serverInfo) {
 
         ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
         KieServerSetup serverSetup = new KieServerSetup();
@@ -208,7 +208,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
     }
 
     @Override
-    public void disconnect(KieServerInfo serverInfo) {
+    public synchronized void disconnect(KieServerInfo serverInfo) {
         ServerTemplate serverTemplate = templateStorage.load(serverInfo.getServerId());
         if (serverTemplate != null) {
             logger.debug("Server id {} known to the controller, checking if given server exists", serverInfo.getServerId());
