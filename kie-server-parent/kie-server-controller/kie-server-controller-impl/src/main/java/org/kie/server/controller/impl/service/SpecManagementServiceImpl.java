@@ -50,7 +50,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     private NotificationService notificationService = LoggingNotificationService.getInstance();
 
     @Override
-    public void saveContainerSpec( String serverTemplateId,
+    public synchronized void saveContainerSpec( String serverTemplateId,
                                    ContainerSpec containerSpec ) {
         ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
@@ -76,7 +76,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void updateContainerSpec( String serverTemplateId,
+    public synchronized void updateContainerSpec( String serverTemplateId,
             ContainerSpec containerSpec ) {
         ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
@@ -105,7 +105,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void saveServerTemplate( ServerTemplate serverTemplate ) {
+    public synchronized void saveServerTemplate( ServerTemplate serverTemplate ) {
         if ( templateStorage.exists( serverTemplate.getId() ) ) {
             templateStorage.update( serverTemplate );
         } else {
@@ -142,7 +142,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void deleteContainerSpec( String serverTemplateId,
+    public synchronized void deleteContainerSpec( String serverTemplateId,
                                      String containerSpecId ) {
         ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
         if ( serverTemplate == null ) {
@@ -160,7 +160,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void deleteServerTemplate( String serverTemplateId ) {
+    public synchronized void deleteServerTemplate( String serverTemplateId ) {
         if ( !templateStorage.exists( serverTemplateId ) ) {
             throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
         }
@@ -171,7 +171,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void copyServerTemplate( String serverTemplateId,
+    public synchronized void copyServerTemplate( String serverTemplateId,
                                     String newServerTemplateId,
                                     String newServerTemplateName ) {
         final ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
@@ -229,7 +229,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void updateContainerConfig( String serverTemplateId,
+    public synchronized void updateContainerConfig( String serverTemplateId,
                                        String containerSpecId,
                                        Capability capability,
                                        ContainerConfig containerConfig ) {
@@ -251,7 +251,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void updateServerTemplateConfig( String serverTemplateId,
+    public synchronized void updateServerTemplateConfig( String serverTemplateId,
                                             Capability capability,
                                             ServerConfig serverTemplateConfig ) {
         ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
@@ -267,7 +267,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void startContainer( ContainerSpecKey containerSpecKey ) {
+    public synchronized void startContainer( ContainerSpecKey containerSpecKey ) {
         ServerTemplate serverTemplate = templateStorage.load( containerSpecKey.getServerTemplateKey().getId() );
         if ( serverTemplate == null ) {
             throw new KieServerControllerNotFoundException( "No server template found for id " + containerSpecKey.getServerTemplateKey().getId() );
@@ -288,7 +288,8 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void stopContainer( ContainerSpecKey containerSpecKey ) {
+    public synchronized void stopContainer( ContainerSpecKey containerSpecKey ) {
+
         ServerTemplate serverTemplate = templateStorage.load( containerSpecKey.getServerTemplateKey().getId() );
         if ( serverTemplate == null ) {
             throw new KieServerControllerNotFoundException( "No server template found for id " + containerSpecKey.getServerTemplateKey().getId() );
