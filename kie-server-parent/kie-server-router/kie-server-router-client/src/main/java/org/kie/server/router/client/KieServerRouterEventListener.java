@@ -15,6 +15,7 @@
 
 package org.kie.server.router.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -158,9 +159,19 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         
         return alias;
     }
-    
+
     protected List<String> routers() {
-        return Arrays.asList(routerURL.split(","));
+        ArrayList<String> list = new ArrayList<>();
+        String[] routerUrls = routerURL.split(",");
+
+        for (String routerUrl : routerUrls) {
+            routerUrl = routerUrl.trim();
+            if (routerUrl.endsWith("/")) {
+                routerUrl = routerUrl.substring(0, routerUrl.length()-1);
+            }
+            list.add(routerUrl);
+        }
+        return list;
     }
     
     protected Throwable findCause(Exception e) {
