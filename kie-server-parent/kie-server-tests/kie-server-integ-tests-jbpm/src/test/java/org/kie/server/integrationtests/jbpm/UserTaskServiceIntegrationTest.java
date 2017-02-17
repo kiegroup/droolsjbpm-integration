@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -34,6 +36,7 @@ import org.kie.server.api.model.instance.TaskEventInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesException;
+import org.kie.server.client.KieServicesHttpException;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -110,6 +113,42 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testCompleteAlreadyCompletedUserTask() throws Exception {
+        Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put("car", "BMW");
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, "test1.process1", variables);
+        assertNotNull(processInstanceId);
+        assertTrue(processInstanceId.longValue() > 0);
+
+        List<TaskSummary> taskList = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
+        assertNotNull(taskList);
+        assertEquals(1, taskList.size());
+
+        Long taskId = taskList.get(0).getId();
+
+        // startTask and completeTask task
+        taskClient.startTask(CONTAINER_ID, taskId, USER_YODA);
+
+        Map<String, Object> taskOutcome = new HashMap<String, Object>();
+        taskOutcome.put("carOutput", "Skoda");
+
+        taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
+
+        try {
+            taskClient.completeTask(CONTAINER_ID, taskId, USER_YODA, taskOutcome);
+            fail("Completing of already completed task should throw an exception.");
+
+        } catch(KieServicesHttpException e) {
+            assertEquals(Response.Status.NOT_FOUND.getStatusCode(), e.getHttpCode().intValue());
+            // expected for REST
+
+        } catch(KieServicesException e) {
+            // expected for JMS
         }
     }
 
