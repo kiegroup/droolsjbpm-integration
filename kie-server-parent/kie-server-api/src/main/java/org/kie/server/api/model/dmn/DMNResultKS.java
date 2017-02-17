@@ -25,7 +25,7 @@ import org.kie.dmn.core.api.DMNResult;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-result")
-public class DMNEvaluationResult implements DMNResult {
+public class DMNResultKS implements DMNResult {
 
     @XmlElement(name="model-namespace")
     private String namespace;
@@ -40,29 +40,29 @@ public class DMNEvaluationResult implements DMNResult {
     private Map<String, Object> dmnContext = new HashMap<>();
 
     @XmlElementWrapper(name="messages")
-    private List<DMNMessage> messages = new ArrayList<>();
+    private List<DMNMessageKS> messages = new ArrayList<>();
     
     @XmlElementWrapper(name="decision-results")
-    private Map<String, DMNDecisionResult> decisionResults = new HashMap<>();
+    private Map<String, DMNDecisionResultKS> decisionResults = new HashMap<>();
     
-    public DMNEvaluationResult() {
+    public DMNResultKS() {
         // no-arg constructor for marshalling
     }
     
-    public DMNEvaluationResult(DMNResult dmnResult) {
+    public DMNResultKS(DMNResult dmnResult) {
         // TODO review not possible as impossible to serialize DMN nodes
         // this.setDmnContext( dmnResult.getContext().getAll() );
         this.setMessages( dmnResult.getMessages() );
         this.setDecisionResults( dmnResult.getDecisionResults() );
     }
     
-    public DMNEvaluationResult(String namespace, String modelName, DMNResult dmnResult) {
+    public DMNResultKS(String namespace, String modelName, DMNResult dmnResult) {
         this(dmnResult);
         this.namespace = namespace;
         this.modelName = modelName;
     }
     
-    public DMNEvaluationResult(String namespace, String modelName, String decisionName, DMNResult dmnResult) {
+    public DMNResultKS(String namespace, String modelName, String decisionName, DMNResult dmnResult) {
         this(namespace, modelName, dmnResult);
         this.decisionName = decisionName;
     }
@@ -103,10 +103,14 @@ public class DMNEvaluationResult implements DMNResult {
 
     
     public void setDmnContext(Map<String, Object> dmnContext) {
-        this.dmnContext = dmnContext;
+        // this.dmnContext = dmnContext;
+        throw new UnsupportedOperationException();
     }
     public void setMessages(List<DMNMessage> messages) {
-        this.messages = messages;
+        // wrap for serialization:
+        for ( DMNMessage m : messages ) {
+            this.messages.add(DMNMessageKS.of(m));
+        }
     }
     public void setDecisionResults(List<DMNDecisionResult> decisionResults) {
         for ( DMNDecisionResult dr : decisionResults ) {
@@ -114,11 +118,11 @@ public class DMNEvaluationResult implements DMNResult {
             System.out.println(dr.getDecisionId());
             System.out.println(dr.getDecisionName());
             System.out.println(dr.getResult());
-            this.decisionResults.put(dr.getDecisionId(), dr);
+            this.decisionResults.put(dr.getDecisionId(), DMNDecisionResultKS.of(dr));
         }
-        unwireDecisionResults();
     }
 
+    @Deprecated
     private void unwireDecisionResults() {
         for ( DMNDecisionResult dr : decisionResults.values() ) {
             if ( dr instanceof DMNDecisionResultImpl ) {
@@ -129,6 +133,7 @@ public class DMNEvaluationResult implements DMNResult {
     }
     
     // TODO review
+    @Deprecated
     private void rewireDecisionResults() {
         for ( DMNDecisionResult dr : decisionResults.values() ) {
             if ( dr.getEvaluationStatus().equals( DecisionEvaluationStatus.SUCCEEDED ) && dr instanceof DMNDecisionResultImpl ) {
@@ -150,7 +155,9 @@ public class DMNEvaluationResult implements DMNResult {
 
     @Override
     public List<DMNMessage> getMessages() {
-        return this.messages;
+        List<DMNMessage> res = new ArrayList<>();
+        messages.forEach(x -> res.add(x));
+        return res;
     }
 
     @Override
@@ -166,26 +173,23 @@ public class DMNEvaluationResult implements DMNResult {
 
     @Override
     public List<DMNDecisionResult> getDecisionResults() {
-        rewireDecisionResults();
         return new ArrayList<>( decisionResults.values() );
     }
 
     @Override
     public DMNDecisionResult getDecisionResultByName( String name ) {
-        rewireDecisionResults();
         return decisionResults.values().stream().filter( dr -> dr.getDecisionName().equals( name ) ).findFirst().get();
     }
 
     @Override
     public DMNDecisionResult getDecisionResultById( String id ) {
-        rewireDecisionResults();
         return decisionResults.get( id );
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("DMNEvaluationResult [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append(", messages=").append(messages).append(", decisionResults=").append(decisionResults).append("]");
+        builder.append("DMNResultKS [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append(", messages=").append(messages).append(", decisionResults=").append(decisionResults).append("]");
         return builder.toString();
     }
      

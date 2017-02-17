@@ -33,7 +33,7 @@ import javax.ws.rs.core.Variant;
 
 import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.dmn.DMNEvaluationResult;
+import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.remote.rest.common.Header;
@@ -90,7 +90,7 @@ public class ModelEvaluatorResource {
             String contentType = getContentType( headers );
             
             LOG.info( "Payload received: {}", payload);
-            ServiceResponse<DMNEvaluationResult> result = modelEvaluatorService.evaluateAllDecisions(containerId, payload, contentType);
+            ServiceResponse<DMNResultKS> result = modelEvaluatorService.evaluateAllDecisions(containerId, payload, contentType);
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }

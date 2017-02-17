@@ -8,10 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.dmn.core.api.DMNContext;
+import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
-import org.kie.server.api.model.dmn.DMNEvaluationContext;
-import org.kie.server.api.model.dmn.DMNEvaluationResult;
+import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
@@ -26,16 +27,16 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         }
 
         @Override
-        public ServiceResponse<DMNEvaluationResult> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
+        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
             Object result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
                 valuesMap.put(CONTAINER_ID, containerId);
 
-                DMNEvaluationContext payload = new DMNEvaluationContext( dmnContext.getAll() ); 
+                DMNContextKS payload = new DMNContextKS( dmnContext.getAll() ); 
                 
                 return makeHttpPostRequestAndCreateServiceResponse(
-                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, DMNEvaluationResult.class);
+                        build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, DMNResultKS.class);
 
             } else {
 //                CommandScript script = new CommandScript( Collections.singletonList(
@@ -51,8 +52,8 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
 
             if (result instanceof Wrapped) {
-                return (ServiceResponse<DMNEvaluationResult>) ((Wrapped) result).unwrap();
+                return (ServiceResponse<DMNResultKS>) ((Wrapped) result).unwrap();
             }
-            return (ServiceResponse<DMNEvaluationResult>) result;
+            return (ServiceResponse<DMNResultKS>) result;
         }
 }

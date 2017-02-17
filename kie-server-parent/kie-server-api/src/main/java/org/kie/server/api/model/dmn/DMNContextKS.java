@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-context")
-public class DMNEvaluationContext {
+public class DMNContextKS {
 
     @XmlElement(name="model-namespace")
     private String namespace;
@@ -25,21 +25,21 @@ public class DMNEvaluationContext {
     @XmlElementWrapper(name="dmn-context")
     private Map<String, Object> dmnContext = new HashMap<>();
     
-    public DMNEvaluationContext() {
+    public DMNContextKS() {
         // no-arg constructor for marshalling
     }
     
-    public DMNEvaluationContext(Map<String, Object> dmnContext) {
+    public DMNContextKS(Map<String, Object> dmnContext) {
         this.dmnContext.putAll( dmnContext );
     }
     
-    public DMNEvaluationContext(String namespace, String modelName, Map<String, Object> dmnContext) {
+    public DMNContextKS(String namespace, String modelName, Map<String, Object> dmnContext) {
         this(dmnContext);
         this.namespace = namespace;
         this.modelName = modelName;
     }
     
-    public DMNEvaluationContext(String namespace, String modelName, String decisionName, Map<String, Object> dmnContext) {
+    public DMNContextKS(String namespace, String modelName, String decisionName, Map<String, Object> dmnContext) {
         this(namespace, modelName, dmnContext);
         this.decisionName = decisionName;
     }
@@ -87,7 +87,7 @@ public class DMNEvaluationContext {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("DMNEvaluationContext [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append("]");
+        builder.append("DMNContextKS [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append("]");
         return builder.toString();
     }
     

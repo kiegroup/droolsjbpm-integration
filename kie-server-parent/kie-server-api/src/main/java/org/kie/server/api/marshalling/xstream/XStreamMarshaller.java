@@ -48,7 +48,8 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
-import org.kie.server.api.model.dmn.DMNEvaluationContext;
+import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConverter;
 import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
@@ -136,7 +137,8 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( GetSolverStateCommand.class );
         this.xstream.processAnnotations( UpdateSolverStateCommand.class );
         
-        this.xstream.processAnnotations( DMNEvaluationContext.class );
+        this.xstream.processAnnotations( DMNContextKS.class );
+        this.xstream.processAnnotations( DMNResultKS.class );
 
         if (classes != null) {
             for (Class<?> clazz : classes) {

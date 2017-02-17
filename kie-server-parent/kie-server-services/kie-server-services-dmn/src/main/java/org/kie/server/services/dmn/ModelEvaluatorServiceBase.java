@@ -23,8 +23,8 @@ import org.kie.dmn.core.api.DMNResult;
 import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.cases.CaseFile;
-import org.kie.server.api.model.dmn.DMNEvaluationContext;
-import org.kie.server.api.model.dmn.DMNEvaluationResult;
+import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
@@ -97,14 +97,14 @@ public class ModelEvaluatorServiceBase {
         }
     }
     
-    public ServiceResponse<DMNEvaluationResult> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
+    public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId);
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             
             LOG.info("Will deserialize payload: {}", contextPayload);
-            DMNEvaluationContext evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNEvaluationContext.class);
+            DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);
             
             DMNModel model;
             if ( evalCtx.getModelName() == null ) {
@@ -135,15 +135,15 @@ public class ModelEvaluatorServiceBase {
             LOG.info("{}",result.getDecisionResults());
             LOG.info("{}",result.getMessages());
             
-            DMNEvaluationResult res = new DMNEvaluationResult(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
+            DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
             
-            return new ServiceResponse<DMNEvaluationResult>(
+            return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK from container '" + containerId + "'",
                     res );
         } catch ( Exception e ) {
             LOG.error( "Error from container '" + containerId + "'", e );
-            return new ServiceResponse<DMNEvaluationResult>(
+            return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Error from container '" + containerId + "'" + e.getMessage(),
                     null );

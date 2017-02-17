@@ -47,10 +47,14 @@
       <artifactId>optaplanner-persistence-jaxb</artifactId>
     </dependency>
     
-    <!-- Needed only for the DMNResult, so should be possible later to migrate to kie-dmn-API -->
+    <!-- Needed only for the DMNResult, DMNContext, etc and FEELEvent so should be possible later to migrate to kie-dmn-API -->
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-feel</artifactId>
     </dependency>
 
     <!-- json -->
