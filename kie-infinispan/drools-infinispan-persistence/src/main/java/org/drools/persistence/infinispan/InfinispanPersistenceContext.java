@@ -16,9 +16,9 @@
 package org.drools.persistence.infinispan;
 
 import org.drools.persistence.PersistenceContext;
+import org.drools.persistence.PersistentSession;
+import org.drools.persistence.PersistentWorkItem;
 import org.drools.persistence.info.EntityHolder;
-import org.drools.persistence.info.SessionInfo;
-import org.drools.persistence.info.WorkItemInfo;
 import org.infinispan.Cache;
 
 public class InfinispanPersistenceContext implements PersistenceContext {
@@ -39,7 +39,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
         this.isJTA = isJTA;
     }
 
-    public SessionInfo persist(SessionInfo entity) {
+    public PersistentSession persist(PersistentSession entity) {
     	if (entity.getId() == null) {
     		entity.setId(generateSessionInfoId());
     	}
@@ -79,7 +79,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
 		return String.valueOf(id); //TODO
 	}
 
-    public SessionInfo findSessionInfo(Long id) {
+    public PersistentSession findSession(Long id) {
     	EntityHolder holder = (EntityHolder) this.cache.get( createSessionKey(id) );
     	if (holder == null) {
     		return null;
@@ -88,7 +88,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     }
 
     @Override
-    public void remove(SessionInfo sessionInfo) {
+    public void remove(PersistentSession sessionInfo) {
         cache.remove( createSessionKey(sessionInfo.getId()) );
         cache.evict( createSessionKey(sessionInfo.getId()) );
     }
@@ -108,7 +108,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
         //cache doesn't close
     }
 
-    public WorkItemInfo persist(WorkItemInfo workItemInfo) {
+    public PersistentWorkItem persist(PersistentWorkItem workItemInfo) {
     	if (workItemInfo.getId() == null) {
     		workItemInfo.setId(generateWorkItemInfoId());
     	}
@@ -118,7 +118,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     	return workItemInfo;
     }
 
-    public WorkItemInfo findWorkItemInfo(Long id) {
+    public PersistentWorkItem findWorkItem(Long id) {
     	EntityHolder holder = (EntityHolder) cache.get(createWorkItemKey(id));
     	if (holder == null) {
     		return null;
@@ -126,12 +126,12 @@ public class InfinispanPersistenceContext implements PersistenceContext {
     	return holder.getWorkItemInfo();
     }
 
-    public void remove(WorkItemInfo workItemInfo) {
+    public void remove(PersistentWorkItem workItemInfo) {
         cache.remove( createWorkItemKey(workItemInfo.getId()) );
         cache.evict( createWorkItemKey(workItemInfo.getId()) );
     }
 
-    public WorkItemInfo merge(WorkItemInfo workItemInfo) {
+    public PersistentWorkItem merge(PersistentWorkItem workItemInfo) {
     	String key = createWorkItemKey(workItemInfo.getId());
     	workItemInfo.transform();
     	EntityHolder entityHolder = new EntityHolder(key, workItemInfo);
@@ -143,7 +143,7 @@ public class InfinispanPersistenceContext implements PersistenceContext {
 		return cache;
 	}
 
-    public void lock(WorkItemInfo workItemInfo) {
+    public void lock(PersistentWorkItem workItemInfo) {
         // no-op: no locking implemented here
     }
 }

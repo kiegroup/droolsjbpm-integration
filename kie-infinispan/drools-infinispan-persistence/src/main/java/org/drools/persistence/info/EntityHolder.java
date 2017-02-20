@@ -21,6 +21,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.drools.core.process.instance.impl.WorkItemImpl;
+import org.drools.persistence.PersistentSession;
+import org.drools.persistence.PersistentWorkItem;
 import org.drools.persistence.util.Base64;
 import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
@@ -59,22 +61,24 @@ public class EntityHolder {
 	@Field
 	private String workItemInfoByteArray;
 
-	public EntityHolder(String key, SessionInfo sessionInfo) {
+	public EntityHolder(String key, PersistentSession session) {
 		this.key = key;
 		this.type = "sessionInfo";
-		this.sessionInfoId = sessionInfo.getId();
+		this.sessionInfoId = session.getId();
+		SessionInfo sessionInfo = (SessionInfo) session;
 		this.sessionInfoVersion = sessionInfo.getVersion();
-		sessionInfo.transform();
+		session.transform();
 		this.sessionInfoData = Base64.encodeBase64String(sessionInfo.getData());
 		this.sessionInfoLastModificationDate = sessionInfo.getLastModificationDate();
 		this.sessionInfoStartDate = sessionInfo.getStartDate();
 	}
 
-	public EntityHolder(String key, WorkItemInfo workItemInfo) {
+	public EntityHolder(String key, PersistentWorkItem workItem) {
 		this.key = key;
 		this.type = "workItemInfo";
-		workItemInfo.transform();
-		this.workItemInfoId = workItemInfo.getId();
+		workItem.transform();
+		this.workItemInfoId = workItem.getId();
+		WorkItemInfo workItemInfo = (WorkItemInfo) workItem;
 		this.workItemInfoName = workItemInfo.getName();
 		this.workItemInfoVersion = workItemInfo.getVersion();
 		this.workItemInfoProcessInstanceId = workItemInfo.getProcessInstanceId();

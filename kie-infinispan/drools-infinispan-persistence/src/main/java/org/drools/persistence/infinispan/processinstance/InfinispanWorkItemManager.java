@@ -15,6 +15,11 @@
 
 package org.drools.persistence.infinispan.processinstance;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.drools.core.WorkItemHandlerNotFoundException;
 import org.drools.core.common.InternalKnowledgeRuntime;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -23,17 +28,13 @@ import org.drools.core.process.instance.WorkItemManager;
 import org.drools.core.process.instance.impl.WorkItemImpl;
 import org.drools.persistence.PersistenceContext;
 import org.drools.persistence.PersistenceContextManager;
+import org.drools.persistence.PersistentWorkItem;
 import org.drools.persistence.info.WorkItemInfo;
 import org.drools.persistence.jpa.processinstance.JPAWorkItemManager;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItemHandler;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class InfinispanWorkItemManager extends JPAWorkItemManager implements WorkItemManager {
 
@@ -116,7 +117,7 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
         PersistenceContext context = ((PersistenceContextManager) env.get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getCommandScopedPersistenceContext();
 
         
-        WorkItemInfo workItemInfo = context.findWorkItemInfo( id );
+        PersistentWorkItem workItemInfo = context.findWorkItem( id );
         // work item may have been aborted
         if (workItemInfo != null) {
             WorkItemImpl workItem = (WorkItemImpl) internalGetWorkItem(workItemInfo);
@@ -141,7 +142,7 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
         PersistenceContext context = ((PersistenceContextManager) env.get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getCommandScopedPersistenceContext();
 
         
-        WorkItemInfo workItemInfo = context.findWorkItemInfo( id );
+        PersistentWorkItem workItemInfo = context.findWorkItem( id );
         
         // work item may have been aborted
         if (workItemInfo != null) {
@@ -163,7 +164,7 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
 //        EntityManager em = (EntityManager) env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
         PersistenceContext context = ((PersistenceContextManager) env.get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getCommandScopedPersistenceContext();
 
-        WorkItemInfo workItemInfo = context.findWorkItemInfo( id );
+        PersistentWorkItem workItemInfo = context.findWorkItem( id );
         
         // work item may have been aborted
         if (workItemInfo != null) {
@@ -184,10 +185,10 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
 //        EntityManager em = (EntityManager) env.get(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER);
         PersistenceContext context = ((PersistenceContextManager) env.get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getCommandScopedPersistenceContext();
         
-        WorkItemInfo workItemInfo = null;
+        PersistentWorkItem workItemInfo = null;
         
         if (context != null) {
-            workItemInfo = context.findWorkItemInfo( id );
+            workItemInfo = context.findWorkItem( id );
         }
 
         if (workItemInfo == null) {
@@ -196,10 +197,10 @@ public class InfinispanWorkItemManager extends JPAWorkItemManager implements Wor
         return internalGetWorkItem(workItemInfo);
     }
 
-    private WorkItem internalGetWorkItem(WorkItemInfo workItemInfo) { 
+    private WorkItem internalGetWorkItem(PersistentWorkItem workItemInfo) { 
         Environment env = kruntime.getEnvironment();
         InternalKnowledgeBase ruleBase = (InternalKnowledgeBase) kruntime.getKieBase();
-        WorkItem workItem = workItemInfo.getWorkItem(env, ruleBase); 
+        WorkItem workItem = ((WorkItemInfo) workItemInfo).getWorkItem(env, ruleBase); 
         ((WorkItemImpl) workItem).setId(workItemInfo.getId());
         return workItem;
     }

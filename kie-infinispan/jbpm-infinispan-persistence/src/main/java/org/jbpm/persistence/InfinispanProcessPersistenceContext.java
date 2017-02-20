@@ -18,6 +18,8 @@ package org.jbpm.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbpm.persistence.PersistentCorrelationKey;
+import org.jbpm.persistence.PersistentProcessInstance;
 import org.drools.persistence.infinispan.InfinispanPersistenceContext;
 import org.infinispan.Cache;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
@@ -41,7 +43,8 @@ public class InfinispanProcessPersistenceContext extends InfinispanPersistenceCo
         super( cache );
     }
 
-    public ProcessInstanceInfo persist(ProcessInstanceInfo processInstanceInfo) {
+    public PersistentProcessInstance persist(PersistentProcessInstance processInstance) {
+        ProcessInstanceInfo processInstanceInfo = (ProcessInstanceInfo) processInstance;
     	String id = generateProcessInstanceInfoId(processInstanceInfo);
         getCache().put( id, new ProcessEntityHolder(id, processInstanceInfo) );
         return processInstanceInfo;
@@ -56,7 +59,8 @@ public class InfinispanProcessPersistenceContext extends InfinispanPersistenceCo
 		return holder.getProcessInstanceInfo();
     }
 
-	public void remove(ProcessInstanceInfo processInstanceInfo) {
+	public void remove(PersistentProcessInstance processInstance) {
+        ProcessInstanceInfo processInstanceInfo = (ProcessInstanceInfo) processInstance;
         getCache().remove( generateProcessInstanceInfoId(processInstanceInfo) );
         getCache().evict( generateProcessInstanceInfoId(processInstanceInfo) );
         List<CorrelationKeyInfo> correlations = getCorrelationKeysByProcessInstanceId(processInstanceInfo.getId());
@@ -136,7 +140,8 @@ public class InfinispanProcessPersistenceContext extends InfinispanPersistenceCo
 		return retval;
     }
 
-    public CorrelationKeyInfo persist(CorrelationKeyInfo correlationKeyInfo) {
+    public CorrelationKeyInfo persist(PersistentCorrelationKey correlationKey) {
+        CorrelationKeyInfo correlationKeyInfo = (CorrelationKeyInfo) correlationKey;
         Long processInstanceId = getProcessInstanceByCorrelationKey(correlationKeyInfo);
         if (processInstanceId != null) {
             throw new RuntimeException(correlationKeyInfo + " already exists");
