@@ -1,25 +1,32 @@
 {
-  "revapi": {
-    "java": {
-      "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
-      "filter": {
-        "packages": {
-          "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
-          "regex": true,
-          "include": [
-            "org\\.kie\\.server\\.remote\\.rest\\.drools.*"
-          ]
-        },
-        "classes": {
-          "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
-          "regex": false,
-          "exclude": [
-            "org.kie.server.remote.rest.drools.DroolsRestApplicationComponentsService"
-          ]
+  "filters": {
+    "revapi": {
+      "java": {
+        "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
+        "filter": {
+          "packages": {
+            "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+            "regex": true,
+            "include": [
+              "org\\.kie\\.server\\.remote\\.rest\\.drools.*"
+            ]
+          },
+          "classes": {
+            "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
+            "regex": false,
+            "exclude": [
+              "org.kie.server.remote.rest.drools.DroolsRestApplicationComponentsService"
+            ]
+          }
         }
       }
-    },
-    "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
-    "ignore": []
+    }
+  },
+
+  "ignores": {
+    "revapi": {
+      "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
+      "ignore": []
+    }
   }
 }
