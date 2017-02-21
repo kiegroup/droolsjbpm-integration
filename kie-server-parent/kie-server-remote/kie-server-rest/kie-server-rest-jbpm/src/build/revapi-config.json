@@ -1,63 +1,70 @@
 {
-  "revapi": {
-    "java": {
-      "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
-      "filter": {
-        "packages": {
-          "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
-          "regex": true,
-          "include": [
-            "org\\.kie\\.server\\.remote\\.rest\\.jbpm.*"
-          ],
-          "exclude": [
-            "org\\.kie\\.server\\.remote\\.rest\\.jbpm\\.resources"
-          ]
-        },
-        "classes": {
-          "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
-          "regex": false,
-          "exclude": [
-            "org.kie.server.remote.rest.jbpm.JbpmRestApplicationComponentsService"
-          ]
+  "filters": {
+    "revapi": {
+      "java": {
+        "_comment": "Only classes with javax.ws.rs annotations are included since we want to check only REST API.",
+        "filter": {
+          "packages": {
+            "comment": "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+            "regex": true,
+            "include": [
+              "org\\.kie\\.server\\.remote\\.rest\\.jbpm.*"
+            ],
+            "exclude": [
+              "org\\.kie\\.server\\.remote\\.rest\\.jbpm\\.resources"
+            ]
+          },
+          "classes": {
+            "_comment": "Classes are excluded, not included, so new classes in future are discovered by revapi.",
+            "regex": false,
+            "exclude": [
+              "org.kie.server.remote.rest.jbpm.JbpmRestApplicationComponentsService"
+            ]
+          }
         }
       }
-    },
-    "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
-    "ignore": [
-      {
-        "code": "java.field.visibilityReduced",
-        "old": "field org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource.logger",
-        "new": "field org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource.logger",
-        "oldVisibility": "public",
-        "newVisibility": "private",
-        "justification": "This is logger, which should definitely be hidden from public API"
-      },
-      {
-        "code": "java.method.numberOfParametersChanged",
-        "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-        "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, java.lang.String)",
-        "justification": "Add filter by task name"
-      },
-      {
-       "code": "java.method.numberOfParametersChanged",
-       "old": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.api.KieServerRegistry)",
-       "new": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
-       "package": "org.kie.server.remote.rest.jbpm",
-       "classSimpleName": "UserTaskResource",
-       "methodName": "<init>",
-       "elementKind": "constructor",
-       "justification": "Required to be able to use runtime data service from within UserTaskServiceResource"
-       },
-       {
-        "code": "java.method.numberOfParametersChanged",
-        "old": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.DefinitionServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
-        "new": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
-        "package": "org.kie.server.remote.rest.jbpm",
-        "classSimpleName": "ProcessResource",
-        "methodName": "<init>",
-        "elementKind": "constructor",
-        "justification": "Removed unused parameters. Change in this constructor does not break backward compatibility of REST API"
+    }
+  },
+
+  "ignores": {
+    "revapi": {
+      "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
+      "ignore": [
+        {
+          "code": "java.field.visibilityReduced",
+          "old": "field org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource.logger",
+          "new": "field org.kie.server.remote.rest.jbpm.admin.ProcessAdminResource.logger",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "justification": "This is logger, which should definitely be hidden from public API"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.RuntimeDataResource::getTasksAssignedAsPotentialOwner(javax.ws.rs.core.HttpHeaders, java.util.List<java.lang.String>, java.util.List<java.lang.String>, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean, java.lang.String)",
+          "justification": "Add filter by task name"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "new": "method void org.kie.server.remote.rest.jbpm.UserTaskResource::<init>(org.kie.server.services.jbpm.UserTaskServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "classSimpleName": "UserTaskResource",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Required to be able to use runtime data service from within UserTaskServiceResource"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.DefinitionServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "new": "method void org.kie.server.remote.rest.jbpm.ProcessResource::<init>(org.kie.server.services.jbpm.ProcessServiceBase, org.kie.server.services.jbpm.RuntimeDataServiceBase, org.kie.server.services.api.KieServerRegistry)",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "classSimpleName": "ProcessResource",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "Removed unused parameters. Change in this constructor does not break backward compatibility of REST API"
         }
-    ]
+      ]
+    }
   }
 }

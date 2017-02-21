@@ -1,228 +1,234 @@
 {
-  "revapi": {
-    "java": {
-      "_comment": "We don't want to check classes, just interfaces. Every class is therefore excluded so new interfaces and classes in future are discovered by revapi.",
-      "filter": {
-        "packages": {
-          "_comment": [
-            "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
-            "Therefore, only module's packages are included. Excluded packages contain only classes."
-          ],
-          "regex": true,
-          "include": [
-            "org\\.kie\\.server\\.client.*"
-          ],
-          "exclude": [
-            "org\\.kie\\.server\\.client\\.admin\\.impl",
-            "org\\.kie\\.server\\.client\\.balancer\\.impl",
-            "org\\.kie\\.server\\.client\\.credentials",
-            "org\\.kie\\.server\\.client\\.impl"
-          ]
-        },
-        "classes": {
-          "_comment": "In the remaining packages which are mixed (both interfaces and classes), we just exclude classes.",
-          "regex": false,
-          "exclude": [
-            "org.kie.server.client.balancer.LoadBalancer",
-            "org.kie.server.client.helper.CaseServicesClientBuilder",
-            "org.kie.server.client.helper.DroolsServicesClientBuilder",
-            "org.kie.server.client.helper.JBPMServicesClientBuilder",
-            "org.kie.server.client.helper.JBPMUIServicesClientBuilder",
-            "org.kie.server.client.helper.OptaplannerServicesClientBuilder",
-            "org.kie.server.client.KieServicesException",
-            "org.kie.server.client.KieServicesFactory"
-          ]
+  "filters": {
+    "revapi": {
+      "java": {
+        "_comment": "We don't want to check classes, just interfaces. Every class is therefore excluded so new interfaces and classes in future are discovered by revapi.",
+        "filter": {
+          "packages": {
+            "_comment": [
+              "We don't want to check transitive classes, e.g. from kie-server-api, since we already check them in their own module.",
+              "Therefore, only module's packages are included. Excluded packages contain only classes."
+            ],
+            "regex": true,
+            "include": [
+              "org\\.kie\\.server\\.client.*"
+            ],
+            "exclude": [
+              "org\\.kie\\.server\\.client\\.admin\\.impl",
+              "org\\.kie\\.server\\.client\\.balancer\\.impl",
+              "org\\.kie\\.server\\.client\\.credentials",
+              "org\\.kie\\.server\\.client\\.impl"
+            ]
+          },
+          "classes": {
+            "_comment": "In the remaining packages which are mixed (both interfaces and classes), we just exclude classes.",
+            "regex": false,
+            "exclude": [
+              "org.kie.server.client.balancer.LoadBalancer",
+              "org.kie.server.client.helper.CaseServicesClientBuilder",
+              "org.kie.server.client.helper.DroolsServicesClientBuilder",
+              "org.kie.server.client.helper.JBPMServicesClientBuilder",
+              "org.kie.server.client.helper.JBPMUIServicesClientBuilder",
+              "org.kie.server.client.helper.OptaplannerServicesClientBuilder",
+              "org.kie.server.client.KieServicesException",
+              "org.kie.server.client.KieServicesFactory"
+            ]
+          }
         }
       }
-    },
-    "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
-    "ignore": [
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method org.kie.server.client.balancer.LoadBalancer org.kie.server.client.KieServicesConfiguration::getLoadBalancer()",
-        "justification": "Added to support Kie Server Client load balancing"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.KieServicesConfiguration::setLoadBalancer(org.kie.server.client.balancer.LoadBalancer)",
-        "justification": "Added to support Kie Server Client load balancing"
-      },
+    }
+  },
 
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessFormByType(java.lang.String, java.lang.String, java.lang.String)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessFormByType(java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessRawForm(java.lang.String, java.lang.String)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByType(java.lang.String, java.lang.Long, java.lang.String)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByType(java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskRawForm(java.lang.String, java.lang.Long)",
-        "justification": "Support multiple formats of forms"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method org.kie.server.api.model.ServiceResponse<org.kie.server.api.model.ReleaseId> org.kie.server.client.KieServicesClient::getReleaseId(java.lang.String)",
-        "justification": "JBPM-5504: Missing getReleaseId method in KieServicesClient"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.TaskSummary> org.kie.server.client.UserTaskServicesClient::findTasksAssignedAsPotentialOwner(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
-        "justification": "JBPM-4646 - Case management - filter by task name"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.TaskSummary> org.kie.server.client.UserTaskServicesClient::findTasksAssignedAsPotentialOwner(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-        "justification": "JBPM-4646 - Case management - filter by task name"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::cancelNodeInstance(java.lang.String, java.lang.Long, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getActiveNodeInstances(java.lang.String, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.admin.ProcessNode> org.kie.server.client.admin.ProcessAdminServicesClient::getProcessNodes(java.lang.String, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.admin.TimerInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getTimerInstances(java.lang.String, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::retriggerNodeInstance(java.lang.String, java.lang.Long, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::triggerNode(java.lang.String, java.lang.Long, java.lang.Long)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::updateTimer(java.lang.String, java.lang.Long, long, long, long, int)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::updateTimerRelative(java.lang.String, java.lang.Long, long, long, long, int)",
-        "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findActiveNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findActiveNodeInstances",
-        "elementKind": "method",
-        "justification": "Allow to find active nodes of a process via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findCompletedNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findCompletedNodeInstances",
-        "elementKind": "method",
-        "justification": "Allow to find completed nodes of a process via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findNodeInstances",
-        "elementKind": "method",
-        "justification": "Allow to find nodes of a process via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.VariableInstance> org.kie.server.client.ProcessServicesClient::findVariableHistory(java.lang.String, java.lang.Long, java.lang.String, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findVariableHistory",
-        "elementKind": "method",
-        "justification": "Allow to find process variable history via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.VariableInstance> org.kie.server.client.ProcessServicesClient::findVariablesCurrentState(java.lang.String, java.lang.Long)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findVariablesCurrentState",
-        "elementKind": "method",
-        "justification": "Allow to find process variable current state via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.TaskEventInstance> org.kie.server.client.UserTaskServicesClient::findTaskEvents(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "UserTaskServicesClient",
-        "methodName": "findTaskEvents",
-        "elementKind": "method",
-        "justification": "Allow to find tasks events via container id"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.TaskEventInstance> org.kie.server.client.UserTaskServicesClient::findTaskEvents(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "UserTaskServicesClient",
-        "methodName": "findTaskEvents",
-        "elementKind": "method",
-        "justification": "Allow to find tasks events via container id with sorting"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findProcessInstancesByParent",
-        "elementKind": "method",
-        "justification": "support for finding process instance by their parent process instance"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findProcessInstancesByParent",
-        "elementKind": "method",
-        "justification": "support for finding process instance by their parent process instance"
-      },
-      {
-        "code": "java.method.addedToInterface",
-        "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-        "package": "org.kie.server.client",
-        "classSimpleName": "ProcessServicesClient",
-        "methodName": "findProcessInstancesByParent",
-        "elementKind": "method",
-        "justification": "support for finding process instance by their parent process instance"
-      }
-    ]
+  "ignores": {
+    "revapi": {
+      "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
+      "ignore": [
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.client.balancer.LoadBalancer org.kie.server.client.KieServicesConfiguration::getLoadBalancer()",
+          "justification": "Added to support Kie Server Client load balancing"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.KieServicesConfiguration::setLoadBalancer(org.kie.server.client.balancer.LoadBalancer)",
+          "justification": "Added to support Kie Server Client load balancing"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessFormByType(java.lang.String, java.lang.String, java.lang.String)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessFormByType(java.lang.String, java.lang.String, java.lang.String, java.lang.String)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getProcessRawForm(java.lang.String, java.lang.String)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByType(java.lang.String, java.lang.Long, java.lang.String)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskFormByType(java.lang.String, java.lang.Long, java.lang.String, java.lang.String)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.lang.String org.kie.server.client.UIServicesClient::getTaskRawForm(java.lang.String, java.lang.Long)",
+          "justification": "Support multiple formats of forms"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.api.model.ServiceResponse<org.kie.server.api.model.ReleaseId> org.kie.server.client.KieServicesClient::getReleaseId(java.lang.String)",
+          "justification": "JBPM-5504: Missing getReleaseId method in KieServicesClient"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.TaskSummary> org.kie.server.client.UserTaskServicesClient::findTasksAssignedAsPotentialOwner(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "justification": "JBPM-4646 - Case management - filter by task name"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.TaskSummary> org.kie.server.client.UserTaskServicesClient::findTasksAssignedAsPotentialOwner(java.lang.String, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "justification": "JBPM-4646 - Case management - filter by task name"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::cancelNodeInstance(java.lang.String, java.lang.Long, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getActiveNodeInstances(java.lang.String, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.admin.ProcessNode> org.kie.server.client.admin.ProcessAdminServicesClient::getProcessNodes(java.lang.String, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.admin.TimerInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getTimerInstances(java.lang.String, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::retriggerNodeInstance(java.lang.String, java.lang.Long, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::triggerNode(java.lang.String, java.lang.Long, java.lang.Long)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::updateTimer(java.lang.String, java.lang.Long, long, long, long, int)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::updateTimerRelative(java.lang.String, java.lang.Long, long, long, long, int)",
+          "justification": "JBPM-5370 - Administration service for processes and tasks - services api and kie server"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findActiveNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findActiveNodeInstances",
+          "elementKind": "method",
+          "justification": "Allow to find active nodes of a process via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findCompletedNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findCompletedNodeInstances",
+          "elementKind": "method",
+          "justification": "Allow to find completed nodes of a process via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.NodeInstance> org.kie.server.client.ProcessServicesClient::findNodeInstances(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findNodeInstances",
+          "elementKind": "method",
+          "justification": "Allow to find nodes of a process via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.VariableInstance> org.kie.server.client.ProcessServicesClient::findVariableHistory(java.lang.String, java.lang.Long, java.lang.String, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findVariableHistory",
+          "elementKind": "method",
+          "justification": "Allow to find process variable history via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.VariableInstance> org.kie.server.client.ProcessServicesClient::findVariablesCurrentState(java.lang.String, java.lang.Long)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findVariablesCurrentState",
+          "elementKind": "method",
+          "justification": "Allow to find process variable current state via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.TaskEventInstance> org.kie.server.client.UserTaskServicesClient::findTaskEvents(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "UserTaskServicesClient",
+          "methodName": "findTaskEvents",
+          "elementKind": "method",
+          "justification": "Allow to find tasks events via container id"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.TaskEventInstance> org.kie.server.client.UserTaskServicesClient::findTaskEvents(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "UserTaskServicesClient",
+          "methodName": "findTaskEvents",
+          "elementKind": "method",
+          "justification": "Allow to find tasks events via container id with sorting"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findProcessInstancesByParent",
+          "elementKind": "method",
+          "justification": "support for finding process instance by their parent process instance"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findProcessInstancesByParent",
+          "elementKind": "method",
+          "justification": "support for finding process instance by their parent process instance"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstancesByParent(java.lang.String, java.lang.Long, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findProcessInstancesByParent",
+          "elementKind": "method",
+          "justification": "support for finding process instance by their parent process instance"
+        }
+      ]
+    }
   }
 }
