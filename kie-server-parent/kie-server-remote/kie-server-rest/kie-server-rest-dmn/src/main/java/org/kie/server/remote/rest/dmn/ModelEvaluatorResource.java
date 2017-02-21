@@ -31,7 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.kie.dmn.core.api.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.type.JaxbList;

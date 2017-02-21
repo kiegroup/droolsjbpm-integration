@@ -16,11 +16,11 @@
 package org.kie.server.services.dmn;
 
 import org.kie.api.runtime.KieSession;
-import org.kie.dmn.core.api.DMNContext;
+import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNModel;   
+import org.kie.dmn.api.core.DMNResult;
+import org.kie.dmn.api.core.DMNRuntime;
 import org.kie.dmn.core.api.DMNFactory;
-import org.kie.dmn.core.api.DMNModel;
-import org.kie.dmn.core.api.DMNResult;
-import org.kie.dmn.core.api.DMNRuntime;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.dmn.DMNContextKS;

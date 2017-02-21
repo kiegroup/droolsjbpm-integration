@@ -1,7 +1,7 @@
 package org.kie.server.client;
 
-import org.kie.dmn.core.api.DMNContext;
-import org.kie.dmn.core.api.DMNResult;
+import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
 
 public interface DMNServicesClient {

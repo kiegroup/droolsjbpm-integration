@@ -5,8 +5,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.dmn.core.api.DMNMessage;
-import org.kie.dmn.feel.runtime.events.FEELEvent;
+import org.kie.dmn.api.core.DMNMessage;
+import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-message")

@@ -2,6 +2,7 @@ package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,14 +15,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.kie.dmn.core.api.DMNContext;
-import org.kie.dmn.core.api.DMNDecisionResult;
-import org.kie.dmn.core.api.DMNDecisionResult.DecisionEvaluationStatus;
-import org.kie.dmn.core.api.DMNFactory;
-import org.kie.dmn.core.api.DMNMessage;
-import org.kie.dmn.core.api.DMNMessage.Severity;
-import org.kie.dmn.core.impl.DMNDecisionResultImpl;
-import org.kie.dmn.core.api.DMNResult;
+import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNDecisionResult;
+import org.kie.dmn.api.core.DMNDecisionResult.DecisionEvaluationStatus;
+import org.kie.dmn.api.core.DMNMessage;
+import org.kie.dmn.api.core.DMNMessage.Severity;
+import org.kie.dmn.api.core.DMNResult;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-result")
@@ -122,35 +121,51 @@ public class DMNResultKS implements DMNResult {
         }
     }
 
-    @Deprecated
-    private void unwireDecisionResults() {
-        for ( DMNDecisionResult dr : decisionResults.values() ) {
-            if ( dr instanceof DMNDecisionResultImpl ) {
-                DMNDecisionResultImpl i = (DMNDecisionResultImpl) dr;
-                i.setResult(null);
-            }
-        }
-    }
-    
-    // TODO review
-    @Deprecated
-    private void rewireDecisionResults() {
-        for ( DMNDecisionResult dr : decisionResults.values() ) {
-            if ( dr.getEvaluationStatus().equals( DecisionEvaluationStatus.SUCCEEDED ) && dr instanceof DMNDecisionResultImpl ) {
-                DMNDecisionResultImpl i = (DMNDecisionResultImpl) dr;
-                i.setResult( dmnContext.get( i.getDecisionId() ) );
-            }
-        }
-    }
-
     @Override
     public DMNContext getContext() {
         // TODO rewiew, this means the DMNContext returned is detached from the internal context here.
-        DMNContext res = DMNFactory.newContext();
-        for ( Entry<String, Object> e : dmnContext.entrySet() ) {
-            res.set(e.getKey(), e.getValue());
+        return MapBackedDMNContext.of(dmnContext);
+    }
+    
+    private static class MapBackedDMNContext implements DMNContext {
+        
+        private Map<String, Object> ctx = new HashMap<>();
+        
+        private MapBackedDMNContext() {
+            // intentional
         }
-        return res;
+        
+        static MapBackedDMNContext of(Map<String, Object> ctx) {
+            MapBackedDMNContext result = new MapBackedDMNContext();
+            result.ctx.putAll(ctx);
+            return result;
+        }
+
+        @Override
+        public Object set(String name, Object value) {
+            return ctx.put(name, value);
+        }
+
+        @Override
+        public Object get(String name) {
+            return ctx.get(name);
+        }
+
+        @Override
+        public Map<String, Object> getAll() {
+            return Collections.unmodifiableMap(ctx);
+        }
+
+        @Override
+        public boolean isDefined(String name) {
+            return ctx.containsKey(name);
+        }
+
+        @Override
+        public DMNContext clone() {
+            return of(this.ctx);
+        }
+        
     }
 
     @Override

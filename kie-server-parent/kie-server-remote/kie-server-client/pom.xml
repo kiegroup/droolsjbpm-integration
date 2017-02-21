@@ -51,6 +51,11 @@
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-api</artifactId>
+    </dependency>
+    <!-- TODO needed only for the DMN context instantiation? -->
+    <dependency>
+      <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
     </dependency> 
     <!-- kie server dependencies -->

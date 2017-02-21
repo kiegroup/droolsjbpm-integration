@@ -7,8 +7,7 @@ import static org.kie.server.api.rest.RestURI.build;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.kie.dmn.core.api.DMNContext;
-import org.kie.dmn.core.api.DMNResult;
+import org.kie.dmn.api.core.DMNContext;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNContextKS;
