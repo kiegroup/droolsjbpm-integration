@@ -100,7 +100,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, language, true} )) );
+                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{containerId, taskId, language, true} )) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
@@ -123,7 +123,7 @@ public class UIServicesClientImpl extends AbstractKieServicesClientImpl implemen
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{taskId, "", false} )) );
+                    (KieServerCommand) new DescriptorCommand( "FormService", "getFormDisplayTask", new Object[]{containerId, taskId, "", false} )) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM-UI", containerId ).getResponses().get(0);
 
             throwExceptionOnFailure(response);

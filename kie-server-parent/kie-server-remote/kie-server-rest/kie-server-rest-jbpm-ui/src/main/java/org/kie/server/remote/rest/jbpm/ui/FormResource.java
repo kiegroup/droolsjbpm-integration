@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.services.task.exception.PermissionDeniedException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,7 +107,7 @@ public class FormResource {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
-            String response = formServiceBase.getFormDisplayTask(taskId, language, filter);
+            String response = formServiceBase.getFormDisplayTask(containerId, taskId, language, filter);
             if (v.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE)) {
                 JSONObject json = XML.toJSONObject(response);
                 formatJSONResponse(json);
@@ -118,6 +119,8 @@ public class FormResource {
 
         } catch (IllegalStateException e) {
             return notFound("Form for task id " + taskId + " not found", v, conversationIdHeader);
+        } catch (PermissionDeniedException e) {
+            return permissionDenied(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format("Unexpected error encountered", e.getMessage()), v, conversationIdHeader);

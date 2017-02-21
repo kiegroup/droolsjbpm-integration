@@ -92,6 +92,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testGetTaskFormInPackageViaUIClientTest() throws Exception {
+        changeUser(USER_YODA);
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
         assertTrue(processInstanceId > 0);
         try {
@@ -105,6 +106,28 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             logger.debug("Form content is '{}'", result);
             assertNotNull(result);
             assertFalse(result.isEmpty());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test(expected = KieServicesException.class)
+    public void testGetTaskFormWithoutPermissioneViaUIClientTest() throws Exception {
+        changeUser(USER_YODA);
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            Long taskId = tasks.get(0).getId();
+
+            changeUser(USER_JOHN);
+
+            uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
+
+            fail();
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }

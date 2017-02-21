@@ -151,6 +151,10 @@ public class RestUtils {
         }
     }
 
+    public static Response permissionDenied(String message, Variant v, Header... customHeaders) {
+        return createResponse(message, v, Response.Status.UNAUTHORIZED, customHeaders);
+    }
+
     public static Response notFound(String message, Variant v, Header... customHeaders) {
         return createResponse(message, v, Response.Status.NOT_FOUND, customHeaders);
     }
