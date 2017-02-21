@@ -22,7 +22,7 @@ import org.drools.core.process.instance.WorkItemManagerFactory;
 import org.drools.core.runtime.ChainableRunner;
 import org.drools.core.time.TimerService;
 import org.drools.persistence.PersistableRunner;
-import org.drools.persistence.TransactionManagerFactory;
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
 import org.kie.api.KieBase;
 import org.kie.api.persistence.jpa.KieStoreServices;

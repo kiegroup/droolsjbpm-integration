@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.drools.core.common.DefaultFactHandle;
-import org.drools.persistence.PersistenceContextManager;
+import org.drools.persistence.api.PersistenceContextManager;
 import org.drools.persistence.util.PersistenceUtil;
 import org.infinispan.manager.DefaultCacheManager;
 import org.junit.After;

@@ -67,6 +67,7 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="[3.1,4.0)">spring-orm</feature>
     <feature version="[${karaf.version.org.apache.aries.jpa},2.0)">jpa</feature>
+    <bundle>mvn:org.drools/drools-persistence-api/${version.org.drools}</bundle>
     <bundle>mvn:org.drools/drools-persistence-jpa/${version.org.drools}</bundle>
   </feature>
 
@@ -130,8 +131,9 @@
     <bundle>mvn:org.jbpm/jbpm-bpmn2/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
-    <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-persistence-api/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/1.4.1_5</bundle>
   </feature>
 

@@ -15,8 +15,8 @@
  */
  package org.drools.persistence.infinispan;
 
-import org.drools.persistence.PersistenceContext;
-import org.drools.persistence.PersistenceContextManager;
+import org.drools.persistence.api.PersistenceContext;
+import org.drools.persistence.api.PersistenceContextManager;
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
 import org.kie.api.runtime.Environment;

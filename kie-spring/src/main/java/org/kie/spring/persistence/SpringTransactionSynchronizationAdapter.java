@@ -16,15 +16,15 @@
 
 package org.kie.spring.persistence;
 
-import org.drools.persistence.TransactionManager;
+import org.drools.persistence.api.TransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;
 
 public class SpringTransactionSynchronizationAdapter
         implements
         TransactionSynchronization {
-    private org.drools.persistence.TransactionSynchronization ts;
+    private org.drools.persistence.api.TransactionSynchronization ts;
 
-    public SpringTransactionSynchronizationAdapter(org.drools.persistence.TransactionSynchronization ts) {
+    public SpringTransactionSynchronizationAdapter(org.drools.persistence.api.TransactionSynchronization ts) {
         this.ts = ts;
     }
 
