@@ -19,6 +19,7 @@
     <resource-root path="jbpm-human-task-jpa-${version.org.kie}.jar"/>
     <resource-root path="jbpm-human-task-workitems-${version.org.kie}.jar"/>
     <resource-root path="jbpm-kie-services-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-persistence-api-${version.org.kie}.jar"/>
     <resource-root path="jbpm-persistence-jpa-${version.org.kie}.jar"/>
     <resource-root path="jbpm-query-jpa-${version.org.kie}.jar"/>
     <resource-root path="jbpm-runtime-manager-${version.org.kie}.jar"/>

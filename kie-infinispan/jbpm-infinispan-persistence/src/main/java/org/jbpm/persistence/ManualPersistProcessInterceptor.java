@@ -29,6 +29,8 @@ import org.drools.core.command.runtime.process.StartProcessInstanceCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.fluent.impl.InternalExecutable;
 import org.drools.persistence.PersistableRunner;
+import org.jbpm.persistence.api.ProcessPersistenceContext;
+import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.persistence.processinstance.ProcessInstanceInfo;
 import org.jbpm.process.instance.ProcessInstance;
 import org.kie.api.command.Command;

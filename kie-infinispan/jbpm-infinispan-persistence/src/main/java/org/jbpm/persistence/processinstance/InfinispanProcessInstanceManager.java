@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.drools.core.common.InternalKnowledgeRuntime;
-import org.jbpm.persistence.ProcessPersistenceContext;
-import org.jbpm.persistence.ProcessPersistenceContextManager;
+import org.jbpm.persistence.api.ProcessPersistenceContext;
+import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.persistence.correlation.CorrelationKeyInfo;
 import org.jbpm.process.instance.InternalProcessRuntime;
 import org.jbpm.process.instance.ProcessInstanceManager;
@@ -124,7 +124,7 @@ public class InfinispanProcessInstanceManager
         }
 
     	// Make sure that the cmd scoped entity manager has started
-        ProcessInstanceInfo processInstanceInfo = context.findProcessInstanceInfo( id );
+        ProcessInstanceInfo processInstanceInfo = (ProcessInstanceInfo) context.findProcessInstanceInfo( id );
         if ( processInstanceInfo == null ) {
             return null;
         }
@@ -160,7 +160,7 @@ public class InfinispanProcessInstanceManager
     @Override
     public void removeProcessInstance(ProcessInstance processInstance) {
         ProcessPersistenceContext context = ((ProcessPersistenceContextManager) this.kruntime.getEnvironment().get( EnvironmentName.PERSISTENCE_CONTEXT_MANAGER )).getProcessPersistenceContext();
-        ProcessInstanceInfo processInstanceInfo = context.findProcessInstanceInfo( processInstance.getId() );
+        ProcessInstanceInfo processInstanceInfo = (ProcessInstanceInfo) context.findProcessInstanceInfo( processInstance.getId() );
         
         if ( processInstanceInfo != null ) {
             context.remove( processInstanceInfo );

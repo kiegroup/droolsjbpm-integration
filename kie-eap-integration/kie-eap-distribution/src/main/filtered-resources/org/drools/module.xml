@@ -5,6 +5,7 @@
     <resource-root path="drools-compiler-${version.org.kie}.jar"/>
     <resource-root path="drools-core-${version.org.kie}.jar"/>
     <resource-root path="drools-decisiontables-${version.org.kie}.jar"/>
+    <resource-root path="drools-persistence-api-${version.org.kie}.jar"/>
     <resource-root path="drools-persistence-jpa-${version.org.kie}.jar"/>
     <resource-root path="drools-pmml-${version.org.kie}.jar"/>
     <resource-root path="drools-scorecards-${version.org.kie}.jar"/>
