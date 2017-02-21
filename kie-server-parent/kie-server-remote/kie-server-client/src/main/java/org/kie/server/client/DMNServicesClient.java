@@ -10,4 +10,6 @@ public interface DMNServicesClient {
     // this \/ generification below is to avoid from API client seeing the ? extends
     <R extends DMNResult> ServiceResponse<R> evaluateAllDecisions(String containerId, DMNContext dmnContext);
 
+    DMNContext newContext();
+
 }

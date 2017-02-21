@@ -35,7 +35,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-dmn-core</artifactId>
+      <artifactId>kie-dmn-api</artifactId>
       <scope>test</scope>
     </dependency>
 

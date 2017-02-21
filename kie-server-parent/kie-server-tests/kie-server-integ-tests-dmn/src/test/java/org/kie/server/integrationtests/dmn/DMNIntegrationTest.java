@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.core.api.DMNFactory;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -65,7 +64,7 @@ public class DMNIntegrationTest
     @Test
     public void testHelloWorld() {
         System.err.println("1+1:");
-        DMNContext dmnContext = DMNFactory.newContext();
+        DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
         ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);

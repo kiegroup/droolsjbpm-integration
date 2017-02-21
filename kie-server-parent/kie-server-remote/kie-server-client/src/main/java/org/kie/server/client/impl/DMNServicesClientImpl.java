@@ -55,4 +55,10 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
             return (ServiceResponse<DMNResultKS>) result;
         }
+
+        @Override
+        public DMNContext newContext() {
+            // in order to leverage the already existing client inner private class
+            return new DMNResultKS().getContext();
+        }
 }
