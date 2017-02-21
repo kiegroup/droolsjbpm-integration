@@ -10,6 +10,7 @@
       <includes>
         <include>org.jbpm:jbpm-flow</include>
         <include>org.jbpm:jbpm-flow-builder</include>
+        <include>org.jbpm:jbpm-persistence-api</include>
         <include>org.jbpm:jbpm-persistence-jpa</include>
         <include>org.jbpm:jbpm-bpmn2</include>
         <include>org.jbpm:jbpm-audit</include>
@@ -49,6 +50,7 @@
         <include>org.drools:drools-cdi</include>
         <include>org.drools:drools-decisiontables</include>
         <include>org.drools:drools-jsr94</include>
+        <include>org.drools:drools-persistence-api</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
@@ -63,6 +65,7 @@
       <excludes>
         <exclude>org.jbpm:jbpm-flow</exclude>
         <exclude>org.jbpm:jbpm-flow-builder</exclude>
+        <exclude>org.jbpm:jbpm-persistence-api</exclude>
         <exclude>org.jbpm:jbpm-persistence-jpa</exclude>
         <exclude>org.jbpm:jbpm-bpmn2</exclude>
         <exclude>org.jbpm:jbpm-audit</exclude>
@@ -102,6 +105,7 @@
         <exclude>org.drools:drools-cdi</exclude>
         <exclude>org.drools:drools-decisiontables</exclude>
         <exclude>org.drools:drools-jsr94</exclude>
+        <exclude>org.drools:drools-persistence-api</exclude>
         <exclude>org.drools:drools-persistence-jpa</exclude>
         <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>

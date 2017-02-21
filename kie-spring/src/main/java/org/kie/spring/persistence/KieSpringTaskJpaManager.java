@@ -17,12 +17,12 @@ package org.kie.spring.persistence;
 
 import javax.persistence.EntityManager;
 
-import org.drools.persistence.PersistenceContext;
-import org.drools.persistence.TransactionManager;
+import org.drools.persistence.api.PersistenceContext;
+import org.drools.persistence.api.TransactionManager;
 import org.drools.persistence.jpa.JpaPersistenceContext;
 import org.jbpm.persistence.JpaProcessPersistenceContext;
-import org.jbpm.persistence.ProcessPersistenceContext;
-import org.jbpm.persistence.ProcessPersistenceContextManager;
+import org.jbpm.persistence.api.ProcessPersistenceContext;
+import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.services.task.persistence.JPATaskPersistenceContext;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;

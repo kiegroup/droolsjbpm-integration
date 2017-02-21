@@ -19,8 +19,8 @@ package org.kie.spring.persistence;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.drools.persistence.TransactionManager;
-import org.drools.persistence.TransactionSynchronization;
+import org.drools.persistence.api.TransactionManager;
+import org.drools.persistence.api.TransactionSynchronization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionDefinition;

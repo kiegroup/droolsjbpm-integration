@@ -18,8 +18,8 @@ package org.jbpm.persistence.processinstance;
 import java.util.List;
 
 import org.drools.core.common.InternalKnowledgeRuntime;
-import org.jbpm.persistence.ProcessPersistenceContext;
-import org.jbpm.persistence.ProcessPersistenceContextManager;
+import org.jbpm.persistence.api.ProcessPersistenceContext;
+import org.jbpm.persistence.api.ProcessPersistenceContextManager;
 import org.jbpm.process.instance.event.DefaultSignalManager;
 import org.jbpm.workflow.instance.impl.WorkflowProcessInstanceImpl;
 import org.kie.api.runtime.EnvironmentName;
