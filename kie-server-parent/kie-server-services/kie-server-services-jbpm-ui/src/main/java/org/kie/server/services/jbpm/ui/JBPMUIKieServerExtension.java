@@ -111,7 +111,7 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
             }
         }
 
-        formServiceBase = new FormServiceBase(definitionService, runtimeDataService, userTaskService, formManagerService);
+        formServiceBase = new FormServiceBase(definitionService, runtimeDataService, userTaskService, formManagerService, registry);
         imageServiceBase = new ImageServiceBase(runtimeDataService, imageReferences);
 
         services.add(formServiceBase);

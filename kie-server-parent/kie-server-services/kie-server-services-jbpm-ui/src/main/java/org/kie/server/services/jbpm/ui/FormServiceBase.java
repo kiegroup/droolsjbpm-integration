@@ -31,7 +31,9 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.jbpm.services.api.model.ProcessDefinition;
+import org.jbpm.services.task.commands.GetUserTaskCommand;
 import org.kie.api.task.model.Task;
+import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +47,15 @@ public class FormServiceBase {
     private DefinitionService definitionService;
     private RuntimeDataService dataService;
     private UserTaskService userTaskService;
+    private KieServerRegistry registry;
 
     private Set<UIFormProvider> providers = new LinkedHashSet<UIFormProvider>();
 
-    public FormServiceBase(DefinitionService definitionService, RuntimeDataService dataService, UserTaskService userTaskService, FormManagerService formManagerService) {
+    public FormServiceBase(DefinitionService definitionService, RuntimeDataService dataService, UserTaskService userTaskService, FormManagerService formManagerService, KieServerRegistry registry) {
         this.definitionService = definitionService;
         this.dataService = dataService;
         this.userTaskService = userTaskService;
+        this.registry = registry;
 
         providers.addAll(collectFormProviders(formManagerService));
     }
@@ -85,8 +89,11 @@ public class FormServiceBase {
         throw new IllegalStateException("No form for process with id " + processDesc.getName() + " found");
     }
 
-    public String getFormDisplayTask(long taskId, String lang, boolean filterContent) {
-        Task task = userTaskService.getTask(taskId);
+    public String getFormDisplayTask(String containerId,
+                                     long taskId,
+                                     String lang,
+                                     boolean filterContent) {
+        Task task = userTaskService.execute(containerId, new GetUserTaskCommand(registry.getIdentityProvider().getName(), taskId));
         if (task == null) {
             throw new IllegalStateException("No task with id " + taskId + " found");
         }
