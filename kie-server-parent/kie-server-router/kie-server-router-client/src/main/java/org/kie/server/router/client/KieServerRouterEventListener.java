@@ -15,9 +15,15 @@
 
 package org.kie.server.router.client;
 
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -27,6 +33,7 @@ import org.kie.server.api.model.KieContainerStatusFilter;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServer;
@@ -41,8 +48,35 @@ public class KieServerRouterEventListener implements KieServerEventListener {
     private String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
     private String serverURL = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION);
     private String routerURL = System.getProperty(KieServerConstants.KIE_SERVER_ROUTER);
+    private int failedAttemptsInterval = Integer.parseInt(System.getProperty(KieServerConstants.KIE_SERVER_ROUTER_ATTEMPT_INTERVAL, "10"));
     
     private KieContainerResourceFilter activeOnly = new KieContainerResourceFilter(ReleaseIdFilter.ACCEPT_ALL, KieContainerStatusFilter.parseFromNullableString("STARTED"));
+
+    private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+    private RouterConnectionObserver observer = new RouterConnectionObserver();
+
+    private String CONTAINER_ID_JSON =
+            "\"containerId\" : \"{0}\","
+            + "\"serverUrl\" : \"{1}\","
+            + "\"serverId\" : \"{2}\","
+            + "\"releaseId\" : \"{3}\"";
+
+    private String CONTAINER_ALIAS_JSON =
+            "\"containerId\" : \"{0}\","
+            + "\"serverUrl\" : \"{1}\","
+            + "\"serverId\" : \"{2}\"";
+
+
+    public KieServerRouterEventListener() {
+    }
+
+    public KieServerRouterEventListener(String serverId, String serverURL, String routerURL, int failedAttemptsInterval) {
+        this.serverId = serverId;
+        this.serverURL = serverURL;
+        this.routerURL = routerURL;
+        this.failedAttemptsInterval = failedAttemptsInterval;
+    }
 
     @Override
     public void beforeServerStarted(KieServer kieServer) {       
@@ -62,12 +96,14 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         containers.getResult().getContainers().forEach(ci -> {
             
             routers().forEach(url -> {
-                boolean success = send(url + "/admin/remove", ci.getContainerId());
+                String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, ci.getContainerId(), serverURL, serverId, ci.getReleaseId().toExternalForm()) + "}";
+                boolean success = send(url + "/admin/remove", ci.getContainerId(), containerIdPayload, false, false);
                 if (success) {
                     logger.info("Removed '{}' as server location for container id '{}'", serverURL, ci.getContainerId());
                 }
                 String alias = getContainerAlias(ci);
-                success = send(url + "/admin/remove", alias);
+                String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
+                success = send(url + "/admin/remove", alias, containerAliasPayload, false, false);
                 if (success) {
                     logger.info("Removed '{}' as server location for container alias '{}'", serverURL, alias);
                 }
@@ -76,7 +112,8 @@ public class KieServerRouterEventListener implements KieServerEventListener {
     }
 
     @Override
-    public void afterServerStopped(KieServer kieServer) {        
+    public void afterServerStopped(KieServer kieServer) {
+        close();
     }
 
     @Override
@@ -91,12 +128,14 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         }
         
         routers().forEach(url -> {
-            boolean success = send(url + "/admin/add", containerInstance.getContainerId());
+            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, containerInstance.getContainerId(), serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
+            boolean success = send(url + "/admin/add", containerInstance.getContainerId(), containerIdPayload, true, true);
             if (success) {
                 logger.info("Added '{}' as server location for container id '{}'", serverURL, containerInstance.getContainerId());
             }
             String alias = getContainerAlias(containerInstance.getResource());
-            success = send(url + "/admin/add", alias);
+            String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
+            success = send(url + "/admin/add", alias, containerAliasPayload, true, true);
             if (success) {
                 logger.info("Added '{}' as server location for container alias '{}'", serverURL, alias);
             }
@@ -114,12 +153,14 @@ public class KieServerRouterEventListener implements KieServerEventListener {
             return;
         }
         routers().forEach(url -> {
-            boolean success = send(url + "/admin/remove", containerInstance.getContainerId());
+            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, containerInstance.getContainerId(), serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
+            boolean success = send(url + "/admin/remove", containerInstance.getContainerId(), containerIdPayload, false, true);
             if (success) {
                 logger.info("Removed '{}' as server location for container id '{}'", serverURL, containerInstance.getContainerId());
             }
             String alias = getContainerAlias(containerInstance.getResource());
-            success = send(url + "/admin/remove", alias);
+            String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
+            success = send(url + "/admin/remove", alias, containerAliasPayload, false, true);
             if (success) {
                 logger.info("Removed '{}' as server location for container alias '{}'", serverURL, alias);
             }
@@ -127,22 +168,45 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         
     }
     
-    protected boolean send(String url, String containerId) {
-        String jsonBody = "{"
-                + "\"containerId\" : \""+ containerId + "\","
-                + "\"serverUrl\" : \""+ serverURL + "\","
-                + "\"serverId\" : \""+ serverId + "\","
-                + "}";
+    protected boolean send(String url, String containerId, String payload, boolean add, boolean retry) {
+
         try {
             KieServerHttpRequest httpRequest = KieServerHttpRequest.newRequest(url)
                     .followRedirects(true)
+                    .contentType("application/json")
+                    .accept("application/json")
                     .timeout(5000)
-                    .body(jsonBody)
+                    .body(payload)
                     .post();
             KieServerHttpResponse response = httpRequest.response();
-            logger.debug("Response for url {} is {}", httpRequest.getUrl(), response.code());
-            
+            int responseCode = response.code();
+            logger.debug("Response for url {} is {}", httpRequest.getUrl(), responseCode);
+            if (responseCode > 201) {
+                throw new KieServerHttpRequestException("Connection error " + responseCode);
+            }
+            observer.onSuccess(url);
+
             return true;
+        } catch (KieServerHttpRequestException ioe) {
+            logger.debug("Send to router failed", ioe);
+            if (retry) {
+                executorService.schedule(() -> {
+                            boolean success = send(url, containerId, payload, add, true);
+                            if (success) {
+                                if (add) {
+                                    logger.info("Added '{}' as server location for container '{}'", serverURL, containerId);
+                                } else {
+                                    logger.info("Removed '{}' as server location for container '{}'", serverURL, containerId);
+                                }
+                            }
+                        },
+                        failedAttemptsInterval, TimeUnit.SECONDS);
+                logger.warn("Failed at sending request to router at {} due to {}. Next attempt is scheduled to fire in {} seconds", url, findCause(ioe).getMessage(), failedAttemptsInterval);
+            } else {
+                logger.warn("Failed at sending request to router at {} due to {}.", url, findCause(ioe).getMessage());
+            }
+            observer.onFailure(url);
+            return false;
         } catch (Exception e) {
             logger.warn("Failed at sending request to router at {} due to {}", url, findCause(e).getMessage());
             logger.debug("Send to router failed", e);
@@ -182,5 +246,29 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         }
         
         return found;
+    }
+
+    public RouterConnectionObserver getObserver() {
+        return observer;
+    }
+
+    public void setObserver(RouterConnectionObserver observer) {
+        this.observer = observer;
+    }
+
+    public static class RouterConnectionObserver {
+        public void onSuccess(String url) {
+
+        }
+
+        public void onFailure(String url) {
+
+        }
+    }
+
+    public void close() {
+        logger.debug("About to shutdown internal executor service to handle failed attempts when connecting to kie server router...");
+        this.executorService.shutdownNow();
+        logger.debug("Internal executor service to handle failed attempts when connecting to kie server router stopped successfully");
     }
 }

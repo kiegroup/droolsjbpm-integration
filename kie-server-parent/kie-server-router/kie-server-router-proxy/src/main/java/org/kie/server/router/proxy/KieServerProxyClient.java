@@ -61,6 +61,9 @@ public class KieServerProxyClient implements ProxyClient {
     public ProxyTarget findTarget(HttpServerExchange exchange) {
         
         String containerId = resolveContainerId(exchange);
+        if (restrictedEndpoint(exchange, containerId)) {
+            return null;
+        }
         LoadBalancingProxyClient client = containerClients.get(containerId);
         
         if (client == null) {
@@ -94,5 +97,16 @@ public class KieServerProxyClient implements ProxyClient {
             return matcher.group(1);            
         }
         return NOT_FOUND;
+    }
+
+    protected boolean restrictedEndpoint(HttpServerExchange exchange, String containerId) {
+        String relativePath = exchange.getRelativePath();
+
+        if (relativePath.endsWith("/containers/" + containerId) || relativePath.endsWith("/scanner") || relativePath.endsWith("/release-id")) {
+            // disallow requests that modify the container as that can lead to inconsistent setup
+            return true;
+        }
+
+        return false;
     }
 }
