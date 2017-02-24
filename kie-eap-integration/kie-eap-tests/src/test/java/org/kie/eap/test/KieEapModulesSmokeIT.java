@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
+import org.kie.api.definition.KiePackage;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieSession;
 import org.kie.internal.utils.KieHelper;
@@ -33,6 +34,7 @@ import java.net.URL;
 
 @RunWith(Arquillian.class)
 public class KieEapModulesSmokeIT {
+    private static final String RULE_PKG_NAME = "org.kie.eap.test";
 
     @Deployment
     public static WebArchive createDeployment() {
@@ -48,7 +50,7 @@ public class KieEapModulesSmokeIT {
 
     @Test
     public void createKieSessionFromSimpleDrlAndFireRules() {
-        String drl = "package org.kie.eap.test;\n" +
+        String drl = "package " + RULE_PKG_NAME + ";\n" +
                 "\n" +
                 "rule \"Dummy rule\"\n" +
                 "when\n" +
@@ -59,8 +61,10 @@ public class KieEapModulesSmokeIT {
         KieHelper kieHelper = new KieHelper();
         kieHelper.addContent(drl, ResourceType.DRL);
         KieBase kieBase = kieHelper.build();
-        Assert.assertEquals("Unexpected number of packages in " + kieBase,  1, kieBase.getKiePackages().size());
-        Assert.assertEquals("Unexpected KiePackage name!", "org.kie.eap.test", kieBase.getKiePackages().iterator().next().getName());
+        // can't easily use AssertJ as it is not available in the server classpath (this is in-container test)
+        Assert.assertFalse("At least one KiePackage expected!", kieBase.getKiePackages().isEmpty());
+        Assert.assertTrue("Expected KiePackage " + RULE_PKG_NAME + " not found in " + kieBase.getKiePackages(),
+                kieBase.getKiePackages().stream().anyMatch(kp -> RULE_PKG_NAME.equals(kp.getName())) );
 
         KieSession kieSession = kieBase.newKieSession();
         kieSession.insert("MyValue");
