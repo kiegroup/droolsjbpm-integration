@@ -132,6 +132,7 @@ public class RestURI {
     public static final String TASKS_ASSIGN_BUSINESS_ADMINS_GET_URI = "tasks/instances/admins";
     public static final String TASKS_OWNED_GET_URI = "tasks/instances/owners";
     public static final String TASKS_GET_URI = "tasks/instances";
+    public static final String TASKS_GET_FILTERED_URI = "tasks/instances/filtered-data";
     public static final String TASKS_EVENTS_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}/events";
     public static final String TASK_GET_URI = "tasks/instances/{" + TASK_INSTANCE_ID + "}";
     public static final String TASK_BY_WORK_ITEM_ID_GET_URI = "tasks/instances/workitem/{" + WORK_ITEM_ID + "}";
