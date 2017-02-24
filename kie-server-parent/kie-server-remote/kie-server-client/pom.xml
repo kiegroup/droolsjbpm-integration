@@ -8,6 +8,7 @@
   </parent>
 
   <artifactId>kie-server-client</artifactId>
+  <version>7.0.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>KIE :: Execution Server :: Remote :: Client</name>
@@ -23,6 +24,12 @@
         <groupId>com.github.tomakehurst</groupId>
         <artifactId>wiremock</artifactId>
         <version>${version.com.github.tomakehurst.wiremock}</version>
+      </dependency>
+      <!-- TODO: Move dependency management to BOM -->
+      <dependency>
+         <groupId>org.kie.server</groupId>
+         <artifactId>kie-server-jbpm-taskqueries-api</artifactId>
+         <version>7.0.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -59,7 +66,12 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
     </dependency>
-
+    <!-- TODO: Do we want to depend on this api here?-->
+    <dependency>
+    	<groupId>org.kie.server</groupId>
+    	<artifactId>kie-server-jbpm-taskqueries-api</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
       <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
