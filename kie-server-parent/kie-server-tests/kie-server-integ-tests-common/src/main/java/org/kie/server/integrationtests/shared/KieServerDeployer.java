@@ -53,6 +53,7 @@ public class KieServerDeployer {
         // remote repo
         logger.debug("Building and deploying Maven project from basedir '{}'.", basedir);
         ClassLoader classLoaderBak = Thread.currentThread().getContextClassLoader();
+        System.setProperty("maven.multiModuleProjectDirectory", basedir); // required by MavenCli 3.3.0+
         MavenCli cli = new MavenCli();
         List<String> mvnArgs;
         if (TestConfig.isLocalServer()) {
@@ -65,6 +66,7 @@ public class KieServerDeployer {
         } else {
             mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
         }
+
         // use custom settings.xml file, if one specified
         String kjarsBuildSettingsXml = TestConfig.getKjarsBuildSettingsXml();
         if (kjarsBuildSettingsXml != null && !kjarsBuildSettingsXml.isEmpty()) {

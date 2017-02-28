@@ -232,10 +232,17 @@
       </exclusions>
     </dependency>
 
-    <!-- kie ci dependency to avoid linkage errors on EAP/Wildfly -->
+    <!-- kie-ci dependency to avoid linkage errors on EAP/Wildfly -->
     <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
+      <groupId>com.google.inject.extensions</groupId>
       <artifactId>guice-servlet</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- We use the com.google.inject:guice:no_aop brought in by kie-ci -->
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

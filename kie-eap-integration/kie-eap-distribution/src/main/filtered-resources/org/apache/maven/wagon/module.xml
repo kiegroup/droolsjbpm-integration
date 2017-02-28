@@ -2,8 +2,8 @@
 <module xmlns="urn:jboss:module:1.3" name="org.apache.maven.wagon" slot="main">
 
   <resources>
-    <resource-root path="wagon-http-shared-${version.org.apache.maven.wagon.http}.jar"/>
-    <resource-root path="wagon-http-${version.org.apache.maven.wagon.http}.jar"/>
+    <resource-root path="wagon-http-shared-${version.org.apache.maven.wagon}.jar"/>
+    <resource-root path="wagon-http-${version.org.apache.maven.wagon}.jar"/>
     <resource-root path="wagon-provider-api-${version.org.apache.maven.wagon}.jar"/>
   </resources>
 

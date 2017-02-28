@@ -25,9 +25,9 @@
     <dependencySet>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
+        <include>com.google.inject:guice:jar:no_aop</include>
         <include>org.eclipse.sisu:org.eclipse.sisu.inject</include>
         <include>org.eclipse.sisu:org.eclipse.sisu.plexus</include>
-        <include>org.sonatype.sisu:sisu-guice:jar:no_aop</include>
         <include>org.sonatype.sisu.inject:guice-servlet</include>
       </includes>
       <outputDirectory>modules/system/layers/bpms/org/eclipse/sisu/main</outputDirectory>

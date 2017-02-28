@@ -15,10 +15,6 @@
 
 package org.kie.server.integrationtests.common;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -33,6 +29,10 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     private static ReleaseId releaseId1 = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -196,6 +196,16 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
         kci = client.getContainerInfo(CONTAINER_ID).getResult();
         Assert.assertEquals(KieScannerStatus.STARTED, kci.getScanner().getStatus());
         Assert.assertEquals(20L, kci.getScanner().getPollInterval().longValue());
+
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.STOPPED, 20L));
+        Assert.assertEquals(si.getMsg(), ResponseType.SUCCESS, si.getType());
+        info = si.getResult();
+        Assert.assertEquals(KieScannerStatus.STOPPED, info.getStatus());
+
+        si = client.updateScanner(CONTAINER_ID, new KieScannerResource(KieScannerStatus.DISPOSED, 10000L));
+        Assert.assertEquals(si.getMsg(), ResponseType.SUCCESS, si.getType());
+        info = si.getResult();
+        Assert.assertEquals(KieScannerStatus.DISPOSED, info.getStatus());
     }
 
     @Test
