@@ -76,7 +76,7 @@
 
         <include>org.quartz-scheduler:quartz</include>
 
-        <include>org.sonatype.sisu.inject:guice-servlet</include>
+        <include>com.google.inject.extensions:guice-servlet</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>

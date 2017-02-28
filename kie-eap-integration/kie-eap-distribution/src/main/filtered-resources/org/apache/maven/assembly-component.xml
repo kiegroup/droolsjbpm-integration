@@ -27,6 +27,7 @@
       <includes>
         <include>org.apache.maven:maven-aether-provider</include>
         <include>org.apache.maven:maven-artifact</include>
+        <include>org.apache.maven:maven-builder-support</include>
         <include>org.apache.maven:maven-compat</include>
         <include>org.apache.maven:maven-core</include>
         <include>org.apache.maven:maven-model</include>

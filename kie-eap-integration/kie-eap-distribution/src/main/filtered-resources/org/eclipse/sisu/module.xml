@@ -4,7 +4,7 @@
   <resources>
     <resource-root path="org.eclipse.sisu.inject-${version.org.eclipse.sisu}.jar"/>
     <resource-root path="org.eclipse.sisu.plexus-${version.org.eclipse.sisu}.jar"/>
-    <resource-root path="sisu-guice-${version.org.sonatype.sisu.sisu-guice}-no_aop.jar"/>
+    <resource-root path="guice-${version.com.google.inject.guice}-no_aop.jar"/>
     <resource-root path="guice-servlet-${version.org.sonatype.sisu.sisu-guice}.jar"/>
   </resources>
 

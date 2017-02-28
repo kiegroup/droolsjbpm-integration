@@ -4,6 +4,7 @@
   <resources>
     <resource-root path="maven-aether-provider-${version.org.apache.maven}.jar"/>
     <resource-root path="maven-artifact-${version.org.apache.maven}.jar"/>
+    <resource-root path="maven-builder-support-${version.org.apache.maven}.jar"/>
     <resource-root path="maven-compat-${version.org.apache.maven}.jar"/>
     <resource-root path="maven-core-${version.org.apache.maven}.jar"/>
     <resource-root path="maven-model-builder-${version.org.apache.maven}.jar"/>
@@ -18,6 +19,7 @@
     <module name="com.google.guava" slot="main" services="import"/>
     <module name="javax.api" slot="main" services="import"/>
     <module name="javax.inject.api" slot="main" services="import"/>
+    <module name="org.apache.commons.lang3" slot="main" services="import"/>
     <module name="org.apache.maven.wagon" slot="main" services="import"/>
     <module name="org.codehaus.plexus" slot="main" services="import"/>
     <module name="org.eclipse.aether" slot="kie" services="import"/>
