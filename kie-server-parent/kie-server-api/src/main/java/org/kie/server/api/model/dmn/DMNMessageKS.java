@@ -13,6 +13,7 @@ import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 //@XmlType(namespace="org.kie.server.api.model.dmn", name = "DMNMessageKS")
 public class DMNMessageKS implements DMNMessage {
     
+    // This is needed as the DMN's Severity would clash with the Kie server API Severity for marshalling scope
     public static enum DMNMessageSeverityKS {
         TRACE, INFO, WARN, ERROR;
         

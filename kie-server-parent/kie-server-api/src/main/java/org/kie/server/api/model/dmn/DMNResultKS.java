@@ -38,6 +38,8 @@ public class DMNResultKS implements DMNResult {
     @XmlElementWrapper(name="dmn-context")
     private Map<String, Object> dmnContext = new HashMap<>();
 
+    // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling
+    
     @XmlElementWrapper(name="messages")
     private List<DMNMessageKS> messages = new ArrayList<>();
     
