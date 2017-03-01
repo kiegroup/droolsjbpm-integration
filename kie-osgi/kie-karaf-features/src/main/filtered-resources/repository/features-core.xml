@@ -51,6 +51,16 @@
      <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>
      <bundle>mvn:org.drools/drools-workbench-models-guided-dtable/${version.org.kie}</bundle>
    </feature>
+   
+   <feature name="kie-dmn" description="Kie DMN" version="${project.version}">
+     <feature version="${project.version}">drools-module</feature>
+     <bundle>mvn:org.antlr/antlr4-runtime/${version.org.antlr4}</bundle>
+     <bundle>mvn:org.kie/kie-dmn-model/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie/kie-dmn-api/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie/kie-dmn-backend/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie/kie-dmn-feel/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie/kie-dmn-core/${version.org.kie}</bundle>
+   </feature>
 
   <feature name="drools-jpa" version="${project.version}" description="Drools JPA">
     <feature version="${project.version}">drools-module</feature>
