@@ -29,19 +29,23 @@ import org.kie.server.api.model.definition.TaskInputsDefinition;
 import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
-
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 
 public class DefinitionServiceBase {
 
     private DefinitionService definitionService;
+    private KieServerRegistry context;
 
-    public DefinitionServiceBase(DefinitionService definitionService) {
+    public DefinitionServiceBase(DefinitionService definitionService, KieServerRegistry context) {
         this.definitionService = definitionService;
+        this.context = context;
     }
 
 
     public org.kie.server.api.model.definition.ProcessDefinition getProcessDefinition(String containerId, String processId) {
 
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         ProcessDefinition procDef = findProcessDefinition(containerId, processId);
 
         org.kie.server.api.model.definition.ProcessDefinition responseObject = org.kie.server.api.model.definition.ProcessDefinition.builder()
@@ -61,7 +65,7 @@ public class DefinitionServiceBase {
     }
 
     public SubProcessesDefinition getReusableSubProcesses(String containerId, String processId) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Collection<String> reusableSubProcesses = definitionService.getReusableSubProcesses(containerId, processId);
@@ -71,17 +75,17 @@ public class DefinitionServiceBase {
 
 
     public VariablesDefinition getProcessVariables(String containerId, String processId) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        findProcessDefinition(containerId, processId);
 
-            findProcessDefinition(containerId, processId);
+        Map<String, String> processVariables = definitionService.getProcessVariables(containerId, processId);
 
-            Map<String, String> processVariables = definitionService.getProcessVariables(containerId, processId);
-
-            return new VariablesDefinition(processVariables);
+        return new VariablesDefinition(processVariables);
     }
 
 
     public ServiceTasksDefinition getServiceTasks(String containerId, String processId) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Map<String, String> serviceTasks = definitionService.getServiceTasks(containerId, processId);
@@ -91,7 +95,7 @@ public class DefinitionServiceBase {
 
 
     public AssociatedEntitiesDefinition getAssociatedEntities(String containerId, String processId) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Map<String, Collection<String>> entities = definitionService.getAssociatedEntities(containerId, processId);
@@ -101,6 +105,7 @@ public class DefinitionServiceBase {
 
 
     public UserTaskDefinitionList getTasksDefinitions(String containerId, String processId) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Collection<UserTaskDefinition> userTaskDefinitions = definitionService.getTasksDefinitions(containerId, processId);
@@ -110,7 +115,7 @@ public class DefinitionServiceBase {
 
 
     public TaskInputsDefinition getTaskInputMappings(String containerId, String processId, String taskName) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Map<String, String> taskInputs = definitionService.getTaskInputMappings(containerId, processId, taskName);
@@ -121,7 +126,7 @@ public class DefinitionServiceBase {
 
 
     public TaskOutputsDefinition getTaskOutputMappings(String containerId, String processId, String taskName) {
-
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
         findProcessDefinition(containerId, processId);
 
         Map<String, String> taskOutputs = definitionService.getTaskOutputMappings(containerId, processId, taskName);
@@ -130,13 +135,13 @@ public class DefinitionServiceBase {
     }
 
     protected ProcessDefinition findProcessDefinition(String containerId, String processId) {
+        containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
+        ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
+        if (procDef == null) {
+            throw new IllegalStateException("Process definition " + containerId + " : " + processId + " not found");
+        }
 
-            ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-            if (procDef == null) {
-                throw new IllegalStateException("Process definition " + containerId + " : " + processId + " not found");
-            }
-
-            return procDef;
+        return procDef;
 
     }
 

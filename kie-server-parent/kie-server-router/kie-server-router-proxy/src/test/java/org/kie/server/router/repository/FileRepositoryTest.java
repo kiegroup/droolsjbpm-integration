@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.kie.server.router.Configuration;
+import org.kie.server.router.ContainerInfo;
 
 public class FileRepositoryTest {
 
@@ -35,6 +36,9 @@ public class FileRepositoryTest {
         
         config.addServerHost("server1", "http://localhost:8080/server");
         config.addServerHost("server2", "http://localhost:8180/server");
+
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
         
         FileRepository repo = new FileRepository(new File("target"));
         
@@ -47,6 +51,7 @@ public class FileRepositoryTest {
         assertNotNull(loaded.getHostsPerServer());
         assertEquals(2, loaded.getHostsPerContainer().size());
         assertEquals(2, loaded.getHostsPerServer().size());
+        assertEquals(2, loaded.getContainerInfosPerContainer().size());
         
         assertEquals(1, loaded.getHostsPerContainer().get("container1").size());
         assertEquals(1, loaded.getHostsPerContainer().get("container2").size());
@@ -59,5 +64,14 @@ public class FileRepositoryTest {
         
         assertEquals("http://localhost:8080/server", loaded.getHostsPerServer().get("server1").iterator().next());
         assertEquals("http://localhost:8180/server", loaded.getHostsPerServer().get("server2").iterator().next());
+
+        assertEquals(1, loaded.getContainerInfosPerContainer().get("test").size());
+        assertEquals(1, loaded.getContainerInfosPerContainer().get("test1.0").size());
+
+        ContainerInfo loadedCI = loaded.getContainerInfosPerContainer().get("test").iterator().next();
+        assertEquals(containerInfo, loadedCI);
+
+        loadedCI = loaded.getContainerInfosPerContainer().get("test1.0").iterator().next();
+        assertEquals(containerInfo, loadedCI);
     }
 }

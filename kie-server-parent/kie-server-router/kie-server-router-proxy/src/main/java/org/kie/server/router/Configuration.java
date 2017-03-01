@@ -15,15 +15,20 @@
 
 package org.kie.server.router;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Configuration {
 
     private Map<String, Set<String>> hostsPerServer = new ConcurrentHashMap<>();
     private Map<String, Set<String>> hostsPerContainer = new ConcurrentHashMap<>();
+    private Map<String, Set<ContainerInfo>> containerInfosPerContainer = new ConcurrentHashMap<>();
+
+    private Set<ConfigurationListener> listeners = new CopyOnWriteArraySet<>();
     
     public Map<String, Set<String>> getHostsPerServer() {
         return hostsPerServer;
@@ -32,7 +37,11 @@ public class Configuration {
     public Map<String, Set<String>> getHostsPerContainer() {
         return hostsPerContainer;
     }
-    
+
+    public Map<String, Set<ContainerInfo>> getContainerInfosPerContainer() {
+        return containerInfosPerContainer;
+    }
+
     public void addContainerHost(String containerId, String serverUrl) {
         Set<String> hosts = hostsPerContainer.get(containerId);
         if (hosts == null) {
@@ -40,6 +49,8 @@ public class Configuration {
             hostsPerContainer.put(containerId, hosts);
         }
         hosts.add(serverUrl);
+
+        this.listeners.forEach(l -> l.onContainerAdded(containerId, serverUrl));
     }
     
     public void addServerHost(String serverId, String serverUrl) {
@@ -49,20 +60,61 @@ public class Configuration {
             hostsPerServer.put(serverId, hosts);
         }
         hosts.add(serverUrl);
+
+        this.listeners.forEach(l -> l.onServerAdded(serverId, serverUrl));
+    }
+
+    public void addContainerInfo(ContainerInfo containerInfo) {
+        Set<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
+        if (containersByAlias == null) {
+            containersByAlias = new LinkedHashSet<>();
+            containerInfosPerContainer.put(containerInfo.getAlias(), containersByAlias);
+        }
+        containersByAlias.add(containerInfo);
+
+        Set<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+        if (containersById == null) {
+            containersById = new LinkedHashSet<>();
+            containerInfosPerContainer.put(containerInfo.getContainerId(), containersById);
+        }
+        containersById.add(containerInfo);
     }
     
     public void removeContainerHost(String containerId, String serverUrl) {
         Set<String> hosts = hostsPerContainer.get(containerId);
         if (hosts != null) {
             hosts.remove(serverUrl);
-        } 
+        }
+
+        this.listeners.forEach(l -> l.onContainerRemoved(containerId, serverUrl));
     }
     
     public void removeServerHost(String serverId, String serverUrl) {
         Set<String> hosts = hostsPerServer.get(serverId);
         if (hosts != null) {
             hosts.remove(serverUrl);
-        } 
+        }
+
+        this.listeners.forEach(l -> l.onServerRemoved(serverId, serverUrl));
+    }
+
+    public void removeContainerInfo(String containerId, String alias) {
+        Set<String> hosts = hostsPerContainer.getOrDefault(containerId, Collections.emptySet());
+        if (hosts.isEmpty()) {
+            containerInfosPerContainer.remove(containerId);
+        }
+        hosts = hostsPerContainer.getOrDefault(alias, Collections.emptySet());
+        if (hosts.isEmpty()) {
+            containerInfosPerContainer.remove(alias);
+        }
+    }
+
+    public void addListener(ConfigurationListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeListener(ConfigurationListener listener) {
+        this.listeners.remove(listener);
     }
 
     @Override

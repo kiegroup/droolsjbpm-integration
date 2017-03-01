@@ -16,23 +16,28 @@
 package org.kie.server.router.repository;
 
 import java.io.Reader;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.kie.server.router.Configuration;
+import org.kie.server.router.ContainerInfo;
 
 public class ConfigurationMarshaller {
 
     public String marshall(Configuration configuration) throws Exception {
         Map<String, Set<String>> perContainer = configuration.getHostsPerContainer();
         Map<String, Set<String>> perServer = configuration.getHostsPerServer();
+        Map<String, Set<ContainerInfo>> containerInfo = configuration.getContainerInfosPerContainer();
         
         JSONArray servers = new JSONArray();
         JSONArray containers = new JSONArray();
+        JSONArray infos = new JSONArray();
         JSONObject config = new JSONObject();            
         
         for (Entry<String, Set<String>> entry : perContainer.entrySet()) {
@@ -54,9 +59,30 @@ public class ConfigurationMarshaller {
             
             servers.put(server);
         }
+        Set<String> processed = new HashSet<>();
+        for (Entry<String, Set<ContainerInfo>> entry : containerInfo.entrySet()) {
+            if (processed.contains(entry.getKey())) {
+                continue;
+            }
+            entry.getValue().forEach(ci -> {
+                JSONObject jsonCI = new JSONObject();
+                processed.add(ci.getAlias());
+                processed.add(ci.getContainerId());
+                try {
+                    jsonCI.put("alias", ci.getAlias());
+                    jsonCI.put("containerId", ci.getContainerId());
+                    jsonCI.put("releaseId", ci.getReleaseId());
+                    infos.put(jsonCI);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            });
+        }
         
         config.put("containers", containers);
         config.put("servers", servers);
+        config.put("containerInfo", infos);
         
         return config.toString(2);
     }
@@ -98,6 +124,15 @@ public class ConfigurationMarshaller {
                     configuration.addServerHost(name, url);
                 }
             }
+        }
+
+        JSONArray containerInfo = config.getJSONArray("containerInfo");
+        for (int i = 0; i < containerInfo.length(); i++) {
+            JSONObject info = (JSONObject)containerInfo.get(i);
+
+            ContainerInfo actualInfo = new ContainerInfo(info.getString("containerId"), info.getString("alias"), info.getString("releaseId"));
+
+            configuration.addContainerInfo(actualInfo);
         }
  
         return configuration; 

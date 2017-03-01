@@ -15,10 +15,14 @@
 
 package org.kie.server.router;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -28,6 +32,7 @@ import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.server.handlers.proxy.ProxyHandler;
 import org.jboss.logging.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.kie.server.router.handlers.AdminHttpHandler;
 import org.kie.server.router.handlers.ContainersHttpHandler;
@@ -38,6 +43,7 @@ import org.kie.server.router.handlers.QueriesDataHttpHandler;
 import org.kie.server.router.handlers.QueriesHttpHandler;
 import org.kie.server.router.proxy.KieServerProxyClient;
 import org.kie.server.router.repository.FileRepository;
+import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 
 public class KieServerRouter {
@@ -56,9 +62,15 @@ public class KieServerRouter {
             "      \"id\" : \"kie-server-router\"\n"+
             "}";
 
+    private ServiceLoader<ConfigRepository> configRepositoryServiceLoader = ServiceLoader.load(ConfigRepository.class);
     
     private Undertow server;
-    private FileRepository repository = new FileRepository();
+    private ConfigRepository repository = new FileRepository();
+
+    public KieServerRouter() {
+        configRepositoryServiceLoader.forEach( repo -> repository = repo);
+        log.info("KIE Server router repository implementation is " + repository);
+    }
 
     public static void main(String[] args) {
         KieServerRouter router = new KieServerRouter();        
@@ -74,10 +86,22 @@ public class KieServerRouter {
     public void start(String host, Integer port) {
         System.setProperty(KieServerRouterConstants.ROUTER_HOST, host);
         System.setProperty(KieServerRouterConstants.ROUTER_PORT, port.toString());
-        final KieServerProxyClient proxyClient = new KieServerProxyClient();
+
+        Configuration configuration = repository.load();
+        if (configuration == null) {
+            configuration = new Configuration();
+        }
+        final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration);
+        Map<String, Set<String>> perContainer = configuration.getHostsPerContainer();
+
+        for (Map.Entry<String, Set<String>> entry : perContainer.entrySet()) {
+            entry.getValue().forEach(url -> {
+                proxyClient.addContainer(entry.getKey(), URI.create(url));
+            });
+        }
         
         HttpHandler notFoundHandler = ResponseCodeHandler.HANDLE_404;        
-        AdminHttpHandler adminHandler = new AdminHttpHandler(proxyClient, repository);
+        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
 
         PathHandler pathHandler = Handlers.path(new ProxyHandler(proxyClient, notFoundHandler));
         pathHandler.addPrefixPath("/queries/definitions", new QueriesDataHttpHandler(notFoundHandler, adminHandler));
@@ -126,11 +150,16 @@ public class KieServerRouter {
             List<String> containers = new ArrayList<>();
 
             JSONObject serverConfig = new JSONObject(jsonResponse);
-            JSONArray sourceList = serverConfig.getJSONArray("containers");
+            try {
+                JSONArray sourceList = serverConfig.getJSONArray("containers");
 
-            for (int i = 0; i < sourceList.length(); i++) {
-                JSONObject container = sourceList.getJSONObject(i);
-                containers.add(container.getString("container-id"));
+                for (int i = 0; i < sourceList.length(); i++) {
+                    JSONObject container = sourceList.getJSONObject(i);
+                    containers.add(container.getString("container-id"));
+                }
+            } catch (JSONException e) {
+                // if the server template did not exist the containers can be null, meaning not JSONArray
+                log.debug("Error when getting list of containers:: " + e.getMessage(), e);
             }
 
             adminHandler.addControllerContainers(containers);

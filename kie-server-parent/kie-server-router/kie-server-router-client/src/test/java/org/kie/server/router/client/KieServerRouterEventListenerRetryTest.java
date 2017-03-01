@@ -73,8 +73,8 @@ public class KieServerRouterEventListenerRetryTest {
 
     @Test(timeout = 10000)
     public void testRouterContainerStartedRetry() throws Exception {
-        final CountDownLatch failureLatch = new CountDownLatch(4);
-        final CountDownLatch successLatch = new CountDownLatch(2);
+        final CountDownLatch failureLatch = new CountDownLatch(2);
+        final CountDownLatch successLatch = new CountDownLatch(1);
 
         int routerPort = findFreePort();
 
@@ -98,13 +98,13 @@ public class KieServerRouterEventListenerRetryTest {
         wireMockServer.start();
         successLatch.await();
 
-        wireMockServer.verify(2, postRequestedFor(urlEqualTo("/admin/add")));
+        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/admin/add")));
     }
 
     @Test(timeout = 10000)
     public void testRouterContainerStoppedRetry() throws Exception {
-        final CountDownLatch failureLatch = new CountDownLatch(4);
-        final CountDownLatch successLatch = new CountDownLatch(2);
+        final CountDownLatch failureLatch = new CountDownLatch(2);
+        final CountDownLatch successLatch = new CountDownLatch(1);
 
         int routerPort = findFreePort();
 
@@ -128,13 +128,13 @@ public class KieServerRouterEventListenerRetryTest {
         wireMockServer.start();
         successLatch.await();
 
-        wireMockServer.verify(2, postRequestedFor(urlEqualTo("/admin/remove")));
+        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/admin/remove")));
     }
 
     @Test(timeout = 10000)
     public void testRouterServerStoppedRetry() throws Exception {
-        final CountDownLatch failureLatch = new CountDownLatch(2);
-        final CountDownLatch successLatch = new CountDownLatch(2);
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch successLatch = new CountDownLatch(1);
 
         int routerPort = findFreePort();
 

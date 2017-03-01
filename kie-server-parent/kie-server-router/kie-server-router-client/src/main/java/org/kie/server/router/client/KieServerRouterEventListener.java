@@ -44,6 +44,9 @@ import org.slf4j.LoggerFactory;
 public class KieServerRouterEventListener implements KieServerEventListener {
     
     private static final Logger logger = LoggerFactory.getLogger(KieServerRouterEventListener.class);
+
+    private static final String ROUTER_ADD_URL = "/admin/add";
+    private static final String ROUTER_REMOVE_URL = "/admin/remove";
     
     private String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
     private String serverURL = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION);
@@ -56,16 +59,12 @@ public class KieServerRouterEventListener implements KieServerEventListener {
 
     private RouterConnectionObserver observer = new RouterConnectionObserver();
 
-    private String CONTAINER_ID_JSON =
+    private String CONTAINER_JSON =
             "\"containerId\" : \"{0}\","
-            + "\"serverUrl\" : \"{1}\","
-            + "\"serverId\" : \"{2}\","
-            + "\"releaseId\" : \"{3}\"";
-
-    private String CONTAINER_ALIAS_JSON =
-            "\"containerId\" : \"{0}\","
-            + "\"serverUrl\" : \"{1}\","
-            + "\"serverId\" : \"{2}\"";
+            + "\"alias\" : \"{1}\","
+            + "\"serverUrl\" : \"{2}\","
+            + "\"serverId\" : \"{3}\","
+            + "\"releaseId\" : \"{4}\"";
 
 
     public KieServerRouterEventListener() {
@@ -96,16 +95,11 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         containers.getResult().getContainers().forEach(ci -> {
             
             routers().forEach(url -> {
-                String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, ci.getContainerId(), serverURL, serverId, ci.getReleaseId().toExternalForm()) + "}";
-                boolean success = send(url + "/admin/remove", ci.getContainerId(), containerIdPayload, false, false);
+                String alias = getContainerAlias(ci);
+                String containerIdPayload = "{" + MessageFormat.format(CONTAINER_JSON, ci.getContainerId(), alias, serverURL, serverId, ci.getReleaseId().toExternalForm()) + "}";
+                boolean success = send(url + ROUTER_REMOVE_URL, ci.getContainerId(), containerIdPayload, false, false);
                 if (success) {
                     logger.info("Removed '{}' as server location for container id '{}'", serverURL, ci.getContainerId());
-                }
-                String alias = getContainerAlias(ci);
-                String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
-                success = send(url + "/admin/remove", alias, containerAliasPayload, false, false);
-                if (success) {
-                    logger.info("Removed '{}' as server location for container alias '{}'", serverURL, alias);
                 }
             });
         });
@@ -128,16 +122,11 @@ public class KieServerRouterEventListener implements KieServerEventListener {
         }
         
         routers().forEach(url -> {
-            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, containerInstance.getContainerId(), serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
-            boolean success = send(url + "/admin/add", containerInstance.getContainerId(), containerIdPayload, true, true);
+            String alias = getContainerAlias(containerInstance.getResource());
+            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_JSON, containerInstance.getContainerId(), alias, serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
+            boolean success = send(url + ROUTER_ADD_URL, containerInstance.getContainerId(), containerIdPayload, true, true);
             if (success) {
                 logger.info("Added '{}' as server location for container id '{}'", serverURL, containerInstance.getContainerId());
-            }
-            String alias = getContainerAlias(containerInstance.getResource());
-            String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
-            success = send(url + "/admin/add", alias, containerAliasPayload, true, true);
-            if (success) {
-                logger.info("Added '{}' as server location for container alias '{}'", serverURL, alias);
             }
         });
     }
@@ -153,16 +142,11 @@ public class KieServerRouterEventListener implements KieServerEventListener {
             return;
         }
         routers().forEach(url -> {
-            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_ID_JSON, containerInstance.getContainerId(), serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
-            boolean success = send(url + "/admin/remove", containerInstance.getContainerId(), containerIdPayload, false, true);
+            String alias = getContainerAlias(containerInstance.getResource());
+            String containerIdPayload = "{" + MessageFormat.format(CONTAINER_JSON, containerInstance.getContainerId(), alias, serverURL, serverId, containerInstance.getResource().getReleaseId().toExternalForm()) + "}";
+            boolean success = send(url + ROUTER_REMOVE_URL, containerInstance.getContainerId(), containerIdPayload, false, true);
             if (success) {
                 logger.info("Removed '{}' as server location for container id '{}'", serverURL, containerInstance.getContainerId());
-            }
-            String alias = getContainerAlias(containerInstance.getResource());
-            String containerAliasPayload = "{" + MessageFormat.format(CONTAINER_ALIAS_JSON, alias, serverURL, serverId) + "}";
-            success = send(url + "/admin/remove", alias, containerAliasPayload, false, true);
-            if (success) {
-                logger.info("Removed '{}' as server location for container alias '{}'", serverURL, alias);
             }
         });
         

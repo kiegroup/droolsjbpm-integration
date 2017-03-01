@@ -16,28 +16,60 @@
 package org.kie.server.router.proxy;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.proxy.ProxyCallback;
 import io.undertow.server.handlers.proxy.ProxyClient;
 import io.undertow.server.handlers.proxy.ProxyConnection;
+import org.jboss.logging.Logger;
+import org.kie.server.router.Configuration;
+import org.kie.server.router.ConfigurationListener;
+import org.kie.server.router.spi.ContainerResolver;
+import org.kie.server.router.spi.RestrictionPolicy;
 
+public class KieServerProxyClient implements ProxyClient, ConfigurationListener {
 
-public class KieServerProxyClient implements ProxyClient {
+    private static final Logger log = Logger.getLogger(KieServerProxyClient.class);
+
+    private ServiceLoader<ContainerResolver> containerResolverServiceLoader = ServiceLoader.load(ContainerResolver.class);
+    private ServiceLoader<RestrictionPolicy> restrictionPolicyServiceLoader = ServiceLoader.load(RestrictionPolicy.class);
     
-    private static final String NOT_FOUND = "NOT_FOUND";
-    
-    private Pattern p = Pattern.compile(".*/containers/([^/]+).*");
-    private Pattern p2 = Pattern.compile(".*/containers/instances/([^/]+).*");
+    private ContainerResolver containerResolver = new DefaultContainerResolver();
+    private RestrictionPolicy restrictionPolicy = new DefaultRestrictionPolicy();
     
     private Map<String, LoadBalancingProxyClient> containerClients = new ConcurrentHashMap<>();
-    
+
+    private Configuration configuration;
+
+    public KieServerProxyClient(Configuration configuration) {
+        this.configuration = configuration;
+        this.configuration.addListener(this);
+        List<ContainerResolver> foundResolvers = new ArrayList<>();
+        containerResolverServiceLoader.forEach(cr -> foundResolvers.add(cr));
+
+        List<RestrictionPolicy> foundPolicies = new ArrayList<>();
+        restrictionPolicyServiceLoader.forEach(p -> foundPolicies.add(p));
+
+        if (foundPolicies.size() > 1 || foundResolvers.size() > 1) {
+            throw new IllegalStateException("Found more than one RestrictionPolicy " + foundPolicies + " or ContainerResolver " + foundResolvers);
+        }
+
+        if (!foundResolvers.isEmpty()) {
+            this.containerResolver = foundResolvers.get(0);
+        }
+        if (!foundPolicies.isEmpty()) {
+            this.restrictionPolicy = foundPolicies.get(0);
+        }
+        log.infof("Using '%s' container resolver and restriction policy '%s'", containerResolver, restrictionPolicy);
+    }
+
     public synchronized void addContainer(String containerId, URI serverURI) {
         
         LoadBalancingProxyClient client = containerClients.get(containerId);
@@ -52,6 +84,7 @@ public class KieServerProxyClient implements ProxyClient {
         
         LoadBalancingProxyClient client = containerClients.get(containerId);
         if (client == null) {
+            log.debugf("No backend server found for %s and server URI %s", containerId, serverURI);
             return;
         }
         client.removeHost(serverURI);
@@ -60,8 +93,9 @@ public class KieServerProxyClient implements ProxyClient {
     @Override
     public ProxyTarget findTarget(HttpServerExchange exchange) {
         
-        String containerId = resolveContainerId(exchange);
-        if (restrictedEndpoint(exchange, containerId)) {
+        String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
+        if (restrictionPolicy.restrictedEndpoint(exchange, containerId)) {
+            log.debugf("URL %s is restricted according to policy %s", exchange.getRelativePath(), restrictionPolicy.toString());
             return null;
         }
         LoadBalancingProxyClient client = containerClients.get(containerId);
@@ -75,38 +109,19 @@ public class KieServerProxyClient implements ProxyClient {
 
     @Override
     public void getConnection(ProxyTarget target, HttpServerExchange exchange, ProxyCallback<ProxyConnection> callback, long timeout, TimeUnit timeUnit) {
-        String containerId = resolveContainerId(exchange);
+        String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
         LoadBalancingProxyClient client = containerClients.get(containerId);
 
         client.getConnection(target, exchange, callback, timeout, timeUnit);
     }
 
-    protected String resolveContainerId(HttpServerExchange exchange) {
-        String relativePath = exchange.getRelativePath();                
-        Matcher matcher = p.matcher(relativePath);
-        
-        if (matcher.find()) {            
-            String containerId = matcher.group(1);
-            if (containerClients.containsKey(containerId)) {
-                return containerId;
-            }
-        }
-        matcher = p2.matcher(relativePath);
-        
-        if (matcher.find()) {            
-            return matcher.group(1);            
-        }
-        return NOT_FOUND;
+    @Override
+    public void onContainerAdded(String container, String serverUrl) {
+        addContainer(container, URI.create(serverUrl));
     }
 
-    protected boolean restrictedEndpoint(HttpServerExchange exchange, String containerId) {
-        String relativePath = exchange.getRelativePath();
-
-        if (relativePath.endsWith("/containers/" + containerId) || relativePath.endsWith("/scanner") || relativePath.endsWith("/release-id")) {
-            // disallow requests that modify the container as that can lead to inconsistent setup
-            return true;
-        }
-
-        return false;
+    @Override
+    public void onContainerRemoved(String container, String serverUrl) {
+        removeContainer(container, URI.create(serverUrl));
     }
 }

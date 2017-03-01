@@ -23,8 +23,9 @@ import java.io.PrintWriter;
 
 import org.kie.server.router.Configuration;
 import org.kie.server.router.KieServerRouterConstants;
+import org.kie.server.router.spi.ConfigRepository;
 
-public class FileRepository {
+public class FileRepository implements ConfigRepository {
     
     private final File repositoryDir; 
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
@@ -37,6 +38,7 @@ public class FileRepository {
         this.repositoryDir = repositoryDir;   
     }
 
+    @Override
     public void persist(Configuration configuration) {
                 
         
@@ -61,7 +63,8 @@ public class FileRepository {
             }
         }
     }
-    
+
+    @Override
     public Configuration load() {
         Configuration configuration = new Configuration();
         File serverStateFile = new File(repositoryDir, "kie-server-router" + ".json");
@@ -78,6 +81,7 @@ public class FileRepository {
         return null;
     }
 
+    @Override
     public void clean() {
         persist(new Configuration());
     }
