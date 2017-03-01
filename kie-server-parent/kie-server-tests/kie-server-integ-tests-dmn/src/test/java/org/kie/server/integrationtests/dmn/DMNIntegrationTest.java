@@ -30,10 +30,12 @@ import org.kie.server.client.KieServicesException;
 
 import java.lang.Thread;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.hasEntry;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -63,16 +65,28 @@ public class DMNIntegrationTest
 
     @Test
     public void testHelloWorld() {
-        System.err.println("1+1:");
+        System.err.println("a+b:");
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
         ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
         
         System.out.println("FROM THE TEST:"+evaluateAllDecisions);
-//        DO NOT CALL: System.out.println(evaluateAllDecisions.getResult().getContext());
-        System.out.println(evaluateAllDecisions.getResult().getMessages());
-        System.out.println(evaluateAllDecisions.getResult().getDecisionResults());
+        
+        DMNResult dmnResult = evaluateAllDecisions.getResult();
+        System.out.println(dmnResult.getContext());
+        System.out.println(dmnResult.getMessages());
+        System.out.println(dmnResult.getDecisionResults());
+        
+        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
+        System.out.println( mathInCtx.size() );
+        System.out.println( mathInCtx.getClass() );
+        mathInCtx.entrySet().forEach( e-> System.out.println(e.getKey()+":"+e.getValue()+" "+e.getValue().getClass()));
+        assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+//        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
+//        System.out.println("dr0: "+dr0);
+//        System.out.println("dr0.size: "+dr0.size());
+//        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
     
     /*

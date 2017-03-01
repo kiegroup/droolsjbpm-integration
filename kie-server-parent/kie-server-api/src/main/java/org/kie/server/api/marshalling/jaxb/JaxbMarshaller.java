@@ -112,6 +112,7 @@ import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.*;
 import org.kie.server.api.model.type.JaxbByteArray;
@@ -279,7 +280,8 @@ public class JaxbMarshaller implements Marshaller {
                 
                 // Kie DMN
                 DMNContextKS.class,
-                DMNResultKS.class
+                DMNResultKS.class,
+                DMNNodeStub.class
         };
     }
 

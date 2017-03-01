@@ -8,7 +8,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 
@@ -23,6 +25,7 @@ public class DMNDecisionResultKS implements DMNDecisionResult {
     private String           decisionName;
     
     @XmlElement(name="result")
+    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Object           result;
     
     @XmlElementWrapper(name="messages")
@@ -36,10 +39,11 @@ public class DMNDecisionResultKS implements DMNDecisionResult {
     }
 
     public static DMNDecisionResultKS of(DMNDecisionResult value) {
+        System.out.println("constructor of DMNDecisionResultKS for value "+value);
         DMNDecisionResultKS res = new DMNDecisionResultKS();
         res.decisionId = value.getDecisionId();
         res.decisionName = value.getDecisionName();
-        // TODO: need to stub DMN nodes
+        res.setResult(value.getResult());
         res.setMessages(value.getMessages());
         res.status = value.getEvaluationStatus();
         return res;
@@ -78,8 +82,8 @@ public class DMNDecisionResultKS implements DMNDecisionResult {
     }
 
     public void setResult(Object result) {
-        // TODO: need to stub DMN nodes
-        // this.result = result;
+        System.out.println("setResult()"+result);
+        this.result = DMNResultKS.stubDMNResult(result);
     }
 
     @Override

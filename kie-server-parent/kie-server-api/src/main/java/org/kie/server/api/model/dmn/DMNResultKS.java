@@ -2,11 +2,13 @@ package org.kie.server.api.model.dmn;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,7 +16,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNDecisionResult.DecisionEvaluationStatus;
@@ -35,7 +39,9 @@ public class DMNResultKS implements DMNResult {
     @XmlElement(name="decision-name")
     private String decisionName;
 
-    @XmlElementWrapper(name="dmn-context")
+//    @XmlElementWrapper(name="dmn-context")
+    @XmlElement(name="dmn-context")
+    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling
@@ -52,7 +58,7 @@ public class DMNResultKS implements DMNResult {
     
     public DMNResultKS(DMNResult dmnResult) {
         // TODO review not possible as impossible to serialize DMN nodes
-        // this.setDmnContext( dmnResult.getContext().getAll() );
+        this.setDmnContext( dmnResult.getContext().getAll() );
         this.setMessages( dmnResult.getMessages() );
         this.setDecisionResults( dmnResult.getDecisionResults() );
     }
@@ -104,8 +110,8 @@ public class DMNResultKS implements DMNResult {
 
     
     public void setDmnContext(Map<String, Object> dmnContext) {
-        // this.dmnContext = dmnContext;
-        throw new UnsupportedOperationException();
+        dmnContext.replaceAll( (k, v) -> stubDMNResult(v) );
+        this.dmnContext = dmnContext;
     }
     public void setMessages(List<DMNMessage> messages) {
         // wrap for serialization:
@@ -210,6 +216,26 @@ public class DMNResultKS implements DMNResult {
         return builder.toString();
     }
      
-    
+    public static Object stubDMNResult(Object result) {
+        System.out.println("called stubDMNResult() on "+result + " of type "+result.getClass());
+        if ( result instanceof DMNContext ) {
+            ((DMNContext) result).getAll().replaceAll( (k, v) -> stubDMNResult(v) );
+            return MapBackedDMNContext.of(((DMNContext) result).getAll());
+        } else if ( result instanceof Map<?, ?> ) {
+            ((Map) result).replaceAll( (k, v) -> stubDMNResult(v) );
+        } else if ( result instanceof List<?> ) {
+            ((List<Object>) result).replaceAll( DMNResultKS::stubDMNResult );
+            return result;
+        } else if ( result instanceof Set<?> ) {
+            Set<?> originalSet = (Set<?>) result;
+            Collection mappedSet = originalSet.stream().map( DMNResultKS::stubDMNResult ).collect(Collectors.toSet());
+            originalSet.clear();
+            originalSet.addAll(mappedSet);
+            return result;
+        } else if ( result.getClass().getPackage().getName().startsWith("org.kie.dmn") ) {
+            return DMNNodeStub.of(result);
+        }
+        return result;
+    }
     
 }
