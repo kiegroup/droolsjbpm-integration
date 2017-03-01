@@ -93,4 +93,8 @@ public class DMNMessageKS implements DMNMessage {
     public FEELEvent getFeelEvent() {
         throw new UnsupportedOperationException();
     }
+
+    public Object getSourceReference() {
+        throw new UnsupportedOperationException();
+    }
 }
