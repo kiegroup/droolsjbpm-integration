@@ -28,6 +28,7 @@ import java.util.Set;
 import org.jboss.logging.Logger;
 import org.json.JSONObject;
 import org.kie.server.router.Configuration;
+import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouterConstants;
 import org.kie.server.router.proxy.KieServerProxyClient;
 import org.kie.server.router.proxy.aggragate.JSONResponseAggregator;
@@ -41,6 +42,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
+import org.kie.server.router.spi.ConfigRepository;
 import org.kie.server.router.utils.HttpUtils;
 
 public class AdminHttpHandler implements HttpHandler {
@@ -49,11 +51,11 @@ public class AdminHttpHandler implements HttpHandler {
 
     private static final String CONTROLLER = System.getProperty(KieServerRouterConstants.CONTROLLER);
     
-    private KieServerProxyClient proxyClient;
+//    private KieServerProxyClient proxyClient;
     private Configuration configuration = new Configuration();
     private List<ResponseAggregator> aggregators = new ArrayList<>();
     
-    private FileRepository repository = null;
+    private ConfigRepository repository = null;
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
 
     private Set<String> controllerContainers = new HashSet<>();
@@ -75,26 +77,10 @@ public class AdminHttpHandler implements HttpHandler {
             "    \"status\" : \"STARTED\"\n" +
             "  }";
         
-    public AdminHttpHandler(KieServerProxyClient proxyClient, FileRepository repository) {
-        this.proxyClient = proxyClient;
+    public AdminHttpHandler(Configuration configuration, ConfigRepository repository) {
+        this.configuration = configuration;
         this.repository = repository;
-        
-        Configuration loaded = repository.load();
-        if (loaded != null) {
-            this.configuration = loaded;
-            
-            Map<String, Set<String>> perContainer = this.configuration.getHostsPerContainer();
-            
-            for (Entry<String, Set<String>> entry : perContainer.entrySet()) {
-                
-                String containerId = entry.getKey();
-                
-                entry.getValue().forEach(url -> {
-                    proxyClient.addContainer(containerId, URI.create(url));
-                });
-            }
-        }
-        
+
         this.aggregators.add(new JSONResponseAggregator());
         this.aggregators.add(new XstreamXMLResponseAggregator());
         this.aggregators.add(new JaxbXMLResponseAggregator());
@@ -121,20 +107,22 @@ public class AdminHttpHandler implements HttpHandler {
             JSONObject jsonData = new JSONObject(data);
             
             String containerId = jsonData.getString("containerId");
+            String alias = jsonData.getString("alias");
             String serverId = jsonData.getString("serverId");
             String serverUrl = jsonData.getString("serverUrl");
-            String releaseId = null;
-            if (jsonData.has("releaseId")) {
-                releaseId = jsonData.getString("releaseId");
-            }
+            String releaseId = jsonData.getString("releaseId");
+
+            ContainerInfo containerInfo = new ContainerInfo(containerId, alias, releaseId);
             
             if (path.startsWith("/add")) {
-                proxyClient.addContainer(containerId, URI.create(serverUrl));
                 log.infof("Added %s as server location for container %s ", serverUrl, containerId);
                 
                 synchronized (configuration) {                
                     configuration.addContainerHost(containerId, serverUrl);
+                    configuration.addContainerHost(alias, serverUrl);
                     configuration.addServerHost(serverId, serverUrl);
+
+                    configuration.addContainerInfo(containerInfo);
                     
                     repository.persist(configuration);
                 }
@@ -144,7 +132,7 @@ public class AdminHttpHandler implements HttpHandler {
                         String[] gav = releaseId.split(":");
                         String jsonPayload = CONTAINER_SPEC_JSON
                                 .replaceFirst("#1@", containerId)
-                                .replaceFirst("#2@", containerId)
+                                .replaceFirst("#2@", alias)
                                 .replaceFirst("#3@", gav[0])
                                 .replaceFirst("#4@", gav[1])
                                 .replaceFirst("#5@", gav[2]);
@@ -159,12 +147,14 @@ public class AdminHttpHandler implements HttpHandler {
                 ResponseCodeHandler.HANDLE_200.handleRequest(exchange);
             
             } else if (path.startsWith("/remove")) {
-            
-                proxyClient.removeContainer(containerId, URI.create(serverUrl));
+
                 log.infof("Removed %s as server location for container %s ", serverUrl, containerId);
                 synchronized (configuration) {
                     configuration.removeContainerHost(containerId, serverUrl);
+                    configuration.removeContainerHost(alias, serverUrl);
                     configuration.removeServerHost(serverId, serverUrl);
+
+                    configuration.removeContainerInfo(containerInfo.getContainerId(), containerInfo.getAlias());
                     
                     repository.persist(configuration);
                 }
@@ -206,5 +196,9 @@ public class AdminHttpHandler implements HttpHandler {
 
     public void addControllerContainers(List<String> containers) {
         this.controllerContainers.addAll(containers);
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

@@ -106,7 +106,7 @@ public class JbpmRestApplicationComponentsService implements KieServerApplicatio
         }
 
         List<Object> components = new ArrayList<Object>(6);
-        DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService);
+        DefinitionServiceBase definitionServiceBase = new DefinitionServiceBase(definitionService, context);
         ProcessServiceBase processServiceBase = new ProcessServiceBase(processService, definitionService, runtimeDataService, context);
         UserTaskServiceBase userTaskServiceBase = new UserTaskServiceBase(userTaskService, context);
         RuntimeDataServiceBase runtimeDataServiceBase = new RuntimeDataServiceBase(runtimeDataService, context);

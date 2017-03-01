@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
 import org.slf4j.Logger;
@@ -51,8 +52,10 @@ public class LatestContainerLocator implements ContainerLocator {
         Map<String, String> versionToIdentifier = new HashMap<String, String>();
         containerInstances.forEach(c ->
                 {
-                    comparableVersions.add(new KieRepositoryImpl.ComparableVersion(c.getKieContainer().getReleaseId().getVersion()));
-                    versionToIdentifier.put(c.getKieContainer().getReleaseId().getVersion(), c.getContainerId());
+                    if (c.getStatus().equals(KieContainerStatus.STARTED)) {
+                        comparableVersions.add(new KieRepositoryImpl.ComparableVersion(c.getKieContainer().getReleaseId().getVersion()));
+                        versionToIdentifier.put(c.getKieContainer().getReleaseId().getVersion(), c.getContainerId());
+                    }
                 }
         );
         KieRepositoryImpl.ComparableVersion latest = Collections.max(comparableVersions);
