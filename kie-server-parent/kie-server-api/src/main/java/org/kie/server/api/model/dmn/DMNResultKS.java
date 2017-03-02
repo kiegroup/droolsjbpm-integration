@@ -45,7 +45,6 @@ public class DMNResultKS implements DMNResult {
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling
-    
     @XmlElementWrapper(name="messages")
     private List<DMNMessageKS> messages = new ArrayList<>();
     
@@ -57,7 +56,6 @@ public class DMNResultKS implements DMNResult {
     }
     
     public DMNResultKS(DMNResult dmnResult) {
-        // TODO review not possible as impossible to serialize DMN nodes
         this.setDmnContext( dmnResult.getContext().getAll() );
         this.setMessages( dmnResult.getMessages() );
         this.setDecisionResults( dmnResult.getDecisionResults() );
@@ -145,7 +143,7 @@ public class DMNResultKS implements DMNResult {
         
         static MapBackedDMNContext of(Map<String, Object> ctx) {
             MapBackedDMNContext result = new MapBackedDMNContext();
-            result.ctx.putAll(ctx);
+            result.ctx = ctx;
             return result;
         }
 
@@ -161,7 +159,7 @@ public class DMNResultKS implements DMNResult {
 
         @Override
         public Map<String, Object> getAll() {
-            return Collections.unmodifiableMap(ctx);
+            return ctx;
         }
 
         @Override

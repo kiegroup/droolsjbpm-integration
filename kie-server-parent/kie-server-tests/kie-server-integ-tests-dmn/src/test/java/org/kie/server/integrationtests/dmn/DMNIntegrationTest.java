@@ -83,10 +83,10 @@ public class DMNIntegrationTest
         System.out.println( mathInCtx.getClass() );
         mathInCtx.entrySet().forEach( e-> System.out.println(e.getKey()+":"+e.getValue()+" "+e.getValue().getClass()));
         assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
-//        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
-//        System.out.println("dr0: "+dr0);
-//        System.out.println("dr0.size: "+dr0.size());
-//        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
+        System.out.println("dr0: "+dr0);
+        System.out.println("dr0.size: "+dr0.size());
+        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
     
     /*
