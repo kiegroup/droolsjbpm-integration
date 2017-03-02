@@ -59,24 +59,6 @@ public class ModelEvaluatorServiceBase {
         this.context = context;
         this.marshallerHelper = new MarshallerHelper(context);
     }
-
-    public ServiceResponse<JaxbList> getDummy(String containerId) {
-        try {
-            List<Object> result = new ArrayList<>();
-            result.add("abc");
-            result.add("def");
-            return new ServiceResponse<JaxbList>(
-                    ServiceResponse.ResponseType.SUCCESS,
-                    "OK list successfully retrieved from container '" + containerId + "'",
-                    new JaxbList(result) );
-        } catch ( Exception e ) {
-            LOG.error( "Error retrieving list from container '" + containerId + "'", e );
-            return new ServiceResponse<JaxbList>(
-                    ServiceResponse.ResponseType.FAILURE,
-                    "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
-                    null );
-        }
-    }
     
     public ServiceResponse<JaxbList> getModels(String containerId) {
         try {
@@ -86,13 +68,13 @@ public class ModelEvaluatorServiceBase {
             List result = kieRuntime.getModels();
             return new ServiceResponse<JaxbList>(
                     ServiceResponse.ResponseType.SUCCESS,
-                    "OK list successfully retrieved from container '" + containerId + "'",
+                    "OK models successfully retrieved from container '" + containerId + "'",
                     new JaxbList( result ) );
         } catch ( Exception e ) {
-            LOG.error( "Error retrieving list from container '" + containerId + "'", e );
+            LOG.error( "Error retrieving models from container '" + containerId + "'", e );
             return new ServiceResponse<JaxbList>(
                     ServiceResponse.ResponseType.FAILURE,
-                    "Error retrieving list from container '" + containerId + "'" + e.getMessage(),
+                    "Error retrieving models from container '" + containerId + "'" + e.getMessage(),
                     null );
         }
     }

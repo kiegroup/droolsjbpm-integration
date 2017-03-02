@@ -22,21 +22,12 @@ import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.ScoreWrapper;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
-import org.kie.server.client.KieServicesException;
 
-import java.lang.Thread;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.hasEntry;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNIntegrationTest
@@ -65,71 +56,18 @@ public class DMNIntegrationTest
 
     @Test
     public void testHelloWorld() {
-        System.err.println("a+b:");
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
         ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
         
-        System.out.println("FROM THE TEST:"+evaluateAllDecisions);
-        
         DMNResult dmnResult = evaluateAllDecisions.getResult();
-        System.out.println(dmnResult.getContext());
-        System.out.println(dmnResult.getMessages());
-        System.out.println(dmnResult.getDecisionResults());
         
         Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
-        System.out.println( mathInCtx.size() );
-        System.out.println( mathInCtx.getClass() );
-        mathInCtx.entrySet().forEach( e-> System.out.println(e.getKey()+":"+e.getValue()+" "+e.getValue().getClass()));
         assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+        
         Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
-        System.out.println("dr0: "+dr0);
-        System.out.println("dr0.size: "+dr0.size());
         assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
-    
-    /*
-    @Test
-    public void testGetSolverState() throws Exception {
-        KieServerAssert.assertSuccess( solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG ) );
-
-        ServiceResponse<SolverInstance> solverState = solverClient.getSolverState(CONTAINER_1_ID, SOLVER_1_ID);
-        KieServerAssert.assertSuccess(solverState);
-
-        SolverInstance returnedInstance = solverState.getResult();
-        assertEquals(CONTAINER_1_ID, returnedInstance.getContainerId());
-        assertEquals( SOLVER_1_CONFIG, returnedInstance.getSolverConfigFile() );
-        assertEquals( SOLVER_1_ID, returnedInstance.getSolverId() );
-        assertEquals( SolverInstance.getSolverInstanceKey( CONTAINER_1_ID, SOLVER_1_ID ), returnedInstance.getSolverInstanceKey());
-        assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, returnedInstance.getStatus());
-        assertNotNull( returnedInstance.getScoreWrapper() );
-        assertNull( returnedInstance.getScoreWrapper().toScore() );
-    }
-
-
-
-    @Test
-    public void testExecuteRunningSolver() throws Exception {
-        ServiceResponse<SolverInstance> response = solverClient.createSolver( CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG );
-        KieServerAssert.assertSuccess( response );
-        assertEquals( SolverInstance.SolverStatus.NOT_SOLVING, response.getResult().getStatus() );
-
-        // start solver
-        SolverInstance instance = new SolverInstance();
-        instance.setStatus( SolverInstance.SolverStatus.SOLVING );
-        instance.setPlanningProblem( loadPlanningProblem( 50, 150 ) );
-        response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        KieServerAssert.assertSuccess( response );
-        assertEquals( SolverInstance.SolverStatus.SOLVING, response.getResult().getStatus() );
-
-        // start solver again
-        response = solverClient.updateSolverState( CONTAINER_1_ID, SOLVER_1_ID, instance );
-        KieServerAssert.assertSuccess( response );
-        KieServerAssert.assertResultContainsStringRegex( response.getMsg(), "Solver.*on container.*is already executing." );
-
-        KieServerAssert.assertSuccess( solverClient.disposeSolver( CONTAINER_1_ID, SOLVER_1_ID ) );
-    }
-*/
 
 }

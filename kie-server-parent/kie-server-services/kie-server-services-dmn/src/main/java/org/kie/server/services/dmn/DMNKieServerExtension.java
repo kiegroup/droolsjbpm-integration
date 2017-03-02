@@ -42,6 +42,7 @@ public class DMNKieServerExtension
     private boolean initialized = false;
 
     private ModelEvaluatorServiceBase modelEvaluatorServiceBase;
+    private DMNKieContainerCommandServiceImpl commandService;
 
     @Override
     public boolean isInitialized() {
@@ -57,6 +58,7 @@ public class DMNKieServerExtension
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
         this.registry = registry;
         this.modelEvaluatorServiceBase = new ModelEvaluatorServiceBase(registry);
+        this.commandService = new DMNKieContainerCommandServiceImpl(registry, modelEvaluatorServiceBase);
         initialized = true;
     }
 
@@ -109,6 +111,9 @@ public class DMNKieServerExtension
     public <T> T getAppComponents(Class<T> serviceType) {
         if ( serviceType.isAssignableFrom( modelEvaluatorServiceBase.getClass() ) ) {
             return (T) modelEvaluatorServiceBase;
+        }
+        if ( serviceType.isAssignableFrom( commandService.getClass() ) ) {
+            return (T) commandService;
         }
         return null;
     }

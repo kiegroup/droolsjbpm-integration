@@ -73,7 +73,7 @@ public class ModelEvaluatorResource {
             }
             return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
         }  catch (Exception e) {
-            LOG.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
+            LOG.error("Unexpected error retrieving models. Message: '{}'", e.getMessage(), e);
             return internalServerError(MessageFormat.format( "ERROR", e.getMessage()), v, conversationIdHeader);
         }
     }
@@ -95,7 +95,7 @@ public class ModelEvaluatorResource {
             }
             return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
         }  catch (Exception e) {
-            LOG.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
+            LOG.error("Unexpected error retrieving models. Message: '{}'", e.getMessage(), e);
             return internalServerError(MessageFormat.format( "ERROR", e.getMessage()), v, conversationIdHeader);
         }
     }

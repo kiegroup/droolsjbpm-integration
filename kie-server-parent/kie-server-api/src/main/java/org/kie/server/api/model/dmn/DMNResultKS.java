@@ -39,7 +39,7 @@ public class DMNResultKS implements DMNResult {
     @XmlElement(name="decision-name")
     private String decisionName;
 
-//    @XmlElementWrapper(name="dmn-context")
+    // please note this must NOT be @XmlElement*Wrapper* otherwise it will be unable to find proper type for marshalling/unmarshalling.
     @XmlElement(name="dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
@@ -119,10 +119,6 @@ public class DMNResultKS implements DMNResult {
     }
     public void setDecisionResults(List<DMNDecisionResult> decisionResults) {
         for ( DMNDecisionResult dr : decisionResults ) {
-            System.out.println(dr);
-            System.out.println(dr.getDecisionId());
-            System.out.println(dr.getDecisionName());
-            System.out.println(dr.getResult());
             this.decisionResults.put(dr.getDecisionId(), DMNDecisionResultKS.of(dr));
         }
     }
@@ -215,7 +211,6 @@ public class DMNResultKS implements DMNResult {
     }
      
     public static Object stubDMNResult(Object result) {
-        System.out.println("called stubDMNResult() on "+result + " of type "+result.getClass());
         if ( result instanceof DMNContext ) {
             ((DMNContext) result).getAll().replaceAll( (k, v) -> stubDMNResult(v) );
             return MapBackedDMNContext.of(((DMNContext) result).getAll());

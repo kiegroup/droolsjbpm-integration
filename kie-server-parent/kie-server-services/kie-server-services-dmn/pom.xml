@@ -53,27 +53,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-core</artifactId>
-<!--       <exclusions>
-      
-          <exclusion>
-                <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-          </exclusion>
-          <exclusion>
-                <groupId>org.kie</groupId>
-      <artifactId>kie-internal</artifactId>
-          </exclusion>
-          <exclusion>
-                <groupId>org.drools</groupId>
-      <artifactId>drools-compiler</artifactId>
-          </exclusion>
-          <exclusion>
-                <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-          </exclusion>
-      </exclusions> -->
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>

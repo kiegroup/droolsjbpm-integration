@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.server.client.impl;
 
 import static org.kie.server.api.rest.RestURI.DMN_URI;
@@ -8,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +34,11 @@ import java.util.stream.Collectors;
 
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNContextKS;
@@ -38,27 +58,24 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
         @Override
         public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
-            Object result = null;
+            DMNContextKS payload = new DMNContextKS( dmnContext.getAll() ); 
+            ServiceResponse<DMNResultKS> result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
                 valuesMap.put(CONTAINER_ID, containerId);
-
-                DMNContextKS payload = new DMNContextKS( dmnContext.getAll() ); 
                 
                 result = makeHttpPostRequestAndCreateServiceResponse(
                         build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, DMNResultKS.class);
 
             } else {
-//                CommandScript script = new CommandScript( Collections.singletonList(
-//                        (KieServerCommand) new DescriptorCommand("CaseService", "startCase", serialize(caseFile), marshaller.getFormat().getType(), new Object[]{containerId, caseDefinitionId})) );
-//                ServiceResponse<String> response = (ServiceResponse<String>)
-//                        executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
-//
-//                throwExceptionOnFailure(response);
-//                if (shouldReturnWithNullResponse(response)) {
-//                    return null;
-//                }
-//                result = deserialize(response.getResult(), Object.class);
+                CommandScript script = new CommandScript( Collections.singletonList(
+                        (KieServerCommand) new DescriptorCommand("DMNService", "evaluateAllDecisions", serialize(payload), marshaller.getFormat().getType(), new Object[]{containerId})) );
+                result = (ServiceResponse<DMNResultKS>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN ).getResponses().get(0);
+
+                throwExceptionOnFailure( result );
+                if (shouldReturnWithNullResponse(result)) {
+                    return null;
+                }
             }
 
             if (result instanceof Wrapped) {
@@ -66,6 +83,9 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
             ServiceResponse<DMNResultKS> result2 = (ServiceResponse<DMNResultKS>) result;
             
+            // coerce numbers to BigDecimal as per DMN spec.
+            // alternative to the below will require instructing special config of kie-server JSONMarshaller
+            // to manage scalar values when deserializing from JSON always as a BigDecimal instead of default Jackson NumberDeserializers
             if ( config.getMarshallingFormat() == MarshallingFormat.JSON ) {
                 recurseAndModifyByCoercingNumbers(result2.getResult().getContext());
                 for ( DMNDecisionResult dr : result2.getResult().getDecisionResults() ) {
