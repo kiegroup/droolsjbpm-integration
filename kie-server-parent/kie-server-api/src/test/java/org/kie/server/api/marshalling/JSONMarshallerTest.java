@@ -1,16 +1,21 @@
 package org.kie.server.api.marshalling;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.kie.server.api.marshalling.objects.DateObject;
 
+import static org.hamcrest.Matchers.hasEntry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class JSONMarshallerTest {
 
@@ -57,4 +62,20 @@ public class JSONMarshallerTest {
         assertEquals( OffsetDateTime.of( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), ZoneOffset.ofHours( 1 ) ), dateObject.getOffsetDateTime() );
     }
 
+    @Test
+    public void testBigDecimal() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, getClass().getClassLoader() );
+        
+        Map<String, Object> ctx = new HashMap<>();
+        ctx.put("a", "b");
+        ctx.put("b", new BigDecimal(1234));
+        String json = marshaller.marshall( ctx );
+        
+        System.out.println(json);
+        
+        Map<String, Object> unmarshall = marshaller.unmarshall(json, Map.class);
+        
+        assertThat( unmarshall, hasEntry( "a", "b" ) );
+        assertThat( unmarshall, hasEntry( "b", BigDecimal.valueOf( 1234 ) ) );
+    }
 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.kie.dmn.api.core.DMNContext;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNContextKS;
@@ -15,14 +16,39 @@ import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.deser.std.NumberDeserializers;
+import com.fasterxml.jackson.databind.deser.std.NumberDeserializers.NumberDeserializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 public class DMNServicesClientImpl extends AbstractKieServicesClientImpl implements DMNServicesClient {
 
         public DMNServicesClientImpl(KieServicesConfiguration config) {
             super(config);
+            specialDMNtricks();
         }
 
         public DMNServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
             super(config, classLoader);
+            specialDMNtricks();
+        }
+
+        private void specialDMNtricks() {
+            switch ( this.config.getMarshallingFormat() ) {
+                case JAXB:
+                    break;
+                case JSON:
+                    JSONMarshaller m = (JSONMarshaller) this.marshaller;
+                    SimpleModule modDeser = new SimpleModule("dmn", Version.unknownVersion());
+                    modDeser.addDeserializer(Number.class, new NumberDeserializers.BigDecimalDeserializer());
+                    m.deserializeObjectMapper.registerModule(modDeser);
+                    break;
+                case XSTREAM:
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override

@@ -93,7 +93,7 @@ public class JSONMarshaller implements Marshaller {
 
     protected Set<Class<?>> classesSet;
 
-    protected ObjectMapper deserializeObjectMapper;
+    public ObjectMapper deserializeObjectMapper;
 
     protected DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
@@ -449,7 +449,7 @@ public class JSONMarshaller implements Marshaller {
             jgen.writeRawValue(json);
         }
     }
-
+    
     class WrappingObjectSerializer extends JsonSerializer<Object> {
 
         private ObjectMapper customObjectMapper;
