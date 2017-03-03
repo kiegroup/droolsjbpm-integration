@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.kie.server</groupId>
+    <artifactId>kie-server-rest</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>kie-server-rest-dmn</artifactId>
+  
+  <name>KIE :: Execution Server :: Remote :: REST :: DMN</name>
+  <description>KIE DMN Execution Server Extension</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-internal</artifactId>
+    </dependency>
+    <!-- TODO Review
+[INFO] maven-enforcer-plugin:1.4.1:enforce (enforce-direct-dependencies) @ kie-server-rest-dmn 
+[INFO] Flag 'useClassesFromLastBuild' is set. Try to use existing output folder.
+[INFO] Analyze dependencies of artifact 'org.kie.server:kie-server-rest-dmn:jar:7.0.0-SNAPSHOT'.
+[WARNING] Rule 0: de.is24.maven.enforcer.rules.IllegalTransitiveDependencyCheck failed with message:
+Found 1 illegal transitive type dependencies in artifact 'org.kie.server:kie-server-rest-dmn:jar:7.0.0-SNAPSHOT':
+1.) org.kie.dmn.core.api.DMNResult
+     -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-dmn-core</artifactId>
+    </dependency>
+  
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-dmn</artifactId>
+    </dependency> 
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-common</artifactId>
+    </dependency> 
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-common</artifactId>
+    </dependency>
+
+
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <!-- Test -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency> 
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>

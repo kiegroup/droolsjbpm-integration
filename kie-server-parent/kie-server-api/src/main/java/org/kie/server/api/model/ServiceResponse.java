@@ -67,6 +67,9 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
+import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNNodeStub;
+import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.*;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
@@ -187,8 +190,13 @@ public class ServiceResponse<T> {
             @XmlElement(name = "case-definition", type = CaseDefinition.class),
             @XmlElement(name = "case-definition-list", type = CaseDefinitionList.class),
             @XmlElement(name = "case-stage-def", type = CaseStageDefinition.class),
-            @XmlElement(name = "case-milestone-def", type = CaseMilestoneDefinition.class)
+            @XmlElement(name = "case-milestone-def", type = CaseMilestoneDefinition.class),
 
+            // Kie DMN
+            @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
+            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
+            @XmlElement(name = "dmn-node-stub" , type = DMNNodeStub.class)
+            
             })
     private T                            result;
 

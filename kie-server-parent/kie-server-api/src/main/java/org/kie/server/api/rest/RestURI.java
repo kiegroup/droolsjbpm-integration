@@ -207,6 +207,9 @@ public class RestURI {
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
     public static final String SOLVER_ID_URI = "/{" + SOLVER_ID + "}";
     public static final String SOLVER_BEST_SOLUTION = "/bestsolution";
+    
+    // DMN URI
+    public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
 
     // document related
     public static final String DOCUMENT_INSTANCE_GET_URI = "{" + DOCUMENT_ID + "}";
