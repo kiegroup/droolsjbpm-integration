@@ -33,7 +33,8 @@ public class DMNKieServerExtension
     private static final Logger LOG = LoggerFactory.getLogger( DMNKieServerExtension.class );
 
     public static final String EXTENSION_NAME = "DMN";
-
+    
+    private static final Boolean droolsDisabled = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_DROOLS_SERVER_EXT_DISABLED, "false" ) );
     private static final Boolean disabled       = Boolean.parseBoolean( System.getProperty( KieServerConstants.KIE_DMN_SERVER_EXT_DISABLED, "false" ) );
 
     private KieServerRegistry registry;
@@ -51,7 +52,7 @@ public class DMNKieServerExtension
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+        return disabled == false && droolsDisabled == false;
     }
 
     @Override
