@@ -119,6 +119,8 @@ public class ModelEvaluatorServiceBase {
             
             DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
             
+            kieSession.dispose();
+            
             return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK from container '" + containerId + "'",
