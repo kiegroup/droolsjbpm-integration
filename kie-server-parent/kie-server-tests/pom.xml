@@ -62,7 +62,7 @@
     <module>kie-server-integ-tests-policy</module>
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
-    <module>kie-server-integ-tests-dmn</module>
+    <!-- <module>kie-server-integ-tests-dmn</module> -->
   </modules>
 
   <dependencyManagement>
