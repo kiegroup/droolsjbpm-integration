@@ -169,9 +169,13 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
+    
+    <!-- DO NOT REMOVE THIS COMMENT. Ref commit 3a92c62 of PR droolsjbpm/droolsjbpm-integration#447 
+     This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
+     parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-integ-tests-jbpm</artifactId>
+      <artifactId>kie-server-integ-tests-case-id-generator</artifactId>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -180,6 +184,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
