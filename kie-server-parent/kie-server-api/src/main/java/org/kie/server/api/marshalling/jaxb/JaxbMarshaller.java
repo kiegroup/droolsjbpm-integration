@@ -26,10 +26,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.drools.core.command.GetVariableCommand;
+import org.drools.core.command.runtime.AdvanceSessionTimeCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
 import org.drools.core.command.runtime.GetFactCountCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.GetIdCommand;
+import org.drools.core.command.runtime.GetSessionTimeCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.rule.AgendaGroupSetFocusCommand;
 import org.drools.core.command.runtime.rule.ClearActivationGroupCommand;
@@ -57,7 +59,12 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
-import org.kie.server.api.commands.optaplanner.*;
+import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
+import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -114,7 +121,34 @@ import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.*;
+import org.kie.server.api.model.instance.DocumentInstance;
+import org.kie.server.api.model.instance.DocumentInstanceList;
+import org.kie.server.api.model.instance.ErrorInfoInstance;
+import org.kie.server.api.model.instance.ErrorInfoInstanceList;
+import org.kie.server.api.model.instance.JobRequestInstance;
+import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.NodeInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.api.model.instance.RequestInfoInstance;
+import org.kie.server.api.model.instance.RequestInfoInstanceList;
+import org.kie.server.api.model.instance.ScoreWrapper;
+import org.kie.server.api.model.instance.SolverInstance;
+import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.api.model.instance.TaskAttachment;
+import org.kie.server.api.model.instance.TaskAttachmentList;
+import org.kie.server.api.model.instance.TaskComment;
+import org.kie.server.api.model.instance.TaskCommentList;
+import org.kie.server.api.model.instance.TaskEventInstance;
+import org.kie.server.api.model.instance.TaskEventInstanceList;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.api.model.instance.TaskSummaryList;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.api.model.instance.VariableInstanceList;
+import org.kie.server.api.model.instance.WorkItemInstance;
+import org.kie.server.api.model.instance.WorkItemInstanceList;
 import org.kie.server.api.model.type.JaxbByteArray;
 import org.kie.server.api.model.type.JaxbDate;
 import org.kie.server.api.model.type.JaxbList;
@@ -176,6 +210,8 @@ public class JaxbMarshaller implements Marshaller {
                 ClearRuleFlowGroupCommand.class,
                 ClearActivationGroupCommand.class,
                 GetFactHandlesCommand.class,
+                GetSessionTimeCommand.class,
+                AdvanceSessionTimeCommand.class,
 
                 KieServerConfig.class,
                 KieServerConfigItem.class,
