@@ -2,7 +2,7 @@ package org.kie.server.services.jbpm.taskqueries.util;
 
 import java.util.Map;
 
-import org.kie.server.api.model.definition.QueryParam;
+import org.jbpm.services.api.query.model.QueryParam;
 
 public class H2TaskQueriesStrategy implements TaskQueriesStrategy {
 

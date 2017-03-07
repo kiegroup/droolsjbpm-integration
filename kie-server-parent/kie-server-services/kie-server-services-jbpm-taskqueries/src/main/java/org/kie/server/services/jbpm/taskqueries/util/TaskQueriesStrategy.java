@@ -2,7 +2,7 @@ package org.kie.server.services.jbpm.taskqueries.util;
 
 import java.util.Map;
 
-import org.kie.server.api.model.definition.QueryParam;
+import org.jbpm.services.api.query.model.QueryParam;
 
 /**
  * Provides DB specific query and column-mappings for task queries.
