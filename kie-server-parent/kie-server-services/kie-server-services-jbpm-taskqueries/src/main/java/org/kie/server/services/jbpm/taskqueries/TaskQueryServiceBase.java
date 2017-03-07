@@ -20,8 +20,10 @@ import static org.kie.server.services.jbpm.ConvertUtils.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.model.ProcessInstanceDesc;
@@ -38,6 +40,9 @@ import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
@@ -50,34 +55,50 @@ import org.slf4j.LoggerFactory;
 public class TaskQueryServiceBase {
 
 	private static final Logger logger = LoggerFactory.getLogger(TaskQueryServiceBase.class);
-	
+
 	private static final String MAPPER_NAME = "UserTasksWithCustomVariables";
-	
+
 	private static final String TASK_QUERY_NAME = "getTasksWithFilters";
-	
+
 	private QueryService queryService;
 	private MarshallerHelper marshallerHelper;
+	private Marshaller jaxbMarshaller;
 	private KieServerRegistry context;
 	private TaskQueriesStrategy taskQueriesStrategy;
 
 	public TaskQueryServiceBase(QueryService queryService, KieServerRegistry context, TaskQueriesStrategy taskQueriesStrategy) {
 		this.queryService = queryService;
 		this.context = context;
+		
+		//We need to add additional JAXB classes (TaskQueryFilterSpec in particular) to be able to unmarshall our response.
+		//TODO: Looks like it's impossible to do this with the existing MarshallerHelper, so we need to build our own Marshaller for now.
 		this.marshallerHelper = new MarshallerHelper(context);
+		
+		MarshallerFactory marshallerFactory  = new MarshallerFactory();
+		
+		//TODO: this is a bit hard-coded. We only support JAXB atm. It would be nicer if we could do this through MarshallerHelper ....
+		//We can also simply register marshallers for all 3 formats in a static way .... until MarshallerHelper supports adding custom classes (if it ever will).
+		Set<Class<?>> extraClasses = new HashSet<>();
+		extraClasses.add(TaskQueryFilterSpec.class);
+		jaxbMarshaller = marshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JAXB, this.getClass().getClassLoader());
+		
 		this.taskQueriesStrategy = taskQueriesStrategy;
-		
+
 		KieServerConfig config = context.getConfig();
-		
-		//Register query.
-		//TODO: Do we need to do this? Only if multiple threads can register the same query. So, if this class is loaded twice ....
-		synchronized(this.getClass()) {
+
+		// Register query.
+		// TODO: Do we need to do this? Only if multiple threads can register the same query. So, if this class is loaded twice ....
+		// I think this class is loaded twice, once for the RESTful endpoint by 'JbpmTaskQueriesRestApplicationComponentsService' and once by the component that loads the JMS stuff.
+		// Note that we have not implemented the JMS stuff yet, so atm, this class is loaded only once.
+		synchronized (this.getClass()) {
 			try {
-				//Throws QueryNotFoundException when the query is not found. So in the exception handling logic we register our query.
+				// Throws QueryNotFoundException when the query is not found. So in the exception handling logic we register our query.
 				queryService.getQuery(TASK_QUERY_NAME);
 			} catch (QueryNotFoundException qnfe) {
-				String taskQuerySource = config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS");
-				
-				QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource,Target.CUSTOM);
+				String taskQuerySource = config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
+						"java:jboss/datasources/ExampleDS");
+
+				QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource, Target.CUSTOM);
 				queryDefinition.setExpression(taskQueriesStrategy.getTaskQueryExpression());
 				queryService.registerQuery(queryDefinition);
 			}
@@ -93,7 +114,9 @@ public class TaskQueryServiceBase {
 		if (payload != null & !payload.isEmpty()) {
 			logger.debug("About to unmarshall query params from payload: '{}'", payload);
 			
-			TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
+			//TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
+			TaskQueryFilterSpec filterSpec = jaxbMarshaller.unmarshall(payload, TaskQueryFilterSpec.class);
+			
 			
 			//queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
 
@@ -110,8 +133,8 @@ public class TaskQueryServiceBase {
 				}
 			}
 			
-			//TODO: Define the column-mapping based on the db-type and the passed in filters.
-			columnMapping = getColumnMapping(filterSpec.getParameters());
+			//TODO: Define the column-mapping based on the db-type and the passed in filters/params.
+			columnMapping = taskQueriesStrategy.getColumnMapping(params);
 		}
 		
 		QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(MAPPER_NAME, columnMapping);
@@ -122,41 +145,37 @@ public class TaskQueryServiceBase {
 		Object result = queryService.query(TASK_QUERY_NAME, resultMapper, queryContext, params);
 		
 		logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
-
-		
 		
 		// The result should be a TaskInstanceList
 		Object actualResult = null;
 		if (result instanceof Collection) {
 			if (UserTaskInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-
 				logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
 				actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
 			} else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-
 				logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
 				actualResult = convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) result);
 			} else {
-
+				String message = "The result should be convertible to TaskInstanceList. Current result is of type: '" + result.getClass().getCanonicalName() + "' and the result-mapper is of type: '" + resultMapper.getType() + "'";
+				logger.error(message);
+				throw new IllegalArgumentException(message);
 			}
+		} else if (result == null) {
+			//Nothing to do here, result is simply empty.
+		} else  {
+			String message = "The result should be a collection. Current result is of type: '" + result.getClass().getCanonicalName() + "'";
+			logger.error(message);
+			throw new IllegalArgumentException(message);
 		}
-
-		else {
-			//
-		}
-
-		//return transform(result, resultMapper);
-		return null;
-
+		return (TaskInstanceList) transform(result, resultMapper);
 	}
-	
-	//Get the column-mapping for the given parameters.
+
+	// Get the column-mapping for the given parameters.
 	private Map<String, String> getColumnMapping(org.kie.server.api.model.definition.QueryParam[] parameters) {
 		Map<String, String> columnMapping = new HashMap<>();
-		
+
 		return columnMapping;
 	}
-
 
 	// TODO: Should we also implement a method that supports QueryBuilders???
 
