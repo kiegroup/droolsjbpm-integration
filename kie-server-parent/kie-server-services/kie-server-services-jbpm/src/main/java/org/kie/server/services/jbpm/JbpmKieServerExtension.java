@@ -661,6 +661,11 @@ public class JbpmKieServerExtension implements KieServerExtension {
         persistenceProperties.put("hibernate.transaction.jta.platform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"));
         persistenceProperties.put("javax.persistence.jtaDataSource", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS, "java:jboss/datasources/ExampleDS"));
 
+        System.getProperties().stringPropertyNames()
+                .stream()
+                .filter(PersistenceUnitInfoLoader::isValidPersistenceKey)
+                .forEach(name -> persistenceProperties.put(name, System.getProperty(name)));
+
         return persistenceProperties;
     }
 
