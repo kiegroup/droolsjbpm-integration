@@ -15,7 +15,11 @@
 
 package org.kie.server.services.impl;
 
+import java.util.concurrent.TimeUnit;
+
+import org.drools.core.command.runtime.AdvanceSessionTimeCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
+import org.drools.core.command.runtime.GetSessionTimeCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.AgendaGroupSetFocusCommand;
@@ -164,6 +168,22 @@ public class CommandsMarshallingTest {
         GetFactHandlesCommand command = marshaller.unmarshall( xmlCommand, GetFactHandlesCommand.class );
 
         assertEquals("<get-fact-handles disconnected=\"false\"/>", marshaller.marshall(command));
+    }
+
+    @Test
+    public void testMarshallGetSessionTimeCommand() {
+        String xmlCommand = "<get-session-time out-identifier=\"session-currenttime\"/>";
+        GetSessionTimeCommand command = marshaller.unmarshall( xmlCommand, GetSessionTimeCommand.class );
+        assertEquals(xmlCommand, marshaller.marshall(command));
+    }
+
+    @Test
+    public void testMarshallAdvanceSessionTimeCommand() {
+        String xmlCommand = "<advance-session-time out-identifier=\"session-advancecurrenttime\" amount=\"2\" unit=\"DAYS\"/>";
+        AdvanceSessionTimeCommand command = marshaller.unmarshall( xmlCommand, AdvanceSessionTimeCommand.class );
+        assertEquals( 2L, command.getAmount() );
+        assertEquals( TimeUnit.DAYS, command.getUnit() );
+        assertEquals(xmlCommand, marshaller.marshall(command));
     }
 
     // TODO determine what other commands are supported and add tests for them
