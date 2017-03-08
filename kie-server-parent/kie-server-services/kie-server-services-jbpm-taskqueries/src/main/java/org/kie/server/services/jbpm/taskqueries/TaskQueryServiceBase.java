@@ -31,7 +31,6 @@ import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryMapperRegistry;
-import org.jbpm.services.api.query.QueryNotFoundException;
 import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryDefinition;
@@ -74,35 +73,21 @@ public class TaskQueryServiceBase {
 		//TODO: Looks like it's impossible to do this with the existing MarshallerHelper, so we need to build our own Marshaller for now.
 		this.marshallerHelper = new MarshallerHelper(context);
 		
-		MarshallerFactory marshallerFactory  = new MarshallerFactory();
-		
 		//TODO: this is a bit hard-coded. We only support JAXB atm. It would be nicer if we could do this through MarshallerHelper ....
 		//We can also simply register marshallers for all 3 formats in a static way .... until MarshallerHelper supports adding custom classes (if it ever will).
+		
+		MarshallerFactory marshallerFactory  = new MarshallerFactory();
 		Set<Class<?>> extraClasses = new HashSet<>();
 		extraClasses.add(TaskQueryFilterSpec.class);
 		jaxbMarshaller = marshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JAXB, this.getClass().getClassLoader());
 		
+		// Register (or replace) query.
+		String taskQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
+				"java:jboss/datasources/ExampleDS");
 		this.taskQueriesStrategy = taskQueriesStrategy;
-
-		KieServerConfig config = context.getConfig();
-
-		// Register query.
-		// TODO: Do we need to do this? Only if multiple threads can register the same query. So, if this class is loaded twice ....
-		// I think this class is loaded twice, once for the RESTful endpoint by 'JbpmTaskQueriesRestApplicationComponentsService' and once by the component that loads the JMS stuff.
-		// Note that we have not implemented the JMS stuff yet, so atm, this class is loaded only once.
-		synchronized (this.getClass()) {
-			try {
-				// Throws QueryNotFoundException when the query is not found. So in the exception handling logic we register our query.
-				queryService.getQuery(TASK_QUERY_NAME);
-			} catch (QueryNotFoundException qnfe) {
-				String taskQuerySource = config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
-						"java:jboss/datasources/ExampleDS");
-
-				QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource, Target.CUSTOM);
-				queryDefinition.setExpression(taskQueriesStrategy.getTaskQueryExpression());
-				queryService.registerQuery(queryDefinition);
-			}
-		}
+		QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource, Target.CUSTOM);
+		queryDefinition.setExpression(taskQueriesStrategy.getTaskQueryExpression());
+		queryService.replaceQuery(queryDefinition);
 	}
 
 	public TaskInstanceList getHumanTasksWithFilters(Integer page, Integer pageSize, String payload, String marshallingType) {
@@ -161,14 +146,7 @@ public class TaskQueryServiceBase {
 			logger.error(message);
 			throw new IllegalArgumentException(message);
 		}
-		return (TaskInstanceList) transform(result, resultMapper);
-	}
-
-	// Get the column-mapping for the given parameters.
-	private Map<String, String> getColumnMapping(org.kie.server.api.model.definition.QueryParam[] parameters) {
-		Map<String, String> columnMapping = new HashMap<>();
-
-		return columnMapping;
+		return (TaskInstanceList) transform(actualResult, resultMapper);
 	}
 
 	// TODO: Should we also implement a method that supports QueryBuilders???
