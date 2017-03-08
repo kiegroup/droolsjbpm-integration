@@ -1,6 +1,6 @@
 package org.kie.server.remote.rest.jbpm.taskqueries;
 
-import static org.kie.server.api.rest.RestURI.TASKS_GET_FILTERED_URI;
+import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 import javax.ws.rs.DefaultValue;
@@ -12,7 +12,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.remote.rest.common.Header;
@@ -35,7 +34,7 @@ public class TaskQueryResource {
 	}
 	
 	
-	//TODO: Implement RESTful operations.
+	//TODO: We now only support standard QueryFilterSpec configurations ... Do we also need to support builders???
 	@POST
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Response getHumanTasksWithFilters(@Context HttpHeaders headers, 
@@ -49,35 +48,8 @@ public class TaskQueryResource {
 		TaskInstanceList result = taskQueryServiceBase.getHumanTasksWithFilters(page, pageSize, payload, type);
 				
 		logger.debug("Returning result of task instance search: {}", result);
-				
 		
 		return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 	}
 	
-	
-	//TODO: We now only support standard QueryFilterSpec configurations ... Do we also need to support builders???
-
 }
-
-
-/*
-
-public Response runQueryFiltered(@Context HttpHeaders headers,
-@PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("builder") String builder,
-@QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, String payload) {
-
-String type = getContentType(headers);
-// no container id available so only used to transfer conversation id if given by client
-Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-Object result = null;
-
-if (builder != null && !builder.isEmpty()) {
-result = queryDataServiceBase.queryFilteredWithBuilder(queryName, mapper, builder, page, pageSize, payload, type);
-} else {
-result = queryDataServiceBase.queryFiltered(queryName, mapper, page, pageSize, payload, type);
-}
-logger.debug("Returning result of process instance search: {}", result);
-
-return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
-}
-*/

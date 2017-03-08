@@ -27,18 +27,6 @@ import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
  */
 public interface TaskQueryServicesClient {
 
-	//ddoyle
-    /*
-     * We don't require a query string, this should be defined in the REST URL (i.e. higher level api).
-     * We do need a TaskQueryFilterSpec, which is a variant of QueryFilterSpec, but with pre-defined column-names and no column-mapping.
-     * The column-names and column-mapping is defined server-side, to decouple the client from the database schema.
-     * Server-side, we need to define a mapping-strategy based on the hibernateDialect that has been defined.
-     * 
-     * We do still support things like paging in the URL QueryParams.
-     * 
-     */
-    //TODO Should the return value be TaskInstance or TaskSummary
-    //TODO Shouldn't this method be in UserTaskServicesClient?
-    List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
+	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
 	
 }
