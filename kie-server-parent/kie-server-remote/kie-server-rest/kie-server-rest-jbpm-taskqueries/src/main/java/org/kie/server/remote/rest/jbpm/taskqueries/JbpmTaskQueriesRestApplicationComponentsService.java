@@ -34,8 +34,7 @@ public class JbpmTaskQueriesRestApplicationComponentsService implements KieServe
             if ( object == null ) {
                 continue;
             } else if ( QueryService.class.isAssignableFrom( object.getClass() ) ) {
-            	//TODO: We depend on the service provided by the jBPM extension. Our extension does not load this one itself.
-                queryService = (QueryService) object;
+            	queryService = (QueryService) object;
                 continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;

@@ -23,10 +23,6 @@ public class TaskQueryFilterSpec {
 	@XmlElement(name = "query-params")
 	private QueryParam[] parameters;
 
-	/*
-	 * @XmlElement(name="result-column-mapping") private Map<String, String> columnMapping;
-	 */
-
 	public TaskQueryFilterSpec() {
 	}
 
@@ -46,9 +42,6 @@ public class TaskQueryFilterSpec {
 		this.ascending = ascending;
 	}
 
-	/*
-	 * TODO: Should we abstract QueryParam into "TaskQueryParam"? QueryParam allows to set any "column-name", not only TASK Fields.
-	 */
 	public QueryParam[] getParameters() {
 		return parameters;
 	}
@@ -56,12 +49,6 @@ public class TaskQueryFilterSpec {
 	public void setParameters(QueryParam[] parameters) {
 		this.parameters = parameters;
 	}
-
-	/*
-	 * public Map<String, String> getColumnMapping() { return columnMapping; }
-	 * 
-	 * public void setColumnMapping(Map<String, String> columnMapping) { this.columnMapping = columnMapping; }
-	 */
 
 	@Override
 	public String toString() {

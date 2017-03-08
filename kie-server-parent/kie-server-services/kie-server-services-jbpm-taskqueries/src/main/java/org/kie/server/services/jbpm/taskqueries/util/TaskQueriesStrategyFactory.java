@@ -14,15 +14,9 @@ public class TaskQueriesStrategyFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(TaskQueriesStrategyFactory.class);
 	
-	//TODO Should we do this with a KieServerConfig?
-	private static final String DB_STRATEGY = System.getProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT);
-	
-	private KieServerRegistry context;
-	
 	private TaskQueriesStrategy strategy;
 	
 	public TaskQueriesStrategyFactory(KieServerRegistry context) {
-		this.context = context;
 		switch (context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect")) {
 		case "org.hibernate.dialect.PostgreSQLDialect":
 			logger.info("Initializing PostgreSQL TaskQuery strategy.");

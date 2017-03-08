@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.jbpm.services.api.query.QueryService;
 import org.kie.server.api.KieServerConstants;
@@ -40,12 +39,6 @@ public class JbpmTaskQueriesKieServerExtension implements KieServerExtension {
     private static final Logger logger = LoggerFactory.getLogger(JbpmTaskQueriesKieServerExtension.class);
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
-
-    /*
-    private boolean isExecutorAvailable = false;
-
-    private String persistenceUnitName = KieServerConstants.KIE_SERVER_PERSISTENCE_UNIT_NAME;
-    */
 
     private KieServerImpl kieServer;
     private KieServerRegistry context;
@@ -70,28 +63,20 @@ public class JbpmTaskQueriesKieServerExtension implements KieServerExtension {
     	this.kieServer = kieServer;
     	this.context = registry;
     	
-    	//TODO: Double check if this is correct.
-        //Requires jBPM Extension, as we depend on the QueryService.
-        //KieServerExtension jBpmExtension = registry.getServerExtension( "jBPM" );
-    	KieServerExtension jBpmExtension = registry.getServerExtension(JbpmKieServerExtension.EXTENSION_NAME);
+    	//Requires jBPM Extension, as we depend on the QueryService.
+        KieServerExtension jBpmExtension = registry.getServerExtension(JbpmKieServerExtension.EXTENSION_NAME);
         if ( jBpmExtension == null ) {
         	logger.error("No jBPM extension available, quiting...");
             return;
         }
-        
         queryService = jBpmExtension.getAppComponents(QueryService.class);
-        
-        //Build the TaskQueryServiceBase
-        //TODO: This is done by the REST extension.
-        //this.taskQueryServiceBase = new TaskQueryServiceBase(null, registry, TaskQueriesStrategyFactory.getTaskQueriesStrategy());
-        
         services.add(queryService);
         initialized = true;
     }
 
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
-        //TODO: Implement destroy logic (if applicable ...).
+    	//no-op
     }
 
     @Override

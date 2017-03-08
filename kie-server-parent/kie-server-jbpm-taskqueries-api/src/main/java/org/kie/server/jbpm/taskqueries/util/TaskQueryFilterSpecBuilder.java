@@ -14,8 +14,7 @@ import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
  * <p/>
  * This provides a higher level-api than the Advanced Query API (i.e. {@link QueryFilterSpecBuilder} as the Task field-names (column-names)
  * are pre-defined and exposed via a strongly-typed API, and thus not bound to specific column-names in the database. This guards users of
- * this API for potential changes in the jBPM schema.
- * 
+ * this API for potential changes in the jBPM schema. 
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
@@ -23,18 +22,12 @@ public class TaskQueryFilterSpecBuilder {
 
 	private List<QueryParam> parameters = new ArrayList<QueryParam>();
 	private TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpec();
-	//private Map<String, String> columnMapping = new HashMap<String, String>();
-
+	
 	public TaskQueryFilterSpec get() {
 		if (!parameters.isEmpty()) {
 			filterSpec.setParameters(parameters.toArray(new QueryParam[parameters.size()]));
 		}
-		//Don't need column mapping here. Column mapping is implicit.
-		/*
-		if (!columnMapping.isEmpty()) {
-			filterSpec.setColumnMapping(columnMapping);
-		}
-		*/
+		
 		return filterSpec;
 	}
 
@@ -122,13 +115,5 @@ public class TaskQueryFilterSpecBuilder {
 
 		return this;
 	}
-
-	/* TODO: Don't need column mapping.
-	public TaskQueryFilterSpecBuilder addColumnMapping(TASK_FIELD field, String type) {
-		columnMapping.put(field.toString(), type);
-
-		return this;
-	}
-	*/
 
 }

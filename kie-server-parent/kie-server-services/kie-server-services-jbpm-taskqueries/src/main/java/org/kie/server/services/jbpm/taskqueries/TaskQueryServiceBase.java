@@ -109,7 +109,6 @@ public class TaskQueryServiceBase {
 		QueryParam[] params = new QueryParam[0];
 		Map<String, String> columnMapping = null;
 		QueryContext queryContext = buildQueryContext(page, pageSize);
-		Map<String, Object> queryParameters = new HashMap<String, Object>();
 
 		if (payload != null & !payload.isEmpty()) {
 			logger.debug("About to unmarshall query params from payload: '{}'", payload);
@@ -117,9 +116,6 @@ public class TaskQueryServiceBase {
 			//TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
 			TaskQueryFilterSpec filterSpec = jaxbMarshaller.unmarshall(payload, TaskQueryFilterSpec.class);
 			
-			
-			//queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
-
 			queryContext.setOrderBy(filterSpec.getOrderBy());
 			queryContext.setAscending(filterSpec.isAscending());
 
@@ -133,7 +129,6 @@ public class TaskQueryServiceBase {
 				}
 			}
 			
-			//TODO: Define the column-mapping based on the db-type and the passed in filters/params.
 			columnMapping = taskQueriesStrategy.getColumnMapping(params);
 		}
 		
@@ -141,7 +136,6 @@ public class TaskQueryServiceBase {
 		
 		logger.debug("About to perform query '{}' with page {} and page size {}", TASK_QUERY_NAME, page, pageSize);
 
-		//Object result = queryService.query(QUERY_NAME, resultMapper, queryContext, params);
 		Object result = queryService.query(TASK_QUERY_NAME, resultMapper, queryContext, params);
 		
 		logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
@@ -226,32 +220,3 @@ public class TaskQueryServiceBase {
 	}
 
 }
-
-/*
- * 
- * public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload,
- * String marshallingType) { Map<String, String> columnMapping = null; QueryContext queryContext = buildQueryContext(page, pageSize);
- * 
- * 
- * Map<String, Object> queryParameters = new HashMap<String, Object>(); if (payload != null && !payload.isEmpty()) {
- * logger.debug("About to unmarshal query params from payload: '{}'", payload); queryParameters = marshallerHelper.unmarshal(payload,
- * marshallingType, Map.class);
- * 
- * String orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY); Boolean ascending = (Boolean)
- * queryParameters.remove(KieServerConstants.QUERY_ASCENDING); columnMapping = (Map<String, String>
- * )queryParameters.remove(KieServerConstants.QUERY_COLUMN_MAPPING);
- * 
- * if (orderBy != null) { queryContext.setOrderBy(orderBy); } if (ascending != null) { queryContext.setAscending(ascending); } }
- * QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, columnMapping); QueryParamBuilderFactory
- * paramBuilderFactory = QueryParamBuilderManager.get().find(builder);
- * 
- * if (paramBuilderFactory == null) { new RuntimeException("No query param builder found for " + builder); }
- * 
- * 
- * logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
- * 
- * Object result = queryService.query(queryName, resultMapper, queryContext, paramBuilderFactory.newInstance(queryParameters));
- * logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
- * 
- * return transform(result, resultMapper); }
- */

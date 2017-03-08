@@ -19,29 +19,6 @@ public class PostgreSQLTaskQueriesStrategy implements TaskQueriesStrategy {
 		return TASK_QUERY;
 	}
 	
-	/*
-	 * 
-	 *  
-	 * id bigint NOT NULL,
-  activationtime timestamp without time zone,
-  actualowner character varying(255),
-  createdby character varying(255),
-  createdon timestamp without time zone,
-  deploymentid character varying(255),
-  description character varying(255),
-  duedate timestamp without time zone,
-  name character varying(255),
-  parentid bigint NOT NULL,
-  priority integer NOT NULL,
-  processid character varying(255),
-  processinstanceid bigint NOT NULL,
-  processsessionid bigint NOT NULL,
-  status character varying(255),
-  taskid bigint,
-  workitemid bigint,
-  CONSTRAINT audittaskimpl_pkey PRIMARY KEY (id)
-	 * 
-	 */
 	@Override
 	public Map<String, String> getColumnMapping(QueryParam[] params) {
 		Map<String, String> mapping = new HashMap<>();
@@ -114,7 +91,6 @@ public class PostgreSQLTaskQueriesStrategy implements TaskQueriesStrategy {
 			String message = "Unknown paramater.";
 			logger.error(message);
 			throw new IllegalArgumentException(message);
-		
 		}
 		return columnType;
 	}
