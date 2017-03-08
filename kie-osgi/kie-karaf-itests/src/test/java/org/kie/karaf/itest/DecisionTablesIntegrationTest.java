@@ -16,31 +16,21 @@
 
 package org.kie.karaf.itest;
 
+import org.drools.decisiontable.ExternalSpreadsheetCompiler;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kie.api.KieBase;
 import org.kie.api.KieServices;
-import org.kie.api.builder.Results;
 import org.kie.api.io.KieResources;
-import org.kie.api.runtime.KieContainer;
-import org.kie.internal.utils.KieHelper;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
-import static org.junit.Assert.assertTrue;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
-
-import org.drools.decisiontable.ExternalSpreadsheetCompiler;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
@@ -59,7 +49,7 @@ public class DecisionTablesIntegrationTest extends AbstractKarafIntegrationTest 
         origTCCL = Thread.currentThread().getContextClassLoader();
         // Pax-exam sets the TCCL to the bundle-under-test classloader which in turn means that the XStream marshalling
         // will work with different TCCL than it would with standalone bundle. Setting system/application classloader as
-        // TCCL is needed to reproduce the fails related to XStream unmarshalling in guided-dtables module
+        // TCCL is needed to reproduce the fails related to XStream unmarshalling
         Thread.currentThread().setContextClassLoader(Object.class.getClassLoader());
     }
 
