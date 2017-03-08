@@ -481,6 +481,9 @@
                   <!-- Reuse yoda user for deploying and undeploying Kie server from within the test -->
                   <cargo.remote.username>yoda</cargo.remote.username>
                   <cargo.remote.password>usetheforce123@</cargo.remote.password>
+                  <!-- Remote repo dir is passed to tests as it is needed by Maven CLI to run properly.
+                       Maven CLI needs specific definition of local repository to download all dependencies there. -->
+                  <kie.server.testing.remote.repo.dir>${kie.server.testing.remote.repo.dir}</kie.server.testing.remote.repo.dir>
                 </systemPropertyVariables>
               </configuration>
             </plugin>
