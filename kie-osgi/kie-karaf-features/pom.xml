@@ -57,7 +57,7 @@
     <karaf.version.org.apache.servicemix.specs.jsr303-api>2.4.0</karaf.version.org.apache.servicemix.specs.jsr303-api>
 
     <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
-    <karaf.version.commons-codec>1.9</karaf.version.commons-codec>
+    <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
     <karaf.version.javax.inject>${version.org.geronimo.atinject}</karaf.version.javax.inject>
     <karaf.version.org.codehaus.janino>${version.org.codehaus.janino}</karaf.version.org.codehaus.janino>
     <!-- Overwrites with a servicemix version -->
@@ -67,8 +67,9 @@
     <karaf.servicemix.version.com.thoughtworks.xmlpull>1.1.4c_7</karaf.servicemix.version.com.thoughtworks.xmlpull>
     <karaf.servicemix.version.javax.xml.bind.jaxb>2.2.0</karaf.servicemix.version.javax.xml.bind.jaxb>
     <karaf.servicemix.version.org.antlr>3.5_1</karaf.servicemix.version.org.antlr>
-    <karaf.servicemix.version.org.apache.poi>3.13_2</karaf.servicemix.version.org.apache.poi>
-    <!-- Santurio and xmlresolver needed by POI 3.11+ -->
+    <karaf.servicemix.version.org.apache.poi>3.15_1</karaf.servicemix.version.org.apache.poi>
+    <!-- Santurio and xmlresolver needed by POI 3.15+ -->
+    <karaf.version.org.apache.commons-collections4>4.1</karaf.version.org.apache.commons-collections4>
     <karaf.version.org.apache.santurio>2.0.6</karaf.version.org.apache.santurio>
     <karaf.servicemix.version.xmlresolver>1.2_5</karaf.servicemix.version.xmlresolver>
     <karaf.servicemix.version.org.codehaus.woodstox>3.2.9_3</karaf.servicemix.version.org.codehaus.woodstox>
