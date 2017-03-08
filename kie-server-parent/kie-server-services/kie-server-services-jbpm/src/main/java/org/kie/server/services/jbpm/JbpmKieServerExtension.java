@@ -370,17 +370,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
             addAsyncHandler(unit, kieContainer);
 
-            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_CLEANUP_LISTENER, "true").equalsIgnoreCase("true")) {
+            if (System.getProperty(KieServerConstants.CFG_JBPM_TASK_CLEANUP_LISTENER, "true").equalsIgnoreCase("true")) {
                 logger.debug("Registering TaskCleanUpProcessEventListener");
                 addTaskCleanUpProcessListener(unit, kieContainer);
             }
 
-            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_TASK_BAM_LISTENER, "true").equalsIgnoreCase("true")) {
+            if (System.getProperty(KieServerConstants.CFG_JBPM_TASK_BAM_LISTENER, "true").equalsIgnoreCase("true")) {
                 logger.debug("Registering BAMTaskEventListener");
                 addTaskBAMEventListener(unit, kieContainer);
             }
 
-            if (config.getConfigItemValue(KieServerConstants.CFG_JBPM_PROCESS_IDENTITY_LISTENER, "true").equalsIgnoreCase("true")) {
+            if (System.getProperty(KieServerConstants.CFG_JBPM_PROCESS_IDENTITY_LISTENER, "true").equalsIgnoreCase("true")) {
                 logger.debug("Registering IdentityProviderAwareProcessListener");
                 addProcessIdentityProcessListener(unit, kieContainer);
             }
