@@ -9,7 +9,6 @@ import org.jbpm.services.api.query.QueryService;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.api.SupportedTransports;
-import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.kie.server.services.jbpm.taskqueries.JbpmTaskQueriesKieServerExtension;
 import org.kie.server.services.jbpm.taskqueries.TaskQueryServiceBase;
 import org.kie.server.services.jbpm.taskqueries.util.TaskQueriesStrategyFactory;

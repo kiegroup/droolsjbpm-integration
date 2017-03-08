@@ -13,6 +13,7 @@ import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.junit.Test;
+import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
@@ -27,6 +28,8 @@ public class TaskQueryServiceBaseTest {
 	public void testGetHumanTasksWithFilters() {
 		QueryService queryServiceMock = Mockito.mock(QueryService.class);
 		KieServerRegistry contextMock = Mockito.mock(KieServerRegistry.class);
+		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
+		when(contextMock.getConfig()).thenReturn(configMock);
 		TaskQueriesStrategy taskQueriesStrategyMock = Mockito.mock(TaskQueriesStrategy.class); 
 		
 		TaskQueryServiceBase base = new TaskQueryServiceBase(queryServiceMock, contextMock, taskQueriesStrategyMock);
