@@ -11,4 +11,9 @@
     <property name="identifier" value="spring-rm"/>
     <property name="runtimeEnvironment" ref="runtimeEnvironment"/>
   </bean>
+
+  <bean id="runtimeManager2" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+    <property name="identifier" value="spring-rm2"/>
+    <property name="runtimeEnvironment" ref="runtimeEnvironment2"/>
+  </bean>
 </beans>
