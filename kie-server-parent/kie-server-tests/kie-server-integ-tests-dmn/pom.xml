@@ -170,7 +170,7 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- DO NOT REMOVE THIS COMMENT. Ref commit 3a92c62 of PR droolsjbpm/droolsjbpm-integration#447 
+    <!-- DO NOT REMOVE THIS COMMENT. Ref commit 3a92c62 of PR kiegroup/droolsjbpm-integration#447
      This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
      parallel build (otherwise the tests fail because of conflicting port binding) -->
     <dependency>
