@@ -43,9 +43,9 @@
   </repositories>
 
   <scm>
-    <connection>scm:git:https://github.com:droolsjbpm/droolsjbpm-integration.git</connection>
-    <developerConnection>scm:git:git@github.com:droolsjbpm/droolsjbpm-integration.git</developerConnection>
-    <url>https://github.com/droolsjbpm/droolsjbpm-integration</url>
+    <connection>scm:git:https://github.com:kiegroup/droolsjbpm-integration.git</connection>
+    <developerConnection>scm:git:git@github.com:kiegroup/droolsjbpm-integration.git</developerConnection>
+    <url>https://github.com/kiegroup/droolsjbpm-integration</url>
   </scm>
 
   <modules>
