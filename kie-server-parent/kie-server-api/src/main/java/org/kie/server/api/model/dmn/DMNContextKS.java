@@ -24,20 +24,28 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-context")
+@XStreamAlias("dmn-evaluation-context")
 public class DMNContextKS {
 
     @XmlElement(name="model-namespace")
+    @XStreamAlias("model-namespace")
     private String namespace;
 
     @XmlElement(name="model-name")
+    @XStreamAlias("model-name")
     private String modelName;
 
     @XmlElement(name="decision-name")
+    @XStreamAlias("decision-name")
     private String decisionName;
 
+    // TODO consistency for JSON
     @XmlElementWrapper(name="dmn-context")
+    @XStreamAlias("dmn-context")
     private Map<String, Object> dmnContext = new HashMap<>();
     
     public DMNContextKS() {

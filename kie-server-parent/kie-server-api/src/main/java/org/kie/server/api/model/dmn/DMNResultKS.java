@@ -24,31 +24,41 @@ import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNDecisionResult.DecisionEvaluationStatus;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessage.Severity;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import org.kie.dmn.api.core.DMNResult;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-result")
+@XStreamAlias("dmn-evaluation-result")
 public class DMNResultKS implements DMNResult {
 
     @XmlElement(name="model-namespace")
+    @XStreamAlias("model-namespace")
     private String namespace;
 
     @XmlElement(name="model-name")
+    @XStreamAlias("model-name")
     private String modelName;
 
     @XmlElement(name="decision-name")
+    @XStreamAlias("decision-name")
     private String decisionName;
 
     // please note this must NOT be @XmlElement*Wrapper* otherwise it will be unable to find proper type for marshalling/unmarshalling.
     @XmlElement(name="dmn-context")
+    @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling
     @XmlElementWrapper(name="messages")
+    @XStreamAlias("messages")
     private List<DMNMessageKS> messages = new ArrayList<>();
     
     @XmlElementWrapper(name="decision-results")
+    @XStreamAlias("decision-results")
     private Map<String, DMNDecisionResultKS> decisionResults = new HashMap<>();
     
     public DMNResultKS() {

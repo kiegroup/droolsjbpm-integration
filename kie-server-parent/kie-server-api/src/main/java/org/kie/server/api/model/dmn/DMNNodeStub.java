@@ -20,11 +20,15 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-node-stub")
+@XStreamAlias("dmn-node-stub")
 public class DMNNodeStub {
 
     @XmlElement(name="value")
+    @XStreamAlias("value")
     private String value;
     
     public DMNNodeStub() {

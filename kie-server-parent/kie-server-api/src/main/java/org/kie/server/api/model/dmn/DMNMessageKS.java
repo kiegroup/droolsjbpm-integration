@@ -23,8 +23,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-message")
+@XStreamAlias("dmn-message")
 //@XmlType(namespace="org.kie.server.api.model.dmn", name = "DMNMessageKS")
 public class DMNMessageKS implements DMNMessage {
     
@@ -64,12 +67,15 @@ public class DMNMessageKS implements DMNMessage {
     }
 
     @XmlElement(name="dmn-message-severity")
+    @XStreamAlias("dmn-message-severity")
     private DMNMessageSeverityKS  severity;
     
     @XmlElement(name="message")
+    @XStreamAlias("message")
     private String    message;
     
     @XmlElement(name="source-id")
+    @XStreamAlias("source-id")
     private String    sourceId;
 
     public DMNMessageKS() {

@@ -29,24 +29,32 @@ import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-decision-result")
+@XStreamAlias("dmn-decision-result")
 public class DMNDecisionResultKS implements DMNDecisionResult {
     
     @XmlElement(name="decision-id")
+    @XStreamAlias("decision-id")
     private String           decisionId;
     
     @XmlElement(name="decision-name")
+    @XStreamAlias("decision-name")
     private String           decisionName;
     
     @XmlElement(name="result")
+    @XStreamAlias("result")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Object           result;
     
     @XmlElementWrapper(name="messages")
+    @XStreamAlias("messages")
     private List<DMNMessageKS> messages;
 
     @XmlElement(name="status")
+    @XStreamAlias("status")
     private DecisionEvaluationStatus status;
 
     public DMNDecisionResultKS() {
