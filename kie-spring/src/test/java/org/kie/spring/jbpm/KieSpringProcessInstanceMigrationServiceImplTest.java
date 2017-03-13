@@ -55,7 +55,12 @@ public class KieSpringProcessInstanceMigrationServiceImplTest extends AbstractJb
     @After
     public void cleanup() {
         System.clearProperty("org.kie.txm.factory.class");
+        TransactionManagerFactory.resetInstance();
         EntityManagerFactoryManager.get().clear();
+        if (context != null) {
+            context.close();
+            context = null;
+        }
     }
 
     public KieSpringProcessInstanceMigrationServiceImplTest(String contextPath,
