@@ -44,6 +44,8 @@ public class KieServerRegistryImpl implements KieServerRegistry {
     private ConcurrentMap<String, KieServerExtension> serverExtensions = new ConcurrentHashMap<String, KieServerExtension>();
 
     private Set<String> controllers = new CopyOnWriteArraySet<String>();
+    
+    private Set<Class<?>> extraClasses = new HashSet<>();
 
     private KieServerStateRepository repository;
 
@@ -228,4 +230,14 @@ public class KieServerRegistryImpl implements KieServerRegistry {
 
         return alias;
     }
+
+	@Override
+	public void addExtraClasses(Set<Class<?>> extraClasses) {
+		this.extraClasses.addAll(extraClasses);
+	}
+
+	@Override
+	public Set<Class<?>> getExtraClasses() {
+		return extraClasses;
+	}
 }

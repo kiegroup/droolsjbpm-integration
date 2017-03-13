@@ -66,8 +66,7 @@ public class MarshallerHelper {
     }
 
     public String marshal(String marshallingFormat, Object entity) {
-        MarshallingFormat format = getFormat(marshallingFormat);
-
+    	MarshallingFormat format = getFormat(marshallingFormat);
 
         if (format == null) {
             throw new IllegalArgumentException("Unknown marshalling format " + marshallingFormat);
@@ -75,13 +74,13 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-            marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
+        	marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
             serverMarshallers.put(format, marshaller);
         }
 
         return marshaller.marshall(entity);
-
     }
+    
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType) {
         return unmarshal(containerId, data, marshallingFormat, unmarshalType, ContainerLocatorProvider.get().getLocator());
     }
