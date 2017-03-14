@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import javax.persistence.EntityManagerFactory;
 
-import org.drools.persistence.TransactionManagerFactory;
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.jbpm.runtime.manager.impl.deploy.DeploymentDescriptorImpl;
 import org.jbpm.runtime.manager.impl.jpa.EntityManagerFactoryManager;
 import org.jbpm.runtime.manager.impl.migration.MigrationException;
