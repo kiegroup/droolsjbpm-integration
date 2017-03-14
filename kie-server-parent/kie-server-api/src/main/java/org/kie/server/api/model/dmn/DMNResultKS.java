@@ -59,7 +59,6 @@ public class DMNResultKS implements DMNResult {
     
     @XmlElement(name="decision-results")
     @XStreamAlias("decision-results")
-    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, DMNDecisionResultKS> decisionResults = new HashMap<>();
     
     public DMNResultKS() {
