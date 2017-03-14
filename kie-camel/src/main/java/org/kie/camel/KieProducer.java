@@ -95,61 +95,52 @@ public class KieProducer extends DefaultProducer {
 
     abstract static class AbstractInternalProducer<C> implements InternalProducer {
 
-        private final C client;
+        protected final C client;
 
-        private final Method operationLookupMethod;
+        private final Optional<Method> operationLookupMethod;
 
         protected AbstractInternalProducer(C client) {
             this.client = client;
             operationLookupMethod = getLookupMethod();
         }
 
-        @Override
-        public Object execute(Exchange exchange) {
-            String operationName = exchange.getIn().getHeader( KIE_OPERATION, String.class );
-            try {
-                return getOperation(operationName).map(op -> op.execute( client, exchange ) ).orElse( null );
-            } catch (Exception e) {
-                log.error( "Error executed operation: " + operationName + " caused by: " + e.getMessage(), e );
-                return null;
-            }
+        protected Optional<Operation<C>> getOperation( String operationName ) {
+            return operationLookupMethod.flatMap( m -> {
+                try {
+                    return Optional.of( (Operation<C>) m.invoke( null, operationName ) );
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    return Optional.empty();
+                }
+            } );
         }
 
-        private Optional<Operation<C>> getOperation( String operationName ) {
-            Operation<C> operation;
-            try {
-                return Optional.of( (Operation<C>) operationLookupMethod.invoke( null, operationName ) );
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                log.error( "Unknown operation name: " + operationName );
-                return Optional.empty();
-            }
-        }
-
-        private Method getLookupMethod() {
+        private Optional<Method> getLookupMethod() {
             try {
                 Class<?> enumClass = Class.forName( getClass().getName() + "$Operations" );
-                return enumClass.getMethod( "valueOf", String.class );
+                return Optional.of(enumClass.getMethod( "valueOf", String.class ));
             } catch (Exception e) {
-                log.error( "Initialization error", e );
-                return null;
+                return Optional.empty();
             }
         }
     }
 
-    abstract static class AbstractReflectiveProducer<C> implements InternalProducer {
-        private final C client;
-
+    abstract static class AbstractReflectiveProducer<C> extends AbstractInternalProducer<C> {
         private final Map<String, Collection<Method>> methodsMap;
 
         protected AbstractReflectiveProducer(C client) {
-            this.client = client;
+            super(client);
             this.methodsMap = indexClientMethod( client.getClass() );
         }
 
         @Override
         public Object execute(Exchange exchange) {
             String operationName = exchange.getIn().getHeader( KIE_OPERATION, String.class );
-            Collection<Method> methods = methodsMap.get(operationName);
+            return getOperation(operationName).map(op -> op.execute( client, exchange ) )
+                                              .orElseGet( () -> executeViaReflection( operationName, exchange ) );
+        }
+
+        private Object executeViaReflection( String operationName, Exchange exchange ) {
+            Collection<Method> methods = methodsMap.get( operationName );
             if (methods == null) {
                 log.error( "Unknown operation name: " + operationName );
                 return null;
@@ -204,15 +195,10 @@ public class KieProducer extends DefaultProducer {
         }
 
         enum Operations implements Operation<KieServicesClient> {
-            getServerInfo {
+            myCustomOperation {
                 @Override
                 public Object execute(KieServicesClient client, Exchange exchange) {
                     return client.getServerInfo();
-                }
-            }, listContainers {
-                @Override
-                public Object execute(KieServicesClient client, Exchange exchange) {
-                    return client.listContainers();
                 }
             }
         }
@@ -238,17 +224,6 @@ public class KieProducer extends DefaultProducer {
     static class ProcessProducer extends AbstractReflectiveProducer<ProcessServicesClient> {
         public ProcessProducer(KieServicesClient client) {
             super( client.getServicesClient(ProcessServicesClient.class) );
-        }
-
-        enum Operations implements Operation<ProcessServicesClient> {
-            getProcessDefinition {
-                @Override
-                public Object execute(ProcessServicesClient client, Exchange exchange) {
-                    String containerId = exchange.getIn().getHeader( "containerId", String.class );
-                    String processId = exchange.getIn().getHeader( "processId", String.class );
-                    return client.getProcessDefinition(containerId, processId);
-                }
-            }
         }
     }
 }

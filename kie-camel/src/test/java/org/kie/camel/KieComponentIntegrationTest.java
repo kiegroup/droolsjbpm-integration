@@ -84,6 +84,21 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
         assertEquals("Number of listed containers", 2, result.getContainers().size());
     }
 
+    @Test
+    public void performCustomOperation() throws Exception {
+        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
+        mockEndpoint.expectedMessageCount( 1 );
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(KIE_CLIENT, "kieServices");
+        headers.put(KIE_OPERATION, "myCustomOperation");
+        template.sendBodyAndHeaders("direct:start", null, headers);
+        assertMockEndpointsSatisfied();
+
+        KieServerInfo result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(KieServerInfo.class);
+        assertEquals("Server version", "1.2.3", result.getVersion());
+    }
+
     @Override
     protected RouteBuilder createRouteBuilder() throws Exception {
         stubFor(get(urlEqualTo("/"))
