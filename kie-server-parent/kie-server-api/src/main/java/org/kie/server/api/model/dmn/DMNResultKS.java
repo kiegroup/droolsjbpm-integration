@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.drools.core.xml.jaxb.util.JaxbMapAdapter;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
@@ -46,7 +47,6 @@ public class DMNResultKS implements DMNResult {
     @XStreamAlias("decision-name")
     private String decisionName;
 
-    // please note this must NOT be @XmlElement*Wrapper* otherwise it will be unable to find proper type for marshalling/unmarshalling.
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
@@ -57,8 +57,9 @@ public class DMNResultKS implements DMNResult {
     @XStreamAlias("messages")
     private List<DMNMessageKS> messages = new ArrayList<>();
     
-    @XmlElementWrapper(name="decision-results")
+    @XmlElement(name="decision-results")
     @XStreamAlias("decision-results")
+    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, DMNDecisionResultKS> decisionResults = new HashMap<>();
     
     public DMNResultKS() {

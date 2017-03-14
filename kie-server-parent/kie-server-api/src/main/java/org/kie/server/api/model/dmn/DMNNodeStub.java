@@ -27,23 +27,23 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("dmn-node-stub")
 public class DMNNodeStub {
 
-    @XmlElement(name="value")
-    @XStreamAlias("value")
-    private String value;
+    @XmlElement(name="dmn-node")
+    @XStreamAlias("dmn-node")
+    private String dmnNode;
     
     public DMNNodeStub() {
         // empty constructor for marshalling
     }
     
-    static DMNNodeStub of( Object value ) {
+    static DMNNodeStub of( Object dmnNode ) {
         DMNNodeStub res = new DMNNodeStub();
-        res.value = value.toString();
+        res.dmnNode = dmnNode.toString();
         return res;
     }
 
     @Override
     public String toString() {
-        return value;
+        return dmnNode;
     }
     
 }
