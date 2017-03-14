@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -135,6 +136,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
 
     @Test
     public void testScheduleAndRunJobWithCustomTypeFromContainer() throws Exception {
+        int currentNumberOfDone = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Collections.singletonList(STATUS.DONE.toString()), 0, 100).size();
         Class<?> personClass = Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader());
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -188,6 +190,14 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         Map<String, Object> responseData = jobRequest.getResponseData();
         assertNotNull(responseData);
         assertEquals(0, responseData.size());
+
+        List<RequestInfoInstance> result = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Arrays.asList(STATUS.QUEUED.name()), 0, 100);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+
+        result = jobServicesClient.getRequestsByContainer(CONTAINER_ID, Arrays.asList(STATUS.DONE.name()), 0, 100);
+        assertNotNull(result);
+        assertEquals(1 + currentNumberOfDone, result.size());
 
     }
 
@@ -302,6 +312,11 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         RequestInfoInstance queuedJob = queuedJobs.get(0);
         assertRequestInfoInstance(expected, queuedJob);
 
+        result = jobServicesClient.getRequestsByBusinessKey(BUSINESS_KEY, Arrays.asList(STATUS.QUEUED.name()),  0, 100);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertRequestInfoInstance(expected, result.get(0));
+
         jobServicesClient.cancelRequest(jobId);
     }
 
@@ -348,7 +363,59 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         numberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, 0, 100).size();
         assertEquals(1 + originalNumberOfSecondCommands, numberOfSecondCommands);
 
+        numberOfSecondCommands = jobServicesClient.getRequestsByCommand(secondCommand, Arrays.asList(STATUS.QUEUED.name()), 0, 100).size();
+        assertEquals(1, numberOfSecondCommands);
+
         jobServicesClient.cancelRequest(jobId);
+    }
+
+    @Test
+    public void testScheduleViewUpdateDataAndCancelJob() {
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("businessKey", BUSINESS_KEY);
+        data.put("customValue", "just a simple value");
+        data.put("processInstanceId", 1234);
+
+        JobRequestInstance jobRequestInstance = createJobRequestInstance();
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
+        jobRequestInstance.setData(data);
+
+        Long jobId = jobServicesClient.scheduleRequest(jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        RequestInfoInstance jobRequest = jobServicesClient.getRequestById(jobId, false, true);
+        RequestInfoInstance expected = createExpectedRequestInfoInstance(jobId, STATUS.QUEUED);
+        assertRequestInfoInstance(expected, jobRequest);
+        assertNotNull(jobRequest.getScheduledDate());
+
+        Map<String, Object> jobsData = jobRequest.getData();
+        assertNotNull(jobsData);
+        assertEquals("just a simple value", jobsData.get("customValue"));
+        assertEquals(1234, jobsData.get("processInstanceId"));
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("customValue", "updated string");
+
+        jobServicesClient.updateRequestData(jobId, null, updates);
+        jobRequest = jobServicesClient.getRequestById(jobId, false, true);
+        jobsData = jobRequest.getData();
+        assertNotNull(jobsData);
+        assertEquals("updated string", jobsData.get("customValue"));
+        assertEquals(1234, jobsData.get("processInstanceId"));
+
+        List<RequestInfoInstance> processRequests = jobServicesClient.getRequestsByProcessInstance(1234L, Arrays.asList(STATUS.QUEUED.name()), 0, 100);
+        assertNotNull(processRequests);
+        assertEquals(1, processRequests.size());
+
+        jobServicesClient.cancelRequest(jobId);
+
+        jobRequest = jobServicesClient.getRequestById(jobId, false, false);
+        expected.setStatus(STATUS.CANCELLED.toString());
+        assertRequestInfoInstance(expected, jobRequest);
     }
 
     private void assertRequestInfoInstance(RequestInfoInstance expected, RequestInfoInstance actual) {

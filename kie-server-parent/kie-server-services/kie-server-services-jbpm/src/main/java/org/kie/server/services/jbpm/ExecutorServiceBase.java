@@ -101,18 +101,27 @@ public class ExecutorServiceBase {
         ((RequeueAware) executorService).requeueById(requestId);
     }
 
+    public void updateRequestData(long requestId, String containerId, String payload, String marshallingType) {
+
+        Map<String, Object> data = null;
+        if (containerId != null && !containerId.isEmpty()) {
+            logger.debug("About to unmarshal job data from payload: '{}' using container {} marshaller", payload, containerId);
+            data = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
+
+        } else {
+            logger.debug("About to unmarshal job data from payload: '{}' using server marshaller", payload);
+            data = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
+        }
+
+        logger.debug("About to update job's ( with id {}) data {}", requestId, data);
+        executorService.updateRequestData(requestId, data);
+    }
+
     // queries
 
     public RequestInfoInstanceList getRequestsByStatus(List<String> statuses, Integer page, Integer pageSize) {
 
-        List<STATUS> statusList = new ArrayList<STATUS>();
-        if (statuses != null && !statuses.isEmpty()) {
-            for (String status : statuses) {
-                statusList.add(STATUS.valueOf(status));
-            }
-        } else {
-            statusList.add(STATUS.QUEUED);
-        }
+        List<STATUS> statusList = convertStatusList(statuses);
         List<RequestInfo> requests = executorService.getRequestsByStatus(statusList, buildQueryContext(page, pageSize));
 
         RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
@@ -129,9 +138,47 @@ public class ExecutorServiceBase {
         return result;
     }
 
+    public RequestInfoInstanceList getRequestsByBusinessKey(String businessKey, List<String> statuses, Integer page, Integer pageSize) {
+        List<STATUS> statusList = convertStatusList(statuses);
+        List<RequestInfo> requests = executorService.getRequestsByBusinessKey(businessKey, statusList, buildQueryContext(page, pageSize));
+
+        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
+
+        return result;
+    }
+
     public RequestInfoInstanceList getRequestsByCommand(String command, Integer page, Integer pageSize) {
 
         List<RequestInfo> requests = executorService.getRequestsByCommand(command, buildQueryContext(page, pageSize));
+
+        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
+
+        return result;
+    }
+
+    public RequestInfoInstanceList getRequestsByCommand(String command, List<String> statuses, Integer page, Integer pageSize) {
+        List<STATUS> statusList = convertStatusList(statuses);
+        List<RequestInfo> requests = executorService.getRequestsByCommand(command, statusList, buildQueryContext(page, pageSize));
+
+        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
+
+        return result;
+    }
+
+    public RequestInfoInstanceList getRequestsByContainer(String containerId, List<String> statuses, Integer page, Integer pageSize) {
+
+        List<STATUS> statusList = convertStatusList(statuses);
+        List<RequestInfo> requests = executorService.getRequestsByDeployment(containerId, statusList, buildQueryContext(page, pageSize));
+
+        RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
+
+        return result;
+    }
+
+    public RequestInfoInstanceList getRequestsByProcessInstance(Number processInstanceId, List<String> statuses, Integer page, Integer pageSize) {
+
+        List<STATUS> statusList = convertStatusList(statuses);
+        List<RequestInfo> requests = executorService.getRequestsByProcessInstance(processInstanceId.longValue(), statusList, buildQueryContext(page, pageSize));
 
         RequestInfoInstanceList result = convertToRequestInfoList(requests, false, false);
 
@@ -257,5 +304,18 @@ public class ExecutorServiceBase {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    protected List<STATUS> convertStatusList(List<String> statuses) {
+        List<STATUS> statusList = new ArrayList<STATUS>();
+        if (statuses != null && !statuses.isEmpty()) {
+            for (String status : statuses) {
+                statusList.add(STATUS.valueOf(status));
+            }
+        } else {
+            statusList.add(STATUS.QUEUED);
+        }
+
+        return statusList;
     }
 }

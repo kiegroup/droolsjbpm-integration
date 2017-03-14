@@ -16,6 +16,7 @@
 package org.kie.server.client;
 
 import java.util.List;
+import java.util.Map;
 
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
@@ -30,13 +31,23 @@ public interface JobServicesClient {
 
     void cancelRequest(long requestId);
 
+    void updateRequestData(long requestId, String containerId, Map<String, Object> data);
+
     void requeueRequest(long requestId);
 
     List<RequestInfoInstance> getRequestsByStatus(List<String> statuses, Integer page, Integer pageSize);
 
     List<RequestInfoInstance> getRequestsByBusinessKey(String businessKey, Integer page, Integer pageSize);
 
+    List<RequestInfoInstance> getRequestsByBusinessKey(String businessKey, List<String> statuses, Integer page, Integer pageSize);
+
     List<RequestInfoInstance> getRequestsByCommand(String command, Integer page, Integer pageSize);
+
+    List<RequestInfoInstance> getRequestsByCommand(String command, List<String> statuses, Integer page, Integer pageSize);
+
+    List<RequestInfoInstance> getRequestsByContainer(String containerId, List<String> statuses, Integer page, Integer pageSize);
+
+    List<RequestInfoInstance> getRequestsByProcessInstance(Long processInstanceId, List<String> statuses, Integer page, Integer pageSize);
 
     RequestInfoInstance getRequestById(Long requestId, boolean withErrors, boolean withData);
 

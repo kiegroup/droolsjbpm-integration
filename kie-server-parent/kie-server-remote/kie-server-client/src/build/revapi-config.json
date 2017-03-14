@@ -227,6 +227,51 @@
           "methodName": "findProcessInstancesByParent",
           "elementKind": "method",
           "justification": "support for finding process instance by their parent process instance"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.RequestInfoInstance> org.kie.server.client.JobServicesClient::getRequestsByBusinessKey(java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "JobServicesClient",
+          "methodName": "getRequestsByBusinessKey",
+          "elementKind": "method",
+          "justification": "Added support for filtering by job status"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.RequestInfoInstance> org.kie.server.client.JobServicesClient::getRequestsByCommand(java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "JobServicesClient",
+          "methodName": "getRequestsByCommand",
+          "elementKind": "method",
+          "justification": "Added support for filtering by job status"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.RequestInfoInstance> org.kie.server.client.JobServicesClient::getRequestsByContainer(java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "JobServicesClient",
+          "methodName": "getRequestsByContainer",
+          "elementKind": "method",
+          "justification": "Added support for filtering by container and job status"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.RequestInfoInstance> org.kie.server.client.JobServicesClient::getRequestsByProcessInstance(java.lang.Long, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "JobServicesClient",
+          "methodName": "getRequestsByProcessInstance",
+          "elementKind": "method",
+          "justification": "Added support for filtering by process instance and job status"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.JobServicesClient::updateRequestData(long, java.lang.String, java.util.Map<java.lang.String, java.lang.Object>)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "JobServicesClient",
+          "methodName": "updateRequestData",
+          "elementKind": "method",
+          "justification": "Added support to update job's data"
         }
       ]
     }
