@@ -16,8 +16,8 @@
 
 package org.kie.spring.persistence;
 
-import org.drools.persistence.TransactionManager;
-import org.drools.persistence.TransactionManagerFactory;
+import org.drools.persistence.api.TransactionManager;
+import org.drools.persistence.api.TransactionManagerFactory;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.springframework.transaction.support.AbstractPlatformTransactionManager;
