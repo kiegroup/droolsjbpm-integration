@@ -43,8 +43,7 @@ public class DMNContextKS {
     @XStreamAlias("decision-name")
     private String decisionName;
 
-    // TODO consistency for JSON
-    @XmlElementWrapper(name="dmn-context")
+    @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
     private Map<String, Object> dmnContext = new HashMap<>();
     
