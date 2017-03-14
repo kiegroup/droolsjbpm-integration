@@ -18,9 +18,14 @@ package org.kie.camel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultProducer;
@@ -34,6 +39,7 @@ import org.kie.server.client.RuleServicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
 import static org.kie.camel.KieComponent.KIE_CLIENT;
 import static org.kie.camel.KieComponent.KIE_OPERATION;
@@ -42,7 +48,9 @@ public class KieProducer extends DefaultProducer {
 
     private static final transient Logger log = LoggerFactory.getLogger( KieProducer.class );
 
-    private final String DEFAULT_CLIENT = "KieServices";
+    private static final String DEFAULT_CLIENT = "KieServices";
+
+    private static final String KIE_HEADERS_PREFIX = "kie.";
 
     private final KieServicesClient client;
 
@@ -128,6 +136,59 @@ public class KieProducer extends DefaultProducer {
         }
     }
 
+    abstract static class AbstractReflectiveProducer<C> implements InternalProducer {
+        private final C client;
+
+        private final Map<String, Collection<Method>> methodsMap;
+
+        protected AbstractReflectiveProducer(C client) {
+            this.client = client;
+            this.methodsMap = indexClientMethod( client.getClass() );
+        }
+
+        @Override
+        public Object execute(Exchange exchange) {
+            String operationName = exchange.getIn().getHeader( KIE_OPERATION, String.class );
+            Collection<Method> methods = methodsMap.get(operationName);
+            if (methods == null) {
+                log.error( "Unknown operation name: " + operationName );
+                return null;
+            }
+            return methods.stream()
+                          .filter( m -> invokable( exchange, m ) )
+                          .findFirst()
+                          .map( m -> invoke( exchange, m ) )
+                          .orElseGet( () -> {
+                              log.error( "Unknown operation name: " + operationName );
+                              return null;
+                          } );
+        }
+
+        private boolean invokable(Exchange exchange, Method method) {
+            Set<String> headers = exchange.getIn().getHeaders().keySet();
+            return Stream.of(method.getParameters()).allMatch( p -> headers.contains( KIE_HEADERS_PREFIX + p.getName() ) );
+        }
+
+        private Object invoke(Exchange exchange, Method method) {
+            try {
+                Object[] args = Stream.of(method.getParameters())
+                                      .map(p -> exchange.getIn().getHeader( KIE_HEADERS_PREFIX + p.getName(), p.getType() ))
+                                      .toArray();
+                return method.invoke(client, args);
+            } catch (Exception e) {
+                log.error( "Error executed operation: " + method.getName() + " caused by: " + e.getMessage(), e );
+                return null;
+            }
+        }
+
+        private Map<String, Collection<Method>> indexClientMethod(Class<?> cls) {
+            return Stream.of(cls.getMethods()).collect( groupingBy(Method::getName,
+                                                                   Collector.of(() -> new TreeSet<Method>( (m1,m2) -> m2.getParameterCount() - m1.getParameterCount() ),
+                                                                                Collection::add,
+                                                                                (left, right) -> { left.addAll(right); return left; })) );
+        }
+    }
+
     interface Operation<C> {
         Object execute(C client, Exchange exchange);
     }
@@ -137,7 +198,7 @@ public class KieProducer extends DefaultProducer {
         public Object execute( Exchange exchange ) { return null; }
     }
 
-    static class KieServicesProducer extends AbstractInternalProducer<KieServicesClient> {
+    static class KieServicesProducer extends AbstractReflectiveProducer<KieServicesClient> {
         public KieServicesProducer(KieServicesClient client) {
             super(client);
         }
@@ -157,7 +218,7 @@ public class KieProducer extends DefaultProducer {
         }
     }
 
-    static class RuleProducer extends AbstractInternalProducer<RuleServicesClient> {
+    static class RuleProducer extends AbstractReflectiveProducer<RuleServicesClient> {
         public RuleProducer(KieServicesClient client) {
             super( client.getServicesClient(RuleServicesClient.class) );
         }
@@ -174,7 +235,7 @@ public class KieProducer extends DefaultProducer {
         }
     }
 
-    static class ProcessProducer extends AbstractInternalProducer<ProcessServicesClient> {
+    static class ProcessProducer extends AbstractReflectiveProducer<ProcessServicesClient> {
         public ProcessProducer(KieServicesClient client) {
             super( client.getServicesClient(ProcessServicesClient.class) );
         }

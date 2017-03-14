@@ -16,9 +16,8 @@
 
 package org.kie.camel;
 
-import java.util.HashMap;
+import java.net.URI;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import javax.naming.InitialContext;
 
 import org.apache.camel.CamelContext;
@@ -28,13 +27,6 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 
 public class KieComponent extends DefaultComponent {
-
-    private static Map<String, BiConsumer<KieServicesConfiguration, Object>> confMap = new HashMap<>();
-
-    static {
-        confMap.put( "username", (conf, value) -> conf.setUserName( ( (String) value ) ) );
-        confMap.put( "password", (conf, value) -> conf.setPassword( ( (String) value ) ) );
-    }
 
     public static final String KIE_CLIENT = "kie-client";
     public static final String KIE_OPERATION = "kie-operation";
@@ -46,14 +38,16 @@ public class KieComponent extends DefaultComponent {
     }
 
     protected Endpoint createEndpoint( String uri, String remaining, Map<String, Object> parameters ) throws Exception {
+        KieConfiguration kieConfiguration = new KieConfiguration();
+        kieConfiguration.configure( new URI( uri ) );
+        setProperties(kieConfiguration, parameters);
+
         KieServicesConfiguration config = remaining.startsWith( "jms" ) ?
                                           KieServicesFactory.newJMSConfiguration( (InitialContext)null, null, null ) :
                                           KieServicesFactory.newRestConfiguration( remaining, null, null );
-        setParams(config, parameters);
-        return new KieEndpoint(uri, this, config);
-    }
 
-    private void setParams(KieServicesConfiguration config, Map<String, Object> parameters) {
-        parameters.forEach( (k,v) -> confMap.get(k).accept( config, v ) );
+        config.setUserName( kieConfiguration.getUsername() );
+        config.setPassword( kieConfiguration.getPassword() );
+        return new KieEndpoint(uri, this, config);
     }
 }

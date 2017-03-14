@@ -38,7 +38,6 @@ public class KieEndpoint extends DefaultEndpoint {
 
     public KieEndpoint(String uri, KieComponent component, KieServicesConfiguration configuration ) throws URISyntaxException, MalformedURLException {
         super(uri, component);
-        // TODO parse configuration
         this.configuration = configuration;
     }
 

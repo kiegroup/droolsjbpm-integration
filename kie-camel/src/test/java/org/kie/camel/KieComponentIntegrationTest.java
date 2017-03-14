@@ -22,7 +22,11 @@ import java.util.Map;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Test;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieContainerResourceList;
+import org.kie.server.api.model.KieContainerStatusFilter;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.ReleaseIdFilter;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
@@ -33,7 +37,7 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
     @Test
     public void interactsOverRest() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint("mock:result");
+        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
         mockEndpoint.expectedMessageCount( 1 );
 
         Map<String, Object> headers = new HashMap<>();
@@ -44,6 +48,40 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
         KieServerInfo result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(KieServerInfo.class);
         assertEquals("Server version", "1.2.3", result.getVersion());
+    }
+
+    @Test
+    public void testListContainers() throws Exception {
+        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
+        mockEndpoint.expectedMessageCount( 1 );
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(KIE_CLIENT, "kieServices");
+        headers.put(KIE_OPERATION, "listContainers");
+        template.sendBodyAndHeaders("direct:start", null, headers);
+        assertMockEndpointsSatisfied();
+
+        KieContainerResourceList result = getResultMessage( mockEndpoint.getExchanges().get( 0 ) ).getBody( KieContainerResourceList.class );
+        assertEquals("Number of listed containers", 2, result.getContainers().size());
+    }
+
+    @Test
+    public void testListContainersOverload() throws Exception {
+        KieContainerResourceFilter filter = new KieContainerResourceFilter( ReleaseIdFilter.ACCEPT_ALL,
+                                                                            KieContainerStatusFilter.ACCEPT_ALL );
+
+        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
+        mockEndpoint.expectedMessageCount( 1 );
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(KIE_CLIENT, "kieServices");
+        headers.put(KIE_OPERATION, "listContainers");
+        headers.put("kie.containerFilter", filter);
+        template.sendBodyAndHeaders("direct:start", null, headers);
+        assertMockEndpointsSatisfied();
+
+        KieContainerResourceList result = getResultMessage( mockEndpoint.getExchanges().get( 0 ) ).getBody( KieContainerResourceList.class );
+        assertEquals("Number of listed containers", 2, result.getContainers().size());
     }
 
     @Override
@@ -59,6 +97,17 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
                                                       "  </kie-server-info>\n" +
                                                       "</response>")));
 
+        stubFor(get(urlEqualTo("/containers"))
+                        .withHeader("Accept", equalTo("application/xml"))
+                        .willReturn(aResponse()
+                                            .withStatus(200)
+                                            .withHeader("Content-Type", "application/xml")
+                                            .withBody("<response type=\"SUCCESS\" msg=\"List of created containers\">\n" +
+                                                      "  <kie-containers>\n" +
+                                                      "    <kie-container container-id=\"kjar1\" status=\"FAILED\"/>\n" +
+                                                      "    <kie-container container-id=\"kjar2\" status=\"STARTED\"/>" +
+                                                      "  </kie-containers>" +
+                                                      "</response>")));
         return new RouteBuilder() {
             @Override
             public void configure() {
