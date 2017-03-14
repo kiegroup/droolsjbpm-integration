@@ -64,7 +64,8 @@ public abstract class AbstractJbpmSpringParameterizedTest extends AbstractJbpmSp
     }
 
     protected AuditLogService getLogService() {
-        return context.getBean("logService", AuditLogService.class);
+        return context.getBean("logService",
+                               AuditLogService.class);
     }
 
     protected RuntimeEngine getEngine() {
@@ -72,7 +73,12 @@ public abstract class AbstractJbpmSpringParameterizedTest extends AbstractJbpmSp
     }
 
     protected RuntimeManager getManager() {
-        return  context.getBean("runtimeManager", RuntimeManager.class);
+        return  context.getBean("runtimeManager",
+                                RuntimeManager.class);
+    }
+
+    protected RuntimeManager getSecondManager() {
+        return  context.getBean("runtimeManager2", RuntimeManager.class);
     }
 
     protected TaskService getTaskService() {

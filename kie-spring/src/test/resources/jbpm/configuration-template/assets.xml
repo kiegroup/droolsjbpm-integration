@@ -37,6 +37,18 @@
     </constructor-arg>
   </bean>
 
+  <bean id="addTaskAfterActiveV1" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
+    <constructor-arg>
+      <value>jbpm/processes/AddTaskAfterActive-v1.bpmn2</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="addTaskAfterActiveV2" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
+    <constructor-arg>
+      <value>jbpm/processes/AddTaskAfterActive-v2.bpmn2</value>
+    </constructor-arg>
+  </bean>
+
   <!-- Map contains list of all assets used in tests. -->
   <util:map id="assets" key-type="org.kie.api.io.Resource" value-type="org.kie.api.io.ResourceType">
     <entry key-ref="sample">
@@ -52,6 +64,12 @@
       <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
     </entry>
     <entry key-ref="scriptTask">
+      <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
+    </entry>
+    <entry key-ref="addTaskAfterActiveV1">
+      <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
+    </entry>
+    <entry key-ref="addTaskAfterActiveV2">
       <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
     </entry>
   </util:map>
