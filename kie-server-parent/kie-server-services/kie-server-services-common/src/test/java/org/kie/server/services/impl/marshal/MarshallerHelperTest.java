@@ -32,6 +32,7 @@ import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.services.api.KieServerRegistry;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 import org.xmlunit.matchers.CompareMatcher;
 
 public class MarshallerHelperTest {
@@ -105,8 +106,8 @@ public class MarshallerHelperTest {
 
 		QueryFilterSpec unmarshalledQFS = helper.unmarshal(marshalledQFS, MarshallingFormat.JAXB.toString(), QueryFilterSpec.class);
 
-		// QueryFilterSpec does not implement equals method .....
-		// assertEquals(expectedQueryFilterSpec, unmarshalledQFS);
+		// QueryFilterSpec does not implement equals method, so using Mockito ReflectionEquals.
+		assertThat(expectedQueryFilterSpec, new ReflectionEquals(unmarshalledQFS));
 	}
 
 	@Test
@@ -145,8 +146,8 @@ public class MarshallerHelperTest {
 
 		QueryFilterSpec unmarshalledQFS = helper.unmarshal(marshalledQFS, MarshallingFormat.JAXB.toString(), QueryFilterSpec.class);
 
-		// QueryFilterSpec does not implement equals method .....
-		// assertEquals(expectedQueryFilterSpec, unmarshalledQFS);
+		// QueryFilterSpec does not implement equals method, so using Mockito ReflectionEquals.
+		assertThat(expectedQueryFilterSpec, new ReflectionEquals(unmarshalledQFS));
 	}
 
 	@XmlAccessorType(XmlAccessType.FIELD)
