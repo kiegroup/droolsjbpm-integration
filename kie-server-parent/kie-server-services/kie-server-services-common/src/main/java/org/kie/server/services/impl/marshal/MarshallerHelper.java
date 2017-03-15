@@ -15,7 +15,9 @@
 
 package org.kie.server.services.impl.marshal;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kie.server.api.marshalling.Marshaller;
@@ -74,12 +76,8 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-        	if (registry != null) {
-        		marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
-        	} else {
-        		marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
-        	}
-            serverMarshallers.put(format, marshaller);
+        	marshaller = MarshallerFactory.getMarshaller(getExtraClasses(registry), format, this.getClass().getClassLoader());
+        	serverMarshallers.put(format, marshaller);
         }
 
         return marshaller.marshall(entity);
@@ -123,12 +121,8 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-        	if (registry != null) {
-        		marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
-        	} else {
-        		marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
-        	}
-            serverMarshallers.put(format, marshaller);
+        	marshaller = MarshallerFactory.getMarshaller(getExtraClasses(registry), format, this.getClass().getClassLoader());
+        	serverMarshallers.put(format, marshaller);
         }
 
         Object instance = marshaller.unmarshall(data, unmarshalType);
@@ -148,4 +142,17 @@ public class MarshallerHelper {
 
         return format;
     }
+    
+    private static Set<Class<?>> getExtraClasses(KieServerRegistry registry) {
+    	Set<Class<?>> extraClasses;
+    	
+    	if (registry != null) {
+    		extraClasses = registry.getExtraClasses();
+    	} else {
+    		extraClasses = Collections.<Class<?>>emptySet();
+    	}
+    	
+    	return extraClasses;
+    }
+
 }
