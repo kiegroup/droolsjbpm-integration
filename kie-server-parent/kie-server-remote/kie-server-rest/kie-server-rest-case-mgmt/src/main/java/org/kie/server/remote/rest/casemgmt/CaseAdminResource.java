@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
@@ -48,30 +49,41 @@ public class CaseAdminResource extends AbstractCaseResource {
     public CaseAdminResource(
             final CaseManagementRuntimeDataServiceBase caseManagementRuntimeDataServiceBase,
             final KieServerRegistry context) {
-        super(caseManagementRuntimeDataServiceBase, context);
+        super(caseManagementRuntimeDataServiceBase,
+              context);
     }
 
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
-            @QueryParam("status") List<Integer> status,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+                                     @QueryParam("status") List<String> status,
+                                     @QueryParam("page") @DefaultValue("0") Integer page,
+                                     @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+                                     @QueryParam("sort") String sort,
+                                     @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
-                "",
-                null,
-                (Variant v, String type, Header... customHeaders) -> {
+                                   "",
+                                   null,
+                                   (Variant v, String type, Header... customHeaders) -> {
 
-                    CaseInstanceList responseObject = null;
+                                       CaseInstanceList responseObject = null;
 
-                        logger.debug("About to look for case instances with status {}", status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstances(status, page, pageSize, sort, sortOrder);
+                                       logger.debug("About to look for case instances with status {}",
+                                                    status);
+                                       responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstances(status,
+                                                                                                                   page,
+                                                                                                                   pageSize,
+                                                                                                                   sort,
+                                                                                                                   sortOrder);
 
-
-                    logger.debug("Returning OK response with content '{}'", responseObject);
-                    return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
-                });
+                                       logger.debug("Returning OK response with content '{}'",
+                                                    responseObject);
+                                       return createCorrectVariant(responseObject,
+                                                                   headers,
+                                                                   Response.Status.OK,
+                                                                   customHeaders);
+                                   });
     }
 }

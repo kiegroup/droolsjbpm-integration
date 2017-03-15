@@ -56,7 +56,9 @@ import org.kie.server.common.rest.KieServerHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.api.rest.RestURI.build;
 
 public abstract class AbstractKieServicesClientImpl {
 

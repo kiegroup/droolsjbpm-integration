@@ -50,7 +50,7 @@ public class CaseAdminServicesClientImpl extends AbstractKieServicesClientImpl i
     }
 
     @Override
-    public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize) {
+    public List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize) {
         return getCaseInstances(status, page, pageSize, "", true);
     }
 
@@ -60,7 +60,7 @@ public class CaseAdminServicesClientImpl extends AbstractKieServicesClientImpl i
     }
 
     @Override
-    public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+    public List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
