@@ -74,7 +74,11 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-        	marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
+        	if (registry != null) {
+        		marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
+        	} else {
+        		marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
+        	}
             serverMarshallers.put(format, marshaller);
         }
 
@@ -119,7 +123,11 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-            marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
+        	if (registry != null) {
+        		marshaller = MarshallerFactory.getMarshaller(registry.getExtraClasses(), format, this.getClass().getClassLoader());
+        	} else {
+        		marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
+        	}
             serverMarshallers.put(format, marshaller);
         }
 
