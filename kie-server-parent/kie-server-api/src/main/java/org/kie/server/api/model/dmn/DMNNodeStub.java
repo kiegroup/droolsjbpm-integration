@@ -17,18 +17,21 @@ package org.kie.server.api.model.dmn;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-node-stub")
 @XStreamAlias("dmn-node-stub")
+@XStreamConverter(value = ToAttributedValueConverter.class, strings = { "dmnNode" })
 public class DMNNodeStub {
 
-    @XmlElement(name="dmn-node")
-    @XStreamAlias("dmn-node")
+    @XmlValue
     private String dmnNode;
     
     public DMNNodeStub() {
@@ -41,9 +44,9 @@ public class DMNNodeStub {
         return res;
     }
 
+    @JsonValue
     @Override
     public String toString() {
         return dmnNode;
     }
-    
 }

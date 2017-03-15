@@ -5,9 +5,25 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.junit.Test;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
 import org.kie.server.api.marshalling.objects.DateObject;
+import org.kie.server.api.model.Wrapped;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -55,6 +71,57 @@ public class JSONMarshallerTest {
         assertEquals( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), dateObject.getLocalDateTime() );
         assertEquals( LocalTime.of( 10, 10, 10 ), dateObject.getLocalTime() );
         assertEquals( OffsetDateTime.of( LocalDateTime.of( 2017, 1, 1, 10, 10, 10 ), ZoneOffset.ofHours( 1 ) ), dateObject.getOffsetDateTime() );
+    }
+    
+    public static class Holder {
+        private String h;
+        
+        public String getH() {
+            return h;
+        }
+        
+        public void setH(String h) {
+            this.h = h;
+        }
+    }
+    
+    public static class Ref {
+        @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
+        @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
+        private Object r;
+        
+        public Object getR() {
+            return r;
+        }
+        
+        public void setR(Object r) {
+            this.r = r;
+        }
+        
+    }
+    
+    @Test
+    public void testRecursiveMap() {
+        Map outerMap = new HashMap<>();
+        Map innerMap = new HashMap<>();
+        Holder holder = new Holder();
+        holder.setH("myValueInH");
+        
+        innerMap.put("level2", holder);
+        outerMap.put("level1", innerMap);
+        
+        Marshaller marshaller = MarshallerFactory.getMarshaller( MarshallingFormat.JSON, getClass().getClassLoader() );
+        
+        Map mu_outerMap = marshaller.unmarshall( marshaller.marshall( outerMap ), Map.class );
+        Map mu_innerMap = marshaller.unmarshall( marshaller.marshall( innerMap ), Map.class );
+        
+        Ref ref = new Ref();
+        ref.setR(innerMap);
+        
+        Ref mu_ref = marshaller.unmarshall( marshaller.marshall( ref ), Ref.class );
+        
+        assertEquals( "verify that Ref.r is not being serialized with JSONMarshaller.WrappingObjectSerializer, but with the specified one in @JsonSerialize",
+                mu_innerMap.entrySet(), ((Map)mu_ref.getR()).entrySet() );
     }
 
 }

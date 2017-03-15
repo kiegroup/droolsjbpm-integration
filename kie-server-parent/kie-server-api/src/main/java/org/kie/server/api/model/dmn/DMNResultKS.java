@@ -25,7 +25,9 @@ import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNDecisionResult.DecisionEvaluationStatus;
 import org.kie.dmn.api.core.DMNMessage;
 import org.kie.dmn.api.core.DMNMessage.Severity;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import org.kie.dmn.api.core.DMNResult;
@@ -50,6 +52,7 @@ public class DMNResultKS implements DMNResult {
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
+    @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
     private Map<String, Object> dmnContext = new HashMap<>();
 
     // concrete implementation of DMNMessage and DMNDecisionResult are needed in order to have proper marshalling

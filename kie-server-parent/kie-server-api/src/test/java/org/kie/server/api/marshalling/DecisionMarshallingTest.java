@@ -16,7 +16,6 @@
 package org.kie.server.api.marshalling;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,10 +34,6 @@ import org.kie.internal.utils.KieHelper;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNResultKS;
-import org.kie.server.api.model.instance.ScoreWrapper;
-import org.kie.server.api.model.instance.SolverInstance;
-import org.optaplanner.core.api.score.Score;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 @RunWith(Parameterized.class)
 public class DecisionMarshallingTest {
