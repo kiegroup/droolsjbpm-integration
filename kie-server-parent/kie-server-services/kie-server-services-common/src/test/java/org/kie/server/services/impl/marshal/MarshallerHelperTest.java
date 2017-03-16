@@ -33,6 +33,7 @@ import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.services.api.KieServerRegistry;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.xmlunit.matchers.CompareMatcher;
 
 public class MarshallerHelperTest {
@@ -75,6 +76,45 @@ public class MarshallerHelperTest {
 
 		assertThat(marshalledQFS, CompareMatcher.isIdenticalTo(expectedMarshalledTEC).ignoreWhitespace());
 	}
+	
+	@Test
+	public void testJsonMarshallWithoutWithEmptyRegistry() throws Exception {
+		
+		KieServerRegistry kieServerRegistryMock = Mockito.mock(KieServerRegistry.class);
+		Mockito.when(kieServerRegistryMock.getExtraClasses()).thenReturn(new HashSet<Class<?>>());
+		
+		MarshallerHelper helper = new MarshallerHelper(kieServerRegistryMock);
+
+		QueryFilterSpec queryFilterSpec = new QueryFilterSpecBuilder().get();
+		
+		String marshalledQFS = helper.marshal(MarshallingFormat.JSON.toString(), queryFilterSpec);
+		
+		System.out.println(marshalledQFS);
+		
+		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
+
+		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
+		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
+	}
+	
+	@Test
+	public void testJsonMarshallWithNullRegistry() throws Exception {
+		
+		
+		MarshallerHelper helper = new MarshallerHelper(null);
+
+		QueryFilterSpec queryFilterSpec = new QueryFilterSpecBuilder().get();
+		
+		String marshalledQFS = helper.marshal(MarshallingFormat.JSON.toString(), queryFilterSpec);
+		
+		System.out.println(marshalledQFS);
+		
+		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
+
+		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
+		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
+	}
+	
 
 	/**
 	 * Tests that MarshallerHelper can also be used when passing in a <code>null</code> KieServerRegistry.

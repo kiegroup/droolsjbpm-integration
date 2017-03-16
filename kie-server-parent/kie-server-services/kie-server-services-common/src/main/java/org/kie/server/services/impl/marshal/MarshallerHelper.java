@@ -15,7 +15,7 @@
 
 package org.kie.server.services.impl.marshal;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,7 +149,7 @@ public class MarshallerHelper {
     	if (registry != null) {
     		extraClasses = registry.getExtraClasses();
     	} else {
-    		extraClasses = Collections.<Class<?>>emptySet();
+    		extraClasses = new HashSet<>();
     	}
     	
     	return extraClasses;
