@@ -17,10 +17,12 @@
 package org.kie.camel;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
+import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.UriParam;
 
-public class KieConfiguration {
+public class KieConfiguration implements Cloneable {
 
     @UriParam(label = "security", secret = true)
     private String username;
@@ -28,16 +30,30 @@ public class KieConfiguration {
     @UriParam(label = "security", secret = true)
     private String password;
 
-    public void configure(URI uri) {
-        String userInfo = uri.getUserInfo();
+    public void configure(String remaining) {
+        String userInfo = null;
+        try {
+            userInfo = new URI(remaining).getUserInfo();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException( e );
+        }
         if (userInfo != null) {
-            String[] parts = uri.getUserInfo().split(":");
+            String[] parts = userInfo.split(":");
             if (parts.length == 2) {
                 setUsername(parts[0]);
                 setPassword(parts[1]);
             } else {
                 setUsername(userInfo);
             }
+        }
+    }
+
+    public KieConfiguration copy() {
+        try {
+            KieConfiguration copy = (KieConfiguration) clone();
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeCamelException(e);
         }
     }
 

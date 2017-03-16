@@ -41,17 +41,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.kie.camel.KieCamelConstants.KIE_HEADERS_PREFIX;
+import static org.kie.camel.KieCamelConstants.RESPONSE_MESSAGE;
+import static org.kie.camel.KieCamelConstants.RESPONSE_TYPE;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
-import static org.kie.camel.KieComponent.KIE_CLIENT;
-import static org.kie.camel.KieComponent.KIE_OPERATION;
+import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
+import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
 
 public class KieProducer extends DefaultProducer {
 
     private static final transient Logger log = LoggerFactory.getLogger( KieProducer.class );
 
     private static final String DEFAULT_CLIENT = "KieServices";
-
-    private static final String KIE_HEADERS_PREFIX = "kie.";
 
     private final KieServicesClient client;
 
@@ -138,8 +139,8 @@ public class KieProducer extends DefaultProducer {
                 ServiceResponse serviceResponse = (ServiceResponse) response;
                 Message message = getResultMessage(exchange);
                 message.setBody( serviceResponse.getResult() );
-                message.setHeader( KIE_HEADERS_PREFIX + "response.type", serviceResponse.getType() );
-                message.setHeader( KIE_HEADERS_PREFIX + "response.message", serviceResponse.getMsg() );
+                message.setHeader( RESPONSE_TYPE, serviceResponse.getType() );
+                message.setHeader( RESPONSE_MESSAGE, serviceResponse.getMsg() );
             } else {
                 getResultMessage(exchange).setBody( response );
             }

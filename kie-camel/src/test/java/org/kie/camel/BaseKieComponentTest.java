@@ -52,4 +52,8 @@ public class BaseKieComponentTest extends CamelTestSupport {
         logger.debug("Allocating port: " + port);
         return port;
     }
+
+    protected String getAuthenticadUrl(String username, String password) {
+        return "http://" + username + ":" + password + "@localhost:" + port;
+    }
 }

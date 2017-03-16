@@ -30,8 +30,8 @@ import org.kie.server.api.model.ReleaseIdFilter;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
-import static org.kie.camel.KieComponent.KIE_CLIENT;
-import static org.kie.camel.KieComponent.KIE_OPERATION;
+import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
+import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
 
 public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
@@ -127,7 +127,7 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
             @Override
             public void configure() {
                 from("direct:start")
-                        .to("kie:" + mockServerBaseUri + "?username=admin&password=admin")
+                        .to("kie:" + getAuthenticadUrl("admin", "admin"))
                         .to("mock:result");
             }
         };

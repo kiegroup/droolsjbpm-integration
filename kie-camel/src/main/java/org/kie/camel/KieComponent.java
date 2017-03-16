@@ -16,7 +16,6 @@
 
 package org.kie.camel;
 
-import java.net.URI;
 import java.util.Map;
 import javax.naming.InitialContext;
 
@@ -28,18 +27,21 @@ import org.kie.server.client.KieServicesFactory;
 
 public class KieComponent extends DefaultComponent {
 
-    public static final String KIE_CLIENT = "kie-client";
-    public static final String KIE_OPERATION = "kie-operation";
+    private KieConfiguration configuration;
 
     public KieComponent() { }
 
-    public KieComponent(CamelContext context ) {
+    public KieComponent(CamelContext context) {
         super(context);
     }
 
+    public KieComponent(KieConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
     protected Endpoint createEndpoint( String uri, String remaining, Map<String, Object> parameters ) throws Exception {
-        KieConfiguration kieConfiguration = new KieConfiguration();
-        kieConfiguration.configure( new URI( uri ) );
+        KieConfiguration kieConfiguration = getConfiguration().copy();
+        kieConfiguration.configure( remaining );
         setProperties(kieConfiguration, parameters);
 
         KieServicesConfiguration config = remaining.startsWith( "jms" ) ?
@@ -49,5 +51,16 @@ public class KieComponent extends DefaultComponent {
         config.setUserName( kieConfiguration.getUsername() );
         config.setPassword( kieConfiguration.getPassword() );
         return new KieEndpoint(uri, this, config);
+    }
+
+    public KieConfiguration getConfiguration() {
+        if (configuration == null) {
+            configuration = new KieConfiguration();
+        }
+        return configuration;
+    }
+
+    public void setConfiguration(KieConfiguration configuration) {
+        this.configuration = configuration;
     }
 }
