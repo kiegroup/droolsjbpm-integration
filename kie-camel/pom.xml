@@ -61,6 +61,10 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -92,6 +96,12 @@
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
