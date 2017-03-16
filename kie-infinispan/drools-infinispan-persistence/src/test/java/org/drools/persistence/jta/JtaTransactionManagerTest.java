@@ -17,7 +17,7 @@ package org.drools.persistence.jta;
 
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
 import org.drools.persistence.PersistableRunner;
-import org.drools.persistence.TransactionManager;
+import org.drools.persistence.api.TransactionManager;
 import org.drools.persistence.infinispan.InfinispanPersistenceContextManager;
 import org.drools.persistence.infinispan.marshaller.InfinispanPlaceholderResolverStrategy;
 import org.drools.persistence.info.EntityHolder;

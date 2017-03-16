@@ -28,6 +28,7 @@
         <include>org.drools:drools-compiler</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-decisiontables</include>
+        <include>org.drools:drools-persistence-api</include>
         <include>org.drools:drools-persistence-jpa</include>
         <include>org.drools:drools-pmml</include>
         <include>org.drools:drools-scorecards</include>

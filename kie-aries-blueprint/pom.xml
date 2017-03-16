@@ -69,6 +69,11 @@
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
+      <artifactId>drools-persistence-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
       <artifactId>drools-persistence-jpa</artifactId>
       <optional>true</optional>
     </dependency>
@@ -77,6 +82,11 @@
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-persistence-api</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
