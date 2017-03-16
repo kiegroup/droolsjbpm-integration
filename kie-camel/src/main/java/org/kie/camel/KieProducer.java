@@ -28,6 +28,7 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.impl.DefaultProducer;
 import org.kie.api.KieServices;
 import org.kie.api.command.Command;
@@ -63,15 +64,7 @@ public class KieProducer extends DefaultProducer {
 
     @Override
     public void process( Exchange exchange ) throws Exception {
-        writeResponse( exchange, getProducer(exchange).execute(exchange) );
-    }
-
-    private void writeResponse( Exchange exchange, Object response ) {
-        if (response instanceof ServiceResponse ) {
-            getResultMessage(exchange).setBody( ( (ServiceResponse) response ).getResult() );
-        } else {
-            getResultMessage(exchange).setBody( response );
-        }
+        getProducer(exchange).execute(exchange);
     }
 
     private InternalProducer getProducer(Exchange exchange) {
@@ -90,7 +83,7 @@ public class KieProducer extends DefaultProducer {
     }
 
     interface InternalProducer {
-        Object execute(Exchange exchange);
+        void execute(Exchange exchange);
     }
 
     abstract static class AbstractInternalProducer<C> implements InternalProducer {
@@ -133,10 +126,23 @@ public class KieProducer extends DefaultProducer {
         }
 
         @Override
-        public Object execute(Exchange exchange) {
+        public final void execute(Exchange exchange) {
             String operationName = exchange.getIn().getHeader( KIE_OPERATION, String.class );
-            return getOperation(operationName).map(op -> op.execute( client, exchange ) )
-                                              .orElseGet( () -> executeViaReflection( operationName, exchange ) );
+            Object response = getOperation(operationName).map(op -> op.execute( client, exchange ) )
+                                                         .orElseGet( () -> executeViaReflection( operationName, exchange ) );
+            writeResponse( exchange, response );
+        }
+
+        private void writeResponse( Exchange exchange, Object response ) {
+            if (response instanceof ServiceResponse ) {
+                ServiceResponse serviceResponse = (ServiceResponse) response;
+                Message message = getResultMessage(exchange);
+                message.setBody( serviceResponse.getResult() );
+                message.setHeader( KIE_HEADERS_PREFIX + "response.type", serviceResponse.getType() );
+                message.setHeader( KIE_HEADERS_PREFIX + "response.message", serviceResponse.getMsg() );
+            } else {
+                getResultMessage(exchange).setBody( response );
+            }
         }
 
         private Object executeViaReflection( String operationName, Exchange exchange ) {
@@ -186,7 +192,7 @@ public class KieProducer extends DefaultProducer {
 
     static class DummyProducer implements InternalProducer {
         @Override
-        public Object execute( Exchange exchange ) { return null; }
+        public void execute( Exchange exchange ) { }
     }
 
     static class KieServicesProducer extends AbstractReflectiveProducer<KieServicesClient> {
