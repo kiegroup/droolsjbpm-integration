@@ -123,6 +123,26 @@ public class ExecutorResource {
         }
     }
 
+    @POST
+    @Path(UPDATE_JOB_DATA_POST_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response updateRequestData(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("jobId") long requestId,
+            @QueryParam("containerId") String containerId, String payload) {
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        try {
+            executorServiceBase.updateRequestData(requestId, containerId, payload, type);
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
+        } catch (IllegalStateException e){
+          return badRequest(e.getMessage(), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
     // queries
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -146,13 +166,19 @@ public class ExecutorResource {
     @Path(JOB_INSTANCES_BY_KEY_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getRequestsByBusinessKey(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("key") String businessKey,
+            @QueryParam("status") List<String> statuses,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
-            RequestInfoInstanceList result = executorServiceBase.getRequestsByBusinessKey(businessKey, page, pageSize);
+            RequestInfoInstanceList result = null;
+            if (statuses == null || statuses.isEmpty()) {
+                result = executorServiceBase.getRequestsByBusinessKey(businessKey, page, pageSize);
+            } else {
+                result = executorServiceBase.getRequestsByBusinessKey(businessKey, statuses, page, pageSize);
+            }
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         }  catch (Exception e) {
@@ -165,12 +191,59 @@ public class ExecutorResource {
     @Path(JOB_INSTANCES_BY_CMD_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getRequestsByCommand(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("cmd") String command,
+            @QueryParam("status") List<String> statuses,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         try {
-            RequestInfoInstanceList result = executorServiceBase.getRequestsByCommand(command, page, pageSize);
+
+            RequestInfoInstanceList result = null;
+            if (statuses == null || statuses.isEmpty()) {
+                result = executorServiceBase.getRequestsByCommand(command, page, pageSize);
+            } else {
+                result = executorServiceBase.getRequestsByCommand(command, statuses, page, pageSize);
+            }
+
+            return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
+        }  catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(JOB_INSTANCES_BY_CONTAINER_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getRequestsByContainer(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @QueryParam("status") List<String> statuses,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+
+        Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        try {
+            RequestInfoInstanceList result = executorServiceBase.getRequestsByContainer(containerId, statuses, page, pageSize);
+
+            return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
+        }  catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getRequestsByProcessInstance(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("pInstanceId") Long processInstanceId,
+            @QueryParam("status") List<String> statuses,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+        Variant v = getVariant(headers);
+        // no container id available so only used to transfer conversation id if given by client
+        Header conversationIdHeader = buildConversationIdHeader("", context, headers);
+        try {
+
+            RequestInfoInstanceList result = executorServiceBase.getRequestsByProcessInstance(processInstanceId, statuses, page, pageSize);
 
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         }  catch (Exception e) {

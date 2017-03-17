@@ -62,6 +62,9 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
                     Object.class);
 
         } else {
+            if (containerId == null) {
+                containerId = "";
+            }
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "JobService", "scheduleRequest", serialize(jobRequest), marshaller.getFormat().getType(), new Object[]{containerId}) ) );
             ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
@@ -94,6 +97,33 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "JobService", "cancelRequest", new Object[]{requestId})));
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void updateRequestData(long requestId, String containerId, Map<String, Object> data) {
+        if( config.isRest() ) {
+
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(JOB_ID, requestId);
+
+            String queryString = "";
+            if (containerId != null && !containerId.isEmpty()) {
+                queryString = "?containerId=" + containerId;
+            }
+            makeHttpPostRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + UPDATE_JOB_DATA_POST_URI, valuesMap) + queryString, data,
+                    Object.class);
+
+        } else {
+            if (containerId == null) {
+                containerId = "";
+            }
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "JobService", "updateRequestData", serialize(safeMap(data)), marshaller.getFormat().getType(), new Object[]{requestId, containerId}) ) );
+            ServiceResponse<String> response = (ServiceResponse<String>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
             throwExceptionOnFailure(response);
         }
     }
@@ -179,6 +209,38 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
     }
 
     @Override
+    public List<RequestInfoInstance> getRequestsByBusinessKey(String businessKey, List<String> statuses, Integer page, Integer pageSize) {
+        RequestInfoInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(JOB_KEY, businessKey);
+
+            String statusQuery = getAdditionalParams("", "status", statuses);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCES_BY_KEY_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "JobService", "getRequestsByBusinessKey", new Object[]{businessKey, safeList(statuses), page, pageSize}) ) );
+            ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null && list.getRequestInfoInstances() != null) {
+            return Arrays.asList(list.getRequestInfoInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<RequestInfoInstance> getRequestsByCommand(String command, Integer page, Integer pageSize) {
         RequestInfoInstanceList list = null;
         if( config.isRest() ) {
@@ -208,6 +270,102 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
         return Collections.emptyList();
 
+    }
+
+    @Override
+    public List<RequestInfoInstance> getRequestsByCommand(String command, List<String> statuses, Integer page, Integer pageSize) {
+        RequestInfoInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(JOB_CMD_NAME, command);
+
+            String statusQuery = getAdditionalParams("", "status", statuses);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCES_BY_CMD_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "JobService", "getRequestsByCommand", new Object[]{command, safeList(statuses), page, pageSize}) ) );
+            ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null && list.getRequestInfoInstances() != null) {
+            return Arrays.asList(list.getRequestInfoInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<RequestInfoInstance> getRequestsByContainer(String containerId, List<String> statuses, Integer page, Integer pageSize) {
+        RequestInfoInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String statusQuery = getAdditionalParams("", "status", statuses);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCES_BY_CONTAINER_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "JobService", "getRequestsByContainer", new Object[]{containerId, safeList(statuses), page, pageSize}) ) );
+            ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null && list.getRequestInfoInstances() != null) {
+            return Arrays.asList(list.getRequestInfoInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<RequestInfoInstance> getRequestsByProcessInstance(Long processInstanceId, List<String> statuses, Integer page, Integer pageSize) {
+        RequestInfoInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String statusQuery = getAdditionalParams("", "status", statuses);
+            String queryString = getPagingQueryString(statusQuery, page, pageSize);
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI, valuesMap) + queryString, RequestInfoInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "JobService", "getRequestsByProcessInstance", new Object[]{processInstanceId, safeList(statuses), page, pageSize}) ) );
+            ServiceResponse<RequestInfoInstanceList> response = (ServiceResponse<RequestInfoInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null && list.getRequestInfoInstances() != null) {
+            return Arrays.asList(list.getRequestInfoInstances());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override

@@ -63,6 +63,108 @@
           "methodName": "<init>",
           "elementKind": "constructor",
           "justification": "Removed unused parameters. Change in this constructor does not break backward compatibility of REST API"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.Integer, java.lang.Integer)",
+          "annotationType": "javax.ws.rs.DefaultValue",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.Integer, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"page\"",
+          "newValue": "\"status\"",
+          "annotationType": "javax.ws.rs.QueryParam",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, ===java.lang.Integer===, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"10\"",
+          "newValue": "\"0\"",
+          "annotationType": "javax.ws.rs.DefaultValue",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, ===java.lang.Integer===, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"pageSize\"",
+          "newValue": "\"page\"",
+          "annotationType": "javax.ws.rs.QueryParam",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByBusinessKey(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "classSimpleName": "ExecutorResource",
+          "methodName": "getRequestsByBusinessKey",
+          "elementKind": "method",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.Integer, java.lang.Integer)",
+          "annotationType": "javax.ws.rs.DefaultValue",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, ===java.util.List<java.lang.String>===, java.lang.Integer, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"page\"",
+          "newValue": "\"status\"",
+          "annotationType": "javax.ws.rs.QueryParam",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, ===java.lang.Integer===, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"10\"",
+          "newValue": "\"0\"",
+          "annotationType": "javax.ws.rs.DefaultValue",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, ===java.lang.Integer===, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"pageSize\"",
+          "newValue": "\"page\"",
+          "annotationType": "javax.ws.rs.QueryParam",
+          "elementKind": "annotation",
+          "justification": "Added support for job status filter"
+        },
+        {
+          "code": "java.method.numberOfParametersChanged",
+          "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.Integer, java.lang.Integer)",
+          "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ExecutorResource::getRequestsByCommand(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.String>, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.remote.rest.jbpm",
+          "classSimpleName": "ExecutorResource",
+          "methodName": "getRequestsByCommand",
+          "elementKind": "method",
+          "justification": "Added support for job status filter"
         }
       ]
     }

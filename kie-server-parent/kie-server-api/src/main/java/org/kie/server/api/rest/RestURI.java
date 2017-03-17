@@ -183,8 +183,11 @@ public class RestURI {
     // job executor prefixed by JOB_URI
     public static final String CANCEL_JOB_DEL_URI = "{" + JOB_ID + "}";
     public static final String REQUEUE_JOB_PUT_URI = "{" + JOB_ID + "}";
+    public static final String UPDATE_JOB_DATA_POST_URI = "{" + JOB_ID + "}/data";
     public static final String JOB_INSTANCES_BY_KEY_GET_URI = "keys/{" + JOB_KEY + "}";
     public static final String JOB_INSTANCES_BY_CMD_GET_URI = "commands/{" + JOB_CMD_NAME + "}";
+    public static final String JOB_INSTANCES_BY_CONTAINER_GET_URI = "containers/{" + CONTAINER_ID + "}";
+    public static final String JOB_INSTANCES_BY_PROCESS_INSTANCE_GET_URI = "processes/instances/{" + PROCESS_INST_ID + "}";
     public static final String JOB_INSTANCE_GET_URI = "{" + JOB_ID + "}";
 
     // form prefixed by FORM_URI
