@@ -15,7 +15,6 @@
 
 package org.kie.server.api.model.dmn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -28,25 +27,36 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNMessage;
+import org.kie.server.api.marshalling.json.JSONMarshaller;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-decision-result")
+@XStreamAlias("dmn-decision-result")
 public class DMNDecisionResultKS implements DMNDecisionResult {
     
     @XmlElement(name="decision-id")
+    @XStreamAlias("decision-id")
     private String           decisionId;
     
     @XmlElement(name="decision-name")
+    @XStreamAlias("decision-name")
     private String           decisionName;
     
     @XmlElement(name="result")
+    @XStreamAlias("result")
     @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
+    @JsonSerialize(using = JSONMarshaller.PassThruSerializer.class)
     private Object           result;
     
     @XmlElementWrapper(name="messages")
+    @XStreamAlias("messages")
     private List<DMNMessageKS> messages;
 
     @XmlElement(name="status")
+    @XStreamAlias("status")
     private DecisionEvaluationStatus status;
 
     public DMNDecisionResultKS() {

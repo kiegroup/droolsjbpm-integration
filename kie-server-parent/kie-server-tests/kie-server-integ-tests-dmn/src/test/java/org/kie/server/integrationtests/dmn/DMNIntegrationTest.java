@@ -55,7 +55,7 @@ public class DMNIntegrationTest
     }
 
     @Test
-    public void testHelloWorld() {
+    public void test_evaluateAllDecisions() {
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
@@ -69,5 +69,25 @@ public class DMNIntegrationTest
         Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
         assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
     }
-
+    
+    // Using explicit namespace and model name
+    @Test
+    public void test_evaluateAllDecisions2() {
+        DMNContext dmnContext = dmnClient.newContext();
+        dmnContext.set( "a", 10 );
+        dmnContext.set( "b", 5 );
+        ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID,
+                "https://www.drools.org/kie-dmn/function-definition", "function-definition",
+                dmnContext);
+        
+        DMNResult dmnResult = evaluateAllDecisions.getResult();
+        
+        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
+        assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+        
+        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
+        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+    }
+    
+    
 }

@@ -85,7 +85,7 @@ public class ModelEvaluatorServiceBase {
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime dmnRuntime = kieSession.getKieRuntime(DMNRuntime.class);
             
-            LOG.info("Will deserialize payload: {}", contextPayload);
+            LOG.debug("Will deserialize payload: {}", contextPayload);
             DMNContextKS evalCtx = marshallerHelper.unmarshal(containerId, contextPayload, marshallingType, DMNContextKS.class);
             
             DMNModel model;
@@ -101,21 +101,21 @@ public class ModelEvaluatorServiceBase {
             if ( model == null ) {
                 throw new RuntimeException("Unable to locate DMN Model to evaluate");
             }
-            LOG.info("Will use model: {}", model);
+            LOG.debug("Will use model: {}", model);
             
             DMNContext dmnContext = DMNFactory.newContext();
             for ( Entry<String, Object> e : evalCtx.getDmnContext().entrySet() ) {
                 dmnContext.set(e.getKey(), e.getValue());
             }
-            LOG.info("Will use dmnContext: {}", dmnContext);
+            LOG.debug("Will use dmnContext: {}", dmnContext);
             
             DMNResult result = dmnRuntime.evaluateAll(model, dmnContext);
             
-            LOG.info("Result:");
-            LOG.info("{}",result);
-            LOG.info("{}",result.getContext());
-            LOG.info("{}",result.getDecisionResults());
-            LOG.info("{}",result.getMessages());
+            LOG.debug("Result:");
+            LOG.debug("{}",result);
+            LOG.debug("{}",result.getContext());
+            LOG.debug("{}",result.getDecisionResults());
+            LOG.debug("{}",result.getMessages());
             
             DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
             
@@ -126,6 +126,7 @@ public class ModelEvaluatorServiceBase {
                     "OK from container '" + containerId + "'",
                     res );
         } catch ( Exception e ) {
+            e.printStackTrace();
             LOG.error( "Error from container '" + containerId + "'", e );
             return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.FAILURE,

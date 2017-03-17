@@ -23,21 +23,32 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "dmn-evaluation-context")
+@XStreamAlias("dmn-evaluation-context")
 public class DMNContextKS {
 
     @XmlElement(name="model-namespace")
+    @XStreamAlias("model-namespace")
     private String namespace;
 
     @XmlElement(name="model-name")
+    @XStreamAlias("model-name")
     private String modelName;
 
     @XmlElement(name="decision-name")
+    @XStreamAlias("decision-name")
     private String decisionName;
 
-    @XmlElementWrapper(name="dmn-context")
+    @XmlElement(name="dmn-context")
+    @XStreamAlias("dmn-context")
+    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
     private Map<String, Object> dmnContext = new HashMap<>();
     
     public DMNContextKS() {

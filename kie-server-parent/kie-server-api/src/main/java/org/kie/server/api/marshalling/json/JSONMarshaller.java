@@ -53,6 +53,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.UntypedObjectDeserializer;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
@@ -309,6 +310,10 @@ public class JSONMarshaller implements Marshaller {
             // replace JaxbUnknownAdapter as it breaks JSON marshaller for list and maps with wrapping serializer
             XmlJavaTypeAdapter adapterInfo = findAnnotation(XmlJavaTypeAdapter.class, am, true, false, false);
             if (adapterInfo != null && adapterInfo.value().isAssignableFrom(JaxbUnknownAdapter.class)) {
+                if ( findAnnotation(JsonSerialize.class, am, true, false, false) != null ) {
+                    // .. unless there is also an explicitly specified serializer, in such case use the specified one:
+                    return super.findSerializer(am);
+                }
                 return new WrappingObjectSerializer(customObjectMapper);
             }
 
@@ -434,6 +439,16 @@ public class JSONMarshaller implements Marshaller {
         }
     }
 
+    /**
+     * Simple utility Serializer which can be used to override replacement of JaxbUnknownAdapter with WrappingObjectSerializer
+     */
+    public static class PassThruSerializer extends JsonSerializer<Object> {
+        @Override
+        public void serialize(Object p0, JsonGenerator p1, SerializerProvider p2) throws IOException, JsonProcessingException {
+            p1.writeObject(p0);
+        }
+    }
+    
     class CustomObjectSerializer extends JsonSerializer<Object> {
 
         private ObjectMapper customObjectMapper;

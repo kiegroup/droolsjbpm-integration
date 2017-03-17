@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNDecisionResult;
+import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
@@ -57,8 +58,8 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         }
 
         @Override
-        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
-            DMNContextKS payload = new DMNContextKS( dmnContext.getAll() ); 
+        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, String namespace, String modelName, DMNContext dmnContext) {
+            DMNContextKS payload = buildDMNContextInput(namespace, modelName, dmnContext); 
             ServiceResponse<DMNResultKS> result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -94,6 +95,19 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
             
             return result2;
+        }
+
+        private DMNContextKS buildDMNContextInput(String namespace, String modelName, DMNContext dmnContext) {
+            if ( namespace != null && modelName != null ) {
+                return new DMNContextKS( namespace, modelName, dmnContext.getAll() ); 
+            } else {
+                return new DMNContextKS( dmnContext.getAll() ); 
+            }
+        }
+        
+        @Override
+        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
+            return evaluateAllDecisions(containerId, null, null, dmnContext);
         }
 
         private static Object recurseAndModifyByCoercingNumbers(Object result) {
@@ -152,4 +166,5 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 return value;
             }
         }
+
 }

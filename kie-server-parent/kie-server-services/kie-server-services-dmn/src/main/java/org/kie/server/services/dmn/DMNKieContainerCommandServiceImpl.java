@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class DMNKieContainerCommandServiceImpl implements KieContainerCommandService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DMNKieContainerCommandServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DMNKieContainerCommandServiceImpl.class);
 
     private KieServerRegistry context;
 
@@ -56,7 +56,7 @@ public class DMNKieContainerCommandServiceImpl implements KieContainerCommandSer
 
         for (KieServerCommand command : commands.getCommands()) {
             if (!(command instanceof DescriptorCommand)) {
-                logger.warn("Unsupported command '{}' given, will not process it", command.getClass().getName());
+                LOG.warn("Unsupported command '{}' given, will not process it", command.getClass().getName());
                 continue;
             }
             try {
@@ -74,11 +74,11 @@ public class DMNKieContainerCommandServiceImpl implements KieContainerCommandSer
                 List<Object> arguments = new ArrayList();
                 // process and unwrap arguments
                 for (Object arg : descriptorCommand.getArguments()) {
-                    logger.info("Before :: Argument with type {} and value {}", arg.getClass(), arg);
+                    LOG.debug("Before :: Argument with type {} and value {}", arg.getClass(), arg);
                     if (arg instanceof Wrapped) {
                         arg = ((Wrapped) arg).unwrap();
                     }
-                    logger.info("After :: Argument with type {} and value {}", arg.getClass(), arg);
+                    LOG.debug("After :: Argument with type {} and value {}", arg.getClass(), arg);
                     arguments.add(arg);
                 }
 
@@ -89,21 +89,21 @@ public class DMNKieContainerCommandServiceImpl implements KieContainerCommandSer
                     arguments.add(descriptorCommand.getMarshallerFormat());
                 }
 
-                logger.info("About to execute {} operation on {} with args {}", descriptorCommand.getMethod(), handler, arguments);
+                LOG.debug("About to execute {} operation on {} with args {}", descriptorCommand.getMethod(), handler, arguments);
                 // process command via reflection and handler
                 result = (ServiceResponse<?>) MethodUtils.invokeMethod(handler, descriptorCommand.getMethod(), arguments.toArray());
-                logger.info("Handler {} returned response {}", handler, result);
+                LOG.debug("Handler {} returned response {}", handler, result);
                 // return successful result
                 responses.add(result);
             } catch (InvocationTargetException e){
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, e.getTargetException().getMessage()));
             } catch (Throwable e) {
-                logger.error("Error while processing {} command", command, e);
+                LOG.error("Error while processing {} command", command, e);
                 // return failure result
                 responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE, e.getMessage()));
             }
         }
-        logger.info("About to return responses '{}'", responses);
+        LOG.debug("About to return responses '{}'", responses);
         return new ServiceResponsesList(responses);
     }
 }

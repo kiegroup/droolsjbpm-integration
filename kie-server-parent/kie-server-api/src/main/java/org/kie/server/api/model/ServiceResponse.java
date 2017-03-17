@@ -194,8 +194,7 @@ public class ServiceResponse<T> {
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
-            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
-            @XmlElement(name = "dmn-node-stub" , type = DMNNodeStub.class)
+            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class)
             
             })
     private T                            result;
