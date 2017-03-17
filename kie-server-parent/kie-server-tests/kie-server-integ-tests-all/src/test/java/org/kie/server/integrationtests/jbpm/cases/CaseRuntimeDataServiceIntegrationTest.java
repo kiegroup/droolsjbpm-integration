@@ -373,20 +373,26 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         // Assert role assignments
         assertNotNull(caseInstance.getRoleAssignments());
-        assertEquals(3, caseInstance.getRoleAssignments().size());
+        assertEquals(4, caseInstance.getRoleAssignments().size());
 
-        CaseRoleAssignment insuredRole = caseInstance.getRoleAssignments().get(0);
+        CaseRoleAssignment ownerRole = caseInstance.getRoleAssignments().get(0);
+        assertEquals("owner", ownerRole.getName());
+        assertEquals(1, ownerRole.getUsers().size());
+        assertEquals(USER_YODA, ownerRole.getUsers().get(0));
+        KieServerAssert.assertNullOrEmpty("Groups should be empty.", ownerRole.getGroups());
+
+        CaseRoleAssignment insuredRole = caseInstance.getRoleAssignments().get(1);
         assertEquals("insured", insuredRole.getName());
         assertEquals(1, insuredRole.getUsers().size());
         assertEquals(USER_YODA, insuredRole.getUsers().get(0));
         KieServerAssert.assertNullOrEmpty("Groups should be empty.", insuredRole.getGroups());
 
-        CaseRoleAssignment assessorRole = caseInstance.getRoleAssignments().get(1);
+        CaseRoleAssignment assessorRole = caseInstance.getRoleAssignments().get(2);
         assertEquals("assessor", assessorRole.getName());
         assertEquals(USER_YODA, assessorRole.getUsers().get(0));
         KieServerAssert.assertNullOrEmpty("Groups should be empty.", assessorRole.getGroups());
 
-        CaseRoleAssignment insuranceRepresentativeRole = caseInstance.getRoleAssignments().get(2);
+        CaseRoleAssignment insuranceRepresentativeRole = caseInstance.getRoleAssignments().get(3);
         assertEquals("insuranceRepresentative", insuranceRepresentativeRole.getName());
         assertEquals(1, insuranceRepresentativeRole.getUsers().size());
         assertEquals(USER_JOHN, insuranceRepresentativeRole.getUsers().get(0));
@@ -1130,12 +1136,17 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(2, caseStage.getAdHocFragments().size());
 
         List<CaseRoleAssignment> roles = caseClient.getRoleAssignments(CONTAINER_ID, caseClaimId);
-        assertEquals(3, roles.size());
+        assertEquals(4, roles.size());
 
         Map<String, CaseRoleAssignment> mappedRoles = roles.stream().collect(toMap(CaseRoleAssignment::getName, r -> r));
+        assertTrue(mappedRoles.containsKey(CASE_OWNER_ROLE));
         assertTrue(mappedRoles.containsKey(CASE_INSURED_ROLE));
         assertTrue(mappedRoles.containsKey(CASE_INS_REP_ROLE));
         assertTrue(mappedRoles.containsKey(CASE_ASSESSOR_ROLE));
+
+        CaseRoleAssignment ownerRole = mappedRoles.get(CASE_OWNER_ROLE);
+        assertTrue(ownerRole.getUsers().contains(USER_YODA));
+        KieServerAssert.assertNullOrEmpty("Groups should be empty", ownerRole.getGroups());
 
         CaseRoleAssignment insuredRole = mappedRoles.get(CASE_INSURED_ROLE);
         assertTrue(insuredRole.getUsers().contains(USER_JOHN));
@@ -1153,7 +1164,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         caseClient.assignGroupToRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, "managers");
 
         roles = caseClient.getRoleAssignments(CONTAINER_ID, caseClaimId);
-        assertEquals(3, roles.size());
+        assertEquals(4, roles.size());
         mappedRoles = roles.stream().collect(toMap(CaseRoleAssignment::getName, r -> r));
 
         assessorRole = mappedRoles.get(CASE_ASSESSOR_ROLE);
@@ -1165,7 +1176,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         caseClient.removeGroupFromRole(CONTAINER_ID, caseClaimId, CASE_ASSESSOR_ROLE, "managers");
 
         roles = caseClient.getRoleAssignments(CONTAINER_ID, caseClaimId);
-        assertEquals(3, roles.size());
+        assertEquals(4, roles.size());
         mappedRoles = roles.stream().collect(toMap(CaseRoleAssignment::getName, r -> r));
 
         assessorRole = mappedRoles.get(CASE_ASSESSOR_ROLE);
@@ -1417,6 +1428,30 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         List<String> mappedDefinitions = definitions.stream().map(ProcessDefinition::getId).collect(Collectors.toList());
         assertTrue(mappedDefinitions.contains("DataVerification"));
         assertTrue(mappedDefinitions.contains("hiring"));
+    }
+
+    @Test
+    public void testTriggerNotExistingAdHocFragments() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
+        assertHrCaseInstance(caseInstance, caseId, USER_YODA);
+
+        List<CaseInstance> caseInstances = caseClient.getCaseInstancesOwnedBy(USER_YODA, null, 0, 10);
+        assertEquals(1, caseInstances.size());
+
+        List<CaseMilestone> milestones = caseClient.getMilestones(CONTAINER_ID, caseId, true, 0, 10);
+        assertNotNull(milestones);
+        assertEquals(0, milestones.size());
+        try {
+            caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, "not existing", null);
+            fail("Should have failed because of not existing comment Id.");
+        } catch (KieServicesException e) {
+            // expected
+        }
     }
 
     private String startUserTaskCase(String owner, String contact) {

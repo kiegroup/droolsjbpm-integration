@@ -282,6 +282,8 @@ public class RestURI {
 
     // case queries
     public static final String CASE_ALL_INSTANCES_GET_URI = "instances";
+    public static final String CASE_ALL_DEFINITIONS_GET_URI = "definitions";
+    public static final String CASE_DEFINITIONS_BY_ID_GET_URI = "definitions/{" + CASE_DEF_ID +"}";
     public static final String CASE_TASKS_AS_POT_OWNER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/pot-owners";
     public static final String CASE_TASKS_AS_ADMIN_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/admins";
     public static final String CASE_TASKS_AS_STAKEHOLDER_GET_URI = "instances/{" + CASE_ID + "}/tasks/instances/stakeholders";

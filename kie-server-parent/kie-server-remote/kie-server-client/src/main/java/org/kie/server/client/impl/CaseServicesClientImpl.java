@@ -914,7 +914,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             queryString = getSortingQueryString(queryString, sort, sortOrder);
 
             list = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI, valuesMap) + queryString, CaseDefinitionList.class);
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_ALL_DEFINITIONS_GET_URI, valuesMap) + queryString, CaseDefinitionList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
@@ -996,7 +996,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             valuesMap.put(CASE_DEF_ID, caseDefinitionId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_GET_URI, valuesMap), CaseDefinition.class);
+                    build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_DEFINITIONS_BY_ID_GET_URI, valuesMap), CaseDefinition.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(

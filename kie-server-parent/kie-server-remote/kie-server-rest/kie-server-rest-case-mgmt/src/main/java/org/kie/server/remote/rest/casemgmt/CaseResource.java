@@ -659,6 +659,7 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @GET
+    @Path(CASE_ALL_DEFINITIONS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseDefinitionsByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId,
@@ -679,7 +680,7 @@ public class CaseResource extends AbstractCaseResource {
     }
 
     @GET
-    @Path(CASE_GET_URI)
+    @Path(CASE_DEFINITIONS_BY_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseDefinitionsByDefinition(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_DEF_ID) String caseDefId) {
