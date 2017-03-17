@@ -15,7 +15,9 @@
 
 package org.kie.server.services.impl.marshal;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kie.server.api.marshalling.Marshaller;
@@ -66,8 +68,7 @@ public class MarshallerHelper {
     }
 
     public String marshal(String marshallingFormat, Object entity) {
-        MarshallingFormat format = getFormat(marshallingFormat);
-
+    	MarshallingFormat format = getFormat(marshallingFormat);
 
         if (format == null) {
             throw new IllegalArgumentException("Unknown marshalling format " + marshallingFormat);
@@ -75,13 +76,13 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-            marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
-            serverMarshallers.put(format, marshaller);
+        	marshaller = MarshallerFactory.getMarshaller(getExtraClasses(registry), format, this.getClass().getClassLoader());
+        	serverMarshallers.put(format, marshaller);
         }
 
         return marshaller.marshall(entity);
-
     }
+    
     public <T> T unmarshal(String containerId, String data, String marshallingFormat, Class<T> unmarshalType) {
         return unmarshal(containerId, data, marshallingFormat, unmarshalType, ContainerLocatorProvider.get().getLocator());
     }
@@ -120,8 +121,8 @@ public class MarshallerHelper {
 
         Marshaller marshaller = serverMarshallers.get(format);
         if (marshaller == null) {
-            marshaller = MarshallerFactory.getMarshaller(format, this.getClass().getClassLoader());
-            serverMarshallers.put(format, marshaller);
+        	marshaller = MarshallerFactory.getMarshaller(getExtraClasses(registry), format, this.getClass().getClassLoader());
+        	serverMarshallers.put(format, marshaller);
         }
 
         Object instance = marshaller.unmarshall(data, unmarshalType);
@@ -141,4 +142,17 @@ public class MarshallerHelper {
 
         return format;
     }
+    
+    private static Set<Class<?>> getExtraClasses(KieServerRegistry registry) {
+    	Set<Class<?>> extraClasses;
+    	
+    	if (registry != null) {
+    		extraClasses = registry.getExtraClasses();
+    	} else {
+    		extraClasses = new HashSet<>();
+    	}
+    	
+    	return extraClasses;
+    }
+
 }

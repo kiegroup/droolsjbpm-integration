@@ -67,4 +67,8 @@ public interface KieServerRegistry {
     KieServerStateRepository getStateRepository();
 
     KieSessionLookupManager getKieSessionLookupManager();
+    
+    void addExtraClasses(Set<Class<?>> extraClasses);
+    
+    Set<Class<?>> getExtraClasses();
 }
