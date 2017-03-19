@@ -171,7 +171,7 @@ public class KSessionFactoryBean
     public Object getObject() throws Exception {
         if ("prototype".equalsIgnoreCase(scope)) {
             helper.setKieBase(kBase);
-            kSession = helper.internalNewObject();
+            Object kSession = helper.internalNewObject();
             attachLoggers((KieRuntimeEventManager) kSession);
             attachListeners((KieRuntimeEventManager) kSession);
             return kSession;
