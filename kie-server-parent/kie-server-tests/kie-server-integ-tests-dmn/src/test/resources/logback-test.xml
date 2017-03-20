@@ -7,6 +7,13 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
+  
+  <appender name="KIECLIENTFILE" class="ch.qos.logback.core.FileAppender">
+    <file>target/kie-client.log</file>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
   <logger name="org.kie.server" level="INFO" />
   <logger name="org.apache.http" level="WARN" />
@@ -15,7 +22,9 @@
   
   <logger name="org.kie.server.services.dmn" level="DEBUG" />
   <logger name="org.kie.server.remote.rest.dmn" level="DEBUG" />
-  <logger name="org.kie.server.client" level="DEBUG" />
+  <logger name="org.kie.server.client.impl.AbstractKieServicesClientImpl" level="DEBUG">
+    <appender-ref ref="KIECLIENTFILE" />
+  </logger>
 
   <root level="INFO">
     <appender-ref ref="STDOUT"/>
