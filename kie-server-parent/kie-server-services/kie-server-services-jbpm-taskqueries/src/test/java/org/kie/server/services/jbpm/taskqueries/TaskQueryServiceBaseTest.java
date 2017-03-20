@@ -7,7 +7,9 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
 import org.jbpm.services.api.query.QueryService;
@@ -16,6 +18,7 @@ import org.junit.Test;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.taskqueries.util.TaskQueriesStrategy;
 import org.mockito.Mockito;
@@ -28,11 +31,22 @@ public class TaskQueryServiceBaseTest {
 	public void testGetHumanTasksWithFilters() {
 		QueryService queryServiceMock = Mockito.mock(QueryService.class);
 		KieServerRegistry contextMock = Mockito.mock(KieServerRegistry.class);
+		
+		
+		//Registry mock needs to return extra classes registered by the extension.
+		Set<Class<?>> extraClasses = new HashSet<>();
+		extraClasses.add(TaskQueryFilterSpec.class);
+		when(contextMock.getExtraClasses()).thenReturn(extraClasses);
+		
 		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
 		when(contextMock.getConfig()).thenReturn(configMock);
+		
 		TaskQueriesStrategy taskQueriesStrategyMock = Mockito.mock(TaskQueriesStrategy.class); 
 		
 		TaskQueryServiceBase base = new TaskQueryServiceBase(queryServiceMock, contextMock, taskQueriesStrategyMock);
+		
+		//Verify that extra classes are registered on the context.
+		verify(contextMock, times(1)).addExtraClasses(extraClasses);
 		
 		Integer page = new Integer(0);
 		Integer pageSize = new Integer(10);

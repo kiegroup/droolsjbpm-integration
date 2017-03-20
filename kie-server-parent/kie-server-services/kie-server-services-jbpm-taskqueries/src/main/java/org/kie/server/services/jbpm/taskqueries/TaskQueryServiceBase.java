@@ -69,17 +69,12 @@ public class TaskQueryServiceBase {
 		this.queryService = queryService;
 		this.context = context;
 		
-		//We need to add additional JAXB classes (TaskQueryFilterSpec in particular) to be able to unmarshall our response.
-		//TODO: Looks like it's impossible to do this with the existing MarshallerHelper, so we need to build our own Marshaller for now.
 		this.marshallerHelper = new MarshallerHelper(context);
 		
-		//TODO: this is a bit hard-coded. We only support JAXB atm. It would be nicer if we could do this through MarshallerHelper ....
-		//We can also simply register marshallers for all 3 formats in a static way .... until MarshallerHelper supports adding custom classes (if it ever will).
-		
-		MarshallerFactory marshallerFactory  = new MarshallerFactory();
+		//Add extra classes to to the KieServerRegistry, which can, for example, be used by the Marshallers.
 		Set<Class<?>> extraClasses = new HashSet<>();
 		extraClasses.add(TaskQueryFilterSpec.class);
-		jaxbMarshaller = marshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JAXB, this.getClass().getClassLoader());
+		context.addExtraClasses(extraClasses);
 		
 		// Register (or replace) query.
 		String taskQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
@@ -98,8 +93,7 @@ public class TaskQueryServiceBase {
 		if (payload != null & !payload.isEmpty()) {
 			logger.debug("About to unmarshall query params from payload: '{}'", payload);
 			
-			//TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
-			TaskQueryFilterSpec filterSpec = jaxbMarshaller.unmarshall(payload, TaskQueryFilterSpec.class);
+			TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
 			
 			queryContext.setOrderBy(filterSpec.getOrderBy());
 			queryContext.setAscending(filterSpec.isAscending());
