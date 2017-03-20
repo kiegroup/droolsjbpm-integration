@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.kie.dmn.api.core.DMNMessage;
+import org.kie.dmn.api.core.DMNMessageType;
 import org.kie.dmn.api.feel.runtime.events.FEELEvent;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -73,6 +74,10 @@ public class DMNMessageKS implements DMNMessage {
     @XmlElement(name="message")
     @XStreamAlias("message")
     private String    message;
+
+    @XmlElement(name="message-type")
+    @XStreamAlias("message-type")
+    private DMNMessageType messageType;
     
     @XmlElement(name="source-id")
     @XStreamAlias("source-id")
@@ -86,6 +91,7 @@ public class DMNMessageKS implements DMNMessage {
         DMNMessageKS res = new DMNMessageKS();
         res.severity = DMNMessageSeverityKS.of( value.getSeverity() );
         res.message = value.getMessage();
+        res.messageType = value.getMessageType();
         res.sourceId = value.getSourceId();
         return res;
     }
@@ -98,6 +104,11 @@ public class DMNMessageKS implements DMNMessage {
     @Override
     public String getMessage() {
         return message;
+    }
+    
+    @Override
+    public DMNMessageType getMessageType() {
+        return this.messageType;
     }
 
     @Override
