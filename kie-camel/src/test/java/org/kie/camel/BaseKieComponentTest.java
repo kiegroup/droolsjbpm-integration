@@ -21,10 +21,12 @@ import java.net.ServerSocket;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class BaseKieComponentTest extends CamelTestSupport {
     private static Logger logger = LoggerFactory.getLogger( BaseKieComponentTest.class );
 

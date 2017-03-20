@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -33,6 +34,7 @@ import static org.kie.camel.KieCamelUtils.getResultMessage;
 import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
 import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
 
+@Ignore
 public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
     @Test
