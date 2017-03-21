@@ -129,6 +129,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         ((CaseServiceImpl) caseService).setCommandService(new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName)));
         ((CaseServiceImpl) caseService).setAuthorizationManager(new AuthorizationManagerImpl(registry.getIdentityProvider(),
                 new TransactionalCommandService(EntityManagerFactoryManager.get().getOrCreate(persistenceUnitName))));
+        ((CaseServiceImpl) caseService).setIdentityProvider(registry.getIdentityProvider());
 
         // build case configuration on deployment listener
         CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener();

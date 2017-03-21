@@ -21,6 +21,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.casemgmt.api.AdHocFragmentNotFoundException;
 import org.jbpm.casemgmt.api.CaseActiveException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.services.api.DeploymentNotFoundException;
@@ -64,6 +65,9 @@ public abstract class AbstractCaseResource {
         } catch (CaseNotFoundException e) {
             return notFound(
                     MessageFormat.format(CASE_INSTANCE_NOT_FOUND, caseId), v, conversationIdHeader);
+        } catch (AdHocFragmentNotFoundException e) {
+            return notFound(
+                    e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
