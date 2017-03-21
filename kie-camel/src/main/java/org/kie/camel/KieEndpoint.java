@@ -28,7 +28,8 @@ import org.kie.server.client.KieServicesConfiguration;
 
 public class KieEndpoint extends DefaultEndpoint {
 
-    private KieServicesConfiguration configuration;
+    private final KieServicesConfiguration kieServicesConf;
+    private final KieConfiguration configuration;
 
     @UriParam
     private String username;
@@ -36,13 +37,18 @@ public class KieEndpoint extends DefaultEndpoint {
     @UriParam
     private String password;
 
-    public KieEndpoint(String uri, KieComponent component, KieServicesConfiguration configuration ) throws URISyntaxException, MalformedURLException {
+    public KieEndpoint(String uri, KieComponent component, KieServicesConfiguration kieServicesConf, KieConfiguration configuration ) throws URISyntaxException, MalformedURLException {
         super(uri, component);
+        this.kieServicesConf = kieServicesConf;
         this.configuration = configuration;
     }
 
-    public KieServicesConfiguration getConfiguration() {
-        return this.configuration;
+    public KieServicesConfiguration getKieServicesConf() {
+        return this.kieServicesConf;
+    }
+
+    public KieConfiguration getConfiguration() {
+        return configuration;
     }
 
     @Override

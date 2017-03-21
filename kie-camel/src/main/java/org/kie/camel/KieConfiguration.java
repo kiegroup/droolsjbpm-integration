@@ -18,6 +18,8 @@ package org.kie.camel;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.UriParam;
@@ -29,6 +31,17 @@ public class KieConfiguration implements Cloneable {
 
     @UriParam(label = "security", secret = true)
     private String password;
+
+    private Map<String, String> bodyParams = new HashMap<>();
+
+    public KieConfiguration() {
+        initBodyParams();
+    }
+
+    private void initBodyParams() {
+        setBodyParam( "process", "signal", "event" );
+        setBodyParam( "dmn", "evaluateAllDecisions", "dmnContext" );
+    }
 
     public void configure(String remaining) {
         String userInfo = null;
@@ -71,5 +84,19 @@ public class KieConfiguration implements Cloneable {
 
     public void setPassword( String password ) {
         this.password = password;
+    }
+
+    public KieConfiguration setBodyParam(String serviceName, String methodName, String paramName) {
+        bodyParams.put(serviceName + "." + methodName, paramName);
+        return this;
+    }
+
+    public String getBodyParam(String serviceName, String methodName) {
+        return bodyParams.get(serviceName + "." + methodName);
+    }
+
+    public KieConfiguration clearBodyParams() {
+        bodyParams.clear();
+        return this;
     }
 }
