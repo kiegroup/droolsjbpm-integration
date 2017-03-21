@@ -22,6 +22,7 @@ import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.ServiceResponse.ResponseType;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -63,6 +64,8 @@ public class DMNTwoDMNModelsIntegrationTest
                 "https://github.com/kiegroup/kie-dmn/input-data-string", "input-data-string",
                 dmnContext);
         
+        assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
+        
         DMNResult dmnResult = evaluateAllDecisions.getResult();
         
         assertThat( dmnResult.getDecisionResults().size(), is( 1 ) );
@@ -81,6 +84,8 @@ public class DMNTwoDMNModelsIntegrationTest
         ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID,
                 "https://www.drools.org/kie-dmn/function-definition", "function-definition",
                 dmnContext);
+        
+        assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
         
         DMNResult dmnResult = evaluateAllDecisions.getResult();
         
