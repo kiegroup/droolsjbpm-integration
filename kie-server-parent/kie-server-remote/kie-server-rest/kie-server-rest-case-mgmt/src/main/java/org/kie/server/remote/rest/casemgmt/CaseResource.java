@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.jbpm.casemgmt.api.CaseCommentNotFoundException;
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseCommentList;
@@ -611,7 +612,7 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstancesByContainer(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId,
-            @QueryParam("status") List<Integer> status,
+            @QueryParam("status") List<String> status,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
@@ -619,10 +620,10 @@ public class CaseResource extends AbstractCaseResource {
                 containerId,
                 null,
                 (Variant v, String type, Header... customHeaders) -> {
-                    List<Integer> actualStatus = status;
+                    List<String> actualStatus = status;
                     if (status == null || status.isEmpty()) {
-                        actualStatus = new ArrayList<Integer>();
-                        actualStatus.add(ProcessInstance.STATE_ACTIVE);
+                        actualStatus = new ArrayList<String>();
+                        actualStatus.add(CaseStatus.OPEN.getName());
                     }
                     logger.debug("About to look for case instances in container {} with status {}", containerId, actualStatus);
                     CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByContainer(containerId, actualStatus, page, pageSize, sort, sortOrder);
@@ -637,7 +638,7 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstancesByDefinition(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_DEF_ID) String caseDefId,
-            @QueryParam("status") List<Integer> status,
+            @QueryParam("status") List<String> status,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
@@ -645,10 +646,10 @@ public class CaseResource extends AbstractCaseResource {
                 containerId,
                 null,
                 (Variant v, String type, Header... customHeaders) -> {
-                    List<Integer> actualStatus = status;
+                    List<String> actualStatus = status;
                     if (status == null || status.isEmpty()) {
-                        actualStatus = new ArrayList<Integer>();
-                        actualStatus.add(ProcessInstance.STATE_ACTIVE);
+                        actualStatus = new ArrayList<String>();
+                        actualStatus.add(CaseStatus.OPEN.getName());
                     }
                     logger.debug("About to look for case instances with case definition id {} with status {}", caseDefId, actualStatus);
                     CaseInstanceList responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByDefinition(containerId, caseDefId, actualStatus, page, pageSize, sort, sortOrder);

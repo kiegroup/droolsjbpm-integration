@@ -20,6 +20,7 @@ import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
 
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +73,7 @@ public class CaseQueryResourceTest {
 
     @Test
     public void testGetCaseInstances(){
-        List<Integer> status = null;
+        List<String> status = null;
         Integer page = 0;
         Integer pageSize= 10;
         String sort = "CorrelationKey";

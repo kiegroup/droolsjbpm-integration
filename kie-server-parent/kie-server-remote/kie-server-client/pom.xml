@@ -53,6 +53,7 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-dmn-api</artifactId>
     </dependency>
+
     <!-- kie server dependencies -->
     <dependency>
       <groupId>org.kie.server</groupId>

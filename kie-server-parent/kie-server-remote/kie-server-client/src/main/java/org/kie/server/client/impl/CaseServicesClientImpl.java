@@ -739,7 +739,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize) {
+    public List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize) {
         return getCaseInstances(status, page, pageSize, "", true);
     }
 
@@ -749,7 +749,7 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+    public List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -782,12 +782,12 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize) {
+    public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<String> status, Integer page, Integer pageSize) {
         return getCaseInstancesOwnedBy(owner, status, page, pageSize, "", true);
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+    public List<CaseInstance> getCaseInstancesOwnedBy(String owner, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -820,12 +820,12 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize) {
+    public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<String> status, Integer page, Integer pageSize) {
         return getCaseInstancesByContainer(containerId, status, page, pageSize, "", true);
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+    public List<CaseInstance> getCaseInstancesByContainer(String containerId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
@@ -859,12 +859,12 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize) {
+    public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize) {
         return getCaseInstancesByDefinition(containerId, caseDefinitionId, status, page, pageSize, "", true);
     }
 
     @Override
-    public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+    public List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         CaseInstanceList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();

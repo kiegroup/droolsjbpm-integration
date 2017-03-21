@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.ReleaseId;
@@ -40,8 +41,9 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class CaseAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "case-insurance",
-            "1.0.0.Final");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing",
+                                                       "case-insurance",
+                                                       "1.0.0.Final");
 
     private static final String CONTAINER_ID = "insurance";
     private static final String PROPERTY_DAMAGE_REPORT_CLASS_NAME = "org.kie.server.testing.PropertyDamageReport";
@@ -65,13 +67,20 @@ public class CaseAdminServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID,
+                        releaseId);
     }
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
-        extraClasses.put(CLAIM_REPORT_CLASS_NAME, Class.forName(CLAIM_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
-        extraClasses.put(PROPERTY_DAMAGE_REPORT_CLASS_NAME, Class.forName(PROPERTY_DAMAGE_REPORT_CLASS_NAME, true, kieContainer.getClassLoader()));
+        extraClasses.put(CLAIM_REPORT_CLASS_NAME,
+                         Class.forName(CLAIM_REPORT_CLASS_NAME,
+                                       true,
+                                       kieContainer.getClassLoader()));
+        extraClasses.put(PROPERTY_DAMAGE_REPORT_CLASS_NAME,
+                         Class.forName(PROPERTY_DAMAGE_REPORT_CLASS_NAME,
+                                       true,
+                                       kieContainer.getClassLoader()));
     }
 
     @After
@@ -84,19 +93,26 @@ public class CaseAdminServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         // Test is using user authentication, isn't available for local execution(which has mocked authentication info).
         Assume.assumeFalse(TestConfig.isLocalServer());
 
-        String caseId = startUserTaskCase(USER_JOHN, USER_MARY);
+        String caseId = startUserTaskCase(USER_JOHN,
+                                          USER_MARY);
         assertNotNull(caseId);
 
         // yoda is not involved in case at all so should not see case at all
-        List<CaseInstance> caseInstances = caseClient.getCaseInstances(0, 10);
-        assertEquals(0, caseInstances.size());
+        List<CaseInstance> caseInstances = caseClient.getCaseInstances(0,
+                                                                       10);
+        assertEquals(0,
+                     caseInstances.size());
 
         // Admin client should return all case instances regardless of user
-        caseInstances = caseAdminClient.getCaseInstances(0, 10);
-        assertEquals(1, caseInstances.size());
+        caseInstances = caseAdminClient.getCaseInstances(0,
+                                                         10);
+        assertEquals(1,
+                     caseInstances.size());
 
-        caseInstances = caseAdminClient.getCaseInstances(1, 10);
-        assertEquals(0, caseInstances.size());
+        caseInstances = caseAdminClient.getCaseInstances(1,
+                                                         10);
+        assertEquals(0,
+                     caseInstances.size());
     }
 
     @Test
@@ -104,93 +120,163 @@ public class CaseAdminServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         // Test is using user authentication, isn't available for local execution(which has mocked authentication info).
         Assume.assumeFalse(TestConfig.isLocalServer());
 
-        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ABORTED), 0, 1000);
+        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.CANCELLED.getName()),
+                                                                            0,
+                                                                            1000);
         assertNotNull(caseInstances);
         int abortedCaseInstanceCount = caseInstances.size();
 
-        String caseId = startUserTaskCase(USER_JOHN, USER_MARY);
+        String caseId = startUserTaskCase(USER_JOHN,
+                                          USER_MARY);
 
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10);
-        assertEquals(1, caseInstances.size());
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.OPEN.getName()),
+                                                         0,
+                                                         10);
+        assertEquals(1,
+                     caseInstances.size());
 
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 1, 10);
-        assertEquals(0, caseInstances.size());
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.OPEN.getName()),
+                                                         1,
+                                                         10);
+        assertEquals(0,
+                     caseInstances.size());
 
         // Only users in roles defined in case-authorization.properties can cancel Case
         changeUser(USER_JOHN);
-        caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+        caseClient.cancelCaseInstance(CONTAINER_ID,
+                                      caseId);
         changeUser(USER_YODA);
 
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ABORTED), 0, 1000);
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.CANCELLED.getName()),
+                                                         0,
+                                                         1000);
         assertNotNull(caseInstances);
-        assertEquals(abortedCaseInstanceCount + 1, caseInstances.size());
+        assertEquals(abortedCaseInstanceCount + 1,
+                     caseInstances.size());
     }
 
     @Test
     public void testGetCaseInstancesSorting() {
-        String hrCaseId = startUserTaskCase(USER_JOHN, USER_MARY);
-        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN, USER_MARY, USER_YODA);
-        assertNotEquals(hrCaseId, claimCaseId);
+        String hrCaseId = startUserTaskCase(USER_JOHN,
+                                            USER_MARY);
+        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN,
+                                                        USER_MARY,
+                                                        USER_YODA);
+        assertNotEquals(hrCaseId,
+                        claimCaseId);
 
-        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
-        assertEquals(1, caseInstances.size());
-        assertEquals(claimCaseId, caseInstances.get(0).getCaseId());
+        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(0,
+                                                                            1,
+                                                                            CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                                            true);
+        assertEquals(1,
+                     caseInstances.size());
+        assertEquals(claimCaseId,
+                     caseInstances.get(0).getCaseId());
 
-        caseInstances = caseAdminClient.getCaseInstances(1, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
-        assertEquals(1, caseInstances.size());
-        assertEquals(hrCaseId, caseInstances.get(0).getCaseId());
+        caseInstances = caseAdminClient.getCaseInstances(1,
+                                                         1,
+                                                         CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                         true);
+        assertEquals(1,
+                     caseInstances.size());
+        assertEquals(hrCaseId,
+                     caseInstances.get(0).getCaseId());
 
-        caseInstances = caseAdminClient.getCaseInstances(0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false);
-        assertEquals(2, caseInstances.size());
-        assertEquals(hrCaseId, caseInstances.get(0).getCaseId());
-        assertEquals(claimCaseId, caseInstances.get(1).getCaseId());
+        caseInstances = caseAdminClient.getCaseInstances(0,
+                                                         10,
+                                                         CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                         false);
+        assertEquals(2,
+                     caseInstances.size());
+        assertEquals(hrCaseId,
+                     caseInstances.get(0).getCaseId());
+        assertEquals(claimCaseId,
+                     caseInstances.get(1).getCaseId());
     }
 
     @Test
     public void testGetCaseInstancesByStatusSorting() {
-        String hrCaseId = startUserTaskCase(USER_JOHN, USER_MARY);
-        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN, USER_MARY, USER_YODA);
-        assertNotEquals(hrCaseId, claimCaseId);
+        String hrCaseId = startUserTaskCase(USER_JOHN,
+                                            USER_MARY);
+        String claimCaseId = startCarInsuranceClaimCase(USER_JOHN,
+                                                        USER_MARY,
+                                                        USER_YODA);
+        assertNotEquals(hrCaseId,
+                        claimCaseId);
 
-        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
-        assertEquals(1, caseInstances.size());
-        assertEquals(claimCaseId, caseInstances.get(0).getCaseId());
+        List<CaseInstance> caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.OPEN.getName()),
+                                                                            0,
+                                                                            1,
+                                                                            CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                                            true);
+        assertEquals(1,
+                     caseInstances.size());
+        assertEquals(claimCaseId,
+                     caseInstances.get(0).getCaseId());
 
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 1, 1, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
-        assertEquals(1, caseInstances.size());
-        assertEquals(hrCaseId, caseInstances.get(0).getCaseId());
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.OPEN.getName()),
+                                                         1,
+                                                         1,
+                                                         CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                         true);
+        assertEquals(1,
+                     caseInstances.size());
+        assertEquals(hrCaseId,
+                     caseInstances.get(0).getCaseId());
 
-        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, false);
-        assertEquals(2, caseInstances.size());
-        assertEquals(hrCaseId, caseInstances.get(0).getCaseId());
-        assertEquals(claimCaseId, caseInstances.get(1).getCaseId());
+        caseInstances = caseAdminClient.getCaseInstances(Arrays.asList(CaseStatus.OPEN.getName()),
+                                                         0,
+                                                         10,
+                                                         CaseServicesClient.SORT_BY_CASE_INSTANCE_ID,
+                                                         false);
+        assertEquals(2,
+                     caseInstances.size());
+        assertEquals(hrCaseId,
+                     caseInstances.get(0).getCaseId());
+        assertEquals(claimCaseId,
+                     caseInstances.get(1).getCaseId());
     }
 
-    private String startUserTaskCase(String owner, String contact) {
+    private String startUserTaskCase(String owner,
+                                     String contact) {
         Map<String, Object> data = new HashMap<>();
-        data.put("s", "first case started");
+        data.put("s",
+                 "first case started");
         CaseFile caseFile = CaseFile.builder()
-                .addUserAssignments(CASE_OWNER_ROLE, owner)
-                .addUserAssignments(CASE_CONTACT_ROLE, contact)
+                .addUserAssignments(CASE_OWNER_ROLE,
+                                    owner)
+                .addUserAssignments(CASE_CONTACT_ROLE,
+                                    contact)
                 .data(data)
                 .build();
 
-        String caseId = caseClient.startCase(CONTAINER_ID, CASE_HR_DEF_ID, caseFile);
+        String caseId = caseClient.startCase(CONTAINER_ID,
+                                             CASE_HR_DEF_ID,
+                                             caseFile);
         assertNotNull(caseId);
         return caseId;
     }
 
-    private String startCarInsuranceClaimCase(String insured, String insuranceRep, String assessor) {
+    private String startCarInsuranceClaimCase(String insured,
+                                              String insuranceRep,
+                                              String assessor) {
         Map<String, Object> data = new HashMap<>();
-        data.put("s", "first case started");
+        data.put("s",
+                 "first case started");
         CaseFile caseFile = CaseFile.builder()
-                .addUserAssignments(CASE_INSURED_ROLE, insured)
-                .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
-                .addUserAssignments(CASE_ASSESSOR_ROLE, assessor)
+                .addUserAssignments(CASE_INSURED_ROLE,
+                                    insured)
+                .addUserAssignments(CASE_INS_REP_ROLE,
+                                    insuranceRep)
+                .addUserAssignments(CASE_ASSESSOR_ROLE,
+                                    assessor)
                 .data(data)
                 .build();
 
-        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        String caseId = caseClient.startCase(CONTAINER_ID,
+                                             CLAIM_CASE_DEF_ID,
+                                             caseFile);
         assertNotNull(caseId);
         return caseId;
     }

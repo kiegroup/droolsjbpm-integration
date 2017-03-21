@@ -23,10 +23,10 @@ public interface CaseAdminServicesClient {
 
     List<CaseInstance> getCaseInstances(Integer page, Integer pageSize);
 
-    List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize);
+    List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize);
 
     List<CaseInstance> getCaseInstances(Integer page, Integer pageSize, String sort, boolean sortOrder);
 
-    List<CaseInstance> getCaseInstances(List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+    List<CaseInstance> getCaseInstances(List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
 }

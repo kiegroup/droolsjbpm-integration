@@ -27,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
@@ -59,7 +60,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
-            @QueryParam("owner") String owner, @QueryParam("status") List<Integer> status,
+            @QueryParam("owner") String owner, @QueryParam("status") List<String> status,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
@@ -71,7 +72,8 @@ public class CaseQueryResource extends AbstractCaseResource {
                     CaseInstanceList responseObject = null;
                     if (owner != null && !owner.isEmpty()) {
                         logger.debug("About to look for case instances owned by {} with status {}", owner, status);
-                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner, status, page, pageSize, sort, sortOrder);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner,
+                                                                                                           status, page, pageSize, sort, sortOrder);
                     } else {
                         logger.debug("About to look for case instances with status {}", status);
                         responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);
@@ -86,7 +88,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Path(CASE_INSTANCES_BY_ROLE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstancesByRole(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CASE_ROLE_NAME) String roleName, @QueryParam("status") List<Integer> status,
+            @PathParam(CASE_ROLE_NAME) String roleName, @QueryParam("status") List<String> status,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
