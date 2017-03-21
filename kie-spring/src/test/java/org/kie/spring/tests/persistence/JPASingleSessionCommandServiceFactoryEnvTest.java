@@ -549,6 +549,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @Test
+    @Ignore("Test causes occational deadlock in service.getProcessInstance(procId)")
     public void testPersistenceTimer() throws Exception {
         log.debug("TMPDIR == " + TMPDIR);
         log.debug("---> get bean jpaSingleSessionCommandService2");
