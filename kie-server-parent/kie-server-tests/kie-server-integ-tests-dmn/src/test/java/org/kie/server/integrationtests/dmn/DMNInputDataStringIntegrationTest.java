@@ -29,20 +29,21 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-public class DMNIntegrationTest
+public class DMNInputDataStringIntegrationTest
         extends DMNKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId(
-            "org.kie.server.testing", "function-definition",
+            "org.kie.server.testing", "input-data-string",
             "1.0.0.Final" );
 
-    private static final String CONTAINER_1_ID  = "function-definition";
+    private static final String CONTAINER_1_ID  = "input-data-string";
 
     @BeforeClass
     public static void deployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
-        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/function-definition" ).getFile() );
+        KieServerDeployer.buildAndDeployMavenProject( ClassLoader.class.getResource( "/kjars-sources/input-data-string" ).getFile() );
 
         kieContainer = KieServices.Factory.get().newKieContainer(kjar1);
         createContainer(CONTAINER_1_ID, kjar1);
@@ -58,41 +59,19 @@ public class DMNIntegrationTest
     @Test
     public void test_evaluateAllDecisions() {
         DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set( "a", 10 );
-        dmnContext.set( "b", 5 );
+        dmnContext.set( "Full Name", "John Doe" );
         ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, dmnContext);
         
         assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
         
         DMNResult dmnResult = evaluateAllDecisions.getResult();
         
-        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
-        assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
-        
-        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
-        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
+        assertThat( dmnResult.getDecisionResults().size(), is( 1 ) );
+        assertThat( dmnResult.getDecisionResultByName( "Greeting Message" ).getResult(), is( "Hello John Doe" ) );
+
+        DMNContext result = dmnResult.getContext();
+
+        assertThat( result.get( "Greeting Message" ), is( "Hello John Doe" ) );
     }
-    
-    // Using explicit namespace and model name
-    @Test
-    public void test_evaluateAllDecisions2() {
-        DMNContext dmnContext = dmnClient.newContext();
-        dmnContext.set( "a", 10 );
-        dmnContext.set( "b", 5 );
-        ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID,
-                "https://www.drools.org/kie-dmn/function-definition", "function-definition",
-                dmnContext);
-        
-        assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
-        
-        DMNResult dmnResult = evaluateAllDecisions.getResult();
-        
-        Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
-        assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
-        
-        Map<String, Object> dr0 = (Map<String, Object>) dmnResult.getDecisionResultByName("Math").getResult();
-        assertThat( dr0, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );
-    }
-    
-    
+
 }
