@@ -14,6 +14,7 @@
   <artifactId>kie-spring</artifactId>
   <packaging>bundle</packaging>
 
+
   <name>Kie :: Spring</name>
   <description>Drools and jBPM integration for Spring.</description>
 
