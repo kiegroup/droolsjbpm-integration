@@ -37,6 +37,12 @@ public class KieEndpoint extends DefaultEndpoint {
     @UriParam
     private String password;
 
+    @UriParam
+    private String client;
+
+    @UriParam
+    private String operation;
+
     public KieEndpoint(String uri, KieComponent component, KieServicesConfiguration kieServicesConf, KieConfiguration configuration ) throws URISyntaxException, MalformedURLException {
         super(uri, component);
         this.kieServicesConf = kieServicesConf;
@@ -80,5 +86,21 @@ public class KieEndpoint extends DefaultEndpoint {
 
     public void setPassword( String password ) {
         this.password = password;
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient( String client ) {
+        this.client = client;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation( String operation ) {
+        this.operation = operation;
     }
 }

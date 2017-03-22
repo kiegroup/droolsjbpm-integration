@@ -20,9 +20,19 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.util.ExchangeHelper;
 
+import static org.kie.camel.KieCamelConstants.KIE_HEADERS_PREFIX;
+
 public class KieCamelUtils {
 
     public static Message getResultMessage( Exchange exchange ) {
         return ExchangeHelper.isOutCapable( exchange ) ? exchange.getOut() : exchange.getIn();
+    }
+
+    public static String asCamelKieName( String name ) {
+        return KIE_HEADERS_PREFIX + ucFirst( name );
+    }
+
+    public static String ucFirst( String name ) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }

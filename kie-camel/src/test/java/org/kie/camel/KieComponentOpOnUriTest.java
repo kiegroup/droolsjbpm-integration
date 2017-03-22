@@ -26,103 +26,15 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
-import org.kie.server.api.model.KieContainerResourceFilter;
-import org.kie.server.api.model.KieContainerResourceList;
-import org.kie.server.api.model.KieContainerStatusFilter;
-import org.kie.server.api.model.KieServerInfo;
-import org.kie.server.api.model.ReleaseIdFilter;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.kie.camel.KieCamelConstants.KIE_CLIENT;
-import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
 import static org.kie.camel.KieCamelUtils.asCamelKieName;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
 
-public class KieComponentIntegrationTest extends BaseKieComponentTest {
-
-    @Test
-    public void testRest() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
-        mockEndpoint.expectedMessageCount( 1 );
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "kieServices");
-        headers.put(KIE_OPERATION, "getServerInfo");
-        template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
-
-        KieServerInfo result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(KieServerInfo.class);
-        assertEquals("Server version", "1.2.3", result.getVersion());
-    }
-
-    @Test
-    public void testListContainers() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
-        mockEndpoint.expectedMessageCount( 1 );
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "kieServices");
-        headers.put(KIE_OPERATION, "listContainers");
-        template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
-
-        KieContainerResourceList result = getResultMessage( mockEndpoint.getExchanges().get( 0 ) ).getBody( KieContainerResourceList.class );
-        assertEquals("Number of listed containers", 2, result.getContainers().size());
-    }
-
-    @Test
-    public void testListContainersOverload() throws Exception {
-        KieContainerResourceFilter filter = new KieContainerResourceFilter( ReleaseIdFilter.ACCEPT_ALL,
-                                                                            KieContainerStatusFilter.ACCEPT_ALL );
-
-        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
-        mockEndpoint.expectedMessageCount( 1 );
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "kieServices");
-        headers.put(KIE_OPERATION, "listContainers");
-        headers.put(asCamelKieName("containerFilter"), filter);
-        template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
-
-        KieContainerResourceList result = getResultMessage( mockEndpoint.getExchanges().get( 0 ) ).getBody( KieContainerResourceList.class );
-        assertEquals("Number of listed containers", 2, result.getContainers().size());
-    }
-
-    @Test
-    public void testCustomOperation() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
-        mockEndpoint.expectedMessageCount( 1 );
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "kieServices");
-        headers.put(KIE_OPERATION, "myCustomOperation");
-        template.sendBodyAndHeaders("direct:start", null, headers);
-        assertMockEndpointsSatisfied();
-
-        KieServerInfo result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(KieServerInfo.class);
-        assertEquals("Server version", "1.2.3", result.getVersion());
-    }
+public class KieComponentOpOnUriTest extends BaseKieComponentTest {
 
     @Test
     public void testBodyParam() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint( "mock:result" );
-        mockEndpoint.expectedMessageCount( 1 );
-
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "process");
-        headers.put(KIE_OPERATION, "signal");
-        headers.put(asCamelKieName("containerId"), "containerId");
-        headers.put(asCamelKieName("signalName"), "signalName");
-        template.sendBodyAndHeaders("direct:start", "test", headers);
-        assertMockEndpointsSatisfied();
-
-        String result = getResultMessage(mockEndpoint.getExchanges().get(0)).getBody(String.class);
-        assertNull(result);
-    }
-
-    @Test
-    public void testBodyParam2() throws Exception {
         DMNContext body = new DMNContext() {
             @Override
             public Object set( String s, Object o ) {
@@ -154,8 +66,6 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
         mockEndpoint.expectedMessageCount( 1 );
 
         Map<String, Object> headers = new HashMap<>();
-        headers.put(KIE_CLIENT, "dmn");
-        headers.put(KIE_OPERATION, "evaluateAllDecisions");
         headers.put(asCamelKieName("containerId"), "containerId");
         template.sendBodyAndHeaders("direct:start", body, headers);
         assertMockEndpointsSatisfied();
@@ -178,25 +88,6 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
                                                       "    <version>1.2.3</version>\n" +
                                                       "  </kie-server-info>\n" +
                                                       "</response>")));
-
-        stubFor(get(urlEqualTo("/containers"))
-                        .withHeader("Accept", equalTo("application/xml"))
-                        .willReturn(aResponse()
-                                            .withStatus(200)
-                                            .withHeader("Content-Type", "application/xml")
-                                            .withBody("<response type=\"SUCCESS\" msg=\"List of created containers\">\n" +
-                                                      "  <kie-containers>\n" +
-                                                      "    <kie-container container-id=\"kjar1\" status=\"FAILED\"/>\n" +
-                                                      "    <kie-container container-id=\"kjar2\" status=\"STARTED\"/>" +
-                                                      "  </kie-containers>" +
-                                                      "</response>")));
-
-        stubFor(post(urlEqualTo("/containers/containerId/processes/instances/signal/signalName"))
-                        .withHeader("Accept", equalTo("application/xml"))
-                        .willReturn(aResponse()
-                                            .withStatus(200)
-                                            .withHeader("Content-Type", "application/xml")
-                                            .withBody("<string-type/>")));
 
         stubFor(post(urlEqualTo("/containers/containerId/dmn"))
                         .withHeader("Accept", equalTo("application/xml"))
@@ -236,7 +127,7 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
             @Override
             public void configure() {
                 from("direct:start")
-                        .to("kie:" + getAuthenticadUrl("admin", "admin"))
+                        .to("kie:" + getAuthenticadUrl("admin", "admin") + "?client=dmn&operation=evaluateAllDecisions")
                         .to("mock:result");
             }
         };

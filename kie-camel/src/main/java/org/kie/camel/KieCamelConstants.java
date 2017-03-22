@@ -18,12 +18,12 @@ package org.kie.camel;
 
 public class KieCamelConstants {
 
-    public static final String KIE_HEADERS_PREFIX = "kie.";
+    public static final String KIE_HEADERS_PREFIX = "CamelKie";
 
-    public static final String KIE_CLIENT = "kie-client";
-    public static final String KIE_OPERATION = "kie-operation";
+    public static final String KIE_CLIENT = KIE_HEADERS_PREFIX + "Client";
+    public static final String KIE_OPERATION = KIE_HEADERS_PREFIX + "Operation";
 
-    public static final String RESPONSE_TYPE = "CamelKieResponseType";
-    public static final String RESPONSE_MESSAGE = "CamelKieResponseMessage";
+    public static final String RESPONSE_TYPE = KIE_HEADERS_PREFIX + "ResponseType";
+    public static final String RESPONSE_MESSAGE = KIE_HEADERS_PREFIX + "ResponseMessage";
 
 }
