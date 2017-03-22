@@ -20,16 +20,18 @@ import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.JsonGenerator;
@@ -43,39 +45,36 @@ import org.codehaus.jackson.map.BeanProperty;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.TypeDeserializer;
-import org.codehaus.jackson.map.deser.BeanDeserializer;
-import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.deser.std.UntypedObjectDeserializer;
 import org.codehaus.jackson.map.introspect.Annotated;
 import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
 import org.codehaus.jackson.map.jsontype.NamedType;
 import org.codehaus.jackson.map.jsontype.TypeIdResolver;
 import org.codehaus.jackson.map.jsontype.TypeResolverBuilder;
-import org.codehaus.jackson.map.jsontype.impl.AsArrayTypeDeserializer;
-import org.codehaus.jackson.map.jsontype.impl.AsExternalTypeDeserializer;
-import org.codehaus.jackson.map.jsontype.impl.AsPropertyTypeDeserializer;
 import org.codehaus.jackson.map.jsontype.impl.AsWrapperTypeDeserializer;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-import org.drools.core.common.DefaultFactHandle;
-import org.drools.core.runtime.rule.impl.FlatQueryResults;
 import org.drools.core.xml.jaxb.util.JaxbListAdapter;
 import org.drools.core.xml.jaxb.util.JaxbListWrapper;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.marshalling.Marshaller;
+import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.type.JaxbByteArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JSONMarshaller implements Marshaller {
+
+    private static final Logger logger = LoggerFactory.getLogger( MarshallerFactory.class );
 
     private static boolean formatDate = Boolean.parseBoolean(System.getProperty("org.kie.server.json.format.date", "false"));
     private static String dateFormatStr = System.getProperty("org.kie.server.json.date_format", "yyyy-MM-dd'T'hh:mm:ss.SSSZ");
@@ -96,6 +95,22 @@ public class JSONMarshaller implements Marshaller {
 
     protected DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
+    // Optional Marshaller Extension to handle new types
+    private static List<JSONMarshallerExtension> EXTENSIONS;
+    
+    // Load Marshaller Extension
+    static {
+        logger.info("Marshaller extesions init.");
+
+        ServiceLoader<JSONMarshallerExtension> plugins = ServiceLoader.load(JSONMarshallerExtension.class);
+        List<JSONMarshallerExtension> tmp = new ArrayList();
+        for(JSONMarshallerExtension c : plugins){
+            logger.debug("JSONMarshallerExtension implementation found: {}", c.getClass().getName());
+            tmp.add(c);
+        }
+        EXTENSIONS = Collections.unmodifiableList(tmp);
+    }
+    
     public JSONMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
         this.classLoader = classLoader;
         buildMarshaller(classes, classLoader);
@@ -318,6 +333,11 @@ public class JSONMarshaller implements Marshaller {
         }
 
         this.classesSet = classes;
+        
+        // Extend the marshaller with optional extensions
+        for(JSONMarshallerExtension extension : EXTENSIONS){
+            extension.extend(this, objectMapper, deserializeObjectMapper);
+        }
     }
 
     protected List<NamedType> prepareCustomClasses(Set<Class<?>> classes) {
