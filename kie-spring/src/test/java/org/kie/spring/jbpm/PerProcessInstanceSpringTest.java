@@ -159,6 +159,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime.getTaskService().start(taskId1, USER_JOHN);
 
         transactionManager.commit(status);
+        manager.disposeRuntimeEngine(runtime);
 
         status = transactionManager.getTransaction(defTransDefinition);
         // start process 2
@@ -178,6 +179,8 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime2.getTaskService().start(taskId2, USER_JOHN);
         transactionManager.commit(status);
 
+        manager.disposeRuntimeEngine(runtime2);
+
         status = transactionManager.getTransaction(defTransDefinition);
         // start and complete first task in process instance 1
         runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
@@ -185,6 +188,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime.getTaskService().complete(taskId1, USER_JOHN, null);
 
         transactionManager.commit(status);
+        manager.disposeRuntimeEngine(runtime);
 
         status = transactionManager.getTransaction(defTransDefinition);
         // start and complete first task in process instance 2
@@ -193,6 +197,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime2.getTaskService().complete(taskId2, USER_JOHN, null);
 
         transactionManager.commit(status);
+        manager.disposeRuntimeEngine(runtime);
 
         status = transactionManager.getTransaction(defTransDefinition);
         runtime = manager.getRuntimeEngine(ProcessInstanceIdContext.get(pi1.getId()));
@@ -207,6 +212,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime.getTaskService().complete(taskId1, USER_MARY, null);
 
         transactionManager.commit(status);
+        manager.disposeRuntimeEngine(runtime);
 
         // since process is completed now session should not be there any more
         try {
@@ -228,6 +234,7 @@ public class PerProcessInstanceSpringTest extends AbstractJbpmSpringParameterize
         runtime2.getTaskService().complete(taskId2, USER_MARY, null);
 
         transactionManager.commit(status);
+        manager.disposeRuntimeEngine(runtime2);
 
         // since process is completed now session should not be there any more
         try {
