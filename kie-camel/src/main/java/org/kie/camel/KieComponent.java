@@ -44,13 +44,13 @@ public class KieComponent extends DefaultComponent {
         kieConfiguration.configure( remaining );
         setProperties(kieConfiguration, parameters);
 
-        KieServicesConfiguration config = remaining.startsWith( "jms" ) ?
-                                          KieServicesFactory.newJMSConfiguration( (InitialContext)null, null, null ) :
-                                          KieServicesFactory.newRestConfiguration( remaining, null, null );
+        KieServicesConfiguration kieServicesConf = remaining.startsWith( "jms" ) ?
+                                                   KieServicesFactory.newJMSConfiguration( (InitialContext)null, null, null ) :
+                                                   KieServicesFactory.newRestConfiguration( remaining, null, null );
 
-        config.setUserName( kieConfiguration.getUsername() );
-        config.setPassword( kieConfiguration.getPassword() );
-        return new KieEndpoint(uri, this, config);
+        kieServicesConf.setUserName( kieConfiguration.getUsername() );
+        kieServicesConf.setPassword( kieConfiguration.getPassword() );
+        return new KieEndpoint(uri, this, kieServicesConf, configuration);
     }
 
     public KieConfiguration getConfiguration() {
