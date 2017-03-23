@@ -34,7 +34,7 @@ import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
-import org.kie.internal.query.QueryContext;
+import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
 import org.kie.server.api.model.cases.CaseMilestone;
