@@ -34,6 +34,14 @@
     <property name="assets" ref="assets"/>
   </bean>
 
+  <bean id="runtimeEnvironment2" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean">
+    <property name="type" value="DEFAULT"/>
+    <property name="entityManagerFactory" ref="jbpmEMF"/>
+    <property name="entityManager" ref="jbpmEM" />
+    <property name="transactionManager" ref="jbpmTxManager"/>
+    <property name="assets" ref="assets"/>
+  </bean>
+
   <bean id="logService" class="org.jbpm.process.audit.JPAAuditLogService" depends-on="runtimeEnvironment">
     <constructor-arg value="#{runtimeEnvironment.environment}" />
     <constructor-arg value="STANDALONE_JTA_SPRING_SHARED_EM" />
