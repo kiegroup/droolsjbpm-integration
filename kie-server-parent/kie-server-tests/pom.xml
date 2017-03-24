@@ -42,6 +42,8 @@
     <kie.server.router.url>http://localhost:${router.port}</kie.server.router.url>
     <!-- This property can be overriden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
+    <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
+    <maven.jdbc.driver.jar/>
 
     <version.tomcat8>8.0.33</version.tomcat8>
     <version.wildfly10>10.0.0.Final</version.wildfly10>
@@ -251,6 +253,9 @@
               </goals>
               <configuration>
                 <excludedGroups>${failsafe.excluded.groups}</excludedGroups>
+                <additionalClasspathElements>
+                  <additionalClasspathElement>${maven.jdbc.driver.jar}</additionalClasspathElement>
+                </additionalClasspathElements>
               </configuration>
             </execution>
           </executions>
