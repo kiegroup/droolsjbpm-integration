@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerRegistry;
@@ -107,6 +108,7 @@ public class KeepLatestContainerOnlyPolicy implements Policy {
             final Map<String, String> report = new HashMap<>();
             containerInstances.stream()
                     .filter(kci -> !kci.getContainerId().equals(latestContainerId))
+                    .filter(kci -> !kci.getStatus().equals(KieContainerStatus.CREATING))
                     .forEach(kci -> {
                         ServiceResponse<Void> response = kieServer.disposeContainer(kci.getContainerId());
                         report.put(kci.getContainerId(), response.getType().toString());
