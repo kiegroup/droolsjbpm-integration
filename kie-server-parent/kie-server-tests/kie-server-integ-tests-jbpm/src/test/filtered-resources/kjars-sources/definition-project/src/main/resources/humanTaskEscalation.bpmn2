@@ -76,14 +76,14 @@
       <bpmn2:dataInputAssociation id="_jwTnOqL0EeOIL6YyOM8POA">
         <bpmn2:targetRef>_4_NotStartedReassignInputX</bpmn2:targetRef>
         <bpmn2:assignment id="_jwTnO6L0EeOIL6YyOM8POA">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_jwTnPKL0EeOIL6YyOM8POA"><![CDATA[[users:#{reassignTo}]@[1s]]]></bpmn2:from>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_jwTnPKL0EeOIL6YyOM8POA"><![CDATA[[users:#{reassignTo}]@[3s]]]></bpmn2:from>
           <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_jwTnPaL0EeOIL6YyOM8POA">_4_NotStartedReassignInputX</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
       <bpmn2:dataInputAssociation id="_jwTnPqL0EeOIL6YyOM8POA">
         <bpmn2:targetRef>_4_NotCompletedNotifyInputX</bpmn2:targetRef>
         <bpmn2:assignment id="_jwTnP6L0EeOIL6YyOM8POA">
-          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_jwTnQKL0EeOIL6YyOM8POA"><![CDATA[[tousers:#{escUser}|subject:Escalation|body:#{escalation}]@[2s]]]></bpmn2:from>
+          <bpmn2:from xsi:type="bpmn2:tFormalExpression" id="_jwTnQKL0EeOIL6YyOM8POA"><![CDATA[[tousers:#{escUser}|subject:Escalation|body:#{escalation}]@[6s]]]></bpmn2:from>
           <bpmn2:to xsi:type="bpmn2:tFormalExpression" id="_jwTnQaL0EeOIL6YyOM8POA">_4_NotCompletedNotifyInputX</bpmn2:to>
         </bpmn2:assignment>
       </bpmn2:dataInputAssociation>
