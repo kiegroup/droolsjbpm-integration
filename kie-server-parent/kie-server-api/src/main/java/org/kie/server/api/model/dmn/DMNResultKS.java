@@ -238,7 +238,7 @@ public class DMNResultKS implements DMNResult {
             originalSet.clear();
             originalSet.addAll(mappedSet);
             return result;
-        } else if ( result.getClass().getPackage().getName().startsWith("org.kie.dmn") ) {
+        } else if ( result != null && result.getClass().getPackage().getName().startsWith("org.kie.dmn") ) {
             return DMNNodeStub.of(result);
         }
         return result;
