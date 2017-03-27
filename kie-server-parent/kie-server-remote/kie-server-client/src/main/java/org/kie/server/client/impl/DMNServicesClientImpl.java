@@ -71,7 +71,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             } else {
                 CommandScript script = new CommandScript( Collections.singletonList(
                         (KieServerCommand) new DescriptorCommand("DMNService", "evaluateAllDecisions", serialize(payload), marshaller.getFormat().getType(), new Object[]{containerId})) );
-                result = (ServiceResponse<DMNResultKS>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN ).getResponses().get(0);
+                result = (ServiceResponse<DMNResultKS>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN, containerId ).getResponses().get(0);
 
                 throwExceptionOnFailure( result );
                 if (shouldReturnWithNullResponse(result)) {
