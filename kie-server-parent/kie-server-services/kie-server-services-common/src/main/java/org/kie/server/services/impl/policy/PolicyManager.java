@@ -48,6 +48,7 @@ public class PolicyManager {
     private KieServer kieServer;
     private KieServerRegistry kieServerRegistry;
 
+    private boolean managedExecutorService = false;
     private ScheduledExecutorService scheduledExecutorService = getScheduledExecutorService();
 
 
@@ -75,6 +76,11 @@ public class PolicyManager {
 
     public synchronized void stop() {
         logger.debug("Stopping policy manager...");
+
+        if (!managedExecutorService) {
+            scheduledExecutorService.shutdownNow();
+            logger.debug("Not managed executor service stopped");
+        }
 
         List<String> activePolicies = new ArrayList<>(activatedPolicies.keySet());
         activePolicies.forEach(policyName -> {
@@ -138,9 +144,11 @@ public class PolicyManager {
         try {
             executorService = InitialContext.doLookup("java:comp/DefaultManagedScheduledExecutorService");
             logger.debug("JEE version of scheduled executor service found");
+            managedExecutorService = true;
         } catch (Exception e) {
             executorService = Executors.newSingleThreadScheduledExecutor();
             logger.debug("Cannot find managed scheduled executor service using standard one instead", e);
+            managedExecutorService = false;
         }
         logger.debug("Executor service to be used is {}", executorService);
         return executorService;
