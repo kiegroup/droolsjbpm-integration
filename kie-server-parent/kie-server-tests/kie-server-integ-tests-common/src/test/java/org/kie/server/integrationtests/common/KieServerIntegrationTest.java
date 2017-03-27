@@ -47,9 +47,14 @@ public class KieServerIntegrationTest extends RestJmsSharedBaseIntegrationTest {
     @Test
     public void testGetServerInfo() throws Exception {
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
-        Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
+
         KieServerInfo info = reply.getResult();
-        Assert.assertEquals(getServerVersion(), info.getVersion());
+        assertEquals(getServerVersion(), info.getVersion());
+
+        // Kie server has all extensions disabled, available just default capability.
+        assertEquals(1, info.getCapabilities().size());
+        assertEquals("KieServer", info.getCapabilities().get(0));
     }
 
     private String getServerVersion() {
