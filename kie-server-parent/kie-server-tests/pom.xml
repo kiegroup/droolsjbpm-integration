@@ -53,16 +53,16 @@
   </properties>
 
   <modules>
-    <module>kie-server-integ-tests-common</module>
-    <module>kie-server-integ-tests-drools</module>
-    <module>kie-server-integ-tests-jbpm</module>
-    <module>kie-server-integ-tests-optaplanner</module>
-    <module>kie-server-integ-tests-all</module>
-    <module>kie-server-integ-tests-controller</module>
+<!--     <module>kie-server-integ-tests-common</module> -->
+<!--     <module>kie-server-integ-tests-drools</module> -->
+<!--     <module>kie-server-integ-tests-jbpm</module> -->
+<!--     <module>kie-server-integ-tests-optaplanner</module> -->
+<!--     <module>kie-server-integ-tests-all</module> -->
+<!--     <module>kie-server-integ-tests-controller</module> -->
     <module>kie-server-integ-tests-policy</module>
     <module>kie-server-integ-tests-router</module>
-    <module>kie-server-integ-tests-case-id-generator</module>
-    <module>kie-server-integ-tests-dmn</module>
+<!--     <module>kie-server-integ-tests-case-id-generator</module> -->
+<!--     <module>kie-server-integ-tests-dmn</module> -->
   </modules>
 
   <dependencyManagement>
@@ -391,6 +391,7 @@
                 <configuration>
                   <properties>
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.start.jvmargs>-Dcom.sun.management.jmxremote.port=8089 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false</cargo.start.jvmargs>
                   </properties>
                 </configuration>
               </configuration>
