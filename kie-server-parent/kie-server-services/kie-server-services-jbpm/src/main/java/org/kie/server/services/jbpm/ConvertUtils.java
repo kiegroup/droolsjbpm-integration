@@ -312,7 +312,10 @@ public class ConvertUtils {
     }
 
     public static TaskInstance convertToTask(UserTaskInstanceDesc userTask) {
-
+    	if (userTask == null) {
+    		return null;
+    	}
+    	
         TaskInstance instance = TaskInstance.builder()
                 .id(userTask.getTaskId())
                 .name(userTask.getName())
