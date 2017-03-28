@@ -16,7 +16,10 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +36,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runners.Parameterized;
+import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.integrationtests.category.Email;
 import org.kie.server.integrationtests.category.Unstable;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -68,6 +74,18 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     private Wiser wiser;
+
+    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    public static Collection<Object[]> data() {
+        KieServicesConfiguration configuration = createKieServicesRestConfiguration();
+
+        Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][] {
+                                {MarshallingFormat.JAXB, configuration}
+                        }
+        ));
+
+        return parameterData;
+    }
 
     @Before
     public void startWiser() {
@@ -165,8 +183,8 @@ public class UserTaskEscalationIntegrationTest extends JbpmKieServerBaseIntegrat
 
         KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
 
-        //wait while, cause email is sended 2s after task start
-        Thread.sleep(3000l);
+        //wait while, cause email is sent 6s after task start
+        Thread.sleep(8000l);
         KieServerAssert.assertNullOrEmpty("Email recieved!", wiser.getMessages());
     }
 
