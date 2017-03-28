@@ -19,7 +19,6 @@ import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +39,6 @@ import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.Marshaller;
-import org.kie.server.api.marshalling.MarshallerFactory;
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
@@ -61,7 +57,6 @@ public class TaskQueryServiceBase {
 
 	private QueryService queryService;
 	private MarshallerHelper marshallerHelper;
-	private Marshaller jaxbMarshaller;
 	private KieServerRegistry context;
 	private TaskQueriesStrategy taskQueriesStrategy;
 
