@@ -45,8 +45,8 @@
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
 
-    <version.tomcat8>8.0.33</version.tomcat8>
-    <version.wildfly10>10.0.0.Final</version.wildfly10>
+    <version.tomcat8>8.5.12</version.tomcat8>
+    <version.wildfly10>10.1.0.Final</version.wildfly10>
     <!-- The EAP 7 binary can't be anonymously downloaded because of the license. It can be downloaded manually
          and for free (e.g. from http://jbossas.jboss.org/downloads.html) and the zip location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
