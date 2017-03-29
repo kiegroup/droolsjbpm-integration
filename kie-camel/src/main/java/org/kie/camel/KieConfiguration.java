@@ -40,7 +40,9 @@ public class KieConfiguration implements Cloneable {
 
     private void initBodyParams() {
         setBodyParam( "process", "signal", "event" );
-        setBodyParam( "dmn", "evaluateAllDecisions", "dmnContext" );
+        setBodyParam( "dmn", "evaluateAll", "dmnContext" );
+        setBodyParam( "dmn", "evaluateDecisionByName", "dmnContext" );
+        setBodyParam( "dmn", "evaluateDecisionById", "dmnContext" );
     }
 
     public void configure(String remaining) {

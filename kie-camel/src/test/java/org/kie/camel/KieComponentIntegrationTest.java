@@ -155,7 +155,7 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
         Map<String, Object> headers = new HashMap<>();
         headers.put(KIE_CLIENT, "dmn");
-        headers.put(KIE_OPERATION, "evaluateAllDecisions");
+        headers.put(KIE_OPERATION, "evaluateAll");
         headers.put(asCamelKieName("containerId"), "containerId");
         template.sendBodyAndHeaders("direct:start", body, headers);
         assertMockEndpointsSatisfied();
@@ -249,7 +249,9 @@ public class KieComponentIntegrationTest extends BaseKieComponentTest {
         kieComponent.getConfiguration()
                     .clearBodyParams()
                     .setBodyParam( "process", "signal", "event" )
-                    .setBodyParam( "dmn", "evaluateAllDecisions", "dmnContext" );
+                    .setBodyParam( "dmn", "evaluateAll", "dmnContext" )
+                    .setBodyParam( "dmn", "evaluateDecisionByName", "dmnContext" )
+                    .setBodyParam( "dmn", "evaluateDecisionById", "dmnContext" );
         context.addComponent( "kie", kieComponent );
         return context;
     }
