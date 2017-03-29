@@ -81,15 +81,15 @@ public class ModelEvaluatorResource {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response evaluateAllDecisions(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId, String payload) {
-        LOG.debug( "About to evaluateAllDecisions on container {}", containerId );
+    public Response evaluateDecisions(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId, String payload) {
+        LOG.debug( "About to evaluateDecisions() on container {}", containerId );
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
             String contentType = getContentType( headers );
             
             LOG.debug( "Payload received: {}", payload);
-            ServiceResponse<DMNResultKS> result = modelEvaluatorService.evaluateAllDecisions(containerId, payload, contentType);
+            ServiceResponse<DMNResultKS> result = modelEvaluatorService.evaluateDecisions(containerId, payload, contentType);
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }

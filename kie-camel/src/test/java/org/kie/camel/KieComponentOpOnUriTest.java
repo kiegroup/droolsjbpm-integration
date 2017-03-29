@@ -127,7 +127,7 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
             @Override
             public void configure() {
                 from("direct:start")
-                        .to("kie:" + getAuthenticadUrl("admin", "admin") + "?client=dmn&operation=evaluateAllDecisions")
+                        .to("kie:" + getAuthenticadUrl("admin", "admin") + "?client=dmn&operation=evaluateAll")
                         .to("mock:result");
             }
         };
@@ -140,7 +140,9 @@ public class KieComponentOpOnUriTest extends BaseKieComponentTest {
         kieComponent.getConfiguration()
                     .clearBodyParams()
                     .setBodyParam( "process", "signal", "event" )
-                    .setBodyParam( "dmn", "evaluateAllDecisions", "dmnContext" );
+                    .setBodyParam( "dmn", "evaluateAll", "dmnContext" )
+                    .setBodyParam( "dmn", "evaluateDecisionByName", "dmnContext" )
+                    .setBodyParam( "dmn", "evaluateDecisionById", "dmnContext" );
         context.addComponent( "kie", kieComponent );
         return context;
     }
