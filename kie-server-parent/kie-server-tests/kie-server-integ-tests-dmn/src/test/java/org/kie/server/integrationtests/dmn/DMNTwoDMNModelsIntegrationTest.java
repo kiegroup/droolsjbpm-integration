@@ -57,16 +57,16 @@ public class DMNTwoDMNModelsIntegrationTest
     }
 
     @Test
-    public void test_evaluateAllDecisionsOnInputDataStringModel() {
+    public void test_evaluateAllOnInputDataStringModel() {
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "Full Name", "John Doe" );
-        ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID, 
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, 
                 "https://github.com/kiegroup/kie-dmn/input-data-string", "input-data-string",
                 dmnContext);
         
-        assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
+        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
         
-        DMNResult dmnResult = evaluateAllDecisions.getResult();
+        DMNResult dmnResult = evaluateAll.getResult();
         
         assertThat( dmnResult.getDecisionResults().size(), is( 1 ) );
         assertThat( dmnResult.getDecisionResultByName( "Greeting Message" ).getResult(), is( "Hello John Doe" ) );
@@ -77,17 +77,17 @@ public class DMNTwoDMNModelsIntegrationTest
     }
     
     @Test
-    public void test_evaluateAllDecisionsOnFunctionDefinitionModel() {
+    public void test_evaluateAllOnFunctionDefinitionModel() {
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "a", 10 );
         dmnContext.set( "b", 5 );
-        ServiceResponse<DMNResult> evaluateAllDecisions = dmnClient.evaluateAllDecisions(CONTAINER_1_ID,
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID,
                 "https://www.drools.org/kie-dmn/function-definition", "function-definition",
                 dmnContext);
         
-        assertEquals(ResponseType.SUCCESS, evaluateAllDecisions.getType());
+        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
         
-        DMNResult dmnResult = evaluateAllDecisions.getResult();
+        DMNResult dmnResult = evaluateAll.getResult();
         
         Map<String, Object> mathInCtx = (Map<String, Object>) dmnResult.getContext().get( "Math" );
         assertThat( mathInCtx, hasEntry( "Sum", BigDecimal.valueOf( 15 ) ) );

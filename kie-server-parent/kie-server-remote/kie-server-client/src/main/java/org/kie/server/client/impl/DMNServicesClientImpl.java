@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,22 +57,47 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
         public DMNServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
             super(config, classLoader);
         }
+        
+        @Override
+        public ServiceResponse<DMNResult> evaluateAll(String containerId, DMNContext dmnContext) {
+            return evaluateAll(containerId, null, null, dmnContext);
+        }
 
         @Override
-        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, String namespace, String modelName, DMNContext dmnContext) {
-            DMNContextKS payload = buildDMNContextInput(namespace, modelName, dmnContext); 
-            ServiceResponse<DMNResultKS> result = null;
+        public ServiceResponse<DMNResult> evaluateAll(String containerId, String namespace, String modelName, DMNContext dmnContext) {
+            DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
+            return evaluateDecisions(containerId, payload);
+        }
+        
+        @Override
+        public ServiceResponse<DMNResult> evaluateDecisionByName(String containerId, String namespace, String modelName, String decisionName, DMNContext dmnContext) {
+            Objects.requireNonNull(decisionName, "Parameter decisionName cannot be null; method evaluateAllDecisions() can be used to avoid the need of supplying decisionName");
+            DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
+            payload.setDecisionName(decisionName);
+            return evaluateDecisions(containerId, payload);
+        }
+
+        @Override
+        public ServiceResponse<DMNResult> evaluateDecisionById(String containerId, String namespace, String modelName, String decisionId, DMNContext dmnContext) {
+            Objects.requireNonNull(decisionId, "Parameter decisionId cannot be null; method evaluateAllDecisions() can be used to avoid the need of supplying decisionId");
+            DMNContextKS payload = new DMNContextKS(namespace, modelName, dmnContext.getAll()); 
+            payload.setDecisionId(decisionId);
+            return evaluateDecisions(containerId, payload);
+        }
+
+        private ServiceResponse<DMNResult> evaluateDecisions(String containerId, DMNContextKS payload) {
+            ServiceResponse<DMNResult> result = null;
             if( config.isRest() ) {
                 Map<String, Object> valuesMap = new HashMap<String, Object>();
                 valuesMap.put(CONTAINER_ID, containerId);
                 
-                result = makeHttpPostRequestAndCreateServiceResponse(
+                result = (ServiceResponse<DMNResult>)(ServiceResponse<?>) makeHttpPostRequestAndCreateServiceResponse(
                         build(loadBalancer.getUrl(), DMN_URI, valuesMap), payload, DMNResultKS.class);
 
             } else {
                 CommandScript script = new CommandScript( Collections.singletonList(
-                        (KieServerCommand) new DescriptorCommand("DMNService", "evaluateAllDecisions", serialize(payload), marshaller.getFormat().getType(), new Object[]{containerId})) );
-                result = (ServiceResponse<DMNResultKS>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN, containerId ).getResponses().get(0);
+                        (KieServerCommand) new DescriptorCommand("DMNService", "evaluateDecisions", serialize(payload), marshaller.getFormat().getType(), new Object[]{containerId})) );
+                result = (ServiceResponse<DMNResult>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN, containerId ).getResponses().get(0);
 
                 throwExceptionOnFailure( result );
                 if (shouldReturnWithNullResponse(result)) {
@@ -80,9 +106,9 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             }
 
             if (result instanceof Wrapped) {
-                return (ServiceResponse<DMNResultKS>) ((Wrapped) result).unwrap();
+                return (ServiceResponse<DMNResult>) ((Wrapped) result).unwrap();
             }
-            ServiceResponse<DMNResultKS> result2 = (ServiceResponse<DMNResultKS>) result;
+            ServiceResponse<DMNResult> result2 = (ServiceResponse<DMNResult>) result;
             
             // coerce numbers to BigDecimal as per DMN spec.
             // alternative to the below will require instructing special config of kie-server JSONMarshaller
@@ -96,20 +122,7 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
             
             return result2;
         }
-
-        private DMNContextKS buildDMNContextInput(String namespace, String modelName, DMNContext dmnContext) {
-            if ( namespace != null && modelName != null ) {
-                return new DMNContextKS( namespace, modelName, dmnContext.getAll() ); 
-            } else {
-                return new DMNContextKS( dmnContext.getAll() ); 
-            }
-        }
         
-        @Override
-        public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, DMNContext dmnContext) {
-            return evaluateAllDecisions(containerId, null, null, dmnContext);
-        }
-
         private static Object recurseAndModifyByCoercingNumbers(Object result) {
             if ( result instanceof DMNContext ) {
                 DMNContext ctx = (DMNContext) result;
@@ -166,5 +179,4 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 return value;
             }
         }
-
 }

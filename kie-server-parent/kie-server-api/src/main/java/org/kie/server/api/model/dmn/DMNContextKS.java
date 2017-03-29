@@ -45,6 +45,10 @@ public class DMNContextKS {
     @XmlElement(name="decision-name")
     @XStreamAlias("decision-name")
     private String decisionName;
+    
+    @XmlElement(name="decision-id")
+    @XStreamAlias("decision-id")
+    private String decisionId;
 
     @XmlElement(name="dmn-context")
     @XStreamAlias("dmn-context")
@@ -64,47 +68,42 @@ public class DMNContextKS {
         this.namespace = namespace;
         this.modelName = modelName;
     }
-    
-    public DMNContextKS(String namespace, String modelName, String decisionName, Map<String, Object> dmnContext) {
-        this(namespace, modelName, dmnContext);
-        this.decisionName = decisionName;
-    }
 
-    
     public String getNamespace() {
         return namespace;
     }
-
     
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
-
     
     public String getModelName() {
         return modelName;
     }
-
     
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
 
-    
     public String getDecisionName() {
         return decisionName;
     }
-
     
     public void setDecisionName(String decisionName) {
         this.decisionName = decisionName;
     }
 
+    public String getDecisionId() {
+        return decisionId;
+    }
     
+    public void setDecisionId(String decisionId) {
+        this.decisionId = decisionId;
+    }
+
     public Map<String, Object> getDmnContext() {
         return dmnContext;
     }
-
     
     public void setDmnContext(Map<String, Object> dmnContext) {
         this.dmnContext = dmnContext;
@@ -116,6 +115,4 @@ public class DMNContextKS {
         builder.append("DMNContextKS [namespace=").append(namespace).append(", modelName=").append(modelName).append(", decisionName=").append(decisionName).append(", dmnContext=").append(dmnContext).append("]");
         return builder.toString();
     }
-    
-    
 }

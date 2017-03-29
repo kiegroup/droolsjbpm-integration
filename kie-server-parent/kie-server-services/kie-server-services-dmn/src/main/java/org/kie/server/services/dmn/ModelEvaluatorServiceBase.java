@@ -79,7 +79,7 @@ public class ModelEvaluatorServiceBase {
         }
     }
     
-    public ServiceResponse<DMNResultKS> evaluateAllDecisions(String containerId, String contextPayload, String marshallingType) {
+    public ServiceResponse<DMNResultKS> evaluateDecisions(String containerId, String contextPayload, String marshallingType) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId);
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
@@ -109,7 +109,25 @@ public class ModelEvaluatorServiceBase {
             }
             LOG.debug("Will use dmnContext: {}", dmnContext);
             
-            DMNResult result = dmnRuntime.evaluateAll(model, dmnContext);
+            DMNResult result = null;
+            
+            if ( evalCtx.getDecisionName() == null && evalCtx.getDecisionId() == null ) {
+                // then implies evaluate All decisions
+                LOG.debug("Invoking evaluateAll...");
+                result = dmnRuntime.evaluateAll(model, dmnContext);
+            } else if ( evalCtx.getDecisionName() != null && evalCtx.getDecisionId() != null ) {
+                LOG.debug("Not supported case, trying to reconciliate manually");
+                if ( !model.getDecisionById(evalCtx.getDecisionId()).equals(model.getDecisionByName(evalCtx.getDecisionName())) ) {
+                    throw new RuntimeException("Unable to locate DMN Decision to evaluate");
+                }
+                result = dmnRuntime.evaluateDecisionById(model, evalCtx.getDecisionId(), dmnContext);
+            } else if ( evalCtx.getDecisionName() != null ) {
+                LOG.debug("Invoking evaluateDecisionByName using {}", evalCtx.getDecisionName());
+                result = dmnRuntime.evaluateDecisionByName(model, evalCtx.getDecisionName(), dmnContext);
+            } else if ( evalCtx.getDecisionId() != null ) {
+                LOG.debug("Invoking evaluateDecisionById using {}", evalCtx.getDecisionId());
+                result = dmnRuntime.evaluateDecisionById(model, evalCtx.getDecisionId(), dmnContext);
+            }
             
             LOG.debug("Result:");
             LOG.debug("{}",result);
