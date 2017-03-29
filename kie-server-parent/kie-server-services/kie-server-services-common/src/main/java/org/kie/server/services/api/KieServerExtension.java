@@ -22,6 +22,8 @@ import org.kie.server.services.impl.KieServerImpl;
 
 public interface KieServerExtension {
 
+    boolean isInitialized();
+
     boolean isActive();
 
     void init(KieServerImpl kieServer, KieServerRegistry registry);

@@ -53,6 +53,12 @@ public class DroolsKieServerExtension implements KieServerExtension {
     private KieServerRegistry registry;
 
     private List<Object> services = new ArrayList<Object>();
+    private boolean initialized = false;
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     @Override
     public boolean isActive() {
@@ -69,6 +75,8 @@ public class DroolsKieServerExtension implements KieServerExtension {
         }
         services.add(batchCommandService);
         services.add(rulesExecutionService);
+
+        initialized = true;
     }
 
     @Override
