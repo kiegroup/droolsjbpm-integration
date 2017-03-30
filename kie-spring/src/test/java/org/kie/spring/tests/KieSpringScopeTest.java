@@ -95,14 +95,14 @@ public class KieSpringScopeTest {
         ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
         final ConcurrentHashMap ksessionMap = new ConcurrentHashMap();
 
-        CountDownLatch latch = new CountDownLatch(nThreads);
+        final CountDownLatch latch = new CountDownLatch(nThreads);
 
         for (int i = 0; i < nThreads; i++) {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
                     KieSession ksession = (KieSession) context.getBean("statefulPrototypeSession");
-                    Object put = ksessionMap.put(ksession.hashCode(), new Object());
+                    Object put = ksessionMap.put(ksession.getIdentifier(), new Object());
                     if (put != null) {
                         log.warn("ksession:{} repeated", ksession);
                     }
