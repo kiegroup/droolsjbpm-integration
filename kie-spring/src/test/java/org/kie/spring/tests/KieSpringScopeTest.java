@@ -19,21 +19,22 @@ package org.kie.spring.tests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.StatelessKieSession;
-import org.kie.spring.beans.Person;
-import org.kie.spring.beans.SampleBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.junit.Assert.*;
 
 public class KieSpringScopeTest {
-
+    private static final Logger log = LoggerFactory.getLogger(KieSpringScopeTest.class);
     static ApplicationContext context = null;
 
     @BeforeClass
@@ -87,6 +88,30 @@ public class KieSpringScopeTest {
         assertNotNull(anotherKsession);
 
         assertNotEquals(ksession.hashCode(), anotherKsession.hashCode());
+    }
+    @Test
+    public void testConcurrentlyGetStatefulPrototypeKieSession() throws Exception {
+        final int nThreads = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(nThreads);
+        final ConcurrentHashMap ksessionMap = new ConcurrentHashMap();
+
+        final CountDownLatch latch = new CountDownLatch(nThreads);
+
+        for (int i = 0; i < nThreads; i++) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    KieSession ksession = (KieSession) context.getBean("statefulPrototypeSession");
+                    Object put = ksessionMap.put(ksession.getIdentifier(), new Object());
+                    if (put != null) {
+                        log.warn("ksession:{} repeated", ksession);
+                    }
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        assertEquals(nThreads,ksessionMap.size());
     }
 
     @AfterClass
