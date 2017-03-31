@@ -7,14 +7,14 @@
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kie-server-jbpm-taskqueries-api</artifactId>
+  <artifactId>kie-server-jbpm-queries-api</artifactId>
   <packaging>bundle</packaging>
 
-  <name>KIE :: Execution Server :: jBPM TaskQueries API</name>
-  <description>KIE Execution Server jBPM TaskQueries API</description>
+  <name>KIE :: Execution Server :: jBPM Queries API</name>
+  <description>KIE Execution Server jBPM Queries API</description>
 
   <properties>
-    <osgi.Bundle-SymbolicName>org.kie.server.jbpm.taskqueries.api</osgi.Bundle-SymbolicName>
+    <osgi.Bundle-SymbolicName>org.kie.server.jbpm.queries.api</osgi.Bundle-SymbolicName>
   </properties>
 
   <dependencies>

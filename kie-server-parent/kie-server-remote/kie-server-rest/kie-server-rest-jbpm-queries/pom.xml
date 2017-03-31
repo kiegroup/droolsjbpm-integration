@@ -9,17 +9,17 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>kie-server-rest-jbpm-taskqueries</artifactId>
+  <artifactId>kie-server-rest-jbpm-queries</artifactId>
 
-  <name>KIE :: Execution Server :: Remote :: REST :: jBPM Task Queries</name>
-  <description>KIE jBPM Task Queries Execution Server Extension</description>
+  <name>KIE :: Execution Server :: Remote :: REST :: jBPM Queries</name>
+  <description>KIE jBPM Queries Execution Server Extension</description>
 
 <dependencyManagement>
 	<dependencies>
 		<dependency>
 			  <groupId>org.kie.server</groupId>
-		      <artifactId>kie-server-services-jbpm-taskqueries</artifactId>
-		      <version>${version.org.kie}</version>
+		 	  <artifactId>kie-server-services-jbpm-queries</artifactId>
+		          <version>${version.org.kie}</version>
 		</dependency>
 	</dependencies>
 
@@ -45,7 +45,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-services-jbpm-taskqueries</artifactId>
+      <artifactId>kie-server-services-jbpm-queries</artifactId>
     </dependency> 
     <dependency>
       <groupId>org.kie.server</groupId>
