@@ -370,7 +370,53 @@
           "methodName": "updateSolverState",
           "elementKind": "method",
           "justification": "State update logic replaced by SolvePlanningProblemCommand and TerminateSolverEarlyCommand"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.client.admin.ProcessAdminServicesClient::acknowledgeError(java.lang.String, java.lang.String[])",
+          "package": "org.kie.server.client.admin",
+          "classSimpleName": "ProcessAdminServicesClient",
+          "methodName": "acknowledgeError",
+          "elementKind": "method",
+          "justification": "Added error handling mechanism managed by the process engine"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.kie.server.api.model.admin.ExecutionErrorInstance org.kie.server.client.admin.ProcessAdminServicesClient::getError(java.lang.String, java.lang.String)",
+          "package": "org.kie.server.client.admin",
+          "classSimpleName": "ProcessAdminServicesClient",
+          "methodName": "getError",
+          "elementKind": "method",
+          "justification": "Added error handling mechanism managed by the process engine"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrors(java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client.admin",
+          "classSimpleName": "ProcessAdminServicesClient",
+          "methodName": "getErrors",
+          "elementKind": "method",
+          "justification": "Added error handling mechanism managed by the process engine"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrorsByProcessInstance(java.lang.String, java.lang.Long, boolean, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client.admin",
+          "classSimpleName": "ProcessAdminServicesClient",
+          "methodName": "getErrorsByProcessInstance",
+          "elementKind": "method",
+          "justification": "Added error handling mechanism managed by the process engine"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.admin.ExecutionErrorInstance> org.kie.server.client.admin.ProcessAdminServicesClient::getErrorsByProcessInstanceAndNode(java.lang.String, java.lang.Long, java.lang.String, boolean, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client.admin",
+          "classSimpleName": "ProcessAdminServicesClient",
+          "methodName": "getErrorsByProcessInstanceAndNode",
+          "elementKind": "method",
+          "justification": "Added error handling mechanism managed by the process engine"
         }
+
       ]
     }
   }

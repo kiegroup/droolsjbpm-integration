@@ -37,6 +37,7 @@ public interface QueryServicesClient {
     public static final String QUERY_MAP_TASK_SUMMARY = "TaskSummaries";
     public static final String QUERY_MAP_PI_WITH_CUSTOM_VARS = "ProcessInstancesWithCustomVariables";
     public static final String QUERY_MAP_TASK_WITH_CUSTOM_VARS = "UserTasksWithCustomVariables";
+    public static final String QUERY_MAP_ERROR = "ExecutionErrors";
 
     public static final String SORT_BY_NAME = "ProcessName";
     public static final String SORT_BY_VERSION = "ProcessVersion";

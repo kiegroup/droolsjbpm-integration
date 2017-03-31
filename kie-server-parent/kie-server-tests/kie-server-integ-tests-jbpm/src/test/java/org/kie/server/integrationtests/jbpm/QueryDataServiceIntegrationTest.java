@@ -34,6 +34,7 @@ import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
@@ -41,9 +42,13 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -167,6 +172,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
         parameters.put("personData", createPersonInstance(USER_JOHN));
+        parameters.put("nullAccepted", true);
 
         List<Long> processInstanceIds = createProcessInstances(parameters);
 
@@ -183,11 +189,12 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             for (ProcessInstance instance : instances) {
                 final Map<String, Object> variables = instance.getVariables();
                 assertNotNull(variables);
-                assertEquals(3, variables.size());
+                assertEquals(4, variables.size());
 
                 assertEquals(TestConfig.getUsername(), variables.get("initiator"));
                 assertEquals("waiting for signal", variables.get("stringData"));
                 assertEquals("Person{name='john'}", variables.get("personData"));
+                assertEquals("true", variables.get("nullAccepted"));
             }
 
         } finally {
@@ -219,11 +226,12 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             for (ProcessInstance instance : instances) {
                 final Map<String, Object> variables = instance.getVariables();
                 assertNotNull(variables);
-                assertEquals(3, variables.size());
+                assertEquals(4, variables.size());
 
                 assertEquals(TestConfig.getUsername(), variables.get("initiator"));
                 assertEquals("waiting for signal", variables.get("stringData"));
                 assertEquals("Person{name='john'}", variables.get("personData"));
+                assertEquals("true", variables.get("nullAccepted"));
             }
 
         } finally {
@@ -659,6 +667,78 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     }
 
+    @Test
+    public void testErrorHandlingFailedToSignal() throws Exception {
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("nullAccepted", false);
+
+        QueryDefinition query = createErrorsQueryDefinition();
+
+        Long processInstanceId = null;
+        try {
+            queryClient.registerQuery(query);
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
+
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
+
+            try {
+                processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", null);
+                fail("Process instance signal should fail as it provides null as event");
+            } catch (KieServicesException e) {
+                // expected
+            }
+
+            errors = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_ERROR, 0, 10, ExecutionErrorInstance.class);
+            assertNotNull(errors);
+            assertEquals(1, errors.size());
+            ExecutionErrorInstance errorInstance = errors.get(0);
+            assertNotNull(errorInstance.getErrorId());
+            assertNull(errorInstance.getError());
+            assertNotNull(errorInstance.getProcessInstanceId());
+            assertNotNull(errorInstance.getActivityId());
+            assertNotNull(errorInstance.getErrorDate());
+
+            assertEquals(CONTAINER_ID, errorInstance.getContainerId());
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, errorInstance.getProcessId());
+            assertEquals("Signal 1 data", errorInstance.getActivityName());
+
+            assertFalse(errorInstance.isAcknowledged());
+            assertNull(errorInstance.getAcknowledgedAt());
+            assertNull(errorInstance.getAcknowledgedBy());
+
+            errors = processAdminClient.getErrorsByProcessInstanceAndNode(CONTAINER_ID, processInstanceId, "Signal 1 data", false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(1, errors.size());
+            ExecutionErrorInstance errorInstance2 = errors.get(0);
+            assertEquals(errorInstance.getErrorId(), errorInstance2.getErrorId());
+
+            processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
+
+            errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
+
+            errorInstance = processAdminClient.getError(CONTAINER_ID, errorInstance.getErrorId());
+            assertNotNull(errorInstance);
+            assertNotNull(errorInstance.getErrorId());
+            assertTrue(errorInstance.isAcknowledged());
+            assertNotNull(errorInstance.getAcknowledgedAt());
+            assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
+        } catch (Exception e) {
+            logger.error("Unexpected error", e);
+            fail(e.getMessage());
+        } finally {
+            queryClient.unregisterQuery(query.getName());
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
         final QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstancesWithVars");
@@ -674,6 +754,15 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
         query.setExpression("select * from ProcessInstanceLog where status = 1");
         query.setTarget(target);
+        return query;
+    }
+
+    private QueryDefinition createErrorsQueryDefinition() {
+        QueryDefinition query = new QueryDefinition();
+        query.setName("unAckErrors");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("select * from ExecutionErrorInfo where ERROR_ACK = 0");
+        query.setTarget("CUSTOM");
         return query;
     }
 

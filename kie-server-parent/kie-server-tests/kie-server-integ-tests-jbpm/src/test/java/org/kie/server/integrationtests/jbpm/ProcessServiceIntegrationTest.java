@@ -398,11 +398,12 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             Map<String, Object> variables = processInstance.getVariables();
             assertNotNull(variables);
-            assertEquals(3, variables.size());
+            assertEquals(4, variables.size());
 
             assertTrue(variables.containsKey("stringData"));
             assertTrue(variables.containsKey("personData"));
             assertTrue(variables.containsKey("initiator"));
+            assertTrue(variables.containsKey("nullAccepted"));
 
             String stringVar = (String) variables.get("stringData");
             Object personVar = variables.get("personData");

@@ -15,6 +15,8 @@
 
 package org.kie.server.client.admin.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +26,8 @@ import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.admin.ProcessNode;
@@ -274,6 +278,131 @@ public class ProcessAdminServicesClientImpl extends AbstractKieServicesClientImp
             ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
+    }
+
+    @Override
+    public void acknowledgeError(String containerId, String... errorId) {
+        ArrayList<String> errorIds = new ArrayList<>(Arrays.asList(errorId));
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+            String endpoint = ACK_ERROR_PUT_URI;
+            String queryString = "";
+            if (errorIds.size() > 1) {
+                endpoint = ACK_ERRORS_PUT_URI;
+                queryString = getAdditionalParams(queryString, "errorId", errorIds);
+            } else {
+                valuesMap.put(ERROR_ID, errorIds.get(0));
+            }
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + endpoint, valuesMap) + queryString, "", String.class, headers);
+        } else {
+
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "ProcessAdminService", "acknowledgeError", new Object[]{containerId, safeList(errorIds)})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public ExecutionErrorInstance getError(String containerId, String errorId) {
+        ExecutionErrorInstance result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(ERROR_ID, errorId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + ERROR_GET_URI , valuesMap), ExecutionErrorInstance.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getError", new Object[]{containerId, errorId}) ) );
+            ServiceResponse<ExecutionErrorInstance> response = (ServiceResponse<ExecutionErrorInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        ExecutionErrorInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String queryString = "?includeAck=" + includeAcknowledged;
+            queryString = getPagingQueryString(queryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + ERRORS_GET_URI + queryString, valuesMap), ExecutionErrorInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getExecutionErrors", new Object[]{containerId, includeAcknowledged, page, pageSize, "", true}) ) );
+            ServiceResponse<ExecutionErrorInstanceList> response = (ServiceResponse<ExecutionErrorInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getErrorsByProcessInstance(String containerId, Long processInstanceId, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        return getErrorsByProcessInstanceAndNode(containerId, processInstanceId, "", includeAcknowledged, page, pageSize);
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getErrorsByProcessInstanceAndNode(String containerId, Long processInstanceId, String nodeName, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        ExecutionErrorInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(PROCESS_INST_ID, processInstanceId);
+
+            String queryString = "?includeAck=" + includeAcknowledged +"&node=" + nodeName;
+            queryString = getPagingQueryString(queryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_PROCESS_URI + "/" + ERRORS_BY_PROCESS_INST_GET_URI + queryString, valuesMap), ExecutionErrorInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "ProcessAdminService", "getExecutionErrorsByProcessInstance", new Object[]{containerId, processInstanceId, nodeName, includeAcknowledged, page, pageSize, "", true}) ) );
+            ServiceResponse<ExecutionErrorInstanceList> response = (ServiceResponse<ExecutionErrorInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
     }
 
     /*

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
@@ -64,4 +65,11 @@ public interface UserTaskAdminServicesClient {
     List<TaskNotification> getTaskNotifications(String containerId, Long taskId, boolean activeOnly);
 
     List<TaskReassignment> getTaskReassignments(String containerId, Long taskId, boolean activeOnly);
+
+    List<ExecutionErrorInstance> getTaskErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize);
+
+    List<ExecutionErrorInstance> getErrorsByTaskId(String containerId, Long taskId, boolean includeAcknowledged, Integer page, Integer pageSize);
+
+    List<ExecutionErrorInstance> getErrorsByTaskInfo(String containerId, Long processId, String taskName, boolean includeAcknowledged, Integer page, Integer pageSize);
+
 }

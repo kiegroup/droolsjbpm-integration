@@ -263,11 +263,14 @@ public class JbpmKieServerExtension implements KieServerExtension {
         this.processInstanceAdminService = new ProcessInstanceAdminServiceImpl();
         ((ProcessInstanceAdminServiceImpl) this.processInstanceAdminService).setProcessService(processService);
         ((ProcessInstanceAdminServiceImpl) this.processInstanceAdminService).setRuntimeDataService(runtimeDataService);
+        ((ProcessInstanceAdminServiceImpl) this.processInstanceAdminService).setCommandService(new TransactionalCommandService(emf));
+        ((ProcessInstanceAdminServiceImpl) this.processInstanceAdminService).setIdentityProvider(registry.getIdentityProvider());
 
         this.userTaskAdminService = new UserTaskAdminServiceImpl();
         ((UserTaskAdminServiceImpl) this.userTaskAdminService).setRuntimeDataService(runtimeDataService);
         ((UserTaskAdminServiceImpl) this.userTaskAdminService).setUserTaskService(userTaskService);
         ((UserTaskAdminServiceImpl) this.userTaskAdminService).setIdentityProvider(context.getIdentityProvider());
+        ((UserTaskAdminServiceImpl) this.userTaskAdminService).setCommandService(new TransactionalCommandService(emf));
 
         this.kieContainerCommandService = new JBPMKieContainerCommandServiceImpl(context, deploymentService, new DefinitionServiceBase(definitionService, context),
                 new ProcessServiceBase(processService, definitionService, runtimeDataService, context), new UserTaskServiceBase(userTaskService, context),

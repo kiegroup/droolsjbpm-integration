@@ -29,6 +29,8 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotification;
@@ -492,6 +494,103 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
             CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
                     new DescriptorCommand( "UserTaskAdminService", "getTaskReassignments", new Object[]{containerId, taskId, activeOnly}) ) );
             ServiceResponse<TaskReassignmentList> response = (ServiceResponse<TaskReassignmentList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getTaskErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        ExecutionErrorInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String queryString = "?includeAck=" + includeAcknowledged;
+            queryString = getPagingQueryString(queryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + ERRORS_GET_URI, valuesMap) + queryString, ExecutionErrorInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskAdminService", "getExecutionErrorsByTaskName", new Object[]{containerId, "", "", includeAcknowledged, page, pageSize, "", true}) ) );
+            ServiceResponse<ExecutionErrorInstanceList> response = (ServiceResponse<ExecutionErrorInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getErrorsByTaskId(String containerId, Long taskId, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        ExecutionErrorInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(TASK_INSTANCE_ID, taskId);
+
+            String queryString = "?includeAck=" + includeAcknowledged;
+            queryString = getPagingQueryString(queryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + ERRORS_BY_TASK_ID_GET_URI, valuesMap) + queryString, ExecutionErrorInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskAdminService", "getExecutionErrorsByTaskId", new Object[]{containerId, taskId, includeAcknowledged, page, pageSize, "", true}) ) );
+            ServiceResponse<ExecutionErrorInstanceList> response = (ServiceResponse<ExecutionErrorInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result != null && result.getItems() != null) {
+            return result.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ExecutionErrorInstance> getErrorsByTaskInfo(String containerId, Long processId, String taskName, boolean includeAcknowledged, Integer page, Integer pageSize) {
+        ExecutionErrorInstanceList result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String queryString = "?includeAck=" + includeAcknowledged+"&name=" + taskName + "&process=" + processId;
+            queryString = getPagingQueryString(queryString, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + ERRORS_GET_URI, valuesMap) + queryString, ExecutionErrorInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskAdminService", "getExecutionErrorsByTaskName", new Object[]{containerId, processId, taskName, includeAcknowledged, page, pageSize, "", true}) ) );
+            ServiceResponse<ExecutionErrorInstanceList> response = (ServiceResponse<ExecutionErrorInstanceList>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
 
             throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {

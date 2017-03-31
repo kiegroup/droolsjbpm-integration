@@ -28,9 +28,12 @@ import org.jbpm.services.api.admin.UserTaskAdminService;
 import org.kie.api.task.model.Group;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.User;
+import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.internal.task.api.TaskModelFactory;
 import org.kie.internal.task.api.TaskModelProvider;
 import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotificationList;
 import org.kie.server.api.model.admin.TaskReassignmentList;
@@ -41,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.stream.Collectors.toList;
+import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 public class UserTaskAdminServiceBase {
 
@@ -237,6 +241,48 @@ public class UserTaskAdminServiceBase {
         ).collect(toList());
 
         return new TaskNotificationList(converted);
+    }
+
+    public ExecutionErrorInstanceList getExecutionErrorsByTaskId(String containerId, Number taskId, boolean includeAcknowledged, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        logger.debug("About to get execution errors for task id {}", taskId);
+        List<ExecutionError> errors = userTaskAdminService.getErrorsByTaskId(taskId.longValue(), includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+
+        logger.debug("Found errors {}", errors);
+        ExecutionErrorInstanceList errorInstanceList = convertToErrorInstanceList(errors);
+        return errorInstanceList;
+    }
+
+    public ExecutionErrorInstanceList getExecutionErrorsByTaskName(String containerId, String processId, String taskName, boolean includeAcknowledged, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        logger.debug("About to get execution errors for task name {} in process {} and container {}", taskName, processId, containerId);
+        List<ExecutionError> errors = null;
+        if (containerId != null && !containerId.isEmpty()) {
+            errors = userTaskAdminService.getErrorsByTaskName(containerId, processId, taskName, includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        } else if (processId != null && !processId.isEmpty()) {
+            errors = userTaskAdminService.getErrorsByTaskName(processId, taskName, includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        } else if (taskName != null && !taskName.isEmpty()) {
+            errors = userTaskAdminService.getErrorsByTaskName(taskName, includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        } else {
+            errors = userTaskAdminService.getErrors(includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        }
+
+        logger.debug("Found errors {}", errors);
+        ExecutionErrorInstanceList errorInstanceList = convertToErrorInstanceList(errors);
+        return errorInstanceList;
+    }
+
+    public ExecutionErrorInstance getError(String errorId) {
+        logger.debug("About to get execution error for {}", errorId);
+
+        ExecutionError error = userTaskAdminService.getError(errorId);
+        logger.debug("Found error {} for error id {}", error, errorId);
+        return convertToErrorInstance(error);
+    }
+
+    public void acknowledgeError(List<String> errorIds) {
+        logger.debug("About to acknowledge execution error with id {}", errorIds);
+        String[] errors = errorIds.toArray(new String[errorIds.size()]);
+        userTaskAdminService.acknowledgeError(errors);
+        logger.debug("Error {} successfully acknowledged", errorIds);
     }
 
     /*

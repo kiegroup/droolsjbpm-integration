@@ -23,6 +23,7 @@ import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinition
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
 import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +48,7 @@ import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.AdvancedQueryContext;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieServerConfig;
@@ -247,6 +249,10 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of TaskSummary to TaskSummaryList");
                 actualResult = convertToTaskSummaryList((Collection<TaskSummary>) result);
+            } else if (ExecutionError.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of ExecutionError to ErrorInstanceList");
+                actualResult = convertToErrorInstanceList((List<ExecutionError>) result);
             } else if (List.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of List to ArrayList");

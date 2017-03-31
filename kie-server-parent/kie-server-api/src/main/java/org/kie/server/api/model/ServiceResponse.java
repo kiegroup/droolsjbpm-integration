@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.drools.core.runtime.impl.ExecutionResultImpl;
 import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.admin.OrgEntities;
@@ -181,6 +183,8 @@ public class ServiceResponse<T> {
             @XmlElement(name = "task-notification-list", type = TaskNotificationList.class),
             @XmlElement(name = "task-reassignment", type = TaskReassignment.class),
             @XmlElement(name = "task-reassignment-list", type = TaskReassignmentList.class),
+            @XmlElement(name = "execution-error", type = ExecutionErrorInstance.class),
+            @XmlElement(name = "execution-error-list", type = ExecutionErrorInstanceList.class),
 
             // case management
             @XmlElement(name = "case-milestone", type = CaseMilestone.class),
