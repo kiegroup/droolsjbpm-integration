@@ -68,6 +68,7 @@ import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.*;
@@ -194,7 +195,8 @@ public class ServiceResponse<T> {
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),
-            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class)
+            @XmlElement(name = "dmn-evaluation-result" , type = DMNResultKS.class),
+            @XmlElement(name = "dmn-model-info-list" , type = DMNModelInfoList.class)
             
             })
     private T                            result;

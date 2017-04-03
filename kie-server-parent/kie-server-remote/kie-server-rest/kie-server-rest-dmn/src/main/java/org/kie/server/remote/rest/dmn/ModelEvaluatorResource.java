@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.type.JaxbList;
 import org.kie.server.api.rest.RestURI;
@@ -61,13 +62,12 @@ public class ModelEvaluatorResource {
     }
 
     @GET
-    // TODO if model should get its own sub-URI
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getModels(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
         Variant v = getVariant( headers );
         Header conversationIdHeader = buildConversationIdHeader(containerId, modelEvaluatorService.getKieServerRegistry(), headers);
         try {
-            ServiceResponse<JaxbList> result = modelEvaluatorService.getModels( containerId );
+            ServiceResponse<DMNModelInfoList> result = modelEvaluatorService.getModels( containerId );
             if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
                 return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
             }
