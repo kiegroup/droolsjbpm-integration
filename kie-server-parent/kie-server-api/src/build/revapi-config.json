@@ -126,7 +126,16 @@
           "annotationType": "org.codehaus.jackson.annotate.JsonIgnoreProperties",
           "elementKind": "annotation",
           "justification": "Upgrade Jackson library to version 2"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "class org.kie.server.api.model.ServiceResponse<T extends java.lang.Object>",
+          "new": "class org.kie.server.api.model.ServiceResponse<T extends java.lang.Object>",
+          "annotationType": "com.thoughtworks.xstream.annotations.XStreamAlias",
+          "elementKind": "annotation",
+          "justification": "DROOLS-1509 ServiceResponse XStream marshalling is with canonical name"
         }
+       
       ]
     }
   }
