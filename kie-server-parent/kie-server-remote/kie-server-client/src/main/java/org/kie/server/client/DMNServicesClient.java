@@ -18,8 +18,17 @@ package org.kie.server.client;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 
 public interface DMNServicesClient {
+    
+    /**
+     * Returns a list of all models available in the given container
+     *
+     * @param containerId the container id deploying the DMN models
+     * @return the list of available models in container identified by containerId. An empty list in case no model is available.
+     */
+    ServiceResponse<DMNModelInfoList> getModels(String containerId);
 
     /**
      * Evaluate all decisions for the model identified by namespace and modelName, given the context dmnContext

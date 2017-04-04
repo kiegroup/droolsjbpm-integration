@@ -44,6 +44,7 @@ import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -56,6 +57,30 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
         public DMNServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
             super(config, classLoader);
+        }
+        
+        @Override
+        public ServiceResponse<DMNModelInfoList> getModels(String containerId) {
+            ServiceResponse<DMNModelInfoList> result = null;
+            if( config.isRest() ) {
+                Map<String, Object> valuesMap = new HashMap<String, Object>();
+                valuesMap.put(CONTAINER_ID, containerId);
+                
+                result = (ServiceResponse<DMNModelInfoList>)(ServiceResponse<?>)
+                        makeHttpGetRequestAndCreateServiceResponse(build(loadBalancer.getUrl(), DMN_URI, valuesMap), DMNModelInfoList.class);
+
+            } else {
+                CommandScript script = new CommandScript( Collections.singletonList(
+                        (KieServerCommand) new DescriptorCommand("DMNService", "getModels", new Object[]{containerId})) );
+                result = (ServiceResponse<DMNModelInfoList>) executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_DMN, containerId ).getResponses().get(0);
+
+                throwExceptionOnFailure( result );
+                if (shouldReturnWithNullResponse(result)) {
+                    return null;
+                }
+            }
+            
+            return result;
         }
         
         @Override
@@ -179,4 +204,5 @@ public class DMNServicesClientImpl extends AbstractKieServicesClientImpl impleme
                 return value;
             }
         }
+
 }

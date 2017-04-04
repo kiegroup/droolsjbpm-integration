@@ -49,8 +49,11 @@ import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
 import org.kie.server.api.model.dmn.DMNMessageKS;
+import org.kie.server.api.model.dmn.DMNModelInfo;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -145,7 +148,10 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( DMNNodeStub.class );
         this.xstream.processAnnotations( DMNMessageKS.class );
         this.xstream.processAnnotations( DMNDecisionResultKS.class);
-
+        this.xstream.processAnnotations( DMNModelInfoList.class );
+        this.xstream.processAnnotations( DMNModelInfo.class );
+        this.xstream.processAnnotations( DMNDecisionInfo.class);
+        
         if (classes != null) {
             for (Class<?> clazz : classes) {
                 this.xstream.processAnnotations( clazz );

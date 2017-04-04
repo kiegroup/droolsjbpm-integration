@@ -20,10 +20,15 @@ import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNModel;   
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.dmn.api.core.DMNRuntime;
+import org.kie.dmn.api.core.ast.DecisionNode;
 import org.kie.dmn.core.api.DMNFactory;
+import org.kie.dmn.model.v1_1.Decision;
 import org.kie.server.api.model.*;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.dmn.DMNContextKS;
+import org.kie.server.api.model.dmn.DMNDecisionInfo;
+import org.kie.server.api.model.dmn.DMNModelInfo;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
@@ -47,6 +52,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 public class ModelEvaluatorServiceBase {
 
@@ -60,23 +66,42 @@ public class ModelEvaluatorServiceBase {
         this.marshallerHelper = new MarshallerHelper(context);
     }
     
-    public ServiceResponse<JaxbList> getModels(String containerId) {
+    public ServiceResponse<DMNModelInfoList> getModels(String containerId) {
         try {
             KieContainerInstanceImpl kContainer = context.getContainer(containerId);
             KieSession kieSession = kContainer.getKieContainer().newKieSession();
             DMNRuntime kieRuntime = kieSession.getKieRuntime(DMNRuntime.class);
-            List result = kieRuntime.getModels();
-            return new ServiceResponse<JaxbList>(
+            
+            List<DMNModel> models = kieRuntime.getModels();
+            List<DMNModelInfo> result = models.stream().map(ModelEvaluatorServiceBase::modelToInfo).collect(Collectors.toList());
+            
+            return new ServiceResponse<DMNModelInfoList>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK models successfully retrieved from container '" + containerId + "'",
-                    new JaxbList( result ) );
+                    new DMNModelInfoList( result ) );
         } catch ( Exception e ) {
             LOG.error( "Error retrieving models from container '" + containerId + "'", e );
-            return new ServiceResponse<JaxbList>(
+            return new ServiceResponse<DMNModelInfoList>(
                     ServiceResponse.ResponseType.FAILURE,
                     "Error retrieving models from container '" + containerId + "'" + e.getMessage(),
                     null );
         }
+    }
+    
+    public static DMNModelInfo modelToInfo(DMNModel model) {
+        DMNModelInfo res = new DMNModelInfo();
+        res.setNamespace(model.getNamespace());
+        res.setName(model.getName());
+        res.setId(model.getDefinitions().getId());
+        res.setDecisions(model.getDecisions().stream().map(ModelEvaluatorServiceBase::decisionToInfo).collect(Collectors.toSet()));
+        return res;
+    }
+    
+    public static DMNDecisionInfo decisionToInfo(DecisionNode decisionNode) {
+        DMNDecisionInfo res = new DMNDecisionInfo();
+        res.setName(decisionNode.getName());
+        res.setId(decisionNode.getId());
+        return res;
     }
     
     public ServiceResponse<DMNResultKS> evaluateDecisions(String containerId, String contextPayload, String marshallingType) {

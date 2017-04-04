@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.dmn;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.dmn.api.core.DMNContext;
@@ -23,13 +24,16 @@ import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
+import org.kie.server.api.model.dmn.DMNModelInfo;
+import org.kie.server.api.model.dmn.DMNModelInfoList;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class DMNTwoDMNModelsIntegrationTest
@@ -54,6 +58,29 @@ public class DMNTwoDMNModelsIntegrationTest
             throws Exception {
 
         // no extra classes.
+    }
+    
+    @Test
+    public void test_getModels() {
+        ServiceResponse<DMNModelInfoList> getModels = dmnClient.getModels(CONTAINER_1_ID);
+        
+        assertEquals(ResponseType.SUCCESS, getModels.getType());
+        
+        List<DMNModelInfo> models = getModels.getResult().getModels();
+        System.out.println(models);
+        assertThat( models, hasSize( 2 ) );
+        
+        DMNModelInfo fdModel = models.stream().filter(mi -> mi.getName().equals("function-definition")).findFirst().orElse(null);
+        assertThat( fdModel, notNullValue() );
+        assertThat( fdModel.getNamespace(), is("https://www.drools.org/kie-dmn/function-definition") );
+        assertThat( fdModel.getDecisions(), hasSize(1) );
+        assertThat( fdModel.getDecisions().iterator().next().getName(), is("Math") );
+        
+        DMNModelInfo idsModel = models.stream().filter(mi -> mi.getName().equals("input-data-string")).findFirst().orElse(null);
+        assertThat( idsModel, notNullValue() );
+        assertThat( idsModel.getNamespace(), is("https://github.com/kiegroup/kie-dmn/input-data-string") );
+        assertThat( idsModel.getDecisions(), hasSize(1) );
+        assertThat( idsModel.getDecisions().iterator().next().getName(), is("Greeting Message") );
     }
 
     @Test
