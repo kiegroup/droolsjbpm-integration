@@ -83,16 +83,22 @@ import org.kie.server.api.model.type.JaxbMap;
 import org.kie.server.api.model.type.JaxbShort;
 import org.kie.server.api.model.type.JaxbString;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 @XmlRootElement(name="response")
 @XmlAccessorType(XmlAccessType.NONE)
+@XStreamAlias("response")
 public class ServiceResponse<T> {
     public static enum ResponseType {
         SUCCESS, FAILURE, NO_RESPONSE;
     }
 
     @XmlAttribute
+    @XStreamAsAttribute
     private ServiceResponse.ResponseType type;
     @XmlAttribute
+    @XStreamAsAttribute
     private String                       msg;
     @XmlElements({
             // types model
