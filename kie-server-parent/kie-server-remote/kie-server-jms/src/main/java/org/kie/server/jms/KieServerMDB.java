@@ -92,9 +92,11 @@ public class KieServerMDB
     public void init() {
         RESPONSE_QUEUE_NAME = System.getProperty( KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE, DEFAULT_RESPONSE_QUEUE_NAME );
 
+        boolean sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
+        int sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
         try {
             connection = factory.createConnection();
-            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+            session = connection.createSession( sessionTransacted, sessionAck );
             connection.start();
         } catch ( JMSException jmse ) {
             // Unable to create connection/session, so no need to try send the message (4.) either
