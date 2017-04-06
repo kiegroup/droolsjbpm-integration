@@ -86,4 +86,8 @@ public class KieServerConstants {
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
 
     public static final String FAILURE_REASON_PROP = "failure-reason";
+
+    public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";
+    public static final String CFG_KIE_SERVER_JMS_SESSION_ACK = "org.kie.server.jms.session.ack";
+
 }

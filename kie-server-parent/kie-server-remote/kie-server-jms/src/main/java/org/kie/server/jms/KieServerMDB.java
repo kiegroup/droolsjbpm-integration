@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -38,6 +38,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.kie.server.api.ConversationId;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.marshalling.Marshaller;
@@ -92,9 +93,11 @@ public class KieServerMDB
     public void init() {
         RESPONSE_QUEUE_NAME = System.getProperty( RESPONSE_QUEUE_NAME_PROPERTY, DEFAULT_RESPONSE_QUEUE_NAME );
 
+        boolean sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
+        int sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
         try {
             connection = factory.createConnection();
-            session = connection.createSession( false, Session.AUTO_ACKNOWLEDGE );
+            session = connection.createSession( sessionTransacted, sessionAck );
             connection.start();
         } catch ( JMSException jmse ) {
             // Unable to create connection/session, so no need to try send the message (4.) either
