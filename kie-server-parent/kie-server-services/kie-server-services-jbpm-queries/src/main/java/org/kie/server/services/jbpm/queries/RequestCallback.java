@@ -26,8 +26,6 @@ import org.kie.server.services.jbpm.queries.util.QueryStrategy;
  */
 public interface RequestCallback {
 
-	public String getPayload();
-	
 	public BaseQueryFilterSpec getQueryFilterSpec();
 	
 }

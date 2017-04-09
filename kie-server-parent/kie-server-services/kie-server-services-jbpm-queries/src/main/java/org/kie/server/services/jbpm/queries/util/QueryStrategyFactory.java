@@ -25,30 +25,33 @@ import org.slf4j.LoggerFactory;
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-public class TaskQueryStrategyFactory {
+public class QueryStrategyFactory {
 
-	private static final Logger logger = LoggerFactory.getLogger(TaskQueryStrategyFactory.class);
+	private static final Logger logger = LoggerFactory.getLogger(QueryStrategyFactory.class);
 	
 	private QueryStrategy processStrategy;
 	
 	private QueryStrategy taskStrategy;
 	
-	public TaskQueryStrategyFactory(KieServerRegistry context) {
+	public QueryStrategyFactory(KieServerRegistry context) {
 		switch (context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect")) {
 		case "org.hibernate.dialect.PostgreSQLDialect":
 			logger.info("Initializing PostgreSQL Query strategies.");
 			this.processStrategy = new PostgreSQLProcessInstanceQueryStrategy();
 			this.taskStrategy = new PostgreSQLTaskQueryStrategy();
+			break;
 		case "org.hibernate.dialect.H2Dialect":
 			logger.info("Initializing H2 Query strategies.");
 			this.processStrategy = new H2ProcessInstanceQueryStrategy();
 			this.taskStrategy = new H2TaskQueryStrategy();
+			break;
 		case "org.hibernate.dialect.Oracle8iDialect":
 		case "org.hibernate.dialect.Oracle9iDialect":
 		case "org.hibernate.dialect.Oracle10gDialect":
 			logger.info("Initializing Oracle Query strategies.");
 			this.processStrategy = new OracleProcessInstanceQueryStrategy();
 			this.taskStrategy = new OracleTaskQueryStrategy();
+			break;
 		default:
 			logger.info("Initializing default H2 TaskQuery strategy.");
 			this.processStrategy = new H2ProcessInstanceQueryStrategy();
