@@ -90,11 +90,6 @@ public class ProcessInstanceQueryServiceBase extends AbstractQueryServiceBase {
 		RequestCallback reqCallback = new RequestCallback() {
 			
 			@Override
-			public String getPayload() {
-				return payload;
-			}
-			
-			@Override
 			public BaseQueryFilterSpec getQueryFilterSpec() {
 				return marshallerHelper.unmarshal(payload, marshallingType, ProcessInstanceQueryFilterSpec.class);
 			}

@@ -89,11 +89,6 @@ public class TaskQueryServiceBase extends AbstractQueryServiceBase {
 		RequestCallback reqCallback = new RequestCallback() {
 			
 			@Override
-			public String getPayload() {
-				return payload;
-			}
-			
-			@Override
 			public BaseQueryFilterSpec getQueryFilterSpec() {
 				return marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
 			}
@@ -103,74 +98,8 @@ public class TaskQueryServiceBase extends AbstractQueryServiceBase {
 		return queryServiceTemplate.getWithFilters(page, pageSize, queryCallback, reqCallback);
 		
 	}
-	
-	
-/*
-	public TaskInstanceList getHumanTasksWithFilters(Integer page, Integer pageSize, String payload, String marshallingType) {
-		QueryParam[] params = new QueryParam[0];
-		Map<String, String> columnMapping = null;
-		QueryContext queryContext = buildQueryContext(page, pageSize);
-
-		if (payload != null & !payload.isEmpty()) {
-			logger.debug("About to unmarshall query params from payload: '{}'", payload);
-			
-			TaskQueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
-			
-			queryContext.setOrderBy(filterSpec.getOrderBy());
-			queryContext.setAscending(filterSpec.isAscending());
-
-			// build parameters for filtering the query
-			if (filterSpec.getParameters() != null) {
-				params = new QueryParam[filterSpec.getParameters().length];
-				int index = 0;
-				for (org.kie.server.api.model.definition.QueryParam param : filterSpec.getParameters()) {
-					params[index] = new QueryParam(param.getColumn(), param.getOperator(), param.getValue());
-					index++;
-				}
-			}
-			
-			columnMapping = taskQueriesStrategy.getColumnMapping(params);
-		}
-		
-		QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(MAPPER_NAME, columnMapping);
-		
-		logger.debug("About to perform query '{}' with page {} and page size {}", TASK_QUERY_NAME, page, pageSize);
-
-		Object result = queryService.query(TASK_QUERY_NAME, resultMapper, queryContext, params);
-		
-		logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
-		
-		// The result should be a TaskInstanceList
-		Object actualResult = null;
-		if (result instanceof Collection) {
-			if (UserTaskInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-				logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
-				actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
-			} else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-				logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
-				actualResult = convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) result);
-			} else {
-				String message = "The result should be convertible to TaskInstanceList. Current result is of type: '" + result.getClass().getCanonicalName() + "' and the result-mapper is of type: '" + resultMapper.getType() + "'";
-				logger.error(message);
-				throw new IllegalArgumentException(message);
-			}
-		} else if (result == null) {
-			//Nothing to do here, result is simply empty.
-		} else  {
-			String message = "The result should be a collection. Current result is of type: '" + result.getClass().getCanonicalName() + "'";
-			logger.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return (TaskInstanceList) transform(actualResult, resultMapper);
-	}
-	*/
 
 	// TODO: Should we also implement a method that supports QueryBuilders???
-
-	/*
-	 * helper methods
-	 */
-
 	
 
 }

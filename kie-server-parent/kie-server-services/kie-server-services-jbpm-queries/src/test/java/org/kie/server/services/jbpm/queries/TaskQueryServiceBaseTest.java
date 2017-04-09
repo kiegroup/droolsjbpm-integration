@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.services.jbpm.taskqueries;
+package org.kie.server.services.jbpm.queries;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
@@ -40,8 +40,6 @@ import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 import org.mockito.Mockito;
 
 public class TaskQueryServiceBaseTest {
-
-	
 	
 	@Test
 	public void testGetHumanTasksWithFilters() {
