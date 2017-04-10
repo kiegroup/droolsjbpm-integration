@@ -15,10 +15,6 @@
 
 package org.kie.server.api.marshalling.xstream;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
@@ -34,7 +30,12 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
-import org.kie.server.api.commands.optaplanner.*;
+import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
+import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -58,40 +59,52 @@ import org.kie.server.api.model.dmn.DMNNodeStub;
 import org.kie.server.api.model.dmn.DMNResultKS;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.bendable.BendableScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.bendablebigdecimal.BendableBigDecimalScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.bendablelong.BendableLongScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoft.HardMediumSoftScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardsoft.HardSoftScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftbigdecimal.HardSoftBigDecimalScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftdouble.HardSoftDoubleScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.hardsoftlong.HardSoftLongScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.simple.SimpleScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.simplebigdecimal.SimpleBigDecimalScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.simpledouble.SimpleDoubleScoreXStreamConverter;
-import org.optaplanner.persistence.xstream.api.score.buildin.simplelong.SimpleLongScoreXStreamConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 public class XStreamMarshaller
         implements Marshaller {
 
+    private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
     protected ClassLoader classLoader;
     protected Map<String, Class> classNames = new HashMap<String, Class>();
+
+    // Optional marshaller extensions to handle new types / configure custom behavior
+    private static final List<XStreamMarshallerExtension> EXTENSIONS;
+
+    static {
+        logger.debug("XStreamMarshaller extensions init");
+        ServiceLoader<XStreamMarshallerExtension> plugins = ServiceLoader.load(XStreamMarshallerExtension.class);
+        List<XStreamMarshallerExtension> loadedPlugins = new ArrayList<>();
+        plugins.forEach(plugin -> {
+            logger.info("XStreamMarshallerExtension implementation found: {}", plugin.getClass().getName());
+            loadedPlugins.add(plugin);
+        });
+        EXTENSIONS = Collections.unmodifiableList(loadedPlugins);
+    }
 
     public XStreamMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.classLoader = classLoader;
         buildMarshaller(classes, classLoader);
 
         configureMarshaller(classes, classLoader);
+        // Extend the marshaller with optional extensions
+        EXTENSIONS.forEach(ext -> ext.extend(this));
     }
 
     protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
-
         this.xstream = XStreamXML.newXStreamMarshaller( new XStream( new PureJavaReflectionProvider() ) {
-
             protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new MapperWrapper(next) {
+                return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS), next)) {
                     public Class realClass(String elementName) {
 
                         Class customClass = classNames.get(elementName);
@@ -103,7 +116,15 @@ public class XStreamMarshaller
                 };
             }
         });
+    }
 
+    private MapperWrapper chainMapperWrappers(List<XStreamMarshallerExtension> extensions, MapperWrapper last) {
+        if (extensions.isEmpty()) {
+            return last;
+        } else {
+            XStreamMarshallerExtension head = extensions.remove(0);
+            return head.chainMapperWrapper(chainMapperWrappers(extensions, last));
+        }
     }
 
     protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
@@ -196,4 +217,9 @@ public class XStreamMarshaller
     public ClassLoader getClassLoader() {
         return classLoader;
     }
+
+    public XStream getXstream() {
+        return xstream;
+    }
+
 }

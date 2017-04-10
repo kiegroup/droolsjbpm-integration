@@ -40,7 +40,7 @@
     <kie.server.testing.kjars.build.settings.xml/>
     <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
     <kie.server.router.url>http://localhost:${router.port}</kie.server.router.url>
-    <!-- This property can be overriden to exclude specific test category according to specific needs. -->
+    <!-- This property can be overridden to exclude specific test category according to specific needs. -->
     <failsafe.excluded.groups/>
     <!-- Sybase driver leaks its Timestamp implementation. To correctly handle it we need to add driver as additional test classpath. -->
     <maven.jdbc.driver.jar/>
