@@ -124,6 +124,11 @@
         <artifactId>cargo-core-uberjar</artifactId>
         <version>${version.org.codehaus.cargo}</version>
       </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-tomcat-integration</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -391,11 +396,21 @@
                       <groupId>org.jboss.spec.javax.security.jacc</groupId>
                       <artifactId>jboss-jacc-api_1.5_spec</artifactId>
                     </dependency>
+                    <dependency>
+                      <groupId>org.kie</groupId>
+                      <artifactId>kie-tomcat-integration</artifactId>
+                    </dependency>
                   </dependencies>
                 </container>
                 <configuration>
                   <properties>
                     <cargo.jvmargs>-Xmx1024m</cargo.jvmargs>
+                    <cargo.tomcat.valve.jaas>
+                      className=org.kie.integration.tomcat.JACCValve
+                    </cargo.tomcat.valve.jaas>
+                    <cargo.tomcat.valve.sso>
+                      className=org.apache.catalina.authenticator.SingleSignOn
+                    </cargo.tomcat.valve.sso>
                   </properties>
                 </configuration>
               </configuration>
@@ -433,6 +448,10 @@
           <groupId>org.jboss.spec.javax.security.jacc</groupId>
           <artifactId>jboss-jacc-api_1.5_spec</artifactId>
           <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.kie</groupId>
+          <artifactId>kie-tomcat-integration</artifactId>
         </dependency>
       </dependencies>
     </profile>
