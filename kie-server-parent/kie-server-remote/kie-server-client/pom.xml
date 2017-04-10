@@ -8,7 +8,6 @@
   </parent>
 
   <artifactId>kie-server-client</artifactId>
-  <version>7.0.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>KIE :: Execution Server :: Remote :: Client</name>
