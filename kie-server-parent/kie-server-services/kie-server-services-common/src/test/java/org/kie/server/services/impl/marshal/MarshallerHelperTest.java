@@ -93,7 +93,6 @@ public class MarshallerHelperTest {
 		
 		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
 
-		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
 		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
 	}
 	
@@ -111,7 +110,6 @@ public class MarshallerHelperTest {
 		
 		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
 
-		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
 		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
 	}
 	
