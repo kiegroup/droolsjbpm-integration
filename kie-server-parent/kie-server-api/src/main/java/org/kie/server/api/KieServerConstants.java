@@ -101,7 +101,7 @@ public class KieServerConstants {
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
-    
+
     public static final String FAILURE_REASON_PROP = "failure-reason";
 
     // case management constants
@@ -120,4 +120,6 @@ public class KieServerConstants {
     public static final String QUERY_ASCENDING = "q_ascending";
     public static final String QUERY_COLUMN_MAPPING = "q_column_mapping";
 
+    public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";
+    public static final String CFG_KIE_SERVER_JMS_SESSION_ACK = "org.kie.server.jms.session.ack";
 }
