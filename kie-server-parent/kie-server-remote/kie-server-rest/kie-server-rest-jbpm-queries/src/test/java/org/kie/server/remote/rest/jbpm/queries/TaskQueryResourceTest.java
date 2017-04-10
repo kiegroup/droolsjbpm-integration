@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.drools.core.runtime.help.impl.XStreamJSon.JSonAdvanceSessionTimeConverter;
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 import org.jboss.resteasy.specimpl.ResteasyHttpHeaders;
 import org.junit.Test;
@@ -99,7 +98,6 @@ public class TaskQueryResourceTest {
 		payloadBuilder.append("</task-query-filter-spec>");
 		return payloadBuilder.toString();
 	}
-	
 	
 	private static TaskInstanceList getTaskInstanceList() {
 		return new TaskInstanceList();
