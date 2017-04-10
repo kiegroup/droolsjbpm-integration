@@ -15,7 +15,6 @@
 
 package org.kie.server.services.jbpm.queries;
 
-import static javaslang.API.*;
 import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 import java.util.ArrayList;
@@ -36,9 +35,6 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.server.jbpm.queries.api.model.definition.BaseQueryFilterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javaslang.Tuple;
-import javaslang.Tuple2;
 
 /**
  * Template which provides functionality to do a query via {@link QueryService}.
@@ -94,52 +90,45 @@ public class QueryServiceTemplate {
 	}
 
 	protected Object transform(Object result, QueryResultMapper resultMapper) {
-		Tuple2<Object, Class<?>> resultTuple = Tuple.of(result, resultMapper.getType());
+		Object actualResult = null;
+		if (result instanceof Collection) {
 
-		return Match(resultTuple).of(
-				Case(t -> ProcessInstanceWithVarsDesc.class.isAssignableFrom(t._2),
-						t -> convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) t._1)),
-				Case(t -> ProcessInstanceDesc.class.isAssignableFrom(t._2),
-						t -> convertToProcessInstanceList((Collection<ProcessInstanceDesc>) t._1)),
-				Case(t -> UserTaskInstanceWithVarsDesc.class.isAssignableFrom(t._2),
-						t -> convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) t._1)),
-				Case(t -> UserTaskInstanceDesc.class.isAssignableFrom(t._2),
-						t -> convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) t._1)),
-				Case(t -> TaskSummary.class.isAssignableFrom(t._2), t -> convertToTaskSummaryList((Collection<TaskSummary>) t._1)),
-				Case(t -> List.class.isAssignableFrom(t._2), t -> new ArrayList((Collection) t._1)), Case($(), resultTuple._1));
+			if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
 
-		/*
-		 * Object actualResult = null; if (result instanceof Collection) {
-		 * 
-		 * if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of ProcessInstanceWithVarsDesc to ProcessInstanceList"); actualResult =
-		 * convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) result); } else if
-		 * (ProcessInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of ProcessInstanceDesc to ProcessInstanceList"); actualResult =
-		 * convertToProcessInstanceList((Collection<ProcessInstanceDesc>) result); } else if
-		 * (UserTaskInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList"); actualResult =
-		 * convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result); } else if
-		 * (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList"); actualResult =
-		 * convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) result); } else if
-		 * (TaskSummary.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of TaskSummary to TaskSummaryList"); actualResult =
-		 * convertToTaskSummaryList((Collection<TaskSummary>) result); } else if (List.class.isAssignableFrom(resultMapper.getType())) {
-		 * 
-		 * logger.debug("Converting collection of List to ArrayList"); actualResult = new ArrayList((Collection) result); } else {
-		 * 
-		 * logger.debug("Convert not supported for custom type {}", resultMapper.getType()); actualResult = result; }
-		 * 
-		 * logger.debug("Actual result after converting is {}", actualResult); } else {
-		 * logger.debug("Result is not a collection - {}, skipping any conversion", result); actualResult = result; } return actualResult;
-		 */
+				logger.debug("Converting collection of ProcessInstanceWithVarsDesc to ProcessInstanceList");
+				actualResult = convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) result);
+			} else if (ProcessInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
 
+				logger.debug("Converting collection of ProcessInstanceDesc to ProcessInstanceList");
+				actualResult = convertToProcessInstanceList((Collection<ProcessInstanceDesc>) result);
+			} else if (UserTaskInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+				logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
+				actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
+			} else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
+
+				logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
+				actualResult = convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) result);
+			} else if (TaskSummary.class.isAssignableFrom(resultMapper.getType())) {
+
+				logger.debug("Converting collection of TaskSummary to TaskSummaryList");
+				actualResult = convertToTaskSummaryList((Collection<TaskSummary>) result);
+			} else if (List.class.isAssignableFrom(resultMapper.getType())) {
+
+				logger.debug("Converting collection of List to ArrayList");
+				actualResult = new ArrayList((Collection) result);
+			} else {
+
+				logger.debug("Convert not supported for custom type {}", resultMapper.getType());
+				actualResult = result;
+			}
+
+			logger.debug("Actual result after converting is {}", actualResult);
+		} else {
+			logger.debug("Result is not a collection - {}, skipping any conversion", result);
+			actualResult = result;
+		}
+		return actualResult;
 	}
 
 }
