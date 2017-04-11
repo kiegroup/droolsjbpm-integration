@@ -105,7 +105,7 @@ public class JSONMarshaller implements Marshaller {
     protected DateFormat dateFormat = new SimpleDateFormat(dateFormatStr);
 
     // Optional Marshaller Extension to handle new types
-    private static List<JSONMarshallerExtension> EXTENSIONS;
+    private static final List<JSONMarshallerExtension> EXTENSIONS;
     
     // Load Marshaller Extension
     static {
