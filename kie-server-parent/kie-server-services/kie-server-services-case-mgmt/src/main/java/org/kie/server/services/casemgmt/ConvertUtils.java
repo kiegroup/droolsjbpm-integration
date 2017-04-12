@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jbpm.casemgmt.api.model.CaseDefinition;
+import org.jbpm.casemgmt.api.model.CaseFileItem;
 import org.jbpm.casemgmt.api.model.CaseRole;
 import org.jbpm.casemgmt.api.model.instance.CaseInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
@@ -37,6 +38,8 @@ import org.kie.api.task.model.User;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseMilestoneDefinition;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
@@ -316,5 +319,37 @@ public class ConvertUtils {
                 .build();
 
         return processDefinition;
+    }
+
+    public static CaseFileDataItemList transformCaseFileDataItems(Collection<CaseFileItem> caseFileItems) {
+        if (caseFileItems == null) {
+            return new CaseFileDataItemList(new CaseFileDataItem[0]);
+        }
+
+        List<CaseFileDataItem> caseFileDataItems = new ArrayList<CaseFileDataItem>(caseFileItems.size());
+        for (CaseFileItem item : caseFileItems) {
+            CaseFileDataItem caseFileDataItem = transformCaseFileDataItem(item);
+
+            caseFileDataItems.add(caseFileDataItem);
+        }
+
+        return new CaseFileDataItemList(caseFileDataItems);
+    }
+
+    public static CaseFileDataItem transformCaseFileDataItem(CaseFileItem caseFileItem) {
+        if (caseFileItem == null) {
+            return null;
+        }
+
+        CaseFileDataItem caseFileDataItem = CaseFileDataItem.builder()
+                .caseId(caseFileItem.getCaseId())
+                .name(caseFileItem.getName())
+                .value(caseFileItem.getValue())
+                .type(caseFileItem.getType())
+                .lastModified(caseFileItem.getLastModified())
+                .lastModifiedBy(caseFileItem.getLastModifiedBy())
+                .build();
+
+        return caseFileDataItem;
     }
 }

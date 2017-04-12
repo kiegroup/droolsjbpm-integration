@@ -22,6 +22,7 @@ import java.util.List;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.model.AdHocFragment;
 import org.jbpm.casemgmt.api.model.CaseDefinition;
+import org.jbpm.casemgmt.api.model.CaseFileItem;
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseStageInstance;
@@ -34,6 +35,7 @@ import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseAdHocFragmentList;
 import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
@@ -222,6 +224,24 @@ public class CaseManagementRuntimeDataServiceBase {
         return caseInstancesList;
     }
 
+    public CaseInstanceList getCaseInstancesByCaseFileData(String dataItemName, String dataItemValue, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        List<CaseStatus> caseStatus = safeCaseStatus(status);
+        sort = safeCaseInstanceSort(sort);
+
+        Collection<org.jbpm.casemgmt.api.model.instance.CaseInstance> caseInstanceDescs = null;
+        if (dataItemValue != null && !dataItemValue.isEmpty()) {
+            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDateItemAndValue(dataItemName, dataItemValue, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        } else {
+            caseInstanceDescs = caseRuntimeDataService.getCaseInstancesByDateItem(dataItemName, caseStatus, ConvertUtils.buildQueryContext(page, pageSize, sort, sortOrder));
+        }
+
+        List<CaseInstance> caseInstances = ConvertUtils.transformCaseInstances(caseInstanceDescs);
+
+        CaseInstanceList caseInstancesList = new CaseInstanceList(caseInstances);
+
+        return caseInstancesList;
+    }
+
     public CaseDefinitionList getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
         sort = safeCaseDefinitionSort(sort);
         containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
@@ -319,6 +339,20 @@ public class CaseManagementRuntimeDataServiceBase {
         TaskSummaryList tasks = ConvertUtils.convertToTaskSummaryList(taskSummaries);
 
         return tasks;
+    }
+
+    public CaseFileDataItemList getCaseInstanceDataItems(String caseId, List<String> names, List<String> types, Integer page, Integer pageSize) {
+        Collection<CaseFileItem> caseFileItems = null;
+        if (!names.isEmpty()) {
+            caseFileItems = caseRuntimeDataService.getCaseInstanceDataItemsByName(caseId, names, ConvertUtils.buildQueryContext(page, pageSize));
+        } else if (!types.isEmpty()) {
+            caseFileItems = caseRuntimeDataService.getCaseInstanceDataItemsByType(caseId, types, ConvertUtils.buildQueryContext(page, pageSize));
+        } else {
+            caseFileItems = caseRuntimeDataService.getCaseInstanceDataItems(caseId, ConvertUtils.buildQueryContext(page, pageSize));
+        }
+
+        CaseFileDataItemList caseFileDataItemList = ConvertUtils.transformCaseFileDataItems(caseFileItems);
+        return caseFileDataItemList;
     }
 
     protected List<CaseStatus> safeCaseStatus(List<String> status) {

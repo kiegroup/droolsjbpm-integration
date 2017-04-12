@@ -102,6 +102,8 @@ import org.kie.server.api.model.cases.CaseCommentList;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
@@ -318,6 +320,8 @@ public class JaxbMarshaller implements Marshaller {
                 CaseDefinitionList.class,
                 CaseMilestoneDefinition.class,
                 CaseStageDefinition.class,
+                CaseFileDataItem.class,
+                CaseFileDataItemList.class,
                 
                 // Kie DMN
                 DMNContextKS.class,
