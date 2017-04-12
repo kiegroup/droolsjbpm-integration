@@ -94,6 +94,12 @@ public class KieServerConstants {
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
 
+    // ProcessConfig configuration item constants
+    public static final String PCFG_RUNTIME_STRATEGY = "RuntimeStrategy";
+    public static final String PCFG_KIE_BASE = "KBase";
+    public static final String PCFG_KIE_SESSION = "KSession";
+    public static final String PCFG_MERGE_MODE = "MergeMode";
+
     public static final String CAPABILITY_BRM = "BRM"; // Business Rules Management
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI

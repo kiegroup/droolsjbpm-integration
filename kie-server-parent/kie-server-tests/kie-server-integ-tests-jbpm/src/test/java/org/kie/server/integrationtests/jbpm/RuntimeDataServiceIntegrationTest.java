@@ -45,6 +45,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 
@@ -924,20 +925,15 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         Long processInstanceEvalutionId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, firstKey);
         Long processInstanceSignalId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, secondKey);
         try {
-            List<ProcessInstance> returnedProcessInstances = queryClient.findProcessInstancesByCorrelationKey(partKey, 0, 10, SORT_BY_INSTANCE_PROCESS_ID, false);
+            List<ProcessInstance> returnedProcessInstances = queryClient.findProcessInstancesByCorrelationKey(partKey, 0, 100, SORT_BY_INSTANCE_PROCESS_ID, false);
             assertNotNull(returnedProcessInstances);
+            assertProcessInstancesOrderById(returnedProcessInstances, false);
 
-            ProcessInstance resturnedSignalProcess, returnedEvaluation;
-            if (processInstanceEvalutionId < processInstanceSignalId) {
-                resturnedSignalProcess = returnedProcessInstances.get(0);
-                returnedEvaluation = returnedProcessInstances.get(1);
-            } else {
-                resturnedSignalProcess = returnedProcessInstances.get(1);
-                returnedEvaluation = returnedProcessInstances.get(0);
-            }
-            assertEquals(PROCESS_ID_SIGNAL_PROCESS, resturnedSignalProcess.getProcessId());
-            assertEquals(processInstanceSignalId, resturnedSignalProcess.getId());
-            assertEquals(secondBusinessKey, resturnedSignalProcess.getCorrelationKey());
+            ProcessInstance returnedSignalProcess = findProcessInstance(returnedProcessInstances, processInstanceSignalId);
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, returnedSignalProcess.getProcessId());
+            assertEquals(processInstanceSignalId, returnedSignalProcess.getId());
+            assertEquals(secondBusinessKey, returnedSignalProcess.getCorrelationKey());
+            ProcessInstance returnedEvaluation = findProcessInstance(returnedProcessInstances, processInstanceEvalutionId);
             assertEquals(PROCESS_ID_EVALUATION, returnedEvaluation.getProcessId());
             assertEquals(processInstanceEvalutionId, returnedEvaluation.getId());
             assertEquals(firstBusinessKey, returnedEvaluation.getCorrelationKey());
@@ -1827,6 +1823,19 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getUserId(), actual.getUserId());
     }
 
+    private void assertProcessInstancesOrderById(List<ProcessInstance> processInstances, boolean ascending) {
+        List<Long> pids = collectInstances(processInstances);
+        List<Long> sortedPids = new ArrayList<Long>(pids);
+
+        if(ascending) {
+            Collections.sort(sortedPids);
+        } else {
+            sortedPids.sort(Collections.reverseOrder());
+        }
+
+        assertThat("Processes are returned in wrong order!", pids, is(sortedPids));
+    }
+
     private TaskSummary createDefaultTaskSummary(long processInstanceId) {
         return TaskSummary
                 .builder()
@@ -1878,5 +1887,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             ids.add(instance.getId());
         }
         return ids;
+    }
+
+    private ProcessInstance findProcessInstance(List<ProcessInstance> processInstances, Long pid) {
+        return processInstances.stream().filter(n -> n.getId().equals(pid)).findFirst().orElseThrow(() -> new RuntimeException("Process instance with id " + pid + " not found."));
     }
 }
