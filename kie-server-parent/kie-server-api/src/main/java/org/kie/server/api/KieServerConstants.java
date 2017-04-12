@@ -94,7 +94,6 @@ public class KieServerConstants {
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
 
-
     public static final String CAPABILITY_BRM = "BRM"; // Business Rules Management
     public static final String CAPABILITY_BPM = "BPM"; // Business Process Management
     public static final String CAPABILITY_BPM_UI = "BPM-UI"; // Business Process Management UI
@@ -118,6 +117,7 @@ public class KieServerConstants {
 
     public static final String QUERY_ORDER_BY = "q_order_by";
     public static final String QUERY_ASCENDING = "q_ascending";
+    public static final String QUERY_ORDER_BY_CLAUSE = "q_order_by_clause";
     public static final String QUERY_COLUMN_MAPPING = "q_column_mapping";
 
     public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";

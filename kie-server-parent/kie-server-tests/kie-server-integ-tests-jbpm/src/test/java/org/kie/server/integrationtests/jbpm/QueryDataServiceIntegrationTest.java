@@ -15,6 +15,11 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,16 +43,11 @@ import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
-
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "query-definition-project",
-            "1.0.0.Final");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "query-definition-project", "1.0.0.Final");
 
     private static final String CONTAINER_ID = "query-definition-project";
 
@@ -210,10 +210,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
             queryClient.registerQuery(query);
 
-            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder()
-                                            .greaterThan("processinstanceid", processInstanceIds.get(3))
-                                            .get();
-
+            QueryFilterSpec filterSpec = new QueryFilterSpecBuilder().greaterThan("processinstanceid", processInstanceIds.get(3)).get();
 
             List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_VARS, filterSpec, 0, 10, ProcessInstance.class);
             assertNotNull(instances);
@@ -446,7 +443,6 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             // switch to john user who has engineering role
             changeUser(USER_JOHN);
 
-
             instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, 0, 10, ProcessInstance.class);
             assertNotNull(instances);
             assertEquals(5, instances.size());
@@ -486,6 +482,40 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
             long pi2 = instances.get(1).getId();
             // since sort order is descending first should be instance id which is bigger then second
             assertTrue(pi1 > pi2);
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    @Test
+    public void testQueryDataServiceUsingCustomQueryBuilderFilterSpecWithOrderByClause() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(1));
+            params.put("max", processInstanceIds.get(0));
+            params.put(KieServerConstants.QUERY_ORDER_BY_CLAUSE, "processId asc , processInstanceId desc");
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 + " not greater than " + pi2, pi1 > pi2);
 
         } finally {
             abortProcessInstances(processInstanceIds);
@@ -543,18 +573,97 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
 
     }
 
+    /*
+     * JBPM-5468 Test case for using ORDER BY clause with query builder and columm mapper.
+     */
+    @Test
+    public void testQueryDataServiceUsingCustomQueryBuilderColumnMappingWithOrderByClause() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = getProcessInstanceWithVariablesQueryDefinition();
+        try {
+
+            queryClient.registerQuery(query);
+
+            Map<String, String> columnMapping = new HashMap<>();
+            columnMapping.put("variableId", "String");
+            columnMapping.put("value", "String");
+
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("min", processInstanceIds.get(4));
+            params.put("max", processInstanceIds.get(0));
+            params.put(KieServerConstants.QUERY_ORDER_BY_CLAUSE, "processInstanceId desc");
+            params.put(KieServerConstants.QUERY_COLUMN_MAPPING, columnMapping);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI_WITH_CUSTOM_VARS, "test", params, 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 + " not greater than " + pi2, pi1 > pi2);
+
+            for (ProcessInstance instance : instances) {
+                final Map<String, Object> variables = instance.getVariables();
+                assertNotNull(variables);
+                assertEquals(2, variables.size());
+
+                assertTrue(variables.containsKey("variableId"));
+                assertTrue(variables.containsKey("value"));
+            }
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
+
+    /*
+     * JBPM-5468 Client requests with 'sortBy' request parameter can now use full ORDER BY clause syntax.
+     */
+    @Test
+    public void testGetProcessInstancesWithOrderByClause() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        QueryDefinition query = createQueryDefinition("CUSTOM");
+        try {
+
+            queryClient.registerQuery(query);
+
+            List<ProcessInstance> instances = queryClient.query(query.getName(), QueryServicesClient.QUERY_MAP_PI, "processId asc, processInstanceId desc", 0, 10, ProcessInstance.class);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            List<Long> found = collectInstances(instances);
+            assertEquals(processInstanceIds, found);
+
+            long pi1 = instances.get(0).getId();
+            long pi2 = instances.get(1).getId();
+            // since sort order is descending first should be instance id which is bigger then second
+            assertTrue(pi1 + " not greater than " + pi2, pi1 > pi2);
+
+        } finally {
+            abortProcessInstances(processInstanceIds);
+            queryClient.unregisterQuery(query.getName());
+        }
+
+    }
 
     protected QueryDefinition getProcessInstanceWithVariablesQueryDefinition() {
         final QueryDefinition query = new QueryDefinition();
         query.setName("allProcessInstancesWithVars");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select pil.*, v.variableId, v.value " +
-                "from ProcessInstanceLog pil " +
-                "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " +
-                "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " +
-                "inner join VariableInstanceLog v " +
-                "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " +
-                "where pil.status = 1");
+        query.setExpression("select pil.*, v.variableId, v.value " + "from ProcessInstanceLog pil " + "inner join (select vil.processInstanceId ,vil.variableId, max(vil.ID) maxvilid  from VariableInstanceLog vil " + "group by vil.processInstanceId, vil.variableId) x on (x.processInstanceId = pil.processInstanceId) " + "inner join VariableInstanceLog v " + "on (v.variableId = x.variableId  and v.id = x.maxvilid and v.processInstanceId = pil.processInstanceId) " + "where pil.status = 1");
         query.setTarget("CUSTOM");
         return query;
     }
