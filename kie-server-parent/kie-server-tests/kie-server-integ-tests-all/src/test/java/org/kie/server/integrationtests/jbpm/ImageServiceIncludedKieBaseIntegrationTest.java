@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -40,7 +41,7 @@ public class ImageServiceIncludedKieBaseIntegrationTest extends JbpmKieServerBas
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/top-level-project").getFile());
 
-        createContainer(CONTAINER_ID, releaseId, new KieServerConfigItem("KBase", "customKB", ""));
+        createContainer(CONTAINER_ID, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_KIE_BASE, "customKB", ""));
     }
 
     @Test

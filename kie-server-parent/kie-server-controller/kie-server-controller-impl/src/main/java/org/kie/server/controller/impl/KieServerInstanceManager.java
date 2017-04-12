@@ -144,28 +144,28 @@ public class KieServerInstanceManager {
 
                         KieServerConfigItem configItem = new KieServerConfigItem();
                         configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                        configItem.setName("KBase");
+                        configItem.setName(KieServerConstants.PCFG_KIE_BASE);
                         configItem.setValue(processConfig.getKBase());
 
                         containerResource.addConfigItem(configItem);
 
                         configItem = new KieServerConfigItem();
                         configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                        configItem.setName("KSession");
+                        configItem.setName(KieServerConstants.PCFG_KIE_SESSION);
                         configItem.setValue(processConfig.getKSession());
 
                         containerResource.addConfigItem(configItem);
 
                         configItem = new KieServerConfigItem();
                         configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                        configItem.setName("MergeMode");
+                        configItem.setName(KieServerConstants.PCFG_MERGE_MODE);
                         configItem.setValue(processConfig.getMergeMode());
 
                         containerResource.addConfigItem(configItem);
 
                         configItem = new KieServerConfigItem();
                         configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                        configItem.setName("RuntimeStrategy");
+                        configItem.setName(KieServerConstants.PCFG_RUNTIME_STRATEGY);
                         configItem.setValue(processConfig.getRuntimeStrategy());
 
                         containerResource.addConfigItem(configItem);
