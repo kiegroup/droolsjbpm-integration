@@ -352,17 +352,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
             // override defaults if config options are given
             KieServerConfig config = new KieServerConfig(kieContainerInstance.getResource().getConfigItems());
 
-            String runtimeStrategy = config.getConfigItemValue("RuntimeStrategy");
+            String runtimeStrategy = config.getConfigItemValue(KieServerConstants.PCFG_RUNTIME_STRATEGY);
             if (runtimeStrategy != null && !runtimeStrategy.isEmpty()) {
                 unit.setStrategy(RuntimeStrategy.valueOf(runtimeStrategy));
             }
-            String mergeMode = config.getConfigItemValue("MergeMode");
+            String mergeMode = config.getConfigItemValue(KieServerConstants.PCFG_MERGE_MODE);
             if (mergeMode != null && !mergeMode.isEmpty()) {
                 unit.setMergeMode(MergeMode.valueOf(mergeMode));
             }
-            String ksession = config.getConfigItemValue("KSession");
+            String ksession = config.getConfigItemValue(KieServerConstants.PCFG_KIE_SESSION);
             unit.setKsessionName(ksession);
-            String kbase = config.getConfigItemValue("KBase");
+            String kbase = config.getConfigItemValue(KieServerConstants.PCFG_KIE_BASE);
             unit.setKbaseName(kbase);
 
             // reuse kieContainer to avoid unneeded bootstrap

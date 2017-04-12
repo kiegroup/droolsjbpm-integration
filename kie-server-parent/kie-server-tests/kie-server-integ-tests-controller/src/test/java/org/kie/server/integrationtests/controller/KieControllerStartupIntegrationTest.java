@@ -47,7 +47,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class KieControllerStartupIntegrationTest extends KieControllerManagementBaseTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0");
 
     private static final String CONTAINER_ID = "kie-concurrent";
 

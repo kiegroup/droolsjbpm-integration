@@ -31,7 +31,6 @@ import org.kie.server.api.model.Message;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.ModelFactory;
 import org.kie.server.controller.api.model.KieServerSetup;
-import org.kie.server.controller.api.model.KieServerStatus;
 import org.kie.server.controller.api.model.events.ServerInstanceConnected;
 import org.kie.server.controller.api.model.events.ServerInstanceDeleted;
 import org.kie.server.controller.api.model.events.ServerInstanceDisconnected;
@@ -39,16 +38,16 @@ import org.kie.server.controller.api.model.events.ServerInstanceUpdated;
 import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstance;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerConfig;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
-import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
-import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.impl.service.LoggingNotificationService;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.slf4j.Logger;
@@ -110,28 +109,28 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
                     KieServerConfigItem configItem = new KieServerConfigItem();
                     configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName("KBase");
+                    configItem.setName(KieServerConstants.PCFG_KIE_BASE);
                     configItem.setValue(processConfig.getKBase());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
                     configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName("KSession");
+                    configItem.setName(KieServerConstants.PCFG_KIE_SESSION);
                     configItem.setValue(processConfig.getKSession());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
                     configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName("MergeMode");
+                    configItem.setName(KieServerConstants.PCFG_MERGE_MODE);
                     configItem.setValue(processConfig.getMergeMode());
 
                     containerResource.addConfigItem(configItem);
 
                     configItem = new KieServerConfigItem();
                     configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                    configItem.setName("RuntimeStrategy");
+                    configItem.setName(KieServerConstants.PCFG_RUNTIME_STRATEGY);
                     configItem.setValue(processConfig.getRuntimeStrategy());
 
                     containerResource.addConfigItem(configItem);
