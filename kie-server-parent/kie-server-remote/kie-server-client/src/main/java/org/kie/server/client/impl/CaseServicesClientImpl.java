@@ -34,6 +34,8 @@ import org.kie.server.api.model.cases.CaseCommentList;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
@@ -899,6 +901,48 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     }
 
     @Override
+    public List<CaseInstance> getCaseInstancesByData(String dataItemName, List<String> status, Integer page, Integer pageSize) {
+        return getCaseInstancesByData(dataItemName, "", status, page, pageSize);
+    }
+
+    @Override
+    public List<CaseInstance> getCaseInstancesByData(String dataItemName, String dataItemValue, List<String> status, Integer page, Integer pageSize) {
+        CaseInstanceList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+
+
+            String queryString = getPagingQueryString("", page, pageSize);
+            queryString = getAdditionalParams(queryString, "status", status);
+            queryString = queryString + "&dataItemName=" + dataItemName;
+            if (dataItemValue != null && !dataItemValue.isEmpty()) {
+                queryString = queryString + "&dataItemValue=" + dataItemValue;
+            }
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_QUERY_URI + "/" + CASE_ALL_INSTANCES_GET_URI, valuesMap) + queryString, CaseInstanceList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstancesByCaseFileData", new Object[]{dataItemName, dataItemValue, safeList(status), page, pageSize, "", true})) );
+            ServiceResponse<CaseInstanceList> response = (ServiceResponse<CaseInstanceList>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null) {
+            return list.getItems();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize) {
         return getCaseDefinitionsByContainer(containerId, page, pageSize, "", true);
     }
@@ -1271,9 +1315,61 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
         return Collections.emptyList();
     }
 
+    @Override
+    public List<CaseFileDataItem> getCaseInstanceDataItems(String caseId, Integer page, Integer pageSize) {
+        return internalGetCaseInstanceDataItems(caseId, null, null, page, pageSize);
+    }
+
+    @Override
+    public List<CaseFileDataItem> getCaseInstanceDataItemsByName(String caseId, List<String> names, Integer page, Integer pageSize) {
+        return internalGetCaseInstanceDataItems(caseId, names, null, page, pageSize);
+    }
+
+    @Override
+    public List<CaseFileDataItem> getCaseInstanceDataItemsByType(String caseId, List<String> types, Integer page, Integer pageSize) {
+        return internalGetCaseInstanceDataItems(caseId, null, types, page, pageSize);
+    }
+
     /*
      * internal methods
      */
+
+    protected List<CaseFileDataItem> internalGetCaseInstanceDataItems(String caseId, List<String> names, List<String> types, Integer page, Integer pageSize) {
+        CaseFileDataItemList list = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CASE_ID, caseId);
+
+            String queryString = getPagingQueryString("", page, pageSize);
+            if (names != null && !names.isEmpty()) {
+                queryString = getAdditionalParams(queryString, "name", names);
+            } else if (types != null && !types.isEmpty()) {
+                queryString = getAdditionalParams(queryString, "type", types);
+            }
+
+
+            list = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), CASE_QUERY_URI + "/" + CASE_FILE_GET_URI, valuesMap) + queryString, CaseFileDataItemList.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand("CaseQueryService", "getCaseInstanceDataItems", new Object[]{caseId, safeList(names), safeList(types), page, pageSize})) );
+            ServiceResponse<CaseFileDataItemList> response = (ServiceResponse<CaseFileDataItemList>)
+                    executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            list = response.getResult();
+        }
+
+        if (list != null) {
+            return list.getItems();
+        }
+
+        return Collections.emptyList();
+    }
 
     protected void internalAddDynamicTask(String containerId, String caseId, String stageId, Map<String, Object> taskSpecMap) {
         if( config.isRest() ) {
