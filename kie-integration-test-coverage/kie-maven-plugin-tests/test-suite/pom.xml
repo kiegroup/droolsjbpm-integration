@@ -40,6 +40,13 @@
       <artifactId>kjar-with-instrumentation</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <!-- Artificial dependency to make sure the `kjar-with-instrumentation` is always build before the
+           test-suite. Without this dependency the parallel (-T) build sometimes fails. -->
+      <groupId>org.drools.testcoverage</groupId>
+      <artifactId>kjar-with-instrumentation-wrapper</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
