@@ -51,6 +51,7 @@
 
         <include>com.sun.xml.bind:jaxb-impl</include>
         <include>com.sun.xml.bind:jaxb-core</include>
+        <include>org.slf4j:slf4j-api</include>
       </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
