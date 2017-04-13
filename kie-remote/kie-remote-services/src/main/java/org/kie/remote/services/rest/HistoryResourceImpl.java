@@ -203,7 +203,7 @@ public class HistoryResourceImpl extends ResourceBase {
     }
     
     @GET
-    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [a-zA-Z0-9-:\\._]+}")
+    @Path("/variable/{varId: [a-zA-Z0-9-:\\._]+}/value/{value: [%a-zA-Z0-9-:\\._]+}")
     @RolesAllowed({REST_ROLE, REST_PROCESS_RO_ROLE, REST_PROCESS_ROLE})
     public Response getVariableInstanceLogsByVariableIdByVariableValue(@PathParam("varId") String variableId, @PathParam("value") String value) {
         Map<String, String []> params = getRequestParams();
