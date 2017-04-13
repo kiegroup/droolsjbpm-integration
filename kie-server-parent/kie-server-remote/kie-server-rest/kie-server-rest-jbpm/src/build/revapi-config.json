@@ -165,6 +165,17 @@
           "methodName": "getRequestsByCommand",
           "elementKind": "method",
           "justification": "Added support for job status filter"
+        },
+		{
+          "code": "java.annotation.attributeValueChanged",
+          "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.QueryDataResource::runQuery(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+          "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.QueryDataResource::runQuery(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+          "attribute": "value",
+          "oldValue": "\"sortBy\"",
+          "newValue": "\"orderBy\"",
+          "annotationType": "javax.ws.rs.QueryParam",
+          "elementKind": "annotation",
+          "justification": "Name of query param needs to be named orderBy as  calls by QueryServiceClient use orderBy, not sortBy"
         }
       ]
     }

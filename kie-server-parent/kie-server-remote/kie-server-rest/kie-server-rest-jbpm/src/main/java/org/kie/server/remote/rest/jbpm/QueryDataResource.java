@@ -15,7 +15,28 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
+import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
+import static org.kie.server.api.rest.RestURI.QUERY_DEF_URI;
+import static org.kie.server.api.rest.RestURI.REPLACE_QUERY_DEF_PUT_URI;
+import static org.kie.server.api.rest.RestURI.RUN_FILTERED_QUERY_DEF_POST_URI;
+import static org.kie.server.api.rest.RestURI.RUN_QUERY_DEF_GET_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.alreadyExists;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_ALREADY_EXISTS;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.QUERY_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
+
 import java.text.MessageFormat;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -41,10 +62,6 @@ import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
-
 @Path("server/" + QUERY_DEF_URI)
 public class QueryDataResource {
 
@@ -64,8 +81,7 @@ public class QueryDataResource {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getQueries(@Context HttpHeaders headers,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response getQueries(@Context HttpHeaders headers, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
         QueryDefinitionList result = queryDataServiceBase.getQueries(page, pageSize);
@@ -154,9 +170,7 @@ public class QueryDataResource {
     @GET
     @Path(RUN_QUERY_DEF_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response runQuery(@Context HttpHeaders headers,
-            @PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("sortBy") String orderBy,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response runQuery(@Context HttpHeaders headers, @PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("orderBy") String orderBy, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -170,9 +184,7 @@ public class QueryDataResource {
     @POST
     @Path(RUN_FILTERED_QUERY_DEF_POST_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response runQueryFiltered(@Context HttpHeaders headers,
-            @PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("builder") String builder,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, String payload) {
+    public Response runQueryFiltered(@Context HttpHeaders headers, @PathParam("queryName") String queryName, @QueryParam("mapper") String mapper, @QueryParam("builder") String builder, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, String payload) {
 
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client

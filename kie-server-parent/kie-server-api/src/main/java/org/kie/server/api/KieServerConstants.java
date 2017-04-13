@@ -123,6 +123,7 @@ public class KieServerConstants {
 
     public static final String QUERY_ORDER_BY = "q_order_by";
     public static final String QUERY_ASCENDING = "q_ascending";
+    public static final String QUERY_ORDER_BY_CLAUSE = "q_order_by_clause";
     public static final String QUERY_COLUMN_MAPPING = "q_column_mapping";
 
     public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";

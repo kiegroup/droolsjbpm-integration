@@ -17,6 +17,7 @@ package org.kie.server.api.model.definition;
 
 import java.util.Arrays;
 import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -26,15 +27,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "query-filter-spec")
 public class QueryFilterSpec {
 
-    @XmlElement(name="order-by")
+    @XmlElement(name = "order-by")
     private String orderBy;
-    @XmlElement(name="order-asc")
+    @XmlElement(name = "order-asc")
     private boolean ascending;
-    @XmlElement(name="query-params")
+    @XmlElement(name = "query-params")
     private QueryParam[] parameters;
-
-    @XmlElement(name="result-column-mapping")
+    @XmlElement(name = "result-column-mapping")
     private Map<String, String> columnMapping;
+    @XmlElement(name = "order-by-clause")
+    private String orderByClause;
 
     public QueryFilterSpec() {
     }
@@ -71,12 +73,17 @@ public class QueryFilterSpec {
         this.columnMapping = columnMapping;
     }
 
+    public String getOrderByClause() {
+        return this.orderByClause;
+    }
+
+    public void setOrderByClause(String orderByClause) {
+        this.orderByClause = orderByClause;
+    }
+
     @Override
     public String toString() {
-        return "QueryFilterSpec{" +
-                "orderBy='" + orderBy + '\'' +
-                ", ascending=" + ascending +
-                ", parameters=" + Arrays.toString(parameters) +
-                '}';
+        return "QueryFilterSpec{" + "orderBy='" + orderBy + '\'' + ", ascending=" + ascending + ", parameters=" + Arrays.toString(parameters) + '}';
     }
+
 }

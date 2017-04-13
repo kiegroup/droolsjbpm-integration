@@ -15,6 +15,15 @@
 
 package org.kie.server.services.jbpm;
 
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertQueryDefinition;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToQueryDefinitionList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +44,7 @@ import org.jbpm.services.api.query.QueryParamBuilderFactory;
 import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
+import org.kie.api.runtime.query.AdvancedQueryContext;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
@@ -47,8 +57,6 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 public class QueryDataServiceBase {
 
@@ -109,13 +117,21 @@ public class QueryDataServiceBase {
 
         QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, null);
         QueryContext queryContext = buildQueryContext(page, pageSize);
+
         if (orderBy != null && !orderBy.isEmpty()) {
-            queryContext.setOrderBy(orderBy);
-            queryContext.setAscending(true);
+            String[] orderBySortOrderItems = orderBy.split(",");
+
+            if (orderBySortOrderItems.length > 1) {
+                logger.debug("-- query() > orderBy clause = {} ", orderBy);
+                queryContext = new AdvancedQueryContext(queryContext, orderBy);
+            } else {
+                logger.debug("-- query() > sortBy = {}", orderBy);
+                queryContext.setOrderBy(orderBy);
+                queryContext.setAscending(true);
+            }
         }
 
-        logger.debug("About to perform query '{}' with sort {} and page {} and page size {}", queryName, orderBy, page, pageSize);
-
+        logger.debug("About to perform query '{}' with sorting criteria '{}' and page {} and page size {}", queryName, orderBy, page, pageSize);
         Object result = queryService.query(queryName, resultMapper, queryContext);
         logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
 
@@ -125,14 +141,13 @@ public class QueryDataServiceBase {
     public Object queryFiltered(String queryName, String mapper, Integer page, Integer pageSize, String payload, String marshallingType) {
         QueryParam[] params = new QueryParam[0];
         Map<String, String> columnMapping = null;
+
         QueryContext queryContext = buildQueryContext(page, pageSize);
+        QueryFilterSpec filterSpec = new QueryFilterSpec();
 
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal queryDefinition from payload: '{}'", payload);
-            QueryFilterSpec filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
-
-            queryContext.setOrderBy(filterSpec.getOrderBy());
-            queryContext.setAscending(filterSpec.isAscending());
+            filterSpec = marshallerHelper.unmarshal(payload, marshallingType, QueryFilterSpec.class);
 
             // build parameters for filtering the query
             if (filterSpec.getParameters() != null) {
@@ -146,10 +161,17 @@ public class QueryDataServiceBase {
 
             columnMapping = filterSpec.getColumnMapping();
         }
+
         QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, columnMapping);
 
-        logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
+        if (filterSpec.getOrderByClause() != null) {
+            queryContext = new AdvancedQueryContext(queryContext, filterSpec.getOrderByClause());
+        } else {
+            queryContext.setOrderBy(filterSpec.getOrderBy());
+            queryContext.setAscending(filterSpec.isAscending());
+        }
 
+        logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
         Object result = queryService.query(queryName, resultMapper, queryContext, params);
         logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
 
@@ -159,23 +181,18 @@ public class QueryDataServiceBase {
     public Object queryFilteredWithBuilder(String queryName, String mapper, String builder, Integer page, Integer pageSize, String payload, String marshallingType) {
         Map<String, String> columnMapping = null;
         QueryContext queryContext = buildQueryContext(page, pageSize);
-
-
         Map<String, Object> queryParameters = new HashMap<String, Object>();
+        String orderBy = null;
+        Boolean ascending = null;
+        String orderByClause = null;
+
         if (payload != null && !payload.isEmpty()) {
             logger.debug("About to unmarshal query params from payload: '{}'", payload);
             queryParameters = marshallerHelper.unmarshal(payload, marshallingType, Map.class);
-
-            String orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
-            Boolean ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
-            columnMapping = (Map<String, String> )queryParameters.remove(KieServerConstants.QUERY_COLUMN_MAPPING);
-
-            if (orderBy != null) {
-                queryContext.setOrderBy(orderBy);
-            }
-            if (ascending != null) {
-                queryContext.setAscending(ascending);
-            }
+            orderBy = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY);
+            ascending = (Boolean) queryParameters.remove(KieServerConstants.QUERY_ASCENDING);
+            orderByClause = (String) queryParameters.remove(KieServerConstants.QUERY_ORDER_BY_CLAUSE);
+            columnMapping = (Map<String, String>) queryParameters.remove(KieServerConstants.QUERY_COLUMN_MAPPING);
         }
         QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(mapper, columnMapping);
         QueryParamBuilderFactory paramBuilderFactory = QueryParamBuilderManager.get().find(builder);
@@ -184,9 +201,18 @@ public class QueryDataServiceBase {
             throw new RuntimeException("No query param builder found for " + builder);
         }
 
+        if (orderByClause != null) {
+            queryContext = new AdvancedQueryContext(queryContext, orderByClause);
+        } else {
+            if (orderBy != null) {
+                queryContext.setOrderBy(orderBy);
+            }
+            if (ascending != null) {
+                queryContext.setAscending(ascending);
+            }
+        }
 
         logger.debug("About to perform query '{}' with page {} and page size {}", queryName, page, pageSize);
-
         Object result = queryService.query(queryName, resultMapper, queryContext, paramBuilderFactory.newInstance(queryParameters));
         logger.debug("Result returned from the query {} mapped with {}", result, resultMapper);
 
@@ -221,20 +247,18 @@ public class QueryDataServiceBase {
 
                 logger.debug("Converting collection of TaskSummary to TaskSummaryList");
                 actualResult = convertToTaskSummaryList((Collection<TaskSummary>) result);
-            }
-            else if (List.class.isAssignableFrom(resultMapper.getType())) {
+            } else if (List.class.isAssignableFrom(resultMapper.getType())) {
 
                 logger.debug("Converting collection of List to ArrayList");
-                actualResult = new ArrayList((Collection)result);
-            }
-            else {
+                actualResult = new ArrayList((Collection) result);
+            } else {
 
                 logger.debug("Convert not supported for custom type {}", resultMapper.getType());
                 actualResult = result;
             }
 
             logger.debug("Actual result after converting is {}", actualResult);
-        }  else {
+        } else {
             logger.debug("Result is not a collection - {}, skipping any conversion", result);
             actualResult = result;
         }
