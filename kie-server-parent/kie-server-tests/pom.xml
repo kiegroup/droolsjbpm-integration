@@ -253,7 +253,7 @@
               </goals>
               <configuration>
                 <excludedGroups>${failsafe.excluded.groups}</excludedGroups>
-                <additionalClasspathElements>
+                <additionalClasspathElements combine.children="append">
                   <additionalClasspathElement>${maven.jdbc.driver.jar}</additionalClasspathElement>
                 </additionalClasspathElements>
               </configuration>
@@ -862,7 +862,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>was85x</id>
+      <id>websphere9</id>
       <properties>
         <container.port>9080</container.port>
         <kie.server.remoting.url>iiop://${container.hostname}:2809</kie.server.remoting.url>
@@ -871,7 +871,7 @@
         <kie.server.jndi.response.queue>jms/KIE.SERVER.RESPONSE</kie.server.jndi.response.queue>
         <kie.server.connection.factory>jms/cf/KIE.SERVER.REQUEST</kie.server.connection.factory>
         <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
-        <kie.server.classifier>ee6</kie.server.classifier>
+        <kie.server.classifier>ee7</kie.server.classifier>
         <cargo.container.id>websphere85x</cargo.container.id>
         <failsafe.excluded.groups>org.kie.server.integrationtests.category.Email,org.kie.server.integrationtests.category.RemotelyControlled,org.kie.server.integrationtests.category.Transactional</failsafe.excluded.groups>
       </properties>
@@ -887,6 +887,7 @@
                   <home>${websphere.home}</home>
                   <timeout>240000</timeout>
                   <systemProperties>
+                    <!-- JtaPlatform doesn't work for new version of Hibernate, user needs to provide own implementation, see https://hibernate.atlassian.net/browse/HHH-11606 . -->
                     <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.WebSphereExtendedJtaPlatform</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.kie.server.domain>WSLogin</org.kie.server.domain>
@@ -896,6 +897,13 @@
                     <!-- disable JMS support for executor to use same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <!-- Disable CDI to speed up Kie server startup -->
+                    <com.ibm.ws.cdi.enableImplicitBeanArchives>false</com.ibm.ws.cdi.enableImplicitBeanArchives>
+                    <com.ibm.ws.cdi.enableCDI>false</com.ibm.ws.cdi.enableCDI>
+                    <!-- Needed by WebSphere to trust JBoss Nexus -->
+                    <javax.net.ssl.trustStore>${java.home}/lib/security/cacerts</javax.net.ssl.trustStore>
+                    <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
+                    <javax.net.ssl.trustStoreType>JKS</javax.net.ssl.trustStoreType>
                   </systemProperties>
                   <dependencies>
                     <dependency>
@@ -908,7 +916,7 @@
                   <type>standalone</type>
                   <properties>
                     <cargo.websphere.profile>${project.artifactId}</cargo.websphere.profile>
-                    <cargo.jvmargs>-Xms2g -Xmx2g</cargo.jvmargs>
+                    <cargo.jvmargs>-Xms1g -Xmx2g</cargo.jvmargs>
                     <cargo.websphere.classloader.mode>PARENT_LAST</cargo.websphere.classloader.mode>
                     <cargo.websphere.war.classloader.policy>SINGLE</cargo.websphere.war.classloader.policy>
                     <!-- CFs -->
@@ -969,9 +977,9 @@
               <artifactId>maven-failsafe-plugin</artifactId>
               <configuration>
                 <additionalClasspathElements>
-                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.ejb.thinclient_8.5.0.jar</additionalClasspathElement>
-                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_8.5.0.jar</additionalClasspathElement>
-                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</additionalClasspathElement>
+                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.ejb.thinclient_9.0.jar</additionalClasspathElement>
+                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.sib.client.thin.jms_9.0.jar</additionalClasspathElement>
+                  <additionalClasspathElement>${websphere.home}/runtimes/com.ibm.ws.orb_9.0.jar</additionalClasspathElement>
                 </additionalClasspathElements>
               </configuration>
             </plugin>
