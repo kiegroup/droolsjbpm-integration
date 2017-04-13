@@ -80,7 +80,7 @@ public class CaseQueryResourceTest {
         boolean sortOrder = true;
         when(runtimeDataService.getCaseInstances(status, page, pageSize, sort, sortOrder)).thenReturn(new CaseInstanceList());
 
-        caseQueryResource.getCaseInstances(httpHeaders, null, status, page, pageSize, sort, sortOrder);
+        caseQueryResource.getCaseInstances(httpHeaders, null, null, null, status, page, pageSize, sort, sortOrder);
 
         verify(kieServerRegistry).getContainer("");
         verify(runtimeDataService).getCaseInstancesAnyRole(status, page, pageSize, sort, sortOrder);

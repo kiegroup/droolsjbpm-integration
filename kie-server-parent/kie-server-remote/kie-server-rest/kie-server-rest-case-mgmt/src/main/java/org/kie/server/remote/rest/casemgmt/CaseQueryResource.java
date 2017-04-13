@@ -29,6 +29,7 @@ import javax.ws.rs.core.Variant;
 
 import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.server.api.model.cases.CaseDefinitionList;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.instance.TaskSummaryList;
@@ -60,6 +61,7 @@ public class CaseQueryResource extends AbstractCaseResource {
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
+            @QueryParam("dataItemName") String dataItemName, @QueryParam("dataItemValue") String dataItemValue,
             @QueryParam("owner") String owner, @QueryParam("status") List<String> status,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
             @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
@@ -70,7 +72,13 @@ public class CaseQueryResource extends AbstractCaseResource {
                 (Variant v, String type, Header... customHeaders) -> {
 
                     CaseInstanceList responseObject = null;
-                    if (owner != null && !owner.isEmpty()) {
+                    if (dataItemName != null && !dataItemName.isEmpty() && dataItemValue != null && !dataItemValue.isEmpty()) {
+                        logger.debug("About to look for case instances by data item name {} and value {} with status {}", dataItemName, dataItemValue, status);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, dataItemValue, status, page, pageSize, sort, sortOrder);
+                    } else if (dataItemName != null && !dataItemName.isEmpty()) {
+                        logger.debug("About to look for case instances by data item name {} with status {}", dataItemName, dataItemValue, status);
+                        responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesByCaseFileData(dataItemName, null, status, page, pageSize, sort, sortOrder);
+                    } else if (owner != null && !owner.isEmpty()) {
                         logger.debug("About to look for case instances owned by {} with status {}", owner, status);
                         responseObject = this.caseManagementRuntimeDataServiceBase.getCaseInstancesOwnedBy(owner,
                                                                                                            status, page, pageSize, sort, sortOrder);
@@ -236,6 +244,24 @@ public class CaseQueryResource extends AbstractCaseResource {
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);
+                });
+    }
+
+    @GET
+    @Path(CASE_FILE_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getCaseInstanceDataItems(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CASE_ID) String caseId,
+            @QueryParam("name") List<String> names, @QueryParam("type") List<String> types,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+        return invokeCaseOperation(headers,
+                "",
+                caseId,
+                (Variant v, String type, Header... customHeaders) -> {
+                    logger.debug("About to load case file data items of case {}", caseId);
+                    CaseFileDataItemList response = this.caseManagementRuntimeDataServiceBase.getCaseInstanceDataItems(caseId, names, types, page, pageSize);
+
+                    logger.debug("Returning OK response with content '{}'", response);
+                    return createCorrectVariant(response, headers, Response.Status.OK, customHeaders);
                 });
     }
 }

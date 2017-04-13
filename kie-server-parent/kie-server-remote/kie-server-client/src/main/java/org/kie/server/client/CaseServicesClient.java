@@ -22,6 +22,7 @@ import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
@@ -143,6 +144,10 @@ public interface CaseServicesClient {
 
     List<CaseInstance> getCaseInstancesByDefinition(String containerId, String caseDefinitionId, List<String> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
+    List<CaseInstance> getCaseInstancesByData(String dataItemName, List<String> status, Integer page, Integer pageSize);
+
+    List<CaseInstance> getCaseInstancesByData(String dataItemName, String dataItemValue, List<String> status, Integer page, Integer pageSize);
+
     List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize);
 
     List<CaseDefinition> getCaseDefinitionsByContainer(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
@@ -192,4 +197,10 @@ public interface CaseServicesClient {
     List<ProcessDefinition> findProcesses(String filter, Integer page, Integer pageSize, String sort, boolean sortOrder);
 
     List<ProcessDefinition> findProcessesByContainerId(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<CaseFileDataItem> getCaseInstanceDataItems(String caseId, Integer page, Integer pageSize);
+
+    List<CaseFileDataItem> getCaseInstanceDataItemsByName(String caseId, List<String> names, Integer page, Integer pageSize);
+
+    List<CaseFileDataItem> getCaseInstanceDataItemsByType(String caseId, List<String> types, Integer page, Integer pageSize);
 }
