@@ -61,10 +61,11 @@ import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
+import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -283,10 +284,11 @@ public class JaxbMarshaller implements Marshaller {
                 // Optaplanner commands
                 CreateSolverCommand.class,
                 DisposeSolverCommand.class,
-                GetBestSolutionCommand.class,
+                GetSolverWithBestSolutionCommand.class,
                 GetSolversCommand.class,
-                GetSolverStateCommand.class,
-                UpdateSolverStateCommand.class,
+                GetSolverCommand.class,
+                SolvePlanningProblemCommand.class,
+                TerminateSolverEarlyCommand.class,
 
                 // admin section
                 MigrationReportInstance.class,

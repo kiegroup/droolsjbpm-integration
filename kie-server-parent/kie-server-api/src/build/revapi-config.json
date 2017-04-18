@@ -14,7 +14,6 @@
       }
     }
   },
-
   "ignores": {
     "revapi": {
       "_comment": "Changes between 6.5.0.Final and master. These changes are desired and thus ignored. They should be removed when 7.0.0.Final is available.",
@@ -134,8 +133,73 @@
           "annotationType": "com.thoughtworks.xstream.annotations.XStreamAlias",
           "elementKind": "annotation",
           "justification": "DROOLS-1509 ServiceResponse XStream marshalling is with canonical name"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.kie.server.api.commands.optaplanner.GetBestSolutionCommand",
+          "package": "org.kie.server.api.commands.optaplanner",
+          "classSimpleName": "GetBestSolutionCommand",
+          "elementKind": "class",
+          "justification": "Renamed to GetSolverWithBestSolutionCommand"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.kie.server.api.commands.optaplanner.GetSolverStateCommand",
+          "package": "org.kie.server.api.commands.optaplanner",
+          "classSimpleName": "GetSolverStateCommand",
+          "elementKind": "class",
+          "justification": "Renamed to GetSolverCommand"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand",
+          "package": "org.kie.server.api.commands.optaplanner",
+          "classSimpleName": "UpdateSolverStateCommand",
+          "elementKind": "class",
+          "justification": "State update logic replaced by SolvePlanningProblemCommand and TerminateSolverEarlyCommand"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.optaplanner.core.api.domain.solution.Solution org.kie.server.api.model.instance.SolverInstance::getPlanningProblem()",
+          "package": "org.kie.server.api.model.instance",
+          "classSimpleName": "SolverInstance",
+          "methodName": "getPlanningProblem",
+          "elementKind": "method",
+          "justification": "planningProblem field removed from SolverInstance"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.kie.server.api.model.instance.SolverInstance::setPlanningProblem(org.optaplanner.core.api.domain.solution.Solution)",
+          "package": "org.kie.server.api.model.instance",
+          "classSimpleName": "SolverInstance",
+          "methodName": "setPlanningProblem",
+          "elementKind": "method",
+          "justification": "planningProblem field removed from SolverInstance"
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION",
+          "new": "field org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION",
+          "oldValue": "/bestsolution",
+          "newValue": "bestsolution",
+          "package": "org.kie.server.api.rest",
+          "classSimpleName": "RestURI",
+          "fieldName": "SOLVER_BEST_SOLUTION",
+          "elementKind": "field",
+          "justification": "Align the style with the rest of RestURI constants"
+        },
+        {
+          "code": "java.field.constantValueChanged",
+          "old": "field org.kie.server.api.rest.RestURI.SOLVER_ID_URI",
+          "new": "field org.kie.server.api.rest.RestURI.SOLVER_ID_URI",
+          "oldValue": "/{solverId}",
+          "newValue": "{solverId}",
+          "package": "org.kie.server.api.rest",
+          "classSimpleName": "RestURI",
+          "fieldName": "SOLVER_ID_URI",
+          "elementKind": "field",
+          "justification": "Align the style with the rest of RestURI constants"
         }
-       
       ]
     }
   }
