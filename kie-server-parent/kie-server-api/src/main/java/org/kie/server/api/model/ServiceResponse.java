@@ -45,6 +45,8 @@ import org.kie.server.api.model.cases.CaseCommentList;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
+import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseInstanceList;
 import org.kie.server.api.model.cases.CaseMilestone;
@@ -198,6 +200,8 @@ public class ServiceResponse<T> {
             @XmlElement(name = "case-definition-list", type = CaseDefinitionList.class),
             @XmlElement(name = "case-stage-def", type = CaseStageDefinition.class),
             @XmlElement(name = "case-milestone-def", type = CaseMilestoneDefinition.class),
+            @XmlElement(name = "case-file-data-item", type = CaseFileDataItem.class),
+            @XmlElement(name = "case-file-data-item-list", type = CaseFileDataItemList.class),
 
             // Kie DMN
             @XmlElement(name = "dmn-evaluation-context", type = DMNContextKS.class),

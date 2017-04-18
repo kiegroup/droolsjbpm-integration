@@ -34,6 +34,7 @@ import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
 import org.kie.server.api.model.cases.CaseDefinition;
 import org.kie.server.api.model.cases.CaseFile;
+import org.kie.server.api.model.cases.CaseFileDataItem;
 import org.kie.server.api.model.cases.CaseInstance;
 import org.kie.server.api.model.cases.CaseMilestone;
 import org.kie.server.api.model.cases.CaseRoleAssignment;
@@ -1453,6 +1454,102 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         } catch (KieServicesException e) {
             // expected
         }
+    }
+
+    @Test
+    public void testGetCaseInstanceDataItems() {
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseClaimId);
+
+        List<CaseFileDataItem> dataItems = caseClient.getCaseInstanceDataItems(caseClaimId, 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(0, dataItems.size());
+
+        List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        dataItems = caseClient.getCaseInstanceDataItems(caseClaimId, 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(1, dataItems.size());
+
+        CaseFileDataItem dataItem = dataItems.get(0);
+        assertEquals(caseClaimId, dataItem.getCaseId());
+        assertEquals("claimReportDone", dataItem.getName());
+        assertEquals("true", dataItem.getValue());
+        assertEquals(Boolean.class.getName(), dataItem.getType());
+        assertEquals(USER_YODA, dataItem.getLastModifiedBy());
+
+        dataItems = caseClient.getCaseInstanceDataItemsByType(caseClaimId, Arrays.asList(Boolean.class.getName()), 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(1, dataItems.size());
+
+        dataItems = caseClient.getCaseInstanceDataItemsByType(caseClaimId, Arrays.asList(String.class.getName()), 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(0, dataItems.size());
+
+        dataItems = caseClient.getCaseInstanceDataItemsByName(caseClaimId, Arrays.asList("claimReportDone"), 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(1, dataItems.size());
+
+        dataItems = caseClient.getCaseInstanceDataItemsByName(caseClaimId, Arrays.asList("notExisting"), 0, 10);
+        assertNotNull(dataItems);
+        assertEquals(0, dataItems.size());
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(3, stages.size());
+        assertBuildClaimReportCaseStage(stages.get(0), "Completed");
+        assertClaimAssesmentCaseStage(stages.get(1), "Active");
+        assertEscalateRejectedClaimCaseStage(stages.get(2), "Available");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
+    }
+
+    @Test
+    public void testGetCaseInstanceByData() {
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseClaimId);
+
+
+        List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertBuildClaimReportCaseStage(stages.iterator().next(), "Active");
+
+        List<CaseInstance> caseInstances = caseClient.getCaseInstancesByData("claimReportDone", Arrays.asList(CaseStatus.OPEN.getName()), 0, 10);
+        assertEquals(0, caseInstances.size());
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone", Arrays.asList(CaseStatus.OPEN.getName()), 0, 10);
+        assertEquals(1, caseInstances.size());
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone", "false", Arrays.asList(CaseStatus.OPEN.getName()), 0, 10);
+        assertEquals(0, caseInstances.size());
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone", "true", Arrays.asList(CaseStatus.OPEN.getName()), 0, 10);
+        assertEquals(1, caseInstances.size());
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(3, stages.size());
+        assertBuildClaimReportCaseStage(stages.get(0), "Completed");
+        assertClaimAssesmentCaseStage(stages.get(1), "Active");
+        assertEscalateRejectedClaimCaseStage(stages.get(2), "Available");
+
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
     }
 
     private String startUserTaskCase(String owner, String contact) {

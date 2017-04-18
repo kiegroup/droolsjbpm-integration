@@ -132,7 +132,7 @@ public class CaseKieServerExtension implements KieServerExtension {
         ((CaseServiceImpl) caseService).setIdentityProvider(registry.getIdentityProvider());
 
         // build case configuration on deployment listener
-        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener();
+        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(registry.getIdentityProvider());
 
         // configure case mgmt services as listeners
         ((KModuleDeploymentService)deploymentService).addListener((CaseRuntimeDataServiceImpl) caseRuntimeDataService);
