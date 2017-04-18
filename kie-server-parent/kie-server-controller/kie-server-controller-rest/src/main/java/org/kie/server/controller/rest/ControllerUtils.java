@@ -120,7 +120,7 @@ public class ControllerUtils {
         }
         // now look for actual Content-Type header
         List<String> contentTypeHeader = headers.getRequestHeader(HttpHeaders.CONTENT_TYPE);
-        if (contentTypeHeader != null && !contentTypeHeader.isEmpty()) {
+        if (contentTypeHeader != null && !contentTypeHeader.isEmpty() && contentTypeHeader.get(0) != null) {
             contentType = contentTypeHeader.get(0);
 
         }
