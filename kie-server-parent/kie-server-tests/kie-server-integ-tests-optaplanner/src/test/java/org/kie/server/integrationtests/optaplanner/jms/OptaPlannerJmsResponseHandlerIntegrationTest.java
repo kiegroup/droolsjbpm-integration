@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
@@ -30,7 +31,6 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
@@ -46,6 +46,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 @Category({JMSOnly.class})
@@ -66,7 +67,7 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
     public static Collection<Object[]> data() {
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
 
-        return new ArrayList<Object[]>(Arrays.asList(new Object[][]{
+        return new ArrayList<>(Arrays.asList(new Object[][]{
                 {MarshallingFormat.JAXB, jmsConfiguration},
                 {MarshallingFormat.JSON, jmsConfiguration},
                 {MarshallingFormat.XSTREAM, jmsConfiguration}
@@ -98,15 +99,15 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         ResponseHandler asyncResponseHandler = new AsyncResponseHandler(responseCallback);
         solverClient.setResponseHandler(asyncResponseHandler);
 
-        ServiceResponse<?> response = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG);
+        SolverInstance response = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG);
         assertThat(response);
         SolverInstance solver = responseCallback.get(SolverInstance.class);
         assertThat(solver).isNotNull();
         assertThat(solver.getContainerId()).isEqualTo(CONTAINER_1_ID);
         assertThat(solver.getSolverId()).isEqualTo(SOLVER_1_ID);
 
-        response = solverClient.getSolvers(CONTAINER_1_ID);
-        assertThat(response);
+        List<SolverInstance> solverInstanceList = solverClient.getSolvers(CONTAINER_1_ID);
+        assertThat(solverInstanceList);
         SolverInstanceList solverList = responseCallback.get(SolverInstanceList.class);
         assertThat(solverList).isNotNull();
         assertThat(solverList.getContainers()).isNotNull().isNotEmpty().hasSize(1);
@@ -114,27 +115,31 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         assertThat(solver.getSolverId()).isEqualTo(SOLVER_1_ID);
         assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.NOT_SOLVING);
 
-        solver = new SolverInstance();
-        solver.setStatus(SolverInstance.SolverStatus.SOLVING);
-        solver.setPlanningProblem(loadPlanningProblem(5, 15));
-        response = solverClient.updateSolverState(CONTAINER_1_ID, SOLVER_1_ID, solver);
+        solverClient.solvePlanningProblem(CONTAINER_1_ID, SOLVER_1_ID, loadPlanningProblem(5, 15));
+        // Make sure the service call result is consumed
+        responseCallback.get(Void.class);
+
+        response = solverClient.getSolver(CONTAINER_1_ID, SOLVER_1_ID);
         assertThat(response);
         solver = responseCallback.get(SolverInstance.class);
         assertThat(solver.getSolverId()).isEqualTo(SOLVER_1_ID);
         assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.SOLVING);
 
-        response = solverClient.getSolverState(CONTAINER_1_ID, SOLVER_1_ID);
+        solverClient.terminateSolverEarly(CONTAINER_1_ID, SOLVER_1_ID);
+        // Make sure the service call result is consumed
+        responseCallback.get(Void.class);
+
+        response = solverClient.getSolver(CONTAINER_1_ID, SOLVER_1_ID);
         assertThat(response);
         solver = responseCallback.get(SolverInstance.class);
         assertThat(solver.getSolverId()).isEqualTo(SOLVER_1_ID);
-        assertThat(solver.getStatus()).isEqualTo(SolverInstance.SolverStatus.SOLVING);
+        assertThat(solver.getStatus()).isIn(SolverInstance.SolverStatus.TERMINATING_EARLY, SolverInstance.SolverStatus.NOT_SOLVING);
 
-        response = solverClient.disposeSolver(CONTAINER_1_ID, SOLVER_1_ID);
-        assertThat(response);
-        responseCallback.get(SolverInstance.class);
+        solverClient.disposeSolver(CONTAINER_1_ID, SOLVER_1_ID);
+        // Make sure the service call result is consumed
+        responseCallback.get(Void.class);
 
-        response = solverClient.getSolvers(CONTAINER_1_ID);
-        assertThat(response);
+        solverClient.getSolvers(CONTAINER_1_ID);
         solverList = responseCallback.get(SolverInstanceList.class);
         assertThat(solverList).isNotNull();
         assertThat(solverList.getContainers()).isNullOrEmpty();
@@ -143,34 +148,35 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
     @Test
     public void testSolverWithFireAndForgetResponseHandler() throws Exception {
         solverClient.setResponseHandler(new FireAndForgetResponseHandler());
-        ServiceResponse<?> response = solverClient.createSolver(CONTAINER_1_ID, SOLVER_1_ID, SOLVER_1_CONFIG);
-        assertThat(response);
+        SolverInstance solverInstance = solverClient.createSolver(CONTAINER_1_ID,
+                                                           SOLVER_1_ID,
+                                                           SOLVER_1_CONFIG);
+        assertThat(solverInstance);
 
         solverClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForSolver(solverClient, CONTAINER_1_ID, SOLVER_1_ID);
 
         solverClient.setResponseHandler(new FireAndForgetResponseHandler());
-        SolverInstance solver = new SolverInstance();
-        solver.setStatus(SolverInstance.SolverStatus.SOLVING);
-        solver.setPlanningProblem(loadPlanningProblem(5, 15));
-        response = solverClient.updateSolverState(CONTAINER_1_ID, SOLVER_1_ID, solver);
-        assertThat(response);
+        solverClient.solvePlanningProblem(CONTAINER_1_ID, SOLVER_1_ID, loadPlanningProblem(5, 15));
 
         solverClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForSolverStatus(solverClient, CONTAINER_1_ID, SOLVER_1_ID, SolverInstance.SolverStatus.SOLVING);
 
         solverClient.setResponseHandler(new FireAndForgetResponseHandler());
-        response = solverClient.disposeSolver(CONTAINER_1_ID, SOLVER_1_ID);
-        assertThat(response);
+        solverClient.terminateSolverEarly(CONTAINER_1_ID, SOLVER_1_ID);
+
+        solverClient.setResponseHandler(new RequestReplyResponseHandler());
+        KieServerSynchronization.waitForSolverStatus(solverClient, CONTAINER_1_ID, SOLVER_1_ID,
+                                                     SolverInstance.SolverStatus.NOT_SOLVING);
+
+        solverClient.setResponseHandler(new FireAndForgetResponseHandler());
+        solverClient.disposeSolver(CONTAINER_1_ID, SOLVER_1_ID);
 
         solverClient.setResponseHandler(new RequestReplyResponseHandler());
         KieServerSynchronization.waitForSolverDispose(solverClient, CONTAINER_1_ID, SOLVER_1_ID);
 
-        ServiceResponse<SolverInstanceList> solverListResponse = solverClient.getSolvers(CONTAINER_1_ID);
-        assertThat(solverListResponse).isNotNull();
-        SolverInstanceList solverList = solverListResponse.getResult();
-        assertThat(solverList).isNotNull();
-        assertThat(solverList.getContainers()).isNullOrEmpty();
+        List<SolverInstance> solverInstanceList = solverClient.getSolvers(CONTAINER_1_ID);
+        assertThat(solverInstanceList).isNullOrEmpty();
     }
 
     public Object loadPlanningProblem(int computerListSize, int processListSize) {

@@ -22,10 +22,11 @@ import java.util.List;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
+import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerCommand;
@@ -42,81 +43,110 @@ import org.slf4j.LoggerFactory;
 public class OptaplannerCommandServiceImpl
         implements KieContainerCommandService {
 
-    private static final Logger logger = LoggerFactory.getLogger( OptaplannerCommandServiceImpl.class );
+    private static final Logger logger = LoggerFactory.getLogger(OptaplannerCommandServiceImpl.class);
 
     private KieServerRegistry context;
 
     private SolverServiceBase solverService;
 
     public OptaplannerCommandServiceImpl(
-            KieServerRegistry context, SolverServiceBase solverService) {
+            KieServerRegistry context,
+            SolverServiceBase solverService) {
 
         this.context = context;
         this.solverService = solverService;
     }
 
     @Override
-    public ServiceResponse<String> callContainer(String containerId, String payload, MarshallingFormat marshallingFormat, String classType) {
+    public ServiceResponse<String> callContainer(String containerId,
+                                                 String payload,
+                                                 MarshallingFormat marshallingFormat,
+                                                 String classType) {
         return null;
     }
 
     @Override
-    public ServiceResponsesList executeScript(CommandScript commands, MarshallingFormat marshallingFormat, String classType) {
+    public ServiceResponsesList executeScript(CommandScript commands,
+                                              MarshallingFormat marshallingFormat,
+                                              String classType) {
         List<ServiceResponse<? extends Object>> responses = new ArrayList<ServiceResponse<? extends Object>>();
 
-
-
-        for ( KieServerCommand command : commands.getCommands() ) {
+        for (KieServerCommand command : commands.getCommands()) {
             try {
                 ServiceResponse<?> response = null;
-                logger.debug( "About to execute command: {}", command );
-                if ( command instanceof CreateSolverCommand ) {
+                logger.debug("About to execute command: {}",
+                             command);
+                if (command instanceof CreateSolverCommand) {
                     CreateSolverCommand csc = (CreateSolverCommand) command;
-                    String containerId = context.getContainerId(csc.getContainerId(), ContainerLocatorProvider.get().getLocator());
+                    String containerId = context.getContainerId(csc.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
                     SolverInstance instance = new SolverInstance();
-                    instance.setContainerId( containerId );
-                    instance.setSolverId( csc.getSolverId() );
-                    instance.setSolverConfigFile( csc.getSolverConfigFile() );
-                    response = solverService.createSolver( containerId, csc.getSolverId(), instance );
-                } else if (command instanceof GetSolversCommand ) {
+                    instance.setContainerId(containerId);
+                    instance.setSolverId(csc.getSolverId());
+                    instance.setSolverConfigFile(csc.getSolverConfigFile());
+                    response = solverService.createSolver(containerId,
+                                                          csc.getSolverId(),
+                                                          instance);
+                } else if (command instanceof GetSolversCommand) {
                     GetSolversCommand gss = (GetSolversCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
-                    response = solverService.getSolvers( containerId );
-                } else if (command instanceof GetSolverStateCommand) {
-                    GetSolverStateCommand gss = (GetSolverStateCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
-                    response = solverService.getSolverState( containerId, gss.getSolverId() );
-                } else if (command instanceof GetBestSolutionCommand ) {
-                    GetBestSolutionCommand gss = (GetBestSolutionCommand) command;
-                    String containerId = context.getContainerId(gss.getContainerId(), ContainerLocatorProvider.get().getLocator());
-                    response = solverService.getBestSolution( containerId, gss.getSolverId() );
-                } else if (command instanceof UpdateSolverStateCommand ) {
-                    UpdateSolverStateCommand uss = (UpdateSolverStateCommand) command;
-                    String containerId = context.getContainerId(uss.getContainerId(), ContainerLocatorProvider.get().getLocator());
-                    KieContainerInstanceImpl kc = context.getContainer( containerId );
-                    Marshaller marshaller = kc.getMarshaller( marshallingFormat );
-                    SolverInstance si = marshaller.unmarshall( uss.getInstance(), SolverInstance.class );
-                    response = solverService.updateSolverState( containerId, uss.getSolverId(), si );
-                } else if (command instanceof DisposeSolverCommand ) {
+                    String containerId = context.getContainerId(gss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getSolvers(containerId);
+                } else if (command instanceof GetSolverCommand) {
+                    GetSolverCommand gss = (GetSolverCommand) command;
+                    String containerId = context.getContainerId(gss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getSolver(containerId,
+                                                       gss.getSolverId());
+                } else if (command instanceof GetSolverWithBestSolutionCommand) {
+                    GetSolverWithBestSolutionCommand gss = (GetSolverWithBestSolutionCommand) command;
+                    String containerId = context.getContainerId(gss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.getSolverWithBestSolution(containerId,
+                                                                       gss.getSolverId());
+                } else if (command instanceof SolvePlanningProblemCommand) {
+                    SolvePlanningProblemCommand uss = (SolvePlanningProblemCommand) command;
+                    String containerId = context.getContainerId(uss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    KieContainerInstanceImpl kc = context.getContainer(containerId);
+                    Marshaller marshaller = kc.getMarshaller(marshallingFormat);
+                    Object planningProblem = marshaller.unmarshall(uss.getPlanningProblem(),
+                                                                   Object.class);
+                    response = solverService.solvePlanningProblem(containerId,
+                                                                  uss.getSolverId(),
+                                                                  planningProblem);
+                } else if (command instanceof TerminateSolverEarlyCommand) {
+                    TerminateSolverEarlyCommand uss = (TerminateSolverEarlyCommand) command;
+                    String containerId = context.getContainerId(uss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.terminateSolverEarly(containerId,
+                                                                  uss.getSolverId());
+                } else if (command instanceof DisposeSolverCommand) {
                     DisposeSolverCommand ds = (DisposeSolverCommand) command;
-                    String containerId = context.getContainerId(ds.getContainerId(), ContainerLocatorProvider.get().getLocator());
-                    response = solverService.disposeSolver( containerId, ds.getSolverId() );
+                    String containerId = context.getContainerId(ds.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.disposeSolver(containerId,
+                                                           ds.getSolverId());
                 } else {
-                    throw new IllegalStateException( "Unsupported command: " + command );
+                    throw new IllegalStateException("Unsupported command: " + command);
                 }
 
-                logger.debug( "Service returned response {}", response );
+                logger.debug("Service returned response {}",
+                             response);
 
                 // return successful result
-                responses.add( response );
-            } catch ( Throwable e ) {
-                logger.error( "Error while processing {} command", command, e );
+                responses.add(response);
+            } catch (Throwable e) {
+                logger.error("Error while processing {} command",
+                             command,
+                             e);
                 // return failure result
-                responses.add( new ServiceResponse( ServiceResponse.ResponseType.FAILURE, e.getMessage() ) );
+                responses.add(new ServiceResponse(ServiceResponse.ResponseType.FAILURE,
+                                                  e.getMessage()));
             }
         }
-        logger.debug( "About to return responses '{}'", responses );
-        return new ServiceResponsesList( responses );
+        logger.debug("About to return responses '{}'",
+                     responses);
+        return new ServiceResponsesList(responses);
     }
-
 }

@@ -1,21 +1,23 @@
 package org.kie.server.api.model.instance;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
-import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
-import org.optaplanner.core.api.score.Score;
-
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.drools.core.xml.jaxb.util.JaxbUnknownAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "solver-instance")
-@XStreamAlias( "solver-instance" )
+@XStreamAlias("solver-instance")
 public class SolverInstance {
 
-    public static enum SolverStatus {
-        NOT_SOLVING, TERMINATING_EARLY, SOLVING
+    public enum SolverStatus {
+        NOT_SOLVING,
+        TERMINATING_EARLY,
+        SOLVING
     }
 
     @XmlElement(name = "container-id")
@@ -37,11 +39,6 @@ public class SolverInstance {
     @XmlElement(name = "score")
     @XStreamAlias("score")
     private ScoreWrapper scoreWrapper;
-
-    @XmlElement(name = "planning-problem")
-    @XStreamAlias("planning-problem")
-    @XmlJavaTypeAdapter(JaxbUnknownAdapter.class)
-    private Object planningProblem;
 
     @XmlElement(name = "best-solution")
     @XStreamAlias("best-solution")
@@ -87,16 +84,8 @@ public class SolverInstance {
         return scoreWrapper;
     }
 
-    public void setScoreWrapper( ScoreWrapper scoreWrapper ) {
+    public void setScoreWrapper(ScoreWrapper scoreWrapper) {
         this.scoreWrapper = scoreWrapper;
-    }
-
-    public Object getPlanningProblem() {
-        return planningProblem;
-    }
-
-    public void setPlanningProblem(Object planningProblem) {
-        this.planningProblem = planningProblem;
     }
 
     public Object getBestSolution() {
@@ -110,20 +99,21 @@ public class SolverInstance {
     @Override
     public String toString() {
         return "SolverInstance{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               ", solverConfigFile='" + solverConfigFile + '\'' +
-               ", status=" + status +
-               ", scoreWrapper=" + scoreWrapper +
-               '}';
+                "containerId='" + containerId + '\'' +
+                ", solverId='" + solverId + '\'' +
+                ", solverConfigFile='" + solverConfigFile + '\'' +
+                ", status=" + status +
+                ", scoreWrapper=" + scoreWrapper +
+                '}';
     }
 
     public String getSolverInstanceKey() {
-        return getSolverInstanceKey( this.containerId, this.solverId );
+        return getSolverInstanceKey(this.containerId,
+                                    this.solverId);
     }
 
-    public static String getSolverInstanceKey( String containerId, String solverId ) {
+    public static String getSolverInstanceKey(String containerId,
+                                              String solverId) {
         return containerId + "/" + solverId;
     }
-
 }

@@ -25,7 +25,6 @@ import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
@@ -43,15 +42,15 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
 
     @Before
     public void abortAllSolvers() {
-        for(KieContainerResource container : getContainers()) {
+        for (KieContainerResource container : getContainers()) {
             abortSolvers(container.getContainerId());
         }
     }
 
     public void abortSolvers(String containerId) {
-        for(SolverInstance solver : getSolvers(containerId)) {
-            ServiceResponse<Void> response = solverClient.disposeSolver(containerId, solver.getSolverId());
-            Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
+        for (SolverInstance solver : getSolvers(containerId)) {
+            solverClient.disposeSolver(containerId,
+                                       solver.getSolverId());
         }
     }
 
@@ -62,14 +61,11 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
     }
 
     private List<SolverInstance> getSolvers(String containerId) {
-        ServiceResponse<SolverInstanceList> response = solverClient.getSolvers(containerId);
-        Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
-        return response.getResult().getContainers();
+        return solverClient.getSolvers(containerId);
     }
 
     @Override
     protected void setupClients(KieServicesClient kieServicesClient) {
-        this.solverClient = kieServicesClient.getServicesClient( SolverServicesClient.class );
+        this.solverClient = kieServicesClient.getServicesClient(SolverServicesClient.class);
     }
-
 }
