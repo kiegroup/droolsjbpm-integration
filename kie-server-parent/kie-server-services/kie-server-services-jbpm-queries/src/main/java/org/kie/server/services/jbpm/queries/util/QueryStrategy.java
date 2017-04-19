@@ -13,20 +13,21 @@
  * limitations under the License.
 */
 
-package org.kie.server.client;
+package org.kie.server.services.jbpm.queries.util;
 
-import java.util.List;
+import java.util.Map;
 
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+import org.jbpm.services.api.query.model.QueryParam;
 
 /**
- * KIE-Server Client API for the advanced Task Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
+ * Provides DB specific query and column-mappings for queries.
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-public interface TaskQueryServicesClient {
+public interface QueryStrategy {
 
-	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
+		String getQueryExpression();
+	
+		Map<String, String> getColumnMapping(QueryParam[] params);
 	
 }

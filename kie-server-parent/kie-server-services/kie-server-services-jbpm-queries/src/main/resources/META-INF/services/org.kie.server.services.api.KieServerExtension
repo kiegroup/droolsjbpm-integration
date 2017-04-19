@@ -1,1 +1,1 @@
-org.kie.server.services.jbpm.taskqueries.JbpmTaskQueriesKieServerExtension
+org.kie.server.services.jbpm.queries.JbpmQueriesKieServerExtension

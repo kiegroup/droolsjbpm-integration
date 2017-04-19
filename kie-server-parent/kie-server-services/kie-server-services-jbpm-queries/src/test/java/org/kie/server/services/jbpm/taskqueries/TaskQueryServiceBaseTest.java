@@ -1,3 +1,18 @@
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
 package org.kie.server.services.jbpm.taskqueries;
 
 import static org.junit.Assert.*;
@@ -18,9 +33,10 @@ import org.junit.Test;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.taskqueries.util.TaskQueriesStrategy;
+import org.kie.server.services.jbpm.queries.TaskQueryServiceBase;
+import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 import org.mockito.Mockito;
 
 public class TaskQueryServiceBaseTest {
@@ -41,7 +57,7 @@ public class TaskQueryServiceBaseTest {
 		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
 		when(contextMock.getConfig()).thenReturn(configMock);
 		
-		TaskQueriesStrategy taskQueriesStrategyMock = Mockito.mock(TaskQueriesStrategy.class); 
+		QueryStrategy taskQueriesStrategyMock = Mockito.mock(QueryStrategy.class); 
 		
 		TaskQueryServiceBase base = new TaskQueryServiceBase(queryServiceMock, contextMock, taskQueriesStrategyMock);
 		

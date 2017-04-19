@@ -13,20 +13,21 @@
  * limitations under the License.
 */
 
-package org.kie.server.client;
+package org.kie.server.services.jbpm.queries;
 
-import java.util.List;
-
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.jbpm.queries.api.model.definition.BaseQueryFilterSpec;
+import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 
 /**
- * KIE-Server Client API for the advanced Task Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
+ * Provides the context for query request execution, including things like payload and unmarshalled {@link BaseQueryFilterSpec}. 
+ * 
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-public interface TaskQueryServicesClient {
+public interface RequestCallback {
 
-	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
+	public String getPayload();
+	
+	public BaseQueryFilterSpec getQueryFilterSpec();
 	
 }

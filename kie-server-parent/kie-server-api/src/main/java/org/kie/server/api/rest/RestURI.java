@@ -109,6 +109,7 @@ public class RestURI {
 
     // runtime data related prefixed by QUERY_URI
     public static final String PROCESS_INSTANCES_GET_URI = "processes/instances";
+    public static final String PROCESS_INSTANCES_GET_FILTERED_URI = "processes/instances/filtered-data";
     public static final String PROCESS_INSTANCES_BY_PROCESS_ID_GET_URI = "processes/{" + PROCESS_ID +"}/instances";
     public static final String PROCESS_INSTANCES_BY_CONTAINER_ID_GET_URI = "containers/{" + CONTAINER_ID + "}/process/instances";
     public static final String PROCESS_INSTANCE_BY_CORRELATION_KEY_GET_URI = "processes/instance/correlation/{" + CORRELATION_KEY + "}";

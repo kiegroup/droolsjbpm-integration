@@ -13,20 +13,16 @@
  * limitations under the License.
 */
 
-package org.kie.server.client;
+package org.kie.server.jbpm.queries.api.model.definition;
 
-import java.util.List;
+import org.kie.server.api.model.definition.QueryParam;
 
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+public interface BaseQueryFilterSpec {
 
-/**
- * KIE-Server Client API for the advanced Task Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
- */
-public interface TaskQueryServicesClient {
-
-	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
+	public String getOrderBy();
+	
+	public boolean isAscending();
+	
+	public QueryParam[] getParameters();
 	
 }
