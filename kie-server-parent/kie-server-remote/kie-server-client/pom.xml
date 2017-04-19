@@ -28,7 +28,7 @@
       <!-- TODO: Move dependency management to BOM -->
       <dependency>
          <groupId>org.kie.server</groupId>
-         <artifactId>kie-server-jbpm-taskqueries-api</artifactId>
+         <artifactId>kie-server-jbpm-queries-api</artifactId>
          <version>7.0.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
@@ -69,7 +69,7 @@
     <!-- TODO: Do we want to depend on this api here?-->
     <dependency>
     	<groupId>org.kie.server</groupId>
-    	<artifactId>kie-server-jbpm-taskqueries-api</artifactId>
+    	<artifactId>kie-server-jbpm-queries-api</artifactId>
     </dependency>
     
     <dependency>

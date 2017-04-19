@@ -13,41 +13,26 @@
  * limitations under the License.
 */
 
-package org.kie.server.services.jbpm.taskqueries;
+package org.kie.server.services.jbpm.queries;
 
-import static org.kie.server.services.jbpm.ConvertUtils.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
-import org.jbpm.services.api.model.ProcessInstanceDesc;
-import org.jbpm.services.api.model.ProcessInstanceWithVarsDesc;
-import org.jbpm.services.api.model.UserTaskInstanceDesc;
-import org.jbpm.services.api.model.UserTaskInstanceWithVarsDesc;
-import org.jbpm.services.api.query.QueryMapperRegistry;
-import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryDefinition;
 import org.jbpm.services.api.query.model.QueryDefinition.Target;
-import org.jbpm.services.api.query.model.QueryParam;
-import org.kie.api.runtime.query.QueryContext;
-import org.kie.api.task.model.TaskSummary;
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.jbpm.taskqueries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.jbpm.queries.api.model.definition.BaseQueryFilterSpec;
+import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.jbpm.taskqueries.util.TaskQueriesStrategy;
+import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TaskQueryServiceBase {
+public class TaskQueryServiceBase extends AbstractQueryServiceBase {
 
 	private static final Logger logger = LoggerFactory.getLogger(TaskQueryServiceBase.class);
 
@@ -55,13 +40,14 @@ public class TaskQueryServiceBase {
 
 	private static final String TASK_QUERY_NAME = "getTasksWithFilters";
 
-	private QueryService queryService;
 	private MarshallerHelper marshallerHelper;
 	private KieServerRegistry context;
-	private TaskQueriesStrategy taskQueriesStrategy;
+	private QueryServiceTemplate queryServiceTemplate;
+	private QueryCallback queryCallback;
 
-	public TaskQueryServiceBase(QueryService queryService, KieServerRegistry context, TaskQueriesStrategy taskQueriesStrategy) {
-		this.queryService = queryService;
+	public TaskQueryServiceBase(QueryService queryService, KieServerRegistry context, QueryStrategy taskQueriesStrategy) {
+		this.queryServiceTemplate = new QueryServiceTemplate(queryService);
+		
 		this.context = context;
 		
 		this.marshallerHelper = new MarshallerHelper(context);
@@ -74,12 +60,52 @@ public class TaskQueryServiceBase {
 		// Register (or replace) query.
 		String taskQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
 				"java:jboss/datasources/ExampleDS");
-		this.taskQueriesStrategy = taskQueriesStrategy;
+		
+		this.queryCallback = new QueryCallback() {
+			
+			@Override
+			public QueryStrategy getQueryStrategy() {
+				return taskQueriesStrategy;
+			}
+			
+			@Override
+			public String getQueryName() {
+				return TASK_QUERY_NAME;
+			}
+			
+			@Override
+			public String getMapperName() {
+				return MAPPER_NAME;
+			}
+		};
+		
 		QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource, Target.CUSTOM);
-		queryDefinition.setExpression(taskQueriesStrategy.getTaskQueryExpression());
+		queryDefinition.setExpression(taskQueriesStrategy.getQueryExpression());
 		queryService.replaceQuery(queryDefinition);
 	}
-
+	
+	public TaskInstanceList getHumanTasksWithFilters(Integer page, Integer pageSize, String payload, String marshallingType) {
+		
+		RequestCallback reqCallback = new RequestCallback() {
+			
+			@Override
+			public String getPayload() {
+				return payload;
+			}
+			
+			@Override
+			public BaseQueryFilterSpec getQueryFilterSpec() {
+				return marshallerHelper.unmarshal(payload, marshallingType, TaskQueryFilterSpec.class);
+			}
+			
+		};
+		
+		return queryServiceTemplate.getWithFilters(page, pageSize, queryCallback, reqCallback);
+		
+	}
+	
+	
+/*
 	public TaskInstanceList getHumanTasksWithFilters(Integer page, Integer pageSize, String payload, String marshallingType) {
 		QueryParam[] params = new QueryParam[0];
 		Map<String, String> columnMapping = null;
@@ -137,6 +163,7 @@ public class TaskQueryServiceBase {
 		}
 		return (TaskInstanceList) transform(actualResult, resultMapper);
 	}
+	*/
 
 	// TODO: Should we also implement a method that supports QueryBuilders???
 
@@ -144,46 +171,6 @@ public class TaskQueryServiceBase {
 	 * helper methods
 	 */
 
-	protected Object transform(Object result, QueryResultMapper resultMapper) {
-		Object actualResult = null;
-		if (result instanceof Collection) {
-
-			if (ProcessInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of ProcessInstanceWithVarsDesc to ProcessInstanceList");
-				actualResult = convertToProcessInstanceWithVarsList((Collection<ProcessInstanceWithVarsDesc>) result);
-			} else if (ProcessInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of ProcessInstanceDesc to ProcessInstanceList");
-				actualResult = convertToProcessInstanceList((Collection<ProcessInstanceDesc>) result);
-			} else if (UserTaskInstanceWithVarsDesc.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of UserTaskInstanceWithVarsDesc to TaskInstanceList");
-				actualResult = convertToTaskInstanceWithVarsList((Collection<UserTaskInstanceWithVarsDesc>) result);
-			} else if (UserTaskInstanceDesc.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of UserTaskInstanceDesc to TaskInstanceList");
-				actualResult = convertToTaskInstanceList((Collection<UserTaskInstanceDesc>) result);
-			} else if (TaskSummary.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of TaskSummary to TaskSummaryList");
-				actualResult = convertToTaskSummaryList((Collection<TaskSummary>) result);
-			} else if (List.class.isAssignableFrom(resultMapper.getType())) {
-
-				logger.debug("Converting collection of List to ArrayList");
-				actualResult = new ArrayList((Collection) result);
-			} else {
-
-				logger.debug("Convert not supported for custom type {}", resultMapper.getType());
-				actualResult = result;
-			}
-
-			logger.debug("Actual result after converting is {}", actualResult);
-		} else {
-			logger.debug("Result is not a collection - {}, skipping any conversion", result);
-			actualResult = result;
-		}
-		return actualResult;
-	}
+	
 
 }

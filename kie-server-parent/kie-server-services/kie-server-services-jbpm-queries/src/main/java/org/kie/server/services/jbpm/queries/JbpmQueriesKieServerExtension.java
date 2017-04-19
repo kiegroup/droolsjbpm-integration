@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.services.jbpm.taskqueries;
+package org.kie.server.services.jbpm.queries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +32,13 @@ import org.kie.server.services.jbpm.JbpmKieServerExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JbpmTaskQueriesKieServerExtension implements KieServerExtension {
+public class JbpmQueriesKieServerExtension implements KieServerExtension {
 
-    public static final String EXTENSION_NAME = "jBPMTaskQueries";
+    public static final String EXTENSION_NAME = "jBPMQueries";
     
-    private static final Logger logger = LoggerFactory.getLogger(JbpmTaskQueriesKieServerExtension.class);
+    private static final Logger logger = LoggerFactory.getLogger(JbpmQueriesKieServerExtension.class);
 
-    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBM_QUERIES_SERVER_EXT_DISABLED, "false"));
 
     private KieServerImpl kieServer;
     private KieServerRegistry context;
@@ -121,7 +121,7 @@ public class JbpmTaskQueriesKieServerExtension implements KieServerExtension {
 
     @Override
     public String getImplementedCapability() {
-        return KieServerConstants.CAPABILITY_BPM_TASK_QUERIES;
+        return KieServerConstants.CAPABILITY_BPM_QUERIES;
     }
 
     @Override

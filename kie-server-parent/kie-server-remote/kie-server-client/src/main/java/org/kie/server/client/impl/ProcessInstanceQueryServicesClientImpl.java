@@ -18,45 +18,32 @@ package org.kie.server.client.impl;
 import static org.kie.server.api.rest.RestURI.*;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskInstanceList;
+import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.TaskQueryServicesClient;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.client.ProcessInstanceQueryServicesClient;
+import org.kie.server.jbpm.queries.api.model.definition.ProcessInstanceQueryFilterSpec;
 
-public class TaskQueryServicesClientImpl extends AbstractKieServicesClientImpl implements TaskQueryServicesClient {
+public class ProcessInstanceQueryServicesClientImpl extends AbstractKieServicesClientImpl implements ProcessInstanceQueryServicesClient {
 
-	private static Set<Class<?>> extraClasses;
-
-	static {
-		extraClasses = new HashSet<>();
-		extraClasses.add(TaskQueryFilterSpec.class);
-	}
-
-	// TODO: Adding extra classes to the config at this point doesn't seem to work. They're not picked up by the JaxB Marshaller
-	public TaskQueryServicesClientImpl(KieServicesConfiguration config) {
+	public ProcessInstanceQueryServicesClientImpl(KieServicesConfiguration config) {
 		super(config);
-		config.addExtraClasses(extraClasses);
 	}
-
-	public TaskQueryServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
+	
+	public ProcessInstanceQueryServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
 		super(config, classLoader);
-		config.addExtraClasses(extraClasses);
 	}
 
 	@Override
-	public List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
-
-		TaskInstanceList result = null;
+	public List<ProcessInstance> findProcessInstancesWithFilters(ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize) {
+		ProcessInstanceList result = null;
 
 		if (config.isRest()) {
 			String queryString = getPagingQueryString("?", page, pageSize);
-			result = makeHttpPostRequestAndCreateCustomResponse(loadBalancer.getUrl() + "/" + TASKS_GET_FILTERED_URI + queryString,
-					filterSpec, TaskInstanceList.class);
+			result = makeHttpPostRequestAndCreateCustomResponse(loadBalancer.getUrl() + "/" + PROCESS_INSTANCES_GET_FILTERED_URI + queryString,
+					filterSpec, ProcessInstanceList.class);
 
 		} else {
 			// TODO: Need to implement the command (used for non-REST scenarios). Look at QueryServicesClientImpl for examples.

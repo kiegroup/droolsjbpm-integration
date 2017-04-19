@@ -13,20 +13,33 @@
  * limitations under the License.
 */
 
-package org.kie.server.client;
-
-import java.util.List;
-
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+package org.kie.server.jbpm.queries.api.model.definition;
 
 /**
- * KIE-Server Client API for the advanced Task Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
+ * ProcessInstance fields.
+ * <p/>
+ * These are the filterable fields in our ProcessInstanceQuery API. 
  * 
  * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
-public interface TaskQueryServicesClient {
+public enum ProcessInstanceField {
 
-	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
-	
+	//@formatter:off
+	ID,
+	CORRELATIONKEY,
+	DURATION,
+	END_DATE,
+	EXTERNALID,
+	USER_IDENTITY,
+	OUTCOME,
+	PARENTPROCESSINSTANCEID,
+	PROCESSID,
+	PROCESSINSTANCEDESCRIPTION,
+	PROCESSINSTANCEID,
+	PROCESSNAME,
+	PROCESSTYPE,
+	PROCESSVERSION,
+	START_DATE,
+	STATUS
+	//@formatter:on
 }
