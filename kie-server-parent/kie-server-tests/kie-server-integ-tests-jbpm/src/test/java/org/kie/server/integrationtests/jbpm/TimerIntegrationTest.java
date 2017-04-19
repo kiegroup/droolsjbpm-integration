@@ -20,10 +20,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesConfiguration;
@@ -34,36 +37,45 @@ import static org.junit.Assert.*;
 
 public class TimerIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    protected static final String TIMER_CONTAINER_ID = "timer-project";
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "timer-project",
             "1.0.0.Final");
 
-    @Parameterized.Parameters(name = "{index}: {0} {1}")
+    @Parameterized.Parameters(name = "{index}: {0} {1} {2}")
     public static Collection<Object[]> data() {
         KieServicesConfiguration configuration = createKieServicesRestConfiguration();
 
         Collection<Object[]> parameterData = new ArrayList<Object[]>(Arrays.asList(new Object[][] {
-                                {MarshallingFormat.JAXB, configuration}
+                                {MarshallingFormat.JAXB, configuration, "SINGLETON"},
+                                {MarshallingFormat.JAXB, configuration, "PER_PROCESS_INSTANCE"}
                         }
         ));
 
         return parameterData;
     }
 
+    @Parameterized.Parameter(2)
+    public String runtimeStrategy;
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/timer-project").getFile());
+    }
 
-        createContainer(TIMER_CONTAINER_ID, releaseId);
+    @After
+    public void disposeContainers() {
+        disposeAllContainers();
     }
 
     @Test(timeout = 60 * 1000)
     public void testTimerStartEvent() throws Exception {
-        List<Integer> completedOnly = Arrays.asList(2);
-        KieServerSynchronization.waitForProcessInstanceStart(queryClient, TIMER_CONTAINER_ID, 3, completedOnly);
+        String containerId = "timer-project-" + runtimeStrategy;
+        createContainer(containerId, releaseId, new KieServerConfigItem(KieServerConstants.PCFG_RUNTIME_STRATEGY, runtimeStrategy, String.class.getName()));
 
-        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByProcessId("timer-start", completedOnly, 0, 10, "Id", false);
+        List<Integer> completedOnly = Arrays.asList(2);
+        KieServerSynchronization.waitForProcessInstanceStart(queryClient, containerId, 3, completedOnly);
+
+        List<ProcessInstance> startedInstances = queryClient.findProcessInstancesByContainerId(containerId, completedOnly, 0, 10, "Id", false);
 
         assertEquals(3, startedInstances.size());
 

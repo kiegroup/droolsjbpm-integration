@@ -111,7 +111,7 @@ public class KieServerSynchronization {
 
     public static void waitForProcessInstanceStart(final QueryServicesClient queryClient, final String containerId, int expectedInstances, List<Integer> statuses) throws Exception {
         waitForCondition(() -> {
-            List<ProcessInstance> processInstances = queryClient.findProcessInstancesByStatus(statuses, 0, 100);
+            List<ProcessInstance> processInstances = queryClient.findProcessInstancesByContainerId(containerId, statuses, 0, 100);
 
             if (processInstances.size() == expectedInstances) {
                 return true;
