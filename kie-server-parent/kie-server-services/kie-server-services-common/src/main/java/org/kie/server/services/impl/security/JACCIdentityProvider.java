@@ -49,7 +49,7 @@ public class JACCIdentityProvider implements IdentityProvider {
 
             if (principals != null) {
                 for (Principal principal : principals) {
-                    if (!(principal instanceof Group)) {
+                    if (supportedPrincipal(principal)) {
                         return principal.getName();
                     }
                 }
@@ -124,5 +124,13 @@ public class JACCIdentityProvider implements IdentityProvider {
         }
 
         return roles;
+    }
+
+    protected boolean supportedPrincipal(Principal principal) {
+        if (!(principal instanceof Group) && !principal.getClass().getName().endsWith("BasicAuthorizationPrincipal")) {
+            return true;
+        }
+
+        return false;
     }
 }
