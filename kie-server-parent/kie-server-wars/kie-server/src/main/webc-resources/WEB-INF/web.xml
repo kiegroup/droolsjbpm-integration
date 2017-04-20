@@ -44,6 +44,7 @@
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>
+      <role-name>user</role-name>
     </auth-constraint>
   </security-constraint>
   <login-config>
@@ -52,6 +53,9 @@
   </login-config>
   <security-role>
     <role-name>kie-server</role-name>
+  </security-role>
+  <security-role>
+    <role-name>user</role-name>
   </security-role>
 
 </web-app>
