@@ -575,7 +575,7 @@ public class JSONMarshaller implements Marshaller {
                 String jsonValue = customObjectMapper.writeValueAsString(mValue);
 
                 // don't wrap java and javax classes as they are always available, in addition avoid double wrapping
-                if (!mValueClassName.startsWith("java.") && !mValueClassName.startsWith("javax.") && !json.contains(mValueClassName)) {
+                if (!mValueClassName.startsWith("java.") && !mValueClassName.startsWith("javax.") && !jsonValue.contains(mValueClassName)) {
                     jsonValue = "{\"" + mValueClassName + "\":" + jsonValue + "}";
                 }
 
