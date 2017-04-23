@@ -40,7 +40,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.helper.KieServicesClientBuilder;
 import org.kie.server.client.jms.RequestReplyResponseHandler;

@@ -24,15 +24,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.admin.MigrationReportInstance;
-import org.kie.server.api.model.definition.UserTaskDefinition;
-import org.kie.server.api.model.definition.UserTaskDefinitionList;
-import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
-import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.*;

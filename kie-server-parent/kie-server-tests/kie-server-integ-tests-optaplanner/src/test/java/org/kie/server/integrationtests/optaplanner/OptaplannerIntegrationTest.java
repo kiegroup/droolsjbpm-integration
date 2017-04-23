@@ -25,9 +25,9 @@ import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.api.exception.KieServicesException;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import static org.junit.Assert.*;

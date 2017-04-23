@@ -30,7 +30,7 @@ import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.DocumentInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;

@@ -33,7 +33,7 @@ import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.SolverServicesClient;
 
 public class SolverServicesClientImpl

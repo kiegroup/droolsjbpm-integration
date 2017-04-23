@@ -17,7 +17,6 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 

@@ -23,7 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 
 import static org.junit.Assert.*;
 

@@ -43,7 +43,7 @@ import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
