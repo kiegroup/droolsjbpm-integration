@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.kie.server.client;
+package org.kie.server.api.exception;
 
 public class KieServicesHttpException extends KieServicesException {
 
@@ -24,7 +24,13 @@ public class KieServicesHttpException extends KieServicesException {
 
     private String responseBody;
 
-    public KieServicesHttpException(final String message, final Integer httpCode, final String url, final String responseBody) {
+    public KieServicesHttpException() {
+    }
+
+    public KieServicesHttpException(final String message,
+                                    final Integer httpCode,
+                                    final String url,
+                                    final String responseBody) {
         super(message);
         this.httpCode = httpCode;
         this.url = url;
@@ -41,5 +47,9 @@ public class KieServicesHttpException extends KieServicesException {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getExceptionMessage() {
+        return responseBody == null || responseBody.isEmpty() ? getMessage() : responseBody;
     }
 }

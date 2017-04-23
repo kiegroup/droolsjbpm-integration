@@ -31,7 +31,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.impl.KieServicesClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

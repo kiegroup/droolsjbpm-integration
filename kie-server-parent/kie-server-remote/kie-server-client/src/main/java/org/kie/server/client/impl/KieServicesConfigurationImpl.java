@@ -18,7 +18,7 @@ package org.kie.server.client.impl;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.CredentialsProvider;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.balancer.LoadBalancer;
 import org.kie.server.client.credentials.EnteredCredentialsProvider;
 import org.kie.server.client.jms.RequestReplyResponseHandler;

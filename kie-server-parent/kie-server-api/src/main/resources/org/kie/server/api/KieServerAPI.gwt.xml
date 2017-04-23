@@ -19,4 +19,9 @@
     <include name="KieServerInfo.java"/>
   </source>
 
+  <source path="exception">
+    <include name="KieServicesException.java"/>
+    <include name="KieServicesHttpException.java"/>
+  </source>
+
 </module>

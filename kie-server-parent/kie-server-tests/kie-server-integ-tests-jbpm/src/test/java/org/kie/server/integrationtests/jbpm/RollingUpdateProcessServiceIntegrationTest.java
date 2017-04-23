@@ -16,7 +16,6 @@
 package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,25 +23,13 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
-import org.kie.api.task.model.Status;
-import org.kie.internal.KieInternalServices;
-import org.kie.internal.executor.api.STATUS;
-import org.kie.internal.process.CorrelationKey;
-import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
-import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.model.instance.WorkItemInstance;
-import org.kie.server.client.KieServicesException;
-import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
 

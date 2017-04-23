@@ -18,7 +18,7 @@ package org.kie.server.integrationtests.jbpm;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.server.api.model.ReleaseId;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
