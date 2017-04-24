@@ -37,7 +37,6 @@ import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
@@ -149,9 +148,8 @@ public class KieServerSynchronization {
 
     public static void waitForSolver(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
         waitForCondition(() -> {
-            ServiceResponse<SolverInstanceList> solverListResponse = client.getSolvers(containerId);
-            SolverInstanceList solverList = solverListResponse.getResult();
-            for (SolverInstance solver : solverList.getContainers()) {
+            List<SolverInstance> solverInstanceList = client.getSolvers(containerId);
+            for (SolverInstance solver : solverInstanceList) {
                 if (solverId.equals(solver.getSolverId())) {
                     return true;
                 }
@@ -162,9 +160,8 @@ public class KieServerSynchronization {
 
     public static void waitForSolverDispose(final SolverServicesClient client, final String containerId, final String solverId) throws Exception {
         waitForCondition(() -> {
-            ServiceResponse<SolverInstanceList> solverListResponse = client.getSolvers(containerId);
-            SolverInstanceList solverList = solverListResponse.getResult();
-            for (SolverInstance solver : solverList.getContainers()) {
+            List<SolverInstance> solverInstanceList = client.getSolvers(containerId);
+            for (SolverInstance solver : solverInstanceList) {
                 if (solverId.equals(solver.getSolverId())) {
                     return false;
                 }
@@ -176,8 +173,9 @@ public class KieServerSynchronization {
     public static void waitForSolverStatus(final SolverServicesClient client, final String containerId, final String solverId,
             final SolverInstance.SolverStatus status) throws Exception {
         waitForCondition(() -> {
-            ServiceResponse<SolverInstance> solverResponse = client.getSolverState(containerId, solverId);
-            return status.equals(solverResponse.getResult().getStatus());
+            SolverInstance solverInstance = client.getSolver(containerId,
+                                                             solverId);
+            return status.equals(solverInstance.getStatus());
         });
     }
 

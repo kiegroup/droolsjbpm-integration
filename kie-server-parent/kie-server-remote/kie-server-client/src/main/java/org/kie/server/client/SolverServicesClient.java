@@ -15,26 +15,35 @@
 
 package org.kie.server.client;
 
-import org.kie.server.api.model.ServiceResponse;
+import java.util.List;
+
 import org.kie.server.api.model.instance.SolverInstance;
-import org.kie.server.api.model.instance.SolverInstanceList;
 import org.kie.server.client.jms.ResponseHandler;
 
 public interface SolverServicesClient {
 
-    ServiceResponse<SolverInstanceList> getSolvers( String containerId );
+    SolverInstance createSolver(String containerId,
+                                String solverId,
+                                String configFile);
 
-    ServiceResponse<SolverInstance> createSolver( String containerId, String solverId, String configFile);
+    List<SolverInstance> getSolvers(String containerId);
 
-    ServiceResponse<SolverInstance> getSolverState( String containerId, String solverId );
+    SolverInstance getSolver(String containerId,
+                             String solverId);
 
-    ServiceResponse<SolverInstance> getSolverBestSolution( String containerId, String solverId );
+    SolverInstance getSolverWithBestSolution(String containerId,
+                                             String solverId);
 
-    ServiceResponse<SolverInstance> updateSolverState(String containerId, String solverId, SolverInstance instance);
+    void solvePlanningProblem(String containerId,
+                              String solverId,
+                              Object planningProblem);
 
-    ServiceResponse<Void> disposeSolver( String containerId, String solverId );
+    void terminateSolverEarly(String containerId,
+                              String solverId);
+
+    void disposeSolver(String containerId,
+                       String solverId);
 
     void setResponseHandler(ResponseHandler responseHandler);
-
 }
 

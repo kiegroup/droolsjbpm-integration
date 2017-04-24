@@ -208,9 +208,11 @@ public class RestURI {
 
     // optaplanner URI
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
-    public static final String SOLVER_ID_URI = "/{" + SOLVER_ID + "}";
-    public static final String SOLVER_BEST_SOLUTION = "/bestsolution";
-    
+    public static final String SOLVER_ID_URI = "{" + SOLVER_ID + "}";
+    public static final String SOLVER_BEST_SOLUTION = "bestsolution";
+    public static final String SOLVER_STATE_RUNNING = "state/solving";
+    public static final String SOLVER_STATE_TERMINATING = "state/terminating-early";
+
     // DMN URI
     public static final String DMN_URI = "containers/{" + CONTAINER_ID + "}/dmn";
 

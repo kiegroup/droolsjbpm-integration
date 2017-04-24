@@ -16,34 +16,36 @@
 
 package org.kie.server.api.commands.optaplanner;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="get-best-solution")
-@XStreamAlias("get-best-solution")
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieServerCommand;
+
+@XmlRootElement(name = "get-solver-with-best-solution")
+@XStreamAlias("get-solver-with-best-solution")
 @XmlAccessorType(XmlAccessType.NONE)
-public class GetBestSolutionCommand
+public class GetSolverWithBestSolutionCommand
         implements KieServerCommand {
+
     private static final long serialVersionUID = -1803374525440238478L;
 
-    @XmlAttribute(name="container-id")
-    @XStreamAlias( "container-id" )
-    private String    containerId;
+    @XmlAttribute(name = "container-id")
+    @XStreamAlias("container-id")
+    private String containerId;
 
-    @XmlAttribute(name="solver-id")
-    @XStreamAlias( "solver-id" )
-    private String    solverId;
+    @XmlAttribute(name = "solver-id")
+    @XStreamAlias("solver-id")
+    private String solverId;
 
-    public GetBestSolutionCommand() {
+    public GetSolverWithBestSolutionCommand() {
         super();
     }
 
-    public GetBestSolutionCommand(String containerId, String solverId) {
+    public GetSolverWithBestSolutionCommand(String containerId,
+                                            String solverId) {
         this.containerId = containerId;
         this.solverId = solverId;
     }
@@ -66,9 +68,9 @@ public class GetBestSolutionCommand
 
     @Override
     public String toString() {
-        return "GetBestSolutionCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               '}';
+        return "GetSolverWithBestSolutionCommand{" +
+                "containerId='" + containerId + '\'' +
+                ", solverId='" + solverId + '\'' +
+                '}';
     }
 }

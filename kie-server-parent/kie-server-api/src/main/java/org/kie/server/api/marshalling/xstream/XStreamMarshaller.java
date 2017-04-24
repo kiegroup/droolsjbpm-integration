@@ -32,10 +32,11 @@ import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
+import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -159,11 +160,12 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( SolverInstance.class );
         this.xstream.processAnnotations( CreateSolverCommand.class );
         this.xstream.processAnnotations( DisposeSolverCommand.class );
-        this.xstream.processAnnotations( GetBestSolutionCommand.class );
+        this.xstream.processAnnotations( GetSolverWithBestSolutionCommand.class );
         this.xstream.processAnnotations( GetSolversCommand.class );
-        this.xstream.processAnnotations( GetSolverStateCommand.class );
-        this.xstream.processAnnotations( UpdateSolverStateCommand.class );
-        
+        this.xstream.processAnnotations( GetSolverCommand.class );
+        this.xstream.processAnnotations( SolvePlanningProblemCommand.class );
+        this.xstream.processAnnotations( TerminateSolverEarlyCommand.class );
+
         this.xstream.processAnnotations( DMNContextKS.class );
         this.xstream.processAnnotations( DMNResultKS.class );
         this.xstream.processAnnotations( DMNNodeStub.class );
