@@ -28,13 +28,19 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.commands.optaplanner.*;
+import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
+import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
+import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
+import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 
 @XmlRootElement(name = "script")
-@XStreamAlias( "script" )
+@XStreamAlias("script")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "script")
 public class CommandScript implements Serializable {
@@ -62,10 +68,11 @@ public class CommandScript implements Serializable {
             // optaplanner commands
             @XmlElement(name = "create-solver", type = CreateSolverCommand.class),
             @XmlElement(name = "dispose-solver", type = DisposeSolverCommand.class),
-            @XmlElement(name = "get-best-solution", type = GetBestSolutionCommand.class),
+            @XmlElement(name = "get-solver-with-best-solution", type = GetSolverWithBestSolutionCommand.class),
             @XmlElement(name = "get-solvers", type = GetSolversCommand.class),
-            @XmlElement(name = "get-solver-state", type = GetSolverStateCommand.class),
-            @XmlElement(name = "update-solver-state", type = UpdateSolverStateCommand.class)
+            @XmlElement(name = "get-solver", type = GetSolverCommand.class),
+            @XmlElement(name = "start-solver", type = SolvePlanningProblemCommand.class),
+            @XmlElement(name = "terminate-solver", type = TerminateSolverEarlyCommand.class)
     })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     protected List<KieServerCommand> commands;
@@ -78,7 +85,7 @@ public class CommandScript implements Serializable {
     }
 
     public List<KieServerCommand> getCommands() {
-        if ( commands == null ) {
+        if (commands == null) {
             commands = new ArrayList<KieServerCommand>();
         }
         return this.commands;
@@ -86,7 +93,7 @@ public class CommandScript implements Serializable {
 
     public String toString() {
         return "CommandScriptImpl{ commands=" + commands +
-               '}';
+                '}';
     }
 
     @Override
@@ -101,7 +108,6 @@ public class CommandScript implements Serializable {
         CommandScript that = (CommandScript) o;
 
         return commands != null ? commands.equals(that.commands) : that.commands == null;
-
     }
 
     @Override

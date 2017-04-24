@@ -40,16 +40,26 @@ import org.kie.server.services.optaplanner.SolverServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION;
+import static org.kie.server.api.rest.RestURI.SOLVER_ID;
+import static org.kie.server.api.rest.RestURI.SOLVER_ID_URI;
+import static org.kie.server.api.rest.RestURI.SOLVER_STATE_RUNNING;
+import static org.kie.server.api.rest.RestURI.SOLVER_STATE_TERMINATING;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
 
-@Path("server/"+ RestURI.SOLVER_URI )
+@Path("server/" + RestURI.SOLVER_URI)
 public class SolverResource {
 
-    public static final Logger logger = LoggerFactory.getLogger( SolverResource.class );
+    public static final Logger logger = LoggerFactory.getLogger(SolverResource.class);
 
     private SolverServiceBase solverService;
-    private MarshallerHelper  marshallerHelper;
+    private MarshallerHelper marshallerHelper;
 
     public SolverResource() {
     }
@@ -59,141 +69,293 @@ public class SolverResource {
         this.marshallerHelper = new MarshallerHelper(solverService.getKieServerRegistry());
     }
 
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getSolvers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId ) {
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
-        try {
-            ServiceResponse<SolverInstanceList> result = solverService.getSolvers( containerId );
-            if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
-            }
-            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
-        }  catch (Exception e) {
-            logger.error("Unexpected error retrieving solvers. Message: '{}'", e.getMessage(), e);
-            return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
-        }
-    }
-
-
-
-    // operations
     @PUT
-    @Path( RestURI.SOLVER_ID_URI )
+    @Path(RestURI.SOLVER_ID_URI)
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response createSolver(
-            @javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId,
-            @PathParam(SOLVER_ID) String solverId, String payload) {
-        logger.debug( "About to create solver {} on container {}", solverId, containerId );
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+            @javax.ws.rs.core.Context HttpHeaders headers,
+            @PathParam(CONTAINER_ID) String containerId,
+            @PathParam(SOLVER_ID) String solverId,
+            String payload) {
+        logger.debug("About to create solver {} on container {}",
+                     solverId,
+                     containerId);
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
         try {
-            String contentType = getContentType( headers );
+            String contentType = getContentType(headers);
 
             if (solverService.getKieServerRegistry().getContainer(containerId) == null) {
-                ServiceResponse<SolverInstance> response = new ServiceResponse<SolverInstance>( ServiceResponse.ResponseType.FAILURE, "Failed to create solver. Container does not exist: " + containerId );
-                return createCorrectVariant(response, headers, Response.Status.BAD_REQUEST );
+                ServiceResponse<SolverInstance> response = new ServiceResponse<SolverInstance>(ServiceResponse.ResponseType.FAILURE,
+                                                                                               "Failed to create solver. Container does not exist: " + containerId);
+                return createCorrectVariant(response,
+                                            headers,
+                                            Response.Status.BAD_REQUEST);
             }
-
-            SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
-            ServiceResponse<SolverInstance> response = solverService.createSolver( containerId, solverId, solverInstance );
-
-
-            if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-
-                return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.CREATED, conversationIdHeader );
+            SolverInstance solverInstance = marshallerHelper.unmarshal(containerId,
+                                                                       payload,
+                                                                       contentType,
+                                                                       SolverInstance.class);
+            ServiceResponse<SolverInstance> response = solverService.createSolver(containerId,
+                                                                                  solverId,
+                                                                                  solverInstance);
+            if (response.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createCorrectVariant(marshallerHelper,
+                                            containerId,
+                                            response.getResult(),
+                                            headers,
+                                            Response.Status.CREATED,
+                                            conversationIdHeader);
             }
-            return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.BAD_REQUEST, conversationIdHeader );
-        } catch ( Exception e ) {
-            logger.error( "Unexpected error creating solver '{}' on container '{}': {}", solverId, containerId, e.getMessage(), e );
-            return internalServerError( MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage() ), v, conversationIdHeader );
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        response.getMsg(),
+                                        headers,
+                                        Response.Status.BAD_REQUEST,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error creating solver '{}' on container '{}': {}",
+                         solverId,
+                         containerId,
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
         }
     }
 
     @GET
-    @Path( RestURI.SOLVER_ID_URI )
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getSolverState(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
-                                    @PathParam( SOLVER_ID ) String solverId ) {
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+    public Response getSolvers(@javax.ws.rs.core.Context HttpHeaders headers,
+                               @PathParam(CONTAINER_ID) String containerId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
         try {
-            ServiceResponse<SolverInstance> result = solverService.getSolverState( containerId, solverId );
-            if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
+            ServiceResponse<SolverInstanceList> result = solverService.getSolvers(containerId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createCorrectVariant(marshallerHelper,
+                                            containerId,
+                                            result.getResult(),
+                                            headers,
+                                            Response.Status.OK,
+                                            conversationIdHeader);
             }
-            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
-        }  catch (Exception e) {
-            logger.error("Unexpected error retrieving solver state {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.NOT_FOUND,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving solvers. Message: '{}'",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
         }
     }
 
     @GET
-    @Path( SOLVER_ID_URI+SOLVER_BEST_SOLUTION )
+    @Path(RestURI.SOLVER_ID_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getBestSolution(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
-                                    @PathParam( SOLVER_ID ) String solverId ) {
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+    public Response getSolver(@javax.ws.rs.core.Context HttpHeaders headers,
+                              @PathParam(CONTAINER_ID) String containerId,
+                              @PathParam(SOLVER_ID) String solverId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
         try {
-            ServiceResponse<SolverInstance> result = solverService.getBestSolution( containerId, solverId );
-            if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
+            ServiceResponse<SolverInstance> result = solverService.getSolver(containerId,
+                                                                             solverId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createCorrectVariant(marshallerHelper,
+                                            containerId,
+                                            result.getResult(),
+                                            headers,
+                                            Response.Status.OK,
+                                            conversationIdHeader);
             }
-            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
-        }  catch (Exception e) {
-            logger.error("Unexpected error during processing {}", e.getMessage(), e);
-            return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.NOT_FOUND,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving solver state {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
         }
+    }
 
+    @GET
+    @Path(SOLVER_ID_URI + "/" + SOLVER_BEST_SOLUTION)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getSolverWithBestSolution(@javax.ws.rs.core.Context HttpHeaders headers,
+                                              @PathParam(CONTAINER_ID) String containerId,
+                                              @PathParam(SOLVER_ID) String solverId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
+        try {
+            ServiceResponse<SolverInstance> result = solverService.getSolverWithBestSolution(containerId,
+                                                                                             solverId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createCorrectVariant(marshallerHelper,
+                                            containerId,
+                                            result.getResult(),
+                                            headers,
+                                            Response.Status.OK,
+                                            conversationIdHeader);
+            }
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.NOT_FOUND,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
+        }
     }
 
     @POST
-    @Path( RestURI.SOLVER_ID_URI )
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_STATE_RUNNING)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateSolverState(
-            @javax.ws.rs.core.Context HttpHeaders headers, @PathParam(CONTAINER_ID) String containerId,
-            @PathParam(SOLVER_ID) String solverId, String payload) {
-
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+    public Response solvePlanningProblem(@javax.ws.rs.core.Context HttpHeaders headers,
+                                         @PathParam(CONTAINER_ID) String containerId,
+                                         @PathParam(SOLVER_ID) String solverId,
+                                         String payload) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
         try {
-            String contentType = getContentType( headers );
-            SolverInstance solverInstance = marshallerHelper.unmarshal( containerId, payload, contentType, SolverInstance.class );
-            ServiceResponse<SolverInstance> response = solverService.updateSolverState( containerId, solverId, solverInstance );
+            String contentType = getContentType(headers);
 
-            if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-                return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.OK, conversationIdHeader );
+            Object planningProblem = marshallerHelper.unmarshal(containerId,
+                                                                payload,
+                                                                contentType,
+                                                                Object.class);
+
+            ServiceResponse<Void> result = solverService.solvePlanningProblem(containerId,
+                                                                              solverId,
+                                                                              planningProblem);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createResponse("",
+                                      v,
+                                      Response.Status.OK,
+                                      conversationIdHeader);
             }
-            return createCorrectVariant(marshallerHelper, containerId, response, headers, Response.Status.BAD_REQUEST, conversationIdHeader );
-        } catch ( Exception e ) {
-            logger.error( "Unexpected error during processing {}", e.getMessage(), e );
-            return internalServerError( MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage() ), v, conversationIdHeader );
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.BAD_REQUEST,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving solver state {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
+        }
+    }
+
+    @POST
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_STATE_TERMINATING)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response terminateSolverEarly(@javax.ws.rs.core.Context HttpHeaders headers,
+                                         @PathParam(CONTAINER_ID) String containerId,
+                                         @PathParam(SOLVER_ID) String solverId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
+        try {
+            ServiceResponse<Void> result = solverService.terminateSolverEarly(containerId,
+                                                                              solverId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createResponse("",
+                                      v,
+                                      Response.Status.OK,
+                                      conversationIdHeader);
+            }
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.BAD_REQUEST,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving solver state {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
         }
     }
 
     @DELETE
-    @Path( RestURI.SOLVER_ID_URI )
+    @Path(RestURI.SOLVER_ID_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response disposeSolver(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam( CONTAINER_ID ) String containerId,
-                                  @PathParam( SOLVER_ID ) String solverId ) {
-        Variant v = getVariant( headers );
-        Header conversationIdHeader = buildConversationIdHeader(containerId, solverService.getKieServerRegistry(), headers);
+    public Response disposeSolver(@javax.ws.rs.core.Context HttpHeaders headers,
+                                  @PathParam(CONTAINER_ID) String containerId,
+                                  @PathParam(SOLVER_ID) String solverId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
         try {
-            ServiceResponse<Void> result = solverService.disposeSolver( containerId, solverId );
-            if( result.getType() == ServiceResponse.ResponseType.SUCCESS ) {
-
-                return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.OK, conversationIdHeader );
+            ServiceResponse<Void> result = solverService.disposeSolver(containerId,
+                                                                       solverId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createResponse("",
+                                      v,
+                                      Response.Status.OK,
+                                      conversationIdHeader);
             }
-            return createCorrectVariant(marshallerHelper, containerId, result, headers, Response.Status.NOT_FOUND, conversationIdHeader );
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.BAD_REQUEST,
+                                        conversationIdHeader);
         } catch (Exception e) {
-            logger.error("Unexpected error disposing solver {} on container {}. Message: '{}'", solverId, containerId, e.getMessage(), e);
-            return internalServerError(MessageFormat.format( Messages.UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+            logger.error("Unexpected error disposing solver {} on container {}. Message: '{}'",
+                         solverId,
+                         containerId,
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
         }
     }
-
 }

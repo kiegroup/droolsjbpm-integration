@@ -15,17 +15,19 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetBestSolutionCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverStateCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
-import org.kie.server.api.commands.optaplanner.UpdateSolverStateCommand;
-import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
+import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
@@ -34,154 +36,245 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesException;
 import org.kie.server.client.SolverServicesClient;
 
-
 public class SolverServicesClientImpl
         extends AbstractKieServicesClientImpl
         implements SolverServicesClient {
 
     public SolverServicesClientImpl(KieServicesConfiguration config) {
-        super( config );
+        super(config);
     }
 
-    public SolverServicesClientImpl(KieServicesConfiguration config, ClassLoader classLoader) {
-        super( config, classLoader );
+    public SolverServicesClientImpl(KieServicesConfiguration config,
+                                    ClassLoader classLoader) {
+        super(config,
+              classLoader);
     }
 
     @Override
-    public ServiceResponse<SolverInstanceList> getSolvers(String containerId) {
-        checkMandatoryParameter( "ContainerID", containerId );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId );
-            return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstanceList.class );
-        } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetSolversCommand( containerId ) ) );
-            ServiceResponse<SolverInstanceList> response = (ServiceResponse<SolverInstanceList>) executeJmsCommand( script, GetSolversCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+    public List<SolverInstance> getSolvers(String containerId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
 
-            throwExceptionOnFailure( response );
+        final SolverInstanceList solverInstanceList;
+        if (config.isRest()) {
+            String uri = getURI(containerId);
+            solverInstanceList = makeHttpGetRequestAndCreateCustomResponse(uri,
+                                                                           SolverInstanceList.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new GetSolversCommand(containerId)));
+            ServiceResponse<SolverInstanceList> response = (ServiceResponse<SolverInstanceList>) executeJmsCommand(script,
+                                                                                                                   GetSolversCommand.class.getName(),
+                                                                                                                   KieServerConstants.CAPABILITY_BRP,
+                                                                                                                   containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            return response;
+            solverInstanceList = response.getResult();
         }
+        if (solverInstanceList != null && solverInstanceList.getContainers() != null) {
+            return new ArrayList<>(solverInstanceList.getContainers());
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
-    public ServiceResponse<SolverInstance> createSolver(String containerId, String solverId, String configFile) {
-        checkMandatoryParameter( "ContainerId", containerId );
-        checkMandatoryParameter( "SolverId", solverId );
-        checkMandatoryParameter( "ConfigFile", configFile );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId, solverId );
+    public SolverInstance createSolver(String containerId,
+                                       String solverId,
+                                       String configFile) {
+        checkMandatoryParameter("ContainerId",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+        checkMandatoryParameter("ConfigFile",
+                                configFile);
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId);
+
             SolverInstance instance = new SolverInstance();
-            instance.setSolverConfigFile( configFile );
-            instance.setContainerId( containerId );
-            instance.setSolverId( solverId );
-            return makeHttpPutRequestAndCreateServiceResponse( uri, instance, SolverInstance.class );
+            instance.setSolverConfigFile(configFile);
+            instance.setContainerId(containerId);
+            instance.setSolverId(solverId);
+
+            return makeHttpPutRequestAndCreateCustomResponse(uri,
+                                                             instance,
+                                                             SolverInstance.class,
+                                                             Collections.emptyMap());
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new CreateSolverCommand( containerId, solverId, configFile ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, CreateSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList(new CreateSolverCommand(containerId,
+                                                                                                       solverId,
+                                                                                                       configFile)));
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand(script,
+                                                                                                           CreateSolverCommand.class.getName(),
+                                                                                                           KieServerConstants.CAPABILITY_BRP,
+                                                                                                           containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            return response;
+            return response.getResult();
         }
     }
 
     @Override
-    public ServiceResponse<SolverInstance> getSolverState(String containerId, String solverId) {
-        checkMandatoryParameter( "ContainerID", containerId );
-        checkMandatoryParameter( "SolverId", solverId );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId, solverId );
-            return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstance.class );
+    public SolverInstance getSolver(String containerId,
+                                    String solverId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId);
+            return makeHttpGetRequestAndCreateCustomResponse(uri,
+                                                             SolverInstance.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetSolverStateCommand( containerId, solverId ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList(new GetSolverCommand(containerId,
+                                                                                                    solverId)));
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand(script,
+                                                                                                           GetSolverCommand.class.getName(),
+                                                                                                           KieServerConstants.CAPABILITY_BRP,
+                                                                                                           containerId).getResponses().get(0);
 
-            throwExceptionOnFailure( response );
+            throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            return response;
+            return response.getResult();
         }
     }
 
     @Override
-    public ServiceResponse<SolverInstance> getSolverBestSolution(String containerId, String solverId) {
-        checkMandatoryParameter( "ContainerID", containerId );
-        checkMandatoryParameter( "SolverId", solverId );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId, solverId ) + RestURI.SOLVER_BEST_SOLUTION;
-            return makeHttpGetRequestAndCreateServiceResponse( uri, SolverInstance.class );
+    public SolverInstance getSolverWithBestSolution(String containerId,
+                                                    String solverId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_BEST_SOLUTION;
+            return makeHttpGetRequestAndCreateCustomResponse(uri,
+                                                             SolverInstance.class);
         } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new GetBestSolutionCommand( containerId, solverId ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, GetBestSolutionCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+            CommandScript script = new CommandScript(Collections.singletonList(new GetSolverWithBestSolutionCommand(containerId,
+                                                                                                                    solverId)));
+            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand(script,
+                                                                                                           GetSolverWithBestSolutionCommand.class.getName(),
+                                                                                                           KieServerConstants.CAPABILITY_BRP,
+                                                                                                           containerId).getResponses().get(0);
 
-            throwExceptionOnFailure( response );
+            throwExceptionOnFailure(response);
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            return response;
+            return response.getResult();
         }
     }
 
     @Override
-    public ServiceResponse<SolverInstance> updateSolverState(String containerId, String solverId, SolverInstance instance) {
-        checkMandatoryParameter( "ContainerID", containerId );
-        checkMandatoryParameter( "SolverId", solverId );
-        checkMandatoryParameter( "instance", instance );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId, solverId );
-            return makeHttpPostRequestAndCreateServiceResponse( uri, instance, SolverInstance.class, getHeaders( instance ) );
-        } else {
-            instance.setContainerId( containerId );
-            instance.setSolverId( solverId );
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new UpdateSolverStateCommand( containerId, solverId, serialize( instance ) ) ) );
-            ServiceResponse<SolverInstance> response = (ServiceResponse<SolverInstance>) executeJmsCommand( script, UpdateSolverStateCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+    public void solvePlanningProblem(String containerId,
+                                     String solverId,
+                                     Object planningProblem) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+        checkMandatoryParameter("planningSolution",
+                                planningProblem);
 
-            throwExceptionOnFailure( response );
-            if (shouldReturnWithNullResponse(response)) {
-                return null;
-            }
-            return response;
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_STATE_RUNNING;
+            makeHttpPostRequestAndCreateCustomResponse(uri,
+                                                       planningProblem,
+                                                       ServiceResponse.class,
+                                                       getHeaders(planningProblem));
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new SolvePlanningProblemCommand(containerId,
+                                                                                                               solverId,
+                                                                                                               serialize(planningProblem))));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script,
+                                                                                       SolvePlanningProblemCommand.class.getName(),
+                                                                                       KieServerConstants.CAPABILITY_BRP,
+                                                                                       containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
     @Override
-    public ServiceResponse<Void> disposeSolver(String containerId, String solverId) {
-        checkMandatoryParameter( "ContainerID", containerId );
-        checkMandatoryParameter( "SolverId", solverId );
-        if ( config.isRest() ) {
-            String uri = getURI( containerId, solverId );
-            return makeHttpDeleteRequestAndCreateCustomResponse( uri, ServiceResponse.class );
-        } else {
-            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand) new DisposeSolverCommand( containerId, solverId ) ) );
-            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand( script, DisposeSolverCommand.class.getName(), KieServerConstants.CAPABILITY_BRP, containerId ).getResponses().get( 0 );
+    public void terminateSolverEarly(String containerId,
+                                     String solverId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
 
-            throwExceptionOnFailure( response );
-            if (shouldReturnWithNullResponse(response)) {
-                return null;
-            }
-            return response;
+        if (config.isRest()) {
+
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_STATE_TERMINATING;
+
+            makeHttpPostRequestAndCreateCustomResponse(uri,
+                                                       "",
+                                                       ServiceResponse.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new TerminateSolverEarlyCommand(containerId,
+                                                                                                               solverId)));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script,
+                                                                                       TerminateSolverEarlyCommand.class.getName(),
+                                                                                       KieServerConstants.CAPABILITY_BRP,
+                                                                                       containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void disposeSolver(String containerId,
+                              String solverId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId);
+            makeHttpDeleteRequestAndCreateCustomResponse(uri,
+                                                         ServiceResponse.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new DisposeSolverCommand(containerId,
+                                                                                                        solverId)));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script,
+                                                                                       DisposeSolverCommand.class.getName(),
+                                                                                       KieServerConstants.CAPABILITY_BRP,
+                                                                                       containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
         }
     }
 
     private String getURI(String containerId) {
-        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId );
+        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI).replace("{" + RestURI.CONTAINER_ID + "}",
+                                                                          containerId);
     }
 
-    private String getURI(String containerId, String solverId) {
-        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI + RestURI.SOLVER_ID_URI).replace( "{" + RestURI.CONTAINER_ID + "}", containerId ).replace( "{" + RestURI.SOLVER_ID + "}", solverId );
+    private String getURI(String containerId,
+                          String solverId) {
+        return (loadBalancer.getUrl() + "/" + RestURI.SOLVER_URI + "/" + RestURI.SOLVER_ID_URI).replace("{" + RestURI.CONTAINER_ID + "}",
+                                                                                                        containerId).replace("{" + RestURI.SOLVER_ID + "}",
+                                                                                                                             solverId);
     }
 
-    private void checkMandatoryParameter(String parameterName, Object parameter) {
-        if ( parameter == null || ((parameter instanceof String) && ((String) parameter).isEmpty()) ) {
-            throw new IllegalArgumentException( parameterName + " can not be null or empty." );
+    private void checkMandatoryParameter(String parameterName,
+                                         Object parameter) {
+        if (parameter == null || ((parameter instanceof String) && ((String) parameter).isEmpty())) {
+            throw new IllegalArgumentException(parameterName + " can not be null or empty.");
         }
     }
 
     protected void throwExceptionOnFailure(ServiceResponse<?> serviceResponse) {
-        if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())){
+        if (serviceResponse != null && ServiceResponse.ResponseType.FAILURE.equals(serviceResponse.getType())) {
             throw new KieServicesException(serviceResponse.getMsg());
         }
     }
