@@ -48,6 +48,8 @@ import org.kie.server.integrationtests.config.TestConfig;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
+import org.kie.server.client.KieServicesHttpException;
+import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -1477,6 +1479,20 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
     }
 
     @Test
+    public void testFindTaskEventsForNotExistingTask() {
+        try {
+            taskClient.findTaskEvents(-9999l, 0, 10);
+            fail("KieServicesException should be thrown complaining about task not found.");
+        } catch (KieServicesException e) {
+            KieServerAssert.assertResultContainsString(e.getMessage(), "No task found with id");
+            if(configuration.isRest()) {
+                KieServicesHttpException httpEx = (KieServicesHttpException) e;
+                assertEquals("Exception has wrong HTTP Response code.", Integer.valueOf(404), httpEx.getHttpCode());
+            }
+        }
+    }
+
+    @Test
     public void testFindTaskEventsSortedByType() throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("stringData", "waiting for signal");
@@ -1498,7 +1514,8 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             // now let's stop it
             taskClient.stopTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
 
-            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, true);
+            // test paging of the result
+            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 3, SORT_BY_TASK_EVENTS_TYPE, true);
             assertNotNull(events);
             assertEquals(3, events.size());
 
@@ -1516,6 +1533,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(event);
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
+
+            events = taskClient.findTaskEvents(taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+            KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
 
             events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, false);
             assertNotNull(events);
@@ -1821,6 +1841,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
         assertEquals(expected.getTaskId(), actual.getTaskId());
         assertEquals(expected.getUserId(), actual.getUserId());
+        assertNotNull(actual.getId());
+        assertNotNull(actual.getLogTime());
+        assertNotNull(actual.getWorkItemId());
     }
 
     private void assertProcessInstancesOrderById(List<ProcessInstance> processInstances, boolean ascending) {
