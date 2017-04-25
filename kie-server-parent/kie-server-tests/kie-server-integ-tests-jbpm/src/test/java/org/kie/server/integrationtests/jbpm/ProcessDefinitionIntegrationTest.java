@@ -30,7 +30,7 @@ import org.kie.server.api.model.definition.TaskOutputsDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.definition.VariablesDefinition;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
