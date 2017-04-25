@@ -23,10 +23,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.TimerInstance;
 import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
@@ -201,6 +203,165 @@ public class ProcessInstanceAdminServiceIntegrationTest extends JbpmKieServerBas
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testErrorHandlingFailedToStart() throws Exception {
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("timer", "invalid value");
+
+        try {
+            processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER, parameters);
+            fail("Process instance should fail as it has invalid timer expression");
+        } catch (KieServicesException e) {
+            // expected as the variable to configure timer duration is invalid
+        }
+        List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        assertNotNull(errors);
+        assertEquals(1, errors.size());
+
+        ExecutionErrorInstance errorInstance = errors.get(0);
+        assertNotNull(errorInstance.getErrorId());
+        assertNull(errorInstance.getError());
+        assertNotNull(errorInstance.getProcessInstanceId());
+        assertNotNull(errorInstance.getActivityId());
+        assertNotNull(errorInstance.getErrorDate());
+
+        assertEquals(CONTAINER_ID, errorInstance.getContainerId());
+        assertEquals(PROCESS_ID_TIMER, errorInstance.getProcessId());
+        assertEquals("timer", errorInstance.getActivityName());
+
+        assertFalse(errorInstance.isAcknowledged());
+        assertNull(errorInstance.getAcknowledgedAt());
+        assertNull(errorInstance.getAcknowledgedBy());
+
+        processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
+
+        errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        assertNotNull(errors);
+        assertEquals(0, errors.size());
+
+        errorInstance = processAdminClient.getError(CONTAINER_ID, errorInstance.getErrorId());
+        assertNotNull(errorInstance);
+        assertNotNull(errorInstance.getErrorId());
+        assertTrue(errorInstance.isAcknowledged());
+        assertNotNull(errorInstance.getAcknowledgedAt());
+        assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
+    }
+
+    @Test
+    public void testErrorHandlingFailedToSignal() throws Exception {
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("nullAccepted", false);
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
+
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
+
+            try {
+                processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", null);
+                fail("Process instance signal fail as it provides null as event");
+            } catch (KieServicesException e) {
+                // expected
+            }
+
+            errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(1, errors.size());
+            ExecutionErrorInstance errorInstance = errors.get(0);
+            assertNotNull(errorInstance.getErrorId());
+            assertNull(errorInstance.getError());
+            assertNotNull(errorInstance.getProcessInstanceId());
+            assertNotNull(errorInstance.getActivityId());
+            assertNotNull(errorInstance.getErrorDate());
+
+            assertEquals(CONTAINER_ID, errorInstance.getContainerId());
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, errorInstance.getProcessId());
+            assertEquals("Signal 1 data", errorInstance.getActivityName());
+
+            assertFalse(errorInstance.isAcknowledged());
+            assertNull(errorInstance.getAcknowledgedAt());
+            assertNull(errorInstance.getAcknowledgedBy());
+
+            errors = processAdminClient.getErrorsByProcessInstanceAndNode(CONTAINER_ID, processInstanceId, "Signal 1 data", false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(1, errors.size());
+            ExecutionErrorInstance errorInstance2 = errors.get(0);
+            assertEquals(errorInstance.getErrorId(), errorInstance2.getErrorId());
+
+            processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
+
+            errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
+
+            errorInstance = processAdminClient.getError(CONTAINER_ID, errorInstance.getErrorId());
+            assertNotNull(errorInstance);
+            assertNotNull(errorInstance.getErrorId());
+            assertTrue(errorInstance.isAcknowledged());
+            assertNotNull(errorInstance.getAcknowledgedAt());
+            assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
+        } catch (KieServicesException e) {
+            logger.error("Unexpected error", e);
+            fail(e.getMessage());
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testErrorHandlingFailedToStartBulkAck() throws Exception {
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("timer", "invalid value");
+
+        try {
+            processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER, parameters);
+            fail("Process instance should fail as it has invalid timer expression");
+        } catch (KieServicesException e) {
+            // expected as the variable to configure timer duration is invalid
+        }
+        try {
+            processClient.startProcess(CONTAINER_ID, PROCESS_ID_TIMER, parameters);
+            fail("Process instance should fail as it has invalid timer expression");
+        } catch (KieServicesException e) {
+            // expected as the variable to configure timer duration is invalid
+        }
+        List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        assertNotNull(errors);
+        assertEquals(2, errors.size());
+
+        ExecutionErrorInstance errorInstance = errors.get(0);
+
+        assertFalse(errorInstance.isAcknowledged());
+        assertNull(errorInstance.getAcknowledgedAt());
+        assertNull(errorInstance.getAcknowledgedBy());
+
+        ExecutionErrorInstance errorInstance2 = errors.get(1);
+
+        assertFalse(errorInstance2.isAcknowledged());
+        assertNull(errorInstance2.getAcknowledgedAt());
+        assertNull(errorInstance2.getAcknowledgedBy());
+
+        processAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId(), errorInstance2.getErrorId());
+
+        errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+        assertNotNull(errors);
+        assertEquals(0, errors.size());
+
+        errorInstance = processAdminClient.getError(CONTAINER_ID, errorInstance.getErrorId());
+        assertNotNull(errorInstance);
+        assertNotNull(errorInstance.getErrorId());
+        assertTrue(errorInstance.isAcknowledged());
+        assertNotNull(errorInstance.getAcknowledgedAt());
+        assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
     }
 
 }

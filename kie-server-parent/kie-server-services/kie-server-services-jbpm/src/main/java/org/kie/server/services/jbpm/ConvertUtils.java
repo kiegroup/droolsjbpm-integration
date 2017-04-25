@@ -32,6 +32,9 @@ import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.query.QueryFilter;
+import org.kie.internal.runtime.error.ExecutionError;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
@@ -155,6 +158,46 @@ public class ConvertUtils {
                 .build();
 
         return processDefinition;
+    }
+
+    public static ExecutionErrorInstanceList convertToErrorInstanceList(List<ExecutionError> executionErrors) {
+        if (executionErrors == null) {
+            return new ExecutionErrorInstanceList(new ExecutionErrorInstance[0]);
+        }
+
+        List<ExecutionErrorInstance> executionErrorInstances = new ArrayList<ExecutionErrorInstance>(executionErrors.size());
+        for (ExecutionError error : executionErrors) {
+            ExecutionErrorInstance errorInstance = convertToErrorInstance(error);
+
+            executionErrorInstances.add(errorInstance);
+        }
+
+        return new ExecutionErrorInstanceList(executionErrorInstances);
+    }
+
+    public static ExecutionErrorInstance convertToErrorInstance(ExecutionError executionError) {
+        if (executionError == null) {
+            return null;
+        }
+
+        ExecutionErrorInstance errorInstance = ExecutionErrorInstance.builder()
+                .error(executionError.getError())
+                .errorId(executionError.getErrorId())
+                .errorDate(executionError.getErrorDate())
+                .processInstanceId(executionError.getProcessInstanceId())
+                .acknowledged(executionError.isAcknowledged())
+                .acknowledgedAt(executionError.getAcknowledgedAt())
+                .acknowledgedBy(executionError.getAcknowledgedBy())
+                .activityId(executionError.getActivityId())
+                .activityName(executionError.getActivityName())
+                .jobId(executionError.getJobId())
+                .containerId(executionError.getDeploymentId())
+                .message(executionError.getErrorMessage())
+                .processId(executionError.getProcessId())
+                .type(executionError.getType())
+                .build();
+
+        return errorInstance;
     }
 
     public static QueryContext buildQueryContext(Integer page, Integer pageSize) {

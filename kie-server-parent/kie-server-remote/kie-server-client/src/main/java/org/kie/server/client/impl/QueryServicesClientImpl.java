@@ -61,6 +61,8 @@ import org.kie.server.api.model.ItemList;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.Wrapped;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -1013,6 +1015,8 @@ public class QueryServicesClientImpl extends AbstractKieServicesClientImpl imple
             return ProcessInstanceList.class;
         } else if (TaskInstance.class.isAssignableFrom(resultType)) {
             return TaskInstanceList.class;
+        } else if (ExecutionErrorInstance.class.isAssignableFrom(resultType)) {
+            return ExecutionErrorInstanceList.class;
         } else {
             return Object.class;
         }

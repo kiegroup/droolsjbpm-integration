@@ -28,6 +28,9 @@ import org.jbpm.services.api.admin.ProcessInstanceMigrationService;
 import org.jbpm.services.api.admin.ProcessNode;
 import org.jbpm.services.api.admin.TimerInstance;
 import org.jbpm.services.api.model.NodeInstanceDesc;
+import org.kie.internal.runtime.error.ExecutionError;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.MigrationReportInstanceList;
 import org.kie.server.api.model.admin.ProcessNodeList;
@@ -39,6 +42,8 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.ConvertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.kie.server.services.jbpm.ConvertUtils.*;
 
 public class ProcessAdminServiceBase {
 
@@ -157,6 +162,45 @@ public class ProcessAdminServiceBase {
         TimerInstanceList timerInstanceList = convertTimerInstances(timerInstances);
 
         return timerInstanceList;
+    }
+
+    public ExecutionErrorInstanceList getExecutionErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        logger.debug("About to get execution errors");
+        List<ExecutionError> errors = processInstanceAdminService.getErrors(includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+
+        logger.debug("Found errors {}", errors);
+        ExecutionErrorInstanceList errorInstanceList = convertToErrorInstanceList(errors);
+        return errorInstanceList;
+    }
+
+    public ExecutionErrorInstanceList getExecutionErrorsByProcessInstance(String containerId, Number processInstanceId, String nodeName, boolean includeAcknowledged, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        logger.debug("About to get execution errors for process instance id {} and node {}", processInstanceId, nodeName);
+        List<ExecutionError> errors = null;
+        if (nodeName == null || nodeName.isEmpty()) {
+            errors = processInstanceAdminService.getErrorsByProcessInstanceId(processInstanceId.longValue(), includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));;
+        } else {
+            errors = processInstanceAdminService.getErrorsByProcessInstanceId(processInstanceId.longValue(), nodeName, includeAcknowledged, buildQueryContext(page, pageSize, sort, sortOrder));
+        }
+
+        logger.debug("Found errors {}", errors);
+        ExecutionErrorInstanceList errorInstanceList = convertToErrorInstanceList(errors);
+        return errorInstanceList;
+    }
+
+    public ExecutionErrorInstance getError(String containerId, String errorId) {
+        logger.debug("About to get execution error for {}", errorId);
+
+        ExecutionError error = processInstanceAdminService.getError(errorId);
+        logger.debug("Found error {} for error id {}", error, errorId);
+        return convertToErrorInstance(error);
+    }
+
+    public void acknowledgeError(String containerId, List<String> errorIds) {
+        logger.debug("About to acknowledge execution error with id {}", errorIds);
+
+        String[] errors = errorIds.toArray(new String[errorIds.size()]);
+        processInstanceAdminService.acknowledgeError(errors);
+        logger.debug("Error {} successfully acknowledged", errorIds);
     }
 
     /*

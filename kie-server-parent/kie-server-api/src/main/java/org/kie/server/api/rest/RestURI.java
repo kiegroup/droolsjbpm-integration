@@ -55,6 +55,7 @@ public class RestURI {
     public static final String ENTITY_ID = "entityId";
     public static final String REASSIGNMENT_ID = "reassignmentId";
     public static final String NOTIFICATION_ID = "notificationId";
+    public static final String ERROR_ID = "errorId";
 
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
@@ -249,6 +250,15 @@ public class RestURI {
     public static final String TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/exl-owners/groups/{" + ENTITY_ID + "}";
     public static final String TASK_INSTANCE_ADMINS_USERS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/admins/users/{" + ENTITY_ID + "}";
     public static final String TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI = "{" + TASK_INSTANCE_ID + "}/admins/groups/{" + ENTITY_ID + "}";
+
+    // error handling related
+    public static final String ERRORS_BY_PROCESS_INST_GET_URI = "instances/{" + PROCESS_INST_ID +"}/errors";
+    public static final String ERROR_GET_URI = "errors/{" + ERROR_ID +"}";
+    public static final String ACK_ERROR_PUT_URI = "errors/{" + ERROR_ID +"}";
+    public static final String ACK_ERRORS_PUT_URI = "errors";
+
+    public static final String ERRORS_BY_TASK_ID_GET_URI = "{" + TASK_INSTANCE_ID +"}/errors";
+    public static final String ERRORS_GET_URI = "errors";
 
     // case management related
     public static final String START_CASE_POST_URI = "{" + CASE_DEF_ID +"}/instances";

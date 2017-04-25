@@ -18,6 +18,7 @@ package org.kie.server.client.admin;
 import java.util.List;
 import java.util.Map;
 
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.MigrationReportInstance;
 import org.kie.server.api.model.admin.ProcessNode;
 import org.kie.server.api.model.admin.TimerInstance;
@@ -48,4 +49,14 @@ public interface ProcessAdminServicesClient {
     List<TimerInstance> getTimerInstances(String containerId, Long processInstanceId);
 
     void triggerNode(String containerId, Long processInstanceId, Long nodeId);
+
+    void acknowledgeError(String containerId, String... errorId);
+
+    ExecutionErrorInstance getError(String containerId, String errorId);
+
+    List<ExecutionErrorInstance> getErrors(String containerId, boolean includeAcknowledged, Integer page, Integer pageSize);
+
+    List<ExecutionErrorInstance> getErrorsByProcessInstance(String containerId, Long processInstanceId, boolean includeAcknowledged, Integer page, Integer pageSize);
+
+    List<ExecutionErrorInstance> getErrorsByProcessInstanceAndNode(String containerId, Long processInstanceId, String nodeName, boolean includeAcknowledged, Integer page, Integer pageSize);
 }

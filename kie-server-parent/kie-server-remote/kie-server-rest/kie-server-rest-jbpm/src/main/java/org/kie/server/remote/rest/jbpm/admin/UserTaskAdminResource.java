@@ -35,6 +35,9 @@ import javax.ws.rs.core.Variant;
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
 import org.jbpm.services.api.TaskNotFoundException;
+import org.jbpm.services.api.admin.ExecutionErrorNotFoundException;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
+import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.TaskNotificationList;
 import org.kie.server.api.model.admin.TaskReassignmentList;
 import org.kie.server.api.model.admin.TimerInstanceList;
@@ -379,6 +382,118 @@ public class UserTaskAdminResource {
         } catch (ProcessInstanceNotFoundException e) {
             return notFound(
                     MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @PUT
+    @Path(ACK_ERROR_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response acknowledgeError(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("errorId") String errorId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+
+            userTaskAdminServiceBase.acknowledgeError(Arrays.asList(errorId));
+            return createCorrectVariant("", headers, Response.Status.CREATED, conversationIdHeader);
+        } catch (ExecutionErrorNotFoundException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @PUT
+    @Path(ACK_ERRORS_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response acknowledgeErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("errorId") List<String> errorIds) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+
+            userTaskAdminServiceBase.acknowledgeError(errorIds);
+            return createCorrectVariant("", headers, Response.Status.CREATED, conversationIdHeader);
+        } catch (ExecutionErrorNotFoundException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(ERROR_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getExecutionErrorById(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("errorId") String errorId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            ExecutionErrorInstance executionErrorInstance = userTaskAdminServiceBase.getError(errorId);
+
+            return createCorrectVariant(executionErrorInstance, headers, Response.Status.OK, conversationIdHeader);
+        } catch (ExecutionErrorNotFoundException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(ERRORS_BY_TASK_ID_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
+            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskId(containerId, taskId,
+                    includeAcknowledged, page, pageSize, sort, sortOrder);
+
+            return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        } catch (ExecutionErrorNotFoundException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(ERRORS_GET_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
+            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
+            @QueryParam("name") String taskName, @QueryParam("process") String processId,
+            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskName(containerId, processId, taskName,
+                    includeAcknowledged, page, pageSize, sort, sortOrder);
+
+            return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
+        } catch (ExecutionErrorNotFoundException e) {
+            return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
