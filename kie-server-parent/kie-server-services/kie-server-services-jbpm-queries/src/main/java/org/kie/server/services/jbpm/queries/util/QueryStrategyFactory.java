@@ -21,9 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Factory responsible for building the database-specific {@link QueryStrategy}. 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
+ * Factory responsible for building the database-specific {@link QueryStrategy}.
  */
 public class QueryStrategyFactory {
 

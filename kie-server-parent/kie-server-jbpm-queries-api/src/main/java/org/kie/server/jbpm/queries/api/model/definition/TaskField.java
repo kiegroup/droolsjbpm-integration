@@ -19,8 +19,6 @@ package org.kie.server.jbpm.queries.api.model.definition;
  * HumanTask fields.
  * <p/>
  * These are the filterable fields in our TaskQuery API. 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
 public enum TaskField {
 

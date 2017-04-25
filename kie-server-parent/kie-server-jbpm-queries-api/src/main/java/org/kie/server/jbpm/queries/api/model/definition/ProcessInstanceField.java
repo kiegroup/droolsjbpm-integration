@@ -18,9 +18,7 @@ package org.kie.server.jbpm.queries.api.model.definition;
 /**
  * ProcessInstance fields.
  * <p/>
- * These are the filterable fields in our ProcessInstanceQuery API. 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
+ * These are the filterable fields in our ProcessInstanceQuery API.
  */
 public enum ProcessInstanceField {
 

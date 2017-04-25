@@ -19,8 +19,6 @@ import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 
 /**
  * Provides the context for query execution, including things like {@link QueryStrategy}, query-name, mapper-name, etc.
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
 public interface QueryCallback {
 

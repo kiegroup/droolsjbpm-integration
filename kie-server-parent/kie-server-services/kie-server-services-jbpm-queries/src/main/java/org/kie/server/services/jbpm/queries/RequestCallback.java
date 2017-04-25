@@ -16,13 +16,9 @@
 package org.kie.server.services.jbpm.queries;
 
 import org.kie.server.jbpm.queries.api.model.definition.BaseQueryFilterSpec;
-import org.kie.server.services.jbpm.queries.util.QueryStrategy;
 
 /**
- * Provides the context for query request execution, including things like payload and unmarshalled {@link BaseQueryFilterSpec}. 
- * 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
+ * Provides the context for query request execution, including things like payload and unmarshalled {@link BaseQueryFilterSpec}.
  */
 public interface RequestCallback {
 

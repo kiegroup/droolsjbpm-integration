@@ -29,9 +29,7 @@ import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
  * <p/>
  * This provides a higher level-api than the Advanced Query API (i.e. {@link QueryFilterSpecBuilder} as the Task field-names (column-names)
  * are pre-defined and exposed via a strongly-typed API, and thus not bound to specific column-names in the database. This guards users of
- * this API for potential changes in the jBPM schema. 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
+ * this API for potential changes in the jBPM schema.
  */
 public class TaskQueryFilterSpecBuilder {
 

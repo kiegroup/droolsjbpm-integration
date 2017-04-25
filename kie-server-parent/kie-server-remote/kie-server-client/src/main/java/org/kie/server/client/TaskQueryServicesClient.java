@@ -22,8 +22,6 @@ import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
 
 /**
  * KIE-Server Client API for the advanced Task Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
 public interface TaskQueryServicesClient {
 

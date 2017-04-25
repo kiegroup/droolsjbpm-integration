@@ -21,8 +21,6 @@ import org.jbpm.services.api.query.model.QueryParam;
 
 /**
  * Provides DB specific query and column-mappings for queries.
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
 public interface QueryStrategy {
 
