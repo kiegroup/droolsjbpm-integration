@@ -41,8 +41,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Users of the template need to provide a {@link QueryCallback} and a {@link RequestCallback}, which provide the context in which to
  * execute the query.
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
  */
 public class QueryServiceTemplate {
 

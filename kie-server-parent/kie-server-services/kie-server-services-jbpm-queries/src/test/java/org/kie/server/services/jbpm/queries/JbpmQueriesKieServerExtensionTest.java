@@ -56,8 +56,6 @@ public class JbpmQueriesKieServerExtensionTest {
 	 * Helper class to test retrieval of AppComponents. 
 	 * <p>
 	 * This class is loaded by the {@link ServiceLoader}.
-	 * 
-	 * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
 	 */
 	public static class TestApplicationComponentsService implements KieServerApplicationComponentsService {
 

@@ -30,9 +30,7 @@ import org.kie.server.jbpm.queries.api.model.definition.TaskField;
  * <p/>
  * This provides a higher level-api than the Advanced Query API (i.e. {@link QueryFilterSpecBuilder} as the ProcessInstance field-names (column-names)
  * are pre-defined and exposed via a strongly-typed API, and thus not bound to specific column-names in the database. This guards users of
- * this API for potential changes in the jBPM schema. 
- * 
- * @author <a href="mailto:duncan.doyle@redhat.com">Duncan Doyle</a>
+ * this API for potential changes in the jBPM schema.
  */
 
 //TODO: Use the "Curiously Recurring Template Pattern" to create a single builder for tasks and process instances, as the code is the same. Just the method signatures are different.
