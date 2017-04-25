@@ -29,7 +29,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesException;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.integrationtests.category.JMSOnly;
