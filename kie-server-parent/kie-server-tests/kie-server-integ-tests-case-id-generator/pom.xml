@@ -210,34 +210,5 @@
         </pluginManagement>
       </build>
     </profile>
-    <profile>
-      <id>was85x</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-antrun-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>prepare-kie-server</id>
-                  <phase>pre-integration-test</phase>
-                  <configuration>
-                    <target>
-                      <unzip src="${maven.dependency.org.kie.server.kie-server.ee6.war.path}" dest="${project.build.directory}/unzipped-kie-server"/>
-                      <copy file="${project.build.directory}/${project.artifactId}-${project.version}.jar" todir="${project.build.directory}/unzipped-kie-server/WEB-INF/lib"/>
-                      <zip destfile="${project.build.directory}/kie-server.war" basedir="${project.build.directory}/unzipped-kie-server"/>
-                    </target>
-                  </configuration>
-                  <goals>
-                    <goal>run</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
   </profiles>
 </project>
