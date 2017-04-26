@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.OrgEntities;
@@ -33,7 +34,7 @@ import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesException;
+//import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -93,7 +94,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             TaskSummary task = tasks.get(0);
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add)
-                                                , "Error code: 404", "Container with id " + BAD_CONTAINER_ID + " not found");
+                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -112,7 +113,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(),  USER_YODA)
-                                              , "Error code: 404", "Container with id " + BAD_CONTAINER_ID + " not found");
+                                              , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -186,7 +187,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
-                                                , "Error code: 404", "Container with id " + BAD_CONTAINER_ID + " not found");
+                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -206,7 +207,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
             assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
-                    , "Error code: 404", "Container with id " + BAD_CONTAINER_ID + " not found");
+                    , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);

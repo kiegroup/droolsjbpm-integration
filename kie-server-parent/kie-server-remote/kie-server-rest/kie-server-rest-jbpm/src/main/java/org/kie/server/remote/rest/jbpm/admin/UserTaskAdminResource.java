@@ -213,6 +213,9 @@ public class UserTaskAdminResource {
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
+        if (expiresAt == null)
+            return badRequest("'expiresAt' query parameter is mandatory", v, conversationIdHeader);
+
         try {
             if (!whenNotCompleted && !whenNotStarted) {
                 return badRequest("At least one query parameters must be set to true - 'whenNotStarted' or 'whenNotCompleted'", v, conversationIdHeader);
@@ -229,13 +232,9 @@ public class UserTaskAdminResource {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
-        } catch (NullPointerException e) {
-            return badRequest("'expiresAt' query parameter is mandatory", v, conversationIdHeader);
         } catch (RuntimeException e) {
             return badRequest("Error parsing 'expiresAt' - " + expiresAt, v, conversationIdHeader);
-        } 
-        
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
@@ -407,8 +406,7 @@ public class UserTaskAdminResource {
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -418,22 +416,17 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
-            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskId(containerId, taskId,
-                    includeAcknowledged, page, pageSize, sort, sortOrder);
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskId(containerId, taskId, includeAcknowledged, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -443,23 +436,17 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
-            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
-            @QueryParam("name") String taskName, @QueryParam("process") String processId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("name") String taskName, @QueryParam("process") String processId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskName(containerId, processId, taskName,
-                    includeAcknowledged, page, pageSize, sort, sortOrder);
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskName(containerId, processId, taskName, includeAcknowledged, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

@@ -69,7 +69,7 @@ public class UserTaskAdminServiceBase {
 
     public void addPotentialOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
 
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
@@ -79,7 +79,7 @@ public class UserTaskAdminServiceBase {
 
     public void addExcludedOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addExcludedOwners(taskId.longValue(), removeExisting, entities);
@@ -89,7 +89,7 @@ public class UserTaskAdminServiceBase {
     public void addBusinessAdmins(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addBusinessAdmins(taskId.longValue(), removeExisting, entities);
@@ -99,7 +99,7 @@ public class UserTaskAdminServiceBase {
     public void removePotentialOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as potential owners", orgEntities, taskId);
  
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
     
         userTaskAdminService.removePotentialOwners(taskId.longValue(), entities);
@@ -109,7 +109,7 @@ public class UserTaskAdminServiceBase {
     public void removeExcludedOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as excluded owners", orgEntities, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeExcludedOwners(taskId.longValue(), entities);
@@ -119,7 +119,7 @@ public class UserTaskAdminServiceBase {
     public void removeBusinessAdmins(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as business admins", orgEntities, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeBusinessAdmins(taskId.longValue(), entities);
@@ -129,7 +129,7 @@ public class UserTaskAdminServiceBase {
     public void addTaskInputs(String containerId, Number taskId, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         Map<String, Object> data = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByTaskIdContainerLocator(taskId.longValue()));
 
         logger.debug("Task input data to be added to a task {} is {}", taskId, data);
@@ -140,7 +140,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskInputs(String containerId, Number taskId, List<String> inputNames) {
         logger.debug("About to remove task inputs {} from task {}", inputNames, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         userTaskAdminService.removeTaskInputs(taskId.longValue(), inputNames.toArray(new String[inputNames.size()]));
         logger.debug("Task inputs {} removed successfully from task {}", inputNames, taskId);
     }
@@ -148,7 +148,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskOutputs(String containerId, Number taskId, List<String> outputNames) {
         logger.debug("About to remove task outputs {} from task {}", outputNames, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         userTaskAdminService.removeTaskOutputs(taskId.longValue(), outputNames.toArray(new String[outputNames.size()]));
         logger.debug("Task outputs {} removed successfully from task {}", outputNames, taskId);
     }
@@ -156,7 +156,7 @@ public class UserTaskAdminServiceBase {
     public String reassignWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotStarted(taskId.longValue(), timeExpression, entities);
@@ -169,7 +169,7 @@ public class UserTaskAdminServiceBase {
     public String reassignWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotCompleted(taskId.longValue(), timeExpression, entities);
@@ -183,7 +183,7 @@ public class UserTaskAdminServiceBase {
     public String notifyWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not started) of task inputs", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -200,7 +200,7 @@ public class UserTaskAdminServiceBase {
     public String notifyWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not completed) of task inputs", payload);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -217,7 +217,7 @@ public class UserTaskAdminServiceBase {
     public void cancelNotification(String containerId, Number taskId, Number notificationId) {
         logger.debug("About to cancel notification {} from task {}", notificationId, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         userTaskAdminService.cancelNotification(taskId.longValue(), notificationId.longValue());
         logger.debug("Notification {} canceled successfully for task {}", notificationId, taskId);
     }
@@ -225,7 +225,7 @@ public class UserTaskAdminServiceBase {
     public void cancelReassignment(String containerId, Number taskId, Number reassignmentId) {
         logger.debug("About to cancel reassignment {} from task {}", reassignmentId, taskId);
 
-        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException(containerId);
+        if (context.getContainer(containerId) == null) throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
         userTaskAdminService.cancelReassignment(taskId.longValue(), reassignmentId.longValue());
         logger.debug("Reassignment {} canceled successfully for task {}", reassignmentId, taskId);
     }
