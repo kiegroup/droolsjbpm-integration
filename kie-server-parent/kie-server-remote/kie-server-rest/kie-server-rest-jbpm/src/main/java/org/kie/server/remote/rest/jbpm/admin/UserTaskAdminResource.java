@@ -213,8 +213,9 @@ public class UserTaskAdminResource {
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
 
-        if (expiresAt == null)
+        if (expiresAt == null) {
             return badRequest("'expiresAt' query parameter is mandatory", v, conversationIdHeader);
+        }
 
         try {
             if (!whenNotCompleted && !whenNotStarted) {
