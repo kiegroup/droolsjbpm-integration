@@ -204,9 +204,7 @@ public abstract class AbstractKieServicesClientImpl {
 
         owner.setConversationId(response.header(KieServerConstants.KIE_CONVERSATION_ID_TYPE_HEADER));
         if ( response.code() == Response.Status.OK.getStatusCode() ) {
-
             return deserialize(response.body(), resultType);
-
         } else {
             throw createExceptionForUnexpectedResponseCode( request, response );
         }

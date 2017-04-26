@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,11 +25,13 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
+import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.kie.api.KieServices;
 import org.kie.api.task.model.Status;
+import org.kie.internal.task.api.model.TaskEvent;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.TaskAttachment;
 import org.kie.server.api.model.instance.TaskComment;
@@ -43,6 +46,9 @@ import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
+import static org.kie.server.integrationtests.jbpm.RuntimeDataServiceIntegrationTest.SORT_BY_TASK_EVENTS_TYPE;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_NOT_FOUND;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -53,8 +59,6 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
-
-
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -1223,18 +1227,110 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
 
             TaskSummary taskInstance = tasks.get(0);
 
+            TaskEventInstance expectedTaskEventInstance = TaskEventInstance
+                    .builder()
+                    .type(TaskEvent.TaskEventType.ADDED.toString())
+                    .processInstanceId(processInstanceId)
+                    .taskId(taskInstance.getId())
+                    .user(PROCESS_ID_USERTASK)
+                    .build();
+
             List<TaskEventInstance> events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 10);
             assertNotNull(events);
             assertEquals(1, events.size());
+            assertTaskEventInstance(expectedTaskEventInstance, events.get(0));
 
             // now let's start it
             taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
             events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 10);
             assertNotNull(events);
             assertEquals(2, events.size());
+            assertTaskEventInstance(expectedTaskEventInstance, events.get(0));
+            expectedTaskEventInstance.setType(TaskEvent.TaskEventType.STARTED.toString());
+            expectedTaskEventInstance.setUserId(USER_YODA);
+            assertTaskEventInstance(expectedTaskEventInstance, events.get(1));
+
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
+    }
+
+    @Test
+    public void testFindTaskEventsForNotExistingTask() {
+        long invalidId = -9999l;
+        try {
+            taskClient.findTaskEvents(CONTAINER_ID, invalidId, 0, 10);
+            fail("KieServicesException should be thrown when task not found");
+        } catch (KieServicesException e) {
+            if(configuration.isRest()) {
+                KieServerAssert.assertResultContainsString(e.getMessage(),  MessageFormat.format(TASK_INSTANCE_NOT_FOUND, invalidId));
+                KieServicesHttpException httpEx = (KieServicesHttpException) e;
+                assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
+            } else {
+                assertTrue(e.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+            }
+        } catch (TaskNotFoundException tnfe) {
+            assertTrue(tnfe.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+        }
+    }
+
+    @Test
+    public void testFindTaskEventsSortedBy() throws Exception {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            TaskSummary taskInstance = tasks.get(0);
+
+            taskClient.startTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
+            taskClient.stopTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
+
+            List<TaskEventInstance> events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+            assertEquals(TaskEvent.TaskEventType.ADDED.toString(), events.get(0).getType());
+            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), events.get(1).getType());
+            assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), events.get(2).getType());
+
+            try {
+                events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+                KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
+            } catch (TaskNotFoundException e) {
+                assertTrue(e.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+            } catch (KieServicesException ee) {
+                if(configuration.isRest()) {
+                    KieServerAssert.assertResultContainsString(ee.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskInstance.getId()));
+                    KieServicesHttpException httpEx = (KieServicesHttpException) ee;
+                    assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
+                } else {
+                    assertTrue(ee.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                }
+            }
+
+            events = taskClient.findTaskEvents(CONTAINER_ID, taskInstance.getId(), 0, 3, SORT_BY_TASK_EVENTS_TYPE, false);
+            assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), events.get(0).getType());
+            assertEquals(TaskEvent.TaskEventType.STARTED.toString(), events.get(1).getType());
+            assertEquals(TaskEvent.TaskEventType.ADDED.toString(), events.get(2).getType());
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    private void assertTaskEventInstance(TaskEventInstance expected, TaskEventInstance actual) {
+        assertNotNull(actual);
+        assertEquals(expected.getType(), actual.getType());
+        assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
+        assertEquals(expected.getTaskId(), actual.getTaskId());
+        assertEquals(expected.getUserId(), actual.getUserId());
+        assertNotNull(actual.getId());
+        assertNotNull(actual.getLogTime());
+        assertNotNull(actual.getWorkItemId());
     }
 
     private void checkTaskNameAndStatus(TaskSummary taskSummary, String name, Status status) {

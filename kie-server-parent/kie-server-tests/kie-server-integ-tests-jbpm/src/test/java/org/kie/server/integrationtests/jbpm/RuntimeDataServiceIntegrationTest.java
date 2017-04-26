@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.services.api.TaskNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -31,6 +33,7 @@ import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKey;
 import org.kie.internal.process.CorrelationKeyFactory;
 import org.kie.internal.task.api.model.TaskEvent;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
@@ -48,6 +51,8 @@ import org.kie.server.integrationtests.config.TestConfig;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_NOT_FOUND;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -1499,7 +1504,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             // now let's stop it
             taskClient.stopTask(CONTAINER_ID, taskInstance.getId(), USER_YODA);
 
-            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, true);
+            // test paging of the result
+            List<TaskEventInstance> events = taskClient.findTaskEvents(taskInstance.getId(), 0, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+
             assertNotNull(events);
             assertEquals(3, events.size());
 
@@ -1517,6 +1524,21 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
             assertNotNull(event);
             assertEquals(taskInstance.getId(), event.getTaskId());
             assertEquals(TaskEvent.TaskEventType.STOPPED.toString(), event.getType());
+
+            try {
+                events = taskClient.findTaskEvents(taskInstance.getId(), 1, 3, SORT_BY_TASK_EVENTS_TYPE, true);
+                KieServerAssert.assertNullOrEmpty("Task events list is not empty.", events);
+            } catch (TaskNotFoundException e) {
+                assertTrue(e.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+            } catch (KieServicesException ee) {
+                if(configuration.isRest()) {
+                    KieServerAssert.assertResultContainsString(ee.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskInstance.getId()));
+                    KieServicesHttpException httpEx = (KieServicesHttpException) ee;
+                    assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
+                } else {
+                    assertTrue(ee.getMessage().contains( MessageFormat.format(TASK_NOT_FOUND, taskInstance.getId()) ));
+                }
+            }
 
             events = taskClient.findTaskEvents(taskInstance.getId(), 0, 10, SORT_BY_TASK_EVENTS_TYPE, false);
             assertNotNull(events);
@@ -1767,6 +1789,25 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         }
     }
 
+    @Test
+    public void testFindTaskEventsForNotExistingTask() {
+        long invalidId = -9999;
+        try {
+            taskClient.findTaskEvents(-9999l, 0, 10);
+            fail("KieServicesException should be thrown when task not found");
+        } catch (KieServicesException e) {
+            if(configuration.isRest()) {
+                KieServerAssert.assertResultContainsString(e.getMessage(), MessageFormat.format(TASK_INSTANCE_NOT_FOUND, invalidId));
+                KieServicesHttpException httpEx = (KieServicesHttpException) e;
+                assertEquals(Integer.valueOf(404), httpEx.getHttpCode());
+            } else {
+                assertTrue(e.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+            }
+        } catch (TaskNotFoundException tnfe) {
+            assertTrue(tnfe.getMessage().contains(MessageFormat.format(TASK_NOT_FOUND, invalidId)));
+        }
+    }
+
 
     private void checkProcessDefinitions(List<String> processIds) {
         assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
@@ -1822,6 +1863,9 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertEquals(expected.getProcessInstanceId(), actual.getProcessInstanceId());
         assertEquals(expected.getTaskId(), actual.getTaskId());
         assertEquals(expected.getUserId(), actual.getUserId());
+        assertNotNull(actual.getId());
+        assertNotNull(actual.getLogTime());
+        assertNotNull(actual.getWorkItemId());
     }
 
     private void assertProcessInstancesOrderById(List<ProcessInstance> processInstances, boolean ascending) {
