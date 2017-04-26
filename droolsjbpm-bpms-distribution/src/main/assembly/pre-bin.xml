@@ -44,6 +44,7 @@
         <include>org.kie.server:kie-server-common</include>
         <include>org.kie.server:kie-server-api</include>
         <include>org.kie.server:kie-server-client</include>
+        <include>org.kie.server:kie-server-router-proxy</include>
         <include>org.kie:kie-karaf-features</include>
         <include>org.drools:drools-core</include>
         <include>org.drools:drools-compiler</include>
@@ -99,6 +100,7 @@
         <exclude>org.kie.server:kie-server-common</exclude>
         <exclude>org.kie.server:kie-server-api</exclude>
         <exclude>org.kie.server:kie-server-client</exclude>
+        <exclude>org.kie.server:kie-server-router-proxy</exclude>
         <exclude>org.kie:kie-karaf-features</exclude>
         <exclude>org.drools:drools-core</exclude>
         <exclude>org.drools:drools-compiler</exclude>
