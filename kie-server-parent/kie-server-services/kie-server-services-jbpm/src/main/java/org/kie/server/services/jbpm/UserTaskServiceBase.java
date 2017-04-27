@@ -443,7 +443,7 @@ public class UserTaskServiceBase {
         return response;
     }
 
-    public String  getTask(String containerId, Number taskId, boolean withInput, boolean withOutput, boolean withAssignments, String marshallingType) {
+    public String getTask(String containerId, Number taskId, boolean withInput, boolean withOutput, boolean withAssignments, String marshallingType) {
 
         Task task = userTaskService.getTask(taskId.longValue());
         if (task == null) {

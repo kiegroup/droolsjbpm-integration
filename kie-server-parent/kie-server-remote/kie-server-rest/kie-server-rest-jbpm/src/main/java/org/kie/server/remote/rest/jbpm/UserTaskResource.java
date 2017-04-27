@@ -776,13 +776,11 @@ public class UserTaskResource {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-
         try {
-
             TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
-
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
-
+        } catch (TaskNotFoundException e) {
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

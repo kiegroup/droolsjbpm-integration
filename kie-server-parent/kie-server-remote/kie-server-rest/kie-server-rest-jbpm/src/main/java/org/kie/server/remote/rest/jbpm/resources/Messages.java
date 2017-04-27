@@ -22,6 +22,7 @@ public class Messages {
 
     public static final String PROCESS_INSTANCE_NOT_FOUND = "Could not find process instance with id \"{0}\"";
     public static final String TASK_INSTANCE_NOT_FOUND = "Could not find task instance with id \"{0}\"";
+    public static final String TASK_NOT_FOUND ="No task found with id {0}";
     public static final String TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM = "Could not find task instance for work item with id \"{0}\"";
     public static final String TASK_ATTACHMENT_NOT_FOUND = "Could not find task attachment with id \"{0}\" attached to task with id \"{1}\"";
     public static final String TASK_COMMENT_NOT_FOUND = "Could not find task comment with id \"{0}\" attached to task with id \"{1}\"";
