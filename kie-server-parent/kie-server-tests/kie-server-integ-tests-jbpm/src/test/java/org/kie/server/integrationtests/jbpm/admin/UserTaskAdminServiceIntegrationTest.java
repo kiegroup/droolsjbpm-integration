@@ -34,7 +34,6 @@ import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
-//import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
@@ -42,9 +41,7 @@ import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.0.Final");
-
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -54,7 +51,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS, null);
     }
 
     @Override
@@ -71,15 +68,13 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     public void testAddPotentialOwnersToNonExistentTask() throws Exception {
         changeUser(USER_ADMINISTRATOR);
         OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID, BAD_TASK_ID, false, add)
-                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID, BAD_TASK_ID, false, add), "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
     }
 
     @Test
     public void testRemovePotentialOwnersToNonExistentTask() throws Exception {
         changeUser(USER_ADMINISTRATOR);
-        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID, BAD_TASK_ID, USER_YODA)
-                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID, BAD_TASK_ID, USER_YODA), "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
     }
 
     @Test
@@ -93,8 +88,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add)
-                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -103,7 +97,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
-    public void testRemovePotentialOwnersWithBadContainerId() throws Exception{
+    public void testRemovePotentialOwnersWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
         Map<String, Object> parameters = new HashMap<>();
 
@@ -112,8 +106,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(),  USER_YODA)
-                                              , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(), USER_YODA), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -121,18 +114,84 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    /*
+     * Test to add and remove of potential owners of a task using a container's alias, not the original container id with which it was created. 
+     */
+    @Test
+    public void testAddRemovePotOwnersWithContainerAlias() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
+
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            Assertions.assertThat(tasks).hasSize(1);
+
+            TaskSummary task = tasks.get(0);
+
+            TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            Assertions.assertThat(instance).isNotNull();
+
+            List<String> potOwners = instance.getPotentialOwners();
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
+
+            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+
+            userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add);
+
+            instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            Assertions.assertThat(instance).isNotNull();
+            potOwners = instance.getPotentialOwners();
+            Assertions.assertThat(potOwners).hasSize(4);
+            Assertions.assertThat(potOwners).contains(USER_YODA, USER_JOHN, "PM", "HR");
+
+            userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID_ALIAS, task.getId(), USER_YODA);
+
+            instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            Assertions.assertThat(instance).isNotNull();
+            potOwners = instance.getPotentialOwners();
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_JOHN, "PM", "HR");
+
+            userTaskAdminClient.removePotentialOwnerGroups(CONTAINER_ID_ALIAS, task.getId(), "PM", "HR");
+            instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            Assertions.assertThat(instance).isNotNull();
+            potOwners = instance.getPotentialOwners();
+            Assertions.assertThat(potOwners).hasSize(1);
+            Assertions.assertThat(potOwners).contains(USER_JOHN);
+
+            add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
+
+            userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add);
+
+            instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            Assertions.assertThat(instance).isNotNull();
+            potOwners = instance.getPotentialOwners();
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_YODA, USER_JOHN, "PM");
+
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_ALIAS, processInstanceId);
+            }
+        }
+    }
+
     @Test
     public void testReassignNotCompletedOnNonExistentTask() throws Exception {
         OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign)
-                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign), "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
     }
 
     @Test
     public void testReassignNotStartedOnNonExistentTask() throws Exception {
         OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign)
-                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign), "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
     }
 
     @Test
@@ -146,8 +205,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, task.getId(), "2sssss", reassign)
-                                                , "Error code: 400", "Error parsing time string:");
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, task.getId(), "2sssss", reassign), "Error code: 400", "Error parsing time string:");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -166,8 +224,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "2ssss", reassign)
-                                              ,"Error code: 400", "Error parsing time string:");
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "2ssss", reassign), "Error code: 400", "Error parsing time string:");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -176,7 +233,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
-    public void testReassignNotStartedWithBadContainerId() throws Exception{
+    public void testReassignNotStartedWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
         Map<String, Object> parameters = new HashMap<>();
 
@@ -186,8 +243,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
-                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -196,7 +252,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
-    public void testReassignNotCompletedWithBadContainerId() throws Exception{
+    public void testReassignNotCompletedWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
         Map<String, Object> parameters = new HashMap<>();
 
@@ -206,8 +262,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
-                    , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -217,13 +272,9 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
     private void assertExceptionContainsCorrectMessage(ThrowableAssert.ThrowingCallable callable, String restMessage, String jmsMessage) throws Exception {
         if (configuration.isRest()) {
-            Assertions.assertThatThrownBy(callable)
-                    .isInstanceOf(KieServicesException.class)
-                    .hasMessageContaining(restMessage);
+            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(restMessage);
         } else {
-            Assertions.assertThatThrownBy(callable)
-                    .isInstanceOf(KieServicesException.class)
-                    .hasMessageContaining(jmsMessage);
+            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(jmsMessage);
         }
     }
 
@@ -407,7 +458,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(businessAdmins).hasSize(4);
             Assertions.assertThat(businessAdmins).contains(USER_YODA, USER_ADMINISTRATOR, "Administrators", "Administrators2");
 
-
             userTaskAdminClient.removeBusinessAdminGroups(CONTAINER_ID, task.getId(), "Administrators2");
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
             Assertions.assertThat(instance).isNotNull();
@@ -503,7 +553,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         testReassignment(false);
     }
 
-
     private void testReassignment(boolean whenNotStarted) throws Exception {
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -537,7 +586,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
                 userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, taskId, "2s", reassign);
             }
 
-
             KieServerSynchronization.waitForTaskStatus(taskClient, taskId, "Ready");
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, taskId, false, false, true);
@@ -547,7 +595,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             potOwners = instance.getPotentialOwners();
             Assertions.assertThat(potOwners).hasSize(1);
             Assertions.assertThat(potOwners).contains(USER_JOHN);
-
 
         } finally {
             if (processInstanceId != null) {
@@ -567,7 +614,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         testCancelReassign(false);
     }
 
-    private void testCancelReassign(boolean whenNotStarted) throws Exception{
+    private void testCancelReassign(boolean whenNotStarted) throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         Long processInstanceId = null;
@@ -623,7 +670,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         testCancelNotify(false);
     }
 
-    private void testCancelNotify(boolean whenNotStarted) throws Exception{
+    private void testCancelNotify(boolean whenNotStarted) throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         Long processInstanceId = null;
@@ -643,13 +690,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(notifications).isNotNull();
             Assertions.assertThat(notifications).hasSize(0);
 
-            EmailNotification emailNotification = EmailNotification.builder()
-                    .from("test@jbpm.org")
-                    .replyTo("no-reply@jbpm.org")
-                    .subject("reminder")
-                    .body("my test content")
-                    .users(Arrays.asList(USER_JOHN))
-                    .build();
+            EmailNotification emailNotification = EmailNotification.builder().from("test@jbpm.org").replyTo("no-reply@jbpm.org").subject("reminder").body("my test content").users(Arrays.asList(USER_JOHN)).build();
             Long notificationId = null;
             if (whenNotStarted) {
                 notificationId = userTaskAdminClient.notifyWhenNotStarted(CONTAINER_ID, taskId, "10s", emailNotification);
