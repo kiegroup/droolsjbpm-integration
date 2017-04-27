@@ -59,7 +59,6 @@ public class UserTaskAdminResource {
     private UserTaskAdminServiceBase userTaskAdminServiceBase;
     private KieServerRegistry context;
 
-
     private static final int POT_OWNER = 1;
     private static final int EXL_OWNER = 2;
     private static final int ADMIN = 3;
@@ -76,8 +75,7 @@ public class UserTaskAdminResource {
     @PUT
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
@@ -85,8 +83,7 @@ public class UserTaskAdminResource {
     @PUT
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
@@ -94,8 +91,7 @@ public class UserTaskAdminResource {
     @PUT
     @Path(TASK_INSTANCE_ADMINS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, ADMIN);
     }
@@ -103,8 +99,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String users) {
+    public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, POT_OWNER);
     }
@@ -112,8 +107,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String users) {
+    public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, EXL_OWNER);
     }
@@ -121,8 +115,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String users) {
+    public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, ADMIN);
     }
@@ -130,8 +123,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String groups) {
+    public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, POT_OWNER);
     }
@@ -139,8 +131,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String groups) {
+    public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
@@ -148,8 +139,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("entityId") String groups) {
+    public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, ADMIN);
     }
@@ -166,11 +156,9 @@ public class UserTaskAdminResource {
             userTaskAdminServiceBase.addTaskInputs(containerId, tInstanceId, payload, type);
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -180,8 +168,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("name")List<String> inputNames) {
+    public Response removeTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("name") List<String> inputNames) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -189,11 +176,9 @@ public class UserTaskAdminResource {
             userTaskAdminServiceBase.removeTaskInputs(containerId, tInstanceId, inputNames);
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -203,8 +188,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_OUTPUTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeTaskOutputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("name")List<String> inputNames) {
+    public Response removeTaskOutputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("name") List<String> inputNames) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -212,11 +196,9 @@ public class UserTaskAdminResource {
             userTaskAdminServiceBase.removeTaskOutputs(containerId, tInstanceId, inputNames);
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -226,18 +208,16 @@ public class UserTaskAdminResource {
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response reassign(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("expiresAt") String expiresAt,
-            @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted,
-            @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
+    public Response reassign(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("expiresAt") String expiresAt, @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
-        try {
-            if (expiresAt == null) {
-                return badRequest("'expiresAt' query parameter is mandatory", v, conversationIdHeader);
-            }
 
+        if (expiresAt == null) {
+            return badRequest("'expiresAt' query parameter is mandatory", v, conversationIdHeader);
+        }
+
+        try {
             if (!whenNotCompleted && !whenNotStarted) {
                 return badRequest("At least one query parameters must be set to true - 'whenNotStarted' or 'whenNotCompleted'", v, conversationIdHeader);
             }
@@ -250,11 +230,11 @@ public class UserTaskAdminResource {
             }
             return createResponse(id, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+        } catch (RuntimeException e) {
+            return badRequest("Error parsing 'expiresAt' - " + expiresAt, v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -264,10 +244,7 @@ public class UserTaskAdminResource {
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response notify(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("expiresAt") String expiresAt,
-            @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted,
-            @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
+    public Response notify(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("expiresAt") String expiresAt, @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -288,11 +265,9 @@ public class UserTaskAdminResource {
             }
             return createResponse(id, v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -302,8 +277,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_REASSIGNMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response cancelReassignment(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("reassignmentId") Long reassignmentId) {
+    public Response cancelReassignment(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("reassignmentId") Long reassignmentId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -311,11 +285,9 @@ public class UserTaskAdminResource {
             userTaskAdminServiceBase.cancelReassignment(containerId, tInstanceId, reassignmentId);
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -325,8 +297,7 @@ public class UserTaskAdminResource {
     @DELETE
     @Path(TASK_INSTANCE_NOTIFICATION_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response cancelNotification(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @PathParam("notificationId") Long notificationId) {
+    public Response cancelNotification(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("notificationId") Long notificationId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -334,11 +305,9 @@ public class UserTaskAdminResource {
             userTaskAdminServiceBase.cancelNotification(containerId, tInstanceId, notificationId);
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -348,8 +317,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getTaskReassignments(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
+    public Response getTaskReassignments(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -357,11 +325,9 @@ public class UserTaskAdminResource {
 
             return createCorrectVariant(taskReassignmentList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -371,8 +337,7 @@ public class UserTaskAdminResource {
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getTaskNotifications(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId,
-            @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
+    public Response getTaskNotifications(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -380,11 +345,9 @@ public class UserTaskAdminResource {
 
             return createCorrectVariant(taskNotificationList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ProcessInstanceNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -444,8 +407,7 @@ public class UserTaskAdminResource {
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -455,22 +417,17 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId,
-            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskId(containerId, taskId,
-                    includeAcknowledged, page, pageSize, sort, sortOrder);
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskId(containerId, taskId, includeAcknowledged, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -480,23 +437,17 @@ public class UserTaskAdminResource {
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId,
-            @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged,
-            @QueryParam("name") String taskName, @QueryParam("process") String processId,
-            @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-            @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("name") String taskName, @QueryParam("process") String processId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskName(containerId, processId, taskName,
-                    includeAcknowledged, page, pageSize, sort, sortOrder);
+            ExecutionErrorInstanceList executionErrorInstanceList = userTaskAdminServiceBase.getExecutionErrorsByTaskName(containerId, processId, taskName, includeAcknowledged, page, pageSize, sort, sortOrder);
 
             return createCorrectVariant(executionErrorInstanceList, headers, Response.Status.OK, conversationIdHeader);
         } catch (ExecutionErrorNotFoundException e) {
             return notFound(e.getMessage(), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -513,27 +464,24 @@ public class UserTaskAdminResource {
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
             switch (operation) {
-                case POT_OWNER :
+                case POT_OWNER:
                     userTaskAdminServiceBase.addPotentialOwners(containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
-                case EXL_OWNER :
+                case EXL_OWNER:
                     userTaskAdminServiceBase.addExcludedOwners(containerId, tInstanceId, removeExisting, payload, type);
                     break;
 
-                case ADMIN :
+                case ADMIN:
                     userTaskAdminServiceBase.addBusinessAdmins(containerId, tInstanceId, removeExisting, payload, type);
                     break;
             }
 
-
             return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
@@ -550,26 +498,24 @@ public class UserTaskAdminResource {
             List<String> listOfEntities = Arrays.asList(multipleEntities);
 
             switch (operation) {
-                case POT_OWNER :
+                case POT_OWNER:
                     userTaskAdminServiceBase.removePotentialOwners(containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
-                case EXL_OWNER :
+                case EXL_OWNER:
                     userTaskAdminServiceBase.removeExcludedOwners(containerId, tInstanceId, listOfEntities, isUser);
                     break;
 
-                case ADMIN :
+                case ADMIN:
                     userTaskAdminServiceBase.removeBusinessAdmins(containerId, tInstanceId, listOfEntities, isUser);
                     break;
             }
 
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
         } catch (DeploymentNotFoundException e) {
-            return notFound(
-                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);

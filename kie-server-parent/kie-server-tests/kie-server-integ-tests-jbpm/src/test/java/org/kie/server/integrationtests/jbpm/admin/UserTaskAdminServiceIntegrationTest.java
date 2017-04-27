@@ -20,10 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.OrgEntities;
@@ -31,12 +34,11 @@ import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskSummary;
+//import org.kie.server.client.KieServicesException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
-
-import static org.junit.Assert.*;
 
 public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -66,6 +68,166 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
     }
 
     @Test
+    public void testAddPotentialOwnersToNonExistentTask() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID, BAD_TASK_ID, false, add)
+                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+    }
+
+    @Test
+    public void testRemovePotentialOwnersToNonExistentTask() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID, BAD_TASK_ID, USER_YODA)
+                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+    }
+
+    @Test
+    public void testAddPotentialOwnersWithBadContainerId() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add)
+                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testRemovePotentialOwnersWithBadContainerId() throws Exception{
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(),  USER_YODA)
+                                              , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotCompletedOnNonExistentTask() throws Exception {
+        OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign)
+                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+    }
+
+    @Test
+    public void testReassignNotStartedOnNonExistentTask() throws Exception {
+        OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+        assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, BAD_TASK_ID, "2s", reassign)
+                                            , "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
+    }
+
+    @Test
+    public void testReassignNotCompletedWithBadTimeFormat() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID, task.getId(), "2sssss", reassign)
+                                                , "Error code: 400", "Error parsing time string:");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotStartedWithBadTimeFormat() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "2ssss", reassign)
+                                              ,"Error code: 400", "Error parsing time string:");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotStartedWithBadContainerId() throws Exception{
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
+                                                , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotCompletedWithBadContainerId() throws Exception{
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign)
+                    , "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID );
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    private void assertExceptionContainsCorrectMessage(ThrowableAssert.ThrowingCallable callable, String restMessage, String jmsMessage) throws Exception {
+        if (configuration.isRest()) {
+            Assertions.assertThatThrownBy(callable)
+                    .isInstanceOf(KieServicesException.class)
+                    .hasMessageContaining(restMessage);
+        } else {
+            Assertions.assertThatThrownBy(callable)
+                    .isInstanceOf(KieServicesException.class)
+                    .hasMessageContaining(jmsMessage);
+        }
+    }
+
+    @Test
     public void testAddRemovePotOwners() throws Exception {
         changeUser(USER_ADMINISTRATOR);
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -73,64 +235,55 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
 
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
 
             TaskSummary task = tasks.get(0);
 
             TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             List<String> potOwners = instance.getPotentialOwners();
-            assertEquals(3, potOwners.size());
-            assertTrue(potOwners.contains(USER_YODA));
-            assertTrue(potOwners.contains("PM"));
-            assertTrue(potOwners.contains("HR"));
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
 
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             potOwners = instance.getPotentialOwners();
-            assertEquals(4, potOwners.size());
-            assertTrue(potOwners.contains(USER_YODA));
-            assertTrue(potOwners.contains(USER_JOHN));
-            assertTrue(potOwners.contains("PM"));
-            assertTrue(potOwners.contains("HR"));
+            Assertions.assertThat(potOwners).hasSize(4);
+            Assertions.assertThat(potOwners).contains(USER_YODA, USER_JOHN, "PM", "HR");
 
             userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID, task.getId(), USER_YODA);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             potOwners = instance.getPotentialOwners();
-            assertEquals(3, potOwners.size());
-            assertTrue(potOwners.contains(USER_JOHN));
-            assertTrue(potOwners.contains("PM"));
-            assertTrue(potOwners.contains("HR"));
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_JOHN, "PM", "HR");
 
             userTaskAdminClient.removePotentialOwnerGroups(CONTAINER_ID, task.getId(), "PM", "HR");
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             potOwners = instance.getPotentialOwners();
-            assertEquals(1, potOwners.size());
-            assertTrue(potOwners.contains(USER_JOHN));
+            Assertions.assertThat(potOwners).hasSize(1);
+            Assertions.assertThat(potOwners).contains(USER_JOHN);
 
             add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
 
             userTaskAdminClient.addPotentialOwners(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             potOwners = instance.getPotentialOwners();
-            assertEquals(3, potOwners.size());
-            assertTrue(potOwners.contains(USER_YODA));
-            assertTrue(potOwners.contains(USER_JOHN));
-            assertTrue(potOwners.contains("PM"));
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_YODA, USER_JOHN, "PM");
 
         } finally {
             if (processInstanceId != null) {
@@ -147,55 +300,54 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
 
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
 
             TaskSummary task = tasks.get(0);
 
             TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             List<String> excludedOwners = instance.getExcludedOwners();
-            assertEquals(0, excludedOwners.size());
+            Assertions.assertThat(excludedOwners).hasSize(0);
 
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
 
             userTaskAdminClient.addExcludedOwners(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             excludedOwners = instance.getExcludedOwners();
-            assertEquals(1, excludedOwners.size());
-            assertTrue(excludedOwners.contains(USER_JOHN));
+            Assertions.assertThat(excludedOwners).hasSize(1);
+            Assertions.assertThat(excludedOwners).contains(USER_JOHN);
 
             userTaskAdminClient.removeExcludedOwnerUsers(CONTAINER_ID, task.getId(), USER_JOHN);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             excludedOwners = instance.getExcludedOwners();
-            assertEquals(0, excludedOwners.size());
+            Assertions.assertThat(excludedOwners).hasSize(0);
 
             add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("PM")).build();
 
             userTaskAdminClient.addExcludedOwners(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             excludedOwners = instance.getExcludedOwners();
-            assertEquals(2, excludedOwners.size());
-            assertTrue(excludedOwners.contains(USER_YODA));
-            assertTrue(excludedOwners.contains("PM"));
+            Assertions.assertThat(excludedOwners).hasSize(2);
+            Assertions.assertThat(excludedOwners).contains(USER_YODA, "PM");
 
             userTaskAdminClient.removeExcludedOwnerGroups(CONTAINER_ID, task.getId(), "PM");
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             excludedOwners = instance.getExcludedOwners();
-            assertEquals(1, excludedOwners.size());
-            assertTrue(excludedOwners.contains(USER_YODA));
+            Assertions.assertThat(excludedOwners).hasSize(1);
+            Assertions.assertThat(excludedOwners).contains(USER_YODA);
 
         } finally {
             if (processInstanceId != null) {
@@ -212,65 +364,56 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
 
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
 
             TaskSummary task = tasks.get(0);
 
             TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             List<String> businessAdmins = instance.getBusinessAdmins();
-            assertEquals(2, businessAdmins.size());
-            assertTrue(businessAdmins.contains(USER_ADMINISTRATOR));
-            assertTrue(businessAdmins.contains("Administrators"));
+            Assertions.assertThat(businessAdmins).hasSize(2);
+            Assertions.assertThat(businessAdmins).contains(USER_ADMINISTRATOR, "Administrators");
 
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
 
             userTaskAdminClient.addBusinessAdmins(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             businessAdmins = instance.getBusinessAdmins();
-            assertEquals(3, businessAdmins.size());
-            assertTrue(businessAdmins.contains(USER_ADMINISTRATOR));
-            assertTrue(businessAdmins.contains("Administrators"));
-            assertTrue(businessAdmins.contains(USER_JOHN));
+            Assertions.assertThat(businessAdmins).hasSize(3);
+            Assertions.assertThat(businessAdmins).contains(USER_ADMINISTRATOR, "Administrators", USER_JOHN);
 
             userTaskAdminClient.removeBusinessAdminUsers(CONTAINER_ID, task.getId(), USER_JOHN);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             businessAdmins = instance.getBusinessAdmins();
-            assertEquals(2, businessAdmins.size());
-            assertTrue(businessAdmins.contains(USER_ADMINISTRATOR));
-            assertTrue(businessAdmins.contains("Administrators"));
+            Assertions.assertThat(businessAdmins).hasSize(2);
+            Assertions.assertThat(businessAdmins).contains(USER_ADMINISTRATOR, "Administrators");
 
             add = OrgEntities.builder().users(Arrays.asList(USER_YODA)).groups(Arrays.asList("Administrators2")).build();
 
             userTaskAdminClient.addBusinessAdmins(CONTAINER_ID, task.getId(), false, add);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             businessAdmins = instance.getBusinessAdmins();
-            assertEquals(4, businessAdmins.size());
-            assertTrue(businessAdmins.contains(USER_YODA));
-            assertTrue(businessAdmins.contains(USER_ADMINISTRATOR));
-            assertTrue(businessAdmins.contains("Administrators"));
-            assertTrue(businessAdmins.contains("Administrators2"));
+            Assertions.assertThat(businessAdmins).hasSize(4);
+            Assertions.assertThat(businessAdmins).contains(USER_YODA, USER_ADMINISTRATOR, "Administrators", "Administrators2");
 
 
             userTaskAdminClient.removeBusinessAdminGroups(CONTAINER_ID, task.getId(), "Administrators2");
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
             businessAdmins = instance.getBusinessAdmins();
-            assertEquals(3, businessAdmins.size());
-            assertTrue(businessAdmins.contains(USER_ADMINISTRATOR));
-            assertTrue(businessAdmins.contains("Administrators"));
-            assertTrue(businessAdmins.contains(USER_YODA));
+            Assertions.assertThat(businessAdmins).hasSize(3);
+            Assertions.assertThat(businessAdmins).contains(USER_YODA, USER_ADMINISTRATOR, "Administrators");
 
         } finally {
             if (processInstanceId != null) {
@@ -287,21 +430,21 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
 
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
 
             TaskSummary task = tasks.get(0);
 
             TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), true, false, false);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             Map<String, Object> input = instance.getInputData();
-            assertNotNull(input);
-            assertEquals(4, input.size());
-            assertFalse(input.containsKey("new content"));
+            Assertions.assertThat(input).isNotNull();
+            Assertions.assertThat(input).hasSize(4);
+            Assertions.assertThat(input).doesNotContainKey("new content");
 
             Map<String, Object> data = new HashMap<>();
             data.put("new content", "test");
@@ -309,38 +452,38 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             userTaskAdminClient.addTaskInputs(CONTAINER_ID, task.getId(), data);
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), true, false, false);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             input = instance.getInputData();
-            assertNotNull(input);
-            assertEquals(5, input.size());
-            assertEquals("test", input.get("new content"));
+            Assertions.assertThat(input).isNotNull();
+            Assertions.assertThat(input).hasSize(5);
+            Assertions.assertThat(input.get("new content")).isEqualTo("test");
 
             userTaskAdminClient.removeTaskInputs(CONTAINER_ID, task.getId(), "new content");
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), true, false, false);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             input = instance.getInputData();
-            assertNotNull(input);
-            assertEquals(4, input.size());
-            assertFalse(input.containsKey("new content"));
+            Assertions.assertThat(input).isNotNull();
+            Assertions.assertThat(input).hasSize(4);
+            Assertions.assertThat(input).doesNotContainKey("new content");
 
             taskClient.saveTaskContent(CONTAINER_ID, task.getId(), data);
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, true, false);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             Map<String, Object> output = instance.getOutputData();
-            assertNotNull(output);
-            assertEquals(1, output.size());
-            assertEquals("test", output.get("new content"));
+            Assertions.assertThat(output).isNotNull();
+            Assertions.assertThat(output).hasSize(1);
+            Assertions.assertThat(output.get("new content")).isEqualTo("test");
 
             userTaskAdminClient.removeTaskOutputs(CONTAINER_ID, task.getId(), "new content");
             instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, true, false);
-            assertNotNull(instance);
+            Assertions.assertThat(instance).isNotNull();
 
             output = instance.getOutputData();
-            assertNotNull(output);
-            assertEquals(0, output.size());
+            Assertions.assertThat(output).isNotNull();
+            Assertions.assertThat(output).hasSize(0);
 
         } finally {
             if (processInstanceId != null) {
@@ -368,25 +511,23 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
             changeUser(USER_YODA);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
             long taskId = tasks.get(0).getId();
             taskClient.claimTask(CONTAINER_ID, taskId, USER_YODA);
 
             changeUser(USER_ADMINISTRATOR);
 
             TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, taskId, false, false, true);
-            assertNotNull(instance);
-            assertEquals("Reserved", instance.getStatus());
+            Assertions.assertThat(instance).isNotNull();
+            Assertions.assertThat(instance.getStatus()).isEqualTo("Reserved");
 
             List<String> potOwners = instance.getPotentialOwners();
-            assertEquals(3, potOwners.size());
-            assertTrue(potOwners.contains(USER_YODA));
-            assertTrue(potOwners.contains("PM"));
-            assertTrue(potOwners.contains("HR"));
+            Assertions.assertThat(potOwners).hasSize(3);
+            Assertions.assertThat(potOwners).contains(USER_YODA, "PM", "HR");
 
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
 
@@ -400,12 +541,12 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             KieServerSynchronization.waitForTaskStatus(taskClient, taskId, "Ready");
 
             instance = taskClient.getTaskInstance(CONTAINER_ID, taskId, false, false, true);
-            assertNotNull(instance);
-            assertEquals("Ready", instance.getStatus());
+            Assertions.assertThat(instance).isNotNull();
+            Assertions.assertThat(instance.getStatus()).isEqualTo("Ready");
 
             potOwners = instance.getPotentialOwners();
-            assertEquals(1, potOwners.size());
-            assertTrue(potOwners.contains(USER_JOHN));
+            Assertions.assertThat(potOwners).hasSize(1);
+            Assertions.assertThat(potOwners).contains(USER_JOHN);
 
 
         } finally {
@@ -432,19 +573,19 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
             changeUser(USER_YODA);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
             long taskId = tasks.get(0).getId();
             taskClient.claimTask(CONTAINER_ID, taskId, USER_YODA);
 
             changeUser(USER_ADMINISTRATOR);
 
             List<TaskReassignment> reassignments = userTaskAdminClient.getTaskReassignments(CONTAINER_ID, taskId, true);
-            assertNotNull(reassignments);
-            assertEquals(0, reassignments.size());
+            Assertions.assertThat(reassignments).isNotNull();
+            Assertions.assertThat(reassignments).hasSize(0);
 
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
             Long reassignmentId = null;
@@ -455,14 +596,14 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             }
 
             reassignments = userTaskAdminClient.getTaskReassignments(CONTAINER_ID, taskId, true);
-            assertNotNull(reassignments);
-            assertEquals(1, reassignments.size());
+            Assertions.assertThat(reassignments).isNotNull();
+            Assertions.assertThat(reassignments).hasSize(1);
 
             userTaskAdminClient.cancelReassignment(CONTAINER_ID, taskId, reassignmentId);
 
             reassignments = userTaskAdminClient.getTaskReassignments(CONTAINER_ID, taskId, true);
-            assertNotNull(reassignments);
-            assertEquals(0, reassignments.size());
+            Assertions.assertThat(reassignments).isNotNull();
+            Assertions.assertThat(reassignments).hasSize(0);
 
         } finally {
             if (processInstanceId != null) {
@@ -488,19 +629,19 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         Long processInstanceId = null;
         try {
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-            assertNotNull(processInstanceId);
-            assertTrue(processInstanceId.longValue() > 0);
+            Assertions.assertThat(processInstanceId).isNotNull();
+            Assertions.assertThat(processInstanceId.longValue()).isGreaterThan(0);
             changeUser(USER_YODA);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-            assertEquals(1, tasks.size());
+            Assertions.assertThat(tasks).hasSize(1);
             long taskId = tasks.get(0).getId();
             taskClient.claimTask(CONTAINER_ID, taskId, USER_YODA);
 
             changeUser(USER_ADMINISTRATOR);
 
             List<TaskNotification> notifications = userTaskAdminClient.getTaskNotifications(CONTAINER_ID, taskId, true);
-            assertNotNull(notifications);
-            assertEquals(0, notifications.size());
+            Assertions.assertThat(notifications).isNotNull();
+            Assertions.assertThat(notifications).hasSize(0);
 
             EmailNotification emailNotification = EmailNotification.builder()
                     .from("test@jbpm.org")
@@ -517,14 +658,14 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             }
 
             notifications = userTaskAdminClient.getTaskNotifications(CONTAINER_ID, taskId, true);
-            assertNotNull(notifications);
-            assertEquals(1, notifications.size());
+            Assertions.assertThat(notifications).isNotNull();
+            Assertions.assertThat(notifications).hasSize(1);
 
             userTaskAdminClient.cancelNotification(CONTAINER_ID, taskId, notificationId);
 
             notifications = userTaskAdminClient.getTaskNotifications(CONTAINER_ID, taskId, true);
-            assertNotNull(notifications);
-            assertEquals(0, notifications.size());
+            Assertions.assertThat(notifications).isNotNull();
+            Assertions.assertThat(notifications).hasSize(0);
 
         } finally {
             if (processInstanceId != null) {

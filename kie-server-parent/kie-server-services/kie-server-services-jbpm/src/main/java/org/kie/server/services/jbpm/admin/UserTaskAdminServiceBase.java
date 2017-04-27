@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.admin.TaskNotification;
 import org.jbpm.services.api.admin.TaskReassignment;
 import org.jbpm.services.api.admin.UserTaskAdminService;
@@ -56,8 +57,8 @@ public class UserTaskAdminServiceBase {
 
     private TaskModelFactory factory = TaskModelProvider.getFactory();
 
-    private Function<String, OrganizationalEntity> mapToUser =  id -> factory.newUser(id);
-    private Function<String, OrganizationalEntity> mapToGroup =  id -> factory.newGroup(id);
+    private Function<String, OrganizationalEntity> mapToUser = id -> factory.newUser(id);
+    private Function<String, OrganizationalEntity> mapToGroup = id -> factory.newGroup(id);
 
     public UserTaskAdminServiceBase(UserTaskAdminService userTaskAdminService, KieServerRegistry context) {
         this.userTaskAdminService = userTaskAdminService;
@@ -65,9 +66,10 @@ public class UserTaskAdminServiceBase {
         this.context = context;
     }
 
-
     public void addPotentialOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
+        verifyContainerId(containerId);
+
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addPotentialOwners(taskId.longValue(), removeExisting, entities);
@@ -76,6 +78,7 @@ public class UserTaskAdminServiceBase {
 
     public void addExcludedOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addExcludedOwners(taskId.longValue(), removeExisting, entities);
@@ -84,6 +87,8 @@ public class UserTaskAdminServiceBase {
 
     public void addBusinessAdmins(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
+
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addBusinessAdmins(taskId.longValue(), removeExisting, entities);
@@ -92,6 +97,8 @@ public class UserTaskAdminServiceBase {
 
     public void removePotentialOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as potential owners", orgEntities, taskId);
+
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removePotentialOwners(taskId.longValue(), entities);
@@ -100,6 +107,8 @@ public class UserTaskAdminServiceBase {
 
     public void removeExcludedOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as excluded owners", orgEntities, taskId);
+
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeExcludedOwners(taskId.longValue(), entities);
@@ -108,6 +117,8 @@ public class UserTaskAdminServiceBase {
 
     public void removeBusinessAdmins(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as business admins", orgEntities, taskId);
+
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeBusinessAdmins(taskId.longValue(), entities);
@@ -116,6 +127,8 @@ public class UserTaskAdminServiceBase {
 
     public void addTaskInputs(String containerId, Number taskId, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
+
+        verifyContainerId(containerId);
         Map<String, Object> data = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByTaskIdContainerLocator(taskId.longValue()));
 
         logger.debug("Task input data to be added to a task {} is {}", taskId, data);
@@ -126,6 +139,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskInputs(String containerId, Number taskId, List<String> inputNames) {
         logger.debug("About to remove task inputs {} from task {}", inputNames, taskId);
 
+        verifyContainerId(containerId);
         userTaskAdminService.removeTaskInputs(taskId.longValue(), inputNames.toArray(new String[inputNames.size()]));
         logger.debug("Task inputs {} removed successfully from task {}", inputNames, taskId);
     }
@@ -133,6 +147,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskOutputs(String containerId, Number taskId, List<String> outputNames) {
         logger.debug("About to remove task outputs {} from task {}", outputNames, taskId);
 
+        verifyContainerId(containerId);
         userTaskAdminService.removeTaskOutputs(taskId.longValue(), outputNames.toArray(new String[outputNames.size()]));
         logger.debug("Task outputs {} removed successfully from task {}", outputNames, taskId);
     }
@@ -140,6 +155,7 @@ public class UserTaskAdminServiceBase {
     public String reassignWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
 
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotStarted(taskId.longValue(), timeExpression, entities);
@@ -151,11 +167,12 @@ public class UserTaskAdminServiceBase {
 
     public String reassignWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
+
+        verifyContainerId(containerId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotCompleted(taskId.longValue(), timeExpression, entities);
         logger.debug("Reassignment (when not completed) to {} successfully created for task {} to fire at {}", entities, taskId, timeExpression);
-
 
         String response = marshallerHelper.marshal(containerId, marshallingType, id, new ByTaskIdContainerLocator(taskId.longValue()));
         return response;
@@ -163,6 +180,8 @@ public class UserTaskAdminServiceBase {
 
     public String notifyWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not started) of task inputs", payload);
+
+        verifyContainerId(containerId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -171,13 +190,14 @@ public class UserTaskAdminServiceBase {
         Long id = userTaskAdminService.notifyWhenNotStarted(taskId.longValue(), timeExpression, email);
         logger.debug("Email notification (when not started) {} added successfully to task {} to be fired after {}", emailNotification, taskId, timeExpression);
 
-
         String response = marshallerHelper.marshal(containerId, marshallingType, id, new ByTaskIdContainerLocator(taskId.longValue()));
         return response;
     }
 
     public String notifyWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not completed) of task inputs", payload);
+
+        verifyContainerId(containerId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -186,7 +206,6 @@ public class UserTaskAdminServiceBase {
         Long id = userTaskAdminService.notifyWhenNotCompleted(taskId.longValue(), timeExpression, email);
         logger.debug("Email notification (when not completed) {} added successfully to task {} to be fired after {}", emailNotification, taskId, timeExpression);
 
-
         String response = marshallerHelper.marshal(containerId, marshallingType, id, new ByTaskIdContainerLocator(taskId.longValue()));
         return response;
     }
@@ -194,6 +213,7 @@ public class UserTaskAdminServiceBase {
     public void cancelNotification(String containerId, Number taskId, Number notificationId) {
         logger.debug("About to cancel notification {} from task {}", notificationId, taskId);
 
+        verifyContainerId(containerId);
         userTaskAdminService.cancelNotification(taskId.longValue(), notificationId.longValue());
         logger.debug("Notification {} canceled successfully for task {}", notificationId, taskId);
     }
@@ -201,6 +221,7 @@ public class UserTaskAdminServiceBase {
     public void cancelReassignment(String containerId, Number taskId, Number reassignmentId) {
         logger.debug("About to cancel reassignment {} from task {}", reassignmentId, taskId);
 
+        verifyContainerId(containerId);
         userTaskAdminService.cancelReassignment(taskId.longValue(), reassignmentId.longValue());
         logger.debug("Reassignment {} canceled successfully for task {}", reassignmentId, taskId);
     }
@@ -209,16 +230,7 @@ public class UserTaskAdminServiceBase {
 
         Collection<TaskReassignment> reassignments = userTaskAdminService.getTaskReassignments(taskId.longValue(), activeOnly);
 
-        List<org.kie.server.api.model.admin.TaskReassignment> converted = reassignments.stream
-        ().map(r -> org.kie.server.api.model.admin.TaskReassignment.builder()
-                        .id(r.getId())
-                        .active(r.isActive())
-                        .name(r.getName())
-                        .reassignAt(r.getDate())
-                        .users(r.getPotentialOwners().stream().filter(oe -> oe instanceof User).map(oe -> oe.getId()).collect(toList()))
-                        .groups(r.getPotentialOwners().stream().filter(oe -> oe instanceof Group).map(oe -> oe.getId()).collect(toList()))
-            .build()
-        ).collect(toList());
+        List<org.kie.server.api.model.admin.TaskReassignment> converted = reassignments.stream().map(r -> org.kie.server.api.model.admin.TaskReassignment.builder().id(r.getId()).active(r.isActive()).name(r.getName()).reassignAt(r.getDate()).users(r.getPotentialOwners().stream().filter(oe -> oe instanceof User).map(oe -> oe.getId()).collect(toList())).groups(r.getPotentialOwners().stream().filter(oe -> oe instanceof Group).map(oe -> oe.getId()).collect(toList())).build()).collect(toList());
 
         return new TaskReassignmentList(converted);
     }
@@ -227,18 +239,7 @@ public class UserTaskAdminServiceBase {
 
         Collection<TaskNotification> notifications = userTaskAdminService.getTaskNotifications(taskId.longValue(), activeOnly);
 
-        List<org.kie.server.api.model.admin.TaskNotification> converted = notifications.stream
-                ().map(r -> org.kie.server.api.model.admin.TaskNotification.builder()
-                        .id(r.getId())
-                        .active(r.isActive())
-                        .name(r.getName())
-                        .subject(r.getSubject())
-                        .content(r.getContent())
-                        .notifyAt(r.getDate())
-                        .users(r.getRecipients().stream().filter(oe -> oe instanceof User).map(oe -> oe.getId()).collect(toList()))
-                        .groups(r.getRecipients().stream().filter(oe -> oe instanceof Group).map(oe -> oe.getId()).collect(toList()))
-                        .build()
-        ).collect(toList());
+        List<org.kie.server.api.model.admin.TaskNotification> converted = notifications.stream().map(r -> org.kie.server.api.model.admin.TaskNotification.builder().id(r.getId()).active(r.isActive()).name(r.getName()).subject(r.getSubject()).content(r.getContent()).notifyAt(r.getDate()).users(r.getRecipients().stream().filter(oe -> oe instanceof User).map(oe -> oe.getId()).collect(toList())).groups(r.getRecipients().stream().filter(oe -> oe instanceof Group).map(oe -> oe.getId()).collect(toList())).build()).collect(toList());
 
         return new TaskNotificationList(converted);
     }
@@ -290,7 +291,7 @@ public class UserTaskAdminServiceBase {
      */
 
     protected OrganizationalEntity[] convert(List<String> orgEntities, boolean isUser) {
-        return orgEntities.stream().map( isUser ? mapToUser : mapToGroup ).toArray(size -> new OrganizationalEntity[size]);
+        return orgEntities.stream().map(isUser ? mapToUser : mapToGroup).toArray(size -> new OrganizationalEntity[size]);
     }
 
     protected org.kie.internal.task.api.model.EmailNotification buildEmail(EmailNotification emailNotification) {
@@ -302,11 +303,7 @@ public class UserTaskAdminServiceBase {
         if (emailNotification.getGroups() != null) {
             recipients.addAll(emailNotification.getGroups().stream().map(mapToGroup).collect(toList()));
         }
-        org.kie.internal.task.api.model.EmailNotification email = userTaskAdminService.buildEmailNotification(emailNotification.getSubject(),
-                recipients,
-                emailNotification.getBody(),
-                emailNotification.getFrom(),
-                emailNotification.getReplyTo());
+        org.kie.internal.task.api.model.EmailNotification email = userTaskAdminService.buildEmailNotification(emailNotification.getSubject(), recipients, emailNotification.getBody(), emailNotification.getFrom(), emailNotification.getReplyTo());
 
         return email;
     }
@@ -323,4 +320,14 @@ public class UserTaskAdminServiceBase {
 
         return entities.toArray(new OrganizationalEntity[entities.size()]);
     }
+
+    /*
+     * Verify the container with given id has been registered or that it is a valid alias
+     */
+    private void verifyContainerId(String containerId) {
+        if (context.getContainer(containerId) == null && !context.getContainerAliases().contains(containerId)) {
+            throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
+        }
+    }
+
 }
