@@ -176,6 +176,7 @@
                      See https://wiki.apache.org/tomcat/HowTo/FasterStartUp#Entropy_Source for more info -->
                 <java.security.egd>file:/dev/./urandom</java.security.egd>
                 <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
+                <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
               </systemProperties>
             </container>
             <deployables>
