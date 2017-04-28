@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.admin.TaskNotification;
 import org.jbpm.services.api.admin.TaskReassignment;
 import org.jbpm.services.api.admin.UserTaskAdminService;
@@ -39,6 +40,7 @@ import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotificationList;
 import org.kie.server.api.model.admin.TaskReassignmentList;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.kie.server.services.jbpm.locator.ByTaskIdContainerLocator;
 import org.slf4j.Logger;
@@ -68,7 +70,7 @@ public class UserTaskAdminServiceBase {
 
     public void addPotentialOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
 
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
@@ -78,7 +80,7 @@ public class UserTaskAdminServiceBase {
 
     public void addExcludedOwners(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addExcludedOwners(taskId.longValue(), removeExisting, entities);
@@ -88,7 +90,7 @@ public class UserTaskAdminServiceBase {
     public void addBusinessAdmins(String containerId, Number taskId, boolean removeExisting, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         userTaskAdminService.addBusinessAdmins(taskId.longValue(), removeExisting, entities);
@@ -98,7 +100,7 @@ public class UserTaskAdminServiceBase {
     public void removePotentialOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as potential owners", orgEntities, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removePotentialOwners(taskId.longValue(), entities);
@@ -108,7 +110,7 @@ public class UserTaskAdminServiceBase {
     public void removeExcludedOwners(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as excluded owners", orgEntities, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeExcludedOwners(taskId.longValue(), entities);
@@ -118,7 +120,7 @@ public class UserTaskAdminServiceBase {
     public void removeBusinessAdmins(String containerId, Number taskId, List<String> orgEntities, boolean isUser) {
         logger.debug("About to remove {} from task {} as business admins", orgEntities, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(orgEntities, isUser);
 
         userTaskAdminService.removeBusinessAdmins(taskId.longValue(), entities);
@@ -128,7 +130,7 @@ public class UserTaskAdminServiceBase {
     public void addTaskInputs(String containerId, Number taskId, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to map of task inputs", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         Map<String, Object> data = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByTaskIdContainerLocator(taskId.longValue()));
 
         logger.debug("Task input data to be added to a task {} is {}", taskId, data);
@@ -139,7 +141,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskInputs(String containerId, Number taskId, List<String> inputNames) {
         logger.debug("About to remove task inputs {} from task {}", inputNames, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         userTaskAdminService.removeTaskInputs(taskId.longValue(), inputNames.toArray(new String[inputNames.size()]));
         logger.debug("Task inputs {} removed successfully from task {}", inputNames, taskId);
     }
@@ -147,7 +149,7 @@ public class UserTaskAdminServiceBase {
     public void removeTaskOutputs(String containerId, Number taskId, List<String> outputNames) {
         logger.debug("About to remove task outputs {} from task {}", outputNames, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         userTaskAdminService.removeTaskOutputs(taskId.longValue(), outputNames.toArray(new String[outputNames.size()]));
         logger.debug("Task outputs {} removed successfully from task {}", outputNames, taskId);
     }
@@ -155,7 +157,7 @@ public class UserTaskAdminServiceBase {
     public String reassignWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotStarted(taskId.longValue(), timeExpression, entities);
@@ -168,7 +170,7 @@ public class UserTaskAdminServiceBase {
     public String reassignWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to list of org entities (users/groups)", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         OrganizationalEntity[] entities = convert(containerId, taskId, payload, marshallingType);
 
         Long id = userTaskAdminService.reassignWhenNotCompleted(taskId.longValue(), timeExpression, entities);
@@ -181,7 +183,7 @@ public class UserTaskAdminServiceBase {
     public String notifyWhenNotStarted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not started) of task inputs", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -197,7 +199,7 @@ public class UserTaskAdminServiceBase {
     public String notifyWhenNotCompleted(String containerId, Number taskId, String timeExpression, String payload, String marshallingType) {
         logger.debug("About to unmarshall payload '{}' to EmailNotification (when not completed) of task inputs", payload);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         EmailNotification emailNotification = marshallerHelper.unmarshal(containerId, payload, marshallingType, EmailNotification.class, new ByTaskIdContainerLocator(taskId.longValue()));
         logger.debug("Email notification to be added to a task {} is {}", taskId, emailNotification);
 
@@ -213,7 +215,7 @@ public class UserTaskAdminServiceBase {
     public void cancelNotification(String containerId, Number taskId, Number notificationId) {
         logger.debug("About to cancel notification {} from task {}", notificationId, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         userTaskAdminService.cancelNotification(taskId.longValue(), notificationId.longValue());
         logger.debug("Notification {} canceled successfully for task {}", notificationId, taskId);
     }
@@ -221,7 +223,7 @@ public class UserTaskAdminServiceBase {
     public void cancelReassignment(String containerId, Number taskId, Number reassignmentId) {
         logger.debug("About to cancel reassignment {} from task {}", reassignmentId, taskId);
 
-        verifyContainerId(containerId);
+        verifyContainerId(containerId, taskId);
         userTaskAdminService.cancelReassignment(taskId.longValue(), reassignmentId.longValue());
         logger.debug("Reassignment {} canceled successfully for task {}", reassignmentId, taskId);
     }
@@ -324,9 +326,21 @@ public class UserTaskAdminServiceBase {
     /*
      * Verify the container with given id has been registered or that it is a valid alias
      */
-    private void verifyContainerId(String containerId) {
-        if (context.getContainer(containerId) == null && !context.getContainerAliases().contains(containerId)) {
-            throw new DeploymentNotFoundException("Could not find container with ID: " + containerId);
+    private void verifyContainerId(String containerId, Number taskId) {
+        String taskContainerId;
+        try {
+            taskContainerId = (new ByTaskIdContainerLocator(taskId.longValue())).locateContainer(containerId, null);
+
+        } catch (IllegalArgumentException e) {
+            throw new TaskNotFoundException(e.getMessage());
+        }
+
+        KieContainerInstanceImpl taskContainer = context.getContainer(taskContainerId);
+        List<KieContainerInstanceImpl> containersByAlias = context.getContainersForAlias(containerId);
+
+        // The container id is either a non-existent one or is not a valid alias for the container id the task is associated with. Both scenarios should raise an exception.
+        if (context.getContainer(containerId) == null && !containersByAlias.contains(taskContainer)) {
+            throw new DeploymentNotFoundException("Task Id: " + taskId + " is not associated with the provided container id: " + containerId + " or its alias.");
         }
     }
 
