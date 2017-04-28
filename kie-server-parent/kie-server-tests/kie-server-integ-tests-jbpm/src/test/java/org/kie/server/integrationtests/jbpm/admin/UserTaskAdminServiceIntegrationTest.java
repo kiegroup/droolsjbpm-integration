@@ -52,6 +52,8 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
         createContainer(CONTAINER_ID, releaseId, CONTAINER_ID_ALIAS, null);
+        createContainer(CONTAINER_ID_V2, releaseId);
+
     }
 
     @Override
@@ -77,6 +79,9 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID, BAD_TASK_ID, USER_YODA), "Error code: 404", "Task with id " + BAD_TASK_ID + " not found");
     }
 
+    /*
+     * Test scenario for container id that is not registered.
+     */
     @Test
     public void testAddPotentialOwnersWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
@@ -88,7 +93,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(BAD_CONTAINER_ID, task.getId(), false, add), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + BAD_CONTAINER_ID + " or its alias.");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -96,6 +101,31 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    /*
+     * Test scenario where container id exists or is an alias but is not valid for the task being updated.
+     */
+    @Test
+    public void testAddPotentialOwnersWithBadContainerAlias() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities add = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.addPotentialOwners(CONTAINER_ID_ALIAS, task.getId(), false, add), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + CONTAINER_ID_ALIAS + " or its alias.");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
+            }
+        }
+    }
+
+    /*
+     * Test scenario for container id that is not registered.
+     */
     @Test
     public void testRemovePotentialOwnersWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
@@ -106,10 +136,31 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(), USER_YODA), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(BAD_CONTAINER_ID, task.getId(), USER_YODA), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + BAD_CONTAINER_ID + " or its alias.");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    /*
+     * Test scenario where container id exists or is an alias but is not valid for the task being updated.
+     */
+    @Test
+    public void testRemovePotentialOwnersWithBadContainerAlias() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.removePotentialOwnerUsers(CONTAINER_ID_ALIAS, task.getId(), USER_YODA), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + CONTAINER_ID_ALIAS + " or its alias.");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
             }
         }
     }
@@ -133,7 +184,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
 
             TaskSummary task = tasks.get(0);
 
-            TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID_ALIAS, task.getId(), false, false, true);
+            TaskInstance instance = taskClient.getTaskInstance(CONTAINER_ID, task.getId(), false, false, true);
             Assertions.assertThat(instance).isNotNull();
 
             List<String> potOwners = instance.getPotentialOwners();
@@ -232,6 +283,9 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    /*
+     * Test scenario for container id that is not registered.
+     */
     @Test
     public void testReassignNotStartedWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
@@ -243,7 +297,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + BAD_CONTAINER_ID + " or its alias.");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -251,6 +305,31 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    /*
+     * Test scenario where container id exists or is an alias but is not valid for the task being updated.
+     */
+    @Test
+    public void testReassignNotStartedWithBadContainerAlias() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID_ALIAS, task.getId(), "2s", reassign), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + CONTAINER_ID_ALIAS + " or its alias.");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
+            }
+        }
+    }
+
+    /*
+     * Test scenario for container id that is not registered.
+     */
     @Test
     public void testReassignNotCompletedWithBadContainerId() throws Exception {
         changeUser(USER_ADMINISTRATOR);
@@ -262,7 +341,7 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
             TaskSummary task = tasks.get(0);
             OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
-            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Could not find container with ID: " + BAD_CONTAINER_ID);
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(BAD_CONTAINER_ID, task.getId(), "2s", reassign), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + BAD_CONTAINER_ID + " or its alias.");
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
@@ -270,13 +349,29 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
-    private void assertExceptionContainsCorrectMessage(ThrowableAssert.ThrowingCallable callable, String restMessage, String jmsMessage) throws Exception {
-        if (configuration.isRest()) {
-            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(restMessage);
-        } else {
-            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(jmsMessage);
+    /*
+     * Test scenario where container id exists or is an alias but is not valid for the task being updated.
+     */
+    @Test
+    public void testReassignNotCompletedWithBadContainerAlias() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertExceptionContainsCorrectMessage(() -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID_ALIAS, task.getId(), "2s", reassign), "Error code: 404", "Task Id: " + task.getId() + " is not associated with the provided container id: " + CONTAINER_ID_ALIAS + " or its alias.");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
+            }
         }
     }
+
+
 
     @Test
     public void testAddRemovePotOwners() throws Exception {
@@ -553,6 +648,28 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         testReassignment(false);
     }
 
+    @Test
+    public void testCancelReassignWhenNotStarted() throws Exception {
+        testCancelReassign(true);
+    }
+
+    @Test
+    public void testCancelReassignWhenNotCompleted() throws Exception {
+    
+        testCancelReassign(false);
+    }
+
+    @Test
+    public void testCancelNotifyWhenNotStarted() throws Exception {
+        testCancelNotify(true);
+    }
+
+    @Test
+    public void testCancelNotifyWhenNotCompleted() throws Exception {
+    
+        testCancelNotify(false);
+    }
+
     private void testReassignment(boolean whenNotStarted) throws Exception {
 
         Map<String, Object> parameters = new HashMap<String, Object>();
@@ -603,17 +720,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
-    @Test
-    public void testCancelReassignWhenNotStarted() throws Exception {
-        testCancelReassign(true);
-    }
-
-    @Test
-    public void testCancelReassignWhenNotCompleted() throws Exception {
-
-        testCancelReassign(false);
-    }
-
     private void testCancelReassign(boolean whenNotStarted) throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -659,17 +765,6 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
-    @Test
-    public void testCancelNotifyWhenNotStarted() throws Exception {
-        testCancelNotify(true);
-    }
-
-    @Test
-    public void testCancelNotifyWhenNotCompleted() throws Exception {
-
-        testCancelNotify(false);
-    }
-
     private void testCancelNotify(boolean whenNotStarted) throws Exception {
         Map<String, Object> parameters = new HashMap<String, Object>();
 
@@ -712,6 +807,14 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             }
+        }
+    }
+    
+    private void assertExceptionContainsCorrectMessage(ThrowableAssert.ThrowingCallable callable, String restMessage, String jmsMessage) throws Exception {
+        if (configuration.isRest()) {
+            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(restMessage);
+        } else {
+            Assertions.assertThatThrownBy(callable).isInstanceOf(KieServicesException.class).hasMessageContaining(jmsMessage);
         }
     }
 }
