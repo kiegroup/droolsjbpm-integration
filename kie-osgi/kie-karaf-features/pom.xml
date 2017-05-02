@@ -58,6 +58,7 @@
 
     <!-- Overwrites with a different Maven version. Apache POI 3.11+ needs version >=1.9 -->
     <karaf.version.commons-codec>1.10</karaf.version.commons-codec>
+    <karaf.version.commons-collections4>4.1</karaf.version.commons-collections4>
     <karaf.version.javax.inject>${version.org.geronimo.atinject}</karaf.version.javax.inject>
     <karaf.version.org.codehaus.janino>${version.org.codehaus.janino}</karaf.version.org.codehaus.janino>
     <!-- Overwrites with a servicemix version -->
