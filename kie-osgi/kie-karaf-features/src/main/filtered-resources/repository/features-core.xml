@@ -14,6 +14,7 @@
   </feature>
 
   <feature name="drools-templates" version="${project.version}" description="Drools Templates">
+    <feature version="${project.version}">drools-module</feature>
     <bundle>mvn:org.drools/drools-templates/${version.org.drools}</bundle>
   </feature>
 
@@ -26,11 +27,15 @@
   </feature>
 
   <feature name="kie" version="${project.version}" description="KIE API">
+    <feature version="${project.version}">drools-common</feature>
     <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-core/${version.org.drools}</bundle>
+    <bundle>mvn:org.drools/drools-compiler/${version.org.drools}</bundle>
   </feature>
 
   <feature name="kie-ci" version="${project.version}" description="KIE CI">
+    <feature version="${project.version}">kie</feature>
     <bundle>mvn:org.kie/kie-ci-osgi/${version.org.drools}</bundle>
   </feature>
 
@@ -40,6 +45,8 @@
     <feature version="${project.version}">jbpm</feature>
     <feature version="${project.version}">jbpm-human-task</feature>
     <feature version="[3.1,4.0)">spring</feature>
+    <feature version="[3.1,4.0)">spring-jdbc</feature>
+    <feature version="[3.1,4.0)">spring-orm</feature>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/${version.org.springframework.osgi}</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/${version.org.springframework.osgi}</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/${version.org.springframework.osgi}</bundle>
