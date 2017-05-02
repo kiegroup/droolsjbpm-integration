@@ -25,6 +25,7 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-templates</feature>
     <bundle>mvn:commons-codec/commons-codec/${karaf.version.commons-codec}</bundle>
+    <bundle>mvn:org.apache.commons/commons-collections4/${karaf.version.commons-collections4}</bundle>
     <bundle>mvn:org.drools/drools-decisiontables/${version.org.drools}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.poi/${karaf.servicemix.version.org.apache.poi}</bundle>
     <bundle>mvn:org.apache.santuario/xmlsec/${karaf.version.org.apache.santurio}</bundle>
@@ -53,7 +54,14 @@
   </feature>
 
   <feature name="jbpm-human-task" version="${project.version}" description="jBPM Human Task">
+    <feature version="${project.version}">drools-module</feature>
+    <feature version="${project.version}">drools-jpa</feature>
+    <feature version="${project.version}">jbpm-commons</feature>
     <bundle>mvn:org.codehaus.jackson/jackson-core-asl/${version.org.codehaus.jackson}</bundle>
+    <bundle>mvn:javax.mail/mail/${version.javax.mail}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
+    <bundle>mvn:org.jbpm/jbpm-audit/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-core/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-workitems/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-human-task-jpa/${version.org.jbpm}</bundle>
@@ -72,7 +80,6 @@
     <bundle>mvn:org.jbpm/jbpm-query-jpa/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-runtime-manager/${version.org.jbpm}</bundle>
     <bundle>mvn:org.jbpm/jbpm-persistence-jpa/${version.org.jbpm}</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax.mail/1.4.1_5</bundle>
   </feature>
 
   <feature name="optaplanner-engine" version="${project.version}" description="OptaPlanner Engine">
@@ -91,6 +98,7 @@
     <details>Enable Hibernate 4.2.x as persistence engine.</details>
     <feature>transaction</feature>
     <feature>jpa</feature>
+    <feature version="${project.version}">servlet-api-drools</feature>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.version.org.apache.servicemix.bundles.antlr}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${karaf.version.org.apache.servicemix.bundles.ant}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${karaf.version.org.apache.servicemix.bundles.dom4j}</bundle>
@@ -115,6 +123,7 @@
 
   <feature name="h2" version="${h2.version}" description="H2 database">
     <bundle>mvn:com.h2database/h2/${h2.version}</bundle>
+    <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle start-level="100">mvn:commons-dbcp/commons-dbcp/${version.commons-dbcp}</bundle>
     <bundle start-level="100">mvn:commons-pool/commons-pool/${version.commons-pool}</bundle>
   </feature>
@@ -149,6 +158,10 @@
     <bundle>mvn:org.jsoup/jsoup/${version.org.jsoup}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/${karaf.version.org.apache.geronimo.specs.jta}</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/${karaf.version.org.apache.geronimo.specs.jms}</bundle>
+    <bundle>wrap:mvn:org.hornetq/hornetq-core-client/${version.org.hornetq}</bundle>
+    <bundle>wrap:mvn:org.hornetq/hornetq-commons/${version.org.hornetq}</bundle>
+    <bundle>wrap:mvn:org.hornetq/hornetq-journal/${version.org.hornetq}</bundle>
+    <bundle>wrap:mvn:org.hornetq/hornetq-jms-client/${version.org.hornetq}</bundle>
   </feature>
 
   <feature name="servlet-api-drools" version="${project.version}">
