@@ -55,21 +55,21 @@ public class InstallFeaturesAbstractKarafIntegrationTest extends AbstractKarafIn
         return Arrays.asList(new Object[][]{
                 {"drools-common"},
                 {"drools-module"},
-                //{"drools-templates"}, // TODO: feature install fails, needs to be investigated
+                {"drools-templates"},
                 {"drools-decisiontable"},
                 {"drools-wb-guided-decisiontables"},
                 {"drools-jpa"},
-                //{"kie"}, // TODO: feature install fails, needs to be investigated
-                //{"kie-ci"}, // TODO: feature install fails, needs to be investigated
+                {"kie"},
+                {"kie-ci"},
                 {"kie-spring"},
                 {"kie-aries-blueprint"},
                 {"jbpm-commons"},
-                //{"jbpm-human-task"}, // TODO: feature install fails, needs to be investigated
+                {"jbpm-human-task"},
                 {"jbpm"},
                 {"jbpm-spring-persistent"},
-                //{"droolsjbpm-hibernate"}, // TODO: feature install fails, needs to be investigated
+                {"droolsjbpm-hibernate"},
                 {"hibernate-validator"},
-                //{"h2"}
+                {"h2"}
         });
     }
 
