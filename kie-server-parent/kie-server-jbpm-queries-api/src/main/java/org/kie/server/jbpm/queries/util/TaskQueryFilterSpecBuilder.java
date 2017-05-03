@@ -75,42 +75,36 @@ public class TaskQueryFilterSpecBuilder {
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder likeTo(TaskField field, boolean caseSensitive, Comparable<?> value) {
 		parameters.add(new QueryParam(field.toString(), "LIKE_TO", Arrays.asList(value, caseSensitive)));
 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder greaterThan(TaskField field, Comparable<?> value) {
 		parameters.add(new QueryParam(field.toString(), "GREATER_THAN", Arrays.asList(value)));
 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder greaterOrEqualTo(TaskField field, Comparable<?> value) {
 		parameters.add(new QueryParam(field.toString(), "GREATER_OR_EQUALS_TO", Arrays.asList(value)));
 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder lowerThan(TaskField field, Comparable<?> value) {
 		parameters.add(new QueryParam(field.toString(), "LOWER_THAN", Arrays.asList(value)));
 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder lowerOrEqualTo(TaskField field, Comparable<?> value) {
 		parameters.add(new QueryParam(field.toString(), "LOWER_OR_EQUALS_TO", Arrays.asList(value)));
 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	public TaskQueryFilterSpecBuilder between(TaskField field, Comparable<?> start, Comparable<?> end) {
 		parameters.add(new QueryParam(field.toString(), "BETWEEN", Arrays.asList(start, end)));
 
