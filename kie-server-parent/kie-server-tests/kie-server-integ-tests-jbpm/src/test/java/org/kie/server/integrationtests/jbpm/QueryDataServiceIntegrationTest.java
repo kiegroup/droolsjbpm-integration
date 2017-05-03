@@ -761,7 +761,7 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         QueryDefinition query = new QueryDefinition();
         query.setName("unAckErrors");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ExecutionErrorInfo where ERROR_ACK = 0");
+        query.setExpression("select * from ExecutionErrorInfo where ERROR_ACK = '0'");
         query.setTarget("CUSTOM");
         return query;
     }
