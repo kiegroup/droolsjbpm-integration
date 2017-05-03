@@ -107,7 +107,6 @@ public class KieServerConstants {
     public static final String CAPABILITY_BRP = "BRP"; // Business Resource Planning
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
-    public static final String CAPABILITY_BPM_TASK_QUERIES = "BPMTaskQueries"; // BPM Task Queries
     public static final String CAPABILITY_BPM_QUERIES = "BPMQueries"; // BPM Queries
 
     public static final String FAILURE_REASON_PROP = "failure-reason";
