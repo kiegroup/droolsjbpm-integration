@@ -87,11 +87,15 @@ public class KieServerMgmtControllerClient {
     }
 
     public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
-        makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART +containerSpec.getId(), containerSpec, Object.class);
+        makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerSpec.getId(), containerSpec, Object.class);
     }
 
     public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
-        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART +containerSpec.getId(), containerSpec, Object.class);
+        updateContainerSpec(serverTemplateId, containerSpec.getId(), containerSpec);
+    }
+
+    public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec) {
+        makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class);
     }
 
     public void saveServerTemplate(ServerTemplate serverTemplate) {

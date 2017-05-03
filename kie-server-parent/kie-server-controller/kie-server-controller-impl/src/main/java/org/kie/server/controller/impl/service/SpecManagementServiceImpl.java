@@ -76,12 +76,20 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public synchronized void updateContainerSpec( String serverTemplateId,
-            ContainerSpec containerSpec ) {
+    public synchronized void updateContainerSpec( String serverTemplateId, ContainerSpec containerSpec ) {
+        updateContainerSpec(serverTemplateId, containerSpec.getId(), containerSpec);
+    }
+
+    @Override
+    public synchronized void updateContainerSpec(final String serverTemplateId, final String containerId, final ContainerSpec containerSpec) {
         ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
 
         if ( serverTemplate == null ) {
             throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+        }
+
+        if( !containerSpec.getId().equals(containerId)) {
+            throw new KieServerControllerException( "Cannot update container " + containerSpec.getId() + " on container " + containerId );
         }
 
         if (!serverTemplate.hasContainerSpec(containerSpec.getId())) {

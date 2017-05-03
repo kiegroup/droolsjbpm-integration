@@ -76,7 +76,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     @Test
     @Category(Smoke.class)
-    public void testCreateKieServerInstance() {
+    public void testCreateKieServerTemplate() {
         ServerTemplate serverTemplate = createServerTemplate();
 
         ServerTemplate storedServerTemplate = mgmtControllerClient.getServerTemplate(serverTemplate.getId());
@@ -91,28 +91,28 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     }
 
     @Test
-    public void testCreateDuplicitKieServerInstance() {
-        // Create kie server instance in controller.
+    public void testCreateDuplicateServerTemplate() {
+        // Create kie server template.
         ServerTemplate serverTemplate = createServerTemplate();
 
         try {
             // Try to create same kie server instance.
             mgmtControllerClient.saveServerTemplate(serverTemplate);
-            fail("Should throw exception about kie server instance already created.");
+            fail("Template already created.");
         } catch (UnexpectedResponseCodeException e) {
             assertEquals(404, e.getResponseCode());
         }
     }
 
     @Test
-    public void testDeleteKieServerInstance() {
+    public void testDeleteServerTemplate() {
         ServerTemplate serverTemplate = createServerTemplate();
 
         Collection<ServerTemplate> serverTemplates = mgmtControllerClient.listServerTemplates();
         assertNotNull(serverTemplates);
         assertEquals(1, serverTemplates.size());
 
-        // Delete created kie server instance.
+        // Delete created server template.
         mgmtControllerClient.deleteServerTemplate(serverTemplate.getId());
 
         // There are no kie server instances in controller now.
@@ -121,9 +121,9 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     }
 
     @Test
-    public void testDeleteNotExistingKieServerInstance() {
+    public void testDeleteNotExistingServerTemplate() {
         try {
-            // Try to delete not existing kie server instance.
+            // Try to delete not existing server template.
             mgmtControllerClient.deleteServerTemplate("not existing");
             fail("Should throw exception about kie server instance not existing.");
         } catch (UnexpectedResponseCodeException e) {
@@ -189,9 +189,9 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     }
 
     @Test
-    public void testEmptyListKieServerInstances() throws Exception {
+    public void testEmptyListServerTemplates() throws Exception {
         Collection<ServerTemplate> instanceList = mgmtControllerClient.listServerTemplates();
-        KieServerAssert.assertNullOrEmpty("Active kie server instance found!", instanceList);
+        KieServerAssert.assertNullOrEmpty("Server templates found!", instanceList);
     }
 
     @Test
@@ -596,6 +596,40 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(serverTemplate.getName(), containerResponseEntity.getServerTemplateKey().getName());
         assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
+    }
+
+    @Test
+    public void testUpdateContainerWithDifferrentID() {
+        ServerTemplate serverTemplate = createServerTemplate();
+        final String ONE_ID = "one";
+        final String TWO_ID = "two";
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerOneToDeploy = new ContainerSpec(ONE_ID, ONE_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        ContainerSpec containerTwoToDeploy = new ContainerSpec(TWO_ID, TWO_ID, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerOneToDeploy);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerTwoToDeploy);
+
+        containerOneToDeploy.setReleasedId(releaseId101);
+
+        try {
+            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerTwoToDeploy.getId(), containerOneToDeploy);
+            fail("Container one was updated from container two REST endpoint.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+            KieServerAssert.assertResultContainsString(e.getMessage(), "Cannot update container " + containerOneToDeploy.getId() + " on container " + containerTwoToDeploy.getId());
+        }
+
+        // Check container that are not changed
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(serverTemplate.getId(), ONE_ID);
+        assertEquals(ONE_ID, containerResponseEntity.getId());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
+
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(serverTemplate.getId(), TWO_ID);
+        assertEquals(TWO_ID, containerResponseEntity.getId());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+        assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
     }
 
     protected ServerTemplate createServerTemplate() {
