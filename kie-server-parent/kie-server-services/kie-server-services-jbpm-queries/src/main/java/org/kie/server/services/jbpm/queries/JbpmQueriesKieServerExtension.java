@@ -39,6 +39,7 @@ public class JbpmQueriesKieServerExtension implements KieServerExtension {
     private static final Logger logger = LoggerFactory.getLogger(JbpmQueriesKieServerExtension.class);
 
     private static final Boolean disabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBM_QUERIES_SERVER_EXT_DISABLED, "false"));
+    private static final Boolean jbpmDisabled = Boolean.parseBoolean(System.getProperty(KieServerConstants.KIE_JBPM_SERVER_EXT_DISABLED, "false"));
 
     private KieServerImpl kieServer;
     private KieServerRegistry context;
@@ -55,7 +56,7 @@ public class JbpmQueriesKieServerExtension implements KieServerExtension {
 
     @Override
     public boolean isActive() {
-        return disabled == false;
+    	return disabled == false && jbpmDisabled == false;
     }
 
     @Override
