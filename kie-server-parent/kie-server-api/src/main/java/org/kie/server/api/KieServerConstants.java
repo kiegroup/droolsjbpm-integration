@@ -30,7 +30,7 @@ public class KieServerConstants {
     public static final String KIE_OPTAPLANNER_SERVER_EXT_DISABLED = "org.optaplanner.server.ext.disabled";
     public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
     public static final String KIE_DMN_SERVER_EXT_DISABLED = "org.kie.dmn.server.ext.disabled";
-    public static final String KIE_JBM_QUERIES_SERVER_EXT_DISABLED = "org.jbpm.taskqueries.server.ext.disabled";
+    public static final String KIE_JBM_QUERIES_SERVER_EXT_DISABLED = "org.jbpm.queries.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
 
