@@ -16,6 +16,7 @@
 package org.kie.server.integrationtests.controller;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -558,12 +559,55 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         }
     }
 
-    protected ServerTemplate createServerTemplate() {
-        ServerTemplate serverTemplate = new ServerTemplate();
-        serverTemplate.setId(kieServerInfo.getServerId());
-        serverTemplate.setName(kieServerInfo.getName());
+    @Test
+    public void testTemplateKeyChangeDuringUpdate() {
+        ServerTemplate serverTemplate = createServerTemplate();
 
-        serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getLocation()));
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+
+        // setting new template to container
+        ServerTemplate secondTemplate = createServerTemplate("st-id", "st-id", kieServerInfo.getLocation());
+        containerToDeploy.setServerTemplateKey(secondTemplate);
+
+        try {
+            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+            fail("Template key should not be allowed to be changed during update.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+            KieServerAssert.assertResultContainsString(e.getMessage(), "Cannot change container template key during update.");
+        }
+
+        assertEquals(2, mgmtControllerClient.listServerTemplates().size());
+        // Check that on other server template is not any container.
+        KieServerAssert.assertNullOrEmpty("Found container in second server template.", mgmtControllerClient.listContainerSpec(secondTemplate.getId()));
+        assertEquals(1, mgmtControllerClient.listContainerSpec(serverTemplate.getId()).size());
+
+        // Check that container is not changed
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(serverTemplate.getId(), containerResponseEntity.getServerTemplateKey().getId());
+        assertEquals(serverTemplate.getName(), containerResponseEntity.getServerTemplateKey().getName());
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+    }
+
+    protected ServerTemplate createServerTemplate() {
+        return createServerTemplate(kieServerInfo.getServerId(), kieServerInfo.getName(), kieServerInfo.getLocation());
+    }
+
+    protected ServerTemplate createServerTemplate(String id, String name, String location) {
+        ServerTemplate serverTemplate = new ServerTemplate();
+        serverTemplate.setId( id );
+        serverTemplate.setName( name );
+
+        serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), location));
         mgmtControllerClient.saveServerTemplate(serverTemplate);
 
         return serverTemplate;

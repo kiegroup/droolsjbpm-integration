@@ -180,6 +180,10 @@ public class ServerTemplate extends ServerTemplateKey {
         this.capabilities = capabilities;
     }
 
+    public boolean hasMatchingId(ServerTemplateKey serverTemplateKey) {
+        return getId().equals(serverTemplateKey.getId());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
