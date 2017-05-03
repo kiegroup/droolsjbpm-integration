@@ -18,13 +18,17 @@ package org.kie.server.client;
 import java.util.List;
 
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.jbpm.queries.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
 
 /**
- * KIE-Server Client API for the advanced Process Instance Queries provided by the <code>kie-server-services-jbpm-queries</code> extension.
+ * KIE-Server Client API for the advanced searches provided by the <code>kie-server-services-jbpm-queries</code> extension.
  */	
-public interface ProcessInstanceQueryServicesClient {
+public interface SearchServicesClient {
 
 	List<ProcessInstance> findProcessInstancesWithFilters(ProcessInstanceQueryFilterSpec filterSpec, Integer page, Integer pageSize);
+	
+	List<TaskInstance> findHumanTasksWithFilters(TaskQueryFilterSpec filterSpec, Integer page, Integer pageSize);
 	
 }
