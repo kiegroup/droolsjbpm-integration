@@ -20,12 +20,10 @@ import java.util.Map;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.ProcessInstanceQueryServicesClient;
-import org.kie.server.client.TaskQueryServicesClient;
-import org.kie.server.client.impl.ProcessInstanceQueryServicesClientImpl;
-import org.kie.server.client.impl.TaskQueryServicesClientImpl;
+import org.kie.server.client.SearchServicesClient;
+import org.kie.server.client.impl.SearchServicesClientImpl;
 
-public class JBPMQueryServicesClientBuilder implements KieServicesClientBuilder {
+public class JBPMSearchServicesClientBuilder implements KieServicesClientBuilder {
 
 	@Override
 	public String getImplementedCapability() {
@@ -36,9 +34,8 @@ public class JBPMQueryServicesClientBuilder implements KieServicesClientBuilder 
 	public Map<Class<?>, Object> build(KieServicesConfiguration configuration, ClassLoader classLoader) {
 		Map<Class<?>, Object> services = new HashMap<Class<?>, Object>();
 
-		services.put(ProcessInstanceQueryServicesClient.class, new ProcessInstanceQueryServicesClientImpl(configuration, classLoader));
-        services.put(TaskQueryServicesClient.class, new TaskQueryServicesClientImpl(configuration, classLoader));
-
+		services.put(SearchServicesClient.class, new SearchServicesClientImpl(configuration, classLoader));
+        
         return services;
 	}
 
