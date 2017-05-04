@@ -22,7 +22,7 @@
     <module>kie-server-services-optaplanner</module>
     <module>kie-server-services-case-mgmt</module>
     <module>kie-server-services-dmn</module>
-    <module>kie-server-services-jbpm-queries</module>
+    <module>kie-server-services-jbpm-search</module>
   </modules>
 
 </project>

@@ -22,7 +22,7 @@
     <module>kie-server-rest-optaplanner</module>
     <module>kie-server-rest-case-mgmt</module>
     <module>kie-server-rest-dmn</module>
-    <module>kie-server-rest-jbpm-queries</module>
+    <module>kie-server-rest-jbpm-search</module>
   </modules>
 
 </project>
