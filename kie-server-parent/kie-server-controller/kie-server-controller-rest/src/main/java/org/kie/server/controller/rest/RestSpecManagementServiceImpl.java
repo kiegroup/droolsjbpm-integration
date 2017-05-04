@@ -90,7 +90,7 @@ public class RestSpecManagementServiceImpl extends SpecManagementServiceImpl {
             ContainerSpec containerSpec = unmarshal(containerSpecPayload, contentType, ContainerSpec.class);
             logger.debug("Container spec is {}", containerSpec);
 
-            super.updateContainerSpec(serverTemplateId, containerSpec);
+            super.updateContainerSpec(serverTemplateId, containerId, containerSpec);
             logger.debug("Returning response for update container spec request for server template with id '{}': CREATED", serverTemplateId);
             return createCorrectVariant("", headers, Response.Status.CREATED);
         } catch (KieServerControllerNotFoundException e) {

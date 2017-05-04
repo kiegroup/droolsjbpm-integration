@@ -38,6 +38,11 @@
           "code": "java.method.addedToInterface",
           "new": "method void org.kie.server.controller.api.service.SpecManagementService::updateContainerSpec(java.lang.String, org.kie.server.controller.api.model.spec.ContainerSpec)",
           "justification": "Allow to update existing container specification"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.kie.server.controller.api.service.SpecManagementService::updateContainerSpec(java.lang.String, java.lang.String, org.kie.server.controller.api.model.spec.ContainerSpec)",
+          "justification": "Allow to check container integrity when updating specification"
         }
       ]
     }
