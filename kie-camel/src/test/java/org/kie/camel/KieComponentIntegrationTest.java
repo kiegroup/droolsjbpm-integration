@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
@@ -38,6 +39,7 @@ import static org.kie.camel.KieCamelConstants.KIE_OPERATION;
 import static org.kie.camel.KieCamelUtils.asCamelKieName;
 import static org.kie.camel.KieCamelUtils.getResultMessage;
 
+@Ignore
 public class KieComponentIntegrationTest extends BaseKieComponentTest {
 
     @Test
