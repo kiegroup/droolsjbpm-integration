@@ -19,6 +19,8 @@
     <module>kie-server-controller-impl</module>
     <module>kie-server-controller-rest</module>
     <module>kie-server-controller-test-war</module>
+    <module>kie-server-controller-standalone</module>
+    <module>kie-server-controller-standalone-war</module>
   </modules>
 
 </project>
