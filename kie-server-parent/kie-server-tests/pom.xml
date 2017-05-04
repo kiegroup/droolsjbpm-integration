@@ -58,6 +58,7 @@
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
+    <module>kie-server-integ-tests-jbpm-search</module>
     <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
@@ -127,6 +128,16 @@
       <dependency>
         <groupId>org.kie</groupId>
         <artifactId>kie-tomcat-integration</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-services-jbpm-search</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-rest-jbpm-search</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
     </dependencies>
