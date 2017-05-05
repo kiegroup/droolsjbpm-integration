@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class JbpmSearchKieServerExtension implements KieServerExtension {
 
-    public static final String EXTENSION_NAME = "jBPMQueries";
+    public static final String EXTENSION_NAME = "jBPMSearch";
     
     private static final Logger logger = LoggerFactory.getLogger(JbpmSearchKieServerExtension.class);
 
