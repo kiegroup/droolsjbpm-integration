@@ -23,4 +23,13 @@
     <module>drools-karaf-itests</module>
   </modules>
 
+  <profiles>
+    <profile>
+      <id>drools-osgi-platforms</id>
+      <modules>
+        <module>drools-osgi-platforms</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>
