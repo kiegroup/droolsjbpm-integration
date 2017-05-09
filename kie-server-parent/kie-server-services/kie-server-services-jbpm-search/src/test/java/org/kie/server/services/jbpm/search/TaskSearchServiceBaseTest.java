@@ -35,8 +35,6 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.search.TaskSearchServiceBase;
-import org.kie.server.services.jbpm.search.util.QueryStrategy;
 import org.mockito.Mockito;
 
 public class TaskSearchServiceBaseTest {
@@ -55,9 +53,7 @@ public class TaskSearchServiceBaseTest {
 		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
 		when(contextMock.getConfig()).thenReturn(configMock);
 		
-		QueryStrategy taskQueriesStrategyMock = Mockito.mock(QueryStrategy.class); 
-		
-		TaskSearchServiceBase base = new TaskSearchServiceBase(queryServiceMock, contextMock, taskQueriesStrategyMock);
+		TaskSearchServiceBase base = new TaskSearchServiceBase(queryServiceMock, contextMock);
 		
 		//Verify that extra classes are registered on the context.
 		verify(contextMock, times(1)).addExtraClasses(extraClasses);

@@ -28,6 +28,8 @@ import org.kie.server.jbpm.search.api.model.definition.BaseQueryFilterSpec;
 import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
+import org.kie.server.services.jbpm.search.util.TaskQueryStrategy;
+import org.kie.server.services.jbpm.search.util.ProcessInstanceQueryStrategy;
 import org.kie.server.services.jbpm.search.util.QueryStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,7 @@ public class TaskSearchServiceBase extends AbstractSearchServiceBase {
 	private QueryServiceTemplate queryServiceTemplate;
 	private QueryCallback queryCallback;
 
-	public TaskSearchServiceBase(QueryService queryService, KieServerRegistry context, QueryStrategy taskQueriesStrategy) {
+	public TaskSearchServiceBase(QueryService queryService, KieServerRegistry context) {
 		this.queryServiceTemplate = new QueryServiceTemplate(queryService);
 		
 		this.context = context;
@@ -61,11 +63,13 @@ public class TaskSearchServiceBase extends AbstractSearchServiceBase {
 		String taskQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
 				"java:jboss/datasources/ExampleDS");
 		
+		QueryStrategy queryStrategy = new TaskQueryStrategy();
+		
 		this.queryCallback = new QueryCallback() {
 			
 			@Override
 			public QueryStrategy getQueryStrategy() {
-				return taskQueriesStrategy;
+				return queryStrategy;
 			}
 			
 			@Override
@@ -80,7 +84,7 @@ public class TaskSearchServiceBase extends AbstractSearchServiceBase {
 		};
 		
 		QueryDefinition queryDefinition = new SqlQueryDefinition(TASK_QUERY_NAME, taskQuerySource, Target.CUSTOM);
-		queryDefinition.setExpression(taskQueriesStrategy.getQueryExpression());
+		queryDefinition.setExpression(queryStrategy.getQueryExpression());
 		queryService.replaceQuery(queryDefinition);
 	}
 	

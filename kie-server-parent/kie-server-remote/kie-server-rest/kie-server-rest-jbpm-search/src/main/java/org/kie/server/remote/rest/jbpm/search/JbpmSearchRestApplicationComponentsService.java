@@ -27,7 +27,6 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.jbpm.search.JbpmSearchKieServerExtension;
 import org.kie.server.services.jbpm.search.ProcessInstanceSearchServiceBase;
 import org.kie.server.services.jbpm.search.TaskSearchServiceBase;
-import org.kie.server.services.jbpm.search.util.QueryStrategyFactory;
 
 public class JbpmSearchRestApplicationComponentsService implements KieServerApplicationComponentsService {
 
@@ -61,11 +60,9 @@ public class JbpmSearchRestApplicationComponentsService implements KieServerAppl
         	throw new IllegalStateException("No QueryService found. Unable to bootstrap jBPM TaskQuery Extension.");
         }
         
-        QueryStrategyFactory queryStrategyFactory = new QueryStrategyFactory(context);
+        ProcessInstanceSearchServiceBase processInstanceQueryServiceBase = new ProcessInstanceSearchServiceBase(queryService, context);
         
-        ProcessInstanceSearchServiceBase processInstanceQueryServiceBase = new ProcessInstanceSearchServiceBase(queryService, context, queryStrategyFactory.getProcessQueriesStrategy());
-        
-        TaskSearchServiceBase taskQueryServiceBase = new TaskSearchServiceBase(queryService, context, queryStrategyFactory.getTaskQueriesStrategy());
+        TaskSearchServiceBase taskQueryServiceBase = new TaskSearchServiceBase(queryService, context);
         
         List<Object> components = new ArrayList<Object>( 1 );
         components.add(new ProcessInstanceSearchResource (processInstanceQueryServiceBase, context));

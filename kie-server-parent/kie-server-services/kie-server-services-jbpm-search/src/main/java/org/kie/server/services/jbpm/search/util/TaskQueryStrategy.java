@@ -23,9 +23,9 @@ import org.kie.server.jbpm.search.api.model.definition.TaskField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OracleTaskQueryStrategy implements QueryStrategy {
-	
-private static final Logger logger = LoggerFactory.getLogger(OracleTaskQueryStrategy.class);
+public class TaskQueryStrategy implements QueryStrategy {
+
+	private static final Logger logger = LoggerFactory.getLogger(TaskQueryStrategy.class);
 	
 	private static final String TASK_QUERY = "select ti.* from AuditTaskImpl ti";
 	
