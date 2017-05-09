@@ -35,8 +35,6 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.search.ProcessInstanceSearchServiceBase;
-import org.kie.server.services.jbpm.search.util.QueryStrategy;
 import org.mockito.Mockito;
 
 public class ProcessInstanceSearchServiceBaseTest {
@@ -55,9 +53,7 @@ public class ProcessInstanceSearchServiceBaseTest {
 		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
 		when(contextMock.getConfig()).thenReturn(configMock);
 		
-		QueryStrategy processInstanceQueriesStrategyMock = Mockito.mock(QueryStrategy.class); 
-		
-		ProcessInstanceSearchServiceBase base = new ProcessInstanceSearchServiceBase(queryServiceMock, contextMock, processInstanceQueriesStrategyMock);
+		ProcessInstanceSearchServiceBase base = new ProcessInstanceSearchServiceBase(queryServiceMock, contextMock);
 		
 		//Verify that extra classes are registered on the context.
 		verify(contextMock, times(1)).addExtraClasses(extraClasses);

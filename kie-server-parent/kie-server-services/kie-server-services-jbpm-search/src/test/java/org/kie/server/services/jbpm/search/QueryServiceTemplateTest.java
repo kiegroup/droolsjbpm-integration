@@ -16,8 +16,8 @@
 package org.kie.server.services.jbpm.search;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,19 +30,13 @@ import org.jbpm.services.api.query.QueryResultMapper;
 import org.jbpm.services.api.query.QueryService;
 import org.junit.Before;
 import org.junit.Test;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.jbpm.search.api.model.definition.BaseQueryFilterSpec;
 import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.jbpm.search.QueryCallback;
-import org.kie.server.services.jbpm.search.QueryServiceTemplate;
-import org.kie.server.services.jbpm.search.RequestCallback;
+import org.kie.server.services.jbpm.search.util.ProcessInstanceQueryStrategy;
 import org.kie.server.services.jbpm.search.util.QueryStrategy;
-import org.kie.server.services.jbpm.search.util.QueryStrategyFactory;
 import org.mockito.Mockito;
 
 
@@ -66,12 +60,7 @@ public class QueryServiceTemplateTest {
 			
 			@Override
 			public QueryStrategy getQueryStrategy() {
-				KieServerRegistry registryMock = Mockito.mock(KieServerRegistry.class);
-				KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
-				when(registryMock.getConfig()).thenReturn(configMock);
-				when(configMock.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.H2Dialect")).thenReturn("org.hibernate.dialect.PostgreSQLDialect");
-				
-				return new QueryStrategyFactory(registryMock).getProcessQueriesStrategy();
+				return new ProcessInstanceQueryStrategy();
 			}
 			
 			@Override

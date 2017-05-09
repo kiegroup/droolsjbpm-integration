@@ -19,87 +19,84 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jbpm.services.api.query.model.QueryParam;
-import org.kie.server.jbpm.search.api.model.definition.TaskField;
+import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class H2TaskQueryStrategy implements QueryStrategy {
+public class ProcessInstanceQueryStrategy implements QueryStrategy {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceQueryStrategy.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(H2TaskQueryStrategy.class);
-	
-	private static final String TASK_QUERY = "select ti.* from AuditTaskImpl ti";
-	
+	private static final String PROCESS_INSTANCE_QUERY = "select pi.* from ProcessInstanceLog pi";
+
 	@Override
 	public String getQueryExpression() {
-		return TASK_QUERY;
+		return PROCESS_INSTANCE_QUERY;
 	}
-	
+
 	@Override
 	public Map<String, String> getColumnMapping(QueryParam[] params) {
 		Map<String, String> mapping = new HashMap<>();
-		
-		for (QueryParam nextParam: params) {
+
+		for (QueryParam nextParam : params) {
 			mapping.put(nextParam.getColumn(), getColumnType(nextParam.getColumn()));
 		}
-		
+
 		return mapping;
 	}
-	
+
 	private String getColumnType(String param) {
 		String columnType = null;
-		
-		switch(TaskField.valueOf(param)) {
+
+		switch (ProcessInstanceField.valueOf(param)) {
 		case ID:
 			columnType = "integer";
 			break;
-		case ACTIVATIONTIME:
-			//TODO: define mapping for timestamp. Is that date?
-			columnType = "date";
-			break;
-		case ACTUALOWNER:
+		case CORRELATIONKEY:
+			// TODO: define mapping for timestamp. Is that date?
 			columnType = "string";
 			break;
-		case CREATEDBY:
-			columnType = "string";
-			break;
-		case CREATEDON:
-			//TODO: define mapping for timestamp. Is that date?
-			columnType = "date";
-			break;
-		case DEPLOYMENTID:
-			columnType = "string";
-			break;
-		case DESCRIPTION:
-			columnType = "string";
-			break;
-		case DUEDATE:
-			columnType = "date";
-			break;
-		case NAME:
-			columnType = "string";
-			break;
-		case PARENTID:
+		case DURATION:
 			columnType = "integer";
 			break;
-		case PRIORITY:
+		case END_DATE:
+			columnType = "date";
+			break;
+		case EXTERNALID:
+			// TODO: define mapping for timestamp. Is that date?
+			columnType = "string";
+			break;
+		case USER_IDENTITY:
+			columnType = "string";
+			break;
+		case OUTCOME:
+			columnType = "string";
+			break;
+		case PARENTPROCESSINSTANCEID:
 			columnType = "integer";
 			break;
 		case PROCESSID:
 			columnType = "string";
 			break;
+		case PROCESSINSTANCEDESCRIPTION:
+			columnType = "string";
+			break;
 		case PROCESSINSTANCEID:
 			columnType = "integer";
 			break;
-		case PROCESSSESSIONID:
+		case PROCESSNAME:
+			columnType = "string";
+			break;
+		case PROCESSTYPE:
 			columnType = "integer";
+			break;
+		case PROCESSVERSION:
+			columnType = "string";
+			break;
+		case START_DATE:
+			columnType = "date";
 			break;
 		case STATUS:
-			columnType = "integer";
-			break;
-		case TASKID:
-			columnType = "integer";
-			break;
-		case WORKITEMID:
 			columnType = "integer";
 			break;
 		default:
@@ -109,5 +106,5 @@ public class H2TaskQueryStrategy implements QueryStrategy {
 		}
 		return columnType;
 	}
-
+	
 }
