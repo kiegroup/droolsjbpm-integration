@@ -128,6 +128,16 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         }
 
         notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+
+        Collection<ContainerSpec> containerSpecs = serverTemplate.getContainersSpec();
+        if (containerSpecs != null && !containerSpecs.isEmpty()) {
+            for (ContainerSpec containerSpec : containerSpecs) {
+                if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
+                    List<Container> containers = kieServerInstanceManager.startContainer( serverTemplate, containerSpec );
+                    notificationService.notify( serverTemplate, containerSpec, containers );
+                }
+            }
+        }
     }
 
     @Override

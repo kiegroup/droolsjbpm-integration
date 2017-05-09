@@ -39,6 +39,7 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
@@ -251,6 +252,37 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     }
 
+
+    @Test
+    public void testCreateServerTemplateWithContainersAutoStart() throws Exception {
+        ServerTemplate serverTemplate = new ServerTemplate();
+        serverTemplate.setId( kieServerInfo.getServerId() );
+        serverTemplate.setName( kieServerInfo.getName() );
+
+        serverTemplate.addServerInstance(ModelFactory.newServerInstanceKey(serverTemplate.getId(), kieServerInfo.getLocation()));
+
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()), releaseId, KieContainerStatus.STARTED, new HashMap());
+        serverTemplate.addContainerSpec(containerToDeploy);
+
+        mgmtControllerClient.saveServerTemplate(serverTemplate);
+
+        // Check that container is deployed.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+
+        // Container is in started state, so it should already be in kie server
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        ServiceResponse<KieContainerResourceList> containersList = client.listContainers();
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containersList.getType());
+        assertEquals(1, containersList.getResult().getContainers().size());
+
+        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        assertEquals(releaseId, containerInfo.getResult().getReleaseId());
+
+    }
     @Test
     public void testCreateContainerOnNotExistingKieServerInstance() {
         // Try to create container using kie controller without created kie server instance.
