@@ -15,7 +15,6 @@
   <description>Modules that align KIE/Drools/jBPM with different OSGi runtimes</description>
 
   <modules>
-    <!--<module>fuse-6.2</module>-->
     <module>osgi-platform-fuse-6.3</module>
   </modules>
 

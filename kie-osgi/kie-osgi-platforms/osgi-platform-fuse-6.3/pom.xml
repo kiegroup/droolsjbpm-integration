@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -210,17 +211,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-common</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-common</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-client</artifactId>
         <version>${project.version}</version>
@@ -230,83 +220,9 @@
         <artifactId>kie-server-client</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-jaxb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-jaxb</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote.ws</groupId>
-        <artifactId>kie-remote-ws-common</artifactId>
-        <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.xml.ws</groupId>
-            <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote.ws</groupId>
-        <artifactId>kie-remote-ws-common</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.xml.ws</groupId>
-            <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-client</artifactId>
-        <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.xml.ws</groupId>
-            <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.jms</groupId>
-            <artifactId>jboss-jms-api_1.1_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.remote</groupId>
-        <artifactId>kie-remote-client</artifactId>
-        <version>${project.version}</version>
-        <classifier>tests</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.xml.ws</groupId>
-            <artifactId>jboss-jaxws-api_2.2_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jboss.spec.javax.jms</groupId>
-            <artifactId>jboss-jms-api_1.1_spec</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <!-- drools dependencies -->
-
       <dependency>
         <groupId>org.drools</groupId>
         <artifactId>drools-core</artifactId>
@@ -994,7 +910,6 @@
         <artifactId>geronimo-jpa_2.0_spec</artifactId>
         <version>${version.org.apache.geronimo.specs-jpa_2.0}</version>
       </dependency>
-      <!-- Dependency on org.hornetq:hornetq-core-client for org.kie.remote:kie-remote-client -->
       <dependency>
         <groupId>org.hornetq</groupId>
         <artifactId>hornetq-core-client</artifactId>
@@ -1188,12 +1103,6 @@
         <version>${version.org.slf4j}</version>
         <scope>test</scope>
       </dependency>
-      <!--dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>${version.commons-logging}</version>
-        <scope>test</scope>
-      </dependency-->
       <dependency><!-- For unit test logging: configure in src/test/resources/logback-test.xml -->
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
@@ -1485,11 +1394,11 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-spring</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie</groupId>-->
-      <!--<artifactId>kie-spring</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-spring</artifactId>
+    <classifier>tests</classifier>
+    </dependency>
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-ci-osgi</artifactId>
@@ -1499,20 +1408,6 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie.server</groupId>-->
-      <!--<artifactId>kie-server-api</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-common</artifactId>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie.remote</groupId>-->
-      <!--<artifactId>kie-remote-common</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-client</artifactId>
@@ -1523,42 +1418,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie.server</groupId>-->
-      <!--<artifactId>kie-server-client</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
     <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-jaxb</artifactId>
+    <groupId>org.kie.server</groupId>
+    <artifactId>kie-server-client</artifactId>
+    <classifier>tests</classifier>
     </dependency>
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-jaxb</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.remote.ws</groupId>
-      <artifactId>kie-remote-ws-common</artifactId>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie.remote.ws</groupId>-->
-      <!--<artifactId>kie-remote-ws-common</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
-    <dependency>
-      <groupId>org.kie.remote</groupId>
-      <artifactId>kie-remote-client</artifactId>
-    </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.kie.remote</groupId>-->
-      <!--<artifactId>kie-remote-client</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-    <!--</dependency>-->
 
     <!-- drools dependencies -->
-
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-core</artifactId>
@@ -1583,62 +1449,62 @@
       <groupId>org.drools</groupId>
       <artifactId>drools-templates</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-templates</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-templates</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-decisiontables</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-decisiontables</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-decisiontables</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-persistence-jpa</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-persistence-jpa</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-persistence-jpa</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-datamodel-api</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-workbench-models-datamodel-api</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-workbench-models-datamodel-api</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-commons</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-workbench-models-commons</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-workbench-models-commons</artifactId>
+    <classifier>tests</classifier>
+    <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-guided-dtable</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.drools</groupId>-->
-      <!--<artifactId>drools-workbench-models-guided-dtable</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-workbench-models-guided-dtable</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
 
     <!-- jbpm dependencies -->
 
@@ -1646,42 +1512,42 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-flow</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-flow-builder</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-flow-builder</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-flow-builder</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-query-jpa</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-query-jpa</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-query-jpa</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-audit</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-audit</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-audit</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-bpmn2</artifactId>
@@ -1706,52 +1572,52 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-jpa</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-human-task-jpa</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-jpa</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-core</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-human-task-core</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-core</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-workitems</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-human-task-workitems</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-workitems</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-human-task-audit</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-human-task-audit</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-human-task-audit</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-runtime-manager</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.jbpm</groupId>-->
-      <!--<artifactId>jbpm-runtime-manager</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.jbpm</groupId>
+      <artifactId>jbpm-runtime-manager</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
 
     <!-- droolsjbpm-optaplanner dependencies -->
 
@@ -1765,32 +1631,32 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.optaplanner</groupId>-->
-      <!--<artifactId>optaplanner-core</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-core</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-common</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.optaplanner</groupId>-->
-      <!--<artifactId>optaplanner-persistence-common</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-common</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-persistence-xstream</artifactId>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>org.optaplanner</groupId>-->
-      <!--<artifactId>optaplanner-persistence-xstream</artifactId>-->
-      <!--<classifier>tests</classifier>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-persistence-xstream</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Transitive dependencies provided by Fuse 6.3 -->
 
@@ -1991,8 +1857,8 @@
       <scope>provided</scope>
     </dependency>
     <!--<dependency>-->
-      <!--<groupId>org.ops4j.pax.logging</groupId>-->
-      <!--<artifactId>pax-logging-api</artifactId>-->
+    <!--<groupId>org.ops4j.pax.logging</groupId>-->
+    <!--<artifactId>pax-logging-api</artifactId>-->
     <!--</dependency>-->
 
     <!-- Additional required test dependencies -->
@@ -2011,11 +1877,6 @@
       <artifactId>slf4j-api</artifactId>
       <scope>test</scope>
     </dependency>
-    <!--dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <scope>test</scope>
-    </dependency-->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -2197,324 +2058,45 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-test</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>drools-persistence-jpa</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <testClassesDirectory>${project.build.directory}/drools-persistence-jpa</testClassesDirectory>
-            </configuration>
-          </execution>
-        </executions>
-        <configuration>
-          <failIfNoTests>false</failIfNoTests>
-          <!-- For jbpm-runtime-manager tests -->
-          <forkMode>always</forkMode>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-tests-dependencies</id>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <!--
-                  It's not that easy to run all unzipped -tests.jar tests. The biggest problem is
-                  different "datasource.properties" contained in these tests jars
-
-                  Unfortunately it's nearly impossible to run all the tests after unzipping *all*
-                  tests. I just run them one at a time. I can imagine some clever maven tricks
-                  (profiles and executions), but this is still a to-do
-                -->
-                <artifactItem>
-                  <groupId>org.kie</groupId>
-                  <artifactId>kie-api</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>tests</classifier>
-                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                </artifactItem>
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie</groupId>-->
-                  <!--<artifactId>kie-internal</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-core</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-compiler</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                  <!-- excludes related to slightly different test classpath -->
-                  <!--<excludes>-->
-                    <!--/org/drools/compiler/kproject/KieProjectDefaultClasspathTest.class,-->
-                    <!--/org/drools/compiler/kproject/KieProjectRuntimeModulesTest,-->
-                    <!--/org/drools/compiler/integrationtests/XSDResourceTest.class-->
-                  <!--</excludes>-->
-                <!--</artifactItem>-->
-                <!-- Special unpack for org.drools.compiler.compiler.xml.changeset.ChangeSetTest.testCustomClassLoader() -->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-compiler</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                  <!--<includes>/org/drools/compiler/compiler/xml/changeset/changeset.jar</includes>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-templates</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-decisiontables</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!-- Special unpack for org.drools.decisiontable.ColumnReplaceTest.testAutoFocusToLockOnActiveReplacement() -->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-decisiontables</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.basedir}/src/test/resources</outputDirectory>-->
-                  <!--<includes>/org/drools/decisiontable/columnReplaceTest.csv</includes>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-persistence-jpa</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.directory}/drools-persistence-jpa</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-flow</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-flow-builder</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-audit</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-query-jpa</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-persistence-jpa</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-bpmn2</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                  <!--<excludes>/org/jbpm/bpmn2/structureref/StructureRefTest.class</excludes>-->
-                <!--</artifactItem>-->
-                <!-- Special unpack for org.jbpm.bpmn2.StandaloneBPMNProcessTest.testXXEProcessVulnerability() -->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-bpmn2</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.basedir}/src/test/resources</outputDirectory>-->
-                  <!--<includes>/xxe-protection/external.dtd</includes>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-human-task-jpa</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-human-task-core</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-human-task-core</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.basedir}/src/test/resources</outputDirectory>-->
-                  <!--<includes>/ldap-config.ldif</includes>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-human-task-workitems</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-human-task-audit</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-runtime-manager</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.jbpm</groupId>-->
-                  <!--<artifactId>jbpm-runtime-manager</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.basedir}/src/test/resources</outputDirectory>-->
-                  <!--<includes>-->
-                    <!--/deployment/*.xml,-->
-                    <!--/kjar/jbpm-module.jar,-->
-                    <!--/kjar/pom.xml-->
-                  <!--</includes>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie</groupId>-->
-                  <!--<artifactId>kie-spring</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-workbench-models-datamodel-api</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-workbench-models-commons</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.drools</groupId>-->
-                  <!--<artifactId>drools-workbench-models-guided-dtable</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.optaplanner</groupId>-->
-                  <!--<artifactId>optaplanner-core</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.optaplanner</groupId>-->
-                  <!--<artifactId>optaplanner-persistence-xstream</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.server</groupId>-->
-                  <!--<artifactId>kie-server-api</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.remote</groupId>-->
-                  <!--<artifactId>kie-remote-common</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.server</groupId>-->
-                  <!--<artifactId>kie-server-client</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.remote</groupId>-->
-                  <!--<artifactId>kie-remote-jaxb</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.remote.ws</groupId>-->
-                  <!--<artifactId>kie-remote-ws-common</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-                <!--<artifactItem>-->
-                  <!--<groupId>org.kie.remote</groupId>-->
-                  <!--<artifactId>kie-remote-client</artifactId>-->
-                  <!--<version>${project.version}</version>-->
-                  <!--<classifier>tests</classifier>-->
-                  <!--<outputDirectory>${project.build.testOutputDirectory}</outputDirectory>-->
-                <!--</artifactItem>-->
-              </artifactItems>
-              <excludes>META-INF/INDEX.LIST</excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <dependenciesToScan>
+              <dependency>org.kie:kie-api</dependency>
+              <dependency>org.kie:kie-internal</dependency>
+              <dependency>org.drools:drools-core</dependency>
+              <dependency>org.drools:drools-compiler</dependency>
+              <dependency>org.drools:drools-templates</dependency>
+              <dependency>org.drools:drools-decisiontables</dependency>
+              <dependency>org.drools:drools-persistence-jpa</dependency>
+              <dependency>org.jbpm:jbpm-flow</dependency>
+              <dependency>org.jbpm:jbpm-flow-builder</dependency>
+              <dependency>org.jbpm:jbpm-audit</dependency>
+              <dependency>org.jbpm:jbpm-query-jpa</dependency>
+              <dependency>org.jbpm:jbpm-persistence-jpa</dependency>
+              <dependency>org.jbpm:jbpm-bpmn2</dependency>
+              <dependency>org.jbpm:jbpm-human-task-core</dependency>
+              <dependency>org.jbpm:jbpm-human-task-jpa</dependency>
+              <dependency>org.jbpm:jbpm-human-task-workitems</dependency>
+              <dependency>org.jbpm:jbpm-human-task-audit</dependency>
+              <dependency>org.jbpm:jbpm-runtime-manager</dependency>
+              <dependency>org.kie:kie-spring</dependency>
+              <dependency>org.drools:drools-workbench-models-datamodel-api</dependency>
+              <dependency>org.drools:drools-workbench-models-commons</dependency>
+              <dependency>org.drools:drools-workbench-models-guided-dtable</dependency>
+              <dependency>org.optaplanner:optaplanner-core</dependency>
+              <dependency>org.optaplanner:optaplanner-persistence-xstream</dependency>
+              <dependency>org.kie:kie-server-api</dependency>
+              <dependency>org.kie:kie-server-client</dependency>
+            </dependenciesToScan>
+            <forkCount>5</forkCount>
+            <reuseForks>false</reuseForks>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>
