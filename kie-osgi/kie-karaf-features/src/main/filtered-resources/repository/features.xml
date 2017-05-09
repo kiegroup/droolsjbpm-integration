@@ -114,7 +114,7 @@
     <details>Enable Hibernate 5.x as persistence engine.</details>
     <feature>transaction</feature>
     <feature>jpa</feature>
-    <feature version="${project.version}">servlet-api-drools</feature>
+    <feature version="${project.version}">servlet-api-kie</feature>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/${karaf.version.org.apache.servicemix.bundles.antlr}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ant/${karaf.version.org.apache.servicemix.bundles.ant}</bundle>
     <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/${karaf.version.org.apache.servicemix.bundles.dom4j}</bundle>
@@ -166,7 +166,7 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${karaf.servicemix.version.com.thoughtworks.xmlpull}</bundle>
   </feature>
 
-  <feature name="servlet-api-drools" version="${project.version}">
+  <feature name="servlet-api-kie" version="${project.version}">
     <bundle>mvn:org.apache.geronimo.specs/geronimo-servlet_3.0_spec/${karaf.version.org.apache.geronimo.specs.servlet}</bundle>
   </feature>
 
