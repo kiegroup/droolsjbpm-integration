@@ -67,6 +67,12 @@ public class KieServerDeployer {
             mvnArgs = new ArrayList<String>(Arrays.asList("-B", "-e", "clean", "deploy"));
         }
 
+        // Maven CLI installs project dependencies to default repo if it is not overridden here.
+        // localRepository element from settings.xml brought by kjarsBuildSettingsXml seems to be ignored for project dependencies.
+        if (TestConfig.isRemoteRepoDirProvided()) {
+            System.setProperty("maven.repo.local", TestConfig.getRemoteRepoDir());
+        }
+
         // use custom settings.xml file, if one specified
         String kjarsBuildSettingsXml = TestConfig.getKjarsBuildSettingsXml();
         if (kjarsBuildSettingsXml != null && !kjarsBuildSettingsXml.isEmpty()) {

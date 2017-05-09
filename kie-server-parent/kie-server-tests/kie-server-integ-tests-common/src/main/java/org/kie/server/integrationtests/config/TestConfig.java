@@ -67,6 +67,7 @@ public class TestConfig {
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
     private static final StringTestParameter KIE_CLIENT_DEPLOYMENT_SETTINGS = new StringTestParameter("kie.server.client.deployment.settings.xml");
+    private static final StringTestParameter REMOTE_REPO_DIR = new StringTestParameter("kie.server.testing.remote.repo.dir");
 
     private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
     private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
@@ -401,6 +402,20 @@ public class TestConfig {
      */
     public static String getKieClientDeploymentSettings() {
         return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
+    }
+
+    /**
+     * @return True if remote repo directory is provided.
+     */
+    public static boolean isRemoteRepoDirProvided() {
+        return TestConfig.REMOTE_REPO_DIR.isParameterConfigured();
+    }
+
+    /**
+     * @return Location of remote repo directory.
+     */
+    public static String getRemoteRepoDir() {
+        return TestConfig.REMOTE_REPO_DIR.getParameterValue();
     }
 
     // Used for printing all configuration values at the beginning of first test run.
