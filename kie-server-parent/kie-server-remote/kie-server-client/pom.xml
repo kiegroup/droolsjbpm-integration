@@ -27,7 +27,7 @@
       <!-- TODO: Move dependency management to BOM -->
       <dependency>
          <groupId>org.kie.server</groupId>
-         <artifactId>kie-server-jbpm-queries-api</artifactId>
+         <artifactId>kie-server-jbpm-search-api</artifactId>
          <version>7.1.0-SNAPSHOT</version>
       </dependency>
     </dependencies>
@@ -68,7 +68,7 @@
     <!-- TODO: Do we want to depend on this api here?-->
     <dependency>
     	<groupId>org.kie.server</groupId>
-    	<artifactId>kie-server-jbpm-queries-api</artifactId>
+    	<artifactId>kie-server-jbpm-search-api</artifactId>
     </dependency>
     
     <dependency>

@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.jbpm.queries.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 
 /**
  * KIE-Server Client API for the advanced searches provided by the <code>kie-server-services-jbpm-queries</code> extension.
