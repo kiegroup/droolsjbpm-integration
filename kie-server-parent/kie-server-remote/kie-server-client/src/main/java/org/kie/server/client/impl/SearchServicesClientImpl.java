@@ -26,8 +26,8 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.SearchServicesClient;
-import org.kie.server.jbpm.queries.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.jbpm.queries.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 
 public class SearchServicesClientImpl extends AbstractKieServicesClientImpl implements SearchServicesClient {
 
