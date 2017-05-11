@@ -259,6 +259,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <!-- Needed for correct functionality of JMS authentication when KieLoginModule is set as login-module in EAP. -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-security</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
