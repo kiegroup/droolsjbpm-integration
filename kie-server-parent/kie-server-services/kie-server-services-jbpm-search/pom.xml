@@ -31,6 +31,11 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.kie</groupId>
+			<artifactId>kie-internal</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-api</artifactId>
 		</dependency>
@@ -43,6 +48,13 @@
 		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-services-common</artifactId>
+			<exclusions>
+        		<exclusion>
+          			<!-- Collides with xml-apis:xml-apis -->
+          			<groupId>javax.xml.stream</groupId>
+          			<artifactId>stax-api</artifactId>
+        		</exclusion>
+      		</exclusions>
 		</dependency>
     
     	<!-- TODO: This dependency is needed because we need access to ConvertUtils. Maybe it's an idea to put those utils in a common lib. -->
