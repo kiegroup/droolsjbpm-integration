@@ -26,84 +26,32 @@
 </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-internal</artifactId>
-    </dependency>
-  
+  	
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-common</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-jbpm-search</artifactId>
-    </dependency> 
+    </dependency>
+    
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-common</artifactId>
     </dependency> 
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-compiler</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-human-task-core</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-runtime-manager</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-shared-services</artifactId>
-    </dependency>
+	
     <dependency>
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-services-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-kie-services</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-executor</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-workitems</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-document</artifactId>
-    </dependency>
-
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -115,11 +63,13 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-matchers</artifactId>
       <scope>test</scope>
     </dependency>
+    
     <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
