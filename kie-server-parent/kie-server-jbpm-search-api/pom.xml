@@ -18,17 +18,12 @@
   </properties>
 
   <dependencies>
-    <!-- core dependencies -->
-    <dependency>
-      <groupId>org.kie</groupId>
-      <artifactId>kie-api</artifactId>
-      <!-- scope>provided</scope -->
-    </dependency>
+    
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
     </dependency>
-
+   
   </dependencies>
 
   <build>
@@ -49,7 +44,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              org.kie.server.jbpm.taskqueries.api.*
+              org.kie.server.jbpm.search.*
             </Export-Package>
             <Import-Package>
               com.thoughtworks.xstream;resolution:=optional,
