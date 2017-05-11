@@ -19,14 +19,19 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.jms.ConnectionFactory;
 import javax.jms.Queue;
 import javax.naming.InitialContext;
 
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.kie.api.command.KieCommands;
 import org.kie.api.runtime.KieContainer;
+import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
@@ -168,4 +173,20 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         return KieServicesFactory.newRestConfiguration(TestConfig.getKieServerHttpUrl(), TestConfig.getUsername(), TestConfig.getPassword());
     }
 
+    protected void assertClientException(ThrowableAssert.ThrowingCallable callable, int expectedHttpCode, String message) {
+        assertClientException(callable, expectedHttpCode, message, message);
+    }
+
+    protected void assertClientException(ThrowableAssert.ThrowingCallable callable, int expectedHttpCode, String restMessage, String jmsMessage) {
+        if(configuration.isRest()) {
+            Assertions.assertThatThrownBy(callable)
+                    .isInstanceOf(KieServicesHttpException.class)
+                    .hasFieldOrPropertyWithValue("httpCode", expectedHttpCode)
+                    .hasMessageContaining(restMessage);
+        } else {
+            Assertions.assertThatThrownBy(callable)
+                    .isInstanceOf(KieServicesException.class)
+                    .hasMessageContaining(jmsMessage);
+        }
+    }
 }

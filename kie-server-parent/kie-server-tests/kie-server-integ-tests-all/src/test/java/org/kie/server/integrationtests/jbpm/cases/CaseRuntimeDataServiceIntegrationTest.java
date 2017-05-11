@@ -1187,6 +1187,62 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     }
 
     @Test
+    public void testAssignUserToRoleNotExistingCase() {
+        assertClientException(
+                () -> caseClient.assignUserToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
+    }
+
+    @Test
+    public void testAssignGroupToRoleNotExistingCase() {
+        assertClientException(
+                () -> caseClient.assignGroupToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
+    }
+
+    @Test
+    public void testRemoveUserFromRoleNotExistingCase() {
+        assertClientException(
+                () -> caseClient.removeUserFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
+    }
+
+    @Test
+    public void testRemoveGroupFromRoleNotExistingCase() {
+        assertClientException(
+                () -> caseClient.removeGroupFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
+    }
+
+    @Test
+    public void testCaseRolesCardinality() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        CaseFile caseFile = CaseFile.builder()
+                .data(data)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
+
+        // Try to add second user to insured role with cardinality 1
+        assertClientException(
+                () -> caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA),
+                400,
+                "Cannot add more users for role " + CASE_INSURED_ROLE);
+    }
+
+    @Test
     public void testGetCaseStages() {
         String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         assertNotNull(caseClaimId);
