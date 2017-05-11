@@ -1,0 +1,70 @@
+
+<form id="1104701787">
+<property name="subject" value=""/>
+<property name="name" value="PurchaseHeader.form"/>
+<property name="displayMode" value="default"/>
+<property name="status" value="0"/>
+<field position="0" name="header_creationDate" type="InputShortDate" id="107096507">
+<property name="fieldRequired" value="true"/>
+<property name="groupWithPrevious" value="false"/>
+<property name="labelCSSClass" value=""/>
+<property name="labelCSSStyle" value=""/>
+<property name="label" value="quot;enquot;,quot;Creation datequot;quot;esquot;,quot;quot;"/>
+<property name="errorMessage" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="title" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="disabled" value="false"/>
+<property name="readonly" value="false"/>
+<property name="size" value="12"/>
+<property name="formula" value=""/>
+<property name="styleclass" value=""/>
+<property name="cssStyle" value=""/>
+<property name="defaultValueFormula" value="=new java.util.Date()"/>
+<property name="inputBinding" value="header/creationDate"/>
+<property name="outputBinding" value="header/creationDate"/>
+</field>
+<field position="1" name="header_customer" type="InputText" id="134184257">
+<property name="fieldRequired" value="true"/>
+<property name="groupWithPrevious" value="true"/>
+<property name="labelCSSClass" value=""/>
+<property name="labelCSSStyle" value=""/>
+<property name="label" value="quot;SSClassquot;,quot;quot;quot;SSStylequot;,quot;quot;quot;enquot;,quot;Customerquot;quot;esquot;,quot;quot;"/>
+<property name="errorMessage" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="title" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="disabled" value="false"/>
+<property name="readonly" value="false"/>
+<property name="size" value="20"/>
+<property name="formula" value=""/>
+<property name="rangeFormula" value=""/>
+<property name="pattern" value=""/>
+<property name="styleclass" value=""/>
+<property name="cssStyle" value=""/>
+<property name="isHTML" value="false"/>
+<property name="hideContent" value="false"/>
+<property name="defaultValueFormula" value=""/>
+<property name="inputBinding" value="header/customer"/>
+<property name="outputBinding" value="header/customer"/>
+</field>
+<field position="2" name="header_project" type="InputText" id="851448903">
+<property name="fieldRequired" value="true"/>
+<property name="groupWithPrevious" value="false"/>
+<property name="labelCSSClass" value=""/>
+<property name="labelCSSStyle" value=""/>
+<property name="label" value="quot;enquot;,quot;Projectquot;quot;esquot;,quot;quot;"/>
+<property name="errorMessage" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="title" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
+<property name="disabled" value="false"/>
+<property name="readonly" value="false"/>
+<property name="size" value="40"/>
+<property name="formula" value=""/>
+<property name="rangeFormula" value=""/>
+<property name="pattern" value=""/>
+<property name="styleclass" value=""/>
+<property name="cssStyle" value=""/>
+<property name="isHTML" value="false"/>
+<property name="hideContent" value="false"/>
+<property name="defaultValueFormula" value=""/>
+<property name="inputBinding" value="header/project"/>
+<property name="outputBinding" value="header/project"/>
+</field>
+<dataHolder inputId="header" name="#0000A0" type="dataModelerEntry" outId="header" value="org.jbpm.examples.purchases.PurchaseOrderHeader" id="header"/>
+</form>
