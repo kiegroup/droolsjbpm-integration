@@ -15,7 +15,13 @@
 
 package org.kie.server.services.jbpm.search;
 
-import static org.kie.server.services.jbpm.ConvertUtils.*;
+import static org.kie.server.services.jbpm.ConvertUtils.buildQueryContext;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToErrorInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToProcessInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskInstanceWithVarsList;
+import static org.kie.server.services.jbpm.ConvertUtils.convertToTaskSummaryList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +38,7 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
+import org.kie.internal.runtime.error.ExecutionError;
 import org.kie.server.jbpm.search.api.model.definition.BaseQueryFilterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +118,11 @@ public class QueryServiceTemplate {
 
 				logger.debug("Converting collection of TaskSummary to TaskSummaryList");
 				actualResult = convertToTaskSummaryList((Collection<TaskSummary>) result);
-			} else if (List.class.isAssignableFrom(resultMapper.getType())) {
+			} else if (ExecutionError.class.isAssignableFrom(resultMapper.getType())) {
+
+                logger.debug("Converting collection of ExecutionError to ErrorInstanceList");
+                actualResult = convertToErrorInstanceList((List<ExecutionError>) result);
+            } else if (List.class.isAssignableFrom(resultMapper.getType())) {
 
 				logger.debug("Converting collection of List to ArrayList");
 				actualResult = new ArrayList((Collection) result);
