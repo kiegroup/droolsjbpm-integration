@@ -69,10 +69,24 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
     }
 
     @Test
-    public void testGetProcessFormWithSubForm() throws Exception {
+    public void testGetProcessFilteredFormWithSubForm() throws Exception {
+        getProcessFormWithSubForm(true);
+    }
+
+    @Test
+    public void testGetProcessUnFilteredFormWithSubForm() throws Exception {
+        getProcessFormWithSubForm(false);
+    }
+
+
+    private void getProcessFormWithSubForm(boolean filtered) throws Exception {
         Map<String, Object> valuesMap = new HashMap<String, Object>();
         valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_ID, TICKETSUPPORT_PROCESS_ID);
+        if(filtered) {
+            valuesMap.put(RestURI.FORM_FILTER, "true");
+        }
+
 
         ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
                 .header("Content-Type", getMediaType().toString())
@@ -120,12 +134,12 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
 
                 NodeList forms = doc.getDocumentElement().getElementsByTagName("form");
                 Node firstForm = forms.item(0);
-                // 2 subform fields and 4 properties
-                assertEquals(6, ((DeferredElementImpl) firstForm).getChildNodes().getLength());
+                // 2 subform fields and 11 properties
+                assertEquals(13, ((DeferredElementImpl) firstForm).getChildNodes().getLength());
 
                 Node secondForm = forms.item(1);
-                // 5 subform fields and 4 properties
-                assertEquals(9, ((DeferredElementImpl) secondForm).getChildNodes().getLength());
+                // 5 subform fields and 14 properties
+                assertEquals(19, ((DeferredElementImpl) secondForm).getChildNodes().getLength());
             }
         }
     }

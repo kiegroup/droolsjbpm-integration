@@ -17,6 +17,7 @@ package org.kie.server.remote.rest.jbpm.ui;
 
 
 import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.FORM_FILTER;
 import static org.kie.server.api.rest.RestURI.FORM_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_FORM_GET_URI;
 import static org.kie.server.api.rest.RestURI.PROCESS_ID;
@@ -71,7 +72,8 @@ public class FormResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId,
-            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
+            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam(FORM_FILTER) boolean filter) {
+
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -103,6 +105,7 @@ public class FormResource {
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(TASK_INSTANCE_ID) Long taskId,
             @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter) {
+
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
