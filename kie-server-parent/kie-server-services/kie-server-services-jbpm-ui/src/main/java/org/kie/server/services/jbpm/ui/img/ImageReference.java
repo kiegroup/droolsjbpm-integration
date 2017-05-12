@@ -51,12 +51,11 @@ public class ImageReference {
         if (process != null) {
             String sourcePath = process.getResource().getSourcePath();
             if (sourcePath != null) {
-                String processDirectory = new File(sourcePath).getParent();
-                if (processDirectory == null) {
-                    processDirectory = "";
-                } else {
-                    processDirectory += "/";
+                String processDirectory = "";
+                if (sourcePath.indexOf("/") != -1) {
+                    processDirectory = sourcePath.substring(0, sourcePath.lastIndexOf("/") + 1);
                 }
+
                 byte[] data = seek(processDirectory, name, kieModule);
 
                 if (data != null) {
