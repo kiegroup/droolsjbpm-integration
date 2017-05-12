@@ -72,7 +72,7 @@ public class FormResource {
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId,
             @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
-            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") boolean marshallContent) {
+            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent) {
 
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -101,7 +101,7 @@ public class FormResource {
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(TASK_INSTANCE_ID) Long taskId,
             @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
-            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") boolean marshallContent ) {
+            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent ) {
 
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
