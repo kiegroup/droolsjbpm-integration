@@ -665,6 +665,175 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
     }
+    
+    @Test
+    public void testUpdateContainerNonValidReleaseId() throws Exception {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, Collections.EMPTY_MAP);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+
+        // Check that container is deployed in kie server.
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        ServiceResponse<KieContainerResource> containerInfoResponse = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfoResponse.getType());
+        KieContainerResource containerResource = containerInfoResponse.getResult();
+        assertEquals(CONTAINER_ID, containerResource.getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
+        assertEquals(releaseId, containerResource.getReleaseId());
+
+        // Update container
+        ReleaseId nonValidReleaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "2.0.0-SNAPSHOT");
+        containerToDeploy.setReleasedId(nonValidReleaseId);
+
+        // We can update container to new version, but if can't be found, then deployed container is not changed.
+        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller. Container has changed ReleaseId
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        assertEquals(CONTAINER_ID, containerResponseEntity.getId());
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(KieContainerStatus.STARTED, containerResponseEntity.getStatus());
+        assertEquals(nonValidReleaseId, containerResponseEntity.getReleasedId());
+
+        // Check deployed container
+        containerInfoResponse = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfoResponse.getType());
+        containerResource = containerInfoResponse.getResult();
+
+        // Check that Kie Container has message about error durining updating
+        // Kie Container store last message
+        assertEquals(1, containerResource.getMessages().size());
+        Collection<String> messages = containerResource.getMessages().get(0).getMessages();
+        assertEquals(1, messages.size());
+        KieServerAssert.assertResultContainsString(messages.iterator().next(), "Error updating releaseId for container");
+        
+        assertEquals(CONTAINER_ID, containerResource.getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
+        assertEquals(releaseId, containerResource.getReleaseId());
+    }
+
+    @Test
+    public void testStartContainerByUpdateKieContainerStatus() throws Exception {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+
+        // Check that container is not deployed in kie server (as container is in STOPPED state).
+        ServiceResponse<KieContainerResource> containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.FAILURE, containerInfo.getType());
+        KieServerAssert.assertResultContainsString(containerInfo.getMsg(), "Container " + CONTAINER_ID + " is not instantiated.");
+
+        // Update container
+        containerToDeploy.setStatus(KieContainerStatus.STARTED);
+        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STARTED);
+
+        // Check that container is deployed in kie server.
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
+        containerInfo = client.getContainerInfo(CONTAINER_ID);
+        assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfo.getType());
+        assertEquals(CONTAINER_ID, containerInfo.getResult().getContainerId());
+        assertEquals(KieContainerStatus.STARTED, containerInfo.getResult().getStatus());
+        assertEquals(releaseId, containerInfo.getResult().getReleaseId());
+    }
+
+    @Test
+    public void testCreateContainerByUpdateContainer() {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        try {
+            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+            fail("Container was created by update command - REST Post method.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(404, e.getResponseCode());
+        }
+
+        KieServerAssert.assertNullOrEmpty("Found deployed container.", mgmtControllerClient.listContainerSpec(serverTemplate.getId()));
+    }
+
+    @Test
+    public void testUpdateContainerId() {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, Collections.EMPTY_MAP);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+
+        containerToDeploy.setId("newID");
+        try {
+            mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), CONTAINER_ID, containerToDeploy);
+            fail("Container has updated id.");
+        } catch (UnexpectedResponseCodeException e) {
+            assertEquals(400, e.getResponseCode());
+            KieServerAssert.assertResultContainsString(e.getMessage(), "Cannot update container newID on container " + CONTAINER_ID);
+        }
+    }
+
+    @Test
+    public void testUpdateContainerWitoutContainerConfig() {
+        // Create kie server instance connection in controller.
+        ServerTemplate serverTemplate = createServerTemplate();
+
+        // Create container configMap
+        Map<Capability, ContainerConfig> containerConfigMap = new HashMap();
+
+        ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
+        containerConfigMap.put(Capability.PROCESS, processConfig);
+        RuleConfig ruleConfig = new RuleConfig(5000l, KieScannerStatus.SCANNING);
+        containerConfigMap.put(Capability.RULE, ruleConfig);
+
+        // Deploy container for kie server instance.
+        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STOPPED, containerConfigMap);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        ContainerSpec containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+
+        // Check process config and rule config.
+        checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
+
+        // Update container
+        containerToDeploy.setConfigs(Collections.EMPTY_MAP);
+        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
+
+        // Get container using kie controller.
+        containerResponseEntity = mgmtControllerClient.getContainerInfo(kieServerInfo.getServerId(), CONTAINER_ID);
+        checkContainer(containerResponseEntity, KieContainerStatus.STOPPED);
+        assertEquals(CONTAINER_NAME, containerResponseEntity.getContainerName());
+        assertEquals(releaseId, containerResponseEntity.getReleasedId());
+        KieServerAssert.assertNullOrEmpty("Container configuration was found.", containerResponseEntity.getConfigs().keySet());
+    }
 
     @Test
     public void testUpdateContainerNonValidReleaseId() throws Exception {
