@@ -15,7 +15,7 @@
 
 package org.kie.server.services.jbpm.search;
 
-import org.kie.server.jbpm.search.api.model.definition.BaseQueryFilterSpec;
+import org.kie.server.api.model.definition.BaseQueryFilterSpec;
 
 /**
  * Provides the context for query request execution, including things like payload and unmarshalled {@link BaseQueryFilterSpec}.

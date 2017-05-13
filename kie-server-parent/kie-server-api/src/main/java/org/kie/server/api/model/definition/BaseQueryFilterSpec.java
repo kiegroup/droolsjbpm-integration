@@ -13,9 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.jbpm.search.api.model.definition;
-
-import org.kie.server.api.model.definition.QueryParam;
+package org.kie.server.api.model.definition;
 
 public interface BaseQueryFilterSpec {
 

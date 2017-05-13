@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jbpm.services.api.query.model.QueryParam;
-import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceField;
+import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

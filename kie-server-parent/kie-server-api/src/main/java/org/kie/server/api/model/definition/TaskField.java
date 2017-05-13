@@ -13,31 +13,32 @@
  * limitations under the License.
 */
 
-package org.kie.server.jbpm.search.api.model.definition;
+package org.kie.server.api.model.definition;
 
 /**
- * ProcessInstance fields.
+ * HumanTask fields.
  * <p/>
- * These are the filterable fields in our ProcessInstanceQuery API.
+ * These are the filterable fields in our TaskQuery API. 
  */
-public enum ProcessInstanceField {
+public enum TaskField {
 
 	//@formatter:off
-	ID,
-	CORRELATIONKEY,
-	DURATION,
-	END_DATE,
-	EXTERNALID,
-	USER_IDENTITY,
-	OUTCOME,
-	PARENTPROCESSINSTANCEID,
-	PROCESSID,
-	PROCESSINSTANCEDESCRIPTION,
-	PROCESSINSTANCEID,
-	PROCESSNAME,
-	PROCESSTYPE,
-	PROCESSVERSION,
-	START_DATE,
-	STATUS
+	ID,			
+	ACTIVATIONTIME,		
+	ACTUALOWNER,			
+	CREATEDBY,			
+	CREATEDON,			
+	DEPLOYMENTID,			
+	DESCRIPTION,			
+	DUEDATE,			
+	NAME,			
+	PARENTID,			
+	PRIORITY,			
+	PROCESSID,			
+	PROCESSINSTANCEID,			
+	PROCESSSESSIONID,			
+	STATUS,			
+	TASKID,			
+	WORKITEMID
 	//@formatter:on
 }

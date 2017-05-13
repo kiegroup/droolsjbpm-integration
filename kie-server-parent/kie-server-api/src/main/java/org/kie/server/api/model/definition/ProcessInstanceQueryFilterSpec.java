@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.server.jbpm.search.api.model.definition;
+package org.kie.server.api.model.definition;
 
 import java.util.Arrays;
 
@@ -21,8 +21,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.kie.server.api.model.definition.QueryParam;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance-query-filter-spec")

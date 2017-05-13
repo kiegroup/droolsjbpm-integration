@@ -31,9 +31,9 @@ import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryParam;
 import org.junit.Test;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
-import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.services.api.KieServerRegistry;
 import org.mockito.Mockito;
 
