@@ -13,17 +13,6 @@
 	<name>KIE :: Execution Server :: Services :: jBPM Search Extension</name>
 	<description>KIE jBPM Search Execution Server Extension</description>
 
-	<dependencyManagement>
-		<dependencies>
-  		<!-- TODO: This should be moved to a parent BOM -->
-			<dependency>
-				<groupId>org.kie.server</groupId>
-				<artifactId>kie-server-jbpm-search-api</artifactId>
-				<version>7.1.0-SNAPSHOT</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.kie</groupId>
@@ -40,11 +29,6 @@
 			<artifactId>kie-server-api</artifactId>
 		</dependency>
 		 
-		<dependency>
-			<groupId>org.kie.server</groupId>
-			<artifactId>kie-server-jbpm-search-api</artifactId>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-services-common</artifactId>

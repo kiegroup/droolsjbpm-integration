@@ -39,7 +39,7 @@ import org.jbpm.services.api.query.model.QueryParam;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.runtime.error.ExecutionError;
-import org.kie.server.jbpm.search.api.model.definition.BaseQueryFilterSpec;
+import org.kie.server.api.model.definition.BaseQueryFilterSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

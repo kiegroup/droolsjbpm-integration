@@ -13,17 +13,16 @@
  * limitations under the License.
 */
 
-package org.kie.server.jbpm.search.util;
+package org.kie.server.api.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.kie.server.api.model.definition.ProcessInstanceField;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
-import org.kie.server.api.util.QueryFilterSpecBuilder;
-import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceField;
-import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.jbpm.search.api.model.definition.TaskField;
+import org.kie.server.api.model.definition.TaskField;
 
 /**
  * QueryFilterSpecBuilder targeted at filters for Process Instances.

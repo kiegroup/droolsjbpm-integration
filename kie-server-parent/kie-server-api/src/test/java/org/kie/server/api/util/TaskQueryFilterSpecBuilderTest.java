@@ -1,4 +1,4 @@
-package org.kie.server.jbpm.search.util;
+package org.kie.server.api.util;
 
 import org.junit.Test;
 
