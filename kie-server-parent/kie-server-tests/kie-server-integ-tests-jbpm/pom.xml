@@ -267,6 +267,8 @@
               <org.jbpm.case.server.ext.disabled>true</org.jbpm.case.server.ext.disabled>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
               <org.kie.server.persistence.ds>${org.kie.server.persistence.ds}</org.kie.server.persistence.ds>
+              <!-- Some tests need to know which DB they are currently run with -->
+              <org.kie.server.datasource.driver.class>${org.kie.server.datasource.driver.class}</org.kie.server.datasource.driver.class>
               <org.jbpm.document.storage>${org.jbpm.document.storage}</org.jbpm.document.storage>
             </systemPropertyVariables>
           </configuration>
