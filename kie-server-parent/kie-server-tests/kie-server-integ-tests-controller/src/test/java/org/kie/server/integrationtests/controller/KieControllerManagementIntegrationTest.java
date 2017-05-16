@@ -665,7 +665,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
     }
-    
+
     @Test
     public void testUpdateContainerNonValidReleaseId() throws Exception {
         // Create kie server instance connection in controller.
@@ -689,6 +689,11 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
         assertEquals(releaseId, containerResource.getReleaseId());
 
+        assertEquals(1, containerResource.getMessages().size());
+        Collection<String> oldMessages = containerResource.getMessages().get(0).getMessages();
+        assertEquals(1, oldMessages.size());
+        String oldMessage = oldMessages.iterator().next();
+
         // Update container
         ReleaseId nonValidReleaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "2.0.0-SNAPSHOT");
         containerToDeploy.setReleasedId(nonValidReleaseId);
@@ -710,6 +715,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
         // Check that Kie Container has message about error during updating
         // Kie Container store last message
+        KieServerSynchronization.waitForKieServerMessage(client, CONTAINER_ID, oldMessage, "Error updating releaseId for container");
         assertEquals(1, containerResource.getMessages().size());
         Collection<String> messages = containerResource.getMessages().get(0).getMessages();
         assertEquals(2, messages.size());
