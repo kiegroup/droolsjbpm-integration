@@ -88,15 +88,15 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
                 stringBuilder.append(line);
             }
         } catch (Throwable e) {
-        	logger.error("Unable to read server template maps from file",e);
-		}
+            logger.error("Unable to read server template maps from file",e);
+        }
         String templatesString = stringBuilder.toString();
         if (templatesString != null && !templatesString.trim().isEmpty()) {
-	        List<ServerTemplate> listOfTemplates = templateMarshaller.unmarshall(stringBuilder.toString(),ClassCaster.<List<ServerTemplate>>castClass(List.class));
-	        listOfTemplates.forEach(template -> {
-	            templateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
-	            templateMap.put(template.getId(),template);
-	        });
+            List<ServerTemplate> listOfTemplates = templateMarshaller.unmarshall(stringBuilder.toString(),ClassCaster.<List<ServerTemplate>>castClass(List.class));
+            listOfTemplates.forEach(template -> {
+                templateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
+                templateMap.put(template.getId(),template);
+            });
         }
     }
 
@@ -120,33 +120,33 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
 
     @Override
     public List<ServerTemplateKey> loadKeys() {
-    	if (templateKeyMap.isEmpty()) {
-    		loadTemplateMapsFromFile();
-    	}
+        if (templateKeyMap.isEmpty()) {
+            loadTemplateMapsFromFile();
+        }
         return new ArrayList<ServerTemplateKey>(templateKeyMap.values());
     }
 
     @Override
     public List<ServerTemplate> load() {
-    	if (templateKeyMap.isEmpty()) {
-    		loadTemplateMapsFromFile();
-    	}
+        if (templateKeyMap.isEmpty()) {
+            loadTemplateMapsFromFile();
+        }
         return new ArrayList<ServerTemplate>(templateMap.values());
     }
 
     @Override
     public ServerTemplate load(String identifier) {
-    	if (templateKeyMap.isEmpty()) {
-    		loadTemplateMapsFromFile();
-    	}
+        if (templateKeyMap.isEmpty()) {
+            loadTemplateMapsFromFile();
+        }
         return templateMap.get(identifier);
     }
 
     @Override
     public boolean exists(String identifier) {
-    	if (templateKeyMap.isEmpty()) {
-    		loadTemplateMapsFromFile();
-    	}
+        if (templateKeyMap.isEmpty()) {
+            loadTemplateMapsFromFile();
+        }
         return templateMap.containsKey(identifier);
     }
 
@@ -154,9 +154,9 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     public ServerTemplate update(ServerTemplate serverTemplate) {
         ServerTemplate updated = null;
         synchronized (templateMap) {
-        	if (templateKeyMap.isEmpty()) {
-        		loadTemplateMapsFromFile();
-        	}
+            if (templateKeyMap.isEmpty()) {
+                loadTemplateMapsFromFile();
+            }
             templateKeyMap.put(serverTemplate.getId(),
                                new ServerTemplateKey(serverTemplate.getId(),serverTemplate.getName()));
             updated = templateMap.put(serverTemplate.getId(),serverTemplate);
@@ -177,15 +177,15 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     }
     
     public void clearTemplateMaps() {
-    	synchronized (templateMap) {
-    		templateKeyMap.entrySet().clear();
-    		templateMap.entrySet().clear();
-    	}
+        synchronized (templateMap) {
+            templateKeyMap.entrySet().clear();
+            templateMap.entrySet().clear();
+        }
     }
     
     public void reloadTemplateMaps() {
-    	this.clearTemplateMaps();
-		loadTemplateMapsFromFile();
+        this.clearTemplateMaps();
+        loadTemplateMapsFromFile();
     }
 
     public void setTemplatesLocation(String templatesLocation) {

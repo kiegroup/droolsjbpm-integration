@@ -57,12 +57,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 
 public class FileBasedKieServerTemplateStorageTest {
-	private static final Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorageTest.class);
-	private static final String TEST_SERVER_TEMPLATE_FILENAME = "/tmp/templates.xml";
-	private static SpecManagementService specManageService;
-	private static RuntimeManagementService runtimeManagementService;
-	private static KieServerInstanceManager kieServerInstanceManager;
-	
+    private static final Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorageTest.class);
+    private static final String TEST_SERVER_TEMPLATE_FILENAME = "/tmp/templates.xml";
+    private static SpecManagementService specManageService;
+    private static RuntimeManagementService runtimeManagementService;
+    private static KieServerInstanceManager kieServerInstanceManager;
+    
     private static Map<ServerTemplateKey, ServerTemplate> templateMap;
     private FileBasedKieServerTemplateStorage storage;
     
@@ -73,7 +73,7 @@ public class FileBasedKieServerTemplateStorageTest {
      * @return A new server template instance
      */
     private static ServerTemplate createServerTemplateWithContainer(String templateName, int templateCount) {
-    	ServerTemplate template = new ServerTemplate();
+        ServerTemplate template = new ServerTemplate();
         template = new ServerTemplate();
 
         template.setName(templateName);
@@ -124,7 +124,7 @@ public class FileBasedKieServerTemplateStorageTest {
         container.setUrl("http://fake.server.net/kie-server");
         container.setStatus(containerSpec.getStatus());
 
-    	return template;
+        return template;
     }
     
     /**
@@ -134,10 +134,10 @@ public class FileBasedKieServerTemplateStorageTest {
      * @return The first server template
      */
     private ServerTemplate getFirstTemplateFromMap() {
-    	Iterator<ServerTemplate> iter = templateMap.values().iterator();
-    	ServerTemplate testTemplate = iter.hasNext() ? iter.next() : null;
-    	assertNotNull("Unable to find a test server template!",testTemplate);
-    	return testTemplate;
+        Iterator<ServerTemplate> iter = templateMap.values().iterator();
+        ServerTemplate testTemplate = iter.hasNext() ? iter.next() : null;
+        assertNotNull("Unable to find a test server template!",testTemplate);
+        return testTemplate;
     }
     
     /**
@@ -149,27 +149,27 @@ public class FileBasedKieServerTemplateStorageTest {
      * @return The retrieved ServerTemplate instance
      */
     private ServerTemplate loadTemplateWithAssertEquals(ServerTemplate template) {
-    	ServerTemplate loadedTemplate = storage.load(template.getId());
-    	assertNotNull("Unable to load template from storage",loadedTemplate);
-    	assertEquals("Loaded template is not the one asked for",template,loadedTemplate);
-    	return loadedTemplate;
+        ServerTemplate loadedTemplate = storage.load(template.getId());
+        assertNotNull("Unable to load template from storage",loadedTemplate);
+        assertEquals("Loaded template is not the one asked for",template,loadedTemplate);
+        return loadedTemplate;
     }
     
     @BeforeClass
     public static void beforeClass() {
-    	System.setProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP, 
-    			TEST_SERVER_TEMPLATE_FILENAME);
-    	specManageService = new SpecManagementServiceImpl();
+        System.setProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP, 
+                TEST_SERVER_TEMPLATE_FILENAME);
+        specManageService = new SpecManagementServiceImpl();
         runtimeManagementService = new RuntimeManagementServiceImpl();
         kieServerInstanceManager = Mockito.mock(KieServerInstanceManager.class);
         ((RuntimeManagementServiceImpl)runtimeManagementService).setKieServerInstanceManager(kieServerInstanceManager);
 
         templateMap = Maps.newConcurrentMap();
         for (int x = 0; x < 3; x++) {
-        	StringBuilder templateName = new StringBuilder("test server : ").append(x);
-        	ServerTemplate template = createServerTemplateWithContainer(templateName.toString(),x+1);
-        	ServerTemplateKey key = new ServerTemplateKey(template.getId(), template.getName());
-        	templateMap.put(key, template);
+            StringBuilder templateName = new StringBuilder("test server : ").append(x);
+            ServerTemplate template = createServerTemplateWithContainer(templateName.toString(),x+1);
+            ServerTemplateKey key = new ServerTemplateKey(template.getId(), template.getName());
+            templateMap.put(key, template);
         }
     }
     
@@ -177,101 +177,101 @@ public class FileBasedKieServerTemplateStorageTest {
     public void setup() {
         storage = FileBasedKieServerTemplateStorage.getInstance();
         templateMap.keySet().forEach(key -> {
-        	storage.store(templateMap.get(key));
+            storage.store(templateMap.get(key));
         });
         assertEquals("Mismatched number of server templates stored",templateMap.keySet().size(),storage.loadKeys().size());
     }
     
     @After
     public void clean() {
-    	Path testServerTemplateFile = Paths.get(TEST_SERVER_TEMPLATE_FILENAME);
-    	try {
-			Files.deleteIfExists(testServerTemplateFile);
-		} catch (IOException e) {
-			logger.warn("Exception while deleting test server template storage",e);
-			e.printStackTrace();
-		}
+        Path testServerTemplateFile = Paths.get(TEST_SERVER_TEMPLATE_FILENAME);
+        try {
+            Files.deleteIfExists(testServerTemplateFile);
+        } catch (IOException e) {
+            logger.warn("Exception while deleting test server template storage",e);
+            e.printStackTrace();
+        }
     }
     
     @AfterClass
     public static void afterClass() {
-    	System.clearProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP);
+        System.clearProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP);
     }
     
 
     @Test
     public void testStore() {
-    	/*
-    	 * Just need to make sure that if we load the keys
-    	 * back in from the file, we get the same size set
-    	 * More in depth testing of the actual elements retrieve
-    	 * happens in later tests
-    	*/
+        /*
+         * Just need to make sure that if we load the keys
+         * back in from the file, we get the same size set
+         * More in depth testing of the actual elements retrieve
+         * happens in later tests
+        */
         storage.reloadTemplateMaps();
         assertEquals("Mismatched number of server templates",templateMap.keySet().size(),storage.loadKeys().size());
     }
     
     @Test
     public void testLoadKeys() {
-    	/*
-    	 * Using the clearTemplateMaps method insures
-    	 * that the code that checks for loading from
-    	 * files is called
-    	 */
-    	storage.clearTemplateMaps();
-    	List<ServerTemplateKey> keys = storage.loadKeys();
-    	/*
-    	 * Now we check that both the number of keys retrieved is correct
-    	 * and that for each key we think we should have, it is in our 
-    	 * reloaded keys
-    	 */
-    	assertEquals("Mismatched number of server template keys",templateMap.keySet().size(),keys.size());
-    	templateMap.keySet().forEach(key -> {
-    		assertTrue("Key for server template not found",keys.contains(key));
-    	});
+        /*
+         * Using the clearTemplateMaps method insures
+         * that the code that checks for loading from
+         * files is called
+         */
+        storage.clearTemplateMaps();
+        List<ServerTemplateKey> keys = storage.loadKeys();
+        /*
+         * Now we check that both the number of keys retrieved is correct
+         * and that for each key we think we should have, it is in our 
+         * reloaded keys
+         */
+        assertEquals("Mismatched number of server template keys",templateMap.keySet().size(),keys.size());
+        templateMap.keySet().forEach(key -> {
+            assertTrue("Key for server template not found",keys.contains(key));
+        });
     }
     
     @Test
     public void testLoadList() {
-    	storage.clearTemplateMaps();
-    	List<ServerTemplate> templates = storage.load();
-    	assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
-    	templateMap.values().forEach(value -> {
-    		assertTrue("Server template not found",templates.contains(value));
-    	});
+        storage.clearTemplateMaps();
+        List<ServerTemplate> templates = storage.load();
+        assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
+        templateMap.values().forEach(value -> {
+            assertTrue("Server template not found",templates.contains(value));
+        });
     }
  
     @Test
     public void testLoadSingle() {
-    	storage.clearTemplateMaps();
-    	ServerTemplate toSearchFor = getFirstTemplateFromMap();
-    	loadTemplateWithAssertEquals(toSearchFor);
+        storage.clearTemplateMaps();
+        ServerTemplate toSearchFor = getFirstTemplateFromMap();
+        loadTemplateWithAssertEquals(toSearchFor);
     }
     
     @Test
     public void testExists() {
-    	storage.clearTemplateMaps();
-    	ServerTemplate toSearchFor = getFirstTemplateFromMap();
-    	assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
+        storage.clearTemplateMaps();
+        ServerTemplate toSearchFor = getFirstTemplateFromMap();
+        assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
     }
     
     @Test
     public void testUpdate() {
-    	final String testName = "Updated template Name";
-    	storage.clearTemplateMaps();
-    	ServerTemplate toUpdateTemplate = getFirstTemplateFromMap();
-    	toUpdateTemplate.setName(testName);
-    	storage.update(toUpdateTemplate);
-    	storage.clearTemplateMaps();
-    	loadTemplateWithAssertEquals(toUpdateTemplate);
+        final String testName = "Updated template Name";
+        storage.clearTemplateMaps();
+        ServerTemplate toUpdateTemplate = getFirstTemplateFromMap();
+        toUpdateTemplate.setName(testName);
+        storage.update(toUpdateTemplate);
+        storage.clearTemplateMaps();
+        loadTemplateWithAssertEquals(toUpdateTemplate);
     }
     
     @Test
     public void testDelete() {
-    	storage.clearTemplateMaps();
-    	ServerTemplate toDeleteTemplate = getFirstTemplateFromMap();
-    	storage.delete(toDeleteTemplate.getId());
-    	storage.clearTemplateMaps();
-    	assertTrue("Delete template failed",!storage.exists(toDeleteTemplate.getId()));
+        storage.clearTemplateMaps();
+        ServerTemplate toDeleteTemplate = getFirstTemplateFromMap();
+        storage.delete(toDeleteTemplate.getId());
+        storage.clearTemplateMaps();
+        assertTrue("Delete template failed",!storage.exists(toDeleteTemplate.getId()));
     }
 }
