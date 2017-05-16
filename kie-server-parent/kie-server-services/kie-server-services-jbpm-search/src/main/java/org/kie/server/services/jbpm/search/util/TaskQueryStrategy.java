@@ -94,7 +94,7 @@ public class TaskQueryStrategy implements QueryStrategy {
 			columnType = "integer";
 			break;
 		case STATUS:
-			columnType = "integer";
+			columnType = "string";
 			break;
 		case TASKID:
 			columnType = "integer";
