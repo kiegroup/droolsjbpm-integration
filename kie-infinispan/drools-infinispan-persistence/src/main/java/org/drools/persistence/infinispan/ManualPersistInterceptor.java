@@ -92,5 +92,11 @@ public class ManualPersistInterceptor extends AbstractInterceptor {
 	public SingleSessionCommandService getInterceptedService() {
 		return interceptedService;
 	}
-	
+
+	@Override
+	public RequestContext createContext() {
+		KieSession ksession = interceptedService.getKieSession();
+		RequestContext context = RequestContext.create(ksession.getClass().getClassLoader()).with( ksession );
+		return context;
+	}
 }

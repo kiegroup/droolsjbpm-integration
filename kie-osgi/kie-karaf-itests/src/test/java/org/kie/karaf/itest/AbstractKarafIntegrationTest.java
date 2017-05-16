@@ -37,6 +37,7 @@ import org.ops4j.pax.exam.karaf.options.KarafDistributionBaseConfigurationOption
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.CoreOptions.*;
 import org.ops4j.pax.exam.MavenUtils;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
@@ -167,6 +168,11 @@ abstract public class AbstractKarafIntegrationTest {
             .unpackDirectory(new File("target/paxexam/unpack/"));
         options.add(karafConfiguration);
         
+        if (System.getProperty("additional.features.url") != null) {
+            options.add(editConfigurationFileExtend("etc/org.apache.karaf.features.cfg", "featuresRepositories",
+                    System.getProperty("additional.features.url")));
+        }
+
         /* Set maximal perm space size */
         if (System.getProperty(PROP_KARAF_MAXPERMSIZE) != null) {
             options.add(vmOption("-XX:MaxPermSize=" + System.getProperty(PROP_KARAF_MAXPERMSIZE)));
@@ -210,9 +216,13 @@ abstract public class AbstractKarafIntegrationTest {
     }
 
     public static MavenArtifactProvisionOption getFeaturesUrl(String groupId, String artifactId, String version) {
+        String classifier = "features";
+        if (System.getProperty("kie.features.classifier") != null && "kie-karaf-features".equals(artifactId)) {
+            classifier = System.getProperty("kie.features.classifier");
+        }
         MavenArtifactProvisionOption mapo = mavenBundle().groupId(groupId).artifactId(artifactId);
         mapo.type("xml");
-        mapo.classifier("features");
+        mapo.classifier(classifier);
 
         if (version == null) {
             mapo.versionAsInProject();
@@ -226,7 +236,15 @@ abstract public class AbstractKarafIntegrationTest {
     }
 
     public static Option loadKieFeaturesRepo() {
-        return features(maven().groupId("org.kie").artifactId("kie-karaf-features").type("xml").classifier("features").versionAsInProject().getURL());
+        String classifier = "features";
+        if (System.getProperty("kie.features.classifier") != null) {
+            classifier = System.getProperty("kie.features.classifier");
+        }
+        return features(maven().groupId("org.kie")
+                .artifactId("kie-karaf-features")
+                .type("xml")
+                .classifier(classifier)
+                .versionAsInProject().getURL());
     }
 
     public static Option loadKieFeatures(String... features) {
