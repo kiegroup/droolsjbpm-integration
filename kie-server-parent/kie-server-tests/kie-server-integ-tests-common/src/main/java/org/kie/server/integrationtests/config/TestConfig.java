@@ -77,6 +77,11 @@ public class TestConfig {
     private static final StringTestParameter WEBLOGIC_HOME = new StringTestParameter("weblogic.home");
 
     /**
+     * Property holding datasource driver class FQCN to determine which DB the tests are currently run with
+     */
+    private static final StringTestParameter ORG_KIE_SERVER_DATASOURCE_DRIVER_CLASS = new StringTestParameter("org.kie.server.datasource.driver.class", "org.h2.Driver");
+
+    /**
      * Get kie-server URL for HTTP services - like REST.
      *
      * @return HTTP URL.
@@ -401,6 +406,20 @@ public class TestConfig {
      */
     public static String getKieClientDeploymentSettings() {
         return TestConfig.KIE_CLIENT_DEPLOYMENT_SETTINGS.getParameterValue();
+    }
+
+    /**
+     * @return FQCN of datasource driver class which is used for currently used database
+     */
+    public static String getKieServerDataSourceDriverClass() {
+        return TestConfig.ORG_KIE_SERVER_DATASOURCE_DRIVER_CLASS.getParameterValue();
+    }
+
+    /**
+     * @return True if Sybase DB is currently used
+     */
+    public static boolean isSybaseDataSource() {
+        return getKieServerDataSourceDriverClass().startsWith("com.sybase");
     }
 
     // Used for printing all configuration values at the beginning of first test run.
