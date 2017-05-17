@@ -14,6 +14,7 @@
 */
 package org.kie.server.controller.impl.storage;
 
+import java.io.EOFException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.io.StreamException;
+
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
     public static final String SERVER_TEMPLATE_FILE_NAME_PROP = "org.kie.server.controller.templatefile";
     public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")+
@@ -39,9 +42,40 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     private static Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorage.class);
     private Map<String, ServerTemplate> templateMap = new ConcurrentHashMap<>();
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
-    private String templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
+    private String templatesLocation;
     private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
 
+    /**
+     * Default constructor
+     */
+    public FileBasedKieServerTemplateStorage() {
+    	init(null); 
+    }
+    
+    /**
+     * Constructor that takes a template location argument
+     * @param templatesLocation A string value that indicates where the server templates should be stored. A null value
+     * indicates that the value should be retrieved from the system properties.
+     */
+    public FileBasedKieServerTemplateStorage(String templatesLocation) {
+    	init(templatesLocation);
+    }
+    
+    /**
+     * Initializes the class instance
+     * @param templatesLocation A string value that indicates where the server templates should be stored. A null value
+     * indicates that the value should be retrieved from the system properties.
+     */
+    protected synchronized void init(String templatesLocation) {
+    	this.templateMap = new ConcurrentHashMap<>();
+    	this.templateKeyMap = new ConcurrentHashMap<>();
+    	if (templatesLocation != null && !templatesLocation.trim().isEmpty()) {
+    		this.templatesLocation = templatesLocation;
+    	} else {
+    		this.templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
+    	}
+    	loadTemplateMapsFromFile();
+    }
 
     /**
      * Writes the map of server templates to the file pointed at by templatesLocation
@@ -63,6 +97,12 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
         ArrayList<ServerTemplate> templates = null;
         try (FileReader reader = new FileReader(templatesLocation)) {
             templates = (ArrayList<ServerTemplate>)((XStreamMarshaller)templateMarshaller).getXstream().fromXML(reader);
+        } catch (StreamException se) {
+        	if (se.getCause() instanceof EOFException) {
+        		logger.warn("Unable to read server template maps from file {}. File does not exist or is empty",templatesLocation);
+        	} else {
+        		logger.error("Unable to read server template maps from file due to stream error",se);
+        	}
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
@@ -91,33 +131,31 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
 
     @Override
     public List<ServerTemplateKey> loadKeys() {
-        if (templateKeyMap.isEmpty()) {
-            loadTemplateMapsFromFile();
-        }
         return new ArrayList<ServerTemplateKey>(templateKeyMap.values());
+    }
+    
+    /**
+     * Returns the ServerTemplateKey object associated with a server template's id
+     * @param id The server template id that points to the ServerTemplateKey
+     * @return The ServerTemplateKey that is associated with the id, or null if the
+     * id does exist in the templateKeyMap
+     */
+    public synchronized ServerTemplateKey getTemplateKey(String id) {
+    	return templateKeyMap.get(id);
     }
 
     @Override
     public List<ServerTemplate> load() {
-        if (templateKeyMap.isEmpty()) {
-            loadTemplateMapsFromFile();
-        }
         return new ArrayList<ServerTemplate>(templateMap.values());
     }
 
     @Override
     public ServerTemplate load(String identifier) {
-        if (templateKeyMap.isEmpty()) {
-            loadTemplateMapsFromFile();
-        }
         return templateMap.get(identifier);
     }
 
     @Override
     public boolean exists(String identifier) {
-        if (templateKeyMap.isEmpty()) {
-            loadTemplateMapsFromFile();
-        }
         return templateMap.containsKey(identifier);
     }
 

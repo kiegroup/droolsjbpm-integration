@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,14 +59,10 @@ import com.google.common.collect.Maps;
 
 public class FileBasedKieServerTemplateStorageTest {
     private static final Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorageTest.class);
-    private static final String TEST_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")
-    		+ System.getProperty("file.separator")
-    		+ "test_template.xml";
-    private static SpecManagementService specManageService;
-    private static RuntimeManagementService runtimeManagementService;
-    private static KieServerInstanceManager kieServerInstanceManager;
+    private static final File TEST_SERVER_TEMPLATE_DIRECTORY = new File(System.getProperty("java.io.tmpdir"));
     
     private static Map<ServerTemplateKey, ServerTemplate> templateMap;
+    private File tmpTemplateStore;
     private FileBasedKieServerTemplateStorage storage;
     
     /**
@@ -76,17 +73,9 @@ public class FileBasedKieServerTemplateStorageTest {
      */
     private static ServerTemplate createServerTemplateWithContainer(String templateName, int templateCount) {
         ServerTemplate template = new ServerTemplate();
-        template = new ServerTemplate();
 
         template.setName(templateName);
         template.setId(UUID.randomUUID().toString());
-
-        specManageService.saveServerTemplate(template);
-
-        Collection<org.kie.server.controller.api.model.spec.ServerTemplateKey> existing = specManageService.listServerTemplateKeys();
-        assertNotNull(existing);
-        assertEquals(templateCount, existing.size());
-
 
         Map<Capability, ContainerConfig> configs = new HashMap<Capability, ContainerConfig>();
         // Add a rule configuration to the server template's configuration
@@ -113,8 +102,9 @@ public class FileBasedKieServerTemplateStorageTest {
         containerSpec.setReleasedId(new ReleaseId("org.kie", "kie-server-kjar", "1.0"));
         containerSpec.setStatus(KieContainerStatus.STOPPED);
         containerSpec.setConfigs(configs);
-
-        specManageService.saveContainerSpec(template.getId(), containerSpec);
+        
+        containerSpec.setServerTemplateKey(new ServerTemplateKey(template.getId(), template.getName()));
+        template.addContainerSpec(containerSpec);
 
         // Create a container with the server template
         Container container = new Container();
@@ -159,13 +149,6 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @BeforeClass
     public static void beforeClass() {
-        System.setProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP, 
-                TEST_SERVER_TEMPLATE_FILENAME);
-        specManageService = new SpecManagementServiceImpl();
-        runtimeManagementService = new RuntimeManagementServiceImpl();
-        kieServerInstanceManager = Mockito.mock(KieServerInstanceManager.class);
-        ((RuntimeManagementServiceImpl)runtimeManagementService).setKieServerInstanceManager(kieServerInstanceManager);
-
         templateMap = Maps.newConcurrentMap();
         for (int x = 0; x < 3; x++) {
             StringBuilder templateName = new StringBuilder("test server : ").append(x);
@@ -176,8 +159,9 @@ public class FileBasedKieServerTemplateStorageTest {
     }
     
     @Before
-    public void setup() {
-        storage = new FileBasedKieServerTemplateStorage();
+    public void setup() throws IOException {
+    	tmpTemplateStore = File.createTempFile("templates_", ".xml", TEST_SERVER_TEMPLATE_DIRECTORY);
+        storage = new FileBasedKieServerTemplateStorage(tmpTemplateStore.getAbsolutePath());
         templateMap.keySet().forEach(key -> {
             storage.store(templateMap.get(key));
         });
@@ -186,9 +170,8 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @After
     public void clean() {
-        Path testServerTemplateFile = Paths.get(TEST_SERVER_TEMPLATE_FILENAME);
         try {
-            Files.deleteIfExists(testServerTemplateFile);
+            Files.deleteIfExists(tmpTemplateStore.toPath());
         } catch (IOException e) {
             logger.warn("Exception while deleting test server template storage",e);
             e.printStackTrace();
@@ -197,7 +180,6 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @AfterClass
     public static void afterClass() {
-        System.clearProperty(FileBasedKieServerTemplateStorage.SERVER_TEMPLATE_FILE_NAME_PROP);
     }
     
 
@@ -220,7 +202,7 @@ public class FileBasedKieServerTemplateStorageTest {
          * that the code that checks for loading from
          * files is called
          */
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();
         List<ServerTemplateKey> keys = storage.loadKeys();
         /*
          * Now we check that both the number of keys retrieved is correct
@@ -235,7 +217,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @Test
     public void testLoadList() {
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();;
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
         templateMap.values().forEach(value -> {
@@ -245,14 +227,14 @@ public class FileBasedKieServerTemplateStorageTest {
  
     @Test
     public void testLoadSingle() {
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();;
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         loadTemplateWithAssertEquals(toSearchFor);
     }
     
     @Test
     public void testExists() {
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
     }
@@ -260,11 +242,11 @@ public class FileBasedKieServerTemplateStorageTest {
     @Test
     public void testUpdate() {
         final String testName = "Updated template Name";
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();
         ServerTemplate toUpdateTemplate = getFirstTemplateFromMap();
         toUpdateTemplate.setName(testName);
         storage.update(toUpdateTemplate);
-        storage.clearTemplateMaps();
+        storage.reloadTemplateMaps();
         loadTemplateWithAssertEquals(toUpdateTemplate);
     }
     
