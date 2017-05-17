@@ -14,29 +14,17 @@
 */
 package org.kie.server.controller.impl.storage;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.drools.core.util.ClassUtils;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.xstream.XStreamMarshaller;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -45,32 +33,23 @@ import org.slf4j.LoggerFactory;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
     public static final String SERVER_TEMPLATE_FILE_NAME_PROP = "org.kie.server.controller.templatefile";
-    public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = "/opt/kie/server-controller/templates.xml";
+    public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")+
+    		System.getProperty("file.separator")
+    		+"template_store.xml";
     private static Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorage.class);
-    private static FileBasedKieServerTemplateStorage INSTANCE = new FileBasedKieServerTemplateStorage();
     private Map<String, ServerTemplate> templateMap = new ConcurrentHashMap<>();
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
     private String templatesLocation = System.getProperty(SERVER_TEMPLATE_FILE_NAME_PROP, DEFAULT_SERVER_TEMPLATE_FILENAME);
     private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
 
-    private static class ClassCaster {
-        @SuppressWarnings("unchecked")
-        public static <T> Class<T> castClass(Class<?> clazz) {
-            return (Class<T>) clazz;
-        }
-    }
-
-    protected FileBasedKieServerTemplateStorage() {
-    }
 
     /**
      * Writes the map of server templates to the file pointed at by templatesLocation
      */
-    private void writeTemplateMap() {
-        try (FileOutputStream target = new FileOutputStream(templatesLocation)) {
-            List<ServerTemplate> templates = templateMap.values().stream().collect(Collectors.toList());
-            String templatesString = templateMarshaller.marshall(templates);
-            target.write(templatesString.getBytes());
+    private synchronized void writeTemplateMap() {
+        try (FileWriter writer = new FileWriter(templatesLocation)) {
+            ((XStreamMarshaller)templateMarshaller).getXstream()
+            	.toXML(new ArrayList<ServerTemplate>(templateMap.values()), writer);
         } catch (Throwable e) {
             logger.error("Unable to write template maps for standalone controller",e);
         }
@@ -79,30 +58,22 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     /**
      * Loads the map of server templates from the file pointed at by the templatesLocation
      */
+    @SuppressWarnings("unchecked")
     private synchronized void loadTemplateMapsFromFile() {
-        StringBuilder stringBuilder = new StringBuilder();
-        try(InputStream inputStream = new FileInputStream(templatesLocation)) {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
+        ArrayList<ServerTemplate> templates = null;
+        try (FileReader reader = new FileReader(templatesLocation)) {
+            templates = (ArrayList<ServerTemplate>)((XStreamMarshaller)templateMarshaller).getXstream().fromXML(reader);
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
-        String templatesString = stringBuilder.toString();
-        if (templatesString != null && !templatesString.trim().isEmpty()) {
-            List<ServerTemplate> listOfTemplates = templateMarshaller.unmarshall(stringBuilder.toString(),ClassCaster.<List<ServerTemplate>>castClass(List.class));
-            listOfTemplates.forEach(template -> {
+        if (templates != null && !templates.isEmpty()) {
+            templates.forEach(template -> {
                 templateKeyMap.put(template.getId(),new ServerTemplateKey(template.getId(),template.getName()));
                 templateMap.put(template.getId(),template);
             });
         }
     }
 
-    public static FileBasedKieServerTemplateStorage getInstance() {
-        return INSTANCE;
-    }
 
     @Override
     public ServerTemplate store(ServerTemplate serverTemplate) {

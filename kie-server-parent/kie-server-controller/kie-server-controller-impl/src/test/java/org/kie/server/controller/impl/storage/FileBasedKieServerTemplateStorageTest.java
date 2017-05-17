@@ -58,7 +58,9 @@ import com.google.common.collect.Maps;
 
 public class FileBasedKieServerTemplateStorageTest {
     private static final Logger logger = LoggerFactory.getLogger(FileBasedKieServerTemplateStorageTest.class);
-    private static final String TEST_SERVER_TEMPLATE_FILENAME = "/tmp/templates.xml";
+    private static final String TEST_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")
+    		+ System.getProperty("file.separator")
+    		+ "test_template.xml";
     private static SpecManagementService specManageService;
     private static RuntimeManagementService runtimeManagementService;
     private static KieServerInstanceManager kieServerInstanceManager;
@@ -175,7 +177,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @Before
     public void setup() {
-        storage = FileBasedKieServerTemplateStorage.getInstance();
+        storage = new FileBasedKieServerTemplateStorage();
         templateMap.keySet().forEach(key -> {
             storage.store(templateMap.get(key));
         });

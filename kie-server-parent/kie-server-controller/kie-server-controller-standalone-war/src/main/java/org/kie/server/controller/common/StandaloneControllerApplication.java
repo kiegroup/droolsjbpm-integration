@@ -19,14 +19,16 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import org.kie.server.controller.service.StandaloneController;
+import org.kie.server.controller.service.StandaloneKieServerControllerImpl;
+import org.kie.server.controller.service.StandaloneSpecManagementServiceImpl;
 
 @ApplicationPath("/")
 public class StandaloneControllerApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(StandaloneController.class);
+        classes.add(StandaloneKieServerControllerImpl.class);
+        classes.add(StandaloneSpecManagementServiceImpl.class);
         return classes;
     }
 }
