@@ -1,10 +1,25 @@
 package org.drools.compiler.xpath.tobeinstrumented;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
-import org.drools.compiler.xpath.tobeinstrumented.model.*;
+import javassist.ClassPool;
+import javassist.CtClass;
+import org.drools.compiler.xpath.tobeinstrumented.model.Child;
+import org.drools.compiler.xpath.tobeinstrumented.model.Man;
+import org.drools.compiler.xpath.tobeinstrumented.model.PojoWithCollections;
+import org.drools.compiler.xpath.tobeinstrumented.model.School;
+import org.drools.compiler.xpath.tobeinstrumented.model.TMDirectory;
+import org.drools.compiler.xpath.tobeinstrumented.model.TMFile;
+import org.drools.compiler.xpath.tobeinstrumented.model.TMFileSet;
+import org.drools.compiler.xpath.tobeinstrumented.model.Toy;
+import org.drools.compiler.xpath.tobeinstrumented.model.Woman;
 import org.drools.core.base.ClassObjectType;
 import org.drools.core.common.InternalWorkingMemory;
 import org.drools.core.impl.InternalKnowledgeBase;
@@ -20,24 +35,7 @@ import org.drools.core.reteoo.ObjectTypeNode;
 import org.drools.core.reteoo.ReactiveFromNode;
 import org.drools.core.reteoo.TupleMemory;
 import org.drools.core.util.Iterator;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
@@ -47,10 +45,7 @@ import org.kie.maven.plugin.BytecodeInjectReactive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
+import static org.junit.Assert.*;
 
 public class XPathTest {
     private static final Logger LOG = LoggerFactory.getLogger(XPathTest.class);
@@ -136,7 +131,7 @@ public class XPathTest {
                 "global java.util.List list\n" +
                 "\n" +
                 "rule R when\n" +
-                "  Man( $toy: /wife/children{age > 10}/toys )\n" +
+                "  Man( $toy: /wife/children[age > 10]/toys )\n" +
                 "then\n" +
                 "  list.add( $toy.getName() );\n" +
                 "end\n";
@@ -186,7 +181,7 @@ public class XPathTest {
                 "global java.util.List list\n" +
                 "\n" +
                 "rule R when\n" +
-                "  Man( $toy: /wife/children{age > 10}/toys )\n" +
+                "  Man( $toy: /wife/children[age > 10]/toys )\n" +
                 "then\n" +
                 "  list.add( $toy.getName() );\n" +
                 "end\n";
@@ -262,7 +257,7 @@ public class XPathTest {
                 "\n" +
                 "rule R when\n" +
                 "  $i : Integer()\n" +
-                "  Man( $toy: /wife/children{age > $i}?/toys )\n" +
+                "  Man( $toy: /wife/children[age > $i]?/toys )\n" +
                 "then\n" +
                 "  list.add( $toy.getName() );\n" +
                 "end\n";
@@ -315,12 +310,12 @@ public class XPathTest {
                 "\n" +
                 "rule R1 when\n" +
                 "  $i : Integer()\n" +
-                "  Man( $toy: /wife/children{age >= $i}/toys )\n" +
+                "  Man( $toy: /wife/children[age >= $i]/toys )\n" +
                 "then\n" +
                 "  toyList.add( $toy.getName() );\n" +
                 "end\n" +
                 "rule R2 when\n" +
-                "  School( $child: /children{age >= 13} )\n" +
+                "  School( $child: /children[age >= 13] )\n" +
                 "then\n" +
                 "  teenagers.add( $child.getName() );\n" +
                 "end\n";
@@ -384,7 +379,7 @@ public class XPathTest {
                 "import org.drools.compiler.xpath.tobeinstrumented.model.*;\n" +
                 "\n" +
                 "rule R2 when\n" +
-                "  School( $child: /children{age >= 13 && age < 20} )\n" +
+                "  School( $child: /children[age >= 13 && age < 20] )\n" +
                 "then\n" +
                 "  System.out.println( $child );\n" +
                 "  insertLogical( $child );\n" +
@@ -440,7 +435,7 @@ public class XPathTest {
                 "import org.drools.compiler.xpath.tobeinstrumented.model.*;\n" +
                 "\n" +
                 "rule R2 when\n" +
-                "  TMFileSet( $id: name, $p: /files{size >= 100} )\n" +
+                "  TMFileSet( $id: name, $p: /files[size >= 100] )\n" +
                 "then\n" +
                 "  System.out.println( $id + \".\" + $p.getName() );\n" +
                 "  insertLogical(      $id + \".\" + $p.getName() );\n" +
@@ -514,7 +509,7 @@ public class XPathTest {
                 "import org.drools.compiler.xpath.tobeinstrumented.model.*;\n" +
                 "\n" +
                 "rule R2 when\n" +
-                "  TMDirectory( $id: name, $p: /files{size >= 100} )\n" +
+                "  TMDirectory( $id: name, $p: /files[size >= 100] )\n" +
                 "then\n" +
                 "  System.out.println( $id + \".\" + $p.getName() );\n" +
                 "  insertLogical(      $id + \".\" + $p.getName() );\n" +
