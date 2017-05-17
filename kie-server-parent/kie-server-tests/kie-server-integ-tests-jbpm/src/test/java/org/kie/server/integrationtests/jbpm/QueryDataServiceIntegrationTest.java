@@ -758,10 +758,14 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
     }
 
     private QueryDefinition createErrorsQueryDefinition() {
+        String queryExpression = "select * from ExecutionErrorInfo where ERROR_ACK = ";
+        // Sybase needs special treatment when it comes to boolean
+        queryExpression += TestConfig.isSybaseDataSource() ? "0" : "'0'";
+
         QueryDefinition query = new QueryDefinition();
         query.setName("unAckErrors");
         query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
-        query.setExpression("select * from ExecutionErrorInfo where ERROR_ACK = '0'");
+        query.setExpression(queryExpression);
         query.setTarget("CUSTOM");
         return query;
     }

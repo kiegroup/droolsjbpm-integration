@@ -27,6 +27,7 @@ import java.util.Set;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.server.handlers.proxy.ProxyHandler;
@@ -111,11 +112,13 @@ public class KieServerRouter {
         pathHandler.addExactPath("/containers", new ContainersHttpHandler(notFoundHandler, adminHandler));
         pathHandler.addPrefixPath("/admin", adminHandler);
         pathHandler.addExactPath("/", new KieServerInfoHandler());
-   
+
+        HttpHandler blockingHandler = new BlockingHandler(pathHandler);
+
         // main server configuration
         server = Undertow.builder()
                 .addHttpListener(port, host)                
-                .setHandler(pathHandler)
+                .setHandler(blockingHandler)
                 .build();
         server.start();
         log.infof("KieServerRouter started on %s:%s at %s", host, port, new Date());
