@@ -30,16 +30,16 @@ end
 
 rule "give a dog to an adult person without a dog"
 when
-  person: Person( /age{ this >= 18 } )
-  not Person( this == person, /pets{ #Dog } )
+  person: Person( /age[ this >= 18 ] )
+  not Person( this == person, /pets#Dog )
 then
   person.addPet(new Dog("Lassie", 1));
 end
 
 rule "give a cat to an adult person without a cat"
 when
-  person: Person( /age{ this >= 18 } )
-  not Person( this == person, /pets{ #Cat } )
+  person: Person( /age[ this >= 18 ] )
+  not Person( this == person, /pets#Cat )
 then
   person.addPet(new Cat("The Cat", 1));
 end
