@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -707,12 +708,12 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfoResponse.getType());
         containerResource = containerInfoResponse.getResult();
 
-        // Check that Kie Container has message about error durining updating
+        // Check that Kie Container has message about error during updating
         // Kie Container store last message
         assertEquals(1, containerResource.getMessages().size());
         Collection<String> messages = containerResource.getMessages().get(0).getMessages();
-        assertEquals(1, messages.size());
-        KieServerAssert.assertResultContainsString(messages.iterator().next(), "Error updating releaseId for container");
+        assertEquals(2, messages.size());
+        Assertions.assertThat(messages).contains("Error updating releaseId for container " + CONTAINER_ID + " to version " + nonValidReleaseId.toString());
         
         assertEquals(CONTAINER_ID, containerResource.getContainerId());
         assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
