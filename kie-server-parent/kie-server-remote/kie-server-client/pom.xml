@@ -24,12 +24,6 @@
         <artifactId>wiremock</artifactId>
         <version>${version.com.github.tomakehurst.wiremock}</version>
       </dependency>
-      <!-- TODO: Move dependency management to BOM -->
-      <dependency>
-         <groupId>org.kie.server</groupId>
-         <artifactId>kie-server-jbpm-search-api</artifactId>
-         <version>7.1.0-SNAPSHOT</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -64,11 +58,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-api</artifactId>
-    </dependency>
-    <!-- TODO: Do we want to depend on this api here?-->
-    <dependency>
-    	<groupId>org.kie.server</groupId>
-    	<artifactId>kie-server-jbpm-search-api</artifactId>
     </dependency>
     
     <dependency>
