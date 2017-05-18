@@ -15,19 +15,20 @@
 
 package org.kie.server.client.impl;
 
-import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_GET_FILTERED_URI;
+import static org.kie.server.api.rest.RestURI.TASKS_GET_FILTERED_URI;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.SearchServicesClient;
-import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
-import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 
 public class SearchServicesClientImpl extends AbstractKieServicesClientImpl implements SearchServicesClient {
 
