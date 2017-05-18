@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.common;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +39,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
+    private static ReleaseId releaseId3 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.2.GA");
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -173,6 +175,18 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
         ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
         KieServerAssert.assertSuccess(disposeReply);
+    }
+
+    @Test
+    public void testUpdateNotExistingReleaseIdForExistingContainer() throws Exception {
+        String containerId = "update-releaseId";
+        String updateErrorMessage = "Error updating releaseId for container " + containerId + ": Artifact with release id " + releaseId3 + " not found.";
+
+        client.createContainer(containerId, new KieContainerResource(containerId, releaseId1));
+
+        ServiceResponse<ReleaseId> reply = client.updateReleaseId(containerId, releaseId3);
+        KieServerAssert.assertFailure(reply);
+        Assertions.assertThat(reply.getMsg()).contains(updateErrorMessage);
     }
 
     @Test
