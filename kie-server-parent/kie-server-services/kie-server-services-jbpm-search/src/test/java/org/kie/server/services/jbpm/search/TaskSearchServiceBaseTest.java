@@ -44,19 +44,10 @@ public class TaskSearchServiceBaseTest {
 		QueryService queryServiceMock = Mockito.mock(QueryService.class);
 		KieServerRegistry contextMock = Mockito.mock(KieServerRegistry.class);
 		
-		
-		//Registry mock needs to return extra classes registered by the extension.
-		Set<Class<?>> extraClasses = new HashSet<>();
-		extraClasses.add(TaskQueryFilterSpec.class);
-		when(contextMock.getExtraClasses()).thenReturn(extraClasses);
-		
 		KieServerConfig configMock = Mockito.mock(KieServerConfig.class);
 		when(contextMock.getConfig()).thenReturn(configMock);
 		
 		TaskSearchServiceBase base = new TaskSearchServiceBase(queryServiceMock, contextMock);
-		
-		//Verify that extra classes are registered on the context.
-		verify(contextMock, times(1)).addExtraClasses(extraClasses);
 		
 		Integer page = new Integer(0);
 		Integer pageSize = new Integer(10);
