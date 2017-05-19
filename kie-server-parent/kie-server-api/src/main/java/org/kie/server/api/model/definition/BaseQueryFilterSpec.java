@@ -15,12 +15,42 @@
 
 package org.kie.server.api.model.definition;
 
-public interface BaseQueryFilterSpec {
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
-	public String getOrderBy();
-	
-	public boolean isAscending();
-	
-	public QueryParam[] getParameters();
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class BaseQueryFilterSpec {
+
+	@XmlElement(name = "order-by")
+	private String orderBy;
+	@XmlElement(name = "order-asc")
+	private boolean ascending;
+	@XmlElement(name = "query-params")
+	private QueryParam[] parameters;
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
+
+	public boolean isAscending() {
+		return ascending;
+	}
+
+	public void setAscending(boolean ascending) {
+		this.ascending = ascending;
+	}
+
+	public QueryParam[] getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(QueryParam[] parameters) {
+		this.parameters = parameters;
+	}
 	
 }

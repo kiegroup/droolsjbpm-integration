@@ -15,9 +15,6 @@
 
 package org.kie.server.services.jbpm.search;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryDefinition;
@@ -42,7 +39,7 @@ public class ProcessInstanceSearchServiceBase extends AbstractSearchServiceBase 
 	private static final String PROCESS_INSTANCE_QUERY_NAME = "getProcessInstancesWithFilters";
 	
 	private MarshallerHelper marshallerHelper;
-	private KieServerRegistry context;
+	
 	private QueryServiceTemplate queryServiceTemplate;
 	private QueryCallback queryCallback;
 	
@@ -50,14 +47,7 @@ public class ProcessInstanceSearchServiceBase extends AbstractSearchServiceBase 
 	public ProcessInstanceSearchServiceBase(QueryService queryService, KieServerRegistry context) {
 		this.queryServiceTemplate = new QueryServiceTemplate(queryService);
 		
-		this.context = context;
-		
 		this.marshallerHelper = new MarshallerHelper(context);
-		
-		//Add extra classes to to the KieServerRegistry, which can, for example, be used by the Marshallers.
-		Set<Class<?>> extraClasses = new HashSet<>();
-		extraClasses.add(ProcessInstanceQueryFilterSpec.class);
-		context.addExtraClasses(extraClasses);
 		
 		// Register (or replace) query.
 		String processInstanceQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,
