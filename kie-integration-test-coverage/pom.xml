@@ -17,6 +17,7 @@
 
   <modules>
     <module>kie-maven-plugin-tests</module>
+    <module>kie-maven-plugin-separate-model-tests</module>
     <module>kie-spring-test</module>
   </modules>
 </project>
