@@ -15,9 +15,6 @@
 
 package org.kie.server.services.jbpm.search;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jbpm.kie.services.impl.query.SqlQueryDefinition;
 import org.jbpm.services.api.query.QueryService;
 import org.jbpm.services.api.query.model.QueryDefinition;
@@ -28,9 +25,8 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.TaskInstanceList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
-import org.kie.server.services.jbpm.search.util.TaskQueryStrategy;
-import org.kie.server.services.jbpm.search.util.ProcessInstanceQueryStrategy;
 import org.kie.server.services.jbpm.search.util.QueryStrategy;
+import org.kie.server.services.jbpm.search.util.TaskQueryStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,21 +39,13 @@ public class TaskSearchServiceBase extends AbstractSearchServiceBase {
 	private static final String TASK_QUERY_NAME = "getTasksWithFilters";
 
 	private MarshallerHelper marshallerHelper;
-	private KieServerRegistry context;
 	private QueryServiceTemplate queryServiceTemplate;
 	private QueryCallback queryCallback;
 
 	public TaskSearchServiceBase(QueryService queryService, KieServerRegistry context) {
 		this.queryServiceTemplate = new QueryServiceTemplate(queryService);
-		
-		this.context = context;
-		
+	
 		this.marshallerHelper = new MarshallerHelper(context);
-		
-		//Add extra classes to to the KieServerRegistry, which can, for example, be used by the Marshallers.
-		Set<Class<?>> extraClasses = new HashSet<>();
-		extraClasses.add(TaskQueryFilterSpec.class);
-		context.addExtraClasses(extraClasses);
 		
 		// Register (or replace) query.
 		String taskQuerySource = context.getConfig().getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS,

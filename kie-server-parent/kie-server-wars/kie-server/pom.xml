@@ -15,12 +15,6 @@
 
   <dependencyManagement>
   	<dependencies>
-  		<!-- TODO: Add these dependencies to the KIE BOM. -->
-  		<dependency>
-        	<groupId>org.kie.server</groupId>
-        	<artifactId>kie-server-jbpm-search-api</artifactId>
-        	<version>${project.version}</version>
-   		</dependency>
    		<dependency>
         	<groupId>org.kie.server</groupId>
         	<artifactId>kie-server-services-jbpm-search</artifactId>

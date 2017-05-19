@@ -19,7 +19,6 @@ import java.util.Arrays;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /*
@@ -27,46 +26,15 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-query-filter-spec")
-public class TaskQueryFilterSpec implements BaseQueryFilterSpec {
-
-	@XmlElement(name = "order-by")
-	private String orderBy;
-	@XmlElement(name = "order-asc")
-	private boolean ascending;
-	@XmlElement(name = "query-params")
-	private QueryParam[] parameters;
+public class TaskQueryFilterSpec extends BaseQueryFilterSpec {
 
 	public TaskQueryFilterSpec() {
 	}
 
-	public String getOrderBy() {
-		return orderBy;
-	}
-
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
-
-	public boolean isAscending() {
-		return ascending;
-	}
-
-	public void setAscending(boolean ascending) {
-		this.ascending = ascending;
-	}
-
-	public QueryParam[] getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(QueryParam[] parameters) {
-		this.parameters = parameters;
-	}
-
 	@Override
 	public String toString() {
-		return "TaskQueryFilterSpec{" + "orderBy='" + orderBy + '\'' + ", ascending=" + ascending + ", parameters="
-				+ Arrays.toString(parameters) + '}';
+		return "TaskQueryFilterSpec{" + "orderBy='" + getOrderBy() + '\'' + ", ascending=" + isAscending() + ", parameters="
+				+ Arrays.toString(getParameters()) + '}';
 	}
 
 }
