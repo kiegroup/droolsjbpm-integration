@@ -15,6 +15,9 @@
 
 package org.kie.server.api.marshalling;
 
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.upperCase;
+
 public enum MarshallingFormat {
     XSTREAM(0, "xstream"), JAXB(1, "xml"), JSON(2, "json");
 
@@ -42,14 +45,17 @@ public enum MarshallingFormat {
     }
 
     public static MarshallingFormat fromType( String type ) {
-        if ("xstream".equalsIgnoreCase( type ) || "application/xstream".equalsIgnoreCase( type ) ) {
+        if(startsWithIgnoreCase(type, "xstream") || startsWithIgnoreCase(type, "application/xstream")) {
             return XSTREAM;
-        } else if ("xml".equalsIgnoreCase( type ) || "application/xml".equalsIgnoreCase( type ) ) {
+        } else if (startsWithIgnoreCase(type, "xml") || startsWithIgnoreCase(type, "application/xml")) {
             return JAXB;
-        } else if ("json".equalsIgnoreCase( type ) || "application/json".equalsIgnoreCase( type ) ) {
+        } else if (startsWithIgnoreCase(type, "json") || startsWithIgnoreCase(type, "application/json")) {
             return JSON;
         } else {
-            return valueOf(type);
+            try {
+                return MarshallingFormat.valueOf(upperCase(type));
+            } catch(Exception ignored) {}
+            throw new RuntimeException("Invalid marshalling format ["+type+"]");
         }
     }
 }
