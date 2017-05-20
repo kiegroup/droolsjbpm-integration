@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.common;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +39,7 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     private static ReleaseId releaseId1 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.0.GA");
     private static ReleaseId releaseId2 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.1.GA");
+    private static ReleaseId releaseId3 = new ReleaseId("org.kie.server.testing", "container-crud-tests1", "2.1.2.GA");
 
     @BeforeClass
     public static void initialize() throws Exception {
@@ -130,18 +132,6 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     }
 
     @Test
-    public void testUpdateReleaseIdForExistingContainer() throws Exception {
-        client.createContainer("update-releaseId", new KieContainerResource("update-releaseId", releaseId1));
-
-        ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
-        KieServerAssert.assertSuccess(reply);
-        Assert.assertEquals(releaseId2, reply.getResult());
-
-        ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
-        KieServerAssert.assertSuccess(disposeReply);
-    }
-
-    @Test
     public void testDisposeContainer() throws Exception {
         client.createContainer("dispose-container", new KieContainerResource("dispose-container", releaseId1));
         ServiceResponse<Void> reply = client.disposeContainer("dispose-container");
@@ -176,7 +166,19 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
     }
 
     @Test
-    public void testUpdateReleaseIdForExistingContainerAndCheckServerState() throws Exception {
+    public void testUpdateNotExistingReleaseIdForExistingContainer() throws Exception {
+        String containerId = "update-releaseId";
+        String updateErrorMessage = "Error updating release id on container " + containerId + " to " + releaseId3;
+
+        client.createContainer(containerId, new KieContainerResource(containerId, releaseId1));
+
+        ServiceResponse<ReleaseId> reply = client.updateReleaseId(containerId, releaseId3);
+        KieServerAssert.assertFailure(reply);
+        Assertions.assertThat(reply.getMsg()).contains(updateErrorMessage);
+    }
+
+    @Test
+    public void testUpdateReleaseIdForExistingContainer() throws Exception {
         client.createContainer("update-releaseId", new KieContainerResource("update-releaseId", releaseId1));
 
         ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
