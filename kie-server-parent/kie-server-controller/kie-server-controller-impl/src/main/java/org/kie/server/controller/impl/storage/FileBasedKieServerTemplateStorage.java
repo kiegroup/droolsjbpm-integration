@@ -204,4 +204,9 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     public String getTemplatesLocation() {
         return templatesLocation;
     }
+
+    @Override
+    public String toString() {
+        return "FileBasedKieServerTemplateStorage: { templatesLocation = " + templatesLocation + "}";
+    }
 }

@@ -31,7 +31,9 @@ public class StandaloneSpecManagementServiceImpl extends RestSpecManagementServi
         if (templateStorages != null && templateStorages.iterator().hasNext()) {
             KieServerTemplateStorage storage = templateStorages.iterator().next();
             this.setTemplateStorage(storage);
-            logger.debug("Setting template storage for SpecManagementService to {}",storage.getClass().getName());
+            logger.debug("Setting template storage for SpecManagementService to {}",storage.toString());
+        } else {
+            logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
         }
     }
 }
