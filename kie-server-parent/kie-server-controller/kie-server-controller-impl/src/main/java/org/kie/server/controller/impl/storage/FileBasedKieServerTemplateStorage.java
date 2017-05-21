@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.thoughtworks.xstream.io.StreamException;
 
 public class FileBasedKieServerTemplateStorage implements KieServerTemplateStorage {
+	private static FileBasedKieServerTemplateStorage INSTANCE; 
     public static final String SERVER_TEMPLATE_FILE_NAME_PROP = "org.kie.server.controller.templatefile";
     public static final String DEFAULT_SERVER_TEMPLATE_FILENAME = System.getProperty("java.io.tmpdir")+
     		System.getProperty("file.separator")
@@ -44,11 +45,25 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     private Map<String, ServerTemplateKey> templateKeyMap = new ConcurrentHashMap<>();
     private String templatesLocation;
     private Marshaller templateMarshaller = MarshallerFactory.getMarshaller(MarshallingFormat.XSTREAM,ServerTemplate.class.getClassLoader());
+    
+    public static synchronized FileBasedKieServerTemplateStorage getInstance() {
+    	if (INSTANCE == null) {
+    		INSTANCE = new FileBasedKieServerTemplateStorage();
+    	}
+    	return INSTANCE;
+    }
+    
+    public static synchronized FileBasedKieServerTemplateStorage getInstance(String templatesLocation) {
+    	if (INSTANCE == null) {
+    		INSTANCE = new FileBasedKieServerTemplateStorage(templatesLocation);
+    	}
+    	return INSTANCE;
+    }
 
     /**
      * Default constructor
      */
-    public FileBasedKieServerTemplateStorage() {
+    protected FileBasedKieServerTemplateStorage() {
     	init(null); 
     }
     
@@ -57,7 +72,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      * @param templatesLocation A string value that indicates where the server templates should be stored. A null value
      * indicates that the value should be retrieved from the system properties.
      */
-    public FileBasedKieServerTemplateStorage(String templatesLocation) {
+    protected FileBasedKieServerTemplateStorage(String templatesLocation) {
     	init(templatesLocation);
     }
     
@@ -140,7 +155,7 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
      * @return The ServerTemplateKey that is associated with the id, or null if the
      * id does exist in the templateKeyMap
      */
-    public synchronized ServerTemplateKey getTemplateKey(String id) {
+    public ServerTemplateKey getTemplateKey(String id) {
     	return templateKeyMap.get(id);
     }
 
@@ -163,9 +178,6 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
     public ServerTemplate update(ServerTemplate serverTemplate) {
         ServerTemplate updated = null;
         synchronized (templateMap) {
-            if (templateKeyMap.isEmpty()) {
-                loadTemplateMapsFromFile();
-            }
             templateKeyMap.put(serverTemplate.getId(),
                                new ServerTemplateKey(serverTemplate.getId(),serverTemplate.getName()));
             updated = templateMap.put(serverTemplate.getId(),serverTemplate);

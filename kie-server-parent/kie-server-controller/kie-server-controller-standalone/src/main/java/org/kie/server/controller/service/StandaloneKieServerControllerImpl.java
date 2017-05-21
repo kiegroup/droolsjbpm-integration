@@ -17,9 +17,7 @@ package org.kie.server.controller.service;
 
 import java.util.ServiceLoader;
 
-import javax.inject.Inject;
-
-import org.kie.server.controller.api.storage.KieServerTemplateStorage;
+import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.rest.RestKieServerControllerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +28,13 @@ public class StandaloneKieServerControllerImpl extends RestKieServerControllerIm
 
     public StandaloneKieServerControllerImpl() {
         super();
-        ServiceLoader<KieServerTemplateStorage> storages = ServiceLoader.load(KieServerTemplateStorage.class);
-        if (storages != null && storages.iterator().hasNext()) {
-            KieServerTemplateStorage storage = storages.iterator().next();
-            this.setTemplateStorage(storage);
-            logger.debug("Server template storage for standalone kie server controller is {}",storage.toString());
+        ServiceLoader<PersistingServerTemplateStorageService> storageServices = 
+        		ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        if (storageServices != null && storageServices.iterator().hasNext()) {
+            PersistingServerTemplateStorageService storageService = storageServices.iterator().next();
+            this.setTemplateStorage(storageService.getTemplateStorage());
+            logger.debug("Server template storage for standalone kie server controller is {}",
+            		storageService.getTemplateStorage().toString());
         } else {
         	logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
         }

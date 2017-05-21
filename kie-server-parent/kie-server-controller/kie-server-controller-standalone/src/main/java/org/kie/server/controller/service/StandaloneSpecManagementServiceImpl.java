@@ -17,7 +17,7 @@ package org.kie.server.controller.service;
 
 import java.util.ServiceLoader;
 
-import org.kie.server.controller.api.storage.KieServerTemplateStorage;
+import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.rest.RestSpecManagementServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,13 @@ public class StandaloneSpecManagementServiceImpl extends RestSpecManagementServi
 
     public StandaloneSpecManagementServiceImpl() {
         super();
-        ServiceLoader<KieServerTemplateStorage> templateStorages = ServiceLoader.load(KieServerTemplateStorage.class);
-        if (templateStorages != null && templateStorages.iterator().hasNext()) {
-            KieServerTemplateStorage storage = templateStorages.iterator().next();
-            this.setTemplateStorage(storage);
-            logger.debug("Setting template storage for SpecManagementService to {}",storage.toString());
+        ServiceLoader<PersistingServerTemplateStorageService> templateStorageServices = 
+        		ServiceLoader.load(PersistingServerTemplateStorageService.class);
+        if (templateStorageServices != null && templateStorageServices.iterator().hasNext()) {
+            PersistingServerTemplateStorageService storageService = templateStorageServices.iterator().next();
+            this.setTemplateStorage(storageService.getTemplateStorage());
+            logger.debug("Setting template storage for SpecManagementService to {}",
+            		storageService.getTemplateStorage().toString());
         } else {
             logger.warn("No server template storage defined. Default storage: InMemoryKieServerTemplateStorage will be used");
         }
