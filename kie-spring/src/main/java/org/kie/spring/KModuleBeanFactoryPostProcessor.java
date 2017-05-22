@@ -16,6 +16,12 @@
 
 package org.kie.spring;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Map;
+
 import org.drools.compiler.kie.builder.impl.ClasspathKieProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieBuilderImpl;
@@ -43,15 +49,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Map;
 
 @Component("kiePostProcessor")
 public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware {
@@ -266,6 +269,9 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
             // in case the kModuleRootUrl is still null at this point, the assumption is we are not running on EAP
             // so we just get the url from the classpath
             if (kModuleRootUrl == null) {
+                kModuleRootUrl = tryGetRootUrlFromContextFile(applicationContext);
+            }
+            if (kModuleRootUrl == null) {
                 kModuleRootUrl = applicationContext.getResource("classpath:/").getURL();
             }
         } catch (IOException e) {
@@ -273,6 +279,23 @@ public class KModuleBeanFactoryPostProcessor implements BeanFactoryPostProcessor
                     applicationContext.getDisplayName(), e);
         }
         log.debug("KieModule root URL (based on application context {}): {}", applicationContext.getDisplayName(), kModuleRootUrl);
+    }
+
+    private URL tryGetRootUrlFromContextFile(ApplicationContext applicationContext) {
+        if ( applicationContext instanceof BeanDefinitionRegistry ) {
+            String[] kmoduleBeanNames = applicationContext.getBeanNamesForType( this.getClass() );
+            if (kmoduleBeanNames.length != 1) {
+                return null;
+            }
+            try {
+                AbstractBeanDefinition contextBean = (AbstractBeanDefinition) ( (BeanDefinitionRegistry) applicationContext ).getBeanDefinition( kmoduleBeanNames[0] );
+                Resource contextResource = contextBean.getResource();
+                String contextUrl = contextResource.getURL().toString();
+                String classPathUrl = contextUrl.substring( 0, contextUrl.length() - (contextResource.getFilename().length() + 1) );
+                return new URL( classPathUrl );
+            } catch (Exception e) { }
+        }
+        return null;
     }
 
     /**
