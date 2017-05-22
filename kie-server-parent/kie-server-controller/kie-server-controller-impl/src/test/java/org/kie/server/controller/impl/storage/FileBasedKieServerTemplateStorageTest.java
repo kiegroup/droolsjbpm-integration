@@ -169,11 +169,6 @@ public class FileBasedKieServerTemplateStorageTest {
         }
     }
     
-    @AfterClass
-    public static void afterClass() {
-    }
-    
-
     @Test
     public void testStore() {
         /*
@@ -208,7 +203,7 @@ public class FileBasedKieServerTemplateStorageTest {
     
     @Test
     public void testLoadList() {
-        storage.reloadTemplateMaps();;
+        storage.reloadTemplateMaps();
         List<ServerTemplate> templates = storage.load();
         assertEquals("Mismatched number of server templates",templateMap.values().size(),templates.size());
         templateMap.values().forEach(value -> {
@@ -218,7 +213,7 @@ public class FileBasedKieServerTemplateStorageTest {
  
     @Test
     public void testLoadSingle() {
-        storage.reloadTemplateMaps();;
+        storage.reloadTemplateMaps();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         loadTemplateWithAssertEquals(toSearchFor);
     }
