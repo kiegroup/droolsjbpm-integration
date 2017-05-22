@@ -32,7 +32,10 @@ import org.kie.server.api.marshalling.MarshallingFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Roundtrip tests which make sure that the input object is the same as the object created by marshalling + unmarshalling.
@@ -107,6 +110,16 @@ public class MarshallingRoundTripTest {
         String rawContent = marshaller.marshall(inputObject);
         Object testObjectAfterMarshallingTurnAround = marshaller.unmarshall(rawContent, inputObject.getClass());
         Assertions.assertThat(inputObject).isEqualTo(testObjectAfterMarshallingTurnAround);
+    }
+
+    @Test
+    public void testMapWithDateJSON() {
+        Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, getClass().getClassLoader());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("date", new Date());
+
+        verifyMarshallingRoundTrip(marshaller, map);
     }
 
  }
