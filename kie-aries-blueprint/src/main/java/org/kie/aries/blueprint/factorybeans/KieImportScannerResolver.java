@@ -16,7 +16,10 @@
 
 package org.kie.aries.blueprint.factorybeans;
 
+import java.util.Collection;
+
 import org.kie.api.builder.KieScanner;
+import org.kie.api.event.kiescanner.KieScannerEventListener;
 import org.kie.aries.blueprint.namespace.BlueprintContextHelper;
 
 public class KieImportScannerResolver extends AbstractKieObjectsResolver implements KieScanner {
@@ -56,5 +59,20 @@ public class KieImportScannerResolver extends AbstractKieObjectsResolver impleme
     @Override
     public void scanNow() {
         kieScanner.scanNow();
+    }
+
+    @Override
+    public void addListener(KieScannerEventListener listener) {
+        kieScanner.addListener(listener);
+    }
+
+    @Override
+    public void removeListener(KieScannerEventListener listener) {
+        kieScanner.removeListener(listener);        
+    }
+
+    @Override
+    public Collection<KieScannerEventListener> getListeners() {
+        return kieScanner.getListeners();
     }
 }
