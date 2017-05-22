@@ -17,7 +17,6 @@ package org.kie.server.integrationtests.shared;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
@@ -94,21 +93,17 @@ public class KieServerSynchronization {
         });
     }
 
-    public static void waitForKieServerMessage(final KieServicesClient client, final String containerId, final String oldMessage, final String expectedMessage) throws Exception {
+    public static void waitForKieServerMessage(final KieServicesClient client, final String containerId, final String expectedMessage) throws Exception {
         waitForCondition(() -> {
             ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(containerId);
-            if (containerResponse.getType() != ServiceResponse.ResponseType.SUCCESS) {
+            if (!containerResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
                 return false;
             }
 
-            // Kie Container store only last message
+            // Kie Container store only one message
             List<Message> messagesList = containerResponse.getResult().getMessages();
             if (messagesList.size() == 1) {
-                Collection<String> messages = messagesList.get(0).getMessages();
-                String message = messages.iterator().next();
-                if (messages.size() == 1 && message.equals(oldMessage)) {
-                    return message.equals(expectedMessage);
-                }
+                return messagesList.get(0).getMessages().stream().anyMatch(n -> n.equals(expectedMessage));
             }
 
             return false;
