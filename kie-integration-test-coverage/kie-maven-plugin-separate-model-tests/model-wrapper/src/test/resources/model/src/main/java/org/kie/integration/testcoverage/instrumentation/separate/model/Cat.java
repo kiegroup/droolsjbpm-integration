@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.model.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate.model;
 
 /**
  * A person's cat.

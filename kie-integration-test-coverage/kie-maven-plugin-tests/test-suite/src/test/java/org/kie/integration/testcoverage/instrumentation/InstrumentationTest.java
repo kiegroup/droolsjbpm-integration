@@ -24,8 +24,8 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.integration.testcoverage.model.instrumentation.Dog;
-import org.kie.integration.testcoverage.model.instrumentation.Person;
+import org.kie.integration.testcoverage.instrumentation.model.Dog;
+import org.kie.integration.testcoverage.instrumentation.model.Person;
 
 import java.util.ArrayList;
 import java.util.List;

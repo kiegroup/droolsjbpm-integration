@@ -15,9 +15,9 @@
 
 package org.kie.integration.testcoverage.instrumentation;
 
-import org.kie.integration.testcoverage.model.instrumentation.Person;
-import org.kie.integration.testcoverage.model.instrumentation.Dog;
-import org.kie.integration.testcoverage.model.instrumentation.Cat;
+import org.kie.integration.testcoverage.instrumentation.model.Person;
+import org.kie.integration.testcoverage.instrumentation.model.Dog;
+import org.kie.integration.testcoverage.instrumentation.model.Cat;
 
 global java.util.List results
 

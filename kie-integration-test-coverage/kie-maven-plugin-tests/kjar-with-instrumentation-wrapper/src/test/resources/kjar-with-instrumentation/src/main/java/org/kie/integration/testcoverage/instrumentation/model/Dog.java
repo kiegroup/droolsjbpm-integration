@@ -13,51 +13,32 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.model.instrumentation;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+package org.kie.integration.testcoverage.instrumentation.model;
 
 /**
- * A sample model class to be instrumented by kie-maven-plugin.
+ * A person's dog.
  */
-public class Person implements Serializable {
+public class Dog implements Pet {
 
-    private String name;
+    private final String name;
 
-    private Integer age;
+    private int age;
 
-    private List<Pet> pets;
-
-    public Person(final String name, final Integer age) {
+    public Dog(final String name, final int age) {
         this.name = name;
         this.age = age;
-        this.pets = new ArrayList<Pet>();
     }
 
     public String getName() {
         return this.name;
     }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
+    public int getAge() {
         return this.age;
     }
 
-    public void setAge(final Integer age) {
+    public void setAge(final int age) {
         this.age = age;
-    }
-
-    public List<Pet> getPets() {
-        return pets;
-    }
-
-    public void addPet(final Pet pet) {
-        this.pets.add(pet);
     }
 
     @Override
@@ -65,28 +46,25 @@ public class Person implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Person person = (Person) o;
+        Dog dog = (Dog) o;
 
-        if (name != null ? !name.equals(person.name) : person.name != null) return false;
-        if (age != null ? !age.equals(person.age) : person.age != null) return false;
-        return pets != null ? pets.equals(person.pets) : person.pets == null;
+        if (age != dog.age) return false;
+        return name != null ? name.equals(dog.name) : dog.name == null;
 
     }
 
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (age != null ? age.hashCode() : 0);
-        result = 31 * result + (pets != null ? pets.hashCode() : 0);
+        result = 31 * result + age;
         return result;
     }
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "Dog{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
-                ", pets=" + pets +
                 '}';
     }
 }

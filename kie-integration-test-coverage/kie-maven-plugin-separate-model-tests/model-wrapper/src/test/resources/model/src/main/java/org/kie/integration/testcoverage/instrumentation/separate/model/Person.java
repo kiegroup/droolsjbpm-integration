@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.model.separate.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

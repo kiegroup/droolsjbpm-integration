@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

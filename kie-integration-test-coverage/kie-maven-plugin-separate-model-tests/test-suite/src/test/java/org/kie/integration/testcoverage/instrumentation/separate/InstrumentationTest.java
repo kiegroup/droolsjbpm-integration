@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,8 +24,8 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.integration.testcoverage.model.separate.instrumentation.Dog;
-import org.kie.integration.testcoverage.model.separate.instrumentation.Person;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Dog;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Person;
 
 import java.util.ArrayList;
 import java.util.List;
