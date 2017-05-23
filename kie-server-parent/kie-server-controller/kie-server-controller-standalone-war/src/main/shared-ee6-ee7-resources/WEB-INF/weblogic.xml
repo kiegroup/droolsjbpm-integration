@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<weblogic-web-app xmlns="http://www.bea.com/ns/weblogic/90" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <container-descriptor>
+    <prefer-application-packages>
+      <package-name>com.fasterxml.jackson.*</package-name>
+    </prefer-application-packages>
+  </container-descriptor>
+  <security-role-assignment>
+    <role-name>kie-server</role-name>
+    <principal-name>kie-server</principal-name>
+  </security-role-assignment>
+</weblogic-web-app>
