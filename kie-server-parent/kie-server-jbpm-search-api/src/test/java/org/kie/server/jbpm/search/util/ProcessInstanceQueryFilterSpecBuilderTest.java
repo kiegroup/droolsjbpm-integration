@@ -9,20 +9,22 @@ import java.util.List;
 
 import org.junit.Test;
 import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceField;
+import org.kie.server.jbpm.search.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.jbpm.search.api.model.definition.TaskField;
 import org.kie.server.jbpm.search.api.model.definition.TaskQueryFilterSpec;
 
-public class TaskQueryFilterSpecBuilderTest {
+public class ProcessInstanceQueryFilterSpecBuilderTest {
 	
 	@Test
 	public void testGetEqualsTo() {
-		TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpecBuilder().equalsTo(TaskField.PROCESSID, "test-process").get();
+		ProcessInstanceQueryFilterSpec filterSpec = new ProcessInstanceQueryFilterSpecBuilder().equalsTo(ProcessInstanceField.PROCESSID, "test-process").get();
 		
 		QueryParam[] params = filterSpec.getParameters();
 		assertEquals(1, params.length);
 		
 		QueryParam param = params[0];
-		assertEquals(TaskField.PROCESSID.toString(), param.getColumn());
+		assertEquals(ProcessInstanceField.PROCESSID.toString(), param.getColumn());
 		assertEquals("EQUALS_TO", param.getOperator());
 		assertEquals("test-process", param.getValue().stream().findFirst().get());
 	}
@@ -41,13 +43,13 @@ public class TaskQueryFilterSpecBuilderTest {
 		   e.printStackTrace();
 		}
 		
-		TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpecBuilder().between(TaskField.CREATEDON, from, to).get();
+		ProcessInstanceQueryFilterSpec filterSpec = new ProcessInstanceQueryFilterSpecBuilder().between(ProcessInstanceField.START_DATE, from, to).get();
 		
 		QueryParam[] params = filterSpec.getParameters();
 		assertEquals(1, params.length);
 		
 		QueryParam param = params[0];
-		assertEquals(TaskField.CREATEDON.toString(), param.getColumn());
+		assertEquals(ProcessInstanceField.START_DATE.toString(), param.getColumn());
 		assertEquals("BETWEEN", param.getOperator());
 		List<?> values = param.getValue();
 		assertEquals(2, values.size());
@@ -69,18 +71,18 @@ public class TaskQueryFilterSpecBuilderTest {
 		   e.printStackTrace();
 		}
 		
-		TaskQueryFilterSpec filterSpec = new TaskQueryFilterSpecBuilder().equalsTo(TaskField.PROCESSID, "test-process").between(TaskField.CREATEDON, from, to).get();
+		ProcessInstanceQueryFilterSpec filterSpec = new ProcessInstanceQueryFilterSpecBuilder().equalsTo(ProcessInstanceField.PROCESSID, "test-process").between(ProcessInstanceField.START_DATE, from, to).get();
 		
 		QueryParam[] params = filterSpec.getParameters();
 		assertEquals(2, params.length);
 		
 		QueryParam paramEqualsTo = params[0];
-		assertEquals(TaskField.PROCESSID.toString(), paramEqualsTo.getColumn());
+		assertEquals(ProcessInstanceField.PROCESSID.toString(), paramEqualsTo.getColumn());
 		assertEquals("EQUALS_TO", paramEqualsTo.getOperator());
 		assertEquals("test-process", paramEqualsTo.getValue().stream().findFirst().get());
 		
 		QueryParam paramBetween = params[1];
-		assertEquals(TaskField.CREATEDON.toString(), paramBetween.getColumn());
+		assertEquals(ProcessInstanceField.START_DATE.toString(), paramBetween.getColumn());
 		assertEquals("BETWEEN", paramBetween.getOperator());
 		List<?> values = paramBetween.getValue();
 		assertEquals(2, values.size());
