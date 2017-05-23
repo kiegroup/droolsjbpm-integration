@@ -41,6 +41,7 @@ import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.api.exception.KieServicesException;
+import org.kie.server.api.model.Message;
 import org.kie.server.client.ProcessServicesClient;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
@@ -88,6 +89,23 @@ public class KieServerSynchronization {
                     return true;
                 }
             }
+            return false;
+        });
+    }
+
+    public static void waitForKieServerMessage(final KieServicesClient client, final String containerId, final String expectedMessage) throws Exception {
+        waitForCondition(() -> {
+            ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(containerId);
+            if (!containerResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
+                return false;
+            }
+
+            // Kie Container store only one message
+            List<Message> messagesList = containerResponse.getResult().getMessages();
+            if (messagesList.size() == 1) {
+                return messagesList.get(0).getMessages().stream().anyMatch(n -> n.equals(expectedMessage));
+            }
+
             return false;
         });
     }
