@@ -111,7 +111,7 @@ public class FormServiceRestOnlyIntegrationTest extends RestJbpmBaseIntegrationT
         response = clientRequest.request(getMediaType()).get();
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        TaskSummaryList taskSummaryList = response.readEntity(TaskSummaryList.class);
+        TaskSummaryList taskSummaryList = marshaller.unmarshall(response.readEntity(String.class), TaskSummaryList.class);
         logger.debug("Form content is '{}'", taskSummaryList);
 
         assertNotNull(taskSummaryList);
