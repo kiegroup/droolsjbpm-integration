@@ -665,7 +665,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(releaseId, containerResponseEntity.getReleasedId());
         assertEquals(KieContainerStatus.STOPPED, containerResponseEntity.getStatus());
     }
-    
+
     @Test
     public void testUpdateContainerNonValidReleaseId() throws Exception {
         // Create kie server instance connection in controller.
@@ -689,7 +689,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
         assertEquals(releaseId, containerResource.getReleaseId());
 
-        // Update container
+        // Update container with non valid ReleaseId
         ReleaseId nonValidReleaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "2.0.0-SNAPSHOT");
         containerToDeploy.setReleasedId(nonValidReleaseId);
 
@@ -704,6 +704,8 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(nonValidReleaseId, containerResponseEntity.getReleasedId());
 
         // Check deployed container
+        String updateErrorMessage = "Error updating releaseId for container " + CONTAINER_ID + " to version " + nonValidReleaseId.toString();
+        KieServerSynchronization.waitForKieServerMessage(client, CONTAINER_ID, updateErrorMessage);
         containerInfoResponse = client.getContainerInfo(CONTAINER_ID);
         assertEquals(ServiceResponse.ResponseType.SUCCESS, containerInfoResponse.getType());
         containerResource = containerInfoResponse.getResult();
@@ -713,8 +715,8 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(1, containerResource.getMessages().size());
         Collection<String> messages = containerResource.getMessages().get(0).getMessages();
         assertEquals(2, messages.size());
-        Assertions.assertThat(messages).contains("Error updating releaseId for container " + CONTAINER_ID + " to version " + nonValidReleaseId.toString());
-        
+        Assertions.assertThat(messages).contains(updateErrorMessage);
+
         assertEquals(CONTAINER_ID, containerResource.getContainerId());
         assertEquals(KieContainerStatus.STARTED, containerResource.getStatus());
         assertEquals(releaseId, containerResource.getReleaseId());
