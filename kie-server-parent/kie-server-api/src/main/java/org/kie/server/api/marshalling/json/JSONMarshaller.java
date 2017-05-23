@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -131,6 +132,7 @@ public class JSONMarshaller implements Marshaller {
         }
         // add byte array handling support to allow byte[] to be send as payload
         classes.add(JaxbByteArray.class);
+        classes.add(Date.class);
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
@@ -244,7 +246,13 @@ public class JSONMarshaller implements Marshaller {
                                         try {
                                             Thread.currentThread().setContextClassLoader(baseType.getRawClass().getClassLoader());
                                             if (classesSet.contains(baseType.getRawClass())) {
-                                                return super.deserializeTypedFromScalar(jp, ctxt);
+                                                try {
+                                                    return super.deserializeTypedFromScalar(jp, ctxt);
+                                                } catch (Exception e) {
+                                                    JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
+                                                    Object value = deser.deserialize(jp, ctxt);
+                                                    return value;
+                                                }
                                             }
                                             JsonDeserializer<Object> deser = _findDeserializer(ctxt, baseTypeName());
                                             Object value = deser.deserialize(jp, ctxt);
