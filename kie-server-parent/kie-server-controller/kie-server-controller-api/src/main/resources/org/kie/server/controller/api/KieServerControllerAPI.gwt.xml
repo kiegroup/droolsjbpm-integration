@@ -7,5 +7,6 @@
 
   <source path='model'/>
   <source path='service'/>
+  <source path='storage'/>
 
 </module>
