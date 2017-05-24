@@ -44,7 +44,6 @@ import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.api.exception.KieServicesException;
-import org.kie.server.api.exception.KieServicesHttpException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
@@ -1485,14 +1484,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         task = tasks.get(0);
         assertNotEquals(SUBMIT_POLICE_REPORT_TASK, task.getName());
 
-        try {
-            caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP);
-            fail("Task was triggered to completed stage");
-        } catch (KieServicesHttpException e) {
-            assertEquals(Integer.valueOf(400), e.getHttpCode());
-        } catch (KieServicesException e) {
-            //ok
-        }
+        assertClientException(
+                () -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP),
+                400,
+                "Could not trigger Fragment for Completed stage " + stage.getName());
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseClaimId);
     }
@@ -1510,15 +1505,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
 
-        try {
-            caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP);
-            fail("AdHoc Task was trigged from canceled case.");
-        } catch (KieServicesHttpException ex) {
-            assertTrue(ex.getMessage().startsWith("Unexpected HTTP response code"));
-            assertEquals(Integer.valueOf(404), ex.getHttpCode());
-        } catch (KieServicesException e) {
-            assertEquals("Case with id " + caseId + " was not found", e.getMessage());
-        }
+        assertClientException(
+                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP),
+                404,
+                "Could not find case instance \"" + caseId + "\"",
+                "Case with id " + caseId + " was not found");
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
