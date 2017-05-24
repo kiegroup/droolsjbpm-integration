@@ -91,6 +91,7 @@ import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.definition.QueryDefinition;
@@ -413,16 +414,19 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 if (qdStream != null) {
                     String qdString = IOUtils.toString(qdStream);
 
-                    QueryDefinition[] queryDefinitionList = kieContainerInstance.getMarshaller(MarshallingFormat.JSON).unmarshall(qdString, QueryDefinition[].class);
-                    List<String> queries = new ArrayList<>();
-                    Arrays.asList(queryDefinitionList).forEach(qd ->
-                    {
-                        queryService.replaceQuery(QueryDataServiceBase.build(context, qd));
-                        queries.add(qd.getName());
-                        logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), id);
-                    });
-                    containerQueries.put(id, queries);
-
+                    try {
+                        QueryDefinition[] queryDefinitionList = kieContainerInstance.getMarshaller(MarshallingFormat.JSON).unmarshall(qdString, QueryDefinition[].class);
+                        List<String> queries = new ArrayList<>();
+                        Arrays.asList(queryDefinitionList).forEach(qd ->
+                        {
+                            queryService.replaceQuery(QueryDataServiceBase.build(context, qd));
+                            queries.add(qd.getName());
+                            logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), id);
+                        });
+                        containerQueries.put(id, queries);
+                    } catch (MarshallingException e) {
+                        logger.error("Error when unmarshalling query definitions from query-definitions.json.", e);
+                    }
                 }
             }
 
