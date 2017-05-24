@@ -24,7 +24,12 @@
     </web-resource-collection>
     <auth-constraint>
       <role-name>kie-server</role-name>
+      <role-name>admin</role-name>
+      <role-name>analyst</role-name>
+      <role-name>developer</role-name>
       <role-name>user</role-name>
+      <role-name>manager</role-name>
+      <role-name>process-admin</role-name>
     </auth-constraint>
   </security-constraint>
   <login-config>
@@ -35,7 +40,22 @@
     <role-name>kie-server</role-name>
   </security-role>
   <security-role>
+    <role-name>admin</role-name>
+  </security-role>
+  <security-role>
+    <role-name>analyst</role-name>
+  </security-role>
+  <security-role>
+    <role-name>developer</role-name>
+  </security-role>
+  <security-role>
     <role-name>user</role-name>
+  </security-role>
+  <security-role>
+    <role-name>manager</role-name>
+  </security-role>
+  <security-role>
+    <role-name>process-admin</role-name>
   </security-role>
 
 </web-app>
