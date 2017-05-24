@@ -1,58 +1,68 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>kie-server-controller</artifactId>
     <groupId>org.kie.server</groupId>
+    <artifactId>kie-server-controller</artifactId>
     <version>7.1.0-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-
   <artifactId>kie-server-controller-standalone</artifactId>
-  <name>KIE :: Execution Server :: Controller :: Standalone Implementation</name>
-  <description>KIE Execution Server Controller Standalone Implementation</description>
-
+  <packaging>pom</packaging>
+  <name>KIE :: Execution Server :: Standalone Controller</name>
+  <description>Standalone Controller WAR files</description>
   <dependencies>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-impl</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-rest-common</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-rest</artifactId>
-    </dependency>
+  	<dependency>
+  		<groupId>org.kie.server</groupId>
+  		<artifactId>kie-server-controller-standalone-impl</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.kie.server</groupId>
+  		<artifactId>kie-server-controller-api</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.kie.server</groupId>
+  		<artifactId>kie-server-controller-impl</artifactId>
+  	</dependency>
   </dependencies>
+  <build>
+    <finalName>kie-server-controller-standalone-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly-ee6-container.xml</descriptor>
+            <descriptor>src/main/assembly/assembly-ee7-container.xml</descriptor>
+            <descriptor>src/main/assembly/assembly-servlet-container.xml</descriptor>
+          </descriptors>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-sources</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
 
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
 </project>
