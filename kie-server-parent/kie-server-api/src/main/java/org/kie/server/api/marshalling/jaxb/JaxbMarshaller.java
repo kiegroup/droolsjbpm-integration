@@ -119,10 +119,12 @@ import org.kie.server.api.model.cases.CaseStageDefinition;
 import org.kie.server.api.model.cases.CaseStageList;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.ProcessDefinitionList;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.api.model.definition.QueryFilterSpec;
 import org.kie.server.api.model.definition.QueryParam;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.dmn.DMNContextKS;
 import org.kie.server.api.model.dmn.DMNDecisionInfo;
 import org.kie.server.api.model.dmn.DMNDecisionResultKS;
@@ -274,6 +276,9 @@ public class JaxbMarshaller implements Marshaller {
                 QueryDefinitionList.class,
                 QueryFilterSpec.class,
                 QueryParam.class,
+                
+                ProcessInstanceQueryFilterSpec.class,
+                TaskQueryFilterSpec.class,
 
                 ArrayList.class,
 
