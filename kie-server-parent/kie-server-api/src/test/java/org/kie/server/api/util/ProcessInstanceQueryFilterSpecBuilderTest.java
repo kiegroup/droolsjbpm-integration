@@ -37,7 +37,6 @@ public class ProcessInstanceQueryFilterSpecBuilderTest {
 		   from = sdf.parse("2017-05-10");
 		   to = sdf.parse("2017-05-14");
 		} catch (ParseException e) {
-		   // TODO Auto-generated catch block
 		   e.printStackTrace();
 		}
 		
@@ -65,7 +64,6 @@ public class ProcessInstanceQueryFilterSpecBuilderTest {
 		   from = sdf.parse("2017-05-10");
 		   to = sdf.parse("2017-05-14");
 		} catch (ParseException e) {
-		   // TODO Auto-generated catch block
 		   e.printStackTrace();
 		}
 		

@@ -14,17 +14,6 @@
   <name>KIE :: Execution Server :: Remote :: REST :: jBPM Search</name>
   <description>KIE jBPM Search Execution Server Extension</description>
 
-<dependencyManagement>
-	<dependencies>
-		<dependency>
-			  <groupId>org.kie.server</groupId>
-		 	  <artifactId>kie-server-services-jbpm-search</artifactId>
-		          <version>${version.org.kie}</version>
-		</dependency>
-	</dependencies>
-
-</dependencyManagement>
-
   <dependencies>
   	
     <dependency>

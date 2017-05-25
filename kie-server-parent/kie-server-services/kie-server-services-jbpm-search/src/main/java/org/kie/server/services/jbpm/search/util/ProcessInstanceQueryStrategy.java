@@ -53,7 +53,6 @@ public class ProcessInstanceQueryStrategy implements QueryStrategy {
 			columnType = "integer";
 			break;
 		case CORRELATIONKEY:
-			// TODO: define mapping for timestamp. Is that date?
 			columnType = "string";
 			break;
 		case DURATION:
@@ -63,7 +62,6 @@ public class ProcessInstanceQueryStrategy implements QueryStrategy {
 			columnType = "date";
 			break;
 		case EXTERNALID:
-			// TODO: define mapping for timestamp. Is that date?
 			columnType = "string";
 			break;
 		case USER_IDENTITY:

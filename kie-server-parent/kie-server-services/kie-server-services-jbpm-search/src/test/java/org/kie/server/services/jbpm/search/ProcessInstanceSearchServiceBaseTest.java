@@ -60,7 +60,6 @@ public class ProcessInstanceSearchServiceBaseTest {
 		
 		ProcessInstanceList processInstances = base.getProcessInstancesWithFilters(page, pageSize, payload, marshallingType);
 		
-		//TODO: Implement the same logic with JUnit AssertThat
 		assertEquals(1, processInstances.getItems().size());
 		
 		ProcessInstance pi1 = processInstances.getItems().stream().findFirst().get();

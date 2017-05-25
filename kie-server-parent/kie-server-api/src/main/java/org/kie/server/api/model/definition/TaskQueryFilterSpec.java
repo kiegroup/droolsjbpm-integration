@@ -21,9 +21,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/*
- * TODO: If QueryFilterSpec would have an abstract class supertype without the column-mapping, we could just inherit from that code, without the need for duplication.
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task-query-filter-spec")
 public class TaskQueryFilterSpec extends BaseQueryFilterSpec {

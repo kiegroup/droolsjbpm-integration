@@ -53,7 +53,6 @@ public class TaskQueryStrategy implements QueryStrategy {
 			columnType = "integer";
 			break;
 		case ACTIVATIONTIME:
-			//TODO: define mapping for timestamp. Is that date?
 			columnType = "date";
 			break;
 		case ACTUALOWNER:
@@ -63,7 +62,6 @@ public class TaskQueryStrategy implements QueryStrategy {
 			columnType = "string";
 			break;
 		case CREATEDON:
-			//TODO: define mapping for timestamp. Is that date?
 			columnType = "date";
 			break;
 		case DEPLOYMENTID:

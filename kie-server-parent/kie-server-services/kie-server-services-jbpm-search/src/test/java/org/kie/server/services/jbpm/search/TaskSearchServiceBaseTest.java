@@ -60,7 +60,6 @@ public class TaskSearchServiceBaseTest {
 		
 		TaskInstanceList taskInstances = base.getHumanTasksWithFilters(page, pageSize, payload, marshallingType);
 		
-		//TODO: Implement the same logic with JUnit AssertThat
 		assertEquals(1, taskInstances.getItems().size());
 		
 		TaskInstance ti1 = taskInstances.getItems().stream().findFirst().get();
