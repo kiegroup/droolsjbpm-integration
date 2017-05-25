@@ -51,6 +51,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -1421,15 +1422,12 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(caseId);
         assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
 
-        List<TaskSummary> caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        changeUser(USER_JOHN);
+        List<TaskSummary> caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_JOHN, 0, 10);
         assertNotNull(caseTasks);
-        assertEquals(1, caseTasks.size());
+        assertEquals(0, caseTasks.size());
 
-        TaskSummary task = caseTasks.get(0);
-        assertNotNull(task);
-        assertEquals(HELLO_1_TASK, task.getName());
-        assertEquals(USER_YODA, task.getActualOwner());
-
+        changeUser(USER_YODA);
         caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP);
 
         changeUser(USER_JOHN);
@@ -1437,15 +1435,25 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(caseTasks);
         assertEquals(1, caseTasks.size());
 
-        task = caseTasks.get(0);
+        TaskSummary task = caseTasks.get(0);
         assertNotNull(task);
         assertEquals(HELLO_2_TASK, task.getName());
         assertEquals(USER_JOHN, task.getActualOwner());
 
         changeUser(USER_YODA);
+        caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        assertNotNull(caseTasks);
+        assertEquals(1, caseTasks.size());
+
+        task = caseTasks.get(0);
+        assertNotNull(task);
+        assertEquals(HELLO_1_TASK, task.getName());
+        assertEquals(USER_YODA, task.getActualOwner());
+
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
     }
 
+    @Ignore // test is ignore due JBPM-6001 and JBPM-6008
     @Test
     public void testTriggerTaskIntoStage() throws Exception {
         String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
