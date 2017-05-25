@@ -27,6 +27,7 @@
     <cargo.container.id>valid-id-needs-to-be-specified-in-appropriate-container-profile</cargo.container.id>
     <kie.server.controller.context>kie-server-controller-services</kie.server.controller.context>
     <kie.server.classifier>ee7</kie.server.classifier>
+    <kie.server.controller.templatefile>${project.build.directory}/server-template-storage.xml</kie.server.controller.templatefile>
     <!-- Path to Kie server WAR file. Used for referencing WAR file in on-demand deployment/undeployment. -->
     <kie.server.war.path>${org.kie.server:kie-server:war:ee7}</kie.server.war.path>
     <kie.server.base.http.url>http://${container.hostname}:${container.port}/${kie.server.context}/services/rest/server</kie.server.base.http.url>
