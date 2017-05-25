@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Pattern;
-
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.JsonGenerator;
@@ -132,7 +130,6 @@ public class JSONMarshaller implements Marshaller {
         }
         // add byte array handling support to allow byte[] to be send as payload
         classes.add(JaxbByteArray.class);
-        classes.add(Date.class);
 
         List<NamedType> customClasses = prepareCustomClasses(classes);
         // this is needed because we are using Jackson 1.x which by default ignores Jaxb annotations
