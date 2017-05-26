@@ -69,6 +69,10 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-jbpm-search</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-jbpm-ui</artifactId>
       <exclusions>
         <exclusion>
@@ -133,6 +137,10 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-rest-jbpm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-rest-jbpm-search</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>

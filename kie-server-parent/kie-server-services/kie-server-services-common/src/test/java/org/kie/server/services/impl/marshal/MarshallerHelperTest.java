@@ -15,7 +15,8 @@
 
 package org.kie.server.services.impl.marshal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,9 +28,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Test;
+import org.kie.internal.runtime.manager.context.ProcessInstanceIdContext;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.definition.ProcessInstanceField;
+import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
+import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 import org.kie.server.services.api.KieServerRegistry;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
@@ -77,8 +84,9 @@ public class MarshallerHelperTest {
 		assertThat(marshalledQFS, CompareMatcher.isIdenticalTo(expectedMarshalledTEC).ignoreWhitespace());
 	}
 	
+	
 	@Test
-	public void testJsonMarshallWithoutWithEmptyRegistry() throws Exception {
+	public void testJsonMarshallWithEmptyRegistry() throws Exception {
 		
 		KieServerRegistry kieServerRegistryMock = Mockito.mock(KieServerRegistry.class);
 		Mockito.when(kieServerRegistryMock.getExtraClasses()).thenReturn(new HashSet<Class<?>>());
@@ -93,7 +101,6 @@ public class MarshallerHelperTest {
 		
 		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
 
-		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
 		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
 	}
 	
@@ -111,7 +118,6 @@ public class MarshallerHelperTest {
 		
 		String expectedMarshalledTEC = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
 
-		//assertThat(marshalledQFS, equalToIgnoringWhiteSpace(expectedMarshalledTEC));
 		JSONAssert.assertEquals(expectedMarshalledTEC, marshalledQFS, false);
 	}
 	
@@ -189,6 +195,41 @@ public class MarshallerHelperTest {
 		// QueryFilterSpec does not implement equals method, so using Mockito ReflectionEquals.
 		assertThat(expectedQueryFilterSpec, new ReflectionEquals(unmarshalledQFS));
 	}
+	
+	@Test
+	public void testJsonUnmarshallQueryFilterSpec() {
+		MarshallerHelper helper = new MarshallerHelper(null);
+		String marshalledQFS = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null, \"result-column-mapping\" : null}";
+		
+		QueryFilterSpec qfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), QueryFilterSpec.class);
+		
+		//TODO: assert value.
+	}
+	
+	
+	@Test
+	public void testJsonUnmarshallProcessInstanceQueryFilterSpec() {
+		ProcessInstanceQueryFilterSpec expectedPiQfs = new ProcessInstanceQueryFilterSpecBuilder().get();
+		
+		MarshallerHelper helper = new MarshallerHelper(null);
+		String marshalledQFS = "{\"order-by\" : null,\"order-asc\" : false,\"query-params\" : null}";
+		
+		ProcessInstanceQueryFilterSpec unmarshalledPiQfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), ProcessInstanceQueryFilterSpec.class);
+		assertThat(expectedPiQfs, new ReflectionEquals(unmarshalledPiQfs));
+	}
+	
+	@Test
+	public void testJsonUnmarshallTaskQueryFilterSpec() {
+		TaskQueryFilterSpec expectedTaskQfs = new TaskQueryFilterSpecBuilder().get();
+		
+		MarshallerHelper helper = new MarshallerHelper(null);
+		String marshalledQFS = "{\"order-by\" : null, \"order-asc\" : false, \"query-params\" : null}";
+		
+		TaskQueryFilterSpec unmarshalledTaskQfs = helper.unmarshal(marshalledQFS, MarshallingFormat.JSON.toString(), TaskQueryFilterSpec.class);
+		assertThat(expectedTaskQfs, new ReflectionEquals(unmarshalledTaskQfs));
+	}
+	
+	
 
 	@XmlAccessorType(XmlAccessType.FIELD)
 	@XmlRootElement(name = "test-extra-class")
