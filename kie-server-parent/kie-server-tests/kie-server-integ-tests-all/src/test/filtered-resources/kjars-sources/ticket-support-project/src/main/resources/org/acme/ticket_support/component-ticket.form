@@ -1,0 +1,23 @@
+
+<form id="1276841538">
+<property name="name" value="component-ticket.form"/>
+<property name="displayMode" value="default"/>
+<property name="status" value="0"/>
+<field position="0" name="ticket_title" type="InputText" id="1022490713">
+<property name="fieldRequired" value="false"/>
+<property name="label" value="quot;enquot;,quot;title (ticket)quot;"/>
+<property name="readonly" value="false"/>
+<property name="inputBinding" value="ticket/title"/>
+<property name="outputBinding" value="ticket/title"/>
+<property name="fieldClass" value="java.lang.String"/>
+</field>
+<field position="1" name="ticket_description" type="InputText" id="1295590244">
+<property name="fieldRequired" value="false"/>
+<property name="label" value="quot;enquot;,quot;description (ticket)quot;"/>
+<property name="readonly" value="false"/>
+<property name="inputBinding" value="ticket/description"/>
+<property name="outputBinding" value="ticket/description"/>
+<property name="fieldClass" value="java.lang.String"/>
+</field>
+<dataHolder inputId="ticket" name="#E9E371" type="dataModelerEntry" outId="ticket" value="org.acme.ticket_support.Ticket" id="ticket"/>
+</form>
