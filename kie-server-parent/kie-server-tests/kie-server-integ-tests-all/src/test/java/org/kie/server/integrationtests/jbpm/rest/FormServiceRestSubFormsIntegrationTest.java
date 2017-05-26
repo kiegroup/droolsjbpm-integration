@@ -20,17 +20,16 @@ import static org.kie.server.api.rest.RestURI.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.ClientRequest;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.integrationtests.config.TestConfig;
@@ -51,7 +50,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
     private static final String CONTAINER_ID = "ticket-support-project";
     private static final String TICKETSUPPORT_PROCESS_ID = "ticket-support";
 
-    private Response response = null;
+    private org.jboss.resteasy.client.ClientResponse<?> response = null;
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -65,7 +64,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
     @After
     public void releaseConnection() {
         if (response != null) {
-            response.close();
+            response.releaseConnection();
         }
     }
 
@@ -75,13 +74,15 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
         valuesMap.put(RestURI.CONTAINER_ID, CONTAINER_ID);
         valuesMap.put(RestURI.PROCESS_ID, TICKETSUPPORT_PROCESS_ID);
 
-        WebTarget clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap));
+        ClientRequest clientRequest = newRequest(build(TestConfig.getKieServerHttpUrl(), FORM_URI + "/" + PROCESS_FORM_GET_URI, valuesMap))
+                .header("Content-Type", getMediaType().toString())
+                .header("Accept", getMediaType().toString());
         logger.info("[GET] " + clientRequest.getUri());
 
-        response = clientRequest.request(getMediaType()).get();
+        response = clientRequest.get();
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 
-        String result = response.readEntity(String.class);
+        String result = response.getEntity(String.class);
         logger.debug("Form content is '{}'", result);
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -90,8 +91,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
         // make sure fields from the two sub-forms are included in the result
         // checking for json only (same will apply for xml as well)
         if(getMediaType().getSubtype().equals("json")) {
-            JSONParser parser = new JSONParser();
-            JSONObject resultJSON = (JSONObject) parser.parse(result);
+            JSONObject resultJSON = new org.json.JSONObject(result);
             assertNotNull(resultJSON);
 
             JSONObject formKey = (JSONObject) resultJSON.get("form");
@@ -99,7 +99,7 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
 
             assertNotNull(allFormFields);
             // two subforms
-            assertEquals(2, allFormFields.size());
+            assertEquals(2, allFormFields.length());
             assertEquals("component-ticket.form", ((JSONObject) allFormFields.get(0)).get("defaultSubform"));
             assertEquals("issue-subform.form", ((JSONObject) allFormFields.get(1)).get("defaultSubform"));
 
@@ -107,10 +107,10 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
             JSONArray allFormInfo = (JSONArray) formKey.get("form");
             assertNotNull(allFormInfo);
             // two subform info
-            assertEquals(2, allFormInfo.size());
+            assertEquals(2, allFormInfo.length());
 
-            assertEquals(2, ((JSONArray) ((JSONObject) allFormInfo.get(0)).get("field")).size());
-            assertEquals(5, ((JSONArray) ((JSONObject) allFormInfo.get(1)).get("field")).size());
+            assertEquals(2, ((JSONArray) ((JSONObject) allFormInfo.get(0)).get("field")).length());
+            assertEquals(5, ((JSONArray) ((JSONObject) allFormInfo.get(1)).get("field")).length());
         } else if(getMediaType().getSubtype().equals("xml")) {
             try (ByteArrayInputStream stream = new java.io.ByteArrayInputStream(result.getBytes("UTF-8"))) {
                 Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
@@ -121,11 +121,11 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
                 NodeList forms = doc.getDocumentElement().getElementsByTagName("form");
                 Node firstForm = forms.item(0);
                 // 2 subform fields and 4 properties
-                assertEquals(6, ((DeferredElementImpl) firstForm).getChildElementCount());
+                assertEquals(6, ((DeferredElementImpl) firstForm).getChildNodes().getLength());
 
                 Node secondForm = forms.item(1);
                 // 5 subform fields and 4 properties
-                assertEquals(9, ((DeferredElementImpl) secondForm).getChildElementCount());
+                assertEquals(9, ((DeferredElementImpl) secondForm).getChildNodes().getLength());
             }
         }
     }

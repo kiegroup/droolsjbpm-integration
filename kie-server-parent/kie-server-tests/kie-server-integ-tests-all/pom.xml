@@ -164,6 +164,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server</artifactId>
       <classifier>webc</classifier>
