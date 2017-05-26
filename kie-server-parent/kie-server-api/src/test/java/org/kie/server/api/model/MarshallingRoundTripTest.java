@@ -34,8 +34,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Roundtrip tests which make sure that the input object is the same as the object created by marshalling + unmarshalling.
@@ -114,7 +116,9 @@ public class MarshallingRoundTripTest {
 
     @Test
     public void testMapWithDateJSON() {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(MarshallingFormat.JSON, getClass().getClassLoader());
+        Set<Class<?>> extraClasses = new HashSet<Class<?>>();
+        extraClasses.add(Date.class);
+        Marshaller marshaller = MarshallerFactory.getMarshaller(extraClasses, MarshallingFormat.JSON, getClass().getClassLoader());
 
         Map<String, Object> map = new HashMap<>();
         map.put("date", new Date());

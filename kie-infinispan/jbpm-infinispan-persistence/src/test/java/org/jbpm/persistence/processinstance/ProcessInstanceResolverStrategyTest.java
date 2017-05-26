@@ -102,7 +102,6 @@ public class ProcessInstanceResolverStrategyTest {
         NonSerializableClass processVar = new NonSerializableClass();
         processVar.setString("1234567890");
         params.put(VAR_NAME, processVar);
-        params.put("logger", logger);
 
         // Persist variable
         DefaultCacheManager cm = (DefaultCacheManager) context.get(ENTITY_MANAGER_FACTORY);
