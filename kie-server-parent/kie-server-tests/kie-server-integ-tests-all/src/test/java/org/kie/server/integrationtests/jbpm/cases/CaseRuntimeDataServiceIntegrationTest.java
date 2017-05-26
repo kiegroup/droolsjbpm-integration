@@ -11,11 +11,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.server.integrationtests.jbpm.cases;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +51,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -82,6 +83,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     private static final String CASE_HR_VERSION = "1.0";
 
     private static final String DATA_VERIFICATION_DEF_ID = "DataVerification";
+
+    private static final String HELLO_1_TASK = "Hello1";
+    private static final String HELLO_2_TASK = "Hello2";
+
+    private static final String SUBMIT_POLICE_REPORT_TASK = "Submit police report";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -885,7 +891,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         } catch (KieServicesException e) {
             // expected
         }
-        }
+    }
 
     @Test
     public void testGetCaseMilestonesNotExistingCase() {
@@ -1396,7 +1402,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue(caseId2.startsWith(CASE_HR_ID_PREFIX));
         caseClient.addDynamicUserTask(CONTAINER_ID, caseId2, "dynamic task", "simple description", USER_JOHN, null, parameters);
 
-
         tasks = caseClient.findCaseTasksAssignedAsStakeholder(caseId, USER_YODA, Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
         assertNotNull(tasks);
         assertEquals(1, tasks.size());
@@ -1406,6 +1411,114 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, tasks.size());
 
         changeUser(USER_JOHN);
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+
+    }
+
+    @Test
+    public void testGetTriggerTask() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        changeUser(USER_JOHN);
+        List<TaskSummary> caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_JOHN, 0, 10);
+        assertNotNull(caseTasks);
+        assertEquals(0, caseTasks.size());
+
+        changeUser(USER_YODA);
+        caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP);
+
+        changeUser(USER_JOHN);
+        caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_JOHN, 0, 10);
+        assertNotNull(caseTasks);
+        assertEquals(1, caseTasks.size());
+
+        TaskSummary task = caseTasks.get(0);
+        assertNotNull(task);
+        assertEquals(HELLO_2_TASK, task.getName());
+        assertEquals(USER_JOHN, task.getActualOwner());
+
+        changeUser(USER_YODA);
+        caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        assertNotNull(caseTasks);
+        assertEquals(1, caseTasks.size());
+
+        task = caseTasks.get(0);
+        assertNotNull(task);
+        assertEquals(HELLO_1_TASK, task.getName());
+        assertEquals(USER_YODA, task.getActualOwner());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
+    }
+
+    @Ignore // test is ignore due JBPM-6001 and JBPM-6008
+    @Test
+    public void testTriggerTaskIntoStage() throws Exception {
+        String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        assertNotNull(caseClaimId);
+
+        List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
+        assertEquals(1, stages.size());
+        CaseStage stage = stages.iterator().next();
+        assertBuildClaimReportCaseStage(stage, "Active");
+
+        List<TaskSummary> tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseClaimId, USER_YODA, 0, 10);
+        assertNotNull(tasks);
+        int countOfTaskBefore = tasks.size();
+
+        assertNotNull(stage.getIdentifier());
+        caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP);
+
+        tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseClaimId, USER_YODA, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(countOfTaskBefore + 1, tasks.size());
+
+        TaskSummary task = tasks.get(0);
+        assertNotNull(task);
+        assertEquals(SUBMIT_POLICE_REPORT_TASK, task.getName());
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, caseClaimId, "claimReportDone", Boolean.TRUE);
+        stages = caseClient.getStages(CONTAINER_ID, caseClaimId, false, 0, 10);
+        assertEquals(3, stages.size());
+        assertBuildClaimReportCaseStage(stages.get(0), "Completed");
+        assertClaimAssesmentCaseStage(stages.get(1), "Active");
+        assertEscalateRejectedClaimCaseStage(stages.get(2), "Available");
+
+        tasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseClaimId, USER_YODA, 0, 10);
+        assertNotNull(tasks);
+        assertEquals(1, tasks.size());
+        task = tasks.get(0);
+        assertNotEquals(SUBMIT_POLICE_REPORT_TASK, task.getName());
+
+        assertClientException(
+                () -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP),
+                400,
+                "Could not trigger Fragment for Completed stage " + stage.getName());
+
+        caseClient.destroyCaseInstance(CONTAINER_ID, caseClaimId);
+    }
+
+    @Test
+    public void testTriggerTaskInCanceledCase() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        List<TaskSummary> caseTasks = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        assertNotNull(caseTasks);
+        assertEquals(1, caseTasks.size());
+
+        caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
+
+        assertClientException(
+                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP),
+                404,
+                "Could not find case instance \"" + caseId + "\"",
+                "Case with id " + caseId + " was not found");
+
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
     }
@@ -1573,7 +1686,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     public void testGetCaseInstanceByData() {
         String caseClaimId = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
         assertNotNull(caseClaimId);
-
 
         List<CaseStage> stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
         assertEquals(1, stages.size());
