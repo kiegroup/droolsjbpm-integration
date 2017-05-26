@@ -39,6 +39,7 @@ public class RestURI {
     public static final String JOB_KEY = "key";
     public static final String QUERY_NAME = "queryName";
     public static final String SOLVER_ID = "solverId";
+    public static final String FORM_FILTER = "filter";
 
     public static final String PROCESS_URI = "containers/{" + CONTAINER_ID + "}/processes";
     public static final String PROCESS_DEF_URI = "containers/{" + CONTAINER_ID + "}/processes/definitions";

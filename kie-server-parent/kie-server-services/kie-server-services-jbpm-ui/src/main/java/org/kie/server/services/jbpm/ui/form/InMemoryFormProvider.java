@@ -39,11 +39,15 @@ import org.jbpm.kie.services.impl.model.ProcessAssetDesc;
 import org.jbpm.services.api.model.ProcessDefinition;
 import org.kie.api.task.model.Task;
 import org.kie.server.services.jbpm.ui.api.UIFormProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class InMemoryFormProvider extends AbstractFormProvider implements UIFormProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryFormProvider.class);
 
     public static final String NODE_FORM = "form";
     public static final String NODE_FIELD = "field";
@@ -85,6 +89,8 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
 
             if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
                 templateString = filterXML(templateString, lang, process.getDeploymentId(), null, null);
+            } else {
+                templateString = attachSubForms(templateString, process.getDeploymentId());
             }
             return templateString;
         }
@@ -120,6 +126,8 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
 
             if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
                 templateString = filterXML(templateString, lang, task.getTaskData().getDeploymentId(), inputs, outputs);
+            } else {
+                templateString = attachSubForms(templateString, task.getTaskData().getDeploymentId());
             }
             return templateString;
         }
@@ -318,18 +326,90 @@ public class InMemoryFormProvider extends AbstractFormProvider implements UIForm
                 }
             }
 
-            DOMSource domSource = new DOMSource(doc);
-            StringWriter writer = new StringWriter();
-            StreamResult result = new StreamResult(writer);
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
-            transformer.transform(domSource, result);
-            document = writer.toString();
+            document = asString(doc);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("Error when filtering form", ex);
         }
         return document;
+    }
+
+    protected String attachSubForms(String document, String deploymentId) {
+        try {
+            if (!document.contains(SUB_FORM_TYPE) && !document.contains(MULTI_SUB_FORM_TYPE)) {
+                return document;
+            }
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            Document doc = builder.parse(new ByteArrayInputStream(document.getBytes()));
+            NodeList nodes = doc.getElementsByTagName(NODE_FORM);
+            Node nodeForm = nodes.item(0);
+            NodeList childNodes = nodeForm.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node node = childNodes.item(i);
+                if (node.getNodeName().equals(NODE_FIELD)) {
+
+                    String fieldType = node.getAttributes().getNamedItem(ATTR_TYPE).getNodeValue();
+                    if (SUB_FORM_TYPE.equals(fieldType)) {
+
+                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
+                        if (defaultSubForm != null) {
+
+                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
+
+                            if (subFormContent != null) {
+                                Document docSubForm = builder.parse(new ByteArrayInputStream(subFormContent.getBytes()));
+
+                                NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
+                                Node nodeFormSubForm = nodesSubForm.item(0);
+
+                                Node imported = doc.importNode(nodeFormSubForm, true);
+
+                                nodeForm.appendChild(imported);
+                            }
+                        }
+                    } else if (MULTI_SUB_FORM_TYPE.equals(fieldType)) {
+
+                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
+                        if (defaultSubForm != null) {
+
+                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
+                            if (subFormContent != null) {
+                                Document docSubForm = builder.parse(new ByteArrayInputStream(subFormContent.getBytes()));
+
+                                NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
+                                Node nodeFormSubForm = nodesSubForm.item(0);
+
+                                Node imported = doc.importNode(nodeFormSubForm, true);
+
+                                nodeForm.appendChild(imported);
+
+                            }
+
+                        }
+
+                    }
+                }
+            }
+            document = asString(doc);
+
+        } catch (Exception ex) {
+            logger.error("Error when attaching subform", ex);
+        }
+        return document;
+    }
+
+    protected String asString(Document doc) throws Exception {
+        DOMSource domSource = new DOMSource(doc);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.transform(domSource, result);
+        return writer.toString();
     }
 
     private void filterProperty(Node property, String lang, String value) {

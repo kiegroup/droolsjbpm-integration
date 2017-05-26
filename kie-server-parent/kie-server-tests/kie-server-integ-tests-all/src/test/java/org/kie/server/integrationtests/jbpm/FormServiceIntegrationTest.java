@@ -34,6 +34,7 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String CONTAINER_ID = "definition-project";
     private static final String HIRING_PROCESS_ID = "hiring";
     private static final String HIRING_2_PROCESS_ID = "hiring2";
+    private static final String HIRING_SUBFORM_PROCESS_ID = "hiringSubform";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -128,6 +129,46 @@ public class FormServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
             uiServicesClient.getTaskForm(CONTAINER_ID, taskId, "en");
 
             fail();
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+    }
+
+    @Test
+    public void testGetProcessWithSubFormRawFormViaUIClient() throws Exception {
+        String result = uiServicesClient.getProcessForm( CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID );
+        logger.debug("Form content is '{}'", result);
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+
+        // check there is content from subform
+        assertTrue("Missing subform content", result.contains("creationDate"));
+
+        // check there is content from multi subform
+        assertTrue("Missing multi subform content", result.contains("unitPrice"));
+    }
+
+    @Test
+    public void testGetTaskFormWithSubformsViaUIClientTest() throws Exception {
+        long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_SUBFORM_PROCESS_ID);
+        assertTrue(processInstanceId > 0);
+        try {
+            List<TaskSummary> tasks = taskClient.findTasksByStatusByProcessInstanceId(processInstanceId, null, 0, 10);
+            assertNotNull(tasks);
+            assertEquals(1, tasks.size());
+
+            Long taskId = tasks.get(0).getId();
+
+            String result = uiServicesClient.getTaskForm(CONTAINER_ID, taskId);
+            logger.debug("Form content is '{}'", result);
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+
+            // check there is content from subform
+            assertTrue("Missing subform content", result.contains("creationDate"));
+
+            // check there is content from multi subform
+            assertTrue("Missing multi subform content", result.contains("unitPrice"));
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
