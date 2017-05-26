@@ -58,6 +58,7 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     protected static final String PROCESS_ID_ASYNC_SCRIPT = "AsyncScriptTask";
     protected static final String PROCESS_ID_TIMER = "definition-project.timer-process";
     protected static final String PROCESS_ID_SIGNAL_PROCESS = "definition-project.signalprocess";
+    protected static final String PROCESS_ID_SIGNAL_PROCESS_2 = "definition-project.signalprocess2";
     protected static final String PROCESS_ID_SIGNAL_START = "signal-start";
     protected static final String PROCESS_ID_CUSTOM_TASK = "customtask";
     protected static final String PROCESS_ID_USERTASK_ESCALATION = "humanTaskEscalation";

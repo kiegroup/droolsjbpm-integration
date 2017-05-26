@@ -65,7 +65,7 @@ public class ContainerUpdateUiIntegrationTest extends JbpmKieServerBaseIntegrati
 
         result = uiServicesClient.getProcessForm(CONTAINER_ID, HIRING_PROCESS_ID, "en");
         assertNotNull(result);
-        assertTrue("Form doesn't contain updated label!", result.contains("Candidate First Name And Surename"));
+        assertTrue("Form doesn't contain updated label!", result.contains("Candidate First Name And Surname"));
     }
 
     @Test

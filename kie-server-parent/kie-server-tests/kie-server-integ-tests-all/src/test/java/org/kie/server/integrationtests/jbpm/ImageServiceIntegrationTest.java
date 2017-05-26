@@ -15,20 +15,28 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.exception.KieServicesException;
-
-import static org.junit.Assert.*;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
+    private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
+            "1.0.1.Final");
 
+    protected static final String CONTAINER_ALIAS = "project";
     private static final String CONTAINER_ID = "definition-project";
+    protected static final String CONTAINER_ID_101 = "definition-project-101";
+
     private static final String HIRING_PROCESS_ID = "hiring";
     private static final String HIRING_2_PROCESS_ID = "hiring2";
 
@@ -37,16 +45,28 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
 
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101").getFile());
 
-        createContainer(CONTAINER_ID, releaseId);
+        createContainer(CONTAINER_ID, releaseId, CONTAINER_ALIAS);
+    }
+
+    @After
+    public void removeExtraContainer() {
+        abortAllProcesses();
+        client.disposeContainer(CONTAINER_ID_101);
+    }
+
+    protected void createExtraContainer() {
+        KieContainerResource containerResource = new KieContainerResource(CONTAINER_ID_101, releaseId101);
+        containerResource.setContainerAlias(CONTAINER_ALIAS);
+        client.createContainer(CONTAINER_ID_101, containerResource);
     }
 
     @Test
     public void testGetProcessImageViaUIClientTest() throws Exception {
         String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_PROCESS_ID);
         logger.debug("Image content is '{}'", result);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
+        assertThat(result).isNotNull().isNotEmpty();
     }
 
     @Test(expected = KieServicesException.class)
@@ -57,15 +77,12 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
     @Test
     public void testGetProcessInstanceImageViaUIClientTest() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_PROCESS_ID);
-        assertTrue(processInstanceId > 0);
-        try {
-            String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
-            logger.debug("Image content is '{}'", result);
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
+        assertThat(processInstanceId).isGreaterThan(0);
+
+        String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
+        logger.debug("Image content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+
     }
 
     @Test(expected = KieServicesException.class)
@@ -77,21 +94,92 @@ public class ImageServiceIntegrationTest extends JbpmKieServerBaseIntegrationTes
     public void testGetProcessImageInPackageViaUIClientTest() throws Exception {
         String result = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_2_PROCESS_ID);
         logger.debug("Image content is '{}'", result);
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
+        assertThat(result).isNotNull().isNotEmpty();
     }
 
     @Test
     public void testGetProcessInstanceImageInPackageViaUIClientTest() throws Exception {
         long processInstanceId = processClient.startProcess(CONTAINER_ID, HIRING_2_PROCESS_ID);
-        assertTrue(processInstanceId > 0);
-        try {
-            String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
-            logger.debug("Image content is '{}'", result);
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-        } finally {
-            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
-        }
+        assertThat(processInstanceId).isGreaterThan(0);
+
+        String result = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
+        logger.debug("Image content is '{}'", result);
+        assertThat(result).isNotNull().isNotEmpty();
+
     }
+
+    @Test
+    public void testGetProcessImageViaUIClientWithAliasTest() throws Exception {
+        String oldResultViaContainerId = uiServicesClient.getProcessImage(CONTAINER_ID, HIRING_PROCESS_ID);
+        logger.debug("Image content is '{}'", oldResultViaContainerId);
+        assertThat(oldResultViaContainerId).isNotNull().isNotEmpty();
+
+        String oldResultViaAlias = uiServicesClient.getProcessImage(CONTAINER_ALIAS, HIRING_PROCESS_ID);
+        logger.debug("Image content is '{}'", oldResultViaAlias);
+        assertThat(oldResultViaAlias).isNotNull().isNotEmpty();
+
+        assertThat(oldResultViaAlias).isEqualTo(oldResultViaContainerId);
+        assertThat(oldResultViaAlias).contains("HR Interview");
+        assertThat(oldResultViaAlias).doesNotContain("Updated HR");
+
+        createExtraContainer();
+
+        String newResultViaContainerId = uiServicesClient.getProcessImage(CONTAINER_ID_101, HIRING_PROCESS_ID);
+        logger.debug("Image content is '{}'", newResultViaContainerId);
+        assertThat(newResultViaContainerId).isNotNull().isNotEmpty();
+
+        String newResultViaAlias = uiServicesClient.getProcessImage(CONTAINER_ALIAS, HIRING_PROCESS_ID);
+        logger.debug("Image content is '{}'", newResultViaAlias);
+        assertThat(newResultViaAlias).isNotNull().isNotEmpty();
+
+        assertThat(newResultViaAlias).isEqualTo(newResultViaContainerId);
+        assertThat(newResultViaAlias).contains("Updated HR");
+
+        assertThat(oldResultViaAlias).isNotEqualTo(newResultViaAlias);
+
+    }
+
+    @Test
+    public void testGetProcessInstanceImageViaUIClientWithAliasTest() throws Exception {
+        long processInstanceId = processClient.startProcess(CONTAINER_ALIAS, HIRING_PROCESS_ID);
+        assertThat(processInstanceId).isGreaterThan(0);
+
+        ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceId);
+        assertThat(pi.getContainerId()).isEqualTo(CONTAINER_ID);
+
+        String oldResultViaContainerId = uiServicesClient.getProcessInstanceImage(CONTAINER_ID, processInstanceId);
+        logger.debug("Image content is '{}'", oldResultViaContainerId);
+        assertThat(oldResultViaContainerId).isNotNull().isNotEmpty();
+
+        String oldResultViaAlias = uiServicesClient.getProcessInstanceImage(CONTAINER_ALIAS, processInstanceId);
+        logger.debug("Image content is '{}'", oldResultViaAlias);
+        assertThat(oldResultViaAlias).isNotNull().isNotEmpty();
+
+        assertThat(oldResultViaAlias).isEqualTo(oldResultViaContainerId);
+        assertThat(oldResultViaAlias).contains("HR Interview");
+        assertThat(oldResultViaAlias).doesNotContain("Updated HR");
+
+        createExtraContainer();
+
+        processInstanceId = processClient.startProcess(CONTAINER_ALIAS, HIRING_PROCESS_ID);
+        assertThat(processInstanceId).isGreaterThan(0);
+
+        pi = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceId);
+        assertThat(pi.getContainerId()).isEqualTo(CONTAINER_ID_101);
+
+        String newResultViaContainerId = uiServicesClient.getProcessInstanceImage(CONTAINER_ID_101, processInstanceId);
+        logger.debug("Image content is '{}'", newResultViaContainerId);
+        assertThat(newResultViaContainerId).isNotNull().isNotEmpty();
+
+        String newResultViaAlias = uiServicesClient.getProcessInstanceImage(CONTAINER_ALIAS, processInstanceId);
+        logger.debug("Image content is '{}'", newResultViaAlias);
+        assertThat(newResultViaAlias).isNotNull().isNotEmpty();
+
+        assertThat(newResultViaAlias).isEqualTo(newResultViaContainerId);
+        assertThat(newResultViaAlias).contains("Updated HR");
+
+        assertThat(oldResultViaAlias).isNotEqualTo(newResultViaAlias);
+
+    }
+
 }

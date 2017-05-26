@@ -11,7 +11,7 @@
 <property name="groupWithPrevious" value="false"/>
 <property name="labelCSSClass" value=""/>
 <property name="labelCSSStyle" value=""/>
-<property name="label" value="quot;SSClassquot;,quot;quot;quot;SSStylequot;,quot;quot;quot;enquot;,quot;Candidate First Name And Surenamequot;quot;esquot;,quot;quot;"/>
+<property name="label" value="quot;SSClassquot;,quot;quot;quot;SSStylequot;,quot;quot;quot;enquot;,quot;Candidate First Name And Surnamequot;quot;esquot;,quot;quot;"/>
 <property name="errorMessage" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
 <property name="title" value="quot;enquot;,quot;quot;quot;esquot;,quot;quot;"/>
 <property name="disabled" value="false"/>
