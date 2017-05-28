@@ -48,11 +48,19 @@
         <include>org.kie.server:kie-server-controller-api</include>
         <include>org.kie.server:kie-server-controller-impl</include>
         <include>org.kie.server:kie-server-controller-standalone</include>
-
+		<include>org.kie.server:kie-server-rest-common</include>
         <include>com.sun.xml.bind:jaxb-impl</include>
         <include>com.sun.xml.bind:jaxb-core</include>
         <include>org.slf4j:slf4j-api</include>
       </includes>
+      <excludes>
+      	<exclude>org.jboss.resteasy:*</exclude>
+        <exclude>org.jboss.spec.javax.annotation:*</exclude>
+        <exclude>org.jboss.spec.javax.ejb:*</exclude>
+        <exclude>org.jboss.spec.javax.interceptor:*</exclude>
+        <exclude>org.jboss.spec.javax.transaction:*</exclude>
+        <exclude>org.jboss.spec.javax.ws.rs:*</exclude>
+      </excludes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
     </dependencySet>

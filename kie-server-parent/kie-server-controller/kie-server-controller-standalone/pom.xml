@@ -22,6 +22,14 @@
   		<groupId>org.kie.server</groupId>
   		<artifactId>kie-server-controller-impl</artifactId>
   	</dependency>
+  	<dependency>
+  		<groupId>org.kie.server</groupId>
+  		<artifactId>kie-server-rest-common</artifactId>
+  	</dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <finalName>kie-server-controller-standalone-${project.version}</finalName>
