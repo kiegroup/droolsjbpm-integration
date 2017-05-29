@@ -16,7 +16,7 @@
     <dependencies>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>ee7</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -24,7 +24,7 @@
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>ee6</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -32,7 +32,7 @@
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>webc</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -129,22 +129,22 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
-      <classifier>webc</classifier>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
+      <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
+      <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>ee6</classifier>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-standalone</artifactId>
+      <classifier>webc</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
@@ -192,12 +192,13 @@
                 <org.kie.server.controller.pwd>usetheforce123@</org.kie.server.controller.pwd>
                 <org.kie.server.user>yoda</org.kie.server.user>
                 <org.kie.server.pwd>usetheforce123@</org.kie.server.pwd>
+                <org.kie.server.controller.templatefile>${kie.server.controller.templatefile}</org.kie.server.controller.templatefile>
               </systemProperties>
             </container>
             <deployables combine.children="append">
               <deployable>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>kie-server-controller-test-war</artifactId>
+                <artifactId>kie-server-controller-standalone</artifactId>
                 <!-- default, may be overriden in container specific profiles -->
                 <classifier>${kie.server.classifier}</classifier>
                 <type>war</type>
