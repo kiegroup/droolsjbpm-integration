@@ -130,16 +130,6 @@
         <artifactId>kie-tomcat-integration</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-services-jbpm-search</artifactId>
-        <version>${version.org.kie}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-rest-jbpm-search</artifactId>
-        <version>${version.org.kie}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
