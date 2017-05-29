@@ -10,18 +10,40 @@
   <name>KIE :: Execution Server :: Standalone Controller</name>
   <description>Standalone Controller WAR files</description>
   <dependencies>
-  	<dependency>
-  		<groupId>org.kie.server</groupId>
-  		<artifactId>kie-server-controller-standalone-impl</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.kie.server</groupId>
-  		<artifactId>kie-server-controller-api</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.kie.server</groupId>
-  		<artifactId>kie-server-controller-impl</artifactId>
-  	</dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-standalone-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>java-assist</groupId>
+          <artifactId>java-assist</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.jcip</groupId>
+          <artifactId>jcip-annotations</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <finalName>kie-server-controller-standalone-${project.version}</finalName>

@@ -40,18 +40,18 @@
 
   <dependencySets>
     <dependencySet>
-      <includes>
-        <include>org.jboss.resteasy:resteasy-jaxrs</include>
-        <include>org.kie.server:kie-server-controller-api</include>
-        <include>org.kie.server:kie-server-controller-impl</include>
-        <include>org.kie.server:kie-server-controller-standalone</include>
-
-        <include>com.sun.xml.bind:jaxb-core</include>
-        <include>com.sun.xml.bind:jaxb-impl</include>
-      </includes>
       <excludes>
       	<exclude>org.slf4j:slf4j-api</exclude>
       </excludes>
+      <includes>
+        <include>org.kie.server:kie-server-controller-api</include>
+        <include>org.kie.server:kie-server-controller-impl</include>
+        <include>org.kie.server:kie-server-controller-standalone</include>
+		<include>org.kie.server:kie-server-rest-common</include>
+        <include>com.sun.xml.bind:jaxb-core</include>
+        <include>com.sun.xml.bind:jaxb-impl</include>
+        <include>org.slf4j:slf4j-sdk14</include>
+      </includes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
     </dependencySet>
