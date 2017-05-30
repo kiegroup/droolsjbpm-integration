@@ -17,7 +17,6 @@ package org.kie.server.integrationtests.jbpm.search;
 
 import org.assertj.core.api.Assertions;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -38,22 +37,16 @@ import java.util.Map;
 
 public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIntegrationTest{
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
+    private static ReleaseId releaseId = new ReleaseId(GROUP_ID, CONTAINER_ID, VERSION);
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
         createContainer(CONTAINER_ID, releaseId);
-    }
-
-    @Before
-    public void cleanup()  {
-        super.cleanup();
     }
 
     @Override
@@ -152,53 +145,45 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
         compareList.put(ProcessInstanceField.PROCESSNAME, process.getProcessName());
 
         List<Long> resultsIds = new ArrayList<>();
-        List<ProcessInstance> results = null;
-
-        results = searchServicesClient.
+        List<ProcessInstance> results = searchServicesClient.
                 findProcessInstancesWithFilters(createQueryFilterAndEqualsTo(compareList), 0, 100);
 
-        resultsIds = new ArrayList<>();
         for (ProcessInstance res : results) {
             resultsIds.add(res.getId());
         }
 
         Assertions.assertThat(results).isNotNull();
-        Assertions.assertThat(results.size()).isGreaterThanOrEqualTo(0);
+        Assertions.assertThat(results).isNotEmpty();
         Assertions.assertThat(resultsIds).contains(process.getId());
 
-        final ProcessInstance[] instance = new ProcessInstance[1];
-        results.forEach((p) -> {
-            if (p.getId().equals(process.getId())){
-                instance[0] = p;
-            }
-        });
+        ProcessInstance instance = results.stream().filter(processInstance -> processInstance.getId().equals(process.getId()))
+                .findFirst().orElse(null);
+        Assertions.assertThat(instance).isNotNull();
 
-        Assertions.assertThat(instance[0].getContainerId()).isEqualTo(CONTAINER_ID);
-        Assertions.assertThat(instance[0].getId()).isEqualTo(processInstanceId);
-        Assertions.assertThat(instance[0].getProcessName()).isEqualTo(process.getProcessName());
-        Assertions.assertThat(instance[0].getCorrelationKey()).isEqualTo(process.getCorrelationKey());
-        Assertions.assertThat(instance[0].getInitiator()).isEqualTo(USER_YODA);
-        Assertions.assertThat(instance[0].getProcessInstanceDescription()).isEqualTo(process.getProcessInstanceDescription());
-        Assertions.assertThat(instance[0].getParentId()).isEqualTo(process.getParentId());
-        Assertions.assertThat(instance[0].getState()).isEqualTo(process.getState());
-        Assertions.assertThat(instance[0].getProcessVersion()).isEqualTo(process.getProcessVersion());
-        Assertions.assertThat(instance[0].getProcessId()).isEqualTo(process.getProcessId());
+        Assertions.assertThat(instance.getContainerId()).isEqualTo(CONTAINER_ID);
+        Assertions.assertThat(instance.getId()).isEqualTo(processInstanceId);
+        Assertions.assertThat(instance.getProcessName()).isEqualTo(process.getProcessName());
+        Assertions.assertThat(instance.getCorrelationKey()).isEqualTo(process.getCorrelationKey());
+        Assertions.assertThat(instance.getInitiator()).isEqualTo(USER_YODA);
+        Assertions.assertThat(instance.getProcessInstanceDescription()).isEqualTo(process.getProcessInstanceDescription());
+        Assertions.assertThat(instance.getParentId()).isEqualTo(process.getParentId());
+        Assertions.assertThat(instance.getState()).isEqualTo(process.getState());
+        Assertions.assertThat(instance.getProcessVersion()).isEqualTo(process.getProcessVersion());
+        Assertions.assertThat(instance.getProcessId()).isEqualTo(process.getProcessId());
     }
 
     private void testFindProcessInstanceWithQueryFilter(ProcessInstanceQueryFilterSpec filter, Long processInstanceId) {
         List<Long> resultsIds = new ArrayList<>();
-        List<ProcessInstance> results = null;
+        List<ProcessInstance> results;
 
         results = searchServicesClient.
                 findProcessInstancesWithFilters(filter, 0, 100);
-
-        resultsIds = new ArrayList<>();
         for (ProcessInstance res : results) {
             resultsIds.add(res.getId());
         }
 
         Assertions.assertThat(results).isNotNull();
-        Assertions.assertThat(results.size()).isGreaterThanOrEqualTo(1);
+        Assertions.assertThat(results).isNotEmpty();
         Assertions.assertThat(resultsIds).contains(processInstanceId);
     }
 

@@ -16,7 +16,6 @@
 package org.kie.server.integrationtests.jbpm.search;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -38,11 +37,10 @@ import java.util.Map;
 
 public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project", "1.0.0.Final");
+    private static ReleaseId releaseId = new ReleaseId(GROUP_ID, CONTAINER_ID, VERSION);
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
-
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
 
@@ -54,11 +52,6 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses) throws Exception {
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
-    }
-
-    @Before
-    public void cleanup()  {
-        super.cleanup();
     }
 
     @Test
@@ -75,7 +68,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterGreaterThan(TaskField.CREATEDON, Date.from(Instant.EPOCH)), task.getId());
     }
@@ -86,7 +79,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.PROCESSID, PROCESS_ID_USERTASK), task.getId());
     }
@@ -97,7 +90,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.DESCRIPTION, ""), task.getId());
     }
@@ -108,7 +101,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.PROCESSINSTANCEID, processInstanceId), task.getId());
     }
@@ -119,7 +112,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.ACTUALOWNER, USER_YODA), task.getId());
     }
@@ -130,7 +123,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.CREATEDBY, USER_YODA), task.getId());
     }
@@ -141,9 +134,9 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
-        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.NAME, "First task"), task.getId());
+        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.NAME, FIRST_TASK_NAME), task.getId());
     }
     @Test
     public void testFindTaskWithTaskIdEqualsToFilter() throws Exception {
@@ -151,7 +144,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.TASKID, task.getId()), task.getId());
     }
@@ -162,7 +155,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.DEPLOYMENTID, CONTAINER_ID), task.getId());
     }
@@ -173,7 +166,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.STATUS, task.getStatus()), task.getId());
     }
@@ -185,7 +178,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterGreaterThan(TaskField.PRIORITY, -1), task.getId());
     }
@@ -196,7 +189,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterGreaterThan(TaskField.ACTIVATIONTIME, Date.from(Instant.EPOCH)), task.getId());
     }
@@ -207,7 +200,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
         testFindTaskInstanceWithSearchService(createQueryFilterGreaterThanAndEqualsTo(TaskField.PARENTID, -2, -1), task.getId());
     }
@@ -218,14 +211,14 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isGreaterThan(0);
+        Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
 
         HashMap<TaskField, Comparable<?>> compareList = new HashMap<>();
         compareList.put(TaskField.TASKID, task.getId());
         compareList.put(TaskField.DEPLOYMENTID, CONTAINER_ID);
         compareList.put(TaskField.PROCESSINSTANCEID, processInstanceId);
-        compareList.put(TaskField.NAME, "First task");
+        compareList.put(TaskField.NAME, FIRST_TASK_NAME);
         compareList.put(TaskField.CREATEDBY, USER_YODA);
         compareList.put(TaskField.ACTUALOWNER, USER_YODA);
         compareList.put(TaskField.DESCRIPTION, "");
@@ -234,71 +227,61 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         compareList.put(TaskField.STATUS, task.getStatus());
 
         List<Long> resultsIds = new ArrayList<>();
-        List<TaskInstance> results = null;
-
-        results = searchServicesClient.
+        List<TaskInstance> results = searchServicesClient.
                 findHumanTasksWithFilters(createQueryFilterAndEqualsTo(compareList), 0, 100);
 
-        resultsIds = new ArrayList<>();
         for (TaskInstance res : results) {
             resultsIds.add(res.getId());
         }
 
         Assertions.assertThat(results).isNotNull();
-        Assertions.assertThat(results.size()).isGreaterThanOrEqualTo(0);
+        Assertions.assertThat(results).isNotEmpty();
         Assertions.assertThat(resultsIds).contains(task.getId());
 
-        final TaskInstance[] instance = new TaskInstance[1];
-        results.forEach((t) -> {
-            if (t.getId().equals(task.getId())){
-                instance[0] = t;
-            }
-        });
+        TaskInstance instance = results.stream().filter(taskInstance -> taskInstance.getId().equals(task.getId()))
+                .findFirst().orElse(null);
+        Assertions.assertThat(instance).isNotNull();
 
-        Assertions.assertThat(instance[0].getContainerId()).isEqualTo(CONTAINER_ID);
-        Assertions.assertThat(instance[0].getProcessInstanceId()).isEqualTo(processInstanceId);
-        Assertions.assertThat(instance[0].getName()).isEqualTo("First task");
-        Assertions.assertThat(instance[0].getActualOwner()).isEqualTo(USER_YODA);
-        Assertions.assertThat(instance[0].getCreatedBy()).isEqualTo(USER_YODA);
-        Assertions.assertThat(instance[0].getDescription()).isEqualTo("");
-        Assertions.assertThat(instance[0].getExpirationDate()).isEqualTo(task.getExpirationTime());
-        Assertions.assertThat(instance[0].getPriority()).isEqualTo(task.getPriority());
-        Assertions.assertThat(instance[0].getStatus()).isEqualTo(task.getStatus());
+        Assertions.assertThat(instance.getContainerId()).isEqualTo(CONTAINER_ID);
+        Assertions.assertThat(instance.getProcessInstanceId()).isEqualTo(processInstanceId);
+        Assertions.assertThat(instance.getName()).isEqualTo(FIRST_TASK_NAME);
+        Assertions.assertThat(instance.getActualOwner()).isEqualTo(USER_YODA);
+        Assertions.assertThat(instance.getCreatedBy()).isEqualTo(USER_YODA);
+        Assertions.assertThat(instance.getDescription()).isEqualTo("");
+        Assertions.assertThat(instance.getExpirationDate()).isEqualTo(task.getExpirationTime());
+        Assertions.assertThat(instance.getPriority()).isEqualTo(task.getPriority());
+        Assertions.assertThat(instance.getStatus()).isEqualTo(task.getStatus());
     }
 
     private void testFindTaskInstanceWithSearchService(TaskQueryFilterSpec filter, Long taskInstanceId) {
         List<Long> resultsIds = new ArrayList<>();
-        List<TaskInstance> results = null;
-
-        results = searchServicesClient.
+        List<TaskInstance> results = searchServicesClient.
                 findHumanTasksWithFilters(filter, 0, 100);
-
-        resultsIds = new ArrayList<>();
         for (TaskInstance res : results) {
             resultsIds.add(res.getId());
         }
 
         Assertions.assertThat(results).isNotNull();
-        Assertions.assertThat(results.size()).isGreaterThanOrEqualTo(1);
+        Assertions.assertThat(results).isNotEmpty();
         Assertions.assertThat(resultsIds).contains(taskInstanceId);
     }
 
     private TaskQueryFilterSpec createQueryFilterEqualsTo(TaskField taskField, Comparable<?> equalsTo) {
-        return  new TaskQueryFilterSpecBuilder().equalsTo(taskField, equalsTo).get();
+        return new TaskQueryFilterSpecBuilder().equalsTo(taskField, equalsTo).get();
     }
 
     private TaskQueryFilterSpec createQueryFilterGreaterThan(TaskField taskField, Comparable<?> greaterThan) {
-        return  new TaskQueryFilterSpecBuilder().greaterThan(taskField, greaterThan).get();
+        return new TaskQueryFilterSpecBuilder().greaterThan(taskField, greaterThan).get();
     }
 
     private TaskQueryFilterSpec createQueryFilterGreaterThanAndEqualsTo(TaskField taskField, Comparable<?> greaterThan, Comparable<?> equalsTo) {
-        return  new TaskQueryFilterSpecBuilder().greaterThan(taskField, greaterThan).equalsTo(taskField, equalsTo).get();
+        return new TaskQueryFilterSpecBuilder().greaterThan(taskField, greaterThan).equalsTo(taskField, equalsTo).get();
     }
 
     private TaskQueryFilterSpec createQueryFilterAndEqualsTo(Map<TaskField, Comparable<?>> filterProperties) {
         TaskQueryFilterSpecBuilder result = new TaskQueryFilterSpecBuilder();
         filterProperties.forEach(result::equalsTo);
-        return  result.get();
+        return result.get();
     }
 
 }

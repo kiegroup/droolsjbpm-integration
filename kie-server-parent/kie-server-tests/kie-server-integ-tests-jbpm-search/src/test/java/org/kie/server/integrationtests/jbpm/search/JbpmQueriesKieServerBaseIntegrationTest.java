@@ -19,7 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
-import org.kie.api.executor.CommandContext;
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.JobServicesClient;
@@ -31,9 +30,7 @@ import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.jbpm.search.util.DBExternalResource;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -49,9 +46,12 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
 
     protected static final String PERSON_CLASS_NAME = "org.jbpm.data.Person";
 
+    protected static final String GROUP_ID = "org.kie.server.testing";
+    protected static final String VERSION = "1.0.0.Final";
     protected static final String CONTAINER_ID = "definition-project";
     protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
     protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
+    protected static final String FIRST_TASK_NAME = "First task";
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -85,9 +85,6 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
     }
 
     protected void deleteLog() {
-        CommandContext commandContext = new CommandContext();
-        commandContext.setData("SingleRun", "true");
-        commandContext.setData("OlderThan", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         synchronized (this) {
             jobServicesClient.scheduleRequest(CONTAINER_ID,
                     JobRequestInstance.builder().command("org.jbpm.executor.commands.LogCleanupCommand").build());
