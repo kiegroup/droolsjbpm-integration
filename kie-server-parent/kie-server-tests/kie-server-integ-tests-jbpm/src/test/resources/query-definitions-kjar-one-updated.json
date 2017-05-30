@@ -1,0 +1,16 @@
+[
+  {
+    "query-name" : "first-query",
+    "query-source" : "${org.kie.server.persistence.ds}",
+    "query-expression" : "select * from NodeInstanceLog",
+    "query-target" : "CUSTOM"
+  }
+  ,
+  {
+    "query-name" : "second-query",
+    "query-source" : "${org.kie.server.persistence.ds}",
+    "query-expression" : "select * from VariableInstanceLog",
+    "query-target" : "CUSTOM"
+
+  }
+]
