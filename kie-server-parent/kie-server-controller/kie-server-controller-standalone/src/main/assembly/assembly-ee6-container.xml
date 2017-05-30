@@ -40,6 +40,9 @@
 
   <dependencySets>
     <dependencySet>
+      <excludes>
+        <exclude>org.jboss.resteasy:resteasy-jaxrs</exclude>
+      </excludes>
       <includes>
         <include>org.kie.server:kie-server-controller-api</include>
         <include>org.kie.server:kie-server-controller-impl</include>
