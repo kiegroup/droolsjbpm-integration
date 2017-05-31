@@ -16,7 +16,7 @@
     <dependencies>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>ee7</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -24,7 +24,7 @@
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>ee6</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -32,7 +32,7 @@
       </dependency>
       <dependency>
         <groupId>org.kie.server</groupId>
-        <artifactId>kie-server-controller-test-war</artifactId>
+        <artifactId>kie-server-controller-standalone</artifactId>
         <classifier>webc</classifier>
         <type>war</type>
         <scope>test</scope>
@@ -129,21 +129,21 @@
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
+      <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>webc</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
+      <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>ee7</classifier>
       <type>war</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-controller-test-war</artifactId>
+      <artifactId>kie-server-controller-standalone</artifactId>
       <classifier>ee6</classifier>
       <type>war</type>
       <scope>test</scope>
@@ -197,15 +197,15 @@
             <deployables combine.children="append">
               <deployable>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>kie-server-controller-test-war</artifactId>
+                <artifactId>kie-server-controller-standalone</artifactId>
                 <!-- default, may be overriden in container specific profiles -->
                 <classifier>${kie.server.classifier}</classifier>
                 <type>war</type>
                 <properties>
                   <context>${kie.server.controller.context}</context>
                 </properties>
-                <pingURL>${kie.server.controller.base.http.url}</pingURL>
-                <pingTimeout>30000</pingTimeout>
+                <pingURL>${kie.server.controller.base.http.url}/management/servers</pingURL>
+                <pingTimeout>60000</pingTimeout>
               </deployable>
             </deployables>
           </configuration>

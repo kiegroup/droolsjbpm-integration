@@ -12,6 +12,7 @@
   <artifactId>kie-server-controller-standalone-impl</artifactId>
   <name>KIE :: Execution Server :: Controller :: Standalone Implementation</name>
   <description>KIE Execution Server Controller Standalone Implementation</description>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
@@ -43,6 +44,7 @@
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-common</artifactId>
     </dependency>
+
 
     <dependency>
       <groupId>org.kie.server</groupId>
