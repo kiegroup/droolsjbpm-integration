@@ -19,11 +19,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.MessageFormat;
 
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -31,14 +33,16 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.PROCESS_DEFINITION_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.NO_PROCESS_AVAILABLE_WITH_ID;
 
 public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.0.Final");
+                                                       "1.0.0.Final");
     private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
-            "1.0.1.Final");
+                                                                "1.0.1.Final");
 
 
     protected static final String CONTAINER_ALIAS = "project";
@@ -50,6 +54,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101").getFile());
+        //KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/different-gav-definition-project").getFile());
 
         kieContainer = KieServices.Factory.get().newKieContainer(releaseId);
 
@@ -90,48 +95,57 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         parameters.put("person", person);
         Long processInstanceId = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION, parameters);
 
-        assertNotNull(processInstanceId);
-        assertTrue(processInstanceId.longValue() > 0);
+        assertThat(processInstanceId).isNotNull();
+        assertThat(processInstanceId).isGreaterThan(0);
 
         ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceId);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
 
         Object personVariable = processClient.getProcessInstanceVariable(CONTAINER_ALIAS, processInstanceId, "person");
-        assertNotNull(personVariable);
-        assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
-
-        personVariable = processClient.getProcessInstanceVariable(CONTAINER_ALIAS, processInstanceId, "person");
-        assertNotNull(personVariable);
-        assertTrue(personClass.isAssignableFrom(personVariable.getClass()));
+        assertThat(personVariable).isNotNull();
+        assertThat(personClass).isAssignableFrom(personVariable.getClass());
 
         Map<String, Object> variables = processClient.getProcessInstanceVariables(CONTAINER_ALIAS, processInstanceId);
-        assertNotNull(variables);
-        assertEquals(5, variables.size());
-        assertTrue(variables.containsKey("test"));
-        assertTrue(variables.containsKey("number"));
-        assertTrue(variables.containsKey("list"));
-        assertTrue(variables.containsKey("person"));
-        assertTrue(variables.containsKey("initiator"));
+        assertThat(variables).isNotNull();
+        assertThat(variables).hasSize(5);
+        assertThat(variables).containsKey("test");
+        assertThat(variables).containsKey("number");
+        assertThat(variables).containsKey("list");
+        assertThat(variables).containsKey("person");
+        assertThat(variables).containsKey("initiator");
 
-        assertNotNull(variables.get("test"));
-        assertNotNull(variables.get("number"));
-        assertNotNull(variables.get("list"));
-        assertNotNull(variables.get("person"));
-        assertNotNull(variables.get("initiator"));
+        assertThat(variables.get("test")).isNotNull();
+        assertThat(variables.get("number")).isNotNull();
+        assertThat(variables.get("list")).isNotNull();
+        assertThat(variables.get("person")).isNotNull();
+        assertThat(variables.get("initiator")).isNotNull();
 
-        assertTrue(String.class.isAssignableFrom(variables.get("test").getClass()));
-        assertTrue(Integer.class.isAssignableFrom(variables.get("number").getClass()));
-        assertTrue(List.class.isAssignableFrom(variables.get("list").getClass()));
-        assertTrue(personClass.isAssignableFrom(variables.get("person").getClass()));
-        assertTrue(String.class.isAssignableFrom(variables.get("initiator").getClass()));
+        assertThat(String.class).isAssignableFrom(variables.get("test").getClass());
+        assertThat(Integer.class).isAssignableFrom(variables.get("number").getClass());
+        assertThat(List.class).isAssignableFrom(variables.get("list").getClass());
+        assertThat(personClass).isAssignableFrom(variables.get("person").getClass());
+        assertThat(String.class).isAssignableFrom(variables.get("initiator").getClass());
 
-        assertEquals(USER_MARY, variables.get("test"));
-        assertEquals(12345, variables.get("number"));
-        assertEquals(1, ((List) variables.get("list")).size());
-        assertEquals("item", ((List) variables.get("list")).get(0));
-        assertEquals(USER_JOHN, valueOf(variables.get("person"), "name"));
-        assertEquals(TestConfig.getUsername(), variables.get("initiator"));
+        assertThat(variables.get("test")).isEqualTo(USER_MARY);
+        assertThat(variables.get("number")).isEqualTo(12345);
+        assertThat((List) variables.get("list")).hasSize(1);
+        assertThat(((List) variables.get("list")).get(0)).isEqualTo("item");
+        assertThat(valueOf(variables.get("person"), "name")).isEqualTo(USER_JOHN);
+        assertThat(variables.get("initiator")).isEqualTo(TestConfig.getUsername());
+
+        processClient.setProcessVariable(CONTAINER_ALIAS, processInstanceId, "test", USER_JOHN);
+        variables = processClient.getProcessInstanceVariables(CONTAINER_ALIAS, processInstanceId);
+        assertThat(variables.get("test")).isEqualTo(USER_JOHN);
+
+        Map<String, Object> newVariables = new HashMap<>();
+        newVariables.put("test", USER_MARY);
+        newVariables.put("number", new Integer(6789));
+
+        processClient.setProcessVariables(CONTAINER_ALIAS, processInstanceId, newVariables);
+        variables = processClient.getProcessInstanceVariables(CONTAINER_ALIAS, processInstanceId);
+        assertThat(variables.get("test")).isEqualTo(USER_MARY);
+        assertThat(variables.get("number")).isEqualTo(6789);
 
     }
 
@@ -153,17 +167,17 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         Long processInstanceIdV1 = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION, parameters);
 
-        assertNotNull(processInstanceIdV1);
-        assertTrue(processInstanceIdV1.longValue() > 0);
+        assertThat(processInstanceIdV1).isNotNull();
+        assertThat(processInstanceIdV1).isGreaterThan(0);
 
         ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         TaskSummary task = tasks.get(0);
-        assertEquals(CONTAINER_ID, task.getContainerId());
+        assertThat(task.getContainerId()).isEqualTo(CONTAINER_ID);
 
         taskClient.completeAutoProgress(CONTAINER_ALIAS, task.getId(), USER_YODA, null);
 
@@ -171,17 +185,17 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION_2, parameters);
 
-        assertNotNull(processInstanceIdV2);
-        assertTrue(processInstanceIdV2.longValue() > 0);
+        assertThat(processInstanceIdV2).isNotNull();
+        assertThat(processInstanceIdV2).isGreaterThan(0);
 
         processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceIdV2);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID_101, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID_101);
 
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         task = tasks.get(0);
-        assertEquals(CONTAINER_ID_101, task.getContainerId());
+        assertThat(task.getContainerId()).isEqualTo(CONTAINER_ID_101);
 
         taskClient.completeAutoProgress(CONTAINER_ALIAS, task.getId(), USER_YODA, null);
 
@@ -204,17 +218,17 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         Long processInstanceIdV1 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
 
-        assertNotNull(processInstanceIdV1);
-        assertTrue(processInstanceIdV1.longValue() > 0);
+        assertThat(processInstanceIdV1).isNotNull();
+        assertThat(processInstanceIdV1).isGreaterThan(0);
 
         ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceIdV1);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         TaskSummary task = tasks.get(0);
-        assertEquals(CONTAINER_ID, task.getContainerId());
+        assertThat(task.getContainerId()).isEqualTo(CONTAINER_ID);
 
         taskClient.completeAutoProgress(CONTAINER_ALIAS, task.getId(), USER_YODA, null);
 
@@ -222,36 +236,100 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
 
         Long processInstanceIdV2 = processClient.startProcess(CONTAINER_ID_101, PROCESS_ID_EVALUATION_2, parameters);
 
-        assertNotNull(processInstanceIdV2);
-        assertTrue(processInstanceIdV2.longValue() > 0);
+        assertThat(processInstanceIdV2).isNotNull();
+        assertThat(processInstanceIdV2).isGreaterThan(0);
 
         processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceIdV2);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID_101, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID_101);
 
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         task = tasks.get(0);
-        assertEquals(CONTAINER_ID_101, task.getContainerId());
+        assertThat(task.getContainerId()).isEqualTo(CONTAINER_ID_101);
 
         taskClient.completeAutoProgress(CONTAINER_ALIAS, task.getId(), USER_YODA, null);
 
-        // let's start another instance of the old version of container
+        // let's start ano  ther instance of the old version of container
         Long processInstanceIdV3 = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
 
-        assertNotNull(processInstanceIdV3);
-        assertTrue(processInstanceIdV3.longValue() > 0);
+        assertThat(processInstanceIdV3).isNotNull();
+        assertThat(processInstanceIdV3).isGreaterThan(0);
 
         processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, processInstanceIdV3);
-        assertNotNull(processInstance);
-        assertEquals(CONTAINER_ID, processInstance.getContainerId());
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
 
         tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         task = tasks.get(0);
-        assertEquals(CONTAINER_ID, task.getContainerId());
+        assertThat(task.getContainerId()).isEqualTo(CONTAINER_ID);
 
         taskClient.completeAutoProgress(CONTAINER_ALIAS, task.getId(), USER_YODA, null);
 
     }
+
+    @Test
+    public void testDifferentGAVsWithAlias() throws Exception {
+        Long oldPid = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION);
+        assertThat(oldPid).isNotNull();
+        assertThat(oldPid).isGreaterThan(0);
+
+        ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, oldPid);
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
+
+        // Create a container with completely different GAV
+        ReleaseId differentReleaseId101 = new ReleaseId("org.kie.server.different", "different-gav-definition-project",
+                                                        "1.0.1.Final");
+        KieContainerResource containerResource = new KieContainerResource(CONTAINER_ID_101, differentReleaseId101);
+        containerResource.setContainerAlias(CONTAINER_ALIAS);
+        client.createContainer(CONTAINER_ID_101, containerResource);
+
+        assertClientException(() -> processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION_2),
+                              404,
+                              MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, PROCESS_ID_EVALUATION_2, CONTAINER_ALIAS),
+                              MessageFormat.format(NO_PROCESS_AVAILABLE_WITH_ID, PROCESS_ID_EVALUATION_2));
+
+        Long pid = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION);
+        assertThat(pid).isNotNull();
+        assertThat(pid).isGreaterThan(0);
+
+        processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, pid);
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
+
+    }
+
+    @Test
+    public void testContainerIdAsAlias() throws Exception {
+        Long oldPid = processClient.startProcess(CONTAINER_ALIAS, PROCESS_ID_EVALUATION);
+        assertThat(oldPid).isNotNull();
+        assertThat(oldPid).isGreaterThan(0);
+
+        ProcessInstance processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, oldPid);
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
+
+        // Create the second container with alias equal to the first containerId
+        KieContainerResource containerResource = new KieContainerResource(CONTAINER_ID_101, releaseId101);
+        containerResource.setContainerAlias(CONTAINER_ID);
+        client.createContainer(CONTAINER_ID_101, containerResource);
+
+        assertClientException(() -> processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION_2),
+                              404,
+                              MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, PROCESS_ID_EVALUATION_2, CONTAINER_ID),
+                              MessageFormat.format(NO_PROCESS_AVAILABLE_WITH_ID, PROCESS_ID_EVALUATION_2));
+
+        // Instead the old one should be chosen, since it looks for containerId first
+        oldPid = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION);
+        assertThat(oldPid).isNotNull();
+        assertThat(oldPid).isGreaterThan(0);
+
+        processInstance = processClient.getProcessInstance(CONTAINER_ALIAS, oldPid);
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getContainerId()).isEqualTo(CONTAINER_ID);
+
+    }
+
 }

@@ -36,6 +36,7 @@ import javax.ws.rs.core.Variant;
 
 import org.jbpm.services.api.DeploymentNotFoundException;
 import org.jbpm.services.api.ProcessInstanceNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 import org.jbpm.services.api.WorkItemNotFoundException;
 import org.kie.internal.KieInternalServices;
 import org.kie.internal.process.CorrelationKeyFactory;
@@ -95,6 +96,12 @@ public class ProcessResource  {
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
@@ -117,6 +124,12 @@ public class ProcessResource  {
             logger.debug("Returning CREATED response with content '{}'", response);
             Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
             return createResponse(response, v, Response.Status.CREATED, conversationIdHeader);
+        } catch (DeploymentNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(

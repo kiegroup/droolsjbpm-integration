@@ -18,6 +18,7 @@ package org.kie.server.remote.rest.jbpm.resources;
 public class Messages {
 
     public static final String PROCESS_DEFINITION_NOT_FOUND = "Could not find process definition \"{0}\" in container \"{1}\"";
+    public static final String NO_PROCESS_AVAILABLE_WITH_ID = "No process available with given id : {0}";
     public static final String PROCESS_DEFINITION_FETCH_ERROR = "Error when retrieving process definition \"{0}\" in container \"{1}\":: Cause: {2}";
 
     public static final String PROCESS_INSTANCE_NOT_FOUND = "Could not find process instance with id \"{0}\"";
