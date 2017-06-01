@@ -23,6 +23,8 @@ import static org.kie.server.api.rest.RestURI.PROCESS_ID;
 import static org.kie.server.api.rest.RestURI.TASK_FORM_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 
 import java.text.MessageFormat;
 
@@ -53,6 +55,8 @@ public class FormResource {
 
     private static final Logger logger = LoggerFactory.getLogger(FormResource.class);
     private static int PRETTY_PRINT_INDENT_FACTOR = 4;
+    public static final String CONTAINER_NOT_FOUND = "Could not find container \"{0}\"";
+    public static final String PROCESS_DEFINITION_NOT_FOUND = "Could not find process definition \"{0}\" in container \"{1}\"";
 
     private FormServiceBase formServiceBase;
     private KieServerRegistry context;
@@ -86,7 +90,10 @@ public class FormResource {
 
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, variant, Response.Status.OK, conversationIdHeader);
-
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
+        } catch (ProcessDefinitionNotFoundException e) {
+            return notFound( MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), variant, conversationIdHeader);
         } catch (IllegalStateException e) {
             return notFound("Form for process id " + processId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {
@@ -106,9 +113,7 @@ public class FormResource {
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-
             String response = formServiceBase.getFormDisplayTask(taskId, language, filter, formType);
-
             if ( marshallContent ) {
                 response = marshallFormContent( response, formType, variant);
             }
@@ -116,6 +121,8 @@ public class FormResource {
             logger.debug("Returning OK response with content '{}'", response);
             return createResponse(response, variant, Response.Status.OK, conversationIdHeader);
 
+        } catch (DeploymentNotFoundException e) {
+            return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), variant, conversationIdHeader);
         } catch (IllegalStateException e) {
             return notFound("Form for task id " + taskId + " not found", variant, conversationIdHeader);
         } catch (Exception e) {

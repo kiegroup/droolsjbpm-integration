@@ -65,11 +65,9 @@ public class ProcessServiceBase {
 
     public String startProcess(String containerId, String processId, String marshallingType) {
         containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-        // Check for presence of process id
-        ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-        if( procDef == null ) {
-            throw new IllegalStateException("Unable to find process '" + processId + "' in container " + containerId);
-        }
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
+
         logger.debug("Calling start process with id {} on container {} and parameters {}", processId, containerId, null);
         Long processInstanceId = processService.startProcess(containerId, processId);
 
@@ -81,11 +79,8 @@ public class ProcessServiceBase {
 
     public String startProcess(String containerId, String processId, String payload, String marshallingType) {
         containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-        // Check for presence of process id
-        ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-        if( procDef == null ) {
-            throw new IllegalStateException("Unable to find process '" + processId + "' in container " + containerId);
-        }
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
 
         logger.debug("About to unmarshal parameters from payload: '{}'", payload);
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
@@ -100,11 +95,9 @@ public class ProcessServiceBase {
 
     public String startProcessWithCorrelation(String containerId, String processId, String correlationKey, String payload, String marshallingType) {
         containerId = context.getContainerId(containerId, ContainerLocatorProvider.get().getLocator());
-        // Check for presence of process id
-        ProcessDefinition procDef = definitionService.getProcessDefinition(containerId, processId);
-        if( procDef == null ) {
-            throw new IllegalStateException("Unable to find process '" + processId + "' in container " + containerId);
-        }
+        // check validity of deployment and process id
+        definitionService.getProcessDefinition(containerId, processId);
+
         logger.debug("About to unmarshal parameters from payload: '{}'", payload);
         Map<String, Object> parameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class);
 
