@@ -59,6 +59,7 @@
     <module>kie-server-integ-tests-common</module>
     <module>kie-server-integ-tests-drools</module>
     <module>kie-server-integ-tests-jbpm</module>
+    <module>kie-server-integ-tests-jbpm-search</module>
     <module>kie-server-integ-tests-optaplanner</module>
     <module>kie-server-integ-tests-all</module>
     <module>kie-server-integ-tests-controller</module>
