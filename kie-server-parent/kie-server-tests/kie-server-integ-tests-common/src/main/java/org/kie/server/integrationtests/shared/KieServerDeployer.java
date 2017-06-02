@@ -18,7 +18,11 @@ package org.kie.server.integrationtests.shared;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -110,23 +114,23 @@ public class KieServerDeployer {
                 + "then\n"
                 + "    list.add(msg);\n"
                 + "end\n";
-        KieServices ks = KieServices.Factory.get();
-        createAndDeployJar(ks, releaseId, drl);
-
-        // make sure it is not deployed in the in-memory repository
-        ks.getRepository().removeKieModule(releaseId);
+        createAndDeployKJar(releaseId, Collections.singletonMap("src/main/resources/org/pkg1/r0.drl", drl));
     }
 
-    private static void createAndDeployJar(KieServices ks,
-            ReleaseId releaseId,
-            String... drls) {
-        KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(
-                releaseId);
-        for (int i = 0; i < drls.length; i++) {
-            if (drls[i] != null) {
-                kfs.write("src/main/resources/org/pkg1/r" + i + ".drl", drls[i]);
-            }
+    /**
+     * Dynamically deploy kjar with content.
+     *
+     * @param releaseId Release id.
+     * @param files Map of file names and file content.
+     */
+    public static void createAndDeployKJar(ReleaseId releaseId, Map<String, String> files) {
+        KieServices ks = KieServices.Factory.get();
+        KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(releaseId);
+
+        for (Entry<String, String> file : files.entrySet()) {
+            kfs.write(file.getKey(), file.getValue());
         }
+
         byte[] pom = kfs.read("pom.xml");
         KieBuilder kb = ks.newKieBuilder(kfs).buildAll();
         Assert.assertFalse(kb.getResults().getMessages(org.kie.api.builder.Message.Level.ERROR).toString(),
@@ -135,6 +139,9 @@ public class KieServerDeployer {
         byte[] jar = kieModule.getBytes();
 
         getRepository().installArtifact(releaseId, jar, pom);
+
+        // make sure it is not deployed in the in-memory repository
+        ks.getRepository().removeKieModule(releaseId);
     }
 
     public static MavenRepository getRepository() {
