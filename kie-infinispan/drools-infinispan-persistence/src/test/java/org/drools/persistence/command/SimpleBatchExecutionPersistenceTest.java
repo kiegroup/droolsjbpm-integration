@@ -22,11 +22,11 @@ import static org.drools.persistence.util.PersistenceUtil.createEnvironment;
 import java.util.HashMap;
 
 import org.drools.compiler.command.SimpleBatchExecutionTest;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.persistence.util.PersistenceUtil;
 import org.junit.After;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
+import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
@@ -41,7 +41,7 @@ public class SimpleBatchExecutionPersistenceTest extends SimpleBatchExecutionTes
         context = null;
     }
 
-    protected StatefulKnowledgeSession createKnowledgeSession(KnowledgeBase kbase) { 
+    protected StatefulKnowledgeSession createKnowledgeSession(KieBase kbase) { 
         if( context == null ) { 
             context = PersistenceUtil.setupWithPoolingDataSource(DROOLS_PERSISTENCE_UNIT_NAME);
         }
