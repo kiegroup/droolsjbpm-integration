@@ -23,11 +23,9 @@ import org.drools.core.util.DroolsStreamUtils;
 import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.jbpm.compiler.ProcessBuilderImpl;
-import org.jbpm.process.builder.ReturnValueEvaluatorBuilder;
 import org.jbpm.process.core.timer.Timer;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
-import org.jbpm.workflow.core.Constraint;
 import org.jbpm.workflow.core.Node;
 import org.jbpm.workflow.core.impl.ConnectionImpl;
 import org.jbpm.workflow.core.impl.DroolsConsequenceAction;
@@ -35,13 +33,13 @@ import org.jbpm.workflow.core.node.*;
 import org.jbpm.workflow.instance.node.SubProcessNodeInstance;
 import org.junit.*;
 import org.kie.api.KieBase;
+import org.kie.api.definition.KiePackage;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.internal.definition.KnowledgePackage;
 import org.kie.spring.beans.persistence.TestWorkItemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -305,7 +303,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         service.dispose();
     }
 
-    private static KnowledgePackage getProcessWorkItems() {
+    private static KiePackage getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.TestProcess");
         process.setName("TestProcess");
@@ -376,7 +374,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         return packageBuilder.getPackage();
     }
 
-    public static void writePackage(KnowledgePackage pkg,
+    public static void writePackage(KiePackage pkg,
                                     File dest) {
         dest.deleteOnExit();
         OutputStream out = null;
@@ -459,7 +457,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KnowledgePackage getProcessSubProcess() {
+    private static KiePackage getProcessSubProcess() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessSubProcess");
         process.setName("ProcessSubProcess");
@@ -606,7 +604,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KnowledgePackage getProcessTimer() {
+    private static KiePackage getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer");
         process.setName("ProcessTimer");
@@ -688,7 +686,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
     }
 
     @SuppressWarnings("unused")
-    private static KnowledgePackage getProcessTimer2() {
+    private static KiePackage getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer2");
         process.setName("ProcessTimer2");

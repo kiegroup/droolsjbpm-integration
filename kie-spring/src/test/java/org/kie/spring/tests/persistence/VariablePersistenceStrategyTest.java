@@ -24,6 +24,7 @@ import org.h2.tools.DeleteDbFiles;
 import org.h2.tools.Server;
 import org.junit.*;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
@@ -31,7 +32,6 @@ import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkflowProcessInstance;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.persistence.jpa.JPAKnowledgeService;
 import org.kie.spring.beans.persistence.*;
 import org.slf4j.Logger;
@@ -101,7 +101,7 @@ public class VariablePersistenceStrategyTest {
         final List<?> list = new ArrayList<Object>();
         PlatformTransactionManager txManager = (PlatformTransactionManager) ctx.getBean("txManager");
 
-        final Environment env = KnowledgeBaseFactory.newEnvironment();
+        final Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER,
@@ -275,7 +275,7 @@ public class VariablePersistenceStrategyTest {
         //                      result.size() );
         log.debug("### Retrieving process instance ###");
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 emf);
         env.set(EnvironmentName.TRANSACTION_MANAGER,
