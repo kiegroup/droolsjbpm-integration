@@ -16,13 +16,13 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatelessKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.StatelessKieSession;
 
 public class StatelessSessionCreation extends AbstractBenchmark {
 
     private final int sessionNumber;
-    private static KnowledgeBase kbase;
+    private static KieBase kbase;
 
     public StatelessSessionCreation(int sessionNumber) {
         this.sessionNumber = sessionNumber;
@@ -36,7 +36,7 @@ public class StatelessSessionCreation extends AbstractBenchmark {
 
     public void execute(int repNr) {
         for (int i = 0; i < sessionNumber; i++) {
-            StatelessKnowledgeSession session = kbase.newStatelessKnowledgeSession();
+            StatelessKieSession session = kbase.newStatelessKieSession();
         }
     }
 

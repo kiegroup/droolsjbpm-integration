@@ -25,17 +25,18 @@ import java.util.regex.Matcher;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.waltz.Line;
 import org.drools.benchmark.model.waltz.Stage;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 public class WaltzBenchmark extends AbstractBenchmark {
 
-    private KnowledgeBase kbase;
+    private KieBase kbase;
     private List<Line> lines = new ArrayList<Line>();
 
     @Override
@@ -49,7 +50,7 @@ public class WaltzBenchmark extends AbstractBenchmark {
     }
 
     public void execute(int repNr) {
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession();
+        KieSession session = kbase.newKieSession();
         for (Line l : lines) {
             session.insert( l );
         }
@@ -58,11 +59,11 @@ public class WaltzBenchmark extends AbstractBenchmark {
         session.dispose();
     }
 
-    private KnowledgeBase readRule() {
+    private KieBase readRule() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newInputStreamResource(getClass().getResourceAsStream("/waltz.drl")), ResourceType.DRL );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
         return kbase;
     }
 

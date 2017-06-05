@@ -18,15 +18,15 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 public class FibonacciBenchmark extends AbstractBenchmark {
 
     private int number;
     private String drlFile;
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
 
     public FibonacciBenchmark(int number) {
         this(number, "fibonacci.drl");
@@ -39,8 +39,8 @@ public class FibonacciBenchmark extends AbstractBenchmark {
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
-        ksession = kbase.newStatefulKnowledgeSession();
+        KieBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
+        ksession = kbase.newKieSession();
     }
 
     public void execute(int repNr) {

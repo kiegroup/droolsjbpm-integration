@@ -15,11 +15,12 @@
 
 package org.drools.benchmark.util;
 
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
 
 public class DroolsUtil {
@@ -36,13 +37,13 @@ public class DroolsUtil {
         return kbuilder;
     }
 
-    public static KnowledgeBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        if (kbuilder != null) kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+    public static KieBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        if (kbuilder != null) kbase.addPackages(kbuilder.getKnowledgePackages());
         return kbase;
     }
 
-    public static KnowledgeBase createKnowledgeBase(String drl) {
+    public static KieBase createKnowledgeBase(String drl) {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource(drl.getBytes()), ResourceType.DRL );
 
@@ -50,8 +51,8 @@ public class DroolsUtil {
             throw new RuntimeException(kbuilder.getErrors().toString());
         }
 
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
         return kbase;
     }
 }

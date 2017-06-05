@@ -18,12 +18,12 @@ package org.drools.benchmark.benchmarks;
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.cep.Figure;
 import org.drools.benchmark.model.cep.Letter;
-import org.kie.internal.KnowledgeBase;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.kie.api.KieBaseConfiguration;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.api.conf.EventProcessingOption;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 public class CepBenchmark extends AbstractBenchmark {
 
@@ -31,9 +31,9 @@ public class CepBenchmark extends AbstractBenchmark {
 
     private int offset = 0;
 
-    private static KnowledgeBase kbase;
+    private static InternalKnowledgeBase kbase;
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
 
     public CepBenchmark(int eventNr) {
         this.eventNr = eventNr;
@@ -48,10 +48,10 @@ public class CepBenchmark extends AbstractBenchmark {
             config.setOption( EventProcessingOption.STREAM );
 
             kbase = KnowledgeBaseFactory.newKnowledgeBase(config);
-            kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+            kbase.addPackages(kbuilder.getKnowledgePackages());
         }
 
-        ksession = kbase.newStatefulKnowledgeSession();
+        ksession = kbase.newKieSession();
         new Thread(new Runnable() {
             public void run() {
                 ksession.fireUntilHalt();
