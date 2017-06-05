@@ -25,10 +25,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.eclipse.bpmn2.FlowElement;
 import org.jbpm.simulation.PathContext;
 import org.jbpm.simulation.impl.SimulationNodeInstanceFactoryRegistry;
 import org.json.JSONObject;
+import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
@@ -41,14 +43,12 @@ import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class TestUtils {
 
@@ -118,15 +118,15 @@ public class TestUtils {
         }
     }
     
-    public static StatefulKnowledgeSession createSession(String process) {
+    public static KieSession createSession(String process) {
         KnowledgeBuilder builder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         
         builder.add(ResourceFactory.newClassPathResource(process), ResourceType.BPMN2);
         
-        KnowledgeBase kbase = builder.newKnowledgeBase();
+        KieBase kbase = builder.newKieBase();
         KieSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         config.setOption(ClockTypeOption.get("pseudo") );
-        StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession(config, EnvironmentFactory.newEnvironment());
+        KieSession session = kbase.newKieSession(config, EnvironmentFactory.newEnvironment());
         session.getEnvironment().set("NodeInstanceFactoryRegistry", SimulationNodeInstanceFactoryRegistry.getInstance());
         
         return session;

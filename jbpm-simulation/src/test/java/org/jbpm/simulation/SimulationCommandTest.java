@@ -18,22 +18,22 @@ package org.jbpm.simulation;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.time.SessionPseudoClock;
 import org.jbpm.simulation.converter.SimulationFilterPathFormatConverter;
 import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.impl.SimulateProcessPathCommand;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.junit.Test;
+import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 public class SimulationCommandTest {
 
@@ -49,13 +49,13 @@ public class SimulationCommandTest {
         
         builder.add(ResourceFactory.newClassPathResource("BPMN2-ExclusiveSplit.bpmn2"), ResourceType.BPMN2);
         
-        KnowledgeBase kbase = builder.newKnowledgeBase();
+        KieBase kbase = builder.newKieBase();
         KieSessionConfiguration config = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
         config.setOption(ClockTypeOption.get("pseudo") );
         
         for (SimulationPath sp : paths) {
         
-            StatefulKnowledgeSession session = kbase.newStatefulKnowledgeSession(config, EnvironmentFactory.newEnvironment());
+            KieSession session = kbase.newKieSession(config, KieServices.get().newEnvironment());
             ((SessionPseudoClock) session.getSessionClock()).advanceTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
             
             session.execute(new SimulateProcessPathCommand("com.sample.test", context, sp));

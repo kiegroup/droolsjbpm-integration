@@ -29,7 +29,7 @@ import org.jbpm.simulation.impl.BPMN2SimulationDataProvider;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.jbpm.simulation.impl.WorkingMemorySimulationRepository;
 import org.junit.Test;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 public class WorkingMemorySimulationRepositoryTest {
 
@@ -46,7 +46,7 @@ public class WorkingMemorySimulationRepositoryTest {
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path);
-            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
+            KieSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());
             // set start date to current time
@@ -72,7 +72,7 @@ public class WorkingMemorySimulationRepositoryTest {
             for (SimulationPath path : paths) {
                 
                 context.setCurrentPath(path);
-                StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-TwoUserTasks.bpmn2");
+                KieSession session = TestUtils.createSession("BPMN2-TwoUserTasks.bpmn2");
                 
                 context.setClock((SessionPseudoClock) session.getSessionClock());
                 // set start date to current time

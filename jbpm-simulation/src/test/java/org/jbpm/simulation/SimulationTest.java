@@ -24,7 +24,7 @@ import org.jbpm.simulation.helper.HardCodedSimulationDataProvider;
 import org.jbpm.simulation.helper.TestUtils;
 import org.jbpm.simulation.impl.SimulationPath;
 import org.junit.Test;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 //@Ignore
 public class SimulationTest {
@@ -40,7 +40,7 @@ public class SimulationTest {
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path);
-            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ParallelSplit.bpmn2");
+            KieSession session = TestUtils.createSession("BPMN2-ParallelSplit.bpmn2");
             context.setClock((SessionPseudoClock) session.getSessionClock());
             // set start date to current time
             context.getClock().advanceTime(System.currentTimeMillis(), TimeUnit.MILLISECONDS);
@@ -61,7 +61,7 @@ public class SimulationTest {
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path);
-            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
+            KieSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());
             // set start date to current time
@@ -83,7 +83,7 @@ public class SimulationTest {
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path);
-            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
+            KieSession session = TestUtils.createSession("BPMN2-UserTask.bpmn2");
             
             context.setClock((SessionPseudoClock) session.getSessionClock());
             // set start date to current time
