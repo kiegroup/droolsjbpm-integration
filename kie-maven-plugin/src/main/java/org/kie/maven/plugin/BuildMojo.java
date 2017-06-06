@@ -92,18 +92,7 @@ public class BuildMojo extends AbstractKieMojo {
     private PlexusContainer container;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Map<String, Object> kieMap = null;
-        if (container != null) { //this happen with 3.0.5
-            try {
-                /**
-                 * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
-                 */
-                kieMap = (Map) container.lookup(Map.class, "java.util.HashMap", "kieMap");
 
-            } catch (ComponentLookupException cle) {
-                throw new RuntimeException(cle);
-            }
-        }
 
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -170,16 +159,17 @@ public class BuildMojo extends AbstractKieMojo {
                 }
                 throw new MojoFailureException("Build failed!");
             } else {
-
-                if(kieMap != null && compilationID != null) {
-                    MemoryFileSystem mfs = new MemoryFileSystem();
-                    KieInMemoryMetaInfoBuilder builder = new KieInMemoryMetaInfoBuilder(mfs, kModule);
-                    KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-                    kieMap.put(compilationID, modelMetaInfo);
-                    getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
-                    mfs.mark();
-
-                }else{
+                if (container != null && compilationID != null) {
+                    Optional<Map<String, Object>> optionalKieMap = getKieMap();
+                    if (optionalKieMap.isPresent()) {
+                        MemoryFileSystem mfs = new MemoryFileSystem();
+                        KieInMemoryMetaInfoBuilder builder = new KieInMemoryMetaInfoBuilder(mfs, kModule);
+                        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
+                        optionalKieMap.get().put(compilationID, modelMetaInfo);
+                        getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
+                        mfs.mark();
+                    }
+                } else {
                     new KieMetaInfoBuilder(new DiskResourceStore(outputDirectory), kModule).writeKieModuleMetaInfo();
                 }
             }
@@ -187,6 +177,23 @@ public class BuildMojo extends AbstractKieMojo {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
+    }
+
+    private Optional<Map<String, Object>> getKieMap() {
+        Map<String, Object> kieMap = null;
+
+        try {
+            /**
+             * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
+             */
+            kieMap = (Map) container.lookup(Map.class, "java.util.HashMap", "kieMap");
+            return Optional.of(kieMap);
+
+        } catch (ComponentLookupException cle) {
+            getLog().info("kieMap not present with compilationID and container present");
+            return Optional.empty();
+        }
+
     }
 
     private KieModuleModel getDependencyKieModel(File jar) {

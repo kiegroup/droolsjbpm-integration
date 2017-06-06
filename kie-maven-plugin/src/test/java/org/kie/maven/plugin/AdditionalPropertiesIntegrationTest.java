@@ -31,11 +31,12 @@ public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseInteg
         File basedir = resources.getBasedir("kjar-3-properties-only");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute("clean", "install");
+                .execute("clean", "install", "-X");
         result.assertErrorFreeLog();
         // additional properties are logged during debug (-X) build
         // following string is created directly inside the KIE Maven plugin execution (the property names and values
         // are logged multiple by maven itself as well, so we should check directly against that string)
+
         result.assertLogText("Additional system properties: {drools.dialect.java.compiler.lnglevel=1.6, my.property=some-value}");
     }
 }
