@@ -27,14 +27,14 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import org.drools.android.DroolsAndroidContext;
 import org.drools.android.roboguice.KnowledgeBaseListener;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.util.DroolsStreamUtils;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.cdi.KBase;
+import org.kie.api.definition.KiePackage;
 import org.kie.api.runtime.KieContainer;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.definition.KnowledgePackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import roboguice.inject.Nullable;
@@ -110,8 +110,8 @@ class KnowledgeBaseListener implements TypeListener {
                     if (!kbases.containsKey(annotation.value())) {
                         logger.debug("Deserializing knowledge base {}", annotation.value());
                         knowledgeBase = KnowledgeBaseFactory.newKnowledgeBase();
-                        ((KnowledgeBase) knowledgeBase).addKnowledgePackages(
-                                (List<KnowledgePackage>) DroolsStreamUtils.streamIn(resources.openRawResource(id)));
+                        ((InternalKnowledgeBase) knowledgeBase).addPackages(
+                                (List<KiePackage>) DroolsStreamUtils.streamIn(resources.openRawResource(id)));
                         kbases.put(annotation.value(), knowledgeBase);
                     }
                     knowledgeBase = kbases.get(annotation.value());
