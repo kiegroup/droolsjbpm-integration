@@ -163,7 +163,7 @@ public class BuildMojo extends AbstractKieMojo {
                     Optional<Map<String, Object>> optionalKieMap = getKieMap();
                     if (optionalKieMap.isPresent()) {
                         MemoryFileSystem mfs = new MemoryFileSystem();
-                        KieInMemoryMetaInfoBuilder builder = new KieInMemoryMetaInfoBuilder(mfs, kModule);
+                        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(mfs, kModule);
                         KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
                         optionalKieMap.get().put(compilationID, modelMetaInfo);
                         getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
