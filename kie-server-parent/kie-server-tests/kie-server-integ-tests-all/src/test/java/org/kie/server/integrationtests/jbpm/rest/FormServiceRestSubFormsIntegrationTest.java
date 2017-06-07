@@ -38,8 +38,8 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.apache.xerces.dom.DeferredElementImpl;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -120,14 +120,44 @@ public class FormServiceRestSubFormsIntegrationTest extends RestJbpmBaseIntegrat
 
                 NodeList forms = doc.getDocumentElement().getElementsByTagName("form");
                 Node firstForm = forms.item(0);
-                // 2 subform fields and 4 properties
-                assertEquals(6, ((DeferredElementImpl) firstForm).getChildElementCount());
+                // 2 subform fields, 3 properties and 1 dataHolder
+                assertFormChildElements(firstForm, 6, 2, 3, 1);
 
                 Node secondForm = forms.item(1);
-                // 5 subform fields and 4 properties
-                assertEquals(9, ((DeferredElementImpl) secondForm).getChildElementCount());
+                // 5 subform fields, 3 properties and 1 dataHolder
+                assertFormChildElements(secondForm, 9, 5, 3, 1);
             }
         }
     }
 
+    private void assertFormChildElements(Node parentNode, int expectedElementsCount, int expectedFieldsCount, int expectedPropertiesCount, int expectedDataHoldersCount) {
+        NodeList childNodes = parentNode.getChildNodes();
+        int elementCount = 0;
+        int fieldsCount = 0;
+        int propertiesCount = 0;
+        int dataHoldersCount = 0;
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node child = childNodes.item(i);
+            if (child instanceof Element) {
+                elementCount++;
+                switch (((Element) child).getTagName()) {
+                    case "field":
+                        fieldsCount++;
+                        break;
+                    case "property":
+                        propertiesCount++;
+                        break;
+                    case "dataHolder":
+                        dataHoldersCount++;
+                        break;
+                }
+            }
+        }
+
+        assertEquals("Wrong count of expected elemntes", expectedElementsCount, elementCount);
+        assertEquals("Wrong count of expected fields", expectedFieldsCount, fieldsCount);
+        assertEquals("Wrong count of expected properties", expectedPropertiesCount, propertiesCount);
+        assertEquals("Wrong count of expected dataHolders", expectedDataHoldersCount, dataHoldersCount);
+    }
 }
