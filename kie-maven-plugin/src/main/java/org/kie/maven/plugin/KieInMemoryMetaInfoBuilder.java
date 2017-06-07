@@ -1,3 +1,17 @@
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 package org.kie.maven.plugin;
 
 import com.google.protobuf.ByteString;
@@ -20,6 +34,7 @@ import org.kie.api.definition.type.FactType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+/*Copy of KieMetaInfoBuilder but with an in memory FS to expose the KieModuleMetaInfo */
 
 public class KieInMemoryMetaInfoBuilder {
 
@@ -42,66 +57,60 @@ public class KieInMemoryMetaInfoBuilder {
     }
 
     private KieModuleMetaInfo generateKieModuleMetaInfo() {
-        Map<String, TypeMetaInfo> typeInfos = new HashMap();
-        Map<String, Set<String>> rulesPerPackage = new HashMap();
-        KieModuleModel kieModuleModel = this.kModule.getKieModuleModel();
-        Iterator var4 = kieModuleModel.getKieBaseModels().keySet().iterator();
+        // TODO: I think this method is wrong because it is only inspecting packages that are included
+        // in at least one kbase, but I believe it should inspect all packages, even if not included in
+        // any kbase, as they could be included in the future
+        Map<String, TypeMetaInfo> typeInfos = new HashMap<String, TypeMetaInfo>();
+        Map<String, Set<String>> rulesPerPackage = new HashMap<String, Set<String>>();
 
-        while (var4.hasNext()) {
-            String kieBaseName = (String) var4.next();
-            KnowledgeBuilderImpl kBuilder = (KnowledgeBuilderImpl) this.kModule.getKnowledgeBuilderForKieBase(kieBaseName);
+        KieModuleModel kieModuleModel = kModule.getKieModuleModel();
+        for ( String kieBaseName : kieModuleModel.getKieBaseModels().keySet() ) {
+            KnowledgeBuilderImpl kBuilder = (KnowledgeBuilderImpl) kModule.getKnowledgeBuilderForKieBase( kieBaseName );
             Map<String, PackageRegistry> pkgRegistryMap = kBuilder.getPackageRegistry();
-            KieModuleCache.KModuleCache.Builder _kmoduleCacheBuilder = this.createCacheBuilder();
-            KieModuleCache.CompilationData.Builder _compData = this.createCompilationData();
 
-            JavaDialectRuntimeData runtimeData;
-            ArrayList types;
-            for (Iterator var10 = kBuilder.getKnowledgePackages().iterator(); var10.hasNext(); this.addToCompilationData(_compData, runtimeData, types)) {
-                KiePackage kPkg = (KiePackage) var10.next();
-                PackageRegistry pkgRegistry = (PackageRegistry) pkgRegistryMap.get(kPkg.getName());
-                runtimeData = (JavaDialectRuntimeData) pkgRegistry.getDialectRuntimeRegistry().getDialectData("java");
-                types = new ArrayList();
+            KieModuleCache.KModuleCache.Builder _kmoduleCacheBuilder = createCacheBuilder();
+            KieModuleCache.CompilationData.Builder _compData = createCompilationData();
 
-                String internalName;
-                for (Iterator var15 = kPkg.getFactTypes().iterator(); var15.hasNext(); types.add(internalName)) {
-                    FactType factType = (FactType) var15.next();
-                    Class<?> typeClass = ((ClassDefinition) factType).getDefinedClass();
-                    TypeDeclaration typeDeclaration = pkgRegistry.getPackage().getTypeDeclaration(typeClass);
-                    if (typeDeclaration != null) {
-                        typeInfos.put(typeClass.getName(), new TypeMetaInfo(typeDeclaration));
+            for ( KiePackage kPkg : kBuilder.getKnowledgePackages() ) {
+                PackageRegistry pkgRegistry = pkgRegistryMap.get( kPkg.getName() );
+                JavaDialectRuntimeData runtimeData = (JavaDialectRuntimeData) pkgRegistry.getDialectRuntimeRegistry().getDialectData( "java" );
+
+                List<String> types = new ArrayList<String>();
+                for ( FactType factType : kPkg.getFactTypes() ) {
+                    Class< ? > typeClass = ((ClassDefinition) factType).getDefinedClass();
+                    TypeDeclaration typeDeclaration = pkgRegistry.getPackage().getTypeDeclaration( typeClass );
+                    if ( typeDeclaration != null ) {
+                        typeInfos.put( typeClass.getName(), new TypeMetaInfo(typeDeclaration) );
                     }
 
                     String className = factType.getName();
-                    internalName = className.replace('.', '/') + ".class";
+                    String internalName = className.replace('.', '/') + ".class";
                     byte[] bytes = runtimeData.getBytecode(internalName);
                     if (bytes != null) {
-                        this.trgMfs.write(internalName, bytes, true);
+                        trgMfs.write( internalName, bytes, true );
+                    }
+                    types.add( internalName );
+                }
+
+                Set<String> rules = rulesPerPackage.get( kPkg.getName() );
+                if( rules == null ) {
+                    rules = new HashSet<String>();
+                }
+                for ( Rule rule : kPkg.getRules() ) {
+                    if( !rules.contains( rule.getName() ) ) {
+                        rules.add(rule.getName());
                     }
                 }
-
-                Set<String> rules = (Set) rulesPerPackage.get(kPkg.getName());
-                if (rules == null) {
-                    rules = new HashSet();
-                }
-
-                Iterator var23 = kPkg.getRules().iterator();
-
-                while (var23.hasNext()) {
-                    Rule rule = (Rule) var23.next();
-                    if (!((Set) rules).contains(rule.getName())) {
-                        ((Set) rules).add(rule.getName());
-                    }
-                }
-
-                if (!((Set) rules).isEmpty()) {
+                if (!rules.isEmpty()) {
                     rulesPerPackage.put(kPkg.getName(), rules);
                 }
+
+                addToCompilationData(_compData, runtimeData, types);
             }
 
-            _kmoduleCacheBuilder.addCompilationData(_compData.build());
-            this.writeCompilationDataToTrg(_kmoduleCacheBuilder.build(), kieBaseName);
+            _kmoduleCacheBuilder.addCompilationData( _compData.build() );
+            writeCompilationDataToTrg( _kmoduleCacheBuilder.build(), kieBaseName );
         }
-
         return new KieModuleMetaInfo(typeInfos, rulesPerPackage);
     }
 
@@ -110,31 +119,33 @@ public class KieInMemoryMetaInfoBuilder {
     }
 
     private KieModuleCache.CompilationData.Builder createCompilationData() {
+        // Create compilation data cache
         return KieModuleCache.CompilationData.newBuilder().setDialect("java");
     }
 
-    private void addToCompilationData(KieModuleCache.CompilationData.Builder _cdata, JavaDialectRuntimeData runtimeData, List<String> types) {
-        Iterator var4 = runtimeData.getStore().entrySet().iterator();
-
-        while (var4.hasNext()) {
-            Map.Entry<String, byte[]> entry = (Map.Entry) var4.next();
-            if (!types.contains(entry.getKey())) {
-                KieModuleCache.CompDataEntry _entry = KieModuleCache.CompDataEntry.newBuilder().setId((String) entry.getKey()).setData(ByteString.copyFrom((byte[]) entry.getValue())).build();
-                _cdata.addEntry(_entry);
+    private void addToCompilationData(KieModuleCache.CompilationData.Builder _cdata,
+                                      JavaDialectRuntimeData runtimeData,
+                                      List<String> types) {
+        for ( Map.Entry<String, byte[]> entry : runtimeData.getStore().entrySet() ) {
+            if ( !types.contains( entry.getKey() ) ) {
+                KieModuleCache.CompDataEntry _entry = KieModuleCache.CompDataEntry.newBuilder()
+                        .setId( entry.getKey() )
+                        .setData( ByteString.copyFrom(entry.getValue()) )
+                        .build();
+                _cdata.addEntry( _entry );
             }
         }
-
     }
 
-    private void writeCompilationDataToTrg(KieModuleCache.KModuleCache _kmoduleCache, String kieBaseName) {
+    private void writeCompilationDataToTrg(KieModuleCache.KModuleCache _kmoduleCache,
+                                           String kieBaseName) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            KieModuleCacheHelper.writeToStreamWithHeader(out, _kmoduleCache);
-            String compilationDataPath = "META-INF/" + kieBaseName.replace('.', '/') + "/kbase.cache";
-            this.trgMfs.write(compilationDataPath, out.toByteArray(), true);
-        } catch (IOException var5) {
-
+            KieModuleCacheHelper.writeToStreamWithHeader( out, _kmoduleCache );
+            String compilatonDataPath = "META-INF/" + kieBaseName.replace( '.', '/' ) + "/kbase.cache";
+            trgMfs.write( compilatonDataPath, out.toByteArray(), true );
+        } catch ( IOException e ) {
+            // what to do here?
         }
-
     }
 }
