@@ -18,8 +18,9 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.*;
-import org.kie.internal.KnowledgeBase;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class FireAlarmBenchmark extends AbstractBenchmark {
 
     private String[] drlFile;
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
 
     private Room[] rooms;
 
@@ -42,8 +43,8 @@ public class FireAlarmBenchmark extends AbstractBenchmark {
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
-        ksession = kbase.newStatefulKnowledgeSession();
+        KieBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFile));
+        ksession = kbase.newKieSession();
 
         rooms = new Room[roomsNumber];
         for (int i = 0; i < roomsNumber; i++) {

@@ -16,8 +16,9 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
-import org.kie.internal.KnowledgeBase;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 public abstract class AgendaBenchmark extends AbstractBenchmark {
@@ -31,9 +32,9 @@ public abstract class AgendaBenchmark extends AbstractBenchmark {
             "then\n" +
             "end\n\n";
 
-    protected StatefulKnowledgeSession ksession;
+    protected KieSession ksession;
     protected FactHandle[] facts;
-    private KnowledgeBase kbase;
+    private KieBase kbase;
 
     public AgendaBenchmark(int rulesNr) {
         this.rulesNr = rulesNr;
@@ -43,7 +44,7 @@ public abstract class AgendaBenchmark extends AbstractBenchmark {
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        ksession = kbase.newStatefulKnowledgeSession();
+        ksession = kbase.newKieSession();
         facts = new FactHandle[rulesNr];
     }
 

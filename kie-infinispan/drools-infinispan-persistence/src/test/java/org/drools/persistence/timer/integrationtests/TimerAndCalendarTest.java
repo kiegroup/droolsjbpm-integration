@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.core.ClockType;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.time.SessionPseudoClock;
 import org.infinispan.manager.DefaultCacheManager;
 import org.junit.After;
@@ -37,6 +39,7 @@ import org.junit.Test;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.definition.KiePackage;
 import org.kie.api.definition.type.FactType;
 import org.kie.api.io.Resource;
 import org.kie.api.io.ResourceType;
@@ -44,13 +47,10 @@ import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.api.time.SessionClock;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderError;
 import org.kie.internal.builder.KnowledgeBuilderErrors;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.definition.KnowledgePackage;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
@@ -62,7 +62,7 @@ public class TimerAndCalendarTest {
     public void testTimerRuleAfterIntReloadSession() throws Exception {
     	KieBaseConfiguration kbaseConf = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
     	kbaseConf.setOption(EventProcessingOption.STREAM);
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConf);
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConf);
         StatefulKnowledgeSession ksession = createSession( kbase );
 
         // must advance time or it won't save.
@@ -93,9 +93,9 @@ public class TimerAndCalendarTest {
                            "        list.add(list.size()); \n" +
                            " end";
         Resource resource = ResourceFactory.newByteArrayResource(timerRule.getBytes());
-        Collection<KnowledgePackage> kpackages = buildKnowledgePackage( resource,
+        Collection<KiePackage> kpackages = buildKnowledgePackage( resource,
                                                                         ResourceType.DRL );
-        kbase.addKnowledgePackages( kpackages );
+        kbase.addPackages( kpackages );
 
         clock = (SessionPseudoClock) ksession.<SessionClock>getSessionClock();
         clock.advanceTime( 10,
@@ -144,7 +144,7 @@ public class TimerAndCalendarTest {
     public void testTimerRuleAfterCronReloadSession() throws Exception {
     	KieBaseConfiguration kbaseConf = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
     	kbaseConf.setOption(EventProcessingOption.STREAM);
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConf);
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase(kbaseConf);
         StatefulKnowledgeSession ksession = createSession( kbase );
 
         // must advance time or it won't save.
@@ -175,9 +175,9 @@ public class TimerAndCalendarTest {
                            "        list.add(list.size()); \n" +
                            " end";
         Resource resource = ResourceFactory.newByteArrayResource( timerRule.getBytes() );
-        Collection<KnowledgePackage> kpackages = buildKnowledgePackage( resource,
+        Collection<KiePackage> kpackages = buildKnowledgePackage( resource,
                                                                         ResourceType.DRL );
-        kbase.addKnowledgePackages( kpackages );
+        kbase.addPackages( kpackages );
 
         List<Integer> list = Collections.synchronizedList( new ArrayList<Integer>() );
         ksession.setGlobal( "list",
@@ -245,11 +245,11 @@ public class TimerAndCalendarTest {
                            "end";
         KieBaseConfiguration kbconf = KnowledgeBaseFactory.newKnowledgeBaseConfiguration();
         kbconf.setOption( EventProcessingOption.STREAM );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase( kbconf );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase( kbconf );
         Resource resource = ResourceFactory.newByteArrayResource( timerRule.getBytes() );
-        Collection<KnowledgePackage> kpackages = buildKnowledgePackage( resource,
+        Collection<KiePackage> kpackages = buildKnowledgePackage( resource,
                                                                         ResourceType.DRL );
-        kbase.addKnowledgePackages( kpackages );
+        kbase.addPackages( kpackages );
         StatefulKnowledgeSession ksession = createSession( kbase );
 
         FactType type = kbase.getFactType( "org.drools.test",
@@ -305,7 +305,7 @@ public class TimerAndCalendarTest {
         return newksession;
     }
 
-    private Collection<KnowledgePackage> buildKnowledgePackage(Resource resource,
+    private Collection<KiePackage> buildKnowledgePackage(Resource resource,
                                                                ResourceType resourceType) {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( resource,
@@ -317,7 +317,7 @@ public class TimerAndCalendarTest {
             }
             Assert.fail( "KnowledgeBase did not build" );
         }
-        Collection<KnowledgePackage> packages = kbuilder.getKnowledgePackages();
+        Collection<KiePackage> packages = kbuilder.getKnowledgePackages();
         return packages;
     }
 

@@ -33,6 +33,8 @@ import org.jbpm.workflow.core.node.*;
 import org.jbpm.workflow.instance.node.SubProcessNodeInstance;
 import org.junit.*;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
+import org.kie.api.definition.KiePackage;
 import org.kie.api.event.process.ProcessEventListener;
 import org.kie.api.event.rule.AgendaEventListener;
 import org.kie.api.event.rule.RuleRuntimeEventListener;
@@ -43,8 +45,6 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.definition.KnowledgePackage;
 import org.kie.spring.beans.persistence.TestWorkItemHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +147,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull(workItem);
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER, ctx.getBean("txManager"));
 
@@ -233,7 +233,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull(workItem);
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER,
@@ -307,7 +307,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     }
 
     @SuppressWarnings("unused")
-    private static KnowledgePackage getProcessWorkItems() {
+    private static KiePackage getProcessWorkItems() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.TestProcess");
         process.setName("TestProcess");
@@ -378,7 +378,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         return packageBuilder.getPackage();
     }
 
-    public static void writePackage(KnowledgePackage pkg, File dest) {
+    public static void writePackage(KiePackage pkg, File dest) {
         dest.deleteOnExit();
         OutputStream out = null;
         try {
@@ -415,7 +415,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull(workItem);
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER,
@@ -489,7 +489,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNotNull(workItem);
         service.dispose();
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER,
@@ -535,7 +535,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
     }
 
     @SuppressWarnings("unused")
-    private static KnowledgePackage getProcessSubProcess() {
+    private static KiePackage getProcessSubProcess() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessSubProcess");
         process.setName("ProcessSubProcess");
@@ -642,7 +642,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         service.dispose();
         log.debug("---> session disposed");
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER, ctx.getBean("txManager"));
 
@@ -675,7 +675,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull(processInstance);
     }
 
-    private static KnowledgePackage getProcessTimer() {
+    private static KiePackage getProcessTimer() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer");
         process.setName("ProcessTimer");
@@ -739,7 +739,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         // wait for timer process to complete
         Thread.sleep(500);
 
-        Environment env = KnowledgeBaseFactory.newEnvironment();
+        Environment env = KieServices.get().newEnvironment();
         env.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 ctx.getBean("myEmf"));
         env.set(EnvironmentName.TRANSACTION_MANAGER,
@@ -756,7 +756,7 @@ public class JPASingleSessionCommandServiceFactoryTest {
         assertNull(processInstance);
     }
 
-    private static KnowledgePackage getProcessTimer2() {
+    private static KiePackage getProcessTimer2() {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId("org.drools.test.ProcessTimer2");
         process.setName("ProcessTimer2");

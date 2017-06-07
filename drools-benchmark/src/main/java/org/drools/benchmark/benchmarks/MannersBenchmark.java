@@ -18,20 +18,20 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
 import org.drools.benchmark.model.manners.*;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 import java.io.*;
 import java.util.*;
 
 public class MannersBenchmark extends AbstractBenchmark {
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder("manners.drl"));
-        ksession = kbase.newStatefulKnowledgeSession();
+        KieBase kbase = createKnowledgeBase(createKnowledgeBuilder("manners.drl"));
+        ksession = kbase.newKieSession();
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("manners128.dat");
         List list = getInputObjects( is );

@@ -26,6 +26,8 @@ import java.util.Map;
 import javax.naming.InitialContext;
 import javax.transaction.UserTransaction;
 
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.io.impl.ClassPathResource;
 import org.jbpm.persistence.session.objects.TestWorkItemHandler;
 import org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler;
@@ -45,8 +47,6 @@ import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderError;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
@@ -106,13 +106,13 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource( ruleString.getBytes() ),
                       ResourceType.DRL );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
         if ( kbuilder.hasErrors() ) {
             fail( kbuilder.getErrors().toString() );
         }
 
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         List<?> list = new ArrayList<Object>();
@@ -136,13 +136,13 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource(ruleString.getBytes()),
                       ResourceType.DRL );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
         if ( kbuilder.hasErrors() ) {
             fail( kbuilder.getErrors().toString() );
         }
 
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         UserTransaction ut = (UserTransaction) new InitialContext().lookup( "java:comp/UserTransaction" );
         ut.begin();
@@ -219,8 +219,8 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "WorkItemsProcess.rf" ),
                       ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         int origNumObjects = ksession.getObjects().size();
@@ -282,8 +282,8 @@ public class InfPersistentStatefulSessionTest {
     public void testPersistenceWorkItems2() throws Exception {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "WorkItemsProcess.rf" ), ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -345,8 +345,8 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "WorkItemsProcess.rf" ),
                       ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         ksession.getWorkItemManager().registerWorkItemHandler("MyWork", new SystemOutWorkItemHandler());
@@ -359,8 +359,8 @@ public class InfPersistentStatefulSessionTest {
     public void testPersistenceState() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "StateProcess.rf" ), ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -387,8 +387,8 @@ public class InfPersistentStatefulSessionTest {
                       ResourceType.DRF );
         kbuilder.add( new ClassPathResource( "RuleSetRules.drl" ),
                       ResourceType.DRL );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -408,8 +408,8 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "EventsProcess.rf" ),
                       ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -450,8 +450,8 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( new ClassPathResource( "WorkItemsProcess.rf" ),
                       ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         final List<ProcessEvent> events = new ArrayList<ProcessEvent>();
@@ -532,8 +532,8 @@ public class InfPersistentStatefulSessionTest {
                       ResourceType.DRF );
         kbuilder.add( new ClassPathResource( "SubProcess.rf" ),
                       ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -579,8 +579,8 @@ public class InfPersistentStatefulSessionTest {
         for (KnowledgeBuilderError error: kbuilder.getErrors()) {
             logger.debug(error.toString());
         }
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         long id = ksession.getIdentifier();
@@ -637,13 +637,13 @@ public class InfPersistentStatefulSessionTest {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource( str.getBytes() ),
                       ResourceType.DRL );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
         if ( kbuilder.hasErrors() ) {
             fail( kbuilder.getErrors().toString() );
         }
 
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
 
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         List<?> list = new ArrayList<Object>();

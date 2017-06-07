@@ -16,16 +16,16 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 public class StatefulSessionCreation extends AbstractBenchmark {
 
-    private final StatefulKnowledgeSession[] kSessions;
-    private static KnowledgeBase kbase;
+    private final KieSession[] kSessions;
+    private static KieBase kbase;
 
     public StatefulSessionCreation(int sessionNumber) {
-        this.kSessions = new StatefulKnowledgeSession[sessionNumber];
+        this.kSessions = new KieSession[sessionNumber];
     }
 
     public void init(BenchmarkDefinition definition, boolean isFirst) {
@@ -36,7 +36,7 @@ public class StatefulSessionCreation extends AbstractBenchmark {
 
     public void execute(int repNr) {
         for (int i = 0; i < kSessions.length; i++) {
-            kSessions[i] = kbase.newStatefulKnowledgeSession();
+            kSessions[i] = kbase.newKieSession();
         }
         for (int i = 0; i < kSessions.length; i++) {
             kSessions[i].dispose();

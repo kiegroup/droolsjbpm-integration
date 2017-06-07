@@ -33,9 +33,9 @@ import org.jbpm.persistence.processinstance.InfinispanProcessInstanceManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Environment;
-import org.kie.internal.KnowledgeBase;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
@@ -52,7 +52,7 @@ public class GetProcessInstancesTest {
     private HashMap<String, Object> context;
     
     private Environment env;
-    private KnowledgeBase kbase;
+    private KieBase kbase;
     private long sessionId;
 
     @Before
@@ -110,12 +110,12 @@ public class GetProcessInstancesTest {
         }
     }
 
-    private KnowledgeBase createBase() {
+    private KieBase createBase() {
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add(ResourceFactory.newClassPathResource("processinstance/HelloWorld.rf"), ResourceType.DRF);
         assertFalse(kbuilder.getErrors().toString(), kbuilder.hasErrors());
 
-        return kbuilder.newKnowledgeBase();
+        return kbuilder.newKieBase();
     }
     
     private StatefulKnowledgeSession reloadKnowledgeSession() {

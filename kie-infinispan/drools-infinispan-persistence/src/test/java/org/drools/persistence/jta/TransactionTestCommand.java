@@ -20,6 +20,8 @@ import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.command.impl.ExecutableCommand;
 import org.drools.core.command.impl.RegistryContext;
 import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.persistence.infinispan.marshaller.InfinispanPlaceholderResolverStrategy;
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
@@ -27,8 +29,6 @@ import org.kie.api.runtime.Context;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
@@ -93,8 +93,8 @@ public class TransactionTestCommand implements ExecutableCommand<Void> {
             KieSession ksession = ((RegistryContext) context).lookup( KieSession.class );
   
             // THe following 3 lines are the important ones! (See below for an explanation)
-            KnowledgeBase cleanKBase = KnowledgeBaseFactory.newKnowledgeBase();
-            cleanKBase.addKnowledgePackages(((KnowledgeBase)ksession.getKieBase()).getKnowledgePackages());
+            InternalKnowledgeBase cleanKBase = KnowledgeBaseFactory.newKnowledgeBase();
+            cleanKBase.addPackages(((InternalKnowledgeBase)ksession.getKieBase()).getKiePackages());
             StatefulKnowledgeSession commandKSession = InfinispanKnowledgeService.newStatefulKnowledgeSession( cleanKBase, null, initializeEnvironment() );
 
             /**
