@@ -15,15 +15,6 @@
 
 package org.jbpm.persistence.session;
 
-import static org.jbpm.persistence.util.PersistenceUtil.JBPM_PERSISTENCE_UNIT_NAME;
-import static org.jbpm.persistence.util.PersistenceUtil.cleanUp;
-import static org.jbpm.persistence.util.PersistenceUtil.createEnvironment;
-import static org.jbpm.persistence.util.PersistenceUtil.setupWithPoolingDataSource;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.kie.api.runtime.EnvironmentName.ENTITY_MANAGER_FACTORY;
-
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -37,20 +28,20 @@ import org.drools.core.WorkItemHandlerNotFoundException;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.process.core.ParameterDefinition;
-import org.drools.core.process.core.Work;
-import org.drools.core.process.core.datatype.impl.type.IntegerDataType;
-import org.drools.core.process.core.datatype.impl.type.ObjectDataType;
-import org.drools.core.process.core.datatype.impl.type.StringDataType;
-import org.drools.core.process.core.impl.ParameterDefinitionImpl;
-import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.runtime.process.ProcessRuntimeFactory;
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
 import org.jbpm.persistence.processinstance.ProcessEntityHolder;
 import org.jbpm.persistence.processinstance.ProcessInstanceInfo;
 import org.jbpm.persistence.session.objects.Person;
+import org.jbpm.process.core.ParameterDefinition;
+import org.jbpm.process.core.Work;
 import org.jbpm.process.core.context.variable.Variable;
+import org.jbpm.process.core.datatype.impl.type.IntegerDataType;
+import org.jbpm.process.core.datatype.impl.type.ObjectDataType;
+import org.jbpm.process.core.datatype.impl.type.StringDataType;
+import org.jbpm.process.core.impl.ParameterDefinitionImpl;
+import org.jbpm.process.core.impl.WorkImpl;
 import org.jbpm.process.instance.ProcessRuntimeFactoryServiceImpl;
 import org.jbpm.process.instance.impl.demo.DoNothingWorkItemHandler;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
@@ -74,6 +65,10 @@ import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jbpm.persistence.util.PersistenceUtil.*;
+import static org.junit.Assert.*;
+import static org.kie.api.runtime.EnvironmentName.ENTITY_MANAGER_FACTORY;
 
 public class WorkItemPersistenceTest {
 
