@@ -17,16 +17,16 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.Bean;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 public class RandomBeansBenchmark extends AbstractBenchmark {
     private final int beansNumber;
 
-    private KnowledgeBase kbase;
+    private KieBase kbase;
 
-    private StatefulKnowledgeSession ksession;
+    private KieSession ksession;
 
     private Bean[] beans;
     private FactHandle[] factHandles;
@@ -38,7 +38,7 @@ public class RandomBeansBenchmark extends AbstractBenchmark {
 
     @Override
     public void init(BenchmarkDefinition definition) {
-        ksession = kbase.newStatefulKnowledgeSession();
+        ksession = kbase.newKieSession();
         beans = Bean.generateRandomBeans(beansNumber);
         factHandles = new FactHandle[beans.length];
     }

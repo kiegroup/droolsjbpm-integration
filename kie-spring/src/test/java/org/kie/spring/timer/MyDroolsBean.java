@@ -26,11 +26,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.drools.core.base.MapGlobalResolver;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.KieSession;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -139,7 +139,7 @@ public class MyDroolsBean {
     }
 
     private Environment getEnvironment() {
-        Environment environment = KnowledgeBaseFactory.newEnvironment();
+        Environment environment = KieServices.get().newEnvironment();
         environment.set(EnvironmentName.ENTITY_MANAGER_FACTORY,
                 emf);
         environment.set(EnvironmentName.TRANSACTION_MANAGER,

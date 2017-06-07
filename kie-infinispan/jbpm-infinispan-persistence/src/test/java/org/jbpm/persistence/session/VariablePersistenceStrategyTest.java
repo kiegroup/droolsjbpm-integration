@@ -40,6 +40,7 @@ import javax.transaction.UserTransaction;
 import junit.framework.Assert;
 
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.io.impl.ClassPathResource;
 import org.drools.core.marshalling.impl.ClassObjectMarshallingStrategyAcceptor;
@@ -73,6 +74,7 @@ import org.jbpm.workflow.core.node.WorkItemNode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
 import org.kie.api.marshalling.ObjectMarshallingStrategy;
 import org.kie.api.runtime.Environment;
@@ -81,8 +83,6 @@ import org.kie.api.runtime.process.ProcessContext;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkflowProcessInstance;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderConfiguration;
 import org.kie.internal.builder.KnowledgeBuilderError;
@@ -116,7 +116,7 @@ public class VariablePersistenceStrategyTest {
         Environment env = createEnvironment();
         String processId = "extendingInterfaceVariablePersistence";
         String variableText = "my extending serializable variable text";
-        KnowledgeBase kbase = getKnowledgeBaseForExtendingInterfaceVariablePersistence(processId,
+        KieBase kbase = getKnowledgeBaseForExtendingInterfaceVariablePersistence(processId,
                                                                                        variableText);
         StatefulKnowledgeSession ksession = createSession( kbase , env );
         Map<String, Object> initialParams = new HashMap<String, Object>();
@@ -134,7 +134,7 @@ public class VariablePersistenceStrategyTest {
         Assert.assertNull( ksession.getProcessInstance( processInstanceId ) );
     }
 
-    private KnowledgeBase getKnowledgeBaseForExtendingInterfaceVariablePersistence(String processId, final String variableText) {
+    private KieBase getKnowledgeBaseForExtendingInterfaceVariablePersistence(String processId, final String variableText) {
         RuleFlowProcess process = new RuleFlowProcess();
         process.setId( processId );
         
@@ -182,7 +182,7 @@ public class VariablePersistenceStrategyTest {
         process.addNode( actionNode );
         process.addNode( endNode );
         
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        KieBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         ((KnowledgeBaseImpl) kbase).addProcess(process);
         return kbase;
     }
@@ -218,7 +218,7 @@ public class VariablePersistenceStrategyTest {
         
         // More setup
         Environment env =  createEnvironment();
-        KnowledgeBase kbase = createKnowledgeBase( "VariablePersistenceStrategyProcess.rf" );
+        KieBase kbase = createKnowledgeBase( "VariablePersistenceStrategyProcess.rf" );
         StatefulKnowledgeSession ksession = createSession( kbase, env );
 
         logger.debug("### Starting process ###");
@@ -374,7 +374,7 @@ public class VariablePersistenceStrategyTest {
             utx.commit();
         }
         Environment env = createEnvironment();
-        KnowledgeBase kbase = createKnowledgeBase( "VariablePersistenceStrategyProcessTypeChange.rf" );
+        KieBase kbase = createKnowledgeBase( "VariablePersistenceStrategyProcessTypeChange.rf" );
         StatefulKnowledgeSession ksession = createSession( kbase, env );
         
         
@@ -428,7 +428,7 @@ public class VariablePersistenceStrategyTest {
         cache.put(generateId(cache, myEntityOnlyFields), myEntityOnlyFields);
         utx.commit();
         Environment env = createEnvironment();
-        KnowledgeBase kbase = createKnowledgeBase( "VariablePersistenceStrategySubProcess.rf" );
+        KieBase kbase = createKnowledgeBase( "VariablePersistenceStrategySubProcess.rf" );
         StatefulKnowledgeSession ksession = createSession( kbase, env );
        
         
@@ -486,7 +486,7 @@ public class VariablePersistenceStrategyTest {
         cache.put(generateId(cache, myEntity), myEntity);
         utx.commit();
         Environment env = createEnvironment();
-        KnowledgeBase kbase = createKnowledgeBase( "VPSProcessWithWorkItems.rf" );
+        KieBase kbase = createKnowledgeBase( "VPSProcessWithWorkItems.rf" );
         StatefulKnowledgeSession ksession = createSession( kbase , env);
         
         
@@ -600,7 +600,7 @@ public class VariablePersistenceStrategyTest {
         cache.put(generateId(cache, myEntity), myEntity);
         utx.commit();
         Environment env = createEnvironment();
-        KnowledgeBase kbase = createKnowledgeBase( "VPSProcessWithWorkItems.rf" );
+        KieBase kbase = createKnowledgeBase( "VPSProcessWithWorkItems.rf" );
         StatefulKnowledgeSession ksession = createSession( kbase , env);
         
         logger.debug("### Starting process ###");
@@ -657,17 +657,17 @@ public class VariablePersistenceStrategyTest {
         assertEquals("This is a changed test SerializableObject", ((MyVariableSerializable) processInstance.getVariable("c")).getText());
     }    
     
-    private StatefulKnowledgeSession createSession(KnowledgeBase kbase, Environment env){
+    private StatefulKnowledgeSession createSession(KieBase kbase, Environment env){
         return InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
     }
     
-    private StatefulKnowledgeSession reloadSession(StatefulKnowledgeSession ksession, KnowledgeBase kbase, Environment env){
+    private StatefulKnowledgeSession reloadSession(StatefulKnowledgeSession ksession, KieBase kbase, Environment env){
         long sessionId = ksession.getIdentifier();
         ksession.dispose();
         return InfinispanKnowledgeService.loadStatefulKnowledgeSession( sessionId, kbase, null, env);
     }
 
-    private KnowledgeBase createKnowledgeBase(String flowFile) {
+    private KieBase createKnowledgeBase(String flowFile) {
         KnowledgeBuilderConfiguration conf = KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
         conf.setProperty("drools.dialect.java.compiler", "JANINO");
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(conf);
@@ -681,8 +681,8 @@ public class VariablePersistenceStrategyTest {
             fail( errorMessage.toString());
         }
         
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );
         return kbase;
     }
 

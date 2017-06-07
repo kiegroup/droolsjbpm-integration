@@ -16,14 +16,14 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 
 public class PlainDRLBenchmark extends AbstractBenchmark {
 
     private String drlFile;
 
-    private KnowledgeBase kbase;
+    private KieBase kbase;
 
     public PlainDRLBenchmark(String drlFile) {
         this.drlFile = drlFile;
@@ -35,7 +35,7 @@ public class PlainDRLBenchmark extends AbstractBenchmark {
     }
 
     public void execute(int repNr) {
-        StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+        KieSession ksession = kbase.newKieSession();
         ksession.fireAllRules();
         ksession.dispose();
     }

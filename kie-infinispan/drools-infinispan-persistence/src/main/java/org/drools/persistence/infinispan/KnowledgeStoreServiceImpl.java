@@ -25,13 +25,13 @@ import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.api.TransactionManagerFactory;
 import org.drools.persistence.infinispan.processinstance.InfinispanWorkItemManagerFactory;
 import org.kie.api.KieBase;
+import org.kie.api.KieServices;
 import org.kie.api.persistence.jpa.KieStoreServices;
 import org.kie.api.runtime.CommandExecutor;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.ExecutableRunner;
 import org.kie.api.runtime.KieSessionConfiguration;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import java.lang.reflect.Constructor;
@@ -185,7 +185,7 @@ public class KnowledgeStoreServiceImpl
 
     private Environment mergeEnvironment(Environment env) {
     	if (env == null) {
-    		env = KnowledgeBaseFactory.newEnvironment();
+    		env = KieServices.get().newEnvironment();
     	}
     	if (env.get(EnvironmentName.PERSISTENCE_CONTEXT_MANAGER) == null) {
     		try {

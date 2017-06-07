@@ -15,9 +15,9 @@
 
 package org.drools.benchmark;
 
-import org.kie.internal.KnowledgeBase;
-
 import java.util.concurrent.Callable;
+
+import org.kie.api.KieBase;
 
 import static org.drools.benchmark.util.DroolsUtil.createKnowledgeBase;
 import static org.drools.benchmark.util.DroolsUtil.createKnowledgeBuilder;
@@ -51,7 +51,7 @@ public class ObjectSizeCalculator {
 
     private static class StatlessSessionGenerator implements Callable<Object> {
 
-        private KnowledgeBase kbase;
+        private KieBase kbase;
         private int idCounter = 0;
 
         public StatlessSessionGenerator() {
@@ -59,7 +59,7 @@ public class ObjectSizeCalculator {
         }
 
         public Object call() throws Exception {
-            return kbase.newStatefulKnowledgeSession();
+            return kbase.newKieSession();
         }
     }
 }

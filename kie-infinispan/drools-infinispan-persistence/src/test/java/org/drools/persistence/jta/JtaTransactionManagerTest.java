@@ -16,6 +16,8 @@
 package org.drools.persistence.jta;
 
 import org.drools.core.command.impl.CommandBasedStatefulKnowledgeSession;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.api.TransactionManager;
 import org.drools.persistence.infinispan.InfinispanPersistenceContextManager;
@@ -27,11 +29,10 @@ import org.infinispan.manager.DefaultCacheManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
@@ -83,7 +84,7 @@ public class JtaTransactionManagerTest {
         PersistenceUtil.tearDown(context);
     }
 
-    private KnowledgeBase initializeKnowledgeBase(String rule) { 
+    private KieBase initializeKnowledgeBase(String rule) { 
         // Initialize knowledge base/session/etc..
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
@@ -92,8 +93,8 @@ public class JtaTransactionManagerTest {
             fail(kbuilder.getErrors().toString());
         }
 
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages(kbuilder.getKnowledgePackages());
        
         return kbase;
     }
@@ -199,7 +200,7 @@ public class JtaTransactionManagerTest {
             
         // Initialize drools environment stuff
         Environment env = createEnvironment(context);
-        KnowledgeBase kbase = initializeKnowledgeBase(simpleRule);
+        KieBase kbase = initializeKnowledgeBase(simpleRule);
         StatefulKnowledgeSession commandKSession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         PersistableRunner commandService = (PersistableRunner) ((CommandBasedStatefulKnowledgeSession) commandKSession).getRunner();
         InfinispanPersistenceContextManager jpm = (InfinispanPersistenceContextManager) getValueOfField("jpm", commandService);

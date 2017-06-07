@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.drools.core.WorkItemHandlerNotFoundException;
 import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.impl.KnowledgeBaseImpl;
 import org.drools.core.process.core.ParameterDefinition;
 import org.drools.core.process.core.Work;
@@ -63,10 +64,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.process.ProcessInstance;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
@@ -97,7 +97,7 @@ public class WorkItemPersistenceTest {
        cleanUp(context); 
     }
    
-    protected StatefulKnowledgeSession createSession(KnowledgeBase kbase) {
+    protected StatefulKnowledgeSession createSession(KieBase kbase) {
         return InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, createEnvironment(context) );
     }
 
@@ -107,7 +107,7 @@ public class WorkItemPersistenceTest {
         String processId = "org.drools.actions";
         String workName = "Unnexistent Task";
         RuleFlowProcess process = getWorkItemProcess( processId, workName );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        KieBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
         ((KnowledgeBaseImpl) kbase).addProcess(process);
         StatefulKnowledgeSession ksession = createSession(kbase);
 
@@ -252,8 +252,8 @@ public class WorkItemPersistenceTest {
         
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newReaderResource(source), ResourceType.DRF );
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );        
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages( kbuilder.getKnowledgePackages() );        
         StatefulKnowledgeSession ksession = createSession(kbase);
         
         DoNothingWorkItemHandler handler = new DoNothingWorkItemHandler();

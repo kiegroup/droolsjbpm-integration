@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.drools.core.common.DefaultFactHandle;
+import org.drools.core.impl.InternalKnowledgeBase;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.persistence.api.PersistenceContextManager;
 import org.drools.persistence.util.PersistenceUtil;
 import org.infinispan.manager.DefaultCacheManager;
@@ -37,14 +39,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.kie.api.KieBase;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
 import org.kie.api.event.rule.DefaultRuleRuntimeEventListener;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.builder.KnowledgeBuilder;
 import org.kie.internal.builder.KnowledgeBuilderFactory;
 import org.kie.internal.io.ResourceFactory;
@@ -78,7 +79,7 @@ public class ReloadSessionTest {
         PersistenceUtil.tearDown(context);
     }
 
-    private KnowledgeBase initializeKnowledgeBase(String rule) { 
+    private KieBase initializeKnowledgeBase(String rule) { 
         // Initialize knowledge base/session/etc..
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
         kbuilder.add( ResourceFactory.newByteArrayResource(rule.getBytes()), ResourceType.DRL);
@@ -87,8 +88,8 @@ public class ReloadSessionTest {
             fail(kbuilder.getErrors().toString());
         }
 
-        KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+        InternalKnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+        kbase.addPackages(kbuilder.getKnowledgePackages());
        
         return kbase;
     }
@@ -98,7 +99,7 @@ public class ReloadSessionTest {
         
         // Initialize drools environment stuff
         Environment env = createEnvironment(context);
-        KnowledgeBase kbase = initializeKnowledgeBase(simpleRule);
+        KieBase kbase = initializeKnowledgeBase(simpleRule);
         StatefulKnowledgeSession commandKSession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
         assertTrue("There should be NO facts present in a new (empty) knowledge session.", commandKSession.getFactHandles().isEmpty());
         
@@ -150,7 +151,7 @@ public class ReloadSessionTest {
     public void testListenersAfterSessionReload() {
         // https://bugzilla.redhat.com/show_bug.cgi?id=826952
         Environment env = createEnvironment(context);
-        KnowledgeBase kbase = initializeKnowledgeBase(simpleRule);
+        KieBase kbase = initializeKnowledgeBase(simpleRule);
         StatefulKnowledgeSession ksession = InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, env );
 
         ksession.addEventListener(new DefaultAgendaEventListener());

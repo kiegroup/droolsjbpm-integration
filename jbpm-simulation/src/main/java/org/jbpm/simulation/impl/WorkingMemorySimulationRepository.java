@@ -58,7 +58,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
             throw new RuntimeException("Error while building knowledge base: " + kbuilder.getErrors());
         }
         
-        this.ksession = kbuilder.newKnowledgeBase().newKieSession();
+        this.ksession = kbuilder.newKieBase().newKieSession();
         try {
             // register global for aggregated events
             ksession.setGlobal("logger", new SystemOutLogger());
@@ -85,7 +85,7 @@ public class WorkingMemorySimulationRepository extends InMemorySimulationReposit
             throw new RuntimeException("Error while building knowledge base: " + kbuilder.getErrors());
         }
         
-        this.ksession = kbuilder.newKnowledgeBase().newKieSession();
+        this.ksession = kbuilder.newKieBase().newKieSession();
         try {
             ksession.setGlobal("logger", new SystemOutLogger());
             // register global for aggregated events

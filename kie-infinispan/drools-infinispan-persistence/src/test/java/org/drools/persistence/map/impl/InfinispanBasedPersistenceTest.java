@@ -28,7 +28,8 @@ import org.drools.persistence.util.PersistenceUtil;
 import org.infinispan.manager.DefaultCacheManager;
 import org.junit.After;
 import org.junit.Before;
-import org.kie.internal.KnowledgeBase;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -66,13 +67,13 @@ public class InfinispanBasedPersistenceTest extends MapPersistenceTest {
 
 
     @Override
-    protected StatefulKnowledgeSession createSession(KnowledgeBase kbase) {
+    protected StatefulKnowledgeSession createSession(KieBase kbase) {
         return InfinispanKnowledgeService.newStatefulKnowledgeSession( kbase, null, createEnvironment(context) );
     }
 
     @Override
-    protected StatefulKnowledgeSession disposeAndReloadSession(StatefulKnowledgeSession ksession,
-                                                               KnowledgeBase kbase) {
+    protected StatefulKnowledgeSession disposeAndReloadSession(KieSession ksession,
+                                                               KieBase kbase) {
         long ksessionId = ksession.getIdentifier();
         ksession.dispose();
         return InfinispanKnowledgeService.loadStatefulKnowledgeSession(ksessionId, kbase, null, createEnvironment(context));

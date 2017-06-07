@@ -17,13 +17,13 @@
 package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.BenchmarkDefinition;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 
 public class InsertAllAndRetract extends AbstractBenchmark {
 
-    private static StatefulKnowledgeSession ksession;
+    private static KieSession ksession;
 
     private String[] drlFiles;
 
@@ -42,8 +42,8 @@ public class InsertAllAndRetract extends AbstractBenchmark {
     @Override
     public void init(BenchmarkDefinition definition, boolean isFirst) {
         if (isFirst) {
-            KnowledgeBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
-            ksession = kbase.newStatefulKnowledgeSession();
+            KieBase kbase = createKnowledgeBase(createKnowledgeBuilder(drlFiles));
+            ksession = kbase.newKieSession();
         }
         facts = new FactHandle[objectsNumber];
     }

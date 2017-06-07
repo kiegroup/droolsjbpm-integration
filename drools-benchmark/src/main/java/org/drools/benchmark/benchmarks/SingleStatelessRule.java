@@ -20,20 +20,19 @@ import static org.drools.benchmark.model.Gender.*;
 
 import org.drools.benchmark.BenchmarkDefinition;
 import org.drools.benchmark.model.*;
-
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.runtime.StatelessKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.runtime.StatelessKieSession;
 
 public class SingleStatelessRule extends AbstractBenchmark {
 
-    private KnowledgeBase kbase;
+    private KieBase kbase;
 
     public void init(BenchmarkDefinition definition) {
         kbase = createKnowledgeBase(createKnowledgeBuilder("licenseApplication.drl"));
     }
 
     public void execute(int repNr) {
-        StatelessKnowledgeSession ksession = kbase.newStatelessKnowledgeSession();
+        StatelessKieSession ksession = kbase.newStatelessKieSession();
         Applicant applicant = new Applicant("Mr John Smith", 21, MALE);
 
         if (applicant.isValid()) throw new RuntimeException("Applicant shouldn't be valid");

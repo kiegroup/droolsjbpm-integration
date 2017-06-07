@@ -18,7 +18,7 @@ package org.drools.benchmark.benchmarks;
 
 import org.drools.benchmark.*;
 import org.drools.benchmark.util.DroolsUtil;
-import org.kie.internal.KnowledgeBase;
+import org.kie.api.KieBase;
 import org.kie.internal.builder.KnowledgeBuilder;
 
 public abstract class AbstractBenchmark implements Benchmark {
@@ -41,11 +41,11 @@ public abstract class AbstractBenchmark implements Benchmark {
         return DroolsUtil.createKnowledgeBuilder(this, drlFiles);
     }
 
-    protected final KnowledgeBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
+    protected final KieBase createKnowledgeBase(KnowledgeBuilder kbuilder) {
         return DroolsUtil.createKnowledgeBase(kbuilder);
     }
 
-    protected final KnowledgeBase createKnowledgeBase(String drl) {
+    protected final KieBase createKnowledgeBase(String drl) {
         return DroolsUtil.createKnowledgeBase(drl);
     }
 

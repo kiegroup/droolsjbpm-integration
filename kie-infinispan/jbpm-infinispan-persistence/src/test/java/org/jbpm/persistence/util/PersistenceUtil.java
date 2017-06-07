@@ -35,13 +35,13 @@ import javax.transaction.UserTransaction;
 
 import org.drools.core.base.MapGlobalResolver;
 import org.drools.core.impl.EnvironmentFactory;
+import org.drools.core.impl.KnowledgeBaseFactory;
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;
 import org.junit.Assert;
+import org.kie.api.KieBase;
 import org.kie.api.runtime.Environment;
 import org.kie.api.runtime.KieSessionConfiguration;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
 import org.kie.internal.persistence.infinispan.InfinispanKnowledgeService;
 import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
@@ -301,7 +301,7 @@ public class PersistenceUtil {
         return env;
     }
     
-   public static StatefulKnowledgeSession createKnowledgeSessionFromKBase(KnowledgeBase kbase, HashMap<String, Object> context) {
+   public static StatefulKnowledgeSession createKnowledgeSessionFromKBase(KieBase kbase, HashMap<String, Object> context) {
        KieSessionConfiguration ksconf = KnowledgeBaseFactory.newKnowledgeSessionConfiguration();
        StatefulKnowledgeSession knowledgeSession = InfinispanKnowledgeService.newStatefulKnowledgeSession(kbase, ksconf, createEnvironment(context));
        return knowledgeSession;

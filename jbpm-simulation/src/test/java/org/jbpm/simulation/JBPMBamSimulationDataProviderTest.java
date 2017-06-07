@@ -29,7 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.definition.process.Node;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
+import org.kie.api.runtime.KieSession;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
@@ -83,7 +83,7 @@ public class JBPMBamSimulationDataProviderTest {
         for (SimulationPath path : paths) {
             
             context.setCurrentPath(path);
-            StatefulKnowledgeSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
+            KieSession session = TestUtils.createSession("BPMN2-ExclusiveSplit.bpmn2");
             
             session.startProcess("com.sample.test");
             double probability = provider.calculatePathProbability(path);
