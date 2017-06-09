@@ -112,7 +112,13 @@ public class RuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertTrue(processIds.contains(PROCESS_ID_EVALUATION));
         assertTrue(processIds.contains(PROCESS_ID_CUSTOM_TASK));
         assertTrue(processIds.contains(PROCESS_ID_CALL_EVALUATION));
+    }
 
+    @Test
+    public void testGetProcessDefinitionsNullPaging() throws Exception {
+        List<ProcessDefinition> definitions = queryClient.findProcesses(null, null);
+        assertNotNull(definitions);
+        assertEquals(10, definitions.size());
     }
 
     @Test
