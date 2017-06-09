@@ -15,6 +15,22 @@
 
 package org.kie.maven.plugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -27,9 +43,19 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.drools.compiler.compiler.*;
-import org.drools.compiler.compiler.io.memory.MemoryFileSystem;
-import org.drools.compiler.kie.builder.impl.*;
+import org.drools.compiler.compiler.BPMN2ProcessFactory;
+import org.drools.compiler.compiler.DecisionTableFactory;
+import org.drools.compiler.compiler.GuidedDecisionTableFactory;
+import org.drools.compiler.compiler.GuidedRuleTemplateFactory;
+import org.drools.compiler.compiler.GuidedScoreCardFactory;
+import org.drools.compiler.compiler.PMMLCompilerFactory;
+import org.drools.compiler.compiler.ProcessBuilderFactory;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieContainerImpl;
+import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
+import org.drools.compiler.kie.builder.impl.KieProject;
+import org.drools.compiler.kie.builder.impl.ResultsImpl;
+import org.drools.compiler.kie.builder.impl.ZipKieModule;
 import org.drools.compiler.kproject.ReleaseIdImpl;
 import org.drools.compiler.kproject.models.KieModuleModelImpl;
 import org.drools.core.rule.KieModuleMetaInfo;
@@ -38,16 +64,6 @@ import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.builder.model.KieModuleModel;
-
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static org.drools.compiler.kie.builder.impl.KieBuilderImpl.setDefaultsforEmptyKieModule;
 
@@ -93,7 +109,6 @@ public class BuildMojo extends AbstractKieMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
@@ -104,22 +119,27 @@ public class BuildMojo extends AbstractKieMojo {
                 urls.add(new File(element).toURI().toURL());
             }
 
-            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile", "runtime")));
+            project.setArtifactFilter(new CumulativeScopeArtifactFilter(Arrays.asList("compile",
+                                                                                      "runtime")));
             for (Artifact artifact : project.getArtifacts()) {
                 File file = artifact.getFile();
                 if (file != null) {
                     urls.add(file.toURI().toURL());
                     KieModuleModel depModel = getDependencyKieModel(file);
                     if (depModel != null) {
-                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-                        kmoduleDeps.add(new ZipKieModule(releaseId, depModel, file));
+                        ReleaseId releaseId = new ReleaseIdImpl(artifact.getGroupId(),
+                                                                artifact.getArtifactId(),
+                                                                artifact.getVersion());
+                        kmoduleDeps.add(new ZipKieModule(releaseId,
+                                                         depModel,
+                                                         file));
                     }
                 }
             }
             urls.add(outputDirectory.toURI().toURL());
 
             ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                    Thread.currentThread().getContextClassLoader());
+                                                                        Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
 
@@ -130,7 +150,6 @@ public class BuildMojo extends AbstractKieMojo {
             GuidedDecisionTableFactory.loadProvider(projectClassLoader);
             GuidedRuleTemplateFactory.loadProvider(projectClassLoader);
             GuidedScoreCardFactory.loadProvider(projectClassLoader);
-
         } catch (DependencyResolutionRequiredException e) {
             throw new RuntimeException(e);
         } catch (MalformedURLException e) {
@@ -162,15 +181,20 @@ public class BuildMojo extends AbstractKieMojo {
                 if (container != null && compilationID != null) {
                     Optional<Map<String, Object>> optionalKieMap = getKieMap();
                     if (optionalKieMap.isPresent()) {
-                        MemoryFileSystem mfs = new MemoryFileSystem();
-                        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(mfs, kModule);
+                        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
                         KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-                        optionalKieMap.get().put(compilationID, modelMetaInfo);
-                        getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
-                        mfs.mark();
+                        
+                        /*Standard for the kieMap keys -> compilationID + dot + classtype with first lowercase*/
+                        StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(modelMetaInfo.getClass().getName());
+                        StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(kModule.getClass().getName());
+                        optionalKieMap.get().put(sbModelMetaInfo.toString(),
+                                                 modelMetaInfo);
+                        optionalKieMap.get().put(sbkModule.toString(),
+                                                 kModule);
+                        getLog().info("KieModelMetaInfo and KieModule available in the map shared with the Maven Embedded");
                     }
                 } else {
-                    new KieMetaInfoBuilder(new DiskResourceStore(outputDirectory), kModule).writeKieModuleMetaInfo();
+                    new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
                 }
             }
         } finally {
@@ -186,14 +210,14 @@ public class BuildMojo extends AbstractKieMojo {
             /**
              * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
              */
-            kieMap = (Map) container.lookup(Map.class, "java.util.HashMap", "kieMap");
+            kieMap = (Map) container.lookup(Map.class,
+                                            "java.util.HashMap",
+                                            "kieMap");
             return Optional.of(kieMap);
-
         } catch (ComponentLookupException cle) {
             getLog().info("kieMap not present with compilationID and container present");
             return Optional.empty();
         }
-
     }
 
     private KieModuleModel getDependencyKieModel(File jar) {
