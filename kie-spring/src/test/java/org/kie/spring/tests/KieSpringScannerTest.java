@@ -16,6 +16,11 @@
 
 package org.kie.spring.tests;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.Test;
 import org.kie.api.KieBase;
@@ -23,14 +28,9 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieSession;
-import org.kie.scanner.MavenRepository;
+import org.kie.scanner.KieMavenRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -47,7 +47,7 @@ public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
         KieServices ks = KieServices.Factory.get();
 
         //step 1: deploy the test module to MAVEN Repo
-        MavenRepository repository = createAndInstallModule( ks, FIRST_VALUE );
+        KieMavenRepository repository = createAndInstallModule( ks, FIRST_VALUE );
 
         //step 2: load the spring context
         createSpringContext();
@@ -94,7 +94,7 @@ public class KieSpringScannerTest extends AbstractKieSpringDynamicModuleTest {
         assertNotNull(releaseIdScanner);
     }
 
-    protected void reinstallModule( MavenRepository repository, KieServices ks ) throws IOException {
+    protected void reinstallModule( KieMavenRepository repository, KieServices ks ) throws IOException {
         InternalKieModule kJar2 = createKieJarWithClass(ks, releaseId, SECOND_VALUE);
         File kPom = createKPom( releaseId );
         repository.installArtifact(releaseId, kJar2, kPom);

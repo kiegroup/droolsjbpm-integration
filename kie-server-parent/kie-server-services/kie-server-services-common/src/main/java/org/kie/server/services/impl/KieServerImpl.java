@@ -15,8 +15,24 @@
 
 package org.kie.server.services.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.naming.InitialContext;
+
+import org.appformer.maven.support.DependencyFilter;
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
-import org.drools.compiler.kproject.xml.DependencyFilter;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
@@ -42,7 +58,6 @@ import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
 import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServer;
-import org.kie.server.services.api.KieServerEventListener;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.controller.ControllerConnectRunnable;
@@ -55,22 +70,6 @@ import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.naming.InitialContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KieServerImpl implements KieServer {
 
