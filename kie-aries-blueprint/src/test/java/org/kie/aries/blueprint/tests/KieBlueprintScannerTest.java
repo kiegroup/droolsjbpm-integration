@@ -16,6 +16,12 @@
 
 package org.kie.aries.blueprint.tests;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.aries.blueprint.container.BlueprintContainerImpl;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.Test;
@@ -24,13 +30,7 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieSession;
 import org.kie.aries.blueprint.KieBlueprintContainer;
-import org.kie.scanner.MavenRepository;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import org.kie.scanner.KieMavenRepository;
 
 import static org.junit.Assert.assertTrue;
 
@@ -44,7 +44,7 @@ public class KieBlueprintScannerTest extends AbstractKieBlueprintDynamicModuleTe
     @Test
     public void testBlueprintKieScanner() throws Exception {
         KieServices ks = KieServices.Factory.get();
-        MavenRepository repository = createAndInstallModule( ks, FIRST_VALUE );
+        KieMavenRepository repository = createAndInstallModule( ks, FIRST_VALUE );
 
         container = createContainer();
 
@@ -66,7 +66,7 @@ public class KieBlueprintScannerTest extends AbstractKieBlueprintDynamicModuleTe
         return new KieBlueprintContainer( ClassLoader.getSystemClassLoader(), urls);
     }
 
-    protected void reinstallModule( MavenRepository repository, KieServices ks ) throws IOException {
+    protected void reinstallModule( KieMavenRepository repository, KieServices ks ) throws IOException {
         InternalKieModule kJar2 = createKieJarWithClass(ks, releaseId, SECOND_VALUE);
         File kPom = createKPom( releaseId );
         repository.installArtifact(releaseId, kJar2, kPom);

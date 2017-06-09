@@ -16,8 +16,6 @@
 
 package org.kie.karaf.itest.util;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +36,10 @@ import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.io.Resource;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.scanner.MavenRepository;
+import org.kie.scanner.KieMavenRepository;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Utility methods for testing KIE-Scanner.
@@ -66,7 +67,7 @@ public class KieScannerTestUtils {
             InternalKieModule kJar1 = createKieJar(ks, releaseId, rules);
             ks.newKieContainer(releaseId);
 
-            MavenRepository repository = MavenRepository.getMavenRepository();
+            KieMavenRepository repository = KieMavenRepository.getKieMavenRepository();
             repository.installArtifact(releaseId, kJar1, createKPom(fileManager, releaseId));
         } catch (IOException e) {
             throw new RuntimeException("Failed to install artifact " + releaseId, e);

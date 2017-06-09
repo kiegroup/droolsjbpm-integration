@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
-import org.kie.scanner.MavenRepository;
+import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -92,6 +92,6 @@ public class KieContainerInstanceImplTest {
         KieModule kieModule = kieServices.newKieBuilder( kfs ).buildAll().getKieModule();
         byte[] pom = kfs.read("pom.xml");
         byte[] jar = ((InternalKieModule)kieModule).getBytes();
-        MavenRepository.getMavenRepository().installArtifact(releaseId, jar, pom);
+        KieMavenRepository.getKieMavenRepository().installArtifact( releaseId, jar, pom );
     }
 }

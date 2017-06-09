@@ -16,6 +16,9 @@
 
 package org.kie.aries.blueprint.tests;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.core.util.FileManager;
 import org.kie.api.KieServices;
@@ -28,19 +31,16 @@ import org.kie.api.builder.model.KieSessionModel;
 import org.kie.api.conf.EqualityBehaviorOption;
 import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.conf.ClockTypeOption;
-import org.kie.scanner.MavenRepository;
-
-import java.io.File;
-import java.io.IOException;
+import org.kie.scanner.KieMavenRepository;
 
 import static org.junit.Assert.assertTrue;
-import static org.kie.scanner.MavenRepository.getMavenRepository;
+import static org.kie.scanner.KieMavenRepository.getKieMavenRepository;
 
 public class AbstractKieBlueprintDynamicModuleTest {
     protected ReleaseId releaseId;
     protected FileManager fileManager;
 
-    protected MavenRepository createAndInstallModule( KieServices ks, int FIRST_VALUE ) throws IOException {
+    protected KieMavenRepository createAndInstallModule( KieServices ks, int FIRST_VALUE ) throws IOException {
         this.fileManager = new FileManager();
         this.fileManager.setUp();
 
@@ -48,7 +48,7 @@ public class AbstractKieBlueprintDynamicModuleTest {
         File kPom = createKPom(releaseId);
         InternalKieModule kJar1 = createKieJarWithClass(ks, releaseId, FIRST_VALUE);
 
-        MavenRepository repository = getMavenRepository();
+        KieMavenRepository repository = getKieMavenRepository();
         repository.installArtifact(releaseId, kJar1, kPom);
         return repository;
     }
