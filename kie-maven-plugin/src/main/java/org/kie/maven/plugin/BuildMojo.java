@@ -183,7 +183,7 @@ public class BuildMojo extends AbstractKieMojo {
                     if (optionalKieMap.isPresent()) {
                         KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
                         KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-                        
+
                         /*Standard for the kieMap keys -> compilationID + dot + classtype with first lowercase*/
                         StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(modelMetaInfo.getClass().getName());
                         StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(kModule.getClass().getName());
