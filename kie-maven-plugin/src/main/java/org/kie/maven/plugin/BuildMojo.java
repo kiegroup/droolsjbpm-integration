@@ -15,8 +15,14 @@
 
 package org.kie.maven.plugin;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -190,7 +196,7 @@ public class BuildMojo extends AbstractKieMojo {
                         optionalKieMap.get().put(sbModelMetaInfo.toString(),
                                                  modelMetaInfo);
                         optionalKieMap.get().put(sbkModule.toString(),
-                                                 kModule);
+                                                 getRaw(kModule));
                         getLog().info("KieModelMetaInfo and KieModule available in the map shared with the Maven Embedded");
                     }
                 } else {
@@ -201,6 +207,36 @@ public class BuildMojo extends AbstractKieMojo {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
+    }
+
+    private byte[] getRaw(Object o){
+
+        //ObjectInput in = null;
+        ObjectOutput out = null;
+        //ByteArrayInputStream bis = null;
+        ByteArrayOutputStream bos = null;
+
+        try {
+            bos = new ByteArrayOutputStream();
+            out = new ObjectOutputStream(bos);
+            out.writeObject(o);
+            out.flush();
+            byte[] objBytes = bos.toByteArray();
+            /*bis = new ByteArrayInputStream(objBytes);
+            in = new ObjectInputStream(bis);
+            Object newObj = in.readObject();
+            return newObj;*/
+            return  objBytes;
+        }catch (IOException ioe){
+            getLog().error(ioe.getMessage());
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ex) {
+                getLog().error(ex.getMessage());
+            }
+        }
+        return new byte[]{};
     }
 
     private Optional<Map<String, Object>> getKieMap() {
