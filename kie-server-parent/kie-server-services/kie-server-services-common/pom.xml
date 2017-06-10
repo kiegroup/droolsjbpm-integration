@@ -178,6 +178,11 @@
     	<scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-maven-support</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>

@@ -19,15 +19,17 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
+import org.appformer.maven.integration.MavenRepository;
+import org.appformer.maven.integration.embedder.MavenProjectLoader;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.Assert;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
-import org.kie.scanner.MavenRepository;
-import org.kie.scanner.embedder.MavenProjectLoader;
+import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.slf4j.Logger;
@@ -36,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class KieServerDeployer {
 
     protected static Logger logger = LoggerFactory.getLogger(KieServerDeployer.class);
-    private static MavenRepository repository;
+    private static KieMavenRepository repository;
 
     /*
      Indicates whether the testing common parent maven project has been deployed in this test run. Most of the testing
@@ -145,8 +147,8 @@ public class KieServerDeployer {
             KieFileSystem kfs = ks.newKieFileSystem().generateAndWritePomXML(initReleaseId);
             byte[] pom = kfs.read("pom.xml");
 
-            MavenProject minimalMavenProject = MavenProjectLoader.parseMavenPom(new ByteArrayInputStream(pom));
-            repository = MavenRepository.getMavenRepository(minimalMavenProject);
+            MavenProject minimalMavenProject = MavenProjectLoader.parseMavenPom( new ByteArrayInputStream( pom) );
+            repository = KieMavenRepository.getKieMavenRepository(minimalMavenProject);
         }
 
         return repository;

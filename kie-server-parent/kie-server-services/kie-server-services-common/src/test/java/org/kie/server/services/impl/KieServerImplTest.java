@@ -15,6 +15,11 @@
 
 package org.kie.server.services.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
@@ -24,7 +29,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
-import org.kie.scanner.MavenRepository;
+import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
@@ -36,11 +41,6 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.services.impl.storage.KieServerState;
 import org.kie.server.services.impl.storage.KieServerStateRepository;
 import org.kie.server.services.impl.storage.file.KieServerStateFileRepository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -231,7 +231,7 @@ public class KieServerImplTest {
         KieFileSystem kfs = kieServices.newKieFileSystem();
         releaseId = kieServices.newReleaseId(GROUP_ID, artifactId, version);
         KieModule kieModule = kieServices.newKieBuilder( kfs ).buildAll().getKieModule();
-        MavenRepository.getMavenRepository().installArtifact(releaseId, (InternalKieModule)kieModule, createPomFile(artifactId, version));
+        KieMavenRepository.getKieMavenRepository().installArtifact( releaseId, (InternalKieModule)kieModule, createPomFile( artifactId, version ) );
         kieServices.getRepository().addKieModule(kieModule);
     }
 
