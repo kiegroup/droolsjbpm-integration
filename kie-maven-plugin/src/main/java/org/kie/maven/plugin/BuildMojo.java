@@ -193,11 +193,16 @@ public class BuildMojo extends AbstractKieMojo {
                         /*Standard for the kieMap keys -> compilationID + dot + classtype with first lowercase*/
                         StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(modelMetaInfo.getClass().getName());
                         StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(kModule.getClass().getName());
-                        optionalKieMap.get().put(sbModelMetaInfo.toString(),
-                                                 modelMetaInfo);
-                        optionalKieMap.get().put(sbkModule.toString(),
-                                                 getRaw(kModule));
-                        getLog().info("KieModelMetaInfo and KieModule available in the map shared with the Maven Embedded");
+                        if(modelMetaInfo != null) {
+                            optionalKieMap.get().put(sbModelMetaInfo.toString(),
+                                                     modelMetaInfo);
+                            getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
+                        }
+                        /* @TODO if(kModule != null) {
+                            optionalKieMap.get().put(sbkModule.toString(),
+                                                     getRaw(kModule));
+                            getLog().info("KieModule available in the map shared with the Maven Embedded");
+                        }*/
                     }
                 } else {
                     new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
@@ -210,10 +215,7 @@ public class BuildMojo extends AbstractKieMojo {
     }
 
     private byte[] getRaw(Object o){
-
-        //ObjectInput in = null;
         ObjectOutput out = null;
-        //ByteArrayInputStream bis = null;
         ByteArrayOutputStream bos = null;
 
         try {
@@ -222,10 +224,6 @@ public class BuildMojo extends AbstractKieMojo {
             out.writeObject(o);
             out.flush();
             byte[] objBytes = bos.toByteArray();
-            /*bis = new ByteArrayInputStream(objBytes);
-            in = new ObjectInputStream(bis);
-            Object newObj = in.readObject();
-            return newObj;*/
             return  objBytes;
         }catch (IOException ioe){
             getLog().error(ioe.getMessage());
