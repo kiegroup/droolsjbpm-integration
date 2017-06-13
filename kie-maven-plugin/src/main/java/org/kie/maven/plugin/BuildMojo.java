@@ -116,6 +116,8 @@ public class BuildMojo extends AbstractKieMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        /*System.out.println("contextClassLoader build mojo:"+contextClassLoader.toString());
+        System.out.println("contextClassLoader build mojo parent :"+contextClassLoader.getParent());*/
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
 
@@ -184,11 +186,19 @@ public class BuildMojo extends AbstractKieMojo {
                 }
                 throw new MojoFailureException("Build failed!");
             } else {
+
                 if (container != null && compilationID != null) {
+
                     Optional<Map<String, Object>> optionalKieMap = getKieMap();
                     if (optionalKieMap.isPresent()) {
+                        StringBuilder sbClazzLoader= new StringBuilder(compilationID).append(".").append(ClassLoader.class.getName());
+                        ClassLoader mapClassloader = (ClassLoader) optionalKieMap.get().get(sbClazzLoader.toString());
+                        //getLog().info("MapClassloader:"+mapClassloader);
+                        Thread.currentThread().setContextClassLoader(mapClassloader);
+
                         KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
                         KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
+                        //getLog().info("modelMetaInfo.getClass().getClassLoader():"+modelMetaInfo.getClass().getClassLoader());
 
                         /*Standard for the kieMap keys -> compilationID + dot + classtype with first lowercase*/
                         StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(modelMetaInfo.getClass().getName());
@@ -196,19 +206,23 @@ public class BuildMojo extends AbstractKieMojo {
                         if(modelMetaInfo != null) {
                             optionalKieMap.get().put(sbModelMetaInfo.toString(),
                                                      modelMetaInfo);
+                            //getLog().info("modelmetainfo added using the classloader:"+Thread.currentThread().getContextClassLoader());
                             getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
                         }
-                        /* @TODO if(kModule != null) {
-                            optionalKieMap.get().put(sbkModule.toString(),
-                                                     getRaw(kModule));
+                         if(kModule != null) {
+                            //optionalKieMap.get().put(sbkModule.toString(), getRaw(kModule));
+                            // getLog().info("kModule.getClass().getClassLoader():"+kModule.getClass().getClassLoader());
+                            optionalKieMap.get().put(sbkModule.toString(), kModule);
+                            //getLog().info("sbkModule added using the classloader:"+Thread.currentThread().getContextClassLoader());
                             getLog().info("KieModule available in the map shared with the Maven Embedded");
-                        }*/
+                        }
                     }
                 } else {
                     new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
                 }
             }
         } finally {
+            getLog().info("Set context classloader:"+contextClassLoader);
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
