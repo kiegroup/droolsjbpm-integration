@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,35 @@
 
 package org.kie.server.api.commands.optaplanner;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.kie.server.api.model.KieServerCommand;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="dispose-solver")
-@XStreamAlias("dispose-solver")
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.model.KieServerCommand;
+
+@XmlRootElement(name = "is-every-problem-fact-change-processed")
+@XStreamAlias("is-every-problem-fact-change-processed")
 @XmlAccessorType(XmlAccessType.NONE)
-public class DisposeSolverCommand
+public class IsEveryProblemFactChangeProcessedCommand
         implements KieServerCommand {
+
     private static final long serialVersionUID = -1803374525440238478L;
 
-    @XmlAttribute(name="container-id")
-    @XStreamAlias( "container-id" )
-    private String    containerId;
+    @XmlAttribute(name = "container-id")
+    @XStreamAlias("container-id")
+    private String containerId;
 
-    @XmlAttribute(name="solver-id")
-    @XStreamAlias( "solver-id" )
-    private String    solverId;
+    @XmlAttribute(name = "solver-id")
+    @XStreamAlias("solver-id")
+    private String solverId;
 
-    public DisposeSolverCommand() {
+    public IsEveryProblemFactChangeProcessedCommand() {
     }
 
-    public DisposeSolverCommand(String containerId, String solverId) {
+    public IsEveryProblemFactChangeProcessedCommand(String containerId,
+                                                    String solverId) {
         this.containerId = containerId;
         this.solverId = solverId;
     }
@@ -65,9 +67,9 @@ public class DisposeSolverCommand
 
     @Override
     public String toString() {
-        return "DisposeSolverCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               '}';
+        return "IsEveryProblemFactChangeProcessedCommand{" +
+                "containerId='" + containerId + '\'' +
+                ", solverId='" + solverId + '\'' +
+                '}';
     }
 }

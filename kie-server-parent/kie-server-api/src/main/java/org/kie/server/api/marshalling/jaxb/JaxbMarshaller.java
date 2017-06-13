@@ -59,8 +59,11 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
@@ -276,7 +279,7 @@ public class JaxbMarshaller implements Marshaller {
                 QueryDefinitionList.class,
                 QueryFilterSpec.class,
                 QueryParam.class,
-                
+
                 ProcessInstanceQueryFilterSpec.class,
                 TaskQueryFilterSpec.class,
 
@@ -296,6 +299,9 @@ public class JaxbMarshaller implements Marshaller {
                 GetSolverCommand.class,
                 SolvePlanningProblemCommand.class,
                 TerminateSolverEarlyCommand.class,
+                AddProblemFactChangeCommand.class,
+                AddProblemFactChangesCommand.class,
+                IsEveryProblemFactChangeProcessedCommand.class,
 
                 // admin section
                 MigrationReportInstance.class,
@@ -333,7 +339,7 @@ public class JaxbMarshaller implements Marshaller {
                 CaseStageDefinition.class,
                 CaseFileDataItem.class,
                 CaseFileDataItemList.class,
-                
+
                 // Kie DMN
                 DMNContextKS.class,
                 DMNResultKS.class,

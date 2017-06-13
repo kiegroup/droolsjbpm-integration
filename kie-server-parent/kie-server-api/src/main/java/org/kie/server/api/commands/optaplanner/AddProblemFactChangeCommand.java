@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 
 package org.kie.server.api.commands.optaplanner;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 
-import javax.xml.bind.annotation.*;
-
-@XmlRootElement(name = "create-solver")
-@XStreamAlias("create-solver")
+@XmlRootElement(name = "add-problem-fact-change")
+@XStreamAlias("add-problem-fact-change")
 @XmlAccessorType(XmlAccessType.NONE)
-public class CreateSolverCommand
+public class AddProblemFactChangeCommand
         implements KieServerCommand {
 
     private static final long serialVersionUID = -1803374525440238478L;
@@ -37,17 +42,20 @@ public class CreateSolverCommand
     @XStreamAlias("solver-id")
     private String solverId;
 
-    @XmlElement(name = "solver-config-file")
-    @XStreamAlias("solver-config-file")
-    private String solverConfigFile;
+    @XmlElement
+    @XStreamAlias("problem-fact-change")
+    // It's not possible to use ProblemFactChange type here due to JAXB marshaller limitations
+    private Object problemFactChange;
 
-    public CreateSolverCommand() {
+    public AddProblemFactChangeCommand() {
     }
 
-    public CreateSolverCommand(String containerId, String solverId, String solverConfigFile) {
+    public AddProblemFactChangeCommand(String containerId,
+                                       String solverId,
+                                       ProblemFactChange problemFactChange) {
         this.containerId = containerId;
         this.solverId = solverId;
-        this.solverConfigFile = solverConfigFile;
+        this.problemFactChange = problemFactChange;
     }
 
     public String getContainerId() {
@@ -66,20 +74,20 @@ public class CreateSolverCommand
         this.solverId = solverId;
     }
 
-    public String getSolverConfigFile() {
-        return solverConfigFile;
+    public ProblemFactChange getProblemFactChange() {
+        return (ProblemFactChange) problemFactChange;
     }
 
-    public void setSolverConfigFile(String solverConfigFile) {
-        this.solverConfigFile = solverConfigFile;
+    public void setProblemFactChange(ProblemFactChange problemFactChange) {
+        this.problemFactChange = problemFactChange;
     }
 
     @Override
     public String toString() {
-        return "CreateSolverCommand{" +
-               "containerId='" + containerId + '\'' +
-               ", solverId='" + solverId + '\'' +
-               ", solverConfigFile='" + solverConfigFile + '\'' +
-               '}';
+        return "AddProblemFactChangeCommand{" +
+                "containerId='" + containerId + '\'' +
+                ", solverId='" + solverId + '\'' +
+                ", problemFactChange='" + problemFactChange + '\'' +
+                '}';
     }
 }

@@ -44,6 +44,8 @@ import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION;
 import static org.kie.server.api.rest.RestURI.SOLVER_ID;
 import static org.kie.server.api.rest.RestURI.SOLVER_ID_URI;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED;
 import static org.kie.server.api.rest.RestURI.SOLVER_STATE_RUNNING;
 import static org.kie.server.api.rest.RestURI.SOLVER_STATE_TERMINATING;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
@@ -312,6 +314,89 @@ public class SolverResource {
                                         conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error retrieving solver state {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
+        }
+    }
+
+    @POST
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGED)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response addProblemFactChanges(@javax.ws.rs.core.Context HttpHeaders headers,
+                                          @PathParam(CONTAINER_ID) String containerId,
+                                          @PathParam(SOLVER_ID) String solverId,
+                                          String payload) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
+        try {
+            String contentType = getContentType(headers);
+
+            Object problemFactChange = marshallerHelper.unmarshal(containerId,
+                                                                  payload,
+                                                                  contentType,
+                                                                  Object.class);
+
+            ServiceResponse<Void> result = solverService.addProblemFactChanges(containerId,
+                                                                               solverId,
+                                                                               problemFactChange);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createResponse("",
+                                      v,
+                                      Response.Status.OK,
+                                      conversationIdHeader);
+            }
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.BAD_REQUEST,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error retrieving solver state {}",
+                         e.getMessage(),
+                         e);
+            return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,
+                                                            e.getMessage()),
+                                       v,
+                                       conversationIdHeader);
+        }
+    }
+
+    @GET
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response isEveryProblemFactChangeProcessed(@javax.ws.rs.core.Context HttpHeaders headers,
+                                                      @PathParam(CONTAINER_ID) String containerId,
+                                                      @PathParam(SOLVER_ID) String solverId) {
+        Variant v = getVariant(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId,
+                                                                solverService.getKieServerRegistry(),
+                                                                headers);
+        try {
+            ServiceResponse<Boolean> result = solverService.isEveryProblemFactChangeProcessed(containerId,
+                                                                                              solverId);
+            if (result.getType() == ServiceResponse.ResponseType.SUCCESS) {
+                return createCorrectVariant(marshallerHelper,
+                                            containerId,
+                                            result.getResult(),
+                                            headers,
+                                            Response.Status.OK,
+                                            conversationIdHeader);
+            }
+            return createCorrectVariant(marshallerHelper,
+                                        containerId,
+                                        result.getMsg(),
+                                        headers,
+                                        Response.Status.NOT_FOUND,
+                                        conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error querying problem facts processing state {}",
                          e.getMessage(),
                          e);
             return internalServerError(MessageFormat.format(Messages.UNEXPECTED_ERROR,

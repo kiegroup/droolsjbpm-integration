@@ -16,10 +16,12 @@
 package org.kie.server.services.optaplanner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.ScoreWrapper;
@@ -31,6 +33,7 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -266,6 +269,127 @@ public class SolverServiceBase {
                          e);
             return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
                                          "Unknown error updating solver state.");
+        }
+    }
+
+    public ServiceResponse<Void> addProblemFactChanges(String containerId,
+                                                       String solverId,
+                                                       Object problemFactChanges) {
+        try {
+            SolverInstanceContext sic = solvers.get(SolverInstance.getSolverInstanceKey(containerId,
+                                                                                        solverId));
+            if (problemFactChanges instanceof List) {
+                List problemFactChangesList = (List) problemFactChanges;
+                Map<Integer, String> indexClassNameErrorMap = new HashMap<>();
+                for (int i = 0; i < problemFactChangesList.size(); i++) {
+                    Object problemFactChange = problemFactChangesList.get(i);
+
+                    if (!(problemFactChange instanceof ProblemFactChange)) {
+                        indexClassNameErrorMap.put(i,
+                                                   problemFactChange.getClass().getName());
+                    }
+                }
+                if (!indexClassNameErrorMap.isEmpty()) {
+                    String errorItemsString = indexClassNameErrorMap
+                            .entrySet()
+                            .stream()
+                            .map(e -> "[index " + e.getKey() + ", type: " + e.getValue().getClass() + "]")
+                            .collect(Collectors.joining(","));
+                    return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                 "Items (" + errorItemsString + ") of supplied 'problemFactChangeObject' parameter are not instances of " + ProblemFactChange.class.getName() + ".");
+                }
+                return submitProblemFactChanges(sic,
+                                                containerId,
+                                                solverId,
+                                                () -> sic.getSolver().addProblemFactChanges(problemFactChangesList));
+            }
+            if (!(problemFactChanges instanceof ProblemFactChange)) {
+                return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                             "Supplied 'problemFactChangeObject' parameter is not an instance of " + ProblemFactChange.class.getName()
+                                                     + ". Actual parameter type: " + problemFactChanges.getClass().getName());
+            }
+            return submitProblemFactChanges(sic,
+                                            containerId,
+                                            solverId,
+                                            () -> sic.getSolver().addProblemFactChange((ProblemFactChange) problemFactChanges));
+        } catch (Exception e) {
+            logger.error("Error adding problem fact change'" + problemFactChanges + "' to solver '" + solverId + "' from container '" + containerId + "'",
+                         e);
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Unknown error while adding problem fact change.");
+        }
+    }
+
+    private ServiceResponse<Void> submitProblemFactChanges(
+            final SolverInstanceContext sic,
+            final String containerId,
+            final String solverId,
+            final Runnable solverAction) {
+        if (sic != null) {
+            synchronized (sic) {
+                switch (sic.getInstance().getStatus()) {
+                    case SOLVING: {
+                        solverAction.run();
+                        return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                                     "Problem fact changes have been successfully submitted to solver '" + solverId + "' on container '" + containerId + "'.");
+                    }
+                    case TERMINATING_EARLY: {
+                        return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                                     "Solver '" + solverId + "' on container '" + containerId + "' has already terminated.");
+                    }
+                    case NOT_SOLVING: {
+                        return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                                     "Solver '" + solverId + "' on container '" + containerId + "' is not running.");
+                    }
+                    default: {
+                        return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                     "Solver '" + solverId + "' on container '" + containerId + "' is in unrecognized state '" + sic.getInstance().getStatus() + "'.");
+                    }
+                }
+            }
+        } else {
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Solver '" + solverId + "' not found in container '" + containerId + "'");
+        }
+    }
+
+    public ServiceResponse<Boolean> isEveryProblemFactChangeProcessed(final String containerId,
+                                                                      final String solverId) {
+        try {
+            SolverInstanceContext sic = solvers.get(SolverInstance.getSolverInstanceKey(containerId,
+                                                                                        solverId));
+            if (sic != null) {
+                synchronized (sic) {
+                    switch (sic.getInstance().getStatus()) {
+                        case SOLVING: {
+                            boolean everyProblemFactChangeProcessed = sic.getSolver().isEveryProblemFactChangeProcessed();
+                            return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                                                         "Problem fact changes have been successfully queried from solver '" + solverId + "' on container '" + containerId + "'.",
+                                                         everyProblemFactChangeProcessed);
+                        }
+                        case TERMINATING_EARLY: {
+                            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                         "Solver '" + solverId + "' on container '" + containerId + "' already terminated.");
+                        }
+                        case NOT_SOLVING: {
+                            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                         "Solver '" + solverId + "' from container '" + containerId + "' is not executing.");
+                        }
+                        default: {
+                            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                                         "Solver '" + solverId + "' on container '" + containerId + "' is in unrecognized state '" + sic.getInstance().getStatus() + "'.");
+                        }
+                    }
+                }
+            } else {
+                return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                             "Solver '" + solverId + "' not found in container '" + containerId + "'");
+            }
+        } catch (Exception e) {
+            logger.error("Error retrieving solver '" + solverId + "' state from container '" + containerId + "'",
+                         e);
+            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
+                                         "Unknown error querying problem facts processing state.");
         }
     }
 
