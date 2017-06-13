@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver>
+  <!-- Domain model configuration -->
+  <solutionClass>org.kie.server.testing.CloudBalance</solutionClass>
+  <entityClass>org.kie.server.testing.CloudProcess</entityClass>
+
+  <!-- Score configuration -->
+  <scoreDirectorFactory>
+    <ksessionName>cloudBalancingKsession</ksessionName> <!-- Or delete this line and set a default ksession in kmodule.xml-->
+    <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
+  </scoreDirectorFactory>
+
+  <!-- Termination configuration -->
+  <termination>
+    <secondsSpentLimit>5</secondsSpentLimit>
+  </termination>
+</solver>

@@ -16,7 +16,6 @@
 
 package org.kie.server.testing;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +25,13 @@ public class CloudBalancingGenerator {
 
     private static class Price {
 
-        private int    hardwareValue;
+        private int hardwareValue;
         private String description;
-        private int    cost;
+        private int cost;
 
-        private Price(int hardwareValue, String description, int cost) {
+        private Price(int hardwareValue,
+                      String description,
+                      int cost) {
             this.hardwareValue = hardwareValue;
             this.description = description;
             this.cost = cost;
@@ -50,31 +51,73 @@ public class CloudBalancingGenerator {
     }
 
     private static final Price[] CPU_POWER_PRICES = { // in gigahertz
-                                                      new Price( 3, "single core 3ghz", 110 ),
-                                                      new Price( 4, "dual core 2ghz", 140 ),
-                                                      new Price( 6, "dual core 3ghz", 180 ),
-                                                      new Price( 8, "quad core 2ghz", 270 ),
-                                                      new Price( 12, "quad core 3ghz", 400 ),
-                                                      new Price( 16, "quad core 4ghz", 1000 ),
-                                                      new Price( 24, "eight core 3ghz", 3000 ),
+            new Price(3,
+                      "single core 3ghz",
+                      110),
+            new Price(4,
+                      "dual core 2ghz",
+                      140),
+            new Price(6,
+                      "dual core 3ghz",
+                      180),
+            new Price(8,
+                      "quad core 2ghz",
+                      270),
+            new Price(12,
+                      "quad core 3ghz",
+                      400),
+            new Price(16,
+                      "quad core 4ghz",
+                      1000),
+            new Price(24,
+                      "eight core 3ghz",
+                      3000),
     };
     private static final Price[] MEMORY_PRICES = { // in gigabyte RAM
-            new Price(2, "2 gigabyte", 140),
-            new Price(4, "4 gigabyte", 180),
-            new Price(8, "8 gigabyte", 220),
-            new Price(16, "16 gigabyte", 300),
-            new Price(32, "32 gigabyte", 400),
-            new Price(64, "64 gigabyte", 600),
-            new Price(96, "96 gigabyte", 1000),
+            new Price(2,
+                      "2 gigabyte",
+                      140),
+            new Price(4,
+                      "4 gigabyte",
+                      180),
+            new Price(8,
+                      "8 gigabyte",
+                      220),
+            new Price(16,
+                      "16 gigabyte",
+                      300),
+            new Price(32,
+                      "32 gigabyte",
+                      400),
+            new Price(64,
+                      "64 gigabyte",
+                      600),
+            new Price(96,
+                      "96 gigabyte",
+                      1000),
     };
     private static final Price[] NETWORK_BANDWIDTH_PRICES = { // in gigabyte per hour
-            new Price(2, "2 gigabyte", 100),
-            new Price(4, "4 gigabyte", 200),
-            new Price(6, "6 gigabyte", 300),
-            new Price(8, "8 gigabyte", 400),
-            new Price(12, "12 gigabyte", 600),
-            new Price(16, "16 gigabyte", 800),
-            new Price(20, "20 gigabyte", 1000),
+            new Price(2,
+                      "2 gigabyte",
+                      100),
+            new Price(4,
+                      "4 gigabyte",
+                      200),
+            new Price(6,
+                      "6 gigabyte",
+                      300),
+            new Price(8,
+                      "8 gigabyte",
+                      400),
+            new Price(12,
+                      "12 gigabyte",
+                      600),
+            new Price(16,
+                      "16 gigabyte",
+                      800),
+            new Price(20,
+                      "20 gigabyte",
+                      1000),
     };
 
     private static final int MAXIMUM_REQUIRED_CPU_POWER = 12; // in gigahertz
@@ -93,48 +136,70 @@ public class CloudBalancingGenerator {
         }
     }
 
-    public CloudBalance createCloudBalance(int computerListSize, int processListSize) {
-        return createCloudBalance(determineFileName(computerListSize, processListSize),
-                computerListSize, processListSize);
+    public CloudBalance createCloudBalance(int computerListSize,
+                                           int processListSize) {
+        return createCloudBalance(determineFileName(computerListSize,
+                                                    processListSize),
+                                  computerListSize,
+                                  processListSize);
     }
 
-    private String determineFileName(int computerListSize, int processListSize) {
+    private String determineFileName(int computerListSize,
+                                     int processListSize) {
         return computerListSize + "computers-" + processListSize + "processes";
     }
 
-    public CloudBalance createCloudBalance(String inputId, int computerListSize, int processListSize) {
+    public CloudBalance createCloudBalance(String inputId,
+                                           int computerListSize,
+                                           int processListSize) {
         random = new Random(47);
         CloudBalance cloudBalance = new CloudBalance();
-        cloudBalance.setId( 0L );
-        createComputerList( cloudBalance, computerListSize );
-        createProcessList( cloudBalance, processListSize );
-        assureComputerCapacityTotalAtLeastProcessRequiredTotal( cloudBalance );
+        cloudBalance.setId(0L);
+        createComputerList(cloudBalance,
+                           computerListSize);
+        createProcessList(cloudBalance,
+                          processListSize);
+        assureComputerCapacityTotalAtLeastProcessRequiredTotal(cloudBalance);
         BigInteger possibleSolutionSize = BigInteger.valueOf(cloudBalance.getComputerList().size()).pow(
                 cloudBalance.getProcessList().size());
         return cloudBalance;
     }
 
-    private void createComputerList(CloudBalance cloudBalance, int computerListSize) {
+    public CloudComputer createCloudComputer(int currentNumberOfComputers) {
+        random = new Random(47);
+        return generateCloudComputer(currentNumberOfComputers);
+    }
+
+    private void createComputerList(CloudBalance cloudBalance,
+                                    int computerListSize) {
         List<CloudComputer> computerList = new ArrayList<CloudComputer>(computerListSize);
         for (int i = 0; i < computerListSize; i++) {
-            CloudComputer computer = new CloudComputer();
-            computer.setId((long) i);
-            int cpuPowerPricesIndex = random.nextInt(CPU_POWER_PRICES.length);
-            computer.setCpuPower(CPU_POWER_PRICES[cpuPowerPricesIndex].getHardwareValue());
-            int memoryPricesIndex = distortIndex(cpuPowerPricesIndex, MEMORY_PRICES.length);
-            computer.setMemory(MEMORY_PRICES[memoryPricesIndex].getHardwareValue());
-            int networkBandwidthPricesIndex = distortIndex(cpuPowerPricesIndex, NETWORK_BANDWIDTH_PRICES.length);
-            computer.setNetworkBandwidth(NETWORK_BANDWIDTH_PRICES[networkBandwidthPricesIndex].getHardwareValue());
-            int cost = CPU_POWER_PRICES[cpuPowerPricesIndex].getCost()
-                    + MEMORY_PRICES[memoryPricesIndex].getCost()
-                    + NETWORK_BANDWIDTH_PRICES[networkBandwidthPricesIndex].getCost();
-            computer.setCost(cost);
+            CloudComputer computer = generateCloudComputer((long) i);
             computerList.add(computer);
         }
         cloudBalance.setComputerList(computerList);
     }
 
-    private int distortIndex(int referenceIndex, int length) {
+    private CloudComputer generateCloudComputer(long id) {
+        CloudComputer computer = new CloudComputer();
+        computer.setId(id);
+        int cpuPowerPricesIndex = random.nextInt(CPU_POWER_PRICES.length);
+        computer.setCpuPower(CPU_POWER_PRICES[cpuPowerPricesIndex].getHardwareValue());
+        int memoryPricesIndex = distortIndex(cpuPowerPricesIndex,
+                                             MEMORY_PRICES.length);
+        computer.setMemory(MEMORY_PRICES[memoryPricesIndex].getHardwareValue());
+        int networkBandwidthPricesIndex = distortIndex(cpuPowerPricesIndex,
+                                                       NETWORK_BANDWIDTH_PRICES.length);
+        computer.setNetworkBandwidth(NETWORK_BANDWIDTH_PRICES[networkBandwidthPricesIndex].getHardwareValue());
+        int cost = CPU_POWER_PRICES[cpuPowerPricesIndex].getCost()
+                + MEMORY_PRICES[memoryPricesIndex].getCost()
+                + NETWORK_BANDWIDTH_PRICES[networkBandwidthPricesIndex].getCost();
+        computer.setCost(cost);
+        return computer;
+    }
+
+    private int distortIndex(int referenceIndex,
+                             int length) {
         int index = referenceIndex;
         double randomDouble = random.nextDouble();
         double loweringThreshold = 0.25;
@@ -150,7 +215,8 @@ public class CloudBalancingGenerator {
         return index;
     }
 
-    private void createProcessList(CloudBalance cloudBalance, int processListSize) {
+    private void createProcessList(CloudBalance cloudBalance,
+                                   int processListSize) {
         List<CloudProcess> processList = new ArrayList<CloudProcess>(processListSize);
         for (int i = 0; i < processListSize; i++) {
             CloudProcess process = new CloudProcess();
@@ -170,7 +236,8 @@ public class CloudBalancingGenerator {
     private int generateRandom(int maximumValue) {
         double randomDouble = random.nextDouble();
         double parabolaBase = 2000.0;
-        double parabolaRandomDouble = (Math.pow(parabolaBase, randomDouble) - 1.0) / (parabolaBase - 1.0);
+        double parabolaRandomDouble = (Math.pow(parabolaBase,
+                                                randomDouble) - 1.0) / (parabolaBase - 1.0);
         if (parabolaRandomDouble < 0.0 || parabolaRandomDouble >= 1.0) {
             throw new IllegalArgumentException("Invalid generated parabolaRandomDouble (" + parabolaRandomDouble + ")");
         }
@@ -223,12 +290,11 @@ public class CloudBalancingGenerator {
     }
 
     private int determineUpgrade(int lacking) {
-        for (int upgrade : new int[] {8, 4, 2, 1}) {
+        for (int upgrade : new int[]{8, 4, 2, 1}) {
             if (lacking >= upgrade) {
                 return upgrade;
             }
         }
         throw new IllegalStateException("Lacking (" + lacking + ") should be at least 1.");
     }
-
 }

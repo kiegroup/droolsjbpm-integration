@@ -21,20 +21,25 @@ import java.util.List;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.api.model.instance.SolverInstanceList;
+import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.rest.RestURI;
 import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.SolverServicesClient;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 public class SolverServicesClientImpl
         extends AbstractKieServicesClientImpl
@@ -229,6 +234,101 @@ public class SolverServicesClientImpl
                                                                                        containerId).getResponses().get(0);
             throwExceptionOnFailure(response);
         }
+    }
+
+    @Override
+    public void addProblemFactChange(String containerId,
+                                     String solverId,
+                                     ProblemFactChange problemFactChange) {
+        checkMandatoryParameter("containerId",
+                                containerId);
+        checkMandatoryParameter("solverId",
+                                solverId);
+        checkMandatoryParameter("problemFactChange",
+                                problemFactChange);
+
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
+            makeHttpPostRequestAndCreateCustomResponse(uri,
+                                                       problemFactChange,
+                                                       ServiceResponse.class,
+                                                       getHeaders(problemFactChange));
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new AddProblemFactChangeCommand(containerId,
+                                                                                                               solverId,
+                                                                                                               problemFactChange)));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script,
+                                                                                       AddProblemFactChangeCommand.class.getName(),
+                                                                                       KieServerConstants.CAPABILITY_BRP,
+                                                                                       containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public void addProblemFactChanges(String containerId,
+                                      String solverId,
+                                      List<ProblemFactChange> problemFactChanges) {
+        checkMandatoryParameter("containerId",
+                                containerId);
+        checkMandatoryParameter("solverId",
+                                solverId);
+        checkMandatoryParameter("problemFactChange",
+                                problemFactChanges);
+
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
+            makeHttpPostRequestAndCreateCustomResponse(uri,
+                                                       problemFactChanges,
+                                                       ServiceResponse.class,
+                                                       getHeaders(problemFactChanges));
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new AddProblemFactChangesCommand(containerId,
+                                                                                                                solverId,
+                                                                                                                problemFactChanges)));
+            ServiceResponse<Void> response = (ServiceResponse<Void>) executeJmsCommand(script,
+                                                                                       AddProblemFactChangeCommand.class.getName(),
+                                                                                       KieServerConstants.CAPABILITY_BRP,
+                                                                                       containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public Boolean isEveryProblemFactChangeProcessed(String containerId,
+                                                     String solverId) {
+        checkMandatoryParameter("ContainerID",
+                                containerId);
+        checkMandatoryParameter("SolverId",
+                                solverId);
+
+        Object result = null;
+        if (config.isRest()) {
+            String uri = getURI(containerId,
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED;
+
+            result = makeHttpGetRequestAndCreateCustomResponse(uri,
+                                                               Object.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList(new IsEveryProblemFactChangeProcessedCommand(containerId,
+                                                                                                                            solverId)));
+            ServiceResponse<Object> response = (ServiceResponse<Object>) executeJmsCommand(script,
+                                                                                           IsEveryProblemFactChangeProcessedCommand.class.getName(),
+                                                                                           KieServerConstants.CAPABILITY_BRP,
+                                                                                           containerId).getResponses().get(0);
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        if (result instanceof JaxbBoolean) {
+            return ((JaxbBoolean) result).unwrap();
+        }
+        return (Boolean) result;
     }
 
     @Override

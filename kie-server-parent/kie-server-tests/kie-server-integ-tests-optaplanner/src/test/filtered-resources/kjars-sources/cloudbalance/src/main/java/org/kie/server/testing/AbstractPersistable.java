@@ -17,23 +17,23 @@
 package org.kie.server.testing;
 
 import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.score.constraint.ConstraintMatch;
 
-@XmlRootElement @XmlAccessorType(XmlAccessType.FIELD)
-public abstract class AbstractPersistable implements Serializable, Comparable<AbstractPersistable> {
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public abstract class AbstractPersistable implements Serializable,
+                                                     Comparable<AbstractPersistable> {
 
     // TODO Use @XmlID @XmlJavaTypeAdapter(IdAdapter.class) to allow CloudProcess's usage of @XmlIDREF
+    @PlanningId
     protected Long id;
 
     protected AbstractPersistable() {
@@ -59,29 +59,17 @@ public abstract class AbstractPersistable implements Serializable, Comparable<Ab
      */
     public int compareTo(AbstractPersistable other) {
         return new CompareToBuilder()
-                .append(getClass().getName(), other.getClass().getName())
-                .append(id, other.id)
+                .append(getClass().getName(),
+                        other.getClass().getName())
+                .append(id,
+                        other.id)
                 .toComparison();
     }
 
     public String toString() {
-        return getClass().getName().replaceAll(".*\\.", "") + "-" + id;
+        return getClass().getName().replaceAll(".*\\.",
+                                               "") + "-" + id;
     }
-
-    // TODO Needed for @XmlIDREF
-//    public static class IdAdapter extends XmlAdapter<String, Long>{
-//
-//        @Override
-//        public Long unmarshal(String v) throws Exception {
-//            return Long.parseLong(v);
-//        }
-//
-//        @Override
-//        public String marshal(Long v) throws Exception {
-//            return String.valueOf(v);
-//        }
-//
-//    }
 
     public int hashCode() {
         return new HashCodeBuilder()
@@ -95,7 +83,8 @@ public abstract class AbstractPersistable implements Serializable, Comparable<Ab
         } else if (o instanceof AbstractPersistable) {
             AbstractPersistable other = (AbstractPersistable) o;
             return new EqualsBuilder()
-                    .append(id, other.id)
+                    .append(id,
+                            other.id)
                     .isEquals();
         } else {
             return false;

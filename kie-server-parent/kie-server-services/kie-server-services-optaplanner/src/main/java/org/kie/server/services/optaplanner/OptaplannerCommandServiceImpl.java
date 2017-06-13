@@ -20,8 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
@@ -29,6 +32,7 @@ import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.marshalling.ModelWrapper;
 import org.kie.server.api.model.KieServerCommand;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
@@ -37,6 +41,7 @@ import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +54,15 @@ public class OptaplannerCommandServiceImpl
 
     private SolverServiceBase solverService;
 
+    private MarshallerHelper marshallerHelper;
+
     public OptaplannerCommandServiceImpl(
             KieServerRegistry context,
             SolverServiceBase solverService) {
 
         this.context = context;
         this.solverService = solverService;
+        this.marshallerHelper = new MarshallerHelper(solverService.getKieServerRegistry());
     }
 
     @Override
@@ -121,6 +129,34 @@ public class OptaplannerCommandServiceImpl
                                                                 ContainerLocatorProvider.get().getLocator());
                     response = solverService.terminateSolverEarly(containerId,
                                                                   uss.getSolverId());
+                } else if (command instanceof AddProblemFactChangeCommand) {
+                    AddProblemFactChangeCommand addProblemFactChangeCommand = (AddProblemFactChangeCommand) command;
+                    String containerId = context.getContainerId(addProblemFactChangeCommand.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.addProblemFactChanges(containerId,
+                                                                   addProblemFactChangeCommand.getSolverId(),
+                                                                   addProblemFactChangeCommand.getProblemFactChange());
+                } else if (command instanceof AddProblemFactChangesCommand) {
+                    AddProblemFactChangesCommand addProblemFactChangesCommand = (AddProblemFactChangesCommand) command;
+                    String containerId = context.getContainerId(addProblemFactChangesCommand.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    response = solverService.addProblemFactChanges(containerId,
+                                                                   addProblemFactChangesCommand.getSolverId(),
+                                                                   addProblemFactChangesCommand.getProblemFactChanges());
+                }  else if (command instanceof IsEveryProblemFactChangeProcessedCommand) {
+                    IsEveryProblemFactChangeProcessedCommand gss = (IsEveryProblemFactChangeProcessedCommand) command;
+                    String containerId = context.getContainerId(gss.getContainerId(),
+                                                                ContainerLocatorProvider.get().getLocator());
+                    ServiceResponse<Boolean> everyProblemFactChangeProcessedResponse = solverService.isEveryProblemFactChangeProcessed(containerId,
+                                                                                                                                       gss.getSolverId());
+                    if (marshallingFormat.equals(MarshallingFormat.JAXB)) {
+                        Object wrappedResult = ModelWrapper.wrap(everyProblemFactChangeProcessedResponse.getResult());
+                        response = new ServiceResponse<>(everyProblemFactChangeProcessedResponse.getType(),
+                                                         everyProblemFactChangeProcessedResponse.getMsg(),
+                                                         wrappedResult);
+                    } else {
+                        response = everyProblemFactChangeProcessedResponse;
+                    }
                 } else if (command instanceof DisposeSolverCommand) {
                     DisposeSolverCommand ds = (DisposeSolverCommand) command;
                     String containerId = context.getContainerId(ds.getContainerId(),

@@ -1,0 +1,27 @@
+{
+  "ignores": {
+    "revapi": {
+      "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored. They should be removed when 7.1.0.Final is available.",
+      "ignore": [
+        {
+        "code": "java.method.addedToInterface",
+        "new": "method void org.kie.server.client.SolverServicesClient::addProblemFactChanges(java.lang.String, java.lang.String, java.util.List<org.optaplanner.core.impl.solver.ProblemFactChange>)",
+        "package": "org.kie.server.client",
+        "classSimpleName": "SolverServicesClient",
+        "methodName": "addProblemFactChanges",
+        "elementKind": "method",
+        "justification": "PLANNER-815 Support real-time planning"
+        },
+        {
+        "code": "java.method.addedToInterface",
+        "new": "method java.lang.Boolean org.kie.server.client.SolverServicesClient::isEveryProblemFactChangeProcessed(java.lang.String, java.lang.String)",
+        "package": "org.kie.server.client",
+        "classSimpleName": "SolverServicesClient",
+        "methodName": "isEveryProblemFactChangeProcessed",
+        "elementKind": "method",
+        "justification": "PLANNER-815 Support real-time planning"
+        }
+      ]
+    }
+  }
+}
