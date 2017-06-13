@@ -54,12 +54,14 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
 
     private static final String CONTAINER_1_ID = "cloudbalance";
     private static final String SOLVER_1_ID = "cloudsolver";
-    private static final String SOLVER_1_CONFIG = "META-INF/cloudbalance-solver.xml";
+    private static final String SOLVER_1_CONFIG = "cloudbalance-solver.xml";
 
     private static final String CLASS_CLOUD_BALANCE = "org.kie.server.testing.CloudBalance";
     private static final String CLASS_CLOUD_COMPUTER = "org.kie.server.testing.CloudComputer";
     private static final String CLASS_CLOUD_PROCESS = "org.kie.server.testing.CloudProcess";
     private static final String CLASS_CLOUD_GENERATOR = "org.kie.server.testing.CloudBalancingGenerator";
+    private static final String CLASS_ADD_COMPUTER_PROBLEM_FACT_CHANGE = "org.kie.server.testing.AddComputerProblemFactChange";
+    private static final String CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE = "org.kie.server.testing.DeleteComputerProblemFactChange";
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
@@ -87,6 +89,8 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
         extraClasses.put(CLASS_CLOUD_BALANCE, Class.forName(CLASS_CLOUD_BALANCE, true, kieContainer.getClassLoader()));
         extraClasses.put(CLASS_CLOUD_COMPUTER, Class.forName(CLASS_CLOUD_COMPUTER, true, kieContainer.getClassLoader()));
         extraClasses.put(CLASS_CLOUD_PROCESS, Class.forName(CLASS_CLOUD_PROCESS, true, kieContainer.getClassLoader()));
+        extraClasses.put(CLASS_ADD_COMPUTER_PROBLEM_FACT_CHANGE, Class.forName(CLASS_ADD_COMPUTER_PROBLEM_FACT_CHANGE, true, kieContainer.getClassLoader()));
+        extraClasses.put(CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE, Class.forName(CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE, true, kieContainer.getClassLoader()));
     }
 
     @Test

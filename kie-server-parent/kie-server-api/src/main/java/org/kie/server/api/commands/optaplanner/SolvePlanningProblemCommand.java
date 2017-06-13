@@ -46,7 +46,6 @@ public class SolvePlanningProblemCommand
     private String planningProblem;
 
     public SolvePlanningProblemCommand() {
-        super();
     }
 
     public SolvePlanningProblemCommand(String containerId,

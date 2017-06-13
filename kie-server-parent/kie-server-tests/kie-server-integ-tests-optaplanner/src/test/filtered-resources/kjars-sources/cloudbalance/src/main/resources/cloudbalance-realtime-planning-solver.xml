@@ -10,8 +10,9 @@
     <initializingScoreTrend>ONLY_DOWN</initializingScoreTrend>
   </scoreDirectorFactory>
 
-  <!-- Optimization algorithms configuration -->
+  <!-- Termination configuration -->
   <termination>
     <secondsSpentLimit>5</secondsSpentLimit>
   </termination>
+
 </solver>

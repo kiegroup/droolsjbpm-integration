@@ -16,18 +16,23 @@
 
 package org.kie.server.api.commands.optaplanner;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.kie.server.api.model.KieServerCommand;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 
-@XmlRootElement(name = "terminate-solver-early")
-@XStreamAlias("terminate-solver-early")
+@XmlRootElement(name = "add-problem-fact-changes")
+@XStreamAlias("add-problem-fact-changes")
 @XmlAccessorType(XmlAccessType.NONE)
-public class TerminateSolverEarlyCommand
+public class AddProblemFactChangesCommand
         implements KieServerCommand {
 
     private static final long serialVersionUID = -1803374525440238478L;
@@ -40,13 +45,20 @@ public class TerminateSolverEarlyCommand
     @XStreamAlias("solver-id")
     private String solverId;
 
-    public TerminateSolverEarlyCommand() {
+    public AddProblemFactChangesCommand() {
     }
 
-    public TerminateSolverEarlyCommand(String containerId,
-                                       String solverId) {
+    @XmlElement
+    @XStreamAlias("problem-fact-changes")
+    // It's not possible to use ProblemFactChange list type here due to JAXB marshaller limitations
+    private List<Object> problemFactChanges;
+
+    public AddProblemFactChangesCommand(String containerId,
+                                        String solverId,
+                                        List<? extends ProblemFactChange> problemFactChanges) {
         this.containerId = containerId;
         this.solverId = solverId;
+        this.problemFactChanges = new ArrayList<>(problemFactChanges);
     }
 
     public String getContainerId() {
@@ -65,11 +77,23 @@ public class TerminateSolverEarlyCommand
         this.solverId = solverId;
     }
 
+    public List<ProblemFactChange> getProblemFactChanges() {
+        if (problemFactChanges == null) {
+            return null;
+        }
+        return problemFactChanges.stream().map(p -> (ProblemFactChange) p).collect(Collectors.toList());
+    }
+
+    public void setProblemFactChanges(List<? extends ProblemFactChange> problemFactChanges) {
+        this.problemFactChanges = new ArrayList<>(problemFactChanges);
+    }
+
     @Override
     public String toString() {
-        return "TerminateSolverEarlyCommand{" +
+        return "AddProblemFactChangesCommand{" +
                 "containerId='" + containerId + '\'' +
                 ", solverId='" + solverId + '\'' +
+                ", problemFactChanges='" + problemFactChanges + '\'' +
                 '}';
     }
 }

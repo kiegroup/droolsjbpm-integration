@@ -14,13 +14,12 @@
       }
     }
   },
-
   "ignores": {
     "revapi": {
       "_comment": "Changes between 7.0.0.Final and the current branch. These changes are desired and thus ignored. They should be removed when 7.1.0.Final is available.",
       "ignore": [
-	{
-	  "code": "java.field.constantValueChanged",
+        {
+          "code": "java.field.constantValueChanged",
           "old": "field org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_GET_URI",
           "new": "field org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_BY_CONTAINER_GET_URI",
           "oldValue": "processes/instances",
@@ -30,9 +29,16 @@
           "fieldName": "PROCESS_INSTANCES_BY_CONTAINER_GET_URI",
           "elementKind": "field",
           "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+        },
+        {
+          "code": "java.annotation.attributeValueChanged",
+          "new": "field org.kie.server.api.commands.CommandScript.commands",
+          "attribute": "value",
+          "annotationType": "javax.xml.bind.annotation.XmlElements",
+          "elementKind": "annotation",
+          "justification": "PLANNER-815 Support real-time planning"
         }
-
-	]
+      ]
     }
   }
 }
