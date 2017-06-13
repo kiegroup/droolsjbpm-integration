@@ -41,7 +41,6 @@ public class GetSolverWithBestSolutionCommand
     private String solverId;
 
     public GetSolverWithBestSolutionCommand() {
-        super();
     }
 
     public GetSolverWithBestSolutionCommand(String containerId,
