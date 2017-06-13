@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.jms.ResponseHandler;
+import org.optaplanner.core.impl.solver.ProblemFactChange;
 
 public interface SolverServicesClient {
 
@@ -40,6 +41,17 @@ public interface SolverServicesClient {
 
     void terminateSolverEarly(String containerId,
                               String solverId);
+
+    void addProblemFactChange(String containerId,
+                              String solverId,
+                              ProblemFactChange problemFactChange);
+
+    void addProblemFactChanges(String containerId,
+                              String solverId,
+                              List<ProblemFactChange> problemFactChange);
+
+    Boolean isEveryProblemFactChangeProcessed(String containerId,
+                                              String solverId);
 
     void disposeSolver(String containerId,
                        String solverId);

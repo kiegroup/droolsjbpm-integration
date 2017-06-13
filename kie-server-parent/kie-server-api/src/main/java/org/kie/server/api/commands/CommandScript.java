@@ -28,8 +28,11 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
@@ -72,7 +75,10 @@ public class CommandScript implements Serializable {
             @XmlElement(name = "get-solvers", type = GetSolversCommand.class),
             @XmlElement(name = "get-solver", type = GetSolverCommand.class),
             @XmlElement(name = "start-solver", type = SolvePlanningProblemCommand.class),
-            @XmlElement(name = "terminate-solver", type = TerminateSolverEarlyCommand.class)
+            @XmlElement(name = "terminate-solver", type = TerminateSolverEarlyCommand.class),
+            @XmlElement(name = "add-problem-fact-change", type = AddProblemFactChangeCommand.class),
+            @XmlElement(name = "add-problem-fact-changes", type = AddProblemFactChangesCommand.class),
+            @XmlElement(name = "is-every-problem-fact-change-processed", type = IsEveryProblemFactChangeProcessedCommand.class)
     })
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     protected List<KieServerCommand> commands;

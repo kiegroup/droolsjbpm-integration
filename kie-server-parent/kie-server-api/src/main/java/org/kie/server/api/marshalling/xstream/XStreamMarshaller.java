@@ -30,8 +30,11 @@ import org.kie.server.api.commands.GetServerInfoCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
+import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
@@ -165,6 +168,9 @@ public class XStreamMarshaller
         this.xstream.processAnnotations( GetSolverCommand.class );
         this.xstream.processAnnotations( SolvePlanningProblemCommand.class );
         this.xstream.processAnnotations( TerminateSolverEarlyCommand.class );
+        this.xstream.processAnnotations( AddProblemFactChangeCommand.class );
+        this.xstream.processAnnotations( AddProblemFactChangesCommand.class );
+        this.xstream.processAnnotations( IsEveryProblemFactChangeProcessedCommand.class );
 
         this.xstream.processAnnotations( DMNContextKS.class );
         this.xstream.processAnnotations( DMNResultKS.class );

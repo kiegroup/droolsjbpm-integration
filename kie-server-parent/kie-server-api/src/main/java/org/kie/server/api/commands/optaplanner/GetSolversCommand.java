@@ -36,7 +36,6 @@ public class GetSolversCommand
     private String containerId;
 
     public GetSolversCommand() {
-        super();
     }
 
     public GetSolversCommand(String containerId) {
