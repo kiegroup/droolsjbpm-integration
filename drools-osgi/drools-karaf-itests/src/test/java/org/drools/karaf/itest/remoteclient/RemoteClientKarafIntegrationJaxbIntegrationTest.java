@@ -74,9 +74,6 @@ public class RemoteClientKarafIntegrationJaxbIntegrationTest extends BaseRemoteC
                 // Install Karaf Container
                 AbstractKarafIntegrationTest.getKarafDistributionOption(),
 
-                // It is really nice if the container sticks around after the test so you can check the contents
-                // of the data directory when things go wrong.
-                keepRuntimeFolder(),
                 // Don't bother with local console output as it just ends up cluttering the logs
                 configureConsole().ignoreLocalConsole(),
                 // Force the log level to INFO so we have more details during the test.  It defaults to WARN.
