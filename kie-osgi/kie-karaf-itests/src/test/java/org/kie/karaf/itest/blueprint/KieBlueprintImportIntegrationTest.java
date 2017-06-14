@@ -19,6 +19,7 @@ package org.kie.karaf.itest.blueprint;
 import javax.inject.Inject;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
@@ -62,7 +63,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertNotNull(kieScanner);
     }
 
-    @Test
+    @Test @Ignore
     public void kieSessionOldPersonTest() {
         Assert.assertNotNull(kieSession);
 
@@ -76,7 +77,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertTrue(order.isApproved());
     }
 
-    @Test
+    @Test @Ignore
     public void kieSessionYoungPersonTest() {
         Assert.assertNotNull(kieSession);
 
