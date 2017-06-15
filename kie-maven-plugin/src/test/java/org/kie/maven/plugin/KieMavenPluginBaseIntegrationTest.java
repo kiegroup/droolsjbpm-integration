@@ -35,7 +35,7 @@ abstract public class KieMavenPluginBaseIntegrationTest {
         this.mavenRuntime = builder
                 .forkedBuilder()
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
-                 .withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
+                //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
                 .build();
     }
 
