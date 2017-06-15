@@ -87,11 +87,11 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
     }
 
     @Test
-    public void testFindProcessInstanceWithCorrelationKeyGreaterThanFilter() throws Exception {
+    public void testFindProcessInstanceWithCorrelationKeyEqualsToFilter() throws Exception {
        Map<String, Object> parameters = new HashMap<>();
        Long processInstanceId  = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-        Assertions.assertThat(processInstanceId).isNotNull();
-        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.CORRELATIONKEY, processInstanceId), processInstanceId);
+       Assertions.assertThat(processInstanceId).isNotNull();
+       testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.CORRELATIONKEY, String.valueOf(processInstanceId)), processInstanceId);
     }
 
     @Test
