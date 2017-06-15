@@ -55,7 +55,8 @@ import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "case-insurance", "1.0.0.Final");
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "case-insurance",
+            "1.0.0.Final");
 
     private static final String CONTAINER_ID = "insurance";
     private static final String CONTAINER_ID2 = "insurance-second";
@@ -966,39 +967,39 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(instances);
         assertEquals(2, instances.size());
     }
-
+    
     @Test
     public void testGetCommentPagination() {
-
-        int pageSize = 20;
-
+    	
+    	int pageSize = 20;
+    	
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
         assertNotNull(caseId);
         assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
-
-        for (int i = 0; i < 55; i++) {
+    	
+        for (int i = 0 ; i < 55 ; i++) {
             caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
         }
-
+        
         List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
         assertNotNull(firstPage);
         assertEquals(20, firstPage.size());
-        for (int i = 0; i < 20; i++) {
-            assertEquals("comment" + i, firstPage.get(i).getText());
+        for (int i = 0; i < 20 ; i++) {
+        	assertEquals("comment" + i, firstPage.get(i).getText());
         }
-
+        
         List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
         assertNotNull(secondPage);
         assertEquals(20, secondPage.size());
-        for (int i = 20; i < 40; i++) {
-            assertEquals("comment" + i, secondPage.get(i - 20).getText());
+        for (int i = 20; i < 40 ; i++) {
+        	assertEquals("comment" + i, secondPage.get(i-20).getText());
         }
-
+        
         List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
         assertNotNull(thirdPage);
         assertEquals(15, thirdPage.size());
-        for (int i = 40; i < 55; i++) {
-            assertEquals("comment" + i, thirdPage.get(i - 40).getText());
+        for (int i = 40; i < 55 ; i++) {
+        	assertEquals("comment" + i, thirdPage.get(i-40).getText());
         }
     }
 
@@ -1228,29 +1229,47 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
     @Test
     public void testAssignUserToRoleNotExistingCase() {
-        assertClientException(() -> caseClient.assignUserToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA), 404, "Could not find case instance \"not-existing-case\"", "Case with id not-existing-case was not found");
+        assertClientException(
+                () -> caseClient.assignUserToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
     }
 
     @Test
     public void testAssignGroupToRoleNotExistingCase() {
-        assertClientException(() -> caseClient.assignGroupToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"), 404, "Could not find case instance \"not-existing-case\"", "Case with id not-existing-case was not found");
+        assertClientException(
+                () -> caseClient.assignGroupToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
     }
 
     @Test
     public void testRemoveUserFromRoleNotExistingCase() {
-        assertClientException(() -> caseClient.removeUserFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA), 404, "Could not find case instance \"not-existing-case\"", "Case with id not-existing-case was not found");
+        assertClientException(
+                () -> caseClient.removeUserFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
     }
 
     @Test
     public void testRemoveGroupFromRoleNotExistingCase() {
-        assertClientException(() -> caseClient.removeGroupFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"), 404, "Could not find case instance \"not-existing-case\"", "Case with id not-existing-case was not found");
+        assertClientException(
+                () -> caseClient.removeGroupFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
+                404,
+                "Could not find case instance \"not-existing-case\"",
+                "Case with id not-existing-case was not found");
     }
 
     @Test
     public void testCaseRolesCardinality() {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
-        CaseFile caseFile = CaseFile.builder().data(data).build();
+        CaseFile caseFile = CaseFile.builder()
+                .data(data)
+                .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
         assertNotNull(caseId);
@@ -1258,7 +1277,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA);
 
         // Try to add second user to insured role with cardinality 1
-        assertClientException(() -> caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA), 400, "Cannot add more users for role " + CASE_INSURED_ROLE);
+        assertClientException(
+                () -> caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_INSURED_ROLE, USER_YODA),
+                400,
+                "Cannot add more users for role " + CASE_INSURED_ROLE);
     }
 
     @Test
@@ -1505,7 +1527,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         task = tasks.get(0);
         assertNotEquals(SUBMIT_POLICE_REPORT_TASK, task.getName());
 
-        assertClientException(() -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP), 400, "Could not trigger Fragment for Completed stage " + stage.getName());
+        assertClientException(
+                () -> caseClient.triggerAdHocFragmentInStage(CONTAINER_ID, caseClaimId, stage.getIdentifier(), SUBMIT_POLICE_REPORT_TASK, Collections.EMPTY_MAP),
+                400,
+                "Could not trigger Fragment for Completed stage " + stage.getName());
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseClaimId);
     }
@@ -1523,7 +1548,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
 
-        assertClientException(() -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP), 404, "Could not find case instance \"" + caseId + "\"", "Case with id " + caseId + " was not found");
+        assertClientException(
+                () -> caseClient.triggerAdHocFragment(CONTAINER_ID, caseId, HELLO_2_TASK, Collections.EMPTY_MAP),
+                404,
+                "Could not find case instance \"" + caseId + "\"",
+                "Case with id " + caseId + " was not found");
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
@@ -1543,14 +1572,14 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
             fail("User john is not an owner so is not allowed to cancel case instance");
         } catch (KieServicesException e) {
             String errorMessage = e.getMessage();
-            assertTrue(errorMessage.contains("User " + USER_JOHN + " is not authorized"));
+            assertTrue(errorMessage.contains("User " + USER_JOHN +" is not authorized"));
         }
         try {
             caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
             fail("User john is not an owner so is not allowed to destroy case instance");
         } catch (KieServicesException e) {
             String errorMessage = e.getMessage();
-            assertTrue(errorMessage.contains("User " + USER_JOHN + " is not authorized"));
+            assertTrue(errorMessage.contains("User " + USER_JOHN +" is not authorized"));
         }
 
         changeUser(USER_YODA);
@@ -1729,7 +1758,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     private String startUserTaskCase(String owner, String contact) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
-        CaseFile caseFile = CaseFile.builder().addUserAssignments(CASE_OWNER_ROLE, owner).addUserAssignments(CASE_CONTACT_ROLE, contact).data(data).build();
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_OWNER_ROLE, owner)
+                .addUserAssignments(CASE_CONTACT_ROLE, contact)
+                .data(data)
+                .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CASE_HR_DEF_ID, caseFile);
         assertNotNull(caseId);
@@ -1739,7 +1772,12 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     private String startCarInsuranceClaimCase(String insured, String insuranceRep, String assessor) {
         Map<String, Object> data = new HashMap<>();
         data.put("s", "first case started");
-        CaseFile caseFile = CaseFile.builder().addUserAssignments(CASE_INSURED_ROLE, insured).addUserAssignments(CASE_INS_REP_ROLE, insuranceRep).addUserAssignments(CASE_ASSESSOR_ROLE, assessor).data(data).build();
+        CaseFile caseFile = CaseFile.builder()
+                .addUserAssignments(CASE_INSURED_ROLE, insured)
+                .addUserAssignments(CASE_INS_REP_ROLE, insuranceRep)
+                .addUserAssignments(CASE_ASSESSOR_ROLE, assessor)
+                .data(data)
+                .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
         assertNotNull(caseId);
