@@ -51,7 +51,16 @@
         "classSimpleName": "PomModel",
         "elementKind": "interface",
         "justification": "move maven integration to uberfire"
-        }
+        },
+	{
+	  "code": "java.method.addedToInterface",
+	  "new": "method java.util.Collection<org.jbpm.casemgmt.api.model.instance.CommentInstance> org.jbpm.casemgmt.api.CaseService::getCaseComments(java.lang.String, int, int, org.kie.api.runtime.query.QueryContext) throws org.jbpm.casemgmt.api.CaseNotFoundException",
+	  "package": "org.jbpm.casemgmt.api",
+	  "classSimpleName": "CaseService",
+	  "methodName": "getCaseComments",
+	  "elementKind": "method",
+	  "justification": "JBPM-6073 getComments Pagination Method"
+	}
       ]
     }
   }
