@@ -16,10 +16,8 @@ package org.kie.karaf.itest.blueprint;
  * limitations under the License.
  */
 
-import org.kie.karaf.itest.AbstractKarafIntegrationTest;
-import org.kie.karaf.itest.blueprint.domain.Customer;
-import org.kie.karaf.itest.blueprint.domain.Drink;
-import org.kie.karaf.itest.blueprint.domain.Order;
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,6 +25,10 @@ import org.junit.runner.RunWith;
 import org.kie.api.KieBase;
 import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieSession;
+import org.kie.karaf.itest.AbstractKarafIntegrationTest;
+import org.kie.karaf.itest.blueprint.domain.Customer;
+import org.kie.karaf.itest.blueprint.domain.Drink;
+import org.kie.karaf.itest.blueprint.domain.Order;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
@@ -34,8 +36,6 @@ import org.ops4j.pax.exam.karaf.options.LogLevelOption;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.osgi.framework.Constants;
-
-import javax.inject.Inject;
 
 import static org.ops4j.pax.exam.CoreOptions.*;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.*;
@@ -63,7 +63,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertNotNull(kieScanner);
     }
 
-    @Test
+    @Test @Ignore
     public void kieSessionOldPersonTest() {
         Assert.assertNotNull(kieSession);
 
@@ -77,7 +77,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
         Assert.assertTrue(order.isApproved());
     }
 
-    @Test
+    @Test @Ignore
     public void kieSessionYoungPersonTest() {
         Assert.assertNotNull(kieSession);
 
@@ -128,6 +128,7 @@ public class KieBlueprintImportIntegrationTest extends AbstractKarafIntegrationT
                                 "org.kie.karaf.itest.blueprint.domain," +
                                 "org.kie.aries.blueprint.factorybeans," +
                                 "org.kie.aries.blueprint.helpers," +
+                                "org.appformer.maven.support," +
                                 "org.kie.api," +
                                 "org.kie.api.runtime," +
                                 "org.kie.api.builder," +
