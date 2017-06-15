@@ -15,14 +15,8 @@
 
 package org.kie.maven.plugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -56,6 +50,7 @@ import org.drools.compiler.compiler.GuidedRuleTemplateFactory;
 import org.drools.compiler.compiler.GuidedScoreCardFactory;
 import org.drools.compiler.compiler.PMMLCompilerFactory;
 import org.drools.compiler.compiler.ProcessBuilderFactory;
+import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
 import org.drools.compiler.kie.builder.impl.KieMetaInfoBuilder;
@@ -116,8 +111,6 @@ public class BuildMojo extends AbstractKieMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        /*System.out.println("contextClassLoader build mojo:"+contextClassLoader.toString());
-        System.out.println("contextClassLoader build mojo parent :"+contextClassLoader.getParent());*/
 
         List<InternalKieModule> kmoduleDeps = new ArrayList<InternalKieModule>();
 
@@ -188,79 +181,48 @@ public class BuildMojo extends AbstractKieMojo {
             } else {
 
                 if (container != null && compilationID != null) {
-
-                    Optional<Map<String, Object>> optionalKieMap = getKieMap();
-                    if (optionalKieMap.isPresent()) {
-                        StringBuilder sbClazzLoader= new StringBuilder(compilationID).append(".").append(ClassLoader.class.getName());
-                        ClassLoader mapClassloader = (ClassLoader) optionalKieMap.get().get(sbClazzLoader.toString());
-                        //getLog().info("MapClassloader:"+mapClassloader);
-                        Thread.currentThread().setContextClassLoader(mapClassloader);
-
-                        KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
-                        KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
-                        //getLog().info("modelMetaInfo.getClass().getClassLoader():"+modelMetaInfo.getClass().getClassLoader());
-
-                        /*Standard for the kieMap keys -> compilationID + dot + classtype with first lowercase*/
-                        StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(modelMetaInfo.getClass().getName());
-                        StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(kModule.getClass().getName());
-                        if(modelMetaInfo != null) {
-                            optionalKieMap.get().put(sbModelMetaInfo.toString(),
-                                                     modelMetaInfo);
-                            //getLog().info("modelmetainfo added using the classloader:"+Thread.currentThread().getContextClassLoader());
-                            getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
-                        }
-                         if(kModule != null) {
-                            //optionalKieMap.get().put(sbkModule.toString(), getRaw(kModule));
-                            // getLog().info("kModule.getClass().getClassLoader():"+kModule.getClass().getClassLoader());
-                            optionalKieMap.get().put(sbkModule.toString(), kModule);
-                            //getLog().info("sbkModule added using the classloader:"+Thread.currentThread().getContextClassLoader());
-                            getLog().info("KieModule available in the map shared with the Maven Embedded");
-                        }
-                    }
+                    shareKieObjectsWithMap(kModule);
                 } else {
                     new KieMetaInfoBuilder(kModule).writeKieModuleMetaInfo(new DiskResourceStore(outputDirectory));
                 }
             }
         } finally {
-            getLog().info("Set context classloader:"+contextClassLoader);
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         getLog().info("KieModule successfully built!");
     }
 
-    private byte[] getRaw(Object o){
-        ObjectOutput out = null;
-        ByteArrayOutputStream bos = null;
+    private void shareKieObjectsWithMap(InternalKieModule kModule) {
+        Optional<Map<String, Object>> optionalKieMap = getKieMap();
+        if (optionalKieMap.isPresent()) {
+            KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
+            KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
 
-        try {
-            bos = new ByteArrayOutputStream();
-            out = new ObjectOutputStream(bos);
-            out.writeObject(o);
-            out.flush();
-            byte[] objBytes = bos.toByteArray();
-            return  objBytes;
-        }catch (IOException ioe){
-            getLog().error(ioe.getMessage());
-        } finally {
-            try {
-                bos.close();
-            } catch (IOException ex) {
-                getLog().error(ex.getMessage());
+            /*Standard for the kieMap keys -> compilationID + dot + class name with first lowercase*/
+            StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
+            StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
+
+            if (modelMetaInfo != null) {
+                optionalKieMap.get().put(sbModelMetaInfo.toString(),
+                                         modelMetaInfo);
+                getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
+            }
+            if (kModule != null) {
+                optionalKieMap.get().put(sbkModule.toString(),
+                                         kModule);
+                getLog().info("KieModule available in the map shared with the Maven Embedded");
             }
         }
-        return new byte[]{};
     }
 
     private Optional<Map<String, Object>> getKieMap() {
-        Map<String, Object> kieMap = null;
-
         try {
             /**
              * Retrieve the map passed into the Plexus container by the MavenEmbedder from the MavenIncrementalCompiler in the kie-wb-common
              */
-            kieMap = (Map) container.lookup(Map.class,
-                                            "java.util.HashMap",
-                                            "kieMap");
+            Map<String, Object> kieMap = (Map) container.lookup(Map.class,
+                                                                "java.util.HashMap",
+                                                                "kieMap");
             return Optional.of(kieMap);
         } catch (ComponentLookupException cle) {
             getLog().info("kieMap not present with compilationID and container present");
