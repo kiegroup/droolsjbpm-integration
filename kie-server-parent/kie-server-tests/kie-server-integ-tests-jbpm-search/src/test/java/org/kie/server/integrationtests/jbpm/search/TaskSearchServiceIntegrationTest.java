@@ -27,8 +27,6 @@ import org.kie.server.api.model.definition.TaskField;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 
-import java.util.Date;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +68,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
-        testFindTaskInstanceWithSearchService(createQueryFilterGreaterThan(TaskField.CREATEDON, Date.from(Instant.EPOCH)), task.getId());
+        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.CREATEDON, task.getCreatedOn()), task.getId());
     }
 
     @Test
@@ -184,14 +182,14 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     }
 
     @Test
-    public void testFindTaskWithActivationTimeGreaterThanFilter() throws Exception {
+    public void testFindTaskWithActivationTimeEqualsToFilter() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
-        testFindTaskInstanceWithSearchService(createQueryFilterGreaterThan(TaskField.ACTIVATIONTIME, Date.from(Instant.EPOCH)), task.getId());
+        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.ACTIVATIONTIME, task.getActivationTime()), task.getId());
     }
 
     @Test
