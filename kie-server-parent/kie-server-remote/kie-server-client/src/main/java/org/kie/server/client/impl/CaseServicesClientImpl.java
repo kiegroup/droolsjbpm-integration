@@ -647,7 +647,6 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             valuesMap.put(CASE_ID, caseId);
 
             String queryString = getPagingQueryString("", page, pageSize);
-
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_GET_URI, valuesMap) + queryString, CaseCommentList.class);
 
@@ -661,12 +660,11 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
             if (shouldReturnWithNullResponse(response)) {
                 return null;
             }
-            
             list = response.getResult();
         }
 
-        if (list != null) {       	
-            return internalGetPaginatedCaseComments(list, page, pageSize);
+        if (list != null) {
+            return list.getItems();
         }
 
         return Collections.emptyList();
@@ -1335,23 +1333,6 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
     /*
      * internal methods
      */
-    
-    protected List<CaseComment> internalGetPaginatedCaseComments(CaseCommentList caseComments, int page, int pageSize) {
-    	
-    	int allCommentsSize = caseComments.getItems().size();    	    	
-    	int pageIndex = (allCommentsSize + pageSize - 1) / pageSize;
-    	
-    	if (allCommentsSize < pageSize) {
-    		return caseComments.getItems();
-    	}    	
-    	else if (pageIndex == page + 1) {
-    		return caseComments.getItems().subList(page * pageSize, allCommentsSize);
-    	}
-    	else {
-    	    return caseComments.getItems().subList(page * pageSize, (page * pageSize) + pageSize);
-    	}
-    	
-    }
 
     protected List<CaseFileDataItem> internalGetCaseInstanceDataItems(String caseId, List<String> names, List<String> types, Integer page, Integer pageSize) {
         CaseFileDataItemList list = null;
