@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.text.MessageFormat;
 
 import org.junit.After;
 import org.junit.Assume;
@@ -51,6 +52,10 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
+import static org.kie.server.remote.rest.casemgmt.Messages.CASE_DEFINITION_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
+
 import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -1937,5 +1942,33 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, adHocFragments.size());
         assertEquals("Negotiation meeting", adHocFragments.get(0).getName());
         assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
+    }
+
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingCase() {
+        String invalidCaseId = "not-existing-case-id";
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
+                              404,
+                              MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
+                              "Case with id " + invalidCaseId + " was not found");
+
+    }
+
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingProcessDefinition() {
+        String invalidProcessId = "not-existing-process-id";
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        CaseFile caseFile = CaseFile.builder()
+                .data(data)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
+                              404,
+                              MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
+                              "No process definition found with id: " + invalidProcessId);
     }
 }
