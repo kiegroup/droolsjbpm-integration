@@ -11,9 +11,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.kie.server.remote.rest.optaplanner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import org.junit.Test;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -22,10 +26,6 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.optaplanner.OptaplannerKieServerExtension;
 import org.kie.server.services.optaplanner.SolverServiceBase;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

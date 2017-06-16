@@ -3,6 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -11,8 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.server.services.optaplanner;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Optaplanner solver service
+ * OptaPlanner solver service.
  */
 public class SolverServiceBase {
 
@@ -89,10 +89,10 @@ public class SolverServiceBase {
                 }
 
                 try {
-                    SolverFactory<?> solverFactory = SolverFactory.createFromKieContainerXmlResource(ci.getKieContainer(),
+                    SolverFactory<Object> solverFactory = SolverFactory.createFromKieContainerXmlResource(ci.getKieContainer(),
                                                                                                      instance.getSolverConfigFile());
 
-                    Solver<?> solver = solverFactory.buildSolver();
+                    Solver<Object> solver = solverFactory.buildSolver();
 
                     sic.setSolver(solver);
                     updateSolverInstance(sic);
@@ -457,24 +457,22 @@ public class SolverServiceBase {
     private void updateSolverInstance(SolverInstanceContext sic) {
         synchronized (sic) {
             // We keep track of the solver status ourselves, so there's no need to call buggy updateSolverStatus( sic );
-            Score bestScore = sic.getSolver().getBestScore();
+            Score<?> bestScore = sic.getSolver().getBestScore();
 
             sic.getInstance().setScoreWrapper(new ScoreWrapper(bestScore));
         }
     }
 
     private void updateSolverStatus(SolverInstanceContext sic) {
-        Solver solver = sic.getSolver();
+        Solver<?> solver = sic.getSolver();
         if (!solver.isSolving()) {
             // TODO BUGGY because a solver might have been a scheduled to start, but not started yet
             // (especially immediately after solvePlanningProblem() call).
             sic.getInstance().setStatus(SolverInstance.SolverStatus.NOT_SOLVING);
+        } else if (solver.isTerminateEarly()) {
+            sic.getInstance().setStatus(SolverInstance.SolverStatus.TERMINATING_EARLY);
         } else {
-            if (solver.isTerminateEarly()) {
-                sic.getInstance().setStatus(SolverInstance.SolverStatus.TERMINATING_EARLY);
-            } else {
-                sic.getInstance().setStatus(SolverInstance.SolverStatus.SOLVING);
-            }
+            sic.getInstance().setStatus(SolverInstance.SolverStatus.SOLVING);
         }
     }
 

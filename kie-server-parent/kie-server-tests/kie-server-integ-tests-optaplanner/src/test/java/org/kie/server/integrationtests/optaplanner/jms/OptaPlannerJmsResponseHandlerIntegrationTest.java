@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 package org.kie.server.integrationtests.optaplanner.jms;
 
 import java.lang.reflect.Method;
@@ -45,7 +45,8 @@ import org.kie.server.integrationtests.optaplanner.OptaplannerKieServerBaseInteg
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 @Category({JMSOnly.class})
 public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKieServerBaseIntegrationTest {
@@ -95,7 +96,7 @@ public class OptaPlannerJmsResponseHandlerIntegrationTest extends OptaplannerKie
 
     @Test
     public void testSolverWithAsyncResponseHandler() throws Exception {
-        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()),
+        Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<>(extraClasses.values()),
                 configuration.getMarshallingFormat(), client.getClassLoader());
         ResponseCallback responseCallback = new BlockingResponseCallback(marshaller);
         ResponseHandler asyncResponseHandler = new AsyncResponseHandler(responseCallback);

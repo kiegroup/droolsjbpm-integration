@@ -3,7 +3,8 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ * You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,21 +12,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.server.services.optaplanner;
-
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.services.api.*;
-import org.kie.server.services.impl.KieServerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.kie.server.api.KieServerConstants;
+import org.kie.server.services.api.KieContainerInstance;
+import org.kie.server.services.api.KieServerApplicationComponentsService;
+import org.kie.server.services.api.KieServerExtension;
+import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.SupportedTransports;
+import org.kie.server.services.impl.KieServerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OptaplannerKieServerExtension
         implements KieServerExtension {
