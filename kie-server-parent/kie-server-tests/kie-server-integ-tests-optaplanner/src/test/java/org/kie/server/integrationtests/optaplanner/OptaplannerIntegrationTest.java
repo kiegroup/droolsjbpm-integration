@@ -3,7 +3,8 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ * You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,8 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-
+ */
 package org.kie.server.integrationtests.optaplanner;
 
 import java.lang.reflect.Constructor;
@@ -72,7 +72,7 @@ public class OptaplannerIntegrationTest
 
     @Override
     protected void addExtraCustomClasses(Map<String, Class<?>> extraClasses)
-            throws Exception {
+            throws ClassNotFoundException {
 
         extraClasses.put(CLASS_CLOUD_BALANCE,
                          Class.forName(CLASS_CLOUD_BALANCE,
@@ -97,8 +97,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testCreateDisposeSolver()
-            throws Exception {
+    public void testCreateDisposeSolver() {
         solverClient.createSolver(CONTAINER_1_ID,
                                   SOLVER_1_ID,
                                   SOLVER_1_CONFIG);
@@ -120,14 +119,14 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateSolverWithoutSolverInstance() throws Exception {
+    public void testCreateSolverWithoutConfigPath() {
         solverClient.createSolver(CONTAINER_1_ID,
                                   SOLVER_1_ID,
                                   null);
     }
 
     @Test
-    public void testCreateSolverWrongSolverInstanceConfigPath() throws Exception {
+    public void testCreateSolverWrongConfigPath() {
         try {
             solverClient.createSolver(CONTAINER_1_ID,
                                       SOLVER_1_ID,
@@ -140,14 +139,14 @@ public class OptaplannerIntegrationTest
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateSolverNullContainer() throws Exception {
+    public void testCreateSolverNullContainer() {
         solverClient.createSolver(null,
                                   SOLVER_1_ID,
-                                  null);
+                                  SOLVER_1_CONFIG);
     }
 
     @Test
-    public void testCreateDuplicitSolver() throws Exception {
+    public void testCreateDuplicitSolver() {
         SolverInstance solverInstance = solverClient.createSolver(CONTAINER_1_ID,
                                                                   SOLVER_1_ID,
                                                                   SOLVER_1_CONFIG);
@@ -165,7 +164,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testDisposeNotExistingSolver() throws Exception {
+    public void testDisposeNotExistingSolver() {
         try {
             solverClient.disposeSolver(CONTAINER_1_ID,
                                        SOLVER_1_ID);
@@ -177,7 +176,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testGetSolverState() throws Exception {
+    public void testGetSolverState() {
         SolverInstance solverInstance = solverClient.createSolver(CONTAINER_1_ID,
                                                                   SOLVER_1_ID,
                                                                   SOLVER_1_CONFIG);
@@ -202,7 +201,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testGetNotExistingSolverState() throws Exception {
+    public void testGetNotExistingSolverState() {
         try {
             solverClient.getSolver(CONTAINER_1_ID,
                                    SOLVER_1_ID);
@@ -214,7 +213,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testGetSolvers() throws Exception {
+    public void testGetSolvers() {
         List<SolverInstance> solverInstanceList = solverClient.getSolvers(CONTAINER_1_ID);
         assertNotNull(solverInstanceList);
         assertEquals(0,
@@ -315,7 +314,7 @@ public class OptaplannerIntegrationTest
         List computerList = null;
 
         for (int i = 0; i < numberOfComputersToAdd; i++) {
-            ProblemFactChange problemFactChange = loadAddProblemFactChange(computerCount + i);
+            ProblemFactChange<?> problemFactChange = loadAddProblemFactChange(computerCount + i);
             solverClient.addProblemFactChange(CONTAINER_1_ID,
                                               SOLVER_1_ID,
                                               problemFactChange);
@@ -334,7 +333,7 @@ public class OptaplannerIntegrationTest
         assertNotNull(computerList);
 
         for (int i = 0; i < numberOfComputersToAdd; i++) {
-            ProblemFactChange problemFactChange = loadDeleteProblemFactChange(computerList.get(i));
+            ProblemFactChange<?> problemFactChange = loadDeleteProblemFactChange(computerList.get(i));
 
             solverClient.addProblemFactChange(CONTAINER_1_ID,
                                               SOLVER_1_ID,
@@ -540,7 +539,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testGetBestSolutionNotExistingSolver() throws Exception {
+    public void testGetBestSolutionNotExistingSolver() {
         try {
             solverClient.getSolverWithBestSolution(CONTAINER_1_ID,
                                                    SOLVER_1_ID);
@@ -552,7 +551,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testTerminateEarlyNotExistingSolver() throws Exception {
+    public void testTerminateEarlyNotExistingSolver() {
         try {
             solverClient.terminateSolverEarly(CONTAINER_1_ID,
                                               SOLVER_1_ID);
@@ -564,7 +563,7 @@ public class OptaplannerIntegrationTest
     }
 
     @Test
-    public void testTerminateEarlyStoppedSolver() throws Exception {
+    public void testTerminateEarlyStoppedSolver() {
         solverClient.createSolver(CONTAINER_1_ID,
                                   SOLVER_1_ID,
                                   SOLVER_1_CONFIG);
@@ -609,8 +608,8 @@ public class OptaplannerIntegrationTest
                                    SOLVER_1_ID);
     }
 
-    public Object loadPlanningProblem(int computerListSize,
-                                      int processListSize) throws NoSuchMethodException, ClassNotFoundException,
+    private Object loadPlanningProblem(int computerListSize,
+                                       int processListSize) throws NoSuchMethodException, ClassNotFoundException,
             IllegalAccessException, InstantiationException, InvocationTargetException {
         Class<?> cbgc = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_GENERATOR);
         Object cbgi = cbgc.newInstance();
@@ -623,7 +622,7 @@ public class OptaplannerIntegrationTest
                              processListSize);
     }
 
-    private ProblemFactChange loadAddProblemFactChange(final int currentNumberOfComputers) throws ClassNotFoundException,
+    private ProblemFactChange<?> loadAddProblemFactChange(final int currentNumberOfComputers) throws ClassNotFoundException,
             IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         Class<?> cbgc = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_GENERATOR);
         Object cbgi = cbgc.newInstance();
@@ -636,16 +635,16 @@ public class OptaplannerIntegrationTest
         Class<?> cloudComputerClass = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_COMPUTER);
         Class<?> problemFactChangeClass = kieContainer.getClassLoader().loadClass(CLASS_ADD_COMPUTER_PROBLEM_FACT_CHANGE);
 
-        Constructor constructor = problemFactChangeClass.getConstructor(cloudComputerClass);
+        Constructor<?> constructor = problemFactChangeClass.getConstructor(cloudComputerClass);
         return (ProblemFactChange) constructor.newInstance(cloudComputer);
     }
 
-    private ProblemFactChange loadDeleteProblemFactChange(final Object cloudComputer) throws ClassNotFoundException,
+    private ProblemFactChange<?> loadDeleteProblemFactChange(final Object cloudComputer) throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class<?> cloudComputerClass = kieContainer.getClassLoader().loadClass(CLASS_CLOUD_COMPUTER);
         Class<?> problemFactChangeClass = kieContainer.getClassLoader().loadClass(CLASS_DELETE_COMPUTER_PROBLEM_FACT_CHANGE);
 
-        Constructor constructor = problemFactChangeClass.getConstructor(cloudComputerClass);
+        Constructor<?> constructor = problemFactChangeClass.getConstructor(cloudComputerClass);
         return (ProblemFactChange) constructor.newInstance(cloudComputer);
     }
 }

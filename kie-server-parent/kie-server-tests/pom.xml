@@ -350,10 +350,10 @@
             <id>create-custom-maven-repo-dir</id>
             <phase>pre-integration-test</phase>
             <configuration>
-              <tasks>
+              <target>
                 <mkdir dir="${kie.server.testing.server.local.repo.dir}"/>
                 <mkdir dir="${kie.server.testing.remote.repo.dir}"/>
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>
