@@ -69,6 +69,8 @@
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/web/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/springframework/tx/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/tukaani/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/uberfire/maven-support/assembly-component.xml</componentDescriptor>
+    <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/uberfire/maven-integration/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/org/wildfly/extras/config/plugin/bpms/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/rome/assembly-component.xml</componentDescriptor>
     <componentDescriptor>${project.basedir}/src/main/filtered-resources/xmlpull/assembly-component.xml</componentDescriptor>
