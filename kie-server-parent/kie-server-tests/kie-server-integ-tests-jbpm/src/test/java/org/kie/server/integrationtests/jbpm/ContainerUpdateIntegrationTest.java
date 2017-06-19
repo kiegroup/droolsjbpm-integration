@@ -18,7 +18,12 @@ package org.kie.server.integrationtests.jbpm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.*;
 
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +31,18 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -40,6 +50,13 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
             "1.0.0.Final");
     private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.1.Final");
+    private static final ReleaseId releaseIdSnapshot = new ReleaseId("org.kie.server.testing", "test-project",
+            "1.0-SNAPSHOT");
+
+    private static final String PROCESS_SCRIPT_EVEN = "script-process-even.bpmn2";
+    private static final String PROCESS_SCRIPT_ODD = "script-process-odd.bpmn2";
+    private static final String PROCESS_ID_EVEN = "test-project.script-task-even";
+    private static final String PROCESS_ID_ODD = "test-project.script-task-odd";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -51,11 +68,12 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
     @Before
     public void cleanContainers() {
         disposeAllContainers();
-        createContainer(CONTAINER_ID, releaseId);
     }
 
     @Test
     public void testUserTaskWithUpdatedContainer() throws Exception {
+        createContainer(CONTAINER_ID, releaseId);
+
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
 
         try {
@@ -80,6 +98,8 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Test
     public void testProcessDefinitionWithUpdatedContainer() throws Exception {
+        createContainer(CONTAINER_ID, releaseId);
+
         UserTaskDefinitionList userTaskDefinitions = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_USERTASK);
         assertEquals(2, userTaskDefinitions.getItems().size());
 
@@ -109,7 +129,30 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
     }
 
     @Test
+    public void testProcessDefinitionWithUpdatedContainerByScanner() throws Exception {
+        deployKjarWithScriptProcess(PROCESS_SCRIPT_EVEN, releaseIdSnapshot);
+
+        KieContainerResource resource = new KieContainerResource(CONTAINER_ID, releaseIdSnapshot);
+        resource.setScanner(new KieScannerResource(KieScannerStatus.STARTED, 500L));
+
+        KieServerAssert.assertSuccess(client.createContainer(CONTAINER_ID, resource));
+        checkDeployedProcessId(PROCESS_ID_EVEN);
+
+        deployKjarWithScriptProcess(PROCESS_SCRIPT_ODD, releaseIdSnapshot);
+
+        KieServerSynchronization.waitForCondition(
+                () -> {
+                    List<ProcessDefinition> processes = queryClient.findProcesses(0, 10);
+                    return processes.size() == 1 && processes.get(0).getId().equals(PROCESS_ID_ODD);
+                });
+
+        checkDeployedProcessId(PROCESS_ID_ODD);
+    }
+
+    @Test
     public void testUpdateContainerWithActiveProcessInstance() throws Exception {
+        createContainer(CONTAINER_ID, releaseId);
+
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
 
         try {
@@ -129,5 +172,25 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         }
 
         return mapped;
+    }
+
+    private void checkDeployedProcessId(String processId) {
+        List<ProcessDefinition> processDefinitions = queryClient.findProcesses(0, 10);
+        assertThat(processDefinitions).isNotNull().hasSize(1);
+        assertThat(processDefinitions.get(0).getId()).isEqualTo(processId);
+    }
+
+    private static void deployKjarWithScriptProcess(String processFileName, ReleaseId releaseId) {
+        String scriptProcess = readFile(processFileName, ContainerUpdateIntegrationTest.class.getClassLoader());
+        KieServerDeployer.createAndDeployKJar(releaseId, Collections.singletonMap("src/main/resources/script-process.bpmn2", scriptProcess));
+    }
+
+    private static String readFile(String resourceName, ClassLoader classLoader) {
+        try {
+            URI resourceUri = classLoader.getResource(resourceName).toURI();
+            return new String(Files.readAllBytes(Paths.get(resourceUri)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
