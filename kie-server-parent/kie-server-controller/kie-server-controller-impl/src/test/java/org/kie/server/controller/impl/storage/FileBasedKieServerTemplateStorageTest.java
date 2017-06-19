@@ -17,6 +17,8 @@ package org.kie.server.controller.impl.storage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +30,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -217,14 +218,29 @@ public class FileBasedKieServerTemplateStorageTest {
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         loadTemplateWithAssertEquals(toSearchFor);
     }
-    
+
+    @Test
+    public void testLoadNotExisting() {
+        storage.reloadTemplateMaps();
+        String notExists = "not-exists";
+        ServerTemplate loadedTemplate = storage.load(notExists);
+        assertNull(loadedTemplate);
+    }
+
     @Test
     public void testExists() {
         storage.reloadTemplateMaps();
         ServerTemplate toSearchFor = getFirstTemplateFromMap();
         assertTrue("Exists fails",storage.exists(toSearchFor.getId()));
     }
-    
+
+    @Test
+    public void testNotExists() {
+        storage.reloadTemplateMaps();
+        String notExists = "not-exists";
+        assertFalse("Exists return true for not existing id: " + notExists, storage.exists(notExists));
+    }
+
     @Test
     public void testUpdate() {
         final String testName = "Updated template Name";
@@ -243,5 +259,22 @@ public class FileBasedKieServerTemplateStorageTest {
         storage.delete(toDeleteTemplate.getId());
         storage.clearTemplateMaps();
         assertTrue("Delete template failed",!storage.exists(toDeleteTemplate.getId()));
+    }
+
+    @Test
+    public void testDeleteNotExistingTemplate() {
+        storage.reloadTemplateMaps();
+        List<ServerTemplate> templates = storage.load();
+        assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
+        storage.delete("not-exists");
+        storage.reloadTemplateMaps();
+        templates = storage.load();
+        assertEquals("Mismatched number of server templates", templateMap.values().size(), templates.size());
+    }
+
+    @Test
+    public void testGetStorageLocation() {
+        String location = storage.getTemplatesLocation();
+        assertEquals(tmpTemplateStore.getAbsolutePath(), location);
     }
 }
