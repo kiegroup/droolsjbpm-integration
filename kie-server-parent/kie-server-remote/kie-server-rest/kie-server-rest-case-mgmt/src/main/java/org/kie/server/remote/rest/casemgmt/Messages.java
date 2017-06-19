@@ -18,6 +18,9 @@ package org.kie.server.remote.rest.casemgmt;
 public class Messages {
 
     public static final String CASE_DEFINITION_NOT_FOUND = "Could not find case definition \"{0}\" in container \"{1}\"";
+
+    public static final String PROCESS_DEFINITION_NOT_FOUND = "Could not find process definition \"{0}\" in container \"{1}\"";
+
     public static final String CONTAINER_NOT_FOUND = "Container not found with id \"{0}\"";
 
     public static final String CASE_INSTANCE_NOT_FOUND = "Could not find case instance \"{0}\"";
