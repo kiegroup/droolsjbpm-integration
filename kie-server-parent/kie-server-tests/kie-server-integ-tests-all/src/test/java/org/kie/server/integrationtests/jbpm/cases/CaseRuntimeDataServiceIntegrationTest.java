@@ -972,6 +972,41 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(instances);
         assertEquals(2, instances.size());
     }
+    
+    @Test
+    public void testGetCommentPagination() {
+    	
+    	int pageSize = 20;
+    	
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+    	
+        for (int i = 0 ; i < 55 ; i++) {
+            caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
+        }
+        
+        List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
+        assertNotNull(firstPage);
+        assertEquals(20, firstPage.size());
+        for (int i = 0; i < 20 ; i++) {
+        	assertEquals("comment" + i, firstPage.get(i).getText());
+        }
+        
+        List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
+        assertNotNull(secondPage);
+        assertEquals(20, secondPage.size());
+        for (int i = 20; i < 40 ; i++) {
+        	assertEquals("comment" + i, secondPage.get(i-20).getText());
+        }
+        
+        List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
+        assertNotNull(thirdPage);
+        assertEquals(15, thirdPage.size());
+        for (int i = 40; i < 55 ; i++) {
+        	assertEquals("comment" + i, thirdPage.get(i-40).getText());
+        }
+    }
 
     @Test
     public void testCreateCaseWithCaseFileWithComments() {
