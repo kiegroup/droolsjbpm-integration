@@ -334,7 +334,7 @@ public class CaseManagementServiceBase {
     }
 
     public CaseCommentList getComments(String containerId, String caseId, Integer page, Integer pageSize) {
-        Collection<CommentInstance> caseComments = caseService.getCaseComments(caseId, page, pageSize, ConvertUtils.buildQueryContext(page, pageSize));
+        Collection<CommentInstance> caseComments = caseService.getCaseComments(caseId, ConvertUtils.buildQueryContext(page, pageSize));
         logger.debug("Comments for case {} are {}", caseId, caseComments);
         List<CaseComment> comments = ConvertUtils.transformCaseComments(caseComments);
         CaseCommentList commentsList = new CaseCommentList(comments);
