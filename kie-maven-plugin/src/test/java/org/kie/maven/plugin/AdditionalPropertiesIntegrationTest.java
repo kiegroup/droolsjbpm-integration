@@ -36,7 +36,6 @@ public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseInteg
         // additional properties are logged during debug (-X) build
         // following string is created directly inside the KIE Maven plugin execution (the property names and values
         // are logged multiple by maven itself as well, so we should check directly against that string)
-
         result.assertLogText("Additional system properties: {drools.dialect.java.compiler.lnglevel=1.6, my.property=some-value}");
     }
 }
