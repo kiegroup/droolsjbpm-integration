@@ -42,6 +42,8 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -834,6 +836,88 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testFindVariableInstances() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<VariableInstance> currentState = processClient.findVariablesCurrentState(CONTAINER_ID, processInstanceId);
+            assertNotNull(currentState);
+            assertEquals(3, currentState.size());
+
+            for (VariableInstance variableInstance : currentState) {
+                if ("personData".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "personData", "Person{name='john'}");
+                } else if ("stringData".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+                } else if ("initiator".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "initiator", TestConfig.getUsername());
+                } else {
+                    fail("Got unexpected variable " + variableInstance.getVariableName());
+                }
+            }
+
+            List<VariableInstance> varHistory = processClient.findVariableHistory(CONTAINER_ID, processInstanceId, "stringData", 0, 10);
+            assertNotNull(varHistory);
+            assertEquals(1, varHistory.size());
+
+            VariableInstance variableInstance = varHistory.get(0);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "stringData", "updated value");
+
+            currentState = processClient.findVariablesCurrentState(CONTAINER_ID, processInstanceId);
+            assertNotNull(currentState);
+            assertEquals(3, currentState.size());
+
+            for (VariableInstance variable : currentState) {
+                if ("personData".equals(variable.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "personData", "Person{name='john'}");
+                } else if ("stringData".equals(variable.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "stringData", "updated value", "waiting for signal");
+                } else if ("initiator".equals(variable.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "initiator", TestConfig.getUsername());
+                } else {
+                    fail("Got unexpected variable " + variable.getVariableName());
+                }
+            }
+
+            varHistory = processClient.findVariableHistory(CONTAINER_ID, processInstanceId, "stringData", 0, 10);
+            assertNotNull(varHistory);
+            assertEquals(2, varHistory.size());
+
+            variableInstance = varHistory.get(0);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "updated value", "waiting for signal");
+
+            variableInstance = varHistory.get(1);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+
+    }
+
+    private void assertVariableInstance(VariableInstance variable, Long processInstanceId, String name, String value) {
+        assertNotNull(variable);
+        assertEquals(processInstanceId, variable.getProcessInstanceId());
+        KieServerAssert.assertNullOrEmpty(variable.getOldValue());
+        assertEquals(value, variable.getValue());
+        assertEquals(name, variable.getVariableName());
+    }
+
+    private void assertVariableInstance(VariableInstance variable, Long processInstanceId, String name, String value, String oldValue) {
+        assertNotNull(variable);
+        assertEquals(processInstanceId, variable.getProcessInstanceId());
+        assertEquals(oldValue, variable.getOldValue());
+        assertEquals(value, variable.getValue());
+        assertEquals(name, variable.getVariableName());
     }
 
     private ProcessInstance createSignalProcessInstance(Long processInstanceId) {

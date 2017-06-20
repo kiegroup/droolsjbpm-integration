@@ -88,10 +88,13 @@ public class RestURI {
     public static final String PROCESS_INSTANCE_VARS_POST_URI = "instances/{" + PROCESS_INST_ID + "}/variables";
     public static final String PROCESS_INSTANCE_VAR_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variable/{" + VAR_NAME + "}";
     public static final String PROCESS_INSTANCE_VARS_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variables";
+    public static final String PROCESS_INSTANCE_VAR_INSTANCES_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variables/instances";
+    public static final String PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI = "instances/{" + PROCESS_INST_ID + "}/variables/instances/{" + VAR_NAME +"}";
     public static final String PROCESS_INSTANCE_SIGNALS_GET_URI = "instances/{" + PROCESS_INST_ID + "}/signals";
-    public static final String PROCESS_INSTANCES_BY_CONTAINER_GET_URI = "processes/instances";
+    public static final String PROCESS_INSTANCES_BY_CONTAINER_GET_URI = "instances";
     public static final String PROCESS_INSTANCES_BY_PARENT_GET_URI = "instances/{" + PROCESS_INST_ID + "}/processes";
 
+    public static final String PROCESS_INSTANCES_NODE_INSTANCES_GET_URI = "instances/{" + PROCESS_INST_ID + "}/nodes/instances";
     public static final String PROCESS_INSTANCE_WORK_ITEM_COMPLETE_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/completed";
     public static final String PROCESS_INSTANCE_WORK_ITEM_ABORT_PUT_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}/aborted";
     public static final String PROCESS_INSTANCE_WORK_ITEM_BY_ID_GET_URI = "instances/{" + PROCESS_INST_ID + "}/workitems/{" + WORK_ITEM_ID +"}";

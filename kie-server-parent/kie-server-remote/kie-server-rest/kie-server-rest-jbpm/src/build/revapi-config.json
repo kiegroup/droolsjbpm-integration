@@ -40,7 +40,51 @@
           "annotationType": "javax.ws.rs.QueryParam",
           "elementKind": "annotation",
           "justification": "JBPM-5468 adding full ORDER BY clause querying with QueryService"
-        }
+        },
+	{
+	  "code": "java.annotation.attributeValueChanged",
+	  "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, java.lang.Integer)",
+	  "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstanceHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.Boolean, java.lang.Boolean, java.lang.Integer, java.lang.Integer)",
+	  "attribute": "value",
+	  "oldValue": "\"processes/instances/{pInstanceId}/nodes/instances\"",
+	  "newValue": "\"instances/{pInstanceId}/nodes/instances\"",
+	  "annotationType": "javax.ws.rs.Path",
+	  "elementKind": "annotation",
+	  "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+	},
+	{
+	"code": "java.annotation.attributeValueChanged",
+	"old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstancesByDeploymentId(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+	"new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getProcessInstancesByDeploymentId(javax.ws.rs.core.HttpHeaders, java.lang.String, java.util.List<java.lang.Integer>, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+	"attribute": "value",
+	"oldValue": "\"processes/instances\"",
+	"newValue": "\"instances\"",
+	"annotationType": "javax.ws.rs.Path",
+	"elementKind": "annotation",
+	"justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+	},
+	{
+	"code": "java.annotation.attributeValueChanged",
+	"old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getVariableHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.String, java.lang.Integer, java.lang.Integer)",
+	"new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getVariableHistory(javax.ws.rs.core.HttpHeaders, java.lang.String, long, java.lang.String, java.lang.Integer, java.lang.Integer)",
+	"attribute": "value",
+	"oldValue": "\"processes/instances/{pInstanceId}/variables/instances/{varName}\"",
+	"newValue": "\"instances/{pInstanceId}/variables/instances/{varName}\"",
+	"annotationType": "javax.ws.rs.Path",
+	"elementKind": "annotation",
+	"justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+	},
+	{
+	"code": "java.annotation.attributeValueChanged",
+	"old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getVariablesCurrentState(javax.ws.rs.core.HttpHeaders, java.lang.String, long)",
+	"new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.jbpm.ProcessResource::getVariablesCurrentState(javax.ws.rs.core.HttpHeaders, java.lang.String, long)",
+	"attribute": "value",
+	"oldValue": "\"processes/instances/{pInstanceId}/variables/instances\"",
+	"newValue": "\"instances/{pInstanceId}/variables/instances\"",
+	"annotationType": "javax.ws.rs.Path",
+	"elementKind": "annotation",
+	"justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+	}
       ]
     }
   }

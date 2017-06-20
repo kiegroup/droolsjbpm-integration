@@ -710,7 +710,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             String queryString = getPagingQueryString("?activeOnly=true", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -743,7 +743,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             String queryString = getPagingQueryString("?completedOnly=true", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -777,7 +777,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + NODE_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_NODE_INSTANCES_GET_URI, valuesMap) + queryString, NodeInstanceList.class);
 
 
         } else {
@@ -809,7 +809,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             valuesMap.put(PROCESS_INST_ID, processInstanceId);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + VAR_INSTANCES_BY_INSTANCE_ID_GET_URI, valuesMap), VariableInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCES_GET_URI, valuesMap), VariableInstanceList.class);
 
 
 
@@ -845,7 +845,7 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             String queryString = getPagingQueryString("", page, pageSize);
 
             result = makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI, valuesMap) + queryString, VariableInstanceList.class);
 
 
         } else {
