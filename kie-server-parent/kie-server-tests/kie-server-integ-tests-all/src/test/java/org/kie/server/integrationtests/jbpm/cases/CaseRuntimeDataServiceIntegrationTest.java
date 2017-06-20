@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm.cases;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -1015,6 +1016,43 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
     }
+    
+    @Test
+    public void testGetCommentPagination() {        
+        int pageSize = 20;
+        
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+        
+        for (int i = 0 ; i < 55 ; i++) {
+            caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
+        }
+        
+        List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
+        assertNotNull(firstPage);
+        assertEquals(20, firstPage.size());
+        Iterator<CaseComment> firstPageIter = firstPage.iterator();
+        for (int i = 0 ; firstPageIter.hasNext() ; i++) {
+            assertComment(firstPageIter.next(), USER_YODA, "comment" + i);
+        }
+ 
+        List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
+        assertNotNull(secondPage);
+        assertEquals(20, secondPage.size());
+        Iterator<CaseComment> secondPageIter = secondPage.iterator();
+        for (int i = 20 ; secondPageIter.hasNext() ; i++) {
+            assertComment(secondPageIter.next(), USER_YODA, "comment" + i);
+        }
+        
+        List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
+        assertNotNull(thirdPage);
+        assertEquals(15, thirdPage.size());
+        Iterator<CaseComment> thirdPageIter = thirdPage.iterator();
+        for (int i = 40 ; thirdPageIter.hasNext() ; i++) {
+            assertComment(thirdPageIter.next(), USER_YODA, "comment" + i);
+        }
+    }
 
     @Test
     public void testGetCaseCommentsNotExistingContainer() {
@@ -1942,6 +1980,12 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, adHocFragments.size());
         assertEquals("Negotiation meeting", adHocFragments.get(0).getName());
         assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
+    }
+    
+    private void assertComment(CaseComment comment, String author, String text) {
+        assertNotNull(comment);
+        assertEquals(comment.getAuthor(), author);
+        assertEquals(comment.getText(), text);
     }
 
     @Test
