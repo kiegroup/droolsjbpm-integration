@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.0.5", "3.2.3"})
+@MavenVersions({"3.2.5", "3.3.9", "3.5.0"})
 abstract public class KieMavenPluginBaseIntegrationTest {
 
     @Rule
@@ -34,9 +34,8 @@ abstract public class KieMavenPluginBaseIntegrationTest {
     public KieMavenPluginBaseIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
         this.mavenRuntime = builder
                 .forkedBuilder()
-                .withCliOptions("-X")
                 // To enable logging using slf4j-simple on the internal classes of the plug-in:
-                //  .withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
+                //.withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
                 .build();
     }
 

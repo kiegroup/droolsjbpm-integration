@@ -31,7 +31,7 @@ public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseInteg
         File basedir = resources.getBasedir("kjar-3-properties-only");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute("clean", "install");
+                .execute("clean", "install", "-X");
         result.assertErrorFreeLog();
         // additional properties are logged during debug (-X) build
         // following string is created directly inside the KIE Maven plugin execution (the property names and values
