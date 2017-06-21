@@ -16,6 +16,9 @@
 package org.kie.server.router;
 
 public class KieServerRouterConstants {
+    public static final String ROUTER_ID = "org.kie.server.router.id";
+    public static final String ROUTER_NAME = "org.kie.server.router.name";
+
     public static final String ROUTER_HOST = "org.kie.server.router.host";
     public static final String ROUTER_PORT = "org.kie.server.router.port";
     public static final String ROUTER_EXTERNAL_URL = "org.kie.server.router.url.external";
