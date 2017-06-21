@@ -878,11 +878,11 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             for (VariableInstance variable : currentState) {
                 if ("personData".equals(variable.getVariableName())) {
-                    assertVariableInstance(variableInstance, processInstanceId, "personData", "Person{name='john'}");
+                    assertVariableInstance(variable, processInstanceId, "personData", "Person{name='john'}");
                 } else if ("stringData".equals(variable.getVariableName())) {
-                    assertVariableInstance(variableInstance, processInstanceId, "stringData", "updated value", "waiting for signal");
+                    assertVariableInstance(variable, processInstanceId, "stringData", "updated value", "waiting for signal");
                 } else if ("initiator".equals(variable.getVariableName())) {
-                    assertVariableInstance(variableInstance, processInstanceId, "initiator", TestConfig.getUsername());
+                    assertVariableInstance(variable, processInstanceId, "initiator", TestConfig.getUsername());
                 } else {
                     fail("Got unexpected variable " + variable.getVariableName());
                 }
