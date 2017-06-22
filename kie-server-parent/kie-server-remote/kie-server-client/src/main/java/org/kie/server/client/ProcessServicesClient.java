@@ -112,4 +112,8 @@ public interface ProcessServicesClient {
     List<ProcessInstance> findProcessInstancesByParent(String containerId, Long parentProcessInstanceId, List<Integer> status, Integer page, Integer pageSize);
 
     List<ProcessInstance> findProcessInstancesByParent(String containerId, Long parentProcessInstanceId, List<Integer> status, Integer page, Integer pageSize, String sort, boolean sortOrder);
+
+    List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize);
+
+    List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder);
 }

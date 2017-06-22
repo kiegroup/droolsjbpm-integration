@@ -528,7 +528,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path(NODE_INSTANCES_BY_INSTANCE_ID_GET_URI)
+    @Path(PROCESS_INSTANCES_NODE_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessInstanceHistory(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId,
             @QueryParam("activeOnly")Boolean active, @QueryParam("completedOnly")Boolean completed,
@@ -542,7 +542,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path(VAR_INSTANCES_BY_INSTANCE_ID_GET_URI)
+    @Path(PROCESS_INSTANCE_VAR_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getVariablesCurrentState(@Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId) {
 
@@ -555,7 +555,7 @@ public class ProcessResource  {
     }
 
     @GET
-    @Path(VAR_INSTANCES_BY_VAR_INSTANCE_ID_GET_URI)
+    @Path(PROCESS_INSTANCE_VAR_INSTANCE_BY_VAR_NAME_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getVariableHistory(@Context HttpHeaders headers,  @PathParam("id") String containerId, @PathParam("pInstanceId") long processInstanceId,
             @PathParam("varName") String variableName,

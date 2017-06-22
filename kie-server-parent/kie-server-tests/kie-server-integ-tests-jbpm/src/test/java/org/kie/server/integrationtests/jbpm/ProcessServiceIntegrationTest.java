@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,8 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.config.TestConfig;
 
 import static org.junit.Assert.*;
+import org.kie.server.api.model.instance.VariableInstance;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -51,6 +54,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    protected static final String SORT_BY_PROCESS_ID = "ProcessId";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -834,6 +838,166 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testFindVariableInstances() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters);
+
+        try {
+            List<VariableInstance> currentState = processClient.findVariablesCurrentState(CONTAINER_ID, processInstanceId);
+            assertNotNull(currentState);
+            assertEquals(3, currentState.size());
+
+            for (VariableInstance variableInstance : currentState) {
+                if ("personData".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "personData", "Person{name='john'}");
+                } else if ("stringData".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+                } else if ("initiator".equals(variableInstance.getVariableName())) {
+                    assertVariableInstance(variableInstance, processInstanceId, "initiator", TestConfig.getUsername());
+                } else {
+                    fail("Got unexpected variable " + variableInstance.getVariableName());
+                }
+            }
+
+            List<VariableInstance> varHistory = processClient.findVariableHistory(CONTAINER_ID, processInstanceId, "stringData", 0, 10);
+            assertNotNull(varHistory);
+            assertEquals(1, varHistory.size());
+
+            VariableInstance variableInstance = varHistory.get(0);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+
+            processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "stringData", "updated value");
+
+            currentState = processClient.findVariablesCurrentState(CONTAINER_ID, processInstanceId);
+            assertNotNull(currentState);
+            assertEquals(3, currentState.size());
+
+            for (VariableInstance variable : currentState) {
+                if ("personData".equals(variable.getVariableName())) {
+                    assertVariableInstance(variable, processInstanceId, "personData", "Person{name='john'}");
+                } else if ("stringData".equals(variable.getVariableName())) {
+                    assertVariableInstance(variable, processInstanceId, "stringData", "updated value", "waiting for signal");
+                } else if ("initiator".equals(variable.getVariableName())) {
+                    assertVariableInstance(variable, processInstanceId, "initiator", TestConfig.getUsername());
+                } else {
+                    fail("Got unexpected variable " + variable.getVariableName());
+                }
+            }
+
+            varHistory = processClient.findVariableHistory(CONTAINER_ID, processInstanceId, "stringData", 0, 10);
+            assertNotNull(varHistory);
+            assertEquals(2, varHistory.size());
+
+            variableInstance = varHistory.get(0);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "updated value", "waiting for signal");
+
+            variableInstance = varHistory.get(1);
+            assertVariableInstance(variableInstance, processInstanceId, "stringData", "waiting for signal");
+
+        } finally {
+            processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+        }
+
+    }
+
+    @Test
+    public void testGetProcessInstances() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = processClient.findProcessInstances(CONTAINER_ID, 0, 10);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            instances = processClient.findProcessInstances(CONTAINER_ID, 0, 3);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+
+            instances = processClient.findProcessInstances(CONTAINER_ID, 1, 3);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+        } finally {
+            processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
+        }
+    }
+
+    @Test
+    public void testGetProcessInstancesSortedByName() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstances(0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
+        }
+    }
+
+    protected List<Long> createProcessInstances(Map<String, Object> parameters) {
+        List<Long> processInstanceIds = new ArrayList<>();
+
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+
+        Collections.sort(processInstanceIds);
+        return processInstanceIds;
+    }
+
+    private void assertVariableInstance(VariableInstance variable, Long processInstanceId, String name, String value) {
+        assertNotNull(variable);
+        assertEquals(processInstanceId, variable.getProcessInstanceId());
+        KieServerAssert.assertNullOrEmpty(variable.getOldValue());
+        assertEquals(value, variable.getValue());
+        assertEquals(name, variable.getVariableName());
+    }
+
+    private void assertVariableInstance(VariableInstance variable, Long processInstanceId, String name, String value, String oldValue) {
+        assertNotNull(variable);
+        assertEquals(processInstanceId, variable.getProcessInstanceId());
+        assertEquals(oldValue, variable.getOldValue());
+        assertEquals(value, variable.getValue());
+        assertEquals(name, variable.getVariableName());
     }
 
     private ProcessInstance createSignalProcessInstance(Long processInstanceId) {
