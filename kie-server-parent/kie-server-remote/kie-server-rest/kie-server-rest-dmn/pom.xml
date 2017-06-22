@@ -54,7 +54,10 @@ Found 1 illegal transitive type dependencies in artifact 'org.kie.server:kie-ser
       <artifactId>kie-server-common</artifactId>
     </dependency>
 
-
+    <dependency>
+    	<groupId>io.swagger</groupId>
+    	<artifactId>swagger-annotations</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>

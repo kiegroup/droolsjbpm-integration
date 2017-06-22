@@ -15,9 +15,6 @@
 
 package org.kie.server.remote.rest.jbpm;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.dashbuilder.dataset.exception.DataSetLookupException;
-
 import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
@@ -67,7 +64,12 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.QueryDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dashbuilder.dataset.exception.DataSetLookupException;
 
+import io.swagger.annotations.Api;
+
+@Api(value="jbpm-query-definitions")
 @Path("server/" + QUERY_DEF_URI)
 public class QueryDataResource {
 

@@ -38,10 +38,13 @@ import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.DefinitionServiceBase;
 
+import io.swagger.annotations.Api;
+
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
+@Api(value="jbpm-process-definition")
 @Path("server/" + PROCESS_DEF_URI)
 public class DefinitionResource {
 

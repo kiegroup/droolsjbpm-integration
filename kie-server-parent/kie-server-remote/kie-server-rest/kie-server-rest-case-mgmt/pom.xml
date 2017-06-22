@@ -40,6 +40,11 @@
       <groupId>org.jbpm</groupId>
       <artifactId>jbpm-case-mgmt-api</artifactId>
     </dependency>
+    
+    <dependency>
+    	<groupId>io.swagger</groupId>
+    	<artifactId>swagger-annotations</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>

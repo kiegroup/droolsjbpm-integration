@@ -14,6 +14,28 @@
   <name>KIE :: Execution Server :: Remote :: REST</name>
   <description>KIE Execution Server Remote Rest Services</description>
 
+  <!-- TODO: Move to BOM or parent POM -->
+  <dependencyManagement>
+    <dependencies>
+	  <dependency>
+	  	<groupId>io.swagger</groupId>
+	  	<artifactId>swagger-jersey2-jaxrs</artifactId>
+	  	<version>1.5.15</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>io.swagger</groupId>
+	  	<artifactId>swagger-jaxrs</artifactId>
+	  	<version>1.5.15</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>io.swagger</groupId>
+	  	<artifactId>swagger-annotations</artifactId>
+	  	<version>1.5.15</version>
+	  </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
   <modules>
     <module>kie-server-rest-common</module>
     <module>kie-server-rest-jbpm</module>
@@ -23,6 +45,7 @@
     <module>kie-server-rest-case-mgmt</module>
     <module>kie-server-rest-dmn</module>
     <module>kie-server-rest-jbpm-search</module>
+    <module>kie-server-rest-swagger</module>
   </modules>
 
 </project>

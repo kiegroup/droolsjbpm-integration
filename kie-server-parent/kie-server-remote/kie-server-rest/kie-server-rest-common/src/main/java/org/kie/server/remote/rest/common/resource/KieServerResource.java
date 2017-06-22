@@ -15,6 +15,8 @@
 
 package org.kie.server.remote.rest.common.resource;
 
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,8 +31,9 @@ import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import io.swagger.annotations.Api;
 
+@Api(value="kie-server-config")
 @Path("server/config")
 public class KieServerResource {
 

@@ -15,8 +15,13 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
+
 import java.text.MessageFormat;
 import java.util.List;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,10 +51,9 @@ import org.kie.server.services.jbpm.RuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
+import io.swagger.annotations.Api;
 
+@Api(value="jbpm-queries")
 @Path("server/" + QUERY_URI)
 public class RuntimeDataResource {
 

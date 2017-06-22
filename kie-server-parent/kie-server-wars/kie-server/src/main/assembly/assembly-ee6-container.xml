@@ -72,6 +72,7 @@
         <include>org.kie.server:kie-server-services-optaplanner</include>
         <include>org.kie.server:kie-server-services-case-mgmt</include>
         <include>org.kie.server:kie-server-services-dmn</include>
+        <include>org.kie.server:kie-server-services-swagger</include>
         <include>org.kie.server:kie-server-jms</include>
         <include>org.kie.server:kie-server-rest-common</include>
         <include>org.kie.server:kie-server-rest-drools</include>
@@ -81,6 +82,7 @@
         <include>org.kie.server:kie-server-rest-optaplanner</include>
         <include>org.kie.server:kie-server-rest-case-mgmt</include>
         <include>org.kie.server:kie-server-rest-dmn</include>
+        <include>org.kie.server:kie-server-rest-swagger</include>
         <include>org.kie.server:kie-server-router-client</include>
         <include>org.kie.server:kie-server-client</include>
         <include>org.kie:jbpm-process-svg</include>

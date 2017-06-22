@@ -47,6 +47,9 @@ import org.kie.server.services.jbpm.search.ProcessInstanceSearchServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+
+@Api(value="process-instance-search")
 @Path("server/" + PROCESS_INSTANCES_GET_FILTERED_URI)
 public class ProcessInstanceSearchResource {
 

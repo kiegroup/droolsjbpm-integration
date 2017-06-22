@@ -35,8 +35,11 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
+@Api(value="drools")
 @Path("server/containers/instances/{id}")
 public class CommandResource {
 
