@@ -15,6 +15,15 @@
 
 package org.jbpm.persistence.session;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import javax.naming.InitialContext;
+import javax.transaction.UserTransaction;
+
 import org.drools.compiler.builder.impl.KnowledgeBuilderImpl;
 import org.drools.core.ClockType;
 import org.drools.core.SessionConfiguration;
@@ -28,8 +37,6 @@ import org.drools.core.definitions.InternalKnowledgePackage;
 import org.drools.core.impl.InternalKnowledgeBase;
 import org.drools.core.impl.KnowledgeBaseFactory;
 import org.drools.core.impl.KnowledgeBaseImpl;
-import org.drools.core.process.core.Work;
-import org.drools.core.process.core.impl.WorkImpl;
 import org.drools.core.time.SessionPseudoClock;
 import org.drools.persistence.PersistableRunner;
 import org.drools.persistence.infinispan.InfinispanTimeJobFactoryManager;
@@ -43,6 +50,8 @@ import org.jbpm.persistence.ManualPersistProcessInterceptor;
 import org.jbpm.persistence.processinstance.InfinispanProcessInstanceManagerFactory;
 import org.jbpm.persistence.processinstance.InfinispanSignalManagerFactory;
 import org.jbpm.persistence.session.objects.TestWorkItemHandler;
+import org.jbpm.process.core.Work;
+import org.jbpm.process.core.impl.WorkImpl;
 import org.jbpm.process.core.timer.Timer;
 import org.jbpm.ruleflow.core.RuleFlowProcess;
 import org.jbpm.ruleflow.instance.RuleFlowProcessInstance;
@@ -69,15 +78,6 @@ import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.api.runtime.process.NodeInstance;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.runtime.process.WorkItem;
-
-import javax.naming.InitialContext;
-import javax.transaction.UserTransaction;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 import static org.jbpm.persistence.util.PersistenceUtil.*;
 import static org.junit.Assert.*;
