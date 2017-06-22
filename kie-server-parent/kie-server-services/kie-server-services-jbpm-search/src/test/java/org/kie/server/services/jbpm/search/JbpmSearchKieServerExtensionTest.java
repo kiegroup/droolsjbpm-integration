@@ -40,12 +40,15 @@ public class JbpmSearchKieServerExtensionTest {
 	
 		Field contextField = kieServerExtension.getClass().getDeclaredField("context");
 		Field queryServiceField = kieServerExtension.getClass().getDeclaredField("queryService");
+		Field initializedField = kieServerExtension.getClass().getDeclaredField("initialized");
 		
 		contextField.setAccessible(true);
 		queryServiceField.setAccessible(true);
+		initializedField.setAccessible(true);
 		
 		contextField.set(kieServerExtension, Mockito.mock(KieServerRegistry.class));
 		queryServiceField.set(kieServerExtension, Mockito.mock(QueryService.class));
+		initializedField.set(kieServerExtension, true);
 		
 		List<Object> appComponents = kieServerExtension.getAppComponents(SupportedTransports.REST);
 		

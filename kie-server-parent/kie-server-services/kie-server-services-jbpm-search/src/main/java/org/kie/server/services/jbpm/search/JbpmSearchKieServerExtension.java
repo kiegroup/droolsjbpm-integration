@@ -105,6 +105,9 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
         ServiceLoader<KieServerApplicationComponentsService> appComponentsServices
                 = ServiceLoader.load( KieServerApplicationComponentsService.class );
         List<Object> appComponentsList = new ArrayList<Object>();
+        if (!initialized) {
+            return appComponentsList;
+        }
         Object[] services = {queryService, context};
         for ( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll( appComponentsService.getAppComponents( EXTENSION_NAME, type, services ) );
@@ -114,6 +117,9 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
 
     @Override
     public <T> T getAppComponents(Class<T> serviceType) {
+        if (!initialized) {
+            return null;
+        }
         if ( serviceType.isAssignableFrom( queryService.getClass() ) ) {
             return (T) queryService;
         }
