@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm.search;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.server.api.model.instance.JobRequestInstance;
@@ -28,6 +29,7 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.SearchServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.integrationtests.jbpm.search.util.DBExternalResource;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 import java.util.ArrayList;
@@ -49,9 +51,10 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
     protected static final String GROUP_ID = "org.kie.server.testing";
     protected static final String VERSION = "1.0.0.Final";
     protected static final String CONTAINER_ID = "definition-project";
-    protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation";
-    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask";
-    protected static final String FIRST_TASK_NAME = "First task";
+    protected static final String PROCESS_ID_EVALUATION = "definition-project.evaluation-search";
+    protected static final String PROCESS_ID_USERTASK = "definition-project.usertask-search";
+    protected static final String PROCESS_NAME_EVALUATION = "evaluation-search";
+    protected static final String FIRST_TASK_NAME = "First task first";
 
     @ClassRule
     public static ExternalResource StaticResource = new DBExternalResource();
@@ -59,7 +62,6 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
     @Before
     public void cleanup() {
         cleanupSingletonSessionId();
-        deleteLog();
     }
 
     @After
@@ -72,7 +74,6 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
                 processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
             }
         }
-        deleteLog();
     }
 
     @Override
@@ -84,10 +85,10 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
         jobServicesClient = client.getServicesClient(JobServicesClient.class);
     }
 
-    protected void deleteLog() {
-        synchronized (this) {
-            jobServicesClient.scheduleRequest(CONTAINER_ID,
-                    JobRequestInstance.builder().command("org.jbpm.executor.commands.LogCleanupCommand").build());
-        }
+    @BeforeClass
+    public static void deleteLog() throws Exception {
+        JobServicesClient jsc = createDefaultStaticClient().getServicesClient(JobServicesClient.class);
+        long id = jsc.scheduleRequest(JobRequestInstance.builder().command("org.jbpm.executor.commands.LogCleanupCommand").build());
+        KieServerSynchronization.waitForJobToFinish(jsc, id);
     }
 }
