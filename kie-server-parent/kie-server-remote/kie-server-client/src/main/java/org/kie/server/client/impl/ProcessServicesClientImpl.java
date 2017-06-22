@@ -15,6 +15,7 @@
 
 package org.kie.server.client.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -903,6 +904,41 @@ public class ProcessServicesClientImpl extends AbstractKieServicesClientImpl imp
             result = response.getResult();
         }
 
+
+        if (result != null && result.getProcessInstances() != null) {
+            return Arrays.asList(result.getProcessInstances());
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize) {
+        return findProcessInstances(containerId, page, pageSize, "", true);
+    }
+
+    @Override
+    public List<ProcessInstance> findProcessInstances(String containerId, Integer page, Integer pageSize, String sort, boolean sortOrder) {
+        ProcessInstanceList result = null;
+        if (config.isRest()) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            String queryString = getPagingQueryString("?sort=" + sort + "&sortOrder=" + sortOrder, page, pageSize);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), PROCESS_URI + "/" + PROCESS_INSTANCES_BY_CONTAINER_GET_URI, valuesMap) + queryString, ProcessInstanceList.class);
+        } else {
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand)
+                    new DescriptorCommand("QueryService", "getProcessInstances", new Object[]{new ArrayList(), "", "", page, pageSize, sort, sortOrder})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPM").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
 
         if (result != null && result.getProcessInstances() != null) {
             return Arrays.asList(result.getProcessInstances());

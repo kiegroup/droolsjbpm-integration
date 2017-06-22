@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.0.Final");
 
+    protected static final String SORT_BY_PROCESS_ID = "ProcessId";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -902,6 +904,84 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
 
+    }
+
+    @Test
+    public void testGetProcessInstances() {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = processClient.findProcessInstances(CONTAINER_ID, 0, 10);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+
+            instances = processClient.findProcessInstances(CONTAINER_ID, 0, 3);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+
+            instances = processClient.findProcessInstances(CONTAINER_ID, 1, 3);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+        } finally {
+            processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
+        }
+    }
+
+    @Test
+    public void testGetProcessInstancesSortedByName() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("stringData", "waiting for signal");
+        parameters.put("personData", createPersonInstance(USER_JOHN));
+
+        List<Long> processInstanceIds = createProcessInstances(parameters);
+
+        try {
+            List<ProcessInstance> instances = queryClient.findProcessInstances(0, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(3, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_SIGNAL_PROCESS, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(1, 3, SORT_BY_PROCESS_ID, true);
+            assertNotNull(instances);
+            assertEquals(2, instances.size());
+            for (ProcessInstance instance : instances) {
+                assertTrue(processInstanceIds.contains(instance.getId()));
+                assertEquals(PROCESS_ID_USERTASK, instance.getProcessId());
+            }
+
+            instances = queryClient.findProcessInstances(0, 10, SORT_BY_PROCESS_ID, false);
+            assertNotNull(instances);
+            assertEquals(5, instances.size());
+            for (int i = 0; i < instances.size(); i++) {
+                if (i < 2) {
+                    assertEquals(PROCESS_ID_USERTASK, instances.get(i).getProcessId());
+                } else {
+                    assertEquals(PROCESS_ID_SIGNAL_PROCESS, instances.get(i).getProcessId());
+                }
+            }
+        } finally {
+            processClient.abortProcessInstances(CONTAINER_ID, processInstanceIds);
+        }
+    }
+
+    protected List<Long> createProcessInstances(Map<String, Object> parameters) {
+        List<Long> processInstanceIds = new ArrayList<>();
+
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK, parameters));
+        processInstanceIds.add(processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters));
+
+        Collections.sort(processInstanceIds);
+        return processInstanceIds;
     }
 
     private void assertVariableInstance(VariableInstance variable, Long processInstanceId, String name, String value) {
