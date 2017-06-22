@@ -16,8 +16,11 @@
 package org.kie.server.integrationtests.jbpm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
@@ -42,13 +46,9 @@ import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskInstance;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.client.QueryServicesClient;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -379,6 +379,36 @@ public class QueryDataServiceIntegrationTest extends JbpmKieServerBaseIntegratio
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, pid);
             queryClient.unregisterQuery(query.getName());
+        }
+    }
+
+    @Test
+    public void testInvalidQuery() {
+        QueryDefinition query = new QueryDefinition();
+        query.setName("invalidQuery");
+        query.setSource(System.getProperty("org.kie.server.persistence.ds", "jdbc/jbpm-ds"));
+        query.setExpression("this is an invalid query");
+        query.setTarget("CUSTOM");
+
+        try {
+            assertClientException(
+                    () -> queryClient.registerQuery(query),
+                    500,
+                    "Can't get metadata on specified data set: invalidQuery");
+
+            assertClientException(
+                    () -> queryClient.getQuery(query.getName()),
+                    404,
+                    "Could not find query definition with name \"" + query.getName() + "\"",
+                    "Query invalidQuery not found");
+
+        } catch (Throwable e) {
+            try {
+                queryClient.unregisterQuery(query.getName());
+            } catch (KieServicesException ex) {
+                // expected in case the query wasn't registered
+            }
+            throw e;
         }
     }
 
