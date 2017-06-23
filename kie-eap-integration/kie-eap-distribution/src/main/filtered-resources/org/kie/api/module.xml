@@ -27,5 +27,6 @@
     <module name="org.jbpm" slot="main" services="import"/>
     <module name="org.slf4j" slot="main" services="import"/>
     <module name="org.sonatype.plexus" slot="main" services="import"/>
+    <module name="org.uberfire.maven-support" slot="main" services="import"/>
   </dependencies>
 </module>

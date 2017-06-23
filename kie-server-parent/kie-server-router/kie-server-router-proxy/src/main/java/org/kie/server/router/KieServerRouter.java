@@ -57,10 +57,10 @@ public class KieServerRouter {
 
     private static final String SERVER_INFO_JSON = "{\n"+
             "      \"version\" : \"LATEST\",\n"+
-            "      \"name\" : \"KIE Server Router\",\n"+
+            "      \"name\" : \"" + KieServerInfoHandler.getRouterName() + "\",\n"+
             "      \"location\" : \"" + KieServerInfoHandler.getLocationUrl() + "\",\n"+
             "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n"+
-            "      \"id\" : \"kie-server-router\"\n"+
+            "      \"id\" : \"" + KieServerInfoHandler.getRouterId() + "\"\n"+
             "}";
 
     private ServiceLoader<ConfigRepository> configRepositoryServiceLoader = ServiceLoader.load(ConfigRepository.class);

@@ -287,6 +287,7 @@ public class CaseResource extends AbstractCaseResource {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
+                processId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to add dynamic subprocess {} in case {}", processId, caseId);
                     this.caseManagementServiceBase.addDynamicSubprocess(containerId, caseId, null, processId, payload, type);
@@ -306,6 +307,7 @@ public class CaseResource extends AbstractCaseResource {
         return invokeCaseOperation(headers,
                 containerId,
                 caseId,
+                processId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to add dynamic subprocess stage {} in case {}", stageId, caseId);
                     this.caseManagementServiceBase.addDynamicSubprocess(containerId, caseId, stageId, processId, payload, type);

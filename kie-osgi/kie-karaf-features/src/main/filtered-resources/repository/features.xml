@@ -70,6 +70,7 @@
     <feature version="${project.version}">drools-module</feature>
     <feature version="${project.version}">drools-jpa</feature>
     <feature version="${project.version}">jbpm-commons</feature>
+    <bundle>mvn:com.google.guava/guava/${version.com.google.guava}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${version.com.fasterxml.jackson}</bundle>
     <bundle>mvn:javax.mail/mail/${version.javax.mail}</bundle>
     <bundle>mvn:org.jbpm/jbpm-flow/${version.org.jbpm}</bundle>

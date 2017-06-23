@@ -15,8 +15,10 @@
 
 package org.kie.server.remote.rest.jbpm.search;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.api.rest.RestURI.PROCESS_INSTANCES_GET_FILTERED_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
@@ -37,35 +39,39 @@ import org.slf4j.LoggerFactory;
 
 @Path("server/" + PROCESS_INSTANCES_GET_FILTERED_URI)
 public class ProcessInstanceSearchResource {
-	
+
 private static final Logger logger = LoggerFactory.getLogger(TaskSearchResource.class);
-	
-	private final ProcessInstanceSearchServiceBase processInstanceQueryServiceBase;
+
+	private ProcessInstanceSearchServiceBase processInstanceQueryServiceBase;
 	private KieServerRegistry context;
-	
+
+	public ProcessInstanceSearchResource() {
+
+	}
+
 	public ProcessInstanceSearchResource(ProcessInstanceSearchServiceBase processInstanceQueryServiceBase, KieServerRegistry context) {
 		this.processInstanceQueryServiceBase = processInstanceQueryServiceBase;
 		this.context = context;
 	}
-	
-	
+
+
 	//TODO: We now only support standard QueryFilterSpec configurations ... Do we also need to support builders???
 	@POST
 	@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	public Response getProcessInstancesWithFilters(@Context HttpHeaders headers, 
-			@QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, 
+	public Response getProcessInstancesWithFilters(@Context HttpHeaders headers,
+			@QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
 			String payload) {
-		
+
 		String type = getContentType(headers);
 		// no container id available so only  used to transfer conversation id if given by client.
 		Header conversationIdHeader = buildConversationIdHeader("", context, headers);
-		
+
 		ProcessInstanceList result = processInstanceQueryServiceBase.getProcessInstancesWithFilters(page, pageSize, payload, type);
-				
+
 		logger.debug("Returning result of process instance search: {}", result);
-		
+
 		return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
 	}
-	
+
 
 }

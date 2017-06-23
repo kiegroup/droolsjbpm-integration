@@ -40,8 +40,12 @@ public class TaskSearchResource {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TaskSearchResource.class);
 	
-	private final TaskSearchServiceBase taskQueryServiceBase;
+	private TaskSearchServiceBase taskQueryServiceBase;
 	private KieServerRegistry context;
+
+	public TaskSearchResource () {
+
+	}
 	
 	public TaskSearchResource(TaskSearchServiceBase taskQueryServiceBase, KieServerRegistry context) {
 		this.taskQueryServiceBase = taskQueryServiceBase;

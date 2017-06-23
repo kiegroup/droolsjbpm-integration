@@ -38,8 +38,8 @@ public class KieServerInfoHandler implements HttpHandler {
             getLocationUrl() + "\n"+
             "</location>\n"+
             "<messages/>\n"+            
-            "<name>KIE Server Router</name>\n"+
-            "<id>kie-server-router</id>\n"+
+            "<name>" + getRouterName() + "</name>\n"+
+            "<id>" + getRouterId() + "</id>\n"+
             "<version>LATEST</version>\n"+
             "</kie-server-info>\n"+
             "</response>";
@@ -50,10 +50,10 @@ public class KieServerInfoHandler implements HttpHandler {
             "  \"result\" : {\n"+
             "    \"kie-server-info\" : {\n"+
             "      \"version\" : \"LATEST\",\n"+
-            "      \"name\" : \"KIE Server Router\",\n"+
+            "      \"name\" : \"" + getRouterName() + "\",\n"+
             "      \"location\" : \"" + getLocationUrl() + "\",\n"+
             "      \"capabilities\" : [ \"KieServer\", \"BRM\", \"BPM\", \"CaseMgmt\", \"BPM-UI\", \"BRP\" ],\n"+     
-            "      \"id\" : \"kie-server-router\"\n"+
+            "      \"id\" : \"" + getRouterId() + "\"\n"+
             "    }\n"+
             "  }\n"+
             "}";
@@ -62,9 +62,9 @@ public class KieServerInfoHandler implements HttpHandler {
                            "<type>SUCCESS</type>\n"+
                            "<msg>Kie Server info</msg>\n"+
                            "<result class=\"kie-server-info\">\n"+
-                           "<serverId>kie-server-router</serverId>\n"+
+                           "<serverId>" + getRouterId() + "</serverId>\n"+
                            "<version>LATEST</version>\n"+
-                           "<name>KIE Server Router</name>\n"+
+                           "<name>" + getRouterName() + "</name>\n"+
                            "<location>\n"+
                            getLocationUrl() + "\n"+
                            "</location>\n"+
@@ -124,5 +124,13 @@ public class KieServerInfoHandler implements HttpHandler {
         }
 
         return externalUrl;
+    }
+
+    public static String getRouterId() {
+        return System.getProperty(KieServerRouterConstants.ROUTER_ID, "kie-server-router");
+    }
+
+    public static String getRouterName() {
+        return System.getProperty(KieServerRouterConstants.ROUTER_NAME, "KIE Server Router");
     }
 }

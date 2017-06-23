@@ -17,7 +17,6 @@ package org.kie.server.integrationtests.optaplanner;
 
 import java.util.List;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.kie.api.KieServices;
@@ -27,6 +26,7 @@ import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.SolverServicesClient;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
 public abstract class OptaplannerKieServerBaseIntegrationTest
@@ -56,7 +56,7 @@ public abstract class OptaplannerKieServerBaseIntegrationTest
 
     private List<KieContainerResource> getContainers() {
         ServiceResponse<KieContainerResourceList> response = client.listContainers();
-        Assume.assumeTrue(ServiceResponse.ResponseType.SUCCESS.equals(response.getType()));
+        KieServerAssert.assertSuccess(response);
         return response.getResult().getContainers();
     }
 

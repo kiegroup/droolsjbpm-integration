@@ -3,7 +3,9 @@ package org.kie.server.integrationtests.controller.client;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +20,8 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.KieServerInstance;
 import org.kie.server.controller.api.model.KieServerInstanceInfo;
 import org.kie.server.controller.api.model.KieServerInstanceList;
@@ -86,8 +90,30 @@ public class KieServerMgmtControllerClient {
         return makeGetRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId, ServerTemplate.class);
     }
 
+    public void saveContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
+        saveContainerSpec(serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, new HashMap<Capability, ContainerConfig>());
+    }
+
+    public void saveContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
+        ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
+        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
+        ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
+        saveContainerSpec(serverTemplateId, containerSpec);
+    }
+
     public void saveContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
         makePutRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerSpec.getId(), containerSpec, Object.class);
+    }
+
+    public void updateContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status) {
+        updateContainerSpec(serverTemplateId, serverTemplateName, containerId, containerAlias, groupId, artifactId, version, status, new HashMap<Capability, ContainerConfig>());
+    }
+
+    public void updateContainerSpec(String serverTemplateId, String serverTemplateName, String containerId, String containerAlias, String groupId, String artifactId, String version, KieContainerStatus status, Map<Capability, ContainerConfig> configs) {
+        ServerTemplateKey serverTemplateKey = new ServerTemplateKey(serverTemplateId, serverTemplateName);
+        ReleaseId releasedId = new ReleaseId(groupId, artifactId, version);
+        ContainerSpec containerSpec = new ContainerSpec(containerId, containerAlias, serverTemplateKey, releasedId, status, configs);
+        updateContainerSpec(serverTemplateId, containerId, containerSpec);
     }
 
     public void updateContainerSpec(String serverTemplateId, ContainerSpec containerSpec ) {
@@ -96,6 +122,11 @@ public class KieServerMgmtControllerClient {
 
     public void updateContainerSpec(String serverTemplateId, String containerId, ContainerSpec containerSpec) {
         makePostRequestAndCreateCustomResponse(controllerBaseUrl + MANAGEMENT_URI_PART + serverTemplateId + CONTAINERS_URI_PART + containerId, containerSpec, Object.class);
+    }
+
+    public void saveServerTemplate(String serverTemplateId, String serverTemplateName) {
+        ServerTemplate serverTemplate = new ServerTemplate(serverTemplateId, serverTemplateName);
+        saveServerTemplate(serverTemplate);
     }
 
     public void saveServerTemplate(ServerTemplate serverTemplate) {

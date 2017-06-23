@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.uberfire.maven-support" slot="main">
+
+  <resources>
+    <resource-root path="uberfire-maven-integration-${version.org.uberfire}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="org.apache.maven" slot="main" services="import"/>
+    <module name="org.apache.maven.wagon" slot="main" services="import"/>
+  </dependencies>
+</module>

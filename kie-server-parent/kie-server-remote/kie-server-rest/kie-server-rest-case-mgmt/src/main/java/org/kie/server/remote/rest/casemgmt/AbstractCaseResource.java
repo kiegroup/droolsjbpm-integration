@@ -25,6 +25,7 @@ import org.jbpm.casemgmt.api.AdHocFragmentNotFoundException;
 import org.jbpm.casemgmt.api.CaseActiveException;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
@@ -51,7 +52,7 @@ public abstract class AbstractCaseResource {
         this.context = context;
     }
 
-    protected Response invokeCaseOperation(HttpHeaders headers, String containerId, String caseId, CaseOperation operation) {
+    protected Response invokeCaseOperation(HttpHeaders headers, String containerId, String caseId, String processId, CaseOperation operation) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -72,13 +73,22 @@ public abstract class AbstractCaseResource {
             return notFound(
                     MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (IllegalArgumentException e) {
-           return badRequest(
-                   e.getMessage(), v, conversationIdHeader);
+            return badRequest(
+                    e.getMessage(),
+                    v,
+                    conversationIdHeader);
+        } catch(ProcessDefinitionNotFoundException e) {
+            return notFound(
+                    MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, processId, containerId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(
                     MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
         }
+    }
+
+    protected Response invokeCaseOperation(HttpHeaders headers, String containerId, String caseId, CaseOperation operation) {
+        return invokeCaseOperation(headers, containerId, caseId, null, operation);
     }
 
 }

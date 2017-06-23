@@ -27,9 +27,7 @@ import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,27 +69,28 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
     }
 
     @Test
-    public void testFindProcessInstanceWithProcessInstanceIdGreaterThanFilter() throws Exception {
+    public void testFindProcessInstanceWithProcessInstanceIdEqualsToFilter() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         Assertions.assertThat(processInstanceId).isNotNull();
-        testFindProcessInstanceWithQueryFilter(createQueryFilterGreaterThan(ProcessInstanceField.PROCESSINSTANCEID, 0), processInstanceId);
+        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.PROCESSINSTANCEID, processInstanceId), processInstanceId);
     }
 
     @Test
-    public void testFindProcessInstanceWithStartDateGreaterThanFilter() throws Exception {
+    public void testFindProcessInstanceWithStartDateEqualsToFilter() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         Assertions.assertThat(processInstanceId).isNotNull();
-        testFindProcessInstanceWithQueryFilter(createQueryFilterGreaterThan(ProcessInstanceField.START_DATE, Date.from(Instant.EPOCH)), processInstanceId);
+        ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
+        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.START_DATE, pi.getDate()), processInstanceId);
     }
 
     @Test
-    public void testFindProcessInstanceWithCorrelationKeyGreaterThanFilter() throws Exception {
+    public void testFindProcessInstanceWithCorrelationKeyEqualsToFilter() throws Exception {
        Map<String, Object> parameters = new HashMap<>();
        Long processInstanceId  = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
-        Assertions.assertThat(processInstanceId).isNotNull();
-        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.CORRELATIONKEY, processInstanceId), processInstanceId);
+       Assertions.assertThat(processInstanceId).isNotNull();
+       testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.CORRELATIONKEY, String.valueOf(processInstanceId)), processInstanceId);
     }
 
     @Test

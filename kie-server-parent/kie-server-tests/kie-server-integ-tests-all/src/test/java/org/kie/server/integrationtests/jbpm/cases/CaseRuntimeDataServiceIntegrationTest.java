@@ -17,9 +17,11 @@ package org.kie.server.integrationtests.jbpm.cases;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.text.MessageFormat;
 
 import org.junit.After;
 import org.junit.Assume;
@@ -51,6 +53,10 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static java.util.stream.Collectors.*;
 import static org.junit.Assert.*;
+import static org.kie.server.remote.rest.casemgmt.Messages.CASE_DEFINITION_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
+
 import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -1010,6 +1016,43 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
     }
+    
+    @Test
+    public void testGetCommentPagination() {        
+        int pageSize = 20;
+        
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+        
+        for (int i = 0 ; i < 55 ; i++) {
+            caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
+        }
+        
+        List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
+        assertNotNull(firstPage);
+        assertEquals(20, firstPage.size());
+        Iterator<CaseComment> firstPageIter = firstPage.iterator();
+        for (int i = 0 ; firstPageIter.hasNext() ; i++) {
+            assertComment(firstPageIter.next(), USER_YODA, "comment" + i);
+        }
+ 
+        List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
+        assertNotNull(secondPage);
+        assertEquals(20, secondPage.size());
+        Iterator<CaseComment> secondPageIter = secondPage.iterator();
+        for (int i = 20 ; secondPageIter.hasNext() ; i++) {
+            assertComment(secondPageIter.next(), USER_YODA, "comment" + i);
+        }
+        
+        List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
+        assertNotNull(thirdPage);
+        assertEquals(15, thirdPage.size());
+        Iterator<CaseComment> thirdPageIter = thirdPage.iterator();
+        for (int i = 40 ; thirdPageIter.hasNext() ; i++) {
+            assertComment(thirdPageIter.next(), USER_YODA, "comment" + i);
+        }
+    }
 
     @Test
     public void testGetCaseCommentsNotExistingContainer() {
@@ -1937,5 +1980,39 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals(1, adHocFragments.size());
         assertEquals("Negotiation meeting", adHocFragments.get(0).getName());
         assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
+    }
+    
+    private void assertComment(CaseComment comment, String author, String text) {
+        assertNotNull(comment);
+        assertEquals(comment.getAuthor(), author);
+        assertEquals(comment.getText(), text);
+    }
+
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingCase() {
+        String invalidCaseId = "not-existing-case-id";
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
+                              404,
+                              MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
+                              "Case with id " + invalidCaseId + " was not found");
+
+    }
+
+    @Test
+    public void testAddDynamicProcessToCaseNotExistingProcessDefinition() {
+        String invalidProcessId = "not-existing-process-id";
+        Map<String, Object> data = new HashMap<>();
+        data.put("s", "first case started");
+        CaseFile caseFile = CaseFile.builder()
+                .data(data)
+                .build();
+
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
+        assertNotNull(caseId);
+
+        assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
+                              404,
+                              MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
+                              "No process definition found with id: " + invalidProcessId);
     }
 }
