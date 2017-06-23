@@ -17,8 +17,11 @@ package org.kie.server.router.handlers;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +104,8 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
                 response = sendRequest(url, exchange, responseHeaders, routerPage, routerPageSize);
             } catch (Exception e) {
                 log.error("Error when forwarding request to server", e);
+
+                removeHostOnException(url, e);
             }
 
             return response;
@@ -177,6 +182,13 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
             return selector.selectHost(hosts.toArray(new String[hosts.size()]));
         }).filter(host -> host != null)
          .collect(Collectors.toSet());
+    }
+
+    protected void removeHostOnException(String url, Exception e) {
+        if (e instanceof SocketException || e instanceof UnknownHostException) {
+            adminHandler.removeUnavailableServer(url);
+            log.warn("Removed host '" + url + "' due to its unavailability (cause " + e.getMessage() + ")");
+        }
     }
 
     protected boolean supportAdvancedAggregate() {

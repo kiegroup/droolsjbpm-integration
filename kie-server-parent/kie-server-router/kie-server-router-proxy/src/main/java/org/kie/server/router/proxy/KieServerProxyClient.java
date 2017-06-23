@@ -15,7 +15,10 @@
 
 package org.kie.server.router.proxy;
 
+import java.net.SocketException;
 import java.net.URI;
+import java.net.UnknownHostException;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +34,7 @@ import io.undertow.server.handlers.proxy.ProxyConnection;
 import org.jboss.logging.Logger;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ConfigurationListener;
+import org.kie.server.router.handlers.AdminHttpHandler;
 import org.kie.server.router.spi.ContainerResolver;
 import org.kie.server.router.spi.RestrictionPolicy;
 
@@ -44,12 +48,14 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
     private ContainerResolver containerResolver = new DefaultContainerResolver();
     private RestrictionPolicy restrictionPolicy = new DefaultRestrictionPolicy();
     
-    private Map<String, LoadBalancingProxyClient> containerClients = new ConcurrentHashMap<>();
+    private Map<String, CaptureHostLoadBalancingProxyClient> containerClients = new ConcurrentHashMap<>();
 
     private Configuration configuration;
+    private AdminHttpHandler adminHandler;
 
-    public KieServerProxyClient(Configuration configuration) {
+    public KieServerProxyClient(Configuration configuration, AdminHttpHandler adminHandler) {
         this.configuration = configuration;
+        this.adminHandler = adminHandler;
         this.configuration.addListener(this);
         List<ContainerResolver> foundResolvers = new ArrayList<>();
         containerResolverServiceLoader.forEach(cr -> foundResolvers.add(cr));
@@ -71,10 +77,10 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
     }
 
     public synchronized void addContainer(String containerId, URI serverURI) {
-        
-        LoadBalancingProxyClient client = containerClients.get(containerId);
+
+        CaptureHostLoadBalancingProxyClient client = containerClients.get(containerId);
         if (client == null) {
-            client = new LoadBalancingProxyClient();
+            client = new CaptureHostLoadBalancingProxyClient();
             containerClients.put(containerId, client);
         }
         client.addHost(serverURI);
@@ -108,11 +114,43 @@ public class KieServerProxyClient implements ProxyClient, ConfigurationListener 
     }
 
     @Override
-    public void getConnection(ProxyTarget target, HttpServerExchange exchange, ProxyCallback<ProxyConnection> callback, long timeout, TimeUnit timeUnit) {
+    public void getConnection(ProxyTarget target, HttpServerExchange exchange, final ProxyCallback<ProxyConnection> callback, long timeout, TimeUnit timeUnit) {
         String containerId = containerResolver.resolveContainerId(exchange, configuration.getContainerInfosPerContainer());
-        LoadBalancingProxyClient client = containerClients.get(containerId);
+        CaptureHostLoadBalancingProxyClient client = containerClients.get(containerId);
+        try {
+            client.getConnection(target, exchange, new ProxyCallback<ProxyConnection>() {
+                @Override
+                public void completed(HttpServerExchange exchange, ProxyConnection result) {
+                    callback.completed(exchange, result);
+                }
 
-        client.getConnection(target, exchange, callback, timeout, timeUnit);
+                @Override
+                public void failed(HttpServerExchange httpServerExchange) {
+                    try {
+                        adminHandler.removeUnavailableServer(client.getUri());
+                    } finally {
+                        callback.failed(exchange);
+                        client.clear();
+                    }
+                }
+
+                @Override
+                public void couldNotResolveBackend(HttpServerExchange exchange) {
+                    callback.couldNotResolveBackend(exchange);
+                }
+
+                @Override
+                public void queuedRequestFailed(HttpServerExchange exchange) {
+                    callback.queuedRequestFailed(exchange);
+                }
+            }, timeout, timeUnit);
+        } catch (Exception e) {
+            if (e instanceof SocketException || e instanceof UnknownHostException || e instanceof UnresolvedAddressException ) {
+                adminHandler.removeUnavailableServer(client.getUri());
+            }
+
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

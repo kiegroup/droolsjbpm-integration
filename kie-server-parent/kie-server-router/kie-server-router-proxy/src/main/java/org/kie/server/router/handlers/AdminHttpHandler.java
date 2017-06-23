@@ -201,4 +201,10 @@ public class AdminHttpHandler implements HttpHandler {
     public Configuration getConfiguration() {
         return configuration;
     }
+    public void removeUnavailableServer(String url) {
+        synchronized (configuration) {
+            configuration.removeUnavailableServer(url);
+            repository.persist(configuration);
+        }
+    }
 }

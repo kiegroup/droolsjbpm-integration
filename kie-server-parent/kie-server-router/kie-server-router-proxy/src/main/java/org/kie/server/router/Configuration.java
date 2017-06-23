@@ -16,8 +16,10 @@
 package org.kie.server.router;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -109,6 +111,50 @@ public class Configuration {
         }
     }
 
+    public synchronized void removeUnavailableServer(String requestURL) {
+        String serverUrl = null;
+        String serverId = null;
+
+        // locate server id for request url
+        for (Map.Entry<String, Set<String>> entry : hostsPerServer.entrySet()) {
+            Set<String> hosts = entry.getValue();
+
+            for (String host : hosts) {
+                if (requestURL.startsWith(host)) {
+                    serverUrl = host;
+                    serverId = entry.getKey();
+
+                    break;
+                }
+            }
+        }
+
+        if (serverId != null && serverUrl != null) {
+            removeServerHost(serverId, serverUrl);
+        }
+
+        // locate containers for request url
+        Set<String> containers = new HashSet<>();
+
+        for (Map.Entry<String, Set<String>> entry : hostsPerContainer.entrySet()) {
+            Set<String> hosts = entry.getValue();
+
+            for (String host : hosts) {
+                if (requestURL.startsWith(host)) {
+                    serverUrl = host;
+                    containers.add(entry.getKey());
+                }
+            }
+        }
+
+        if (!containers.isEmpty()) {
+            final String actualServerUrl = serverUrl;
+            containers.forEach( container ->
+                    removeContainerHost(container, actualServerUrl)
+            );
+        }
+    }
+
     public void addListener(ConfigurationListener listener) {
         this.listeners.add(listener);
     }
@@ -120,5 +166,21 @@ public class Configuration {
     @Override
     public String toString() {
         return "{hostsPerServer=" + hostsPerServer + ", hostsPerContainer=" + hostsPerContainer + "}";
+    }
+
+    public void addEmptyContainerHost(String containerId) {
+        Set<String> hosts = hostsPerContainer.get(containerId);
+        if (hosts == null) {
+            hosts = new LinkedHashSet<>();
+            hostsPerContainer.put(containerId, hosts);
+        }
+    }
+
+    public void addEmptyServerHost(String serverId) {
+        Set<String> hosts = hostsPerServer.get(serverId);
+        if (hosts == null) {
+            hosts = new LinkedHashSet<>();
+            hostsPerServer.put(serverId, hosts);
+        }
     }
 }
