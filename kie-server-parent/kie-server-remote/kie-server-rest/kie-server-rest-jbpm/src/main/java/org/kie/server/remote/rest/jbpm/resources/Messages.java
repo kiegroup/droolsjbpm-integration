@@ -23,7 +23,7 @@ public class Messages {
 
     public static final String PROCESS_INSTANCE_NOT_FOUND = "Could not find process instance with id \"{0}\"";
     public static final String TASK_INSTANCE_NOT_FOUND = "Could not find task instance with id \"{0}\"";
-    public static final String TASK_NOT_FOUND ="No task found with id {0}";
+    public static final String TASK_NOT_FOUND = "No task found with id {0}";
     public static final String TASK_INSTANCE_NOT_FOUND_FOR_WORKITEM = "Could not find task instance for work item with id \"{0}\"";
     public static final String TASK_ATTACHMENT_NOT_FOUND = "Could not find task attachment with id \"{0}\" attached to task with id \"{1}\"";
     public static final String TASK_COMMENT_NOT_FOUND = "Could not find task comment with id \"{0}\" attached to task with id \"{1}\"";
@@ -45,6 +45,7 @@ public class Messages {
     public static final String CREATE_RESPONSE_ERROR = "Unable to create response: {0}";
 
     public static final String UNEXPECTED_ERROR = "Unexpected error during processing: {0}";
+    public static final String BAD_REQUEST = "The request could not be understood by the server due to malformed syntax: {0}";
 
     public static final String QUERY_NOT_FOUND = "Could not find query definition with name \"{0}\"";
     public static final String QUERY_ALREADY_EXISTS = "Query definition with name \"{0}\" already exists";
