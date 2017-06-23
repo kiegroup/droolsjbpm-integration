@@ -37,5 +37,10 @@
       <groupId>org.kie</groupId>
       <artifactId>kie-maven-plugin</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>
