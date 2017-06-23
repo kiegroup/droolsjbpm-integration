@@ -10,10 +10,10 @@
   </parent>
 
   <groupId>org.kie</groupId>
-  <artifactId>kie-maven-plugin</artifactId>
+  <artifactId>kie-maven-plugin-takari</artifactId>
   <packaging>takari-maven-plugin</packaging>
 
-  <name>KIE :: Maven Plugin</name>
+  <name>KIE :: Maven Plugin Takari</name>
 
   <build>
     <plugins>
@@ -33,6 +33,11 @@
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-maven-plugin</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
