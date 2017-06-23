@@ -10,7 +10,7 @@
   <bpmn2:itemDefinition id="__8BFDD5E5-1D06-4F2C-9D98-F71795AEB6F0_BodyInputXItem" structureRef="String"/>
   <bpmn2:itemDefinition id="__8BFDD5E5-1D06-4F2C-9D98-F71795AEB6F0_SubjectInputXItem" structureRef="String"/>
   <bpmn2:itemDefinition id="__8BFDD5E5-1D06-4F2C-9D98-F71795AEB6F0_ToInputXItem" structureRef="String"/>
-  <bpmn2:process id="definition-project.evaluation" drools:packageName="org.jbpm" drools:version="1.0" name="evaluation" isExecutable="true">
+  <bpmn2:process id="definition-project.evaluation-search" drools:packageName="org.jbpm" drools:version="1.0" name="evaluation-search" isExecutable="true">
     <bpmn2:property id="name" itemSubjectRef="_nameItem"/>
     <bpmn2:property id="item" itemSubjectRef="_itemItem"/>
     <bpmn2:property id="outcome" itemSubjectRef="_outcomeItem"/>
@@ -118,7 +118,7 @@
     <bpmn2:sequenceFlow id="_5F738344-23B6-4308-908B-2141A1660CCD" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="_4E8E7545-FB70-494E-9136-2B9ABE655889" targetRef="_8BFDD5E5-1D06-4F2C-9D98-F71795AEB6F0"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="_lYQh4PMtEeSoD-9HcIhmjA">
-    <bpmndi:BPMNPlane id="_lYQh4fMtEeSoD-9HcIhmjA" bpmnElement="definition-project.evaluation">
+    <bpmndi:BPMNPlane id="_lYQh4fMtEeSoD-9HcIhmjA" bpmnElement="definition-project.evaluation-search">
       <bpmndi:BPMNShape id="_lYQh4vMtEeSoD-9HcIhmjA" bpmnElement="processStartEvent">
         <dc:Bounds height="30.0" width="30.0" x="120.0" y="165.0"/>
       </bpmndi:BPMNShape>
