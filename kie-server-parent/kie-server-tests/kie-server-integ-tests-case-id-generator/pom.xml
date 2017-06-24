@@ -199,11 +199,14 @@
               <groupId>org.codehaus.cargo</groupId>
               <artifactId>cargo-maven2-plugin</artifactId>
               <configuration>
-                <container>
-                  <systemProperties combine.self="append">
-                    <bitronix.tm.configuration>${project.build.testOutputDirectory}/btm-config.properties</bitronix.tm.configuration>
-                  </systemProperties>
-                </container>
+                <configuration>
+                  <configfiles>
+                    <configfile>
+                      <file>${project.basedir}/src/test/config/context.xml</file>
+                      <todir>/conf</todir>
+                    </configfile>
+                  </configfiles>
+                </configuration>
               </configuration>
             </plugin>
           </plugins>

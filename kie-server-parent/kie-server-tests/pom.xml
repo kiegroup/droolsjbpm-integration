@@ -365,35 +365,21 @@
                     <conf.directory>${project.build.testOutputDirectory}</conf.directory>
                     <tmp.directory>${project.build.directory}</tmp.directory>
                     <jbpm.tsr.jndi.lookup>java:comp/env/TransactionSynchronizationRegistry</jbpm.tsr.jndi.lookup>
-                    <org.kie.server.persistence.tm>org.hibernate.service.jta.platform.internal.BitronixJtaPlatform</org.kie.server.persistence.tm>
+                    <jbpm.tm.jndi.lookup>java:comp/env/TransactionManager</jbpm.tm.jndi.lookup>
+                    <org.kie.server.persistence.tm>JBossTS</org.kie.server.persistence.tm>
                     <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
                     <org.jboss.logging.provider>jdk</org.jboss.logging.provider>
                     <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <hibernate.connection.release_mode>after_transaction</hibernate.connection.release_mode>
                   </systemProperties>
                   <dependencies>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.codehaus.btm</groupId>
-                      <artifactId>btm-tomcat55-lifecycle</artifactId>
-                    </dependency>
                     <dependency>
                       <groupId>com.h2database</groupId>
                       <artifactId>h2</artifactId>
                     </dependency>
                     <dependency>
-                      <groupId>org.jboss.spec.javax.transaction</groupId>
-                      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-                    </dependency>
-                    <dependency>
                       <groupId>org.slf4j</groupId>
                       <artifactId>slf4j-api</artifactId>
-                    </dependency>
-                    <dependency>
-                      <groupId>org.slf4j</groupId>
-                      <artifactId>slf4j-jdk14</artifactId>
                     </dependency>
                     <dependency>
                       <groupId>org.jboss.spec.javax.security.jacc</groupId>
@@ -424,16 +410,6 @@
       <dependencies>
         <!-- Deps needed by Tomcat 8 -->
         <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.codehaus.btm</groupId>
-          <artifactId>btm-tomcat55-lifecycle</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
           <scope>test</scope>
@@ -442,10 +418,6 @@
           <groupId>org.jboss.spec.javax.transaction</groupId>
           <artifactId>jboss-transaction-api_1.2_spec</artifactId>
           <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
         </dependency>
         <dependency>
           <groupId>org.jboss.spec.javax.security.jacc</groupId>
