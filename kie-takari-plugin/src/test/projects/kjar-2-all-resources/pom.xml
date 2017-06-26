@@ -15,13 +15,19 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-takari-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>7.1.0-SNAPSHOT</version>
         <extensions>true</extensions>
         <configuration>
           <properties>
             <drools.dialect.java.compiler.lnglevel>1.6</drools.dialect.java.compiler.lnglevel>
           </properties>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>io.takari.maven.plugins</groupId>
+        <artifactId>takari-lifecycle-plugin</artifactId>
+        <version>1.12.5</version>
+        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>

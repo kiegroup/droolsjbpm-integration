@@ -68,7 +68,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
                 .execute("clean",
-                         "install");
+                         "install", "-X");
         result.assertErrorFreeLog();
 
         File classDir = new File(basedir,

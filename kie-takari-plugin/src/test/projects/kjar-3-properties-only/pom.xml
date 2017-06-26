@@ -9,13 +9,24 @@
   <version>1.0.0.Final</version>
 
   <packaging>kjar</packaging>
-
+<!--<dependencies>
+  <dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>3.0.2</version>
+  </dependency>
+  <dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-resources-plugin</artifactId>
+    <version>3.0.2</version>
+  </dependency>
+</dependencies>-->
   <build>
     <plugins>
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-takari-plugin</artifactId>
-        <version>${it-plugin.version}</version>
+        <version>7.1.0-SNAPSHOT</version>
         <extensions>true</extensions>
         <configuration>
           <properties>
@@ -26,7 +37,7 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
+  <!--<repositories>
     <repository>
       <id>central</id>
       <url>https://repository.jboss.org/nexus/content/groups/public/</url>
@@ -51,5 +62,5 @@
         <enabled>true</enabled>
       </snapshots>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories>-->
 </project>
