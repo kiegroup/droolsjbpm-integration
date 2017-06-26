@@ -92,7 +92,8 @@ public class KieServerRouter {
         if (configuration == null) {
             configuration = new Configuration();
         }
-        final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration);
+        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
+        final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
         Map<String, Set<String>> perContainer = configuration.getHostsPerContainer();
 
         for (Map.Entry<String, Set<String>> entry : perContainer.entrySet()) {
@@ -102,7 +103,7 @@ public class KieServerRouter {
         }
         
         HttpHandler notFoundHandler = ResponseCodeHandler.HANDLE_404;        
-        AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
+
 
         PathHandler pathHandler = Handlers.path(new ProxyHandler(proxyClient, notFoundHandler));
         pathHandler.addPrefixPath("/queries/definitions", new QueriesDataHttpHandler(notFoundHandler, adminHandler));

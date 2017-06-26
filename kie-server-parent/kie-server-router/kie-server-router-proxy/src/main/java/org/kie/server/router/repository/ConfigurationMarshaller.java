@@ -100,11 +100,14 @@ public class ConfigurationMarshaller {
             
             for (String name : names) {
                 JSONArray urls = (JSONArray) container.get(name);
-                
-                for (int j = 0; j < urls.length(); j++) {
-                    String url = urls.get(j).toString();
-                    
-                    configuration.addContainerHost(name, url);
+                if (urls.length() > 0) {
+                    for (int j = 0; j < urls.length(); j++) {
+                        String url = urls.get(j).toString();
+
+                        configuration.addContainerHost(name, url);
+                    }
+                } else {
+                    configuration.addEmptyContainerHost(name);
                 }
             }
         }
@@ -117,11 +120,14 @@ public class ConfigurationMarshaller {
             
             for (String name : names) {
                 JSONArray urls = (JSONArray) server.get(name);
-                
-                for (int j = 0; j < urls.length(); j++) {
-                    String url = urls.get(j).toString();
-                    
-                    configuration.addServerHost(name, url);
+                if (urls.length() > 0) {
+                    for (int j = 0; j < urls.length(); j++) {
+                        String url = urls.get(j).toString();
+
+                        configuration.addServerHost(name, url);
+                    }
+                } else {
+                    configuration.addEmptyServerHost(name);
                 }
             }
         }
