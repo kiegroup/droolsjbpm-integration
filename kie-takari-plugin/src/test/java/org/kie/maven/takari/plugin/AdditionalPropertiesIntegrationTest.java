@@ -33,8 +33,7 @@ public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseInteg
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
                 .execute("clean",
-                         "install",
-                         "-X");
+                         "install", "-X");
         result.assertErrorFreeLog();
         // additional properties are logged during debug (-X) build
         // following string is created directly inside the KIE Maven plugin execution (the property names and values
