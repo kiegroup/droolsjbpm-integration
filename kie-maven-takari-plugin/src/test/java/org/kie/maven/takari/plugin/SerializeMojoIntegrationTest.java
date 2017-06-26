@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,29 +13,30 @@
  * limitations under the License.
 */
 
-package org.kie.maven.plugin;
-
-import io.takari.maven.testing.executor.MavenExecutionResult;
-import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+package org.kie.maven.takari.plugin;
 
 import java.io.File;
 
-public class AdditionalPropertiesIntegrationTest extends KieMavenPluginBaseIntegrationTest {
-    public AdditionalPropertiesIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+import io.takari.maven.testing.executor.MavenExecutionResult;
+import io.takari.maven.testing.executor.MavenRuntime;
+import org.junit.Ignore;
+import org.junit.Test;
+
+@Ignore("The test takes insane amount of time (minutes) to complete, because the serialization takes into account" +
+        "also huge amount of DRLs coming from drools-pmml. Will be investigated and fixed by psiroky.")
+public class SerializeMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest {
+
+    public SerializeMojoIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
         super(builder);
     }
 
     @Test
-    public void testAdditionalPropertiesCorrectlySet() throws Exception {
-        File basedir = resources.getBasedir("kjar-3-properties-only");
+    public void testCleanInstallWithSerialize() throws Exception {
+        File basedir = resources.getBasedir("kjar-1-with-serialize");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute("clean", "install");
+                .execute("clean",
+                         "install");
         result.assertErrorFreeLog();
-        // additional properties are logged during debug (-X) build
-        // following string is created directly inside the KIE Maven plugin execution (the property names and values
-        // are logged multiple by maven itself as well, so we should check directly against that string)
-        result.assertLogText("Additional system properties: {drools.dialect.java.compiler.lnglevel=1.6, my.property=some-value}");
     }
 }

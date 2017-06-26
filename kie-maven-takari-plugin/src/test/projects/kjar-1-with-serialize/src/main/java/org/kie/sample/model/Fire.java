@@ -19,7 +19,8 @@ public class Fire {
 
     private Room room;
 
-    public Fire() { }
+    public Fire() {
+    }
 
     public Fire(Room room) {
         this.room = room;

@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.maven.plugin;
+package org.kie.maven.takari.plugin;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenRuntime;
@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.0.5", "3.2.3"})
+@MavenVersions({"3.2.5", "3.3.9", "3.5.0"})
 abstract public class KieMavenPluginBaseIntegrationTest {
 
     @Rule
@@ -39,5 +39,4 @@ abstract public class KieMavenPluginBaseIntegrationTest {
                 //  .withCliOptions("-Dorg.slf4j.simpleLogger.defaultLogLevel=debug")
                 .build();
     }
-
 }

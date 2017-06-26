@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TMFileSet {
+
     private final String name;
     private final Set<TMFile> members = new HashSet<TMFile>();
 

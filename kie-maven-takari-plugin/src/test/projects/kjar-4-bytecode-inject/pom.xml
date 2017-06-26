@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
@@ -9,21 +9,21 @@
   <version>1.0.0.Final</version>
 
   <packaging>kjar</packaging>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <dependencies>
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-math3</artifactId>
-    <version>3.2</version>
-</dependency>
     <dependency>
-        <groupId>org.magicwerk</groupId>
-        <artifactId>brownies-collections</artifactId>
-        <version>0.9.13</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.magicwerk</groupId>
+      <artifactId>brownies-collections</artifactId>
+      <version>0.9.13</version>
     </dependency>
   </dependencies>
 
@@ -31,11 +31,11 @@
     <plugins>
       <plugin>
         <groupId>org.kie</groupId>
-        <artifactId>kie-maven-plugin</artifactId>
+        <artifactId>kie-maven-takari-plugin</artifactId>
         <version>${it-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-            <instrument-enabled>true</instrument-enabled>
+          <instrument-enabled>true</instrument-enabled>
         </configuration>
       </plugin>
       <!-- locating and copying dependency JARs will be used conveniently by testing for sandboxed classloading purposes: -->

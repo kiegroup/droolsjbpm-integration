@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.maven.plugin;
+package org.kie.maven.takari.plugin;
+
+import java.io.File;
 
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import org.junit.Test;
-
-import java.io.File;
 
 public class BuildMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest {
 
@@ -32,9 +32,9 @@ public class BuildMojoIntegrationTest extends KieMavenPluginBaseIntegrationTest 
         File basedir = resources.getBasedir("kjar-2-all-resources");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute("clean", "install");
+                .execute("clean",
+                         "install");
         result.assertErrorFreeLog();
     }
-
 }
 

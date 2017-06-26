@@ -3,7 +3,8 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ * You may obtain a copy of the License at
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,25 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
+package org.kie.maven.takari.plugin;
 
-package to.instrument;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
-public class Man extends Adult {
+/**
+ * Compiles and serializes knowledge packages.
+ */
+@Mojo(name = "touch",
+        requiresProject = true,
+        defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+public class TouchResourcesMojo extends org.kie.maven.plugin.TouchResourcesMojo {
 
-    private Woman wife;
-
-    public Man(String name,
-               int age) {
-        super(name,
-              age);
-    }
-
-    public Woman getWife() {
-        return wife;
-    }
-
-    public void setWife(Woman wife) {
-        this.wife = wife;
-    }
 }

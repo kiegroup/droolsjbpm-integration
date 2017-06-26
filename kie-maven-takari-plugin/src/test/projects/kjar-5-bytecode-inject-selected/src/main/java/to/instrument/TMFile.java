@@ -16,10 +16,12 @@
 package to.instrument;
 
 public class TMFile {
+
     private final String name;
     private int size;
 
-    public TMFile(String name, int size) {
+    public TMFile(String name,
+                  int size) {
         this.name = name;
         this.size = size;
     }

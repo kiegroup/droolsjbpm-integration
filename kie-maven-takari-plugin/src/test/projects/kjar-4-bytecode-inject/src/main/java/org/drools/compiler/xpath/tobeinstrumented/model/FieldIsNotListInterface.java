@@ -25,9 +25,8 @@ public class FieldIsNotListInterface {
     public FieldIsNotListInterface() {
         myField = new ArrayList();
     }
-    
+
     public List getMyField() {
         return myField;
     }
-    
 }

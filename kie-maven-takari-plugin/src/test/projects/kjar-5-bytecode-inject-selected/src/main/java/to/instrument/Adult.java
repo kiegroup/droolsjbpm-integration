@@ -22,8 +22,10 @@ public class Adult extends Person {
 
     private final List<Child> children = new ArrayList<Child>();
 
-    public Adult(String name, int age) {
-        super(name, age);
+    public Adult(String name,
+                 int age) {
+        super(name,
+              age);
     }
 
     public List<Child> getChildren() {

@@ -13,39 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.kie.maven.plugin.test;
+package org.kie.maven.takari.plugin;
 
-public class Person {
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
-    private int id;
-    private String name;
-    private boolean adult;
+/**
+ * Compiles and serializes knowledge bases.
+ */
+@Mojo(name = "serialize",
+        requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
+        requiresProject = true,
+        defaultPhase = LifecyclePhase.COMPILE,
+        configurator = "include-project-dependencies")
+public class SerializeMojo extends org.kie.maven.plugin.SerializeMojo {
 
-    public Person(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isAdult() {
-        return adult;
-    }
-
-    public void setAdult(boolean adult) {
-        this.adult = adult;
-    }
 }

@@ -28,11 +28,11 @@ public class FieldsSomeInterfacesSomeNot {
     public FieldsSomeInterfacesSomeNot() {
         myField = new ArrayList();
     }
-    
+
     public List getMyField() {
         return myField;
     }
-    
+
     public void setMyField(ArrayList myField) {
         this.myField = myField;
     }
@@ -40,7 +40,7 @@ public class FieldsSomeInterfacesSomeNot {
     public List getMyField2() {
         return myField2;
     }
-    
+
     public void setMyField2(List myField2) {
         this.myField2 = myField2;
     }
@@ -48,9 +48,8 @@ public class FieldsSomeInterfacesSomeNot {
     public Collection getMyField3() {
         return myField3;
     }
-    
+
     public void setMyField3(Collection myField3) {
         this.myField3 = myField3;
     }
-
 }

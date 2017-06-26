@@ -39,7 +39,7 @@ public class School {
     public void addChild(Child child) {
         children.add(child);
     }
-    
+
     public void removeChild(Child child) {
         children.remove(child);
     }

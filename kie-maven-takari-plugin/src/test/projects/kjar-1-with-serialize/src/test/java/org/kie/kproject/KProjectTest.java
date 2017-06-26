@@ -43,10 +43,12 @@ public class KProjectTest {
         FactHandle fireFH = kSession.insert(fire);
 
         int rules = kSession.fireAllRules();
-        assertEquals(2, rules);
+        assertEquals(2,
+                     rules);
 
         kSession.delete(fireFH);
         rules = kSession.fireAllRules();
-        assertEquals(3, rules);
+        assertEquals(3,
+                     rules);
     }
 }

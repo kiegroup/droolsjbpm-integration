@@ -20,7 +20,8 @@ public class Sprinkler {
     private Room room;
     private boolean on = false;
 
-    public Sprinkler() { }
+    public Sprinkler() {
+    }
 
     public Sprinkler(Room room) {
         this.room = room;
@@ -49,7 +50,9 @@ public class Sprinkler {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Sprinkler)) { return false; }
+        if (!(obj instanceof Sprinkler)) {
+            return false;
+        }
         return room.equals(((Sprinkler) obj).getRoom());
     }
 

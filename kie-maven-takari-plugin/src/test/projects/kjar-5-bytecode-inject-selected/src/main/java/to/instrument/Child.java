@@ -20,12 +20,13 @@ import java.util.List;
 
 public class Child extends Person {
 
+    private final List<Toy> toys = new ArrayList<Toy>();
     private String mother;
 
-    private final List<Toy> toys = new ArrayList<Toy>();
-
-    public Child(String name, int age) {
-        super(name, age);
+    public Child(String name,
+                 int age) {
+        super(name,
+              age);
     }
 
     public List<Toy> getToys() {

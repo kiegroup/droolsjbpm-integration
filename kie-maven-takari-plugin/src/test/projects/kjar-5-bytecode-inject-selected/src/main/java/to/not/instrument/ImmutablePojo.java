@@ -20,7 +20,8 @@ public abstract class ImmutablePojo {
     private final String name;
     private final int age;
 
-    public ImmutablePojo(String name, int age) {
+    public ImmutablePojo(String name,
+                         int age) {
         this.name = name;
         this.age = age;
     }
@@ -32,5 +33,4 @@ public abstract class ImmutablePojo {
     public int getAge() {
         return age;
     }
-
 }
