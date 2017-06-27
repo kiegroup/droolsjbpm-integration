@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 @RunWith(MavenJUnitTestRunner.class)
-@MavenVersions({"3.2.5","3.3.9", "3.5.0"})
+@MavenVersions({"3.3.9", "3.5.0"})
 abstract public class KieMavenPluginBaseIntegrationTest {
 
     @Rule
