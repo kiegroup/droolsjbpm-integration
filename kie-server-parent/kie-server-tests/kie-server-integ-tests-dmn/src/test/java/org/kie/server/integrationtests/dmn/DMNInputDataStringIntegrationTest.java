@@ -58,9 +58,7 @@ public class DMNInputDataStringIntegrationTest
     
     @Before
     public void cleanContainers() {
-        System.out.println("*** DISPOSING CONTAINERS ***");
         disposeAllContainers();
-        System.out.println("*** CREATING "+kjar1+" ***");
         createContainer(CONTAINER_ID, kjar1);
     }
 
@@ -90,11 +88,10 @@ public class DMNInputDataStringIntegrationTest
     
     @Test
     public void test_evaluateAll_withUpdate() {
-        System.out.println("                      *** START ***");
         ServiceResponse<DMNModelInfoList> models = dmnClient.getModels(CONTAINER_ID);
-        System.out.println(models);
-        System.out.println("                      *** /START ***");
-        
+        assertEquals( ResponseType.SUCCESS, models.getType() );
+        assertEquals( 1, models.getResult().getModels().size() );
+
         DMNContext dmnContext = dmnClient.newContext();
         dmnContext.set( "Full Name", "John Doe" );
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_ID, dmnContext);
@@ -112,10 +109,16 @@ public class DMNInputDataStringIntegrationTest
         
         KieServerAssert.assertSuccess(client.updateReleaseId(CONTAINER_ID, kjar_v101));
         
-        System.out.println("                      *** UPDATED ***");
-        ServiceResponse<DMNModelInfoList> UPDATED = dmnClient.getModels(CONTAINER_ID);
-        System.out.println(UPDATED);
-        System.out.println("                      *** /UPDATED ***");
+        models = dmnClient.getModels(CONTAINER_ID);
+        assertEquals( ResponseType.SUCCESS, models.getType() );
+        assertEquals( 1, models.getResult().getModels().size() );
+        
+        evaluateAll = dmnClient.evaluateAll(CONTAINER_ID, dmnContext);
+        assertEquals(ResponseType.SUCCESS, evaluateAll.getType());
+        
+        dmnResult = evaluateAll.getResult();
+        assertThat( dmnResult.getDecisionResults().size(), is( 1 ) );
+        assertThat( dmnResult.getDecisionResultByName( "Greeting Message" ).getResult(), is( "Salve John Doe" ) );
     }
     
     // See org.kie.dmn.core.DMNInputRuntimeTest
