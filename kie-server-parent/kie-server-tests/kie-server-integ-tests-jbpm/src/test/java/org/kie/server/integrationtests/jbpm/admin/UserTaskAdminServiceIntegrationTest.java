@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm.admin;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -283,6 +284,54 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    @Test
+    public void testReassignNotStartedWithEmptyTimeFormat() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+
+            assertClientException(
+                    () -> userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "", reassign),
+                    400,
+                    "Invalid time expression",
+                    "Invalid time expression");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotStartedWithBadOrgEntities() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(new ArrayList<>()).build();
+
+            assertClientException(
+                    () ->  userTaskAdminClient.reassignWhenNotStarted(CONTAINER_ID, task.getId(), "2s", reassign),
+                    400,
+                    "Invalid org entity",
+                    "Invalid org entity");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+
     /*
      * Test scenario for container id that is not registered.
      */
@@ -371,7 +420,51 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
         }
     }
 
+    @Test
+    public void testReassignNotCompletedWithEmptyTimeFormat() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
 
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(Arrays.asList(USER_JOHN)).build();
+            assertClientException(
+                    () -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID_V2, task.getId(), "", reassign),
+                    400,
+                    "Invalid time expression",
+                    "Invalid time expression");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
+            }
+        }
+    }
+
+    @Test
+    public void testReassignNotCompletedWithBadOrgEntities() throws Exception {
+        changeUser(USER_ADMINISTRATOR);
+        Map<String, Object> parameters = new HashMap<>();
+
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID_V2, PROCESS_ID_EVALUATION, parameters);
+            List<TaskSummary> tasks = taskClient.findTasksAssignedAsBusinessAdministrator(USER_ADMINISTRATOR, 0, 10);
+            TaskSummary task = tasks.get(0);
+            OrgEntities reassign = OrgEntities.builder().users(new ArrayList<>()).build();
+            assertClientException(
+                    () -> userTaskAdminClient.reassignWhenNotCompleted(CONTAINER_ID_V2, task.getId(), "2s", reassign),
+                    400,
+                    "Invalid org entity",
+                    "Invalid org entity");
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID_V2, processInstanceId);
+            }
+        }
+    }
 
     @Test
     public void testAddRemovePotOwners() throws Exception {

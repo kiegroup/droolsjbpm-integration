@@ -234,7 +234,7 @@ public class UserTaskAdminResource {
         } catch (DeploymentNotFoundException e) {
             return notFound(MessageFormat.format(CONTAINER_NOT_FOUND, containerId), v, conversationIdHeader);
         } catch (RuntimeException e) {
-            return badRequest("Error parsing 'expiresAt' - " + expiresAt, v, conversationIdHeader);
+            return badRequest(e.getMessage(), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
             return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
