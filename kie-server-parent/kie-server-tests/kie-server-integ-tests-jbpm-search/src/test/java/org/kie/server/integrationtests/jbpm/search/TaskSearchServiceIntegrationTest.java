@@ -28,8 +28,6 @@ import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -287,12 +285,4 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         filterProperties.forEach(result::equalsTo);
         return result.get();
     }
-
-    private Date subtractOneMinuteFromDate(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.MINUTE, -1);
-        return cal.getTime();
-    }
-
 }

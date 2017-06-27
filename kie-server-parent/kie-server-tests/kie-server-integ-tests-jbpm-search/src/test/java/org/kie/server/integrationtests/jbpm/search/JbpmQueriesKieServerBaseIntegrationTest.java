@@ -32,7 +32,10 @@ import org.kie.server.integrationtests.jbpm.search.util.DBExternalResource;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -90,5 +93,11 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
         JobServicesClient jsc = createDefaultStaticClient().getServicesClient(JobServicesClient.class);
         long id = jsc.scheduleRequest(JobRequestInstance.builder().command("org.jbpm.executor.commands.LogCleanupCommand").build());
         KieServerSynchronization.waitForJobToFinish(jsc, id, 120000L);
+    }
+
+    protected Date subtractOneMinuteFromDate(Date date) {
+        Instant instant = Instant.from(date.toInstant());
+        instant = instant.minus(Duration.ofMinutes(1));
+        return Date.from(instant);
     }
 }

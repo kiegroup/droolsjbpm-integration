@@ -28,8 +28,6 @@ import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.util.ProcessInstanceQueryFilterSpecBuilder;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -220,12 +218,5 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
         ProcessInstanceQueryFilterSpecBuilder result = new ProcessInstanceQueryFilterSpecBuilder();
         filterProperties.forEach(result::equalsTo);
         return  result.get();
-    }
-
-    private Date subtractOneMinuteFromDate(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.MINUTE, -1);
-        return cal.getTime();
     }
 }
