@@ -1016,19 +1016,19 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
     }
-    
+
     @Test
-    public void testGetCommentPagination() {        
+    public void testGetCommentPagination() {
         int pageSize = 20;
-        
+
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
         assertNotNull(caseId);
         assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
-        
+
         for (int i = 0 ; i < 55 ; i++) {
             caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
         }
-        
+
         List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
         assertNotNull(firstPage);
         assertEquals(20, firstPage.size());
@@ -1036,7 +1036,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         for (int i = 0 ; firstPageIter.hasNext() ; i++) {
             assertComment(firstPageIter.next(), USER_YODA, "comment" + i);
         }
- 
+
         List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
         assertNotNull(secondPage);
         assertEquals(20, secondPage.size());
@@ -1044,7 +1044,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         for (int i = 20 ; secondPageIter.hasNext() ; i++) {
             assertComment(secondPageIter.next(), USER_YODA, "comment" + i);
         }
-        
+
         List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
         assertNotNull(thirdPage);
         assertEquals(15, thirdPage.size());
@@ -1761,6 +1761,105 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
         assertEquals(1, stages.size());
         assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
+    }
+
+    @Test
+    public void testCreateCaseWithCaseFileWithCommentsSorted() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_CONTACT_ROLE, USER_MARY);
+
+        List<CaseComment> comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(0, comments.size());
+        try {
+            caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "yoda's comment");
+            changeUser(USER_JOHN);
+            caseClient.addComment(CONTAINER_ID, caseId, USER_JOHN, "john's comment");
+            changeUser(USER_MARY);
+            caseClient.addComment(CONTAINER_ID, caseId, USER_MARY, "mary's comment");
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            CaseComment comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, CaseServicesClient.COMMENT_SORT_BY_AUTHOR, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, CaseServicesClient.COMMENT_SORT_BY_DATE, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+        } finally {
+            changeUser(USER_YODA);
+        }
     }
 
     private String startUserTaskCase(String owner, String contact) {

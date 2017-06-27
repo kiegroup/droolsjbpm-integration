@@ -28,6 +28,7 @@ import org.jbpm.casemgmt.api.model.instance.CaseFileInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseRoleInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentInstance;
+import org.jbpm.casemgmt.api.model.instance.CommentSortBy;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.TaskModelFactory;
@@ -334,12 +335,32 @@ public class CaseManagementServiceBase {
     }
 
     public CaseCommentList getComments(String containerId, String caseId, Integer page, Integer pageSize) {
-        Collection<CommentInstance> caseComments = caseService.getCaseComments(caseId, ConvertUtils.buildQueryContext(page, pageSize));
+        return getComments(containerId, caseId, null, page, pageSize);
+    }
+
+    public CaseCommentList getComments(String containerId, String caseId, String sort, Integer page, Integer pageSize) {
+        CommentSortBy sortBy = parseCommentSortBy(sort);
+        Collection<CommentInstance> caseComments = caseService.getCaseComments(caseId, sortBy, ConvertUtils.buildQueryContext(page, pageSize));
         logger.debug("Comments for case {} are {}", caseId, caseComments);
         List<CaseComment> comments = ConvertUtils.transformCaseComments(caseComments);
         CaseCommentList commentsList = new CaseCommentList(comments);
 
         return commentsList;
+    }
+
+    protected CommentSortBy parseCommentSortBy(String sort) {
+        if (sort == null || sort.isEmpty()) {
+            return CommentSortBy.Date;
+        }
+
+        if (sort.equalsIgnoreCase("date")) {
+            return CommentSortBy.Date;
+        } else if (sort.equalsIgnoreCase("author")) {
+            return CommentSortBy.Author;
+        }
+
+        logger.warn("Unexpected sort option for case comments '{}', returning default one - by date");
+        return CommentSortBy.Date;
     }
 
 }

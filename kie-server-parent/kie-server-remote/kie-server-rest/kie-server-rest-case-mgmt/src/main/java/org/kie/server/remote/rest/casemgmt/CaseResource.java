@@ -525,6 +525,7 @@ public class CaseResource extends AbstractCaseResource {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstanceComments(@javax.ws.rs.core.Context HttpHeaders headers,
             @PathParam(CONTAINER_ID) String containerId, @PathParam(CASE_ID) String caseId,
+            @QueryParam("sort") String sort,
             @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
 
         return invokeCaseOperation(headers,
@@ -532,7 +533,7 @@ public class CaseResource extends AbstractCaseResource {
                 caseId,
                 (Variant v, String type, Header... customHeaders) -> {
                     logger.debug("About to look for comments in case {}", caseId);
-                    CaseCommentList responseObject = this.caseManagementServiceBase.getComments(containerId, caseId, page, pageSize);
+                    CaseCommentList responseObject = this.caseManagementServiceBase.getComments(containerId, caseId, sort, page, pageSize);
 
                     logger.debug("Returning OK response with content '{}'", responseObject);
                     return createCorrectVariant(responseObject, headers, Response.Status.OK, customHeaders);

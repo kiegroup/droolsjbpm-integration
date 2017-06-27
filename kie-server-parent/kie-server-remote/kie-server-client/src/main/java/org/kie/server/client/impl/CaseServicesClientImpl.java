@@ -638,21 +638,26 @@ public class CaseServicesClientImpl extends AbstractKieServicesClientImpl implem
         internalRemoveRoleAssignment(containerId, caseId, roleName, null, group);
     }
 
-    @Override
     public List<CaseComment> getComments(String containerId, String caseId, Integer page, Integer pageSize) {
+        return getComments(containerId, caseId, "", page, pageSize);
+    }
+
+    @Override
+    public List<CaseComment> getComments(String containerId, String caseId, String sortBy, Integer page, Integer pageSize) {
         CaseCommentList list = null;
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(CONTAINER_ID, containerId);
             valuesMap.put(CASE_ID, caseId);
 
-            String queryString = getPagingQueryString("", page, pageSize);
+            String queryString = getPagingQueryString("?sort=" + sortBy, page, pageSize);
+
             list = makeHttpGetRequestAndCreateCustomResponse(
                     build(loadBalancer.getUrl(), CASE_URI + "/" + CASE_COMMENTS_GET_URI, valuesMap) + queryString, CaseCommentList.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
-                    (KieServerCommand) new DescriptorCommand("CaseService", "getComments", new Object[]{containerId, caseId, page, pageSize})) );
+                    (KieServerCommand) new DescriptorCommand("CaseService", "getComments", new Object[]{containerId, caseId, sortBy, page, pageSize})) );
             ServiceResponse<CaseCommentList> response = (ServiceResponse<CaseCommentList>)
                     executeJmsCommand( script, DescriptorCommand.class.getName(), KieServerConstants.CAPABILITY_CASE ).getResponses().get(0);
 

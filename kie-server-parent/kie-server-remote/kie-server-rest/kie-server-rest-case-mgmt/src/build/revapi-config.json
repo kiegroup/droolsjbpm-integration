@@ -51,7 +51,58 @@
         "classSimpleName": "PomModel",
         "elementKind": "interface",
         "justification": "move maven integration to uberfire"
-        }
+        },
+        {
+         "code": "java.annotation.removed",
+         "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+         "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+         "annotationType": "javax.ws.rs.DefaultValue",
+         "elementKind": "annotation",
+         "justification": "Added new method to support case instance comments basic sorting"
+         },
+         {
+         "code": "java.annotation.attributeValueChanged",
+         "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+         "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, ===java.lang.String===, java.lang.Integer, java.lang.Integer)",
+         "attribute": "value",
+         "oldValue": "\"page\"",
+         "newValue": "\"sort\"",
+         "annotationType": "javax.ws.rs.QueryParam",
+         "elementKind": "annotation",
+         "justification": "Added new method to support case instance comments basic sorting"
+         },
+         {
+         "code": "java.annotation.attributeValueChanged",
+         "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+         "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+         "attribute": "value",
+         "oldValue": "\"10\"",
+         "newValue": "\"0\"",
+         "annotationType": "javax.ws.rs.DefaultValue",
+         "elementKind": "annotation",
+         "justification": "Added new method to support case instance comments basic sorting"
+         },
+         {
+         "code": "java.annotation.attributeValueChanged",
+         "old": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.Integer, ===java.lang.Integer===)",
+         "new": "parameter javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, ===java.lang.Integer===, java.lang.Integer)",
+         "attribute": "value",
+         "oldValue": "\"pageSize\"",
+         "newValue": "\"page\"",
+         "annotationType": "javax.ws.rs.QueryParam",
+         "elementKind": "annotation",
+         "justification": "Added new method to support case instance comments basic sorting"
+         },
+         {
+         "code": "java.method.numberOfParametersChanged",
+         "old": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer)",
+         "new": "method javax.ws.rs.core.Response org.kie.server.remote.rest.casemgmt.CaseResource::getCaseInstanceComments(javax.ws.rs.core.HttpHeaders, java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer)",
+         "package": "org.kie.server.remote.rest.casemgmt",
+         "classSimpleName": "CaseResource",
+         "methodName": "getCaseInstanceComments",
+         "elementKind": "method",
+         "justification": "Added new method to support case instance comments basic sorting"
+         }
       ]
     }
   }
