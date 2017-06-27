@@ -15,7 +15,7 @@
       <plugin>
         <groupId>org.kie</groupId>
         <artifactId>kie-takari-plugin</artifactId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>${it-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <properties>
@@ -26,30 +26,4 @@
       </plugin>
     </plugins>
   </build>
-  <!--<repositories>
-    <repository>
-      <id>central</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>-->
 </project>
