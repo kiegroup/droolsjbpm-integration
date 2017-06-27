@@ -16,7 +16,7 @@
         <groupId>org.drools</groupId>
         <artifactId>drools-bom</artifactId>
         <!-- Version of Drools deps and kie-maven-plugin will always be the same, so we can reuse the property -->
-        <version>${it-plugin.version}</version>
+        <version>7.1.0-SNAPSHOT</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
