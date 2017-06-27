@@ -8,13 +8,13 @@
   <bpmn2:itemDefinition id="__44BE4412-91B0-4707-89DD-D45CECA36413_person_OutputXItem" structureRef="org.jbpm.data.Person"/>
   <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_string2_InputXItem" structureRef="String"/>
   <bpmn2:itemDefinition id="__87C563E0-EB8C-4184-BDB0-219E05780A0E_person2_InputXItem" structureRef="org.jbpm.data.Person"/>
-  <bpmn2:process id="definition-project.usertask" drools:packageName="org.jbpm" drools:version="1.0" name="usertask" isExecutable="true">
+  <bpmn2:process id="definition-project.usertask-search" drools:packageName="org.jbpm" drools:version="1.0" name="usertask-search" isExecutable="true">
     <bpmn2:property id="stringData" itemSubjectRef="_stringDataItem"/>
     <bpmn2:property id="personData" itemSubjectRef="_personDataItem"/>
     <bpmn2:startEvent id="processStartEvent" drools:selectable="true" color:background-color="#9acd32" color:border-color="#000000" color:color="#000000" name="start">
       <bpmn2:outgoing>_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4</bpmn2:outgoing>
     </bpmn2:startEvent>
-    <bpmn2:userTask id="_44BE4412-91B0-4707-89DD-D45CECA36413" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="First task">
+    <bpmn2:userTask id="_44BE4412-91B0-4707-89DD-D45CECA36413" drools:selectable="true" drools:scriptFormat="http://www.java.com/java" color:background-color="#fafad2" color:border-color="#000000" color:color="#000000" name="First task first">
       <bpmn2:incoming>_7DD40B5F-AE51-4DEA-99E3-79E8B02542F4</bpmn2:incoming>
       <bpmn2:outgoing>_3A18378C-AF7E-4A46-9E3F-439990743823</bpmn2:outgoing>
       <bpmn2:ioSpecification id="_u5JCEfpbEeSqMsMWx6c2wQ">
@@ -105,7 +105,7 @@
     <bpmn2:sequenceFlow id="_75C9F602-54EC-4C49-8B5F-90A1527ED698" drools:selectable="true" color:background-color="#000000" color:border-color="#000000" color:color="#000000" sourceRef="_87C563E0-EB8C-4184-BDB0-219E05780A0E" targetRef="_12205041-6185-4BC6-A152-CDC1569F1205"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="_u5KQMvpbEeSqMsMWx6c2wQ">
-    <bpmndi:BPMNPlane id="_u5KQM_pbEeSqMsMWx6c2wQ" bpmnElement="definition-project.usertask">
+    <bpmndi:BPMNPlane id="_u5KQM_pbEeSqMsMWx6c2wQ" bpmnElement="definition-project.usertask-search">
       <bpmndi:BPMNShape id="_u5KQNPpbEeSqMsMWx6c2wQ" bpmnElement="processStartEvent">
         <dc:Bounds height="30.0" width="30.0" x="120.0" y="165.0"/>
       </bpmndi:BPMNShape>
