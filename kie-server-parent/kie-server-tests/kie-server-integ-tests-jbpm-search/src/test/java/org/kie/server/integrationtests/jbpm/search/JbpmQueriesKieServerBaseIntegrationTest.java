@@ -89,6 +89,6 @@ public abstract class JbpmQueriesKieServerBaseIntegrationTest extends RestJmsSha
     public static void deleteLog() throws Exception {
         JobServicesClient jsc = createDefaultStaticClient().getServicesClient(JobServicesClient.class);
         long id = jsc.scheduleRequest(JobRequestInstance.builder().command("org.jbpm.executor.commands.LogCleanupCommand").build());
-        KieServerSynchronization.waitForJobToFinish(jsc, id);
+        KieServerSynchronization.waitForJobToFinish(jsc, id, 120000L);
     }
 }
