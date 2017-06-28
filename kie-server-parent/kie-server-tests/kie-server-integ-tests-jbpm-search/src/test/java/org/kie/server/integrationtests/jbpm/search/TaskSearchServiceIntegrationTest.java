@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.jbpm.search;
 
 import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
@@ -52,7 +53,8 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         extraClasses.put(PERSON_CLASS_NAME, Class.forName(PERSON_CLASS_NAME, true, kieContainer.getClassLoader()));
     }
 
-   // @Test
+    @Test
+    @Ignore("Disabled due to JBPM-6027.")
     public void testFindTaskWithIncompatibleTypeFilter() throws Exception {
         assertClientException(
                 () -> searchServicesClient.findHumanTasksWithFilters(createQueryFilterEqualsTo(TaskField.NAME, 1), 0, 100),
