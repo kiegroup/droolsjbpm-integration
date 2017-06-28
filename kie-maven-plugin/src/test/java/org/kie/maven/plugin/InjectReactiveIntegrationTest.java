@@ -10,14 +10,19 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.drools.compiler.xpath.tobeinstrumented.InjectReactiveMojoConfigTest;
 import org.drools.core.phreak.ReactiveObject;
 
 import org.junit.Test;
 
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegrationTest {
+
+    private static Logger logger = LoggerFactory.getLogger(InjectReactiveIntegrationTest.class);
 
     public InjectReactiveIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
         super(builder);
@@ -32,8 +37,8 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         result.assertErrorFreeLog();
         
         File classDir = new File(basedir, "target/classes");
-        
-        System.out.println(classDir);
+
+        logger.info(classDir.toString());
         
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());
@@ -67,8 +72,8 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         result.assertErrorFreeLog();
         
         File classDir = new File(basedir, "target/classes");
-        
-        System.out.println(classDir);
+
+        logger.info(classDir.toString());
         
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());

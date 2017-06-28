@@ -13,10 +13,14 @@ import io.takari.maven.testing.executor.MavenRuntime;
 import org.drools.core.phreak.ReactiveObject;
 import org.junit.Test;
 import org.kie.maven.plugin.BytecodeInjectReactive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 
 public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegrationTest {
+
+    private static Logger logger = LoggerFactory.getLogger(InjectReactiveIntegrationTest.class);
 
     public InjectReactiveIntegrationTest(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
         super(builder);
@@ -34,7 +38,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         File classDir = new File(basedir,
                                  "target/classes");
 
-        System.out.println(classDir);
+        logger.info(classDir.toString());
 
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());
@@ -74,7 +78,7 @@ public class InjectReactiveIntegrationTest extends KieMavenPluginBaseIntegration
         File classDir = new File(basedir,
                                  "target/classes");
 
-        System.out.println(classDir);
+        logger.info(classDir.toString());
 
         List<URL> classloadingURLs = new ArrayList<>();
         classloadingURLs.add(classDir.toURI().toURL());

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.drools.core.phreak.ReactiveObject;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.*;
 import static org.kie.maven.plugin.InjectReactiveMojo.convertAllToPkgRegExps;
@@ -12,13 +14,15 @@ import static org.kie.maven.plugin.InjectReactiveMojo.isPackageNameIncluded;
 
 public class InjectReactiveMojoConfigTest {
 
+    private static Logger logger = LoggerFactory.getLogger(InjectReactiveMojoConfigTest.class);
+
     @Test
     public void testRegexpForPackagesDefault() {
         String[] inputConfig = new String[]{"*"};
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertTrue(isPackageNameIncluded(Object.class.getPackage().getName(),
                                          config));
@@ -34,7 +38,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -50,7 +54,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -66,7 +70,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -82,7 +86,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -98,7 +102,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -114,7 +118,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        System.out.println(Arrays.asList(config));
+        logger.info(Arrays.asList(config).toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
