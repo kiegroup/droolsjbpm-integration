@@ -54,6 +54,10 @@ public class KieServerSynchronization {
     private static final long TIMEOUT_BETWEEN_CALLS = 200;
 
     public static void waitForJobToFinish(final JobServicesClient jobServicesClient, final Long jobId) throws Exception {
+        waitForJobToFinish(jobServicesClient, jobId, SERVICE_TIMEOUT);
+    }
+
+    public static void waitForJobToFinish(final JobServicesClient jobServicesClient, final Long jobId, final Long timeOut) throws Exception {
         waitForCondition(() -> {
             RequestInfoInstance result = jobServicesClient.getRequestById(jobId, false, false);
 
@@ -64,7 +68,7 @@ public class KieServerSynchronization {
                 return true;
             }
             return false;
-        });
+        }, timeOut);
     }
 
     public static void waitForKieServerSynchronization(final KieServicesClient client, final int numberOfExpectedContainers) throws Exception {
@@ -242,7 +246,15 @@ public class KieServerSynchronization {
      * @throws Exception
      */
     private static void waitForCondition(BooleanSupplier condition) throws Exception {
-        long timeoutTime = Calendar.getInstance().getTimeInMillis() + SERVICE_TIMEOUT;
+        waitForCondition(condition, SERVICE_TIMEOUT);
+    }
+
+    /**
+     * @param condition Condition result supplier. If returns true then condition is met.
+     * @throws Exception
+     */
+    private static void waitForCondition(BooleanSupplier condition, long timeOut) throws Exception {
+        long timeoutTime = Calendar.getInstance().getTimeInMillis() + timeOut;
         while (Calendar.getInstance().getTimeInMillis() < timeoutTime) {
 
             if (condition.getAsBoolean()) {
@@ -250,6 +262,6 @@ public class KieServerSynchronization {
             }
             Thread.sleep(TIMEOUT_BETWEEN_CALLS);
         }
-        throw new TimeoutException("Synchronization failed for defined timeout: " + SERVICE_TIMEOUT + " milliseconds.");
+        throw new TimeoutException("Synchronization failed for defined timeout: " + timeOut + " milliseconds.");
     }
 }

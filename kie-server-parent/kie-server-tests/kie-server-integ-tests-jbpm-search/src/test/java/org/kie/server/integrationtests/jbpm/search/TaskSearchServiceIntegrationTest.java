@@ -61,14 +61,14 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     }
 
     @Test
-    public void testFindTaskWithCreatedOnEqualsToFilter() throws Exception {
+    public void testFindTaskWithCreatedOnGreaterThanOrEqualsToFilter() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
-        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.CREATEDON, task.getCreatedOn()), task.getId());
+        testFindTaskInstanceWithSearchService(createQueryFilterGreaterThanOrEqualsTo(TaskField.CREATEDON, subtractOneMinuteFromDate(task.getCreatedOn())), task.getId());
     }
 
     @Test
@@ -182,14 +182,14 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     }
 
     @Test
-    public void testFindTaskWithActivationTimeEqualsToFilter() throws Exception {
+    public void testFindTaskWithActivationTimeGreaterThanEqualsToFilter() throws Exception {
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_USERTASK);
         Assertions.assertThat(processInstanceId).isNotNull();
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
         Assertions.assertThat(tasks).isNotEmpty();
         TaskSummary task = tasks.get(0);
-        testFindTaskInstanceWithSearchService(createQueryFilterEqualsTo(TaskField.ACTIVATIONTIME, task.getActivationTime()), task.getId());
+        testFindTaskInstanceWithSearchService(createQueryFilterGreaterThanOrEqualsTo(TaskField.ACTIVATIONTIME, subtractOneMinuteFromDate(task.getActivationTime())), task.getId());
     }
 
     @Test
@@ -276,10 +276,13 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
         return new TaskQueryFilterSpecBuilder().greaterThan(taskField, greaterThan).equalsTo(taskField, equalsTo).get();
     }
 
+    private TaskQueryFilterSpec createQueryFilterGreaterThanOrEqualsTo(TaskField taskField, Comparable<?> equalsTo) {
+        return  new TaskQueryFilterSpecBuilder().greaterOrEqualTo(taskField, equalsTo).get();
+    }
+
     private TaskQueryFilterSpec createQueryFilterAndEqualsTo(Map<TaskField, Comparable<?>> filterProperties) {
         TaskQueryFilterSpecBuilder result = new TaskQueryFilterSpecBuilder();
         filterProperties.forEach(result::equalsTo);
         return result.get();
     }
-
 }

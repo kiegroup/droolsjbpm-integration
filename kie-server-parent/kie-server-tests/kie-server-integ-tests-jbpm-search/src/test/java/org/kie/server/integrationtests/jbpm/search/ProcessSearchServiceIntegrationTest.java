@@ -61,11 +61,16 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
     }
 
     @Test
-    public void testFindProcessInstanceWithProcessNameEqualsToFilter() throws Exception {
+    public void testFindProcessInstanceWithProcessNameAndIdEqualsToFilter() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         Assertions.assertThat(processInstanceId).isNotNull();
-        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.PROCESSNAME, PROCESS_NAME_EVALUATION), processInstanceId);
+
+        HashMap<ProcessInstanceField, Comparable<?>> compareList = new HashMap<>();
+        compareList.put(ProcessInstanceField.PROCESSNAME, PROCESS_NAME_EVALUATION);
+        compareList.put(ProcessInstanceField.PROCESSINSTANCEID, processInstanceId);
+
+        testFindProcessInstanceWithQueryFilter(createQueryFilterAndEqualsTo(compareList), processInstanceId);
     }
 
     @Test
@@ -77,12 +82,12 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
     }
 
     @Test
-    public void testFindProcessInstanceWithStartDateEqualsToFilter() throws Exception {
+    public void testFindProcessInstanceWithStartDateGreaterThanOrEqualsToFilter() throws Exception {
         Map<String, Object> parameters = new HashMap<>();
         Long processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_EVALUATION, parameters);
         Assertions.assertThat(processInstanceId).isNotNull();
         ProcessInstance pi = processClient.getProcessInstance(CONTAINER_ID, processInstanceId);
-        testFindProcessInstanceWithQueryFilter(createQueryFilterEqualsTo(ProcessInstanceField.START_DATE, pi.getDate()), processInstanceId);
+        testFindProcessInstanceWithQueryFilter(createQueryFilterGreaterThanOrEqualsTo(ProcessInstanceField.START_DATE, subtractOneMinuteFromDate(pi.getDate())), processInstanceId);
     }
 
     @Test
@@ -101,7 +106,7 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
 
         HashMap<ProcessInstanceField, Comparable<?>> compareList = new HashMap<>();
         compareList.put(ProcessInstanceField.EXTERNALID, CONTAINER_ID);
-        compareList.put(ProcessInstanceField.PROCESSID, PROCESS_ID_EVALUATION);
+        compareList.put(ProcessInstanceField.PROCESSINSTANCEID, processInstanceId);
 
         testFindProcessInstanceWithQueryFilter(createQueryFilterAndEqualsTo(compareList), processInstanceId);
     }
@@ -113,7 +118,7 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
         Assertions.assertThat(processInstanceId).isNotNull();
 
         HashMap<ProcessInstanceField, Comparable<?>> compareList = new HashMap<>();
-        compareList.put(ProcessInstanceField.PROCESSID, PROCESS_ID_EVALUATION);
+        compareList.put(ProcessInstanceField.PROCESSINSTANCEID, processInstanceId);
         compareList.put(ProcessInstanceField.USER_IDENTITY, USER_YODA);
 
         testFindProcessInstanceWithQueryFilter(createQueryFilterAndEqualsTo(compareList), processInstanceId);
@@ -127,7 +132,7 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
 
         HashMap<ProcessInstanceField, Comparable<?>> compareList = new HashMap<>();
         compareList.put(ProcessInstanceField.PARENTPROCESSINSTANCEID, -1);
-        compareList.put(ProcessInstanceField.PROCESSNAME, PROCESS_NAME_EVALUATION);
+        compareList.put(ProcessInstanceField.PROCESSINSTANCEID, processInstanceId);
 
         testFindProcessInstanceWithQueryFilter(createQueryFilterAndEqualsTo(compareList), processInstanceId);
     }
@@ -203,6 +208,10 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
 
     private ProcessInstanceQueryFilterSpec createQueryFilterEqualsTo(ProcessInstanceField processInstanceField, Comparable<?> equalsTo) {
         return  new ProcessInstanceQueryFilterSpecBuilder().equalsTo(processInstanceField, equalsTo).get();
+    }
+
+    private ProcessInstanceQueryFilterSpec createQueryFilterGreaterThanOrEqualsTo(ProcessInstanceField processInstanceField, Comparable<?> equalsTo) {
+        return  new ProcessInstanceQueryFilterSpecBuilder().greaterOrEqualTo(processInstanceField, equalsTo).get();
     }
 
     private ProcessInstanceQueryFilterSpec createQueryFilterAndEqualsTo(Map<ProcessInstanceField, Comparable<?>> filterProperties) {
