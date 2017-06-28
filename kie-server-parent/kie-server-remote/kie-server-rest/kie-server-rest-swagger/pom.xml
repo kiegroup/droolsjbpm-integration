@@ -14,17 +14,6 @@
   <name>KIE :: Execution Server :: Remote :: REST :: Swagger</name>
   <description>KIE Server Swagger Extension</description>
 
-  <dependencyManagement>
-  	<!-- TODO: Move to parent POM or BOM. -->
-  	<dependencies>
-  		<dependency>
-  			<groupId>org.kie.server</groupId>
-  			<artifactId>kie-server-services-swagger</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  	</dependencies>
-  </dependencyManagement>
-
   <dependencies>
   	
     <dependency>

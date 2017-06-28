@@ -13,24 +13,6 @@
   <name>KIE :: Execution Server :: Wars :: Distribution Wars</name>
   <description>KIE Execution Server Distribution Wars. Name of the module is just 'kie-server' so that the final WARs have nicer names.</description>
 
-  <!-- TODO: Add to BOM or parent POM. -->
-  <dependencyManagement>
-    <dependencies>
-  	  <dependency>
-  		<groupId>org.kie.server</groupId>
-  		<artifactId>kie-server-services-swagger</artifactId>
-  		<version>${project.version}</version>
-		<scope>compile</scope>
-  	  </dependency>
-  	  <dependency>
-  		<groupId>org.kie.server</groupId>
-  		<artifactId>kie-server-rest-swagger</artifactId>
-  		<version>${project.version}</version>
-		<scope>compile</scope>
-  	  </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -143,7 +125,6 @@
     <dependency>
       <groupId>org.kie.server</groupId>
       <artifactId>kie-server-services-swagger</artifactId>
-      <!-- TODO Exclusions? -->
     </dependency>
     <dependency>
       <groupId>org.kie.server</groupId>
