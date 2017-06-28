@@ -50,7 +50,7 @@ public class SwaggerRestApplicationComponentsService implements KieServerApplica
         //TODO: Set the API version (or retrieve it from somewhere ...)
         //beanConfig.setVersion("1.0.2");
         String contextRoot = KieServerEnvironment.getContextRoot();
-        if (contextRoot != null && !("".equals(contextRoot))) {
+        if (contextRoot != null && !contextRoot.isEmpty()) {
         	beanConfig.setBasePath(contextRoot + "/services/rest");
         }
         beanConfig.setResourcePackage(RESOURCE_PACKAGES);
