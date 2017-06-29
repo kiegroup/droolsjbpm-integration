@@ -26,7 +26,11 @@
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
+        <version>1.12.5</version>
         <extensions>true</extensions>
+        <configuration>
+          <proc>none</proc>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -208,45 +212,24 @@
     </dependency>
     <dependency>
       <groupId>io.takari.maven.plugins</groupId>
-      <artifactId>takari-lifecycle-plugin</artifactId>
-      <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.takari.maven.plugins</groupId>
       <artifactId>takari-plugin-testing</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>io.takari.maven.plugins</groupId>
-      <artifactId>takari-plugin-integration-testing</artifactId>
-      <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-
     <!--Logs-->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-ext</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 </project>
