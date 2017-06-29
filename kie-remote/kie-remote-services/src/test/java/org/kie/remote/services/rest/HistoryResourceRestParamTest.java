@@ -37,16 +37,15 @@ public class HistoryResourceRestParamTest {
                              "" );
         String regex = path.substring( 0,
                                        path.length() - 1 );
-
         // Test : value with space
         String test = "my%20value%20with%20spaces";
         assertTrue( test,
                     Pattern.matches( regex,
                                      test ) );
         test = "my value";
-        assertFalse( test,
-                     Pattern.matches( regex,
-                                      test ) );
+        assertTrue(test,
+                Pattern.matches(regex,
+                        test));
     }
 
     @Test
@@ -60,16 +59,15 @@ public class HistoryResourceRestParamTest {
                              "" );
         String regex = path.substring( 0,
                                        path.indexOf( "}" ) );
-
         // Test : value with space
         String test = "my%20value%20with%20spaces";
         assertTrue( test,
                     Pattern.matches( regex,
                                      test ) );
         test = "my value";
-        assertFalse( test,
-                     Pattern.matches( regex,
-                                      test ) );
+        assertTrue(test,
+                Pattern.matches(regex,
+                        test));
 
     }
 
