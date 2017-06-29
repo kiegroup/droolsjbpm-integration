@@ -24,7 +24,9 @@ The following table lists all currently supported combinations of parameters:
 |     EAP 7           | eap7                  | eap7.download.url                         |
 |     Tomcat 8        | tomcat8               | *none*                                    |
 | Oracle WebLogic 12  | oracle-wls-12         | weblogic.home                             |
-| IBM WebSphere 9     | websphere9            | websphere.home                            |
+| IBM WebSphere 9*    | websphere9            | websphere.home                            |
+
+\* User used to run tests against WebSphere needs to have write access into WebSphere installation folder, subfolders and files.
 
 
 ## Database configuration
