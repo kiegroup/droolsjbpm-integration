@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.ExternalResource;
 import org.kie.api.KieServices;
-import org.kie.api.runtime.process.ProcessInstance;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.client.CaseServicesClient;
 import org.kie.server.client.JobServicesClient;
 import org.kie.server.client.KieServicesClient;
@@ -35,6 +35,8 @@ import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
 import org.kie.server.client.admin.CaseAdminServicesClient;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
+
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
 
 public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
@@ -72,8 +74,9 @@ public abstract class JbpmKieServerBaseIntegrationTest extends RestJmsSharedBase
     @After
     public void abortAllProcesses() {
         List<Integer> status = new ArrayList<Integer>();
-        status.add(ProcessInstance.STATE_ACTIVE);
-        List<org.kie.server.api.model.instance.ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100);
+        status.add(STATE_ACTIVE);
+        List<ProcessInstance> activeInstances = queryClient.findProcessInstancesByStatus(status, 0, 100,
+                CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, false);
         if (activeInstances != null) {
             for (org.kie.server.api.model.instance.ProcessInstance instance : activeInstances) {
                 processClient.abortProcessInstance(instance.getContainerId(), instance.getId());
