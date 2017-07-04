@@ -14,6 +14,7 @@
  */
 package org.kie.server.integrationtests.jbpm.cases;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,16 +22,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.text.MessageFormat;
 
+import org.assertj.core.api.Assertions;
+import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.api.KieServices;
-import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.api.task.model.Status;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseComment;
@@ -43,21 +45,22 @@ import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.definition.ProcessDefinition;
 import org.kie.server.api.model.instance.NodeInstance;
+import org.kie.server.api.model.instance.ProcessInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.CaseServicesClient;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.junit.Assert.*;
-import static org.kie.server.remote.rest.casemgmt.Messages.CASE_DEFINITION_NOT_FOUND;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ABORTED;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_ACTIVE;
+import static org.kie.api.runtime.process.ProcessInstance.STATE_COMPLETED;
 import static org.kie.server.remote.rest.casemgmt.Messages.CASE_INSTANCE_NOT_FOUND;
 import static org.kie.server.remote.rest.casemgmt.Messages.PROCESS_DEFINITION_NOT_FOUND;
-
-import org.junit.Ignore;
 
 public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -89,6 +92,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     private static final String CASE_HR_VERSION = "1.0";
 
     private static final String DATA_VERIFICATION_DEF_ID = "DataVerification";
+    private static final String USER_TASK_DEF_ID = "UserTask";
 
     private static final String HELLO_1_TASK = "Hello1";
     private static final String HELLO_2_TASK = "Hello2";
@@ -728,42 +732,42 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         String userTaskCase = startUserTaskCase(USER_YODA, USER_JOHN);
         String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 1);
+        List<ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(STATE_ACTIVE), 0, 1);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
         assertHrProcessInstance(processInstances.get(0), userTaskCase);
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(ProcessInstance.STATE_ACTIVE), 1, 1);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(STATE_ACTIVE), 1, 1);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(STATE_ACTIVE), 0, 10);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
         assertCarInsuranceProcessInstance(processInstances.get(0), carInsuranceClaimCase);
 
         caseClient.cancelCaseInstance(CONTAINER_ID, userTaskCase);
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(STATE_ACTIVE), 0, 10);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(ProcessInstance.STATE_ABORTED), 0, 10);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, userTaskCase, Arrays.asList(STATE_ABORTED), 0, 10);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
-        assertHrProcessInstance(processInstances.get(0), userTaskCase, ProcessInstance.STATE_ABORTED);
+        assertHrProcessInstance(processInstances.get(0), userTaskCase, STATE_ABORTED);
     }
 
     @Test
     public void testGetProcessInstancesNotExistingCase() {
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, "not-existing-case", Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10);
+        List<ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, "not-existing-case", Arrays.asList(STATE_ACTIVE), 0, 10);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
     }
 
     @Test
     public void testGetProcessInstancesNotExistingContainer() {
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances("not-existing-container", CASE_HR_DEF_ID, Arrays.asList(ProcessInstance.STATE_ACTIVE), 0, 10);
+        List<ProcessInstance> processInstances = caseClient.getProcessInstances("not-existing-container", CASE_HR_DEF_ID, Arrays.asList(STATE_ACTIVE), 0, 10);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
     }
@@ -773,17 +777,17 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
         caseClient.addDynamicSubProcess(CONTAINER_ID, carInsuranceClaimCase, DATA_VERIFICATION_DEF_ID, new HashMap<>());
 
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(ProcessInstance.STATE_ACTIVE, ProcessInstance.STATE_COMPLETED), 0, 1, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
+        List<ProcessInstance> processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(STATE_ACTIVE, STATE_COMPLETED), 0, 1, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
         assertEquals(processInstances.get(0).getProcessId(), CLAIM_CASE_DEF_ID);
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(ProcessInstance.STATE_ACTIVE, ProcessInstance.STATE_COMPLETED), 1, 1, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(STATE_ACTIVE, STATE_COMPLETED), 1, 1, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
         assertEquals(processInstances.get(0).getProcessId(), DATA_VERIFICATION_DEF_ID);
 
-        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(ProcessInstance.STATE_ACTIVE, ProcessInstance.STATE_COMPLETED), 0, 10, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, false);
+        processInstances = caseClient.getProcessInstances(CONTAINER_ID, carInsuranceClaimCase, Arrays.asList(STATE_ACTIVE, STATE_COMPLETED), 0, 10, CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, false);
         assertNotNull(processInstances);
         assertEquals(2, processInstances.size());
         assertEquals(processInstances.get(0).getProcessId(), DATA_VERIFICATION_DEF_ID);
@@ -795,7 +799,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         String userTaskCase = startUserTaskCase(USER_YODA, USER_JOHN);
         String carInsuranceClaimCase = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
 
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, userTaskCase, 0, 1);
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, userTaskCase, 0, 1);
         assertNotNull(processInstances);
         assertEquals(1, processInstances.size());
         assertHrProcessInstance(processInstances.get(0), userTaskCase);
@@ -818,15 +822,63 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
     @Test
     public void testGetActiveProcessInstancesNotExistingCase() {
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, "not-existing-case", 0, 10);
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, "not-existing-case", 0, 10);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
     }
 
     @Test
     public void testGetActiveProcessInstancesNotExistingContainer() {
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances("not-existing-container", CASE_HR_DEF_ID, 0, 10);
+        assertNotNull(processInstances);
+        assertEquals(0, processInstances.size());
+    }
 
-        List<org.kie.server.api.model.instance.ProcessInstance> processInstances = caseClient.getActiveProcessInstances("not-existing-container", CASE_HR_DEF_ID, 0, 10);
+    @Test
+    public void testGetActiveProcessInstancesSorting() {
+        String caseId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
+        caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, USER_TASK_DEF_ID, Collections.emptyMap());
+
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10,
+                CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, true);
+        Assertions.assertThat(processInstances).isNotNull().hasSize(2);
+        Assertions.assertThat(processInstances).extracting(ProcessInstance::getProcessId)
+                .containsExactly(CLAIM_CASE_DEF_ID, USER_TASK_DEF_ID);
+
+        processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10,
+                CaseServicesClient.SORT_BY_PROCESS_INSTANCE_ID, false);
+        assertNotNull(processInstances);
+        Assertions.assertThat(processInstances).isNotNull().hasSize(2);
+        Assertions.assertThat(processInstances).extracting(ProcessInstance::getProcessId)
+                .containsExactly(USER_TASK_DEF_ID, CLAIM_CASE_DEF_ID);
+
+        processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10,
+                CaseServicesClient.SORT_BY_PROCESS_NAME, true);
+        Assertions.assertThat(processInstances).isNotNull().hasSize(2);
+        Assertions.assertThat(processInstances).extracting(ProcessInstance::getProcessId)
+                .containsExactly(CLAIM_CASE_DEF_ID, USER_TASK_DEF_ID);
+    }
+
+    @Test
+    public void testGetActiveProcessInstancesSortingNotExistingField() {
+        String caseId = startCarInsuranceClaimCase(USER_JOHN, USER_YODA, USER_YODA);
+
+        Assertions.assertThatThrownBy(() -> caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10,
+                "xyz", true)).isInstanceOf(KieServicesException.class);
+    }
+
+    @Test
+    public void testGetActiveProcessInstancesSortingNotExistingCase() {
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances(CONTAINER_ID, "not-existing-case", 0, 10,
+                CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
+        assertNotNull(processInstances);
+        assertEquals(0, processInstances.size());
+    }
+
+    @Test
+    public void testGetActiveProcessInstancesSortingNotExistingContainer() {
+        List<ProcessInstance> processInstances = caseClient.getActiveProcessInstances("not-existing-container",
+                CASE_HR_DEF_ID, 0, 10, CaseServicesClient.SORT_BY_CASE_INSTANCE_ID, true);
         assertNotNull(processInstances);
         assertEquals(0, processInstances.size());
     }
@@ -928,11 +980,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(completedNodes);
         assertEquals(0, completedNodes.size());
 
-        List<org.kie.server.api.model.instance.ProcessInstance> instances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10);
+        List<ProcessInstance> instances = caseClient.getActiveProcessInstances(CONTAINER_ID, caseId, 0, 10);
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
-        org.kie.server.api.model.instance.ProcessInstance pi = instances.get(0);
+        ProcessInstance pi = instances.get(0);
         assertEquals(CASE_HR_DEF_ID, pi.getProcessId());
         assertEquals(caseId, pi.getCorrelationKey());
 
@@ -1016,40 +1068,40 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(comments);
         assertEquals(0, comments.size());
     }
-    
+
     @Test
-    public void testGetCommentPagination() {        
+    public void testGetCommentPagination() {
         int pageSize = 20;
-        
+
         String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
         assertNotNull(caseId);
         assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
-        
-        for (int i = 0 ; i < 55 ; i++) {
+
+        for (int i = 0; i < 55; i++) {
             caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "comment" + i);
         }
-        
+
         List<CaseComment> firstPage = caseClient.getComments(CONTAINER_ID, caseId, 0, pageSize);
         assertNotNull(firstPage);
         assertEquals(20, firstPage.size());
         Iterator<CaseComment> firstPageIter = firstPage.iterator();
-        for (int i = 0 ; firstPageIter.hasNext() ; i++) {
+        for (int i = 0; firstPageIter.hasNext(); i++) {
             assertComment(firstPageIter.next(), USER_YODA, "comment" + i);
         }
- 
+
         List<CaseComment> secondPage = caseClient.getComments(CONTAINER_ID, caseId, 1, pageSize);
         assertNotNull(secondPage);
         assertEquals(20, secondPage.size());
         Iterator<CaseComment> secondPageIter = secondPage.iterator();
-        for (int i = 20 ; secondPageIter.hasNext() ; i++) {
+        for (int i = 20; secondPageIter.hasNext(); i++) {
             assertComment(secondPageIter.next(), USER_YODA, "comment" + i);
         }
-        
+
         List<CaseComment> thirdPage = caseClient.getComments(CONTAINER_ID, caseId, 2, pageSize);
         assertNotNull(thirdPage);
         assertEquals(15, thirdPage.size());
         Iterator<CaseComment> thirdPageIter = thirdPage.iterator();
-        for (int i = 40 ; thirdPageIter.hasNext() ; i++) {
+        for (int i = 40; thirdPageIter.hasNext(); i++) {
             assertComment(thirdPageIter.next(), USER_YODA, "comment" + i);
         }
     }
@@ -1367,6 +1419,10 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(instances);
         assertEquals(1, instances.size());
 
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10, "t.name", true);
+        assertNotNull(instances);
+        assertEquals(1, instances.size());
+
         String caseId2 = startUserTaskCase(USER_YODA, USER_JOHN);
 
         assertNotNull(caseId2);
@@ -1382,6 +1438,108 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId2);
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsPotentialOwnerNotExistingCase() {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+        Assertions.assertThat(caseId).isNotNull().startsWith(CASE_HR_ID_PREFIX);
+
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case",
+                USER_YODA, 0, 10);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA, 0, 10,
+                "t.id", true);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner("not-existing-case", USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10,
+                "t.name", false);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsPotentialOwnerNoTasks() {
+        String caseId = startUserTaskCase(USER_JOHN, USER_MARY);
+        Assertions.assertThat(caseId).isNotNull().startsWith(CASE_HR_ID_PREFIX);
+
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10, "t.id", true);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsPotentialOwnerPaging() {
+        String caseId = startUserTaskCase(USER_JOHN, USER_YODA);
+        Assertions.assertThat(caseId).isNotNull().startsWith(CASE_HR_ID_PREFIX);
+
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskA", null, USER_YODA, null, Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskB", null, USER_YODA, null, Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskC", null, USER_YODA, null, Collections.emptyMap());
+
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 3);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskA", "TaskB", "TaskC");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 1, 3);
+        Assertions.assertThat(instances).isNotNull().isEmpty();
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 2, "t.id", true);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskA", "TaskB");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 1, 2, "t.id", true);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskC");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 1, "t.name", false);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskC");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 1, 1, "t.name", false);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskB");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 2, 1, "t.name", false);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsOnly("TaskA");
+    }
+
+    @Test
+    public void testFindCaseTasksAssignedAsPotentialOwnerSorting() {
+        String caseId = startUserTaskCase(USER_JOHN, USER_YODA);
+        Assertions.assertThat(caseId).isNotNull().startsWith(CASE_HR_ID_PREFIX);
+
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskA", null, USER_YODA, null, Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskB", null, USER_YODA, null, Collections.emptyMap());
+        caseClient.addDynamicUserTask(CONTAINER_ID, caseId, "TaskC", null, USER_YODA, null, Collections.emptyMap());
+
+        List<TaskSummary> instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA, 0, 10, "t.id", true);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsExactly("TaskA", "TaskB", "TaskC");
+
+        instances = caseClient.findCaseTasksAssignedAsPotentialOwner(caseId, USER_YODA,
+                Arrays.asList(Status.Ready.toString(), Status.Reserved.toString()), 0, 10, "t.name", false);
+        Assertions.assertThat(instances).isNotNull()
+                .extracting(TaskSummary::getName).containsExactly("TaskC", "TaskB", "TaskA");
     }
 
     @Test
@@ -1455,7 +1613,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         changeUser(USER_JOHN);
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
-
     }
 
     @Test
@@ -1563,7 +1720,6 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 "Case with id " + caseId + " was not found");
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
-
     }
 
     @Test
@@ -1580,14 +1736,14 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
             fail("User john is not an owner so is not allowed to cancel case instance");
         } catch (KieServicesException e) {
             String errorMessage = e.getMessage();
-            assertTrue(errorMessage.contains("User " + USER_JOHN +" is not authorized"));
+            assertTrue(errorMessage.contains("User " + USER_JOHN + " is not authorized"));
         }
         try {
             caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
             fail("User john is not an owner so is not allowed to destroy case instance");
         } catch (KieServicesException e) {
             String errorMessage = e.getMessage();
-            assertTrue(errorMessage.contains("User " + USER_JOHN +" is not authorized"));
+            assertTrue(errorMessage.contains("User " + USER_JOHN + " is not authorized"));
         }
 
         changeUser(USER_YODA);
@@ -1601,7 +1757,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     public void testGetProcessDefinitionsByContainer() {
         List<ProcessDefinition> definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 10);
         assertNotNull(definitions);
-        assertEquals(2, definitions.size());
+        assertEquals(3, definitions.size());
 
         List<String> mappedDefinitions = definitions.stream().map(ProcessDefinition::getId).collect(Collectors.toList());
         assertTrue(mappedDefinitions.contains("DataVerification"));
@@ -1615,7 +1771,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 1, 1);
         assertNotNull(definitions);
         assertEquals(1, definitions.size());
-        assertEquals("hiring", definitions.get(0).getId());
+        assertEquals(USER_TASK_DEF_ID, definitions.get(0).getId());
 
         definitions = caseClient.findProcessesByContainerId(CONTAINER_ID, 0, 1, CaseServicesClient.SORT_BY_PROCESS_NAME, false);
         assertNotNull(definitions);
@@ -1637,7 +1793,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
 
         definitions = caseClient.findProcesses(0, 10);
         assertNotNull(definitions);
-        assertEquals(2, definitions.size());
+        assertEquals(3, definitions.size());
 
         List<String> mappedDefinitions = definitions.stream().map(ProcessDefinition::getId).collect(Collectors.toList());
         assertTrue(mappedDefinitions.contains("DataVerification"));
@@ -1761,6 +1917,150 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         stages = caseClient.getStages(CONTAINER_ID, caseClaimId, true, 0, 10);
         assertEquals(1, stages.size());
         assertClaimAssesmentCaseStage(stages.iterator().next(), "Active");
+    }
+
+    @Test
+    public void testGetCaseInstancesByDataPaging() {
+        String case1 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        Assertions.assertThat(case1).isNotNull().startsWith(CLAIM_CASE_ID_PREFIX);
+        String case2 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        Assertions.assertThat(case2).isNotNull().startsWith(CLAIM_CASE_ID_PREFIX);
+        String case3 = startCarInsuranceClaimCase(USER_YODA, USER_JOHN, USER_YODA);
+        Assertions.assertThat(case3).isNotNull().startsWith(CLAIM_CASE_ID_PREFIX);
+
+        caseClient.putCaseInstanceData(CONTAINER_ID, case1, "claimReportDone", Boolean.TRUE);
+        caseClient.putCaseInstanceData(CONTAINER_ID, case2, "claimReportDone", Boolean.TRUE);
+        caseClient.putCaseInstanceData(CONTAINER_ID, case3, "claimReportDone", Boolean.TRUE);
+
+        List<CaseInstance> caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 0, 3);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case1, case2, case3);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 1, 3);
+        Assertions.assertThat(caseInstances).isEmpty();
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 0, 2);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case1, case2);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 1, 2);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case3);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 2, 2);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).isEmpty();
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 0, 1);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case1);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 1, 1);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case2);
+
+        caseInstances = caseClient.getCaseInstancesByData("claimReportDone",
+                Collections.singletonList(CaseStatus.OPEN.getName()), 2, 1);
+        Assertions.assertThat(caseInstances).extracting(CaseInstance::getCaseId).containsOnly(case3);
+    }
+
+    @Test
+    public void testCreateCaseWithCaseFileWithCommentsSorted() throws Exception {
+        String caseId = startUserTaskCase(USER_YODA, USER_JOHN);
+
+        assertNotNull(caseId);
+        assertTrue(caseId.startsWith(CASE_HR_ID_PREFIX));
+
+        caseClient.assignUserToRole(CONTAINER_ID, caseId, CASE_CONTACT_ROLE, USER_MARY);
+
+        List<CaseComment> comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+        assertNotNull(comments);
+        assertEquals(0, comments.size());
+        try {
+            caseClient.addComment(CONTAINER_ID, caseId, USER_YODA, "yoda's comment");
+            changeUser(USER_JOHN);
+            caseClient.addComment(CONTAINER_ID, caseId, USER_JOHN, "john's comment");
+            changeUser(USER_MARY);
+            caseClient.addComment(CONTAINER_ID, caseId, USER_MARY, "mary's comment");
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            CaseComment comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, CaseServicesClient.COMMENT_SORT_BY_AUTHOR, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comments = caseClient.getComments(CONTAINER_ID, caseId, CaseServicesClient.COMMENT_SORT_BY_DATE, 0, 10);
+            assertNotNull(comments);
+            assertEquals(3, comments.size());
+
+            comment = comments.get(0);
+            assertNotNull(comment);
+            assertEquals(USER_YODA, comment.getAuthor());
+            assertEquals("yoda's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(1);
+            assertNotNull(comment);
+            assertEquals(USER_JOHN, comment.getAuthor());
+            assertEquals("john's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+
+            comment = comments.get(2);
+            assertNotNull(comment);
+            assertEquals(USER_MARY, comment.getAuthor());
+            assertEquals("mary's comment", comment.getText());
+            assertNotNull(comment.getAddedAt());
+            assertNotNull(comment.getId());
+        } finally {
+            changeUser(USER_YODA);
+        }
     }
 
     private String startUserTaskCase(String owner, String contact) {
@@ -1889,11 +2189,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertTrue("Role 'assessor' is missing.", caseDefinition.getRoles().containsKey("assessor"));
     }
 
-    private void assertHrProcessInstance(org.kie.server.api.model.instance.ProcessInstance processInstance, String caseId) {
-        assertHrProcessInstance(processInstance, caseId, ProcessInstance.STATE_ACTIVE);
+    private void assertHrProcessInstance(ProcessInstance processInstance, String caseId) {
+        assertHrProcessInstance(processInstance, caseId, STATE_ACTIVE);
     }
 
-    private void assertHrProcessInstance(org.kie.server.api.model.instance.ProcessInstance processInstance, String caseId, long processInstanceState) {
+    private void assertHrProcessInstance(ProcessInstance processInstance, String caseId, long processInstanceState) {
         assertNotNull(processInstance);
         assertNotNull(processInstance.getId());
         assertEquals(caseId, processInstance.getCorrelationKey());
@@ -1909,11 +2209,11 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(processInstance.getDate());
     }
 
-    private void assertCarInsuranceProcessInstance(org.kie.server.api.model.instance.ProcessInstance processInstance, String caseId) {
+    private void assertCarInsuranceProcessInstance(ProcessInstance processInstance, String caseId) {
         assertNotNull(processInstance);
         assertNotNull(processInstance.getId());
         assertEquals(caseId, processInstance.getCorrelationKey());
-        assertEquals(ProcessInstance.STATE_ACTIVE, processInstance.getState().intValue());
+        assertEquals(STATE_ACTIVE, processInstance.getState().intValue());
         assertEquals(CLAIM_CASE_DEF_ID, processInstance.getProcessId());
         assertEquals(CLAIM_CASE_NAME, processInstance.getProcessName());
         assertEquals(CLAIM_CASE_VERSION, processInstance.getProcessVersion());
@@ -1981,7 +2281,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertEquals("Negotiation meeting", adHocFragments.get(0).getName());
         assertEquals("HumanTaskNode", adHocFragments.get(0).getType());
     }
-    
+
     private void assertComment(CaseComment comment, String author, String text) {
         assertNotNull(comment);
         assertEquals(comment.getAuthor(), author);
@@ -1992,10 +2292,9 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
     public void testAddDynamicProcessToCaseNotExistingCase() {
         String invalidCaseId = "not-existing-case-id";
         assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
-                              404,
-                              MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
-                              "Case with id " + invalidCaseId + " was not found");
-
+                404,
+                MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
+                "Case with id " + invalidCaseId + " was not found");
     }
 
     @Test
@@ -2011,8 +2310,8 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertNotNull(caseId);
 
         assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, caseId, invalidProcessId, null),
-                              404,
-                              MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
-                              "No process definition found with id: " + invalidProcessId);
+                404,
+                MessageFormat.format(PROCESS_DEFINITION_NOT_FOUND, invalidProcessId, CONTAINER_ID),
+                "No process definition found with id: " + invalidProcessId);
     }
 }

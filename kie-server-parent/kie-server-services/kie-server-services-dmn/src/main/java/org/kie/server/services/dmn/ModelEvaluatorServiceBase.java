@@ -75,6 +75,7 @@ public class ModelEvaluatorServiceBase {
             List<DMNModel> models = kieRuntime.getModels();
             List<DMNModelInfo> result = models.stream().map(ModelEvaluatorServiceBase::modelToInfo).collect(Collectors.toList());
             
+            kieSession.dispose();
             return new ServiceResponse<DMNModelInfoList>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK models successfully retrieved from container '" + containerId + "'",
@@ -163,7 +164,6 @@ public class ModelEvaluatorServiceBase {
             DMNResultKS res = new DMNResultKS(model.getNamespace(), model.getName(), evalCtx.getDecisionName(), result);
             
             kieSession.dispose();
-            
             return new ServiceResponse<DMNResultKS>(
                     ServiceResponse.ResponseType.SUCCESS,
                     "OK from container '" + containerId + "'",

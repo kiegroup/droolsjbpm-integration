@@ -46,6 +46,9 @@ public interface CaseServicesClient {
 
     public static final String SORT_BY_PROCESS_INSTANCE_ID = "ProcessInstanceId";
 
+    public static final String COMMENT_SORT_BY_AUTHOR = "Author";
+    public static final String COMMENT_SORT_BY_DATE = "Date";
+
     String startCase(String containerId, String caseDefinitionId);
 
     String startCase(String containerId, String caseDefinitionId, CaseFile caseFile);
@@ -117,6 +120,8 @@ public interface CaseServicesClient {
     void removeGroupFromRole(String containerId, String caseId, String roleName, String group);
 
     List<CaseComment> getComments(String containerId, String caseId, Integer page, Integer pageSize);
+
+    List<CaseComment> getComments(String containerId, String caseId, String sortBy, Integer page, Integer pageSize);
 
     void addComment(String containerId, String caseId, String author, String text);
 

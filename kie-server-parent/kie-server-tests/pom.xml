@@ -227,6 +227,18 @@
                     <role>Accounting</role>
                   </roles>
                 </user>
+                <user>
+                  <name>mary</name>
+                  <password>usetheforce123@</password>
+                  <roles>
+                    <role>kie-server</role>
+                    <role>guest</role>
+                    <role>engineering</role>
+                    <role>HR</role>
+                    <role>IT</role>
+                    <role>Accounting</role>
+                  </roles>
+                </user>
               </users>
               <properties>
                 <cargo.servlet.port>${container.port}</cargo.servlet.port>

@@ -15,6 +15,8 @@
  */
 package org.kie.spring.namespace;
 
+import java.util.List;
+
 import org.drools.core.ClockType;
 import org.drools.core.SessionConfiguration;
 import org.drools.core.command.runtime.SetGlobalCommand;
@@ -23,7 +25,6 @@ import org.drools.core.command.runtime.process.StartProcessCommand;
 import org.drools.core.command.runtime.rule.FireAllRulesCommand;
 import org.drools.core.command.runtime.rule.FireUntilHaltCommand;
 import org.drools.core.command.runtime.rule.InsertObjectCommand;
-import org.springframework.util.StringUtils;
 import org.kie.spring.factorybeans.KSessionFactoryBean;
 import org.kie.spring.factorybeans.helper.StatefulKSessionFactoryBeanHelper;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -33,12 +34,11 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.List;
 
 import static org.kie.spring.namespace.DefinitionParserHelper.emptyAttributeCheck;
 
@@ -55,7 +55,7 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
     private static final String IMPLEMENTATION_ATTRIBUTE = "implementation";
 
     private static final String KEEP_REFERENCE = "keep-reference";
-    private static final String CLOCK_TYPE = "clock-type";
+    private static final String CLOCK_TYPE = "clockType";
     private static final String SCOPE = "scope";
 
     private static final String WORK_ITEMS = "work-item-handlers";
@@ -89,6 +89,11 @@ public class KSessionDefinitionParser extends AbstractBeanDefinitionParser {
             factory.addPropertyValue(SCOPE, scope);
         } else {
             factory.addPropertyValue(SCOPE, "singleton");
+        }
+
+        String clockType = element.getAttribute(CLOCK_TYPE);
+        if (StringUtils.hasLength(clockType)){
+            factory.addPropertyValue(CLOCK_TYPE, clockType);
         }
 
         String listeners = element.getAttribute(LISTENERS_REF_ATTRIBUTE);

@@ -16,12 +16,18 @@
 
 package org.kie.spring.factorybeans;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.command.Command;
 import org.kie.api.event.KieRuntimeEventManager;
 import org.kie.api.event.process.ProcessEventListener;
+import org.kie.api.event.rule.AgendaEventListener;
+import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.kie.api.logger.KieLoggers;
 import org.kie.api.logger.KieRuntimeLogger;
 import org.kie.api.runtime.KieRuntime;
@@ -35,11 +41,7 @@ import org.kie.spring.factorybeans.helper.StatelessKSessionFactoryBeanHelper;
 import org.kie.spring.namespace.EventListenersUtil;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.kie.api.event.rule.AgendaEventListener;
-import org.kie.api.event.rule.RuleRuntimeEventListener;
 import org.springframework.beans.factory.support.ManagedList;
-
-import java.util.*;
 
 public class KSessionFactoryBean
         implements
@@ -52,6 +54,7 @@ public class KSessionFactoryBean
     private KieBase kBase;
     private String kBaseName;
     private String name;
+    private String clockType;
     private List<Command<?>> batch;
     private KieSessionConfiguration conf;
     private StatefulKSessionFactoryBeanHelper.JpaConfiguration jpaConfiguration;
@@ -119,6 +122,14 @@ public class KSessionFactoryBean
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getClockType() {
+        return clockType;
+    }
+
+    public void setClockType( String clockType ) {
+        this.clockType = clockType;
     }
 
     public String getScope() {

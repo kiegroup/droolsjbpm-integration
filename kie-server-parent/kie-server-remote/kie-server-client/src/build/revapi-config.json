@@ -115,24 +115,33 @@
           "elementKind": "method",
           "justification": "JBPM-5851 Technical Error Events"
         },
-	{
-	  "code": "java.method.addedToInterface",
-	  "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer)",
-	  "package": "org.kie.server.client",
-	  "classSimpleName": "ProcessServicesClient",
-	  "methodName": "findProcessInstances",
-	  "elementKind": "method",
-	  "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
-	},
-	{
-	  "code": "java.method.addedToInterface",
-	  "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
-	  "package": "org.kie.server.client",
-	  "classSimpleName": "ProcessServicesClient",
-	  "methodName": "findProcessInstances",
-	  "elementKind": "method",
-	  "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
-	}
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findProcessInstances",
+          "elementKind": "method",
+          "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method java.util.List<org.kie.server.api.model.instance.ProcessInstance> org.kie.server.client.ProcessServicesClient::findProcessInstances(java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.String, boolean)",
+          "package": "org.kie.server.client",
+          "classSimpleName": "ProcessServicesClient",
+          "methodName": "findProcessInstances",
+          "elementKind": "method",
+          "justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
+        },
+        {
+         "code": "java.method.addedToInterface",
+         "new": "method java.util.List<org.kie.server.api.model.cases.CaseComment> org.kie.server.client.CaseServicesClient::getComments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer)",
+         "package": "org.kie.server.client",
+         "classSimpleName": "CaseServicesClient",
+         "methodName": "getComments",
+         "elementKind": "method",
+         "justification": "Added new method to support case instance comments basic sorting"
+         }
       ]
     }
   }
