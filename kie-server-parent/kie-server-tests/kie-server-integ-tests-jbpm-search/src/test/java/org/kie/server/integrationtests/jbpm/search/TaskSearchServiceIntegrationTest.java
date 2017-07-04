@@ -69,7 +69,8 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                      0,
                                                                                      100 ),
                                400,
-                               BAD_REQUEST.split("\\{",2)[0] );
+                               BAD_REQUEST.split( "\\{",
+                                                  2 )[0] );
     }
 
     @Test
