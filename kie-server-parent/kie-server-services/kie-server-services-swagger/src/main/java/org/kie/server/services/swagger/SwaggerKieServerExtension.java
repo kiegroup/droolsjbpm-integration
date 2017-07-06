@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -29,6 +30,12 @@ import org.kie.server.services.api.SupportedTransports;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.config.DefaultJaxrsScanner;
+import io.swagger.jaxrs.config.JaxrsScanner;
+import io.swagger.jaxrs.config.SwaggerContextService;
+import io.swagger.jaxrs.config.SwaggerScannerLocator;
 
 public class SwaggerKieServerExtension implements KieServerExtension {
 
@@ -58,6 +65,27 @@ public class SwaggerKieServerExtension implements KieServerExtension {
     public void init(KieServerImpl kieServer, KieServerRegistry registry) {
     	this.kieServer = kieServer;
     	this.context = registry;
+    	
+    	JaxrsScanner jaxrsScanner = new DefaultJaxrsScanner();
+		jaxrsScanner.setPrettyPrint(true);
+		/*
+		 * Set our JAX-RS Scanner with SCANNER_ID_DEFAULT.
+		 * We need to do this before creating the BeanConfig, as this prevents the BeanConfig to register itself as the default scanner.
+		 * The first one wins.
+		 */
+		SwaggerScannerLocator.getInstance()	.putScanner((SwaggerContextService.SCANNER_ID_DEFAULT), jaxrsScanner);
+
+		BeanConfig beanConfig = new BeanConfig();
+		// TODO: Set the API version (or retrieve it from somewhere ...)
+		// beanConfig.setVersion("1.0.2");
+
+		String contextRoot = KieServerEnvironment.getContextRoot();
+		if (contextRoot != null && !contextRoot.isEmpty()) {
+			beanConfig.setBasePath(contextRoot + "/services/rest");
+		}
+
+		beanConfig.setScan(true);
+    	
     	initialized = true;
     }
 
@@ -121,7 +149,7 @@ public class SwaggerKieServerExtension implements KieServerExtension {
 
     @Override
     public Integer getStartOrder() {
-        return 50;
+        return Integer.MAX_VALUE;
     }
 
     @Override
