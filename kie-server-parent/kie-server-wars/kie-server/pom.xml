@@ -326,23 +326,6 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.projectodd.jrapidoc</groupId>
-        <artifactId>jrapidoc-rest-plugin</artifactId>
-        <version>0.5.0.Final</version>
-        <executions><execution>
-          <id>run</id>
-          <goals><goal>run</goal></goals>
-        </execution></executions>
-        <configuration>
-          <modelTarget>${project.build.directory}/rest-api-doc</modelTarget>
-          <groups><group>
-            <baseUrl>REMOTE-URL/services/rest</baseUrl>
-            <description>KIE Server REST API</description>
-            <includes><include>org.kie.server</include></includes>
-          </group></groups>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 
