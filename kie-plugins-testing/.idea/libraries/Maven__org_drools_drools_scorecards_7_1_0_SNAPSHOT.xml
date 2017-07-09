@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.drools:drools-scorecards:7.1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-scorecards/7.1.0-SNAPSHOT/drools-scorecards-7.1.0-20170707.192040-217.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-scorecards/7.1.0-SNAPSHOT/drools-scorecards-7.1.0-20170707.192040-217-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-scorecards/7.1.0-SNAPSHOT/drools-scorecards-7.1.0-20170707.192040-217-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

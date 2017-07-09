@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.drools:drools-templates:7.1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-templates/7.1.0-SNAPSHOT/drools-templates-7.1.0-20170707.191340-218.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-templates/7.1.0-SNAPSHOT/drools-templates-7.1.0-20170707.191340-218-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/drools/drools-templates/7.1.0-SNAPSHOT/drools-templates-7.1.0-20170707.191340-218-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

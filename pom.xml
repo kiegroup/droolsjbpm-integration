@@ -75,6 +75,7 @@
     <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
     <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
+    <module>kie-plugins-testing</module>
   </modules>
 
   <dependencyManagement>
