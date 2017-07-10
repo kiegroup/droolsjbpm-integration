@@ -17,11 +17,11 @@ package org.kie.server.services;
 
 import java.nio.charset.Charset;
 import java.util.UUID;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.services.impl.KieServerImpl;
 import org.kie.server.services.impl.KieServerLocator;
@@ -36,6 +36,8 @@ public class Bootstrap implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
+    	KieServerEnvironment.setContextRoot(sce.getServletContext().getContextPath());
+    	
         if (KieServerEnvironment.getServerId() == null) {
             String serverName = sce.getServletContext().getServletContextName() +"@"+ sce.getServletContext().getContextPath();
             String serverId = UUID.nameUUIDFromBytes(serverName.getBytes(Charset.forName("UTF-8"))).toString();

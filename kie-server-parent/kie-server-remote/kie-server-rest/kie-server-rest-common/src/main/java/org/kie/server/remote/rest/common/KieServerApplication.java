@@ -37,9 +37,7 @@ public class KieServerApplication extends Application {
 
 	private final Set<Object> instances;
 	
-	public KieServerApplication(@Context ServletContext context) {
-		KieServerEnvironment.setContextRoot(context.getContextPath());
-		
+	public KieServerApplication() {
 		instances = new CopyOnWriteArraySet<Object>() {
 			private static final long serialVersionUID = 1763183096852523317L;
 			{
