@@ -12,6 +12,7 @@
   <groupId>org.kie</groupId>
   <artifactId>kie-maven-plugin</artifactId>
   <packaging>takari-maven-plugin</packaging>
+  <!--<packaging>jar</packaging>-->
 
   <name>KIE :: Maven Plugin</name>
 
@@ -26,7 +27,6 @@
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>1.12.5</version>
         <extensions>true</extensions>
         <configuration>
           <proc>none</proc>
