@@ -16,6 +16,7 @@
 package org.kie.server.services.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -29,17 +30,31 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.naming.InitialContext;
 
 import org.appformer.maven.support.DependencyFilter;
 import org.drools.compiler.kie.builder.impl.InternalKieContainer;
 import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
+import org.kie.api.builder.model.KieBaseModel;
+import org.kie.api.builder.model.KieModuleModel;
+import org.kie.api.builder.model.KieSessionModel;
+import org.kie.api.builder.model.KieSessionModel.KieSessionType;
+import org.kie.api.conf.EqualityBehaviorOption;
+import org.kie.api.conf.EventProcessingOption;
+import org.kie.api.io.ResourceType;
+import org.kie.internal.utils.KieHelper;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.Version;
+import org.kie.server.api.model.KieContainerKjarResourcesRequest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -48,8 +63,10 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
+import org.kie.server.api.model.KjarResource;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ResourceTypeEnum;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponse.ResponseType;
 import org.kie.server.api.model.Severity;
@@ -331,6 +348,44 @@ public class KieServerImpl implements KieServer {
             this.containerMessages.put(containerId, messages);
         }
 
+    }
+    
+    public ServiceResponse<KieContainerResource> createContainerFromResources( String id, KieContainerKjarResourcesRequest containerAndResources ){
+       	KieServices ks = KieServices.Factory.get();
+    	
+    	//Create a KJAR in memory and deploy it to the internal KIE Registry.
+    	KieHelper helper = new KieHelper();
+    	
+    	//Add the resources.
+    	Collection<KjarResource> resources = containerAndResources.getKjarResources();
+    	
+    	for(KjarResource nextKjarResource: resources) {
+    		helper.addContent(nextKjarResource.getResource(), getResourceType(nextKjarResource.getResourceType()));
+    	}
+    	
+    	KieFileSystem kfs = helper.kfs;
+    	
+    	//Add the kmodule.xml
+    	KieModuleModel kmoduleModel = ks.newKieModuleModel();
+    	KieBaseModel kbModel = kmoduleModel.newKieBaseModel("default-kiebase").setEqualsBehavior(EqualityBehaviorOption.EQUALITY).setEventProcessingMode(EventProcessingOption.CLOUD); 
+    	KieSessionModel ksModel = kbModel.newKieSessionModel("default-kiesession").setType(KieSessionType.STATELESS);
+    	kfs.writeKModuleXML(kmoduleModel.toXML());
+    	
+    	//Add the pom.xml		
+    	kfs.generateAndWritePomXML(containerAndResources.getKieContainerResource().getReleaseId());
+    	
+    	//Build everything.
+    	KieBuilder kieBuilder = ks.newKieBuilder(kfs).buildAll();
+    	//TODO: Check the result of the build
+    	
+        //And get the KieModule.
+        KieModule kieModule = kieBuilder.getKieModule(); 
+        
+        //Add the KieModule to the internal registry so we can reference it and create a container from it.
+    	KieRepository kr = ks.getRepository();
+    	kr.addKieModule(kieModule);
+    	
+    	return createContainer(id, containerAndResources.getKieContainerResource());
     }
 
     public ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter) {
@@ -884,4 +939,97 @@ public class KieServerImpl implements KieServer {
                 "location='" + kieServerLocation + '\'' +
                 '}';
     }
+    
+    private ResourceType getResourceType(ResourceTypeEnum resourceType) {
+		ResourceType type = null;
+		switch(resourceType) {
+		case BAYES:
+			type = ResourceType.BAYES;
+			break;
+		case BPMN2:
+			type = ResourceType.BPMN2;
+			break;
+		case BRL:
+			type = ResourceType.BRL;
+			break;
+		case CHANGE_SET:
+			type = ResourceType.CHANGE_SET;
+			break;
+		case DESCR:
+			type = ResourceType.DESCR;
+			break;
+		case DMN:
+			type = ResourceType.DMN;
+			break;
+		case DRL:
+			type = ResourceType.DRL;
+			break;
+		case DRF:
+			type = ResourceType.DRF;
+			break;
+		case DRT:
+			type = ResourceType.DRT;
+			break;
+		case DSL:
+			type = ResourceType.DSL;
+			break;
+		case DSLR:
+			type = ResourceType.DSLR;
+			break;
+		case DTABLE:
+			type = ResourceType.DTABLE;
+			break;
+		case FEEL:
+			type = ResourceType.FEEL;
+			break;
+		case GDRL:
+			type = ResourceType.GDRL;
+			break;
+		case GDST:
+			type = ResourceType.GDST;
+			break;
+		case JAVA:
+			type = ResourceType.JAVA;
+			break;
+		case PKG:
+			type = ResourceType.PKG;
+			break;
+		case PMML:
+			type = ResourceType.PMML;
+			break;
+		case PROPERTIES:
+			type = ResourceType.PROPERTIES;
+			break;
+		case RDRL:
+			type = ResourceType.RDRL;
+			break;
+		case RDSLR:
+			type = ResourceType.RDSLR;
+			break;
+		case SCARD:
+			type = ResourceType.SCARD;
+			break;
+		case SCGD:
+			type = ResourceType.SCGD;
+			break;
+		case SOLVER:
+			type = ResourceType.SOLVER;
+			break;
+		case TDRL:
+			type = ResourceType.TDRL;
+			break;
+		case TEMPLATE:
+			type = ResourceType.TEMPLATE;
+			break;
+		case XDRL:
+			type = ResourceType.XDRL;
+			break;
+		case XSD:
+			type = ResourceType.XSD;
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported ResourceType.");
+		}
+		return type;
+	}
 }

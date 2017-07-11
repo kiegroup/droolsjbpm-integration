@@ -17,6 +17,7 @@ package org.kie.server.client;
 
 import org.kie.api.command.Command;
 import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.model.KieContainerKjarResourcesRequest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -39,6 +40,8 @@ public interface KieServicesClient {
     ServiceResponse<KieContainerResourceList> listContainers(KieContainerResourceFilter containerFilter);
 
     ServiceResponse<KieContainerResource> createContainer(String id, KieContainerResource resource);
+    
+    ServiceResponse<KieContainerResource> createContainerFromResources(String id, KieContainerKjarResourcesRequest containerAndResources);
 
     ServiceResponse<KieContainerResource> getContainerInfo(String id);
 
