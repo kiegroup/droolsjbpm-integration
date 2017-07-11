@@ -13,7 +13,6 @@ public class PojoWithCollections {
     public PojoWithCollections(Collection fieldCollection,
                                List fieldList,
                                Set fieldSet) {
-        super();
         this.fieldCollection = fieldCollection;
         this.fieldList = fieldList;
         this.fieldSet = fieldSet;

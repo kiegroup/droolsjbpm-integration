@@ -22,7 +22,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertTrue(isPackageNameIncluded(Object.class.getPackage().getName(),
                                          config));
@@ -38,7 +38,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -54,7 +54,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -70,7 +70,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -86,7 +86,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -102,7 +102,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
@@ -118,7 +118,7 @@ public class InjectReactiveMojoConfigTest {
 
         List<String> config = convertAllToPkgRegExps(inputConfig);
 
-        logger.info(Arrays.asList(config).toString());
+        logger.info(config.toString());
 
         assertFalse(isPackageNameIncluded(Object.class.getPackage().getName(),
                                           config));
