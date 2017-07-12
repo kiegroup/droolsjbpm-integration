@@ -195,20 +195,6 @@
                 </execution>
               </executions>
             </plugin>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <configuration>
-                <configuration>
-                  <configfiles>
-                    <configfile>
-                      <file>${project.basedir}/src/test/config/context.xml</file>
-                      <todir>/conf</todir>
-                    </configfile>
-                  </configfiles>
-                </configuration>
-              </configuration>
-            </plugin>
           </plugins>
         </pluginManagement>
       </build>

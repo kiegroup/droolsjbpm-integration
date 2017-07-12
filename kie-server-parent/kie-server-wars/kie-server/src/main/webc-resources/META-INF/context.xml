@@ -9,6 +9,6 @@
 
 
   <Resource name="jdbc/jbpm" auth="Container" type="javax.sql.DataSource"
-            username="sa" password="sa" driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
+            driverClassName="com.arjuna.ats.jdbc.TransactionalDriver"
             url="jdbc:arjuna:java:comp/env/sharedDataSource" />
 </Context>
