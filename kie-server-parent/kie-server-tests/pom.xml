@@ -413,6 +413,21 @@
                       className=org.apache.catalina.authenticator.SingleSignOn
                     </cargo.tomcat.valve.sso>
                   </properties>
+                  <resources>
+                    <resource>
+                      <name>sharedDataSource</name>
+                      <type>org.h2.jdbcx.JdbcDataSource</type>
+                      <parameters>
+                        <user>sa</user>
+                        <password>sa</password>
+                        <url>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MVCC=TRUE</url>
+                        <description>H2 Data Source</description>
+                        <loginTimeout>0</loginTimeout>
+                        <testOnBorrow>false</testOnBorrow>
+                        <factory>org.h2.jdbcx.JdbcDataSourceFactory</factory>
+                      </parameters>
+                    </resource>
+                  </resources>
                 </configuration>
               </configuration>
             </plugin>
