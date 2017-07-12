@@ -12,7 +12,6 @@
   <groupId>org.kie</groupId>
   <artifactId>kie-maven-plugin</artifactId>
   <packaging>takari-maven-plugin</packaging>
-  <!--<packaging>jar</packaging>-->
 
   <name>KIE :: Maven Plugin</name>
 
