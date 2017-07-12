@@ -199,15 +199,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
     </dependency>
-    <!-- Was added to support log on Maven 3.0.5 but now old; if this dep is missing, when running takari for maven 3.0.5 the log might be missing some lines from the internal classes logging.
-         Also could be handy for temporarily turn on debug output of the inner classes while performing tests using the takari framework.
-         But in conclusion, not a good practice to depend on logging implementation.
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-simple</artifactId>
-          <scope>runtime</scope>
-        </dependency> -->
-
     <!-- Testing deps -->
     <dependency>
       <groupId>org.apache.maven</groupId>
