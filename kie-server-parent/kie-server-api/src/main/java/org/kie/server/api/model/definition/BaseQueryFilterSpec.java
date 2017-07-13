@@ -15,9 +15,13 @@
 
 package org.kie.server.api.model.definition;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+
+import org.kie.server.api.model.Wrapped;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class BaseQueryFilterSpec {
@@ -51,6 +55,27 @@ public abstract class BaseQueryFilterSpec {
 
 	public void setParameters(QueryParam[] parameters) {
 		this.parameters = parameters;
+	}
+
+	protected void unwrapParameters() {
+		if (parameters == null) {
+			return;
+		}
+		for (QueryParam param : parameters) {
+			if (param.getValue() != null) {
+				List<Object> items = new ArrayList<>();
+
+				param.getValue().forEach(item -> {
+					Object toAdd = item;
+					if (item instanceof Wrapped) {
+						toAdd = ((Wrapped) item).unwrap();
+					}
+					items.add(toAdd);
+				});
+
+				param.setValue(items);
+			}
+		}
 	}
 	
 }
