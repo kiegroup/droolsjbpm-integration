@@ -16,7 +16,7 @@
 package org.kie.server.services.impl;
 
 import org.assertj.core.api.Assertions;
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.drools.core.impl.InternalKieContainer;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.Test;
 import org.kie.api.KieServices;

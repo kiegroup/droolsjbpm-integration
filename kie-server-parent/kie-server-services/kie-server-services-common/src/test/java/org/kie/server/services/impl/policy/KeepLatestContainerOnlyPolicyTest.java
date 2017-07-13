@@ -15,13 +15,7 @@
 
 package org.kie.server.services.impl.policy;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.drools.core.impl.InternalKieContainer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +27,9 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerRegistryImpl;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KeepLatestContainerOnlyPolicyTest {

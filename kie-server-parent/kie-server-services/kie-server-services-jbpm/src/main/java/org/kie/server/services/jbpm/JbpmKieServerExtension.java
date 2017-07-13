@@ -36,7 +36,7 @@ import javax.persistence.spi.PersistenceProviderResolverHolder;
 import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.apache.commons.io.IOUtils;
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.drools.core.impl.InternalKieContainer;
 import org.jbpm.document.service.impl.DocumentImpl;
 import org.jbpm.executor.ExecutorServiceFactory;
 import org.jbpm.executor.impl.ExecutorImpl;

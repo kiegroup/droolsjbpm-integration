@@ -15,8 +15,13 @@
 
 package org.kie.server.services.impl;
 
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.drools.compiler.kie.builder.impl.InternalKieScanner;
+import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
 import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -27,11 +32,6 @@ import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.services.api.KieContainerInstance;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class KieContainerInstanceImpl implements KieContainerInstance {
 
