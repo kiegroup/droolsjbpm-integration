@@ -19,13 +19,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.cases.CaseAdHocFragment;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseStage;
+import org.kie.server.api.model.instance.NodeInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
@@ -53,6 +57,13 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     private static final String CAR_PRODUCER_REPORT_PARAMETER = "carId";
     private static final String CAR_PRODUCER_REPORT_OUTPUT = "carProducerReport";
+
+    private static final String NON_EXISTENT_STAGE_ID = "I don't exist stage";
+    private static final String NON_EXISTENT_CASE_ID = "I don't exist case";
+    private static final String BAD_CONTAINER_ID = "bad-insurance-not-valid";
+    private static final String EMPTY_CASE_STAGE = "EmptyCaseStage";
+    private static final String FIRST_CASE_ID = "CASE-0000000001";
+    private static final String TWO_STAGES_CASE_P_ID = "CaseWithTwoStages";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -363,6 +374,38 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         } catch (KieServicesException e) {
             // expected
         }
+    }
+
+    @Test
+    public void testAddDynamicTaskToNotExistingStage() throws Exception {
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        assertNotNull(caseId);
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(CONTAINER_ID, caseId, NON_EXISTENT_STAGE_ID,
+                        "ContactCarProducer", "Contact car producer", null), 404, NON_EXISTENT_STAGE_ID);
+    }
+
+    @Test
+    public void testAddDynamicTaskToStageNotExistingCase() throws Exception {
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(CONTAINER_ID, NON_EXISTENT_CASE_ID, "Stage One",
+                        "ContactCarProducer", "Contact car producer", null), 404, NON_EXISTENT_CASE_ID);
+    }
+
+    @Test
+    public void testAddDynamicTaskToStageInvalidContainer() throws Exception {
+        String caseId = caseClient.startCase(CONTAINER_ID, TWO_STAGES_CASE_P_ID);
+        assertNotNull(caseId);
+
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 100);
+        Assertions.assertThat(caseStages).isNotNull();
+        Assertions.assertThat(caseStages).isNotEmpty();
+
+        CaseStage firstCaseStage = caseStages.iterator().next();
+        String firstStageId = firstCaseStage.getIdentifier();
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(BAD_CONTAINER_ID, caseId, firstStageId,
+                        "ContactCarProducer", "Contact car producer", null), 404, BAD_CONTAINER_ID);
     }
 
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
