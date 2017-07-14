@@ -25,6 +25,8 @@ import java.util.Map;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.DescriptorCommand;
 import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.definition.BaseQueryFilterSpec;
+import org.kie.server.api.model.definition.QueryParam;
 import org.kie.server.api.model.type.JaxbBoolean;
 import org.kie.server.api.model.type.JaxbByte;
 import org.kie.server.api.model.type.JaxbByteArray;
@@ -66,7 +68,9 @@ public class ModelWrapper {
     }
 
     public static Object wrapSkipPrimitives(Object object) {
-
+        if (object == null) {
+            return null;
+        }
         if (object instanceof List) {
             return new JaxbList((List) object);
         } else if (object instanceof Map) {
@@ -83,7 +87,15 @@ public class ModelWrapper {
                      ((DescriptorCommand) cmd).setArguments(arguments);
                  }
              }
-         }
+         } else if (object instanceof BaseQueryFilterSpec) {
+            BaseQueryFilterSpec spec = (BaseQueryFilterSpec) object;
+
+            for (QueryParam param : spec.getParameters()) {
+                List<?> items = new JaxbList(new ArrayList(param.getValue())).getItems();
+                param.setValue(items);
+
+            }
+        }
 
         return object;
     }

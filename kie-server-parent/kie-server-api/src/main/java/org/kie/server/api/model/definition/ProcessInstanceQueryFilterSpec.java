@@ -21,9 +21,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.kie.server.api.model.Wrapped;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "process-instance-query-filter-spec")
-public class ProcessInstanceQueryFilterSpec extends BaseQueryFilterSpec {
+public class ProcessInstanceQueryFilterSpec extends BaseQueryFilterSpec implements Wrapped<ProcessInstanceQueryFilterSpec> {
 
 	public ProcessInstanceQueryFilterSpec() {
 	}
@@ -34,4 +36,9 @@ public class ProcessInstanceQueryFilterSpec extends BaseQueryFilterSpec {
 				+ Arrays.toString(getParameters()) + '}';
 	}
 
+	@Override
+	public ProcessInstanceQueryFilterSpec unwrap() {
+		unwrapParameters();
+		return this;
+	}
 }
