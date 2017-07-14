@@ -102,7 +102,66 @@
          "methodName": "getCaseInstanceComments",
          "elementKind": "method",
          "justification": "Added new method to support case instance comments basic sorting"
-         }
+         },
+         {
+         "code": "java.class.removed",
+         "old": "interface org.drools.compiler.kie.builder.impl.InternalKieContainer",
+         "package": "org.drools.compiler.kie.builder.impl",
+         "classSimpleName": "InternalKieContainer",
+         "elementKind": "interface",
+         "justification": "move of InternalKieContainer to drools-core"
+        },
+        {
+         "code": "java.method.parameterTypeChanged",
+         "old": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::<init>(java.lang.String, org.kie.server.api.model.KieContainerStatus, ===org.drools.compiler.kie.builder.impl.InternalKieContainer===)",
+         "new": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::<init>(java.lang.String, org.kie.server.api.model.KieContainerStatus, ===org.drools.core.impl.InternalKieContainer===)",
+         "oldType": "org.drools.compiler.kie.builder.impl.InternalKieContainer",
+         "newType": "org.drools.core.impl.InternalKieContainer",
+         "package": "org.kie.server.services.impl",
+         "classSimpleName": "KieContainerInstanceImpl",
+         "methodName": "<init>",
+         "parameterIndex": "2",
+         "elementKind": "parameter",
+         "justification": "move of InternalKieContainer to drools-core"
+        },
+        {
+         "code": "java.method.parameterTypeChanged",
+         "old": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::<init>(java.lang.String, org.kie.server.api.model.KieContainerStatus, ===org.drools.compiler.kie.builder.impl.InternalKieContainer===, org.kie.server.api.model.ReleaseId)",
+         "new": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::<init>(java.lang.String, org.kie.server.api.model.KieContainerStatus, ===org.drools.core.impl.InternalKieContainer===, org.kie.server.api.model.ReleaseId)",
+         "oldType": "org.drools.compiler.kie.builder.impl.InternalKieContainer",
+         "newType": "org.drools.core.impl.InternalKieContainer",
+         "package": "org.kie.server.services.impl",
+         "classSimpleName": "KieContainerInstanceImpl",
+         "methodName": "<init>",
+         "parameterIndex": "2",
+         "elementKind": "parameter",
+         "justification": "move of InternalKieContainer to drools-core"
+        },
+        {
+         "code": "java.method.returnTypeChanged",
+         "old": "method org.drools.compiler.kie.builder.impl.InternalKieContainer org.kie.server.services.impl.KieContainerInstanceImpl::getKieContainer()",
+         "new": "method org.drools.core.impl.InternalKieContainer org.kie.server.services.impl.KieContainerInstanceImpl::getKieContainer()",
+         "oldType": "org.drools.compiler.kie.builder.impl.InternalKieContainer",
+         "newType": "org.drools.core.impl.InternalKieContainer",
+         "package": "org.kie.server.services.impl",
+         "classSimpleName": "KieContainerInstanceImpl",
+         "methodName": "getKieContainer",
+         "elementKind": "method",
+         "justification": "move of InternalKieContainer to drools-core"
+        },
+        {
+         "code": "java.method.parameterTypeChanged",
+         "old": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::setKieContainer(===org.drools.compiler.kie.builder.impl.InternalKieContainer===)",
+         "new": "parameter void org.kie.server.services.impl.KieContainerInstanceImpl::setKieContainer(===org.drools.core.impl.InternalKieContainer===)",
+         "oldType": "org.drools.compiler.kie.builder.impl.InternalKieContainer",
+         "newType": "org.drools.core.impl.InternalKieContainer",
+         "package": "org.kie.server.services.impl",
+         "classSimpleName": "KieContainerInstanceImpl",
+         "methodName": "setKieContainer",
+         "parameterIndex": "0",
+         "elementKind": "parameter",
+         "justification": "move of InternalKieContainer to drools-core"
+        }
       ]
     }
   }
