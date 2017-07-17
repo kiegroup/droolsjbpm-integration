@@ -11,11 +11,9 @@
   <context:annotation-config />
   <tx:annotation-driven />
 
-  <bean id="dataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close">
+  <bean id="dataSource" class="org.jbpm.test.util.PoolingDataSource" init-method="init" destroy-method="close">
     <property name="uniqueName" value="jdbc/jbpm-ds" />
     <property name="className" value="org.h2.jdbcx.JdbcDataSource" />
-    <property name="maxPoolSize" value="50" />
-    <property name="allowLocalTransactions" value="true" />
     <property name="driverProperties">
       <props>
         <prop key="user">sa</prop>

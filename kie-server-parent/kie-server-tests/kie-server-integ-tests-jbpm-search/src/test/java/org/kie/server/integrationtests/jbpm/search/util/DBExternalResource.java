@@ -15,8 +15,9 @@
 
 package org.kie.server.integrationtests.jbpm.search.util;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import org.jbpm.test.util.PoolingDataSource;
 import org.junit.rules.ExternalResource;
+import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
 
 public class DBExternalResource extends ExternalResource {
@@ -34,17 +35,15 @@ public class DBExternalResource extends ExternalResource {
     protected void before() throws Throwable {
 
         KieServerBaseIntegrationTest.cleanupSingletonSessionId();
-
-        pds = new PoolingDataSource();
-        pds.setUniqueName("jdbc/jbpm-ds");
-        pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
-        pds.setMaxPoolSize(50);
-        pds.setAllowLocalTransactions(true);
-        pds.getDriverProperties().put("user", "sa");
-        pds.getDriverProperties().put("password", "");
-        pds.getDriverProperties().put("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
-        pds.getDriverProperties().put("driverClassName", "org.h2.Driver");
-        pds.init();
+        if (TestConfig.isLocalServer()) {
+            pds = new PoolingDataSource();
+            pds.setUniqueName("jdbc/jbpm-ds");
+            pds.setClassName("org.h2.jdbcx.JdbcDataSource");
+            pds.getDriverProperties().put("user", "sa");
+            pds.getDriverProperties().put("password", "");
+            pds.getDriverProperties().put("URL", "jdbc:h2:mem:jbpm-db;MVCC=true");
+            pds.init();
+        }
     };
 
     public PoolingDataSource getPds() {

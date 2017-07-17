@@ -19,13 +19,15 @@ import org.kie.spring.jbpm.tools.IntegrationSpringBase;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import javax.naming.Context;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import org.jbpm.test.util.PoolingDataSource;
 
 public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
 
@@ -34,8 +36,11 @@ public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
 
     @BeforeClass
     public static void generalSetup() {
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.jbpm.test.util.CloseSafeMemoryContextFactory");
+        System.setProperty("org.osjava.sj.root", "target/test-classes/config");
+        System.setProperty("org.osjava.jndi.delimiter", "/");
+        System.setProperty("org.osjava.sj.jndi.shared", "true");
         pds = setupPoolingDataSource();
-        System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
     }
 
     @Before
@@ -62,13 +67,10 @@ public abstract class AbstractJbpmSpringTest extends IntegrationSpringBase {
     protected static PoolingDataSource setupPoolingDataSource() {
         PoolingDataSource pds = new PoolingDataSource();
         pds.setUniqueName("jdbc/jbpm-ds");
-        pds.setClassName("bitronix.tm.resource.jdbc.lrc.LrcXADataSource");
-        pds.setMaxPoolSize(50);
-        pds.setAllowLocalTransactions(true);
+        pds.setClassName("org.h2.jdbcx.JdbcDataSource");
         pds.getDriverProperties().put("user", "sa");
         pds.getDriverProperties().put("password", "");
-        pds.getDriverProperties().put("url", "jdbc:h2:mem:jbpm-db;MVCC=true");
-        pds.getDriverProperties().put("driverClassName", "org.h2.Driver");
+        pds.getDriverProperties().put("URL", "jdbc:h2:mem:jbpm-db;MVCC=true");
         pds.init();
         return pds;
     }

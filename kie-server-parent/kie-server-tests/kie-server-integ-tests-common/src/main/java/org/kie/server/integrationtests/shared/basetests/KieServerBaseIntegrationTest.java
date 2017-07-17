@@ -62,12 +62,20 @@ public abstract class KieServerBaseIntegrationTest {
 
     protected static final long DEFAULT_TIMEOUT = 60000;
 
+    static {
+        if (TestConfig.isLocalServer()) {
+            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.jbpm.test.util.CloseSafeMemoryContextFactory");
+            System.setProperty("org.osjava.sj.root", "target/test-classes/config");
+            System.setProperty("org.osjava.jndi.delimiter", "/");
+            System.setProperty("org.osjava.sj.jndi.shared", "true");
+        }
+    }
+
     @BeforeClass
     public static void setupClass() throws Exception {
         router = new KieServerRouterExecutor();
         router.startKieRouter();
         if (TestConfig.isLocalServer()) {
-            System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
             controller = new KieControllerExecutor();
             controller.startKieController();
             server = new KieServerExecutor();
