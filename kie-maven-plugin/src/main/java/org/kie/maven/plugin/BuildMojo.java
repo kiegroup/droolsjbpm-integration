@@ -198,19 +198,19 @@ public class BuildMojo extends AbstractKieMojo {
             KieMetaInfoBuilder builder = new KieMetaInfoBuilder(kModule);
             KieModuleMetaInfo modelMetaInfo = builder.getKieModuleMetaInfo();
 
-            /*Standard for the kieMap keys -> compilationID + dot + class name with first lowercase*/
+            /*Standard for the kieMap keys -> compilationID + dot + class name */
             StringBuilder sbModelMetaInfo = new StringBuilder(compilationID).append(".").append(KieModuleMetaInfo.class.getName());
             StringBuilder sbkModule = new StringBuilder(compilationID).append(".").append(FileKieModule.class.getName());
 
             if (modelMetaInfo != null) {
                 optionalKieMap.get().put(sbModelMetaInfo.toString(),
                                          modelMetaInfo);
-                getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedded");
+                getLog().info("KieModelMetaInfo available in the map shared with the Maven Embedder");
             }
             if (kModule != null) {
                 optionalKieMap.get().put(sbkModule.toString(),
                                          kModule);
-                getLog().info("KieModule available in the map shared with the Maven Embedded");
+                getLog().info("KieModule available in the map shared with the Maven Embedder");
             }
         }
     }

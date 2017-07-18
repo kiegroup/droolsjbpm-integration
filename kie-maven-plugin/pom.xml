@@ -26,8 +26,10 @@
       <plugin>
         <groupId>io.takari.maven.plugins</groupId>
         <artifactId>takari-lifecycle-plugin</artifactId>
-        <version>1.12.4</version>
         <extensions>true</extensions>
+        <configuration>
+          <proc>none</proc>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -185,15 +187,14 @@
       <artifactId>kie-dmn-core</artifactId>
       <scope>runtime</scope>
     </dependency>
-
-<!-- Was added to support log on Maven 3.0.5 but now old; if this dep is missing, when running takari for maven 3.0.5 the log might be missing some lines from the internal classes logging.
-     Also could be handy for temporarily turn on debug output of the inner classes while performing tests using the takari framework.
-     But in conclusion, not a good practice to depend on logging implementation.
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>runtime</scope>
-    </dependency> -->
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+    </dependency>
 
     <!-- Testing deps -->
     <dependency>
@@ -212,16 +213,15 @@
       <artifactId>takari-plugin-testing</artifactId>
       <scope>test</scope>
     </dependency>
+    <!--Logs-->
     <dependency>
-      <groupId>io.takari.maven.plugins</groupId>
-      <artifactId>takari-plugin-integration-testing</artifactId>
-      <type>pom</type>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-ext</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

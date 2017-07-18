@@ -22,6 +22,7 @@ import java.util.Map;
 public abstract class AbstractKieMojo extends AbstractMojo {
 
     protected void setSystemProperties(Map<String, String> properties) {
+
         if (properties != null) {
             getLog().debug("Additional system properties: " + properties);
             for (Map.Entry<String, String> property : properties.entrySet()) {

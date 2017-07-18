@@ -51,6 +51,7 @@
   <modules>
     <module>kie-identity-session-provider</module>
     <module>kie-maven-plugin</module>
+    <module>kie-takari-plugin</module>
     <!-- The example can not be in the build because of the chicken-egg problem with depending on the plugin,
          that is about to be build in the same Maven reactor build -->
     <!--<module>kie-maven-plugin-example</module>-->
@@ -74,6 +75,7 @@
     <!-- The Android examples require Android SDK to be installed, so they are excluded from the default build -->
     <!-- <module>drools-examples-android</module> -->
     <module>kie-integration-test-coverage</module>
+    <module>kie-plugins-testing</module>
   </modules>
 
   <dependencyManagement>

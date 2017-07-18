@@ -12,6 +12,7 @@
 .classpath
 .project
 .settings
+.idea
 target
 
 # Repository wide ignore mac DS_Store files
