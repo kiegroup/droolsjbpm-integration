@@ -385,7 +385,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         processBuilder.buildProcess(process,
                 null);
 
-        return packageBuilder.getPackage();
+        return packageBuilder.getPackage("org.drools.test");
     }
 
     public static void writePackage(KiePackage pkg,
@@ -557,7 +557,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
 
         processBuilder.buildProcess(process,
                 null);
-        return packageBuilder.getPackage();
+        return packageBuilder.getPackage("org.drools.test");
     }
 
     @Test
@@ -663,7 +663,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);
-        return packageBuilder.getPackage();
+        return packageBuilder.getPackage("org.drools.test");
     }
 
     @Test
@@ -745,7 +745,7 @@ public class JPASingleSessionCommandServiceFactoryEnvTest {
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl(packageBuilder);
         processBuilder.buildProcess(process,
                 null);
-        return packageBuilder.getPackage();
+        return packageBuilder.getPackage("org.drools.test");
     }
     
     private static CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
