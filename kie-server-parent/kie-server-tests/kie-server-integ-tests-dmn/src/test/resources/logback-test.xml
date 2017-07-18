@@ -18,7 +18,6 @@
   <logger name="org.kie.server" level="INFO" />
   <logger name="org.apache.http" level="WARN" />
   <logger name="org.apache.maven" level="WARN" />
-  <logger name="bitronix" level="ERROR" />
 <!--   
   <logger name="org.kie.server.services.dmn" level="DEBUG" />
   <logger name="org.kie.server.remote.rest.dmn" level="DEBUG" />

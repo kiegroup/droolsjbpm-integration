@@ -24,8 +24,6 @@ import java.util.List;
 import javax.jms.XAConnectionFactory;
 import javax.transaction.UserTransaction;
 
-import bitronix.tm.TransactionManagerServices;
-import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -50,6 +48,9 @@ import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
+import org.jboss.narayana.jta.jms.ConnectionFactoryProxy;
+import org.jboss.narayana.jta.jms.TransactionHelperImpl;
+
 @Category({JMSOnly.class, Transactional.class})
 public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -72,7 +73,7 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
     @Parameterized.Parameter(2)
     public ResponseHandler responseHandler;
 
-    private PoolingConnectionFactory connectionFactory;
+    private ConnectionFactoryProxy connectionFactory;
     private UserTransaction transaction;
 
     private ProcessServicesClient transactionalProcessClient;
@@ -87,18 +88,13 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
     @Before
     public void createTransactionalProcessClient() throws Exception {
-        TransactionManagerServices.getConfiguration().setJournal("null").setGracefulShutdownInterval(2);
-        transaction = TransactionManagerServices.getTransactionManager();
+
+        transaction = com.arjuna.ats.jta.UserTransaction.userTransaction();
 
         KieServicesConfiguration jmsConfiguration = createKieServicesJmsConfiguration();
         KieServerXAConnectionFactory.connectionFactory = (XAConnectionFactory) jmsConfiguration.getConnectionFactory();
 
-        connectionFactory = new PoolingConnectionFactory();
-        connectionFactory.setClassName("org.kie.server.integrationtests.jbpm.jms.KieServerXAConnectionFactory");
-        connectionFactory.setUniqueName("cf");
-        connectionFactory.setMaxPoolSize(5);
-        connectionFactory.setAllowLocalTransactions(true);
-        connectionFactory.init();
+        connectionFactory = new ConnectionFactoryProxy(KieServerXAConnectionFactory.connectionFactory, new TransactionHelperImpl(com.arjuna.ats.jta.TransactionManager.transactionManager()));
         jmsConfiguration.setConnectionFactory(connectionFactory);
 
         List<String> capabilities = new ArrayList<>();
@@ -110,14 +106,6 @@ public class JmsTransactionsIntegrationTest extends JbpmKieServerBaseIntegration
 
         KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(jmsConfiguration);
         transactionalProcessClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);
-    }
-
-    @After
-    public void releaseResources() {
-        if (connectionFactory != null) {
-            connectionFactory.close();
-        }
-        TransactionManagerServices.getTransactionManager().shutdown();
     }
 
     @Test

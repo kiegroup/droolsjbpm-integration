@@ -11,7 +11,6 @@
   <logger name="org.kie.server" level="WARN" />
   <logger name="org.apache.http" level="WARN" />
   <logger name="org.apache.maven" level="WARN" />
-  <logger name="bitronix" level="ERROR" />
 
   <root level="INFO">
     <appender-ref ref="STDOUT"/>

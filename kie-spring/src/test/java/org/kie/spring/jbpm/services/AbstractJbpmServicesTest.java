@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.Context;
+
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -54,7 +56,10 @@ public class AbstractJbpmServicesTest {
 
     @BeforeClass
     public static void generalSetup() {
-        System.setProperty(javax.naming.Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.jbpm.test.util.CloseSafeMemoryContextFactory");
+        System.setProperty("org.osjava.sj.root", "target/test-classes/config");
+        System.setProperty("org.osjava.jndi.delimiter", "/");
+        System.setProperty("org.osjava.sj.jndi.shared", "true");
     }
 
     @AfterClass

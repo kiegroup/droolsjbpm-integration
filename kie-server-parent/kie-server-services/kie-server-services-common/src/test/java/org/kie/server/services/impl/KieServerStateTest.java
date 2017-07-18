@@ -65,7 +65,7 @@ public class KieServerStateTest {
 
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm");
-        System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
+        System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform");
 
         repository.store(serverId, state);
 
@@ -77,7 +77,7 @@ public class KieServerStateTest {
         Assert.assertNotNull(config);
         Assert.assertEquals("org.hibernate.dialect.PostgreSQLDialect", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT));
         Assert.assertEquals("jdbc/jbpm", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS));
-        Assert.assertEquals("org.hibernate.service.jta.platform.internal.BitronixJtaPlatform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM));
+        Assert.assertEquals("org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class KieServerStateTest {
 
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         System.setProperty(KieServerConstants.CFG_PERSISTANCE_DS, "jdbc/jbpm");
-        System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
+        System.setProperty(KieServerConstants.CFG_PERSISTANCE_TM, "org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform");
 
         String serverId = UUID.randomUUID().toString();
 
@@ -98,6 +98,6 @@ public class KieServerStateTest {
 
         Assert.assertEquals("org.hibernate.dialect.PostgreSQLDialect", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DIALECT));
         Assert.assertEquals("jdbc/jbpm", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_DS));
-        Assert.assertEquals("org.hibernate.service.jta.platform.internal.BitronixJtaPlatform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM));
+        Assert.assertEquals("org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform", config.getConfigItemValue(KieServerConstants.CFG_PERSISTANCE_TM));
     }
 }
