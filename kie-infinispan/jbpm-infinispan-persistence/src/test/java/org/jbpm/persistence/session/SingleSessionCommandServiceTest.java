@@ -16,6 +16,7 @@
 package org.jbpm.persistence.session;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -438,9 +439,7 @@ public class SingleSessionCommandServiceTest {
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
-        List<KiePackage> list = new ArrayList<KiePackage>();
-        list.add( packageBuilder.getPackage() );
-        return list;
+        return Arrays.asList(packageBuilder.getPackages());
     }
 
     @Test
@@ -625,7 +624,7 @@ public class SingleSessionCommandServiceTest {
 
         processBuilder.buildProcess( process,
                                      null );
-        return packageBuilder.getPackage();
+        return packageBuilder.getPackage("org.drools.test");
     }
 
     @Test @Ignore
@@ -727,9 +726,7 @@ public class SingleSessionCommandServiceTest {
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
-        List<KiePackage> list = new ArrayList<KiePackage>();
-        list.add( packageBuilder.getPackage() );
-        return list;
+        return Arrays.asList(packageBuilder.getPackages());
     }
 
     @Test @Ignore
@@ -820,9 +817,7 @@ public class SingleSessionCommandServiceTest {
         ProcessBuilderImpl processBuilder = new ProcessBuilderImpl( packageBuilder );
         processBuilder.buildProcess( process,
                                      null );
-        List<KiePackage> list = new ArrayList<KiePackage>();
-        list.add( packageBuilder.getPackage() );
-        return list;
+        return Arrays.asList(packageBuilder.getPackages());
     }
 
 	private PersistableRunner createSingleSessionCommandService(KieBase ruleBase, SessionConfiguration conf, Environment env) {
