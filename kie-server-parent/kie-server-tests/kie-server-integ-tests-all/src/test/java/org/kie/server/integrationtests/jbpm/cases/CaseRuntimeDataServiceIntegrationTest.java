@@ -1293,7 +1293,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 () -> caseClient.assignUserToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
                 404,
                 "Could not find case instance \"not-existing-case\"",
-                "Case with id not-existing-case was not found");
+                "Case with id not-existing-case not found");
     }
 
     @Test
@@ -1302,7 +1302,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 () -> caseClient.assignGroupToRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
                 404,
                 "Could not find case instance \"not-existing-case\"",
-                "Case with id not-existing-case was not found");
+                "Case with id not-existing-case not found");
     }
 
     @Test
@@ -1311,7 +1311,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 () -> caseClient.removeUserFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, USER_YODA),
                 404,
                 "Could not find case instance \"not-existing-case\"",
-                "Case with id not-existing-case was not found");
+                "Case with id not-existing-case not found");
     }
 
     @Test
@@ -1320,7 +1320,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
                 () -> caseClient.removeGroupFromRole(CONTAINER_ID, "not-existing-case", CASE_ASSESSOR_ROLE, "managers"),
                 404,
                 "Could not find case instance \"not-existing-case\"",
-                "Case with id not-existing-case was not found");
+                "Case with id not-existing-case not found");
     }
 
     @Test
@@ -2294,7 +2294,7 @@ public class CaseRuntimeDataServiceIntegrationTest extends JbpmKieServerBaseInte
         assertClientException(() -> caseClient.addDynamicSubProcess(CONTAINER_ID, invalidCaseId, CLAIM_CASE_DEF_ID, null),
                 404,
                 MessageFormat.format(CASE_INSTANCE_NOT_FOUND, invalidCaseId),
-                "Case with id " + invalidCaseId + " was not found");
+                "Case with id " + invalidCaseId + " not found");
     }
 
     @Test
