@@ -13,18 +13,18 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.model.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.model;
 
 /**
- * A person's cat.
+ * A person's dog.
  */
-public class Cat implements Pet {
+public class Dog implements Pet {
 
     private final String name;
 
     private int age;
 
-    public Cat(final String name, final int age) {
+    public Dog(final String name, final int age) {
         this.name = name;
         this.age = age;
     }
@@ -46,10 +46,10 @@ public class Cat implements Pet {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Cat cat = (Cat) o;
+        Dog dog = (Dog) o;
 
-        if (age != cat.age) return false;
-        return name != null ? name.equals(cat.name) : cat.name == null;
+        if (age != dog.age) return false;
+        return name != null ? name.equals(dog.name) : dog.name == null;
 
     }
 
@@ -62,7 +62,7 @@ public class Cat implements Pet {
 
     @Override
     public String toString() {
-        return "Cat{" +
+        return "Dog{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
                 '}';

@@ -13,11 +13,11 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate;
 
-import org.kie.integration.testcoverage.instrumentation.model.Person;
-import org.kie.integration.testcoverage.instrumentation.model.Dog;
-import org.kie.integration.testcoverage.instrumentation.model.Cat;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Person;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Dog;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Cat;
 
 global java.util.List results
 

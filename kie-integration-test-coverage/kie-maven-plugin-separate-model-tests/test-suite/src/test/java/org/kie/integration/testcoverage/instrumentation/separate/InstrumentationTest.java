@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-package org.kie.integration.testcoverage.instrumentation;
+package org.kie.integration.testcoverage.instrumentation.separate;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,8 +24,8 @@ import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.integration.testcoverage.instrumentation.model.Dog;
-import org.kie.integration.testcoverage.instrumentation.model.Person;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Dog;
+import org.kie.integration.testcoverage.instrumentation.separate.model.Person;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstrumentationTest {
 
     private static final KieServices KIE_SERVICES = KieServices.get();
-    private static final ReleaseId RELEASE_ID = KIE_SERVICES.newReleaseId("org.drools.testcoverage", "kjar-with-instrumentation", TestUtil.getProjectVersion());
+    private static final ReleaseId RELEASE_ID = KIE_SERVICES.newReleaseId("org.drools.testcoverage", "kjar-with-separate-instrumentation", TestUtil.getProjectVersion());
 
     private static KieContainer kieContainer;
     private KieSession kieSession;
