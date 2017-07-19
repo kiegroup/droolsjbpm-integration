@@ -15,11 +15,19 @@
 
 package org.kie.server.services.casemgmt;
 
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_ACTORS_PROP;
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_DATA_PROP;
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_DESC_PROP;
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_GROUPS_PROP;
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_NAME_PROP;
+import static org.kie.server.api.KieServerConstants.CASE_DYNAMIC_NODE_TYPE_PROP;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.dynamic.TaskSpecification;
@@ -29,6 +37,7 @@ import org.jbpm.casemgmt.api.model.instance.CaseInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseRoleInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentInstance;
 import org.jbpm.casemgmt.api.model.instance.CommentSortBy;
+import org.jbpm.services.api.DeploymentNotFoundException;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.internal.identity.IdentityProvider;
 import org.kie.internal.task.api.TaskModelFactory;
@@ -41,12 +50,11 @@ import org.kie.server.api.model.cases.CaseRoleAssignment;
 import org.kie.server.api.model.cases.CaseRoleAssignmentList;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.casemgmt.locator.ByCaseIdContainerLocator;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.kie.server.api.KieServerConstants.*;
 
 public class CaseManagementServiceBase {
 
@@ -126,7 +134,7 @@ public class CaseManagementServiceBase {
     }
 
     public String getCaseInstance(String containerId, String caseId, boolean withData, boolean withRoles, boolean withMilestones, boolean withStages, String marshallingType) {
-
+    	verifyContainerId(containerId, caseId);
         CaseInstance actualCaseInstance = caseService.getCaseInstance(caseId, withData, withRoles, withMilestones, withStages);
 
         org.kie.server.api.model.cases.CaseInstance caseInstance = ConvertUtils.transformCaseInstance(actualCaseInstance);
@@ -152,6 +160,7 @@ public class CaseManagementServiceBase {
     }
 
     public void cancelCaseInstance(String containerId, String caseId, boolean destroy) {
+    	verifyContainerId(containerId, caseId);
         if (destroy) {
             logger.debug("Destroying case with id {} inside container {}", caseId, containerId);
             caseService.destroyCase(caseId);
@@ -162,6 +171,7 @@ public class CaseManagementServiceBase {
     }
 
     public void reopenCase(String caseId, String containerId, String caseDefinitionId, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         containerId = context.getContainerId(containerId, new ByCaseIdContainerLocator(caseId));
 
         CaseDefinition caseDef = caseRuntimeDataService.getCase(containerId, caseDefinitionId);
@@ -178,6 +188,7 @@ public class CaseManagementServiceBase {
     }
 
     public String getCaseFileData(String containerId, String caseId, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         CaseFileInstance caseFileInstance = caseService.getCaseFileInstance(caseId);
 
         Map<String, Object> caseFileData = caseFileInstance.getData();
@@ -187,6 +198,7 @@ public class CaseManagementServiceBase {
     }
 
     public String getCaseFileDataByName(String containerId, String caseId, String name, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         CaseFileInstance caseFileInstance = caseService.getCaseFileInstance(caseId);
 
         Object caseFileData = caseFileInstance.getData(name);
@@ -196,6 +208,7 @@ public class CaseManagementServiceBase {
     }
 
     public void putCaseFileData(String containerId, String caseId, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
         Map<String, Object> caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
         logger.debug("Unmarshalled case file data {} for case with id '{}'", caseFileData, caseId);
@@ -203,6 +216,7 @@ public class CaseManagementServiceBase {
     }
 
     public void putCaseFileDataByName(String containerId, String caseId, String name, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal case file data from payload: '{}'", payload);
         Object caseFileData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Object.class, new ByCaseIdContainerLocator(caseId));
         logger.debug("Unmarshalled case file data {} for case with id '{}' will be stored under {}", caseFileData, caseId, name);
@@ -210,12 +224,14 @@ public class CaseManagementServiceBase {
     }
 
     public void removeCaseFileDataByName(String containerId, String caseId, List<String> names) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("Removing {} variables from case with id '{}'", names, caseId);
         caseService.removeDataFromCaseFile(caseId, names);
 
     }
 
     public void addDynamicTask(String containerId, String caseId, String stageId, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal task specification content from payload: '{}'", payload);
         Map<String, Object> taskSpecificationMap = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
         TaskSpecification taskSpecification = null;
@@ -249,6 +265,7 @@ public class CaseManagementServiceBase {
     }
 
     public void addDynamicSubprocess(String containerId, String caseId, String stageId, String processId, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal process data from payload: '{}'", payload);
         Map<String, Object> subProcessParameters = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
 
@@ -263,6 +280,7 @@ public class CaseManagementServiceBase {
     }
 
     public void triggerAdHocNode(String containerId, String caseId, String stageId, String adHocName, String payload, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("About to unmarshal task data from payload: '{}'", payload);
         Map<String, Object> adHocTaskData = marshallerHelper.unmarshal(containerId, payload, marshallingType, Map.class, new ByCaseIdContainerLocator(caseId));
 
@@ -275,6 +293,7 @@ public class CaseManagementServiceBase {
     }
 
     public CaseRoleAssignmentList getRoleAssignment(String containerId, String caseId) {
+    	verifyContainerId(containerId, caseId);
         Collection<CaseRoleInstance> caseRoleInstances = caseService.getCaseRoleAssignments(caseId);
         logger.debug("Roles assignments for case {} are {}", caseId, caseRoleInstances);
         List<CaseRoleAssignment> caseRoles = ConvertUtils.transformRoleAssignment(caseRoleInstances);
@@ -284,6 +303,7 @@ public class CaseManagementServiceBase {
     }
 
     public void assignToRole(String containerId, String caseId, String roleName, String user, String group) {
+    	verifyContainerId(containerId, caseId);
         OrganizationalEntity entity = null;
 
         if (user != null && !user.isEmpty()) {
@@ -299,6 +319,7 @@ public class CaseManagementServiceBase {
     }
 
     public void removeFromRole(String containerId, String caseId, String roleName, String user, String group) {
+    	verifyContainerId(containerId, caseId);
         OrganizationalEntity entity = null;
 
         if (user != null && !user.isEmpty()) {
@@ -314,7 +335,8 @@ public class CaseManagementServiceBase {
     }
 
     public void addCommentToCase(String containerId, String caseId, String author, String comment, String marshallingType) {
-        author = getUser(author);
+    	verifyContainerId(containerId, caseId);
+    	author = getUser(author);
         String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
         logger.debug("Adding comment to case {} by {} with text '{}'", caseId, author, actualComment);
@@ -322,6 +344,7 @@ public class CaseManagementServiceBase {
     }
 
     public void updateCommentInCase(String containerId, String caseId, String commentId, String author, String comment, String marshallingType) {
+    	verifyContainerId(containerId, caseId);
         author = getUser(author);
         String actualComment = marshallerHelper.unmarshal(containerId, comment, marshallingType, String.class, new ByCaseIdContainerLocator(caseId));
 
@@ -330,6 +353,7 @@ public class CaseManagementServiceBase {
     }
 
     public void removeCommentFromCase(String containerId, String caseId, String commentId) {
+    	verifyContainerId(containerId, caseId);
         logger.debug("Removing comment with id {} from case {}", commentId, caseId);
         caseService.removeCaseComment(caseId, commentId);
     }
@@ -339,6 +363,7 @@ public class CaseManagementServiceBase {
     }
 
     public CaseCommentList getComments(String containerId, String caseId, String sort, Integer page, Integer pageSize) {
+    	verifyContainerId(containerId, caseId);
         CommentSortBy sortBy = parseCommentSortBy(sort);
         Collection<CommentInstance> caseComments = caseService.getCaseComments(caseId, sortBy, ConvertUtils.buildQueryContext(page, pageSize));
         logger.debug("Comments for case {} are {}", caseId, caseComments);
@@ -361,6 +386,24 @@ public class CaseManagementServiceBase {
 
         logger.warn("Unexpected sort option for case comments '{}', returning default one - by date");
         return CommentSortBy.Date;
+    }
+    
+    private void verifyContainerId(String containerId, String caseId) {
+        String caseContainerId;
+        try {
+        	caseContainerId = (new ByCaseIdContainerLocator(caseId)).locateContainer(containerId, null);
+
+        } catch (IllegalArgumentException e) {
+            throw new CaseNotFoundException(e.getMessage());
+        }
+
+        KieContainerInstanceImpl taskContainer = context.getContainer(caseContainerId);
+        List<KieContainerInstanceImpl> containersByAlias = context.getContainersForAlias(containerId);
+
+        // The container id is either a non-existent one or is not a valid alias for the container id the task is associated with. Both scenarios should raise an exception.
+        if (context.getContainer(containerId) == null && !containersByAlias.contains(taskContainer)) {
+        	throw new DeploymentNotFoundException("CaseId: " + caseId + " is not associated with the provided container id: " + containerId + " or its alias.");
+        }
     }
 
 }
