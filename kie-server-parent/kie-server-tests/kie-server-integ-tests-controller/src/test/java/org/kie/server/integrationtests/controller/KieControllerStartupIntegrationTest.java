@@ -220,10 +220,9 @@ public class KieControllerStartupIntegrationTest extends KieControllerManagement
         assertEquals(1, instanceList.size());
 
         // Turn kie server off, dispose container and start kie server again.
-        server.stopKieServer();
-
         mgmtControllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
+        server.stopKieServer();
 
         server.startKieServer();
 
