@@ -605,4 +605,59 @@ public class UserTaskAdminServicesClientImpl extends AbstractKieServicesClientIm
 
         return Collections.emptyList();
     }
+    
+    @Override
+    public void acknowledgeError(String containerId, String... errorId) {
+        ArrayList<String> errorIds = new ArrayList<>(Arrays.asList(errorId));
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+
+            Map<String, String> headers = new HashMap<String, String>();
+
+            String endpoint = ACK_ERROR_PUT_URI;
+            String queryString = "";
+            if (errorIds.size() > 1) {
+                endpoint = ACK_ERRORS_PUT_URI;
+                queryString = getAdditionalParams(queryString, "errorId", errorIds);
+            } else {
+                valuesMap.put(ERROR_ID, errorIds.get(0));
+            }
+
+            makeHttpPutRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + endpoint, valuesMap) + queryString, "", String.class, headers);
+        } else {
+
+            CommandScript script = new CommandScript( Collections.singletonList(
+                    (KieServerCommand) new DescriptorCommand( "UserTaskAdminService", "acknowledgeError", new Object[]{safeList(errorIds)})));
+            ServiceResponse<?> response = (ServiceResponse<?>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM", containerId ).getResponses().get(0);
+            throwExceptionOnFailure(response);
+        }
+    }
+
+    @Override
+    public ExecutionErrorInstance getError(String containerId, String errorId) {
+        ExecutionErrorInstance result = null;
+        if( config.isRest() ) {
+            Map<String, Object> valuesMap = new HashMap<String, Object>();
+            valuesMap.put(CONTAINER_ID, containerId);
+            valuesMap.put(ERROR_ID, errorId);
+
+            result = makeHttpGetRequestAndCreateCustomResponse(
+                    build(loadBalancer.getUrl(), ADMIN_TASK_URI + "/" + ERROR_GET_URI , valuesMap), ExecutionErrorInstance.class);
+
+        } else {
+            CommandScript script = new CommandScript( Collections.singletonList( (KieServerCommand)
+                    new DescriptorCommand( "UserTaskAdminService", "getError", new Object[]{errorId}) ) );
+            ServiceResponse<ExecutionErrorInstance> response = (ServiceResponse<ExecutionErrorInstance>) executeJmsCommand( script, DescriptorCommand.class.getName(), "BPM" ).getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();
+        }
+
+        return result;
+    }
 }

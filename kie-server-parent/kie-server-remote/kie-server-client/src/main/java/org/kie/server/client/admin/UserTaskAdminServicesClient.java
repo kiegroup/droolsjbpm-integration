@@ -71,5 +71,9 @@ public interface UserTaskAdminServicesClient {
     List<ExecutionErrorInstance> getErrorsByTaskId(String containerId, Long taskId, boolean includeAcknowledged, Integer page, Integer pageSize);
 
     List<ExecutionErrorInstance> getErrorsByTaskInfo(String containerId, Long processId, String taskName, boolean includeAcknowledged, Integer page, Integer pageSize);
+    
+    void acknowledgeError(String containerId, String... errorId);
+
+    ExecutionErrorInstance getError(String containerId, String errorId);
 
 }
