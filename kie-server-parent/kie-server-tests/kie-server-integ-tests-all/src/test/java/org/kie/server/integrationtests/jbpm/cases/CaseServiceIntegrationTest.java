@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -26,8 +27,8 @@ import org.kie.api.runtime.process.ProcessInstance;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.cases.CaseFile;
 import org.kie.server.api.model.cases.CaseInstance;
+import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -54,6 +55,14 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     private static final String CAR_PRODUCER_REPORT_PARAMETER = "carId";
     private static final String CAR_PRODUCER_REPORT_OUTPUT = "carProducerReport";
 
+    private static final String NON_EXISTENT_STAGE_ID = "I don't exist stage";
+    private static final String NON_EXISTENT_CASE_ID = "I don't exist case";
+    private static final String BAD_CONTAINER_ID = "not-existing-container";
+    private static final String BAD_CASE_ID = "not-existing-case";
+
+    private static final String TWO_STAGES_CASE_P_ID = "CaseWithTwoStages";
+    private static final String ACCIDENT_TASK_NAME = "Provide accident information";
+
     @BeforeClass
     public static void buildAndDeployArtifacts() {
 
@@ -75,15 +84,15 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     public void testCreateCaseWithEmptyCaseFile() {
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
 
         // since roles were not assigned to any users/groups no tasks are available
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(0, tasks.size());
+        Assertions.assertThat(tasks.size()).isEqualTo(0);
     }
 
     @Test
@@ -94,8 +103,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
@@ -104,10 +113,10 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         assertEquals(1, tasks.size());
 
         TaskSummary task = tasks.get(0);
-        assertNotNull(task);
-        assertEquals("Provide accident information", task.getName());
-        assertEquals(null, task.getActualOwner());
-        assertEquals("Ready", task.getStatus());
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo(ACCIDENT_TASK_NAME);
+        Assertions.assertThat(task.getActualOwner()).isNull();
+        Assertions.assertThat(task.getStatus()).isEqualTo("Ready");
     }
 
     @Test
@@ -122,29 +131,29 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-        assertNotNull(caseData);
-        assertEquals(1, caseData.size());
-        assertEquals("ford", caseData.get("car"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(1);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("ford");
 
         caseClient.putCaseInstanceData(CONTAINER_ID, caseId, "car", "fiat");
 
         Object carCaseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "car");
-        assertNotNull(carCaseData);
-        assertTrue(carCaseData instanceof String);
-        assertEquals("fiat", carCaseData);
+        Assertions.assertThat(carCaseData).isNotNull();
+        Assertions.assertThat(carCaseData).isInstanceOf(String.class);
+        Assertions.assertThat(carCaseData).isEqualTo("fiat");
 
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(1, tasks.size());
+        Assertions.assertThat(tasks).hasSize(1);
 
         TaskSummary task = tasks.get(0);
-        assertNotNull(task);
-        assertEquals("Provide accident information", task.getName());
-        assertEquals(null, task.getActualOwner());
-        assertEquals("Ready", task.getStatus());
+        Assertions.assertThat(task).isNotNull();
+        Assertions.assertThat(task.getName()).isEqualTo(ACCIDENT_TASK_NAME);
+        Assertions.assertThat(task.getStatus()).isEqualTo("Ready");
+        Assertions.assertThat(task.getActualOwner()).isNull();
 
         Map<String, Object> output = new HashMap<>();
         Object claimReport = createInstance(CLAIM_REPORT_CLASS_NAME);
@@ -154,19 +163,19 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, output);
 
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-        assertNotNull(caseData);
-        assertEquals(2, caseData.size());
-        assertEquals("fiat", caseData.get("car"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(2);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
 
         Object caseClaimReport = caseData.get("claimReport");
-        assertNotNull(caseClaimReport);
-        assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
+        Assertions.assertThat(caseClaimReport).isNotNull();
+        Assertions.assertThat(caseClaimReport.getClass().getName()).isEqualTo(CLAIM_REPORT_CLASS_NAME);
 
         caseClient.removeCaseInstanceData(CONTAINER_ID, caseId, "claimReport");
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-        assertNotNull(caseData);
-        assertEquals(1, caseData.size());
-        assertEquals("fiat", caseData.get("car"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(1);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
 
         Map<String, Object> data = new HashMap<>();
         data.put("owner", "john");
@@ -174,22 +183,22 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         caseClient.putCaseInstanceData(CONTAINER_ID, caseId, data);
 
         caseData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-        assertNotNull(caseData);
-        assertEquals(3, caseData.size());
-        assertEquals("fiat", caseData.get("car"));
-        assertEquals("john", caseData.get("owner"));
+        Assertions.assertThat(caseData).isNotNull();
+        Assertions.assertThat(caseData).hasSize(3);
+        Assertions.assertThat(caseData.get("car")).isEqualTo("fiat");
+        Assertions.assertThat(caseData.get("owner")).isEqualTo("john");
 
         caseClaimReport = caseData.get("report");
-        assertNotNull(caseClaimReport);
-        assertEquals(caseClaimReport.getClass().getName(), CLAIM_REPORT_CLASS_NAME);
+        Assertions.assertThat(caseClaimReport).isNotNull();
+        Assertions.assertThat(caseClaimReport.getClass().getName()).isEqualTo(CLAIM_REPORT_CLASS_NAME);
     }
 
     @Test
     public void testCreateCaseWithEmptyCaseFileThenDestroyIt() {
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
@@ -200,80 +209,59 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
-        try {
-            // this should throw exception as there is no case any more
-            caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            fail("Case should not exists any more");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId.toString());
     }
 
     @Test
     public void testCreateCancelAndReopenCaseWithEmptyCaseFile() {
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
 
         caseClient.cancelCaseInstance(CONTAINER_ID, caseId);
 
-        try {
-            // this should throw exception as there is no case any more
-            caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            fail("Case should not exists any more");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId.toString());
+
         Map<String, Object> data = new HashMap<>();
         data.put("additionalComment", "reopening the case");
         caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID, data);
 
         caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
-        assertNotNull(caseInstance);
-        assertEquals(caseId, caseInstance.getCaseId());
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
 
         Object additionalComment = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "additionalComment");
-        assertNotNull(additionalComment);
-        assertEquals("reopening the case", additionalComment);
+        Assertions.assertThat(additionalComment).isNotNull();
+        Assertions.assertThat(additionalComment).isEqualTo("reopening the case");
     }
 
     @Test
     public void testCreateCaseWithEmptyCaseFileWithContainerAlias() {
         String caseId = caseClient.startCase(CONTAINER_ALIAS, CLAIM_CASE_DEF_ID);
 
-        assertNotNull(caseId);
-        assertTrue(caseId.startsWith(CLAIM_CASE_ID_PREFIX));
+        Assertions.assertThat(caseId).isNotNull();
+        Assertions.assertThat(caseId).startsWith(CLAIM_CASE_ID_PREFIX);
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ALIAS, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
 
         // since roles were not assigned to any users/groups no tasks are available
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        assertEquals(0, tasks.size());
+        Assertions.assertThat(tasks).hasSize(0);
     }
 
     @Test
     public void testCancelCaseInstanceNotExistingContainer() {
-        try {
-            caseClient.cancelCaseInstance("not-existing-container", CLAIM_CASE_DEF_ID);
-            fail("Should have failed because of not existing container.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.cancelCaseInstance(BAD_CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , BAD_CONTAINER_ID);
     }
 
     @Test
     public void testCancelCaseInstanceNotExistingCase() {
-        try {
-            caseClient.cancelCaseInstance(CONTAINER_ID, "not-existing-case");
-            fail("Should have failed because of not existing case definition Id.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.cancelCaseInstance(CONTAINER_ID, BAD_CASE_ID), 404 , BAD_CASE_ID);
     }
 
     @Test
@@ -285,47 +273,27 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
                 .build();
 
         String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID, caseFile);
-        assertNotNull(caseId);
+        Assertions.assertThat(caseId).isNotNull();
 
         CaseInstance caseInstance = caseClient.getCaseInstance(CONTAINER_ID, caseId);
         assertCarInsuranceCaseInstance(caseInstance, caseId, USER_YODA);
 
         caseClient.destroyCaseInstance(CONTAINER_ID, caseId);
 
-        try {
-            // this should throw exception as there is no case any more
-            caseClient.getCaseInstance(CONTAINER_ID, caseId);
-            fail("Case should not exists any more");
-        } catch (KieServicesException e) {
-            // expected
-        }
-
-        try {
-            caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID);
-            fail("Should have failed because destroyed case cannot be reopen.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        // Should throw exception because case doesn't exist
+        assertClientException(() -> caseClient.getCaseInstance(CONTAINER_ID, caseId), 404 , caseId);
+        // Should throw exception because destroyed case cannot be reopen.
+        assertClientException(() -> caseClient.reopenCase(caseId, CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , caseId);
     }
 
     @Test
     public void testDestroyCaseInstanceNotExistingContainer() {
-        try {
-            caseClient.destroyCaseInstance("not-existing-container", CLAIM_CASE_DEF_ID);
-            fail("Should have failed because of not existing container.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.destroyCaseInstance(BAD_CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , BAD_CONTAINER_ID);
     }
 
     @Test
     public void testDestroyCaseInstanceNotExistingCase() {
-        try {
-            caseClient.destroyCaseInstance(CONTAINER_ID, "not-existing-case");
-            fail("Should have failed because of not existing case definition Id.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(() -> caseClient.destroyCaseInstance(CONTAINER_ID, BAD_CASE_ID), 404 , BAD_CASE_ID);
     }
 
     @Test
@@ -341,40 +309,66 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
         caseClient.addDynamicTask(CONTAINER_ID, caseId, "ContactCarProducer", "Contact car producer", data);
 
         Map<String, Object> caseInstanceData = caseClient.getCaseInstanceData(CONTAINER_ID, caseId);
-        assertTrue(caseInstanceData.containsKey(CAR_PRODUCER_REPORT_OUTPUT));
-        assertEquals(producerReportResponse, caseInstanceData.get(CAR_PRODUCER_REPORT_OUTPUT));
+        Assertions.assertThat(caseInstanceData).containsKey(CAR_PRODUCER_REPORT_OUTPUT);
+        Assertions.assertThat(caseInstanceData.get(CAR_PRODUCER_REPORT_OUTPUT)).isEqualTo(producerReportResponse);
     }
 
     @Test
     public void testAddDynamicWorkItemTaskNotExistingContainer() {
-        try {
-            caseClient.addDynamicTask("not-existing-container", "not-existing-case", "ContactCarProducer", "Contact car producer", null);
-            fail("Should have failed because of not existing container.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(
+                () -> caseClient.addDynamicTask(BAD_CONTAINER_ID, BAD_CASE_ID, "ContactCarProducer", "Contact car producer", null),
+                404 , BAD_CONTAINER_ID);
     }
 
     @Test
     public void testAddDynamicWorkItemTaskNotExistingCase() {
-        try {
-            caseClient.addDynamicTask(CONTAINER_ID, "not-existing-case", "ContactCarProducer", "Contact car producer", null);
-            fail("Should have failed because of not existing case case Id.");
-        } catch (KieServicesException e) {
-            // expected
-        }
+        assertClientException(
+                () -> caseClient.addDynamicTask(CONTAINER_ID, BAD_CASE_ID, "ContactCarProducer", "Contact car producer", null),
+                404 , BAD_CONTAINER_ID);
+    }
+
+    @Test
+    public void testAddDynamicTaskToNotExistingStage() throws Exception {
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        Assertions.assertThat(caseId).isNotNull();
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(CONTAINER_ID, caseId, NON_EXISTENT_STAGE_ID,
+                        "ContactCarProducer", "Contact car producer", null), 404, NON_EXISTENT_STAGE_ID);
+    }
+
+    @Test
+    public void testAddDynamicTaskToStageNotExistingCase() throws Exception {
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(CONTAINER_ID, NON_EXISTENT_CASE_ID, "Stage One",
+                        "ContactCarProducer", "Contact car producer", null), 404, NON_EXISTENT_CASE_ID);
+    }
+
+    @Test
+    public void testAddDynamicTaskToStageInvalidContainer() throws Exception {
+        String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        Assertions.assertThat(caseId).isNotNull();
+
+        List<CaseStage> caseStages = caseClient.getStages(CONTAINER_ID, caseId, false, 0, 100);
+        Assertions.assertThat(caseStages).isNotNull();
+        Assertions.assertThat(caseStages).isNotEmpty();
+
+        CaseStage firstCaseStage = caseStages.iterator().next();
+        String firstStageId = firstCaseStage.getIdentifier();
+        assertClientException(
+                () -> caseClient.addDynamicTaskToStage(BAD_CONTAINER_ID, caseId, firstStageId,
+                        "ContactCarProducer", "Contact car producer", null), 404, BAD_CONTAINER_ID);
     }
 
     private void assertCarInsuranceCaseInstance(CaseInstance caseInstance, String caseId, String owner) {
-        assertNotNull(caseInstance);
-        assertEquals(caseId, caseInstance.getCaseId());
-        assertEquals(CLAIM_CASE_DEF_ID, caseInstance.getCaseDefinitionId());
-        assertEquals(CLAIM_CASE_DESRIPTION, caseInstance.getCaseDescription());
-        assertEquals(owner, caseInstance.getCaseOwner());
-        assertEquals(ProcessInstance.STATE_ACTIVE, caseInstance.getCaseStatus().intValue());
-        assertNotNull(caseInstance.getStartedAt());
-        assertNull(caseInstance.getCompletedAt());
-        assertEquals("", caseInstance.getCompletionMessage());
-        assertEquals(CONTAINER_ID, caseInstance.getContainerId());
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getCaseId()).isEqualTo(caseId);
+        Assertions.assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(CLAIM_CASE_DEF_ID);
+        Assertions.assertThat(caseInstance.getCaseDescription()).isEqualTo(CLAIM_CASE_DESRIPTION);
+        Assertions.assertThat(caseInstance.getCaseOwner()).isEqualTo(owner);
+        Assertions.assertThat(caseInstance.getCaseStatus().intValue()).isEqualTo(ProcessInstance.STATE_ACTIVE);
+        Assertions.assertThat(caseInstance.getStartedAt()).isNotNull();
+        Assertions.assertThat(caseInstance.getCompletedAt()).isNull();
+        Assertions.assertThat(caseInstance.getCompletionMessage()).isEqualTo("");
+        Assertions.assertThat(caseInstance.getContainerId()).isEqualTo(CONTAINER_ID);
     }
 }
