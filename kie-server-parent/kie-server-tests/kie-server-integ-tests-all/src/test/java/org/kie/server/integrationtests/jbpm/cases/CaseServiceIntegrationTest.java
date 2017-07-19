@@ -92,7 +92,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         // since roles were not assigned to any users/groups no tasks are available
         List<TaskSummary> tasks = taskClient.findTasksAssignedAsPotentialOwner(USER_YODA, 0, 10);
-        Assertions.assertThat(tasks.size()).isEqualTo(0);
+        Assertions.assertThat(tasks).isEmpty();
     }
 
     @Test
@@ -256,7 +256,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testCancelCaseInstanceNotExistingContainer() {
-        assertClientException(() -> caseClient.cancelCaseInstance(BAD_CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , BAD_CONTAINER_ID);
+    	String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        assertClientException(() -> caseClient.cancelCaseInstance(BAD_CONTAINER_ID, caseId), 404 , BAD_CONTAINER_ID);
     }
 
     @Test
@@ -288,7 +289,8 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testDestroyCaseInstanceNotExistingContainer() {
-        assertClientException(() -> caseClient.destroyCaseInstance(BAD_CONTAINER_ID, CLAIM_CASE_DEF_ID), 404 , BAD_CONTAINER_ID);
+    	String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+        assertClientException(() -> caseClient.destroyCaseInstance(BAD_CONTAINER_ID, caseId), 404 , BAD_CONTAINER_ID);
     }
 
     @Test
@@ -315,8 +317,10 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
     @Test
     public void testAddDynamicWorkItemTaskNotExistingContainer() {
+    	String caseId = caseClient.startCase(CONTAINER_ID, CLAIM_CASE_DEF_ID);
+    	
         assertClientException(
-                () -> caseClient.addDynamicTask(BAD_CONTAINER_ID, BAD_CASE_ID, "ContactCarProducer", "Contact car producer", null),
+                () -> caseClient.addDynamicTask(BAD_CONTAINER_ID, caseId, "ContactCarProducer", "Contact car producer", null),
                 404 , BAD_CONTAINER_ID);
     }
 
@@ -324,7 +328,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
     public void testAddDynamicWorkItemTaskNotExistingCase() {
         assertClientException(
                 () -> caseClient.addDynamicTask(CONTAINER_ID, BAD_CASE_ID, "ContactCarProducer", "Contact car producer", null),
-                404 , BAD_CONTAINER_ID);
+                404 , BAD_CASE_ID);
     }
 
     @Test
