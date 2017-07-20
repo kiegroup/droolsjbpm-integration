@@ -59,6 +59,7 @@ import org.jbpm.services.api.query.QueryAlreadyRegisteredException;
 import org.jbpm.services.api.query.QueryNotFoundException;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryDefinitionList;
+import org.kie.server.common.rest.HttpStatusCodeException;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.QueryDataServiceBase;
@@ -319,7 +320,7 @@ public class QueryDataResource {
                                          conversationIdHeader );
         } catch ( Exception e ) {
             Throwable root = ExceptionUtils.getRootCause( e );
-            if ( root instanceof NumberFormatException ) {
+            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) ) {
 
                 logger.error( "{}",
                               MessageFormat.format( BAD_REQUEST,
