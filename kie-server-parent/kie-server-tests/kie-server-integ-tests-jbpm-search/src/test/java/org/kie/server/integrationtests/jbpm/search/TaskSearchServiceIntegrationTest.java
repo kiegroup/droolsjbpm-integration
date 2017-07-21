@@ -15,25 +15,24 @@
 
 package org.kie.server.integrationtests.jbpm.search;
 
+import org.assertj.core.api.Assertions;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.kie.api.KieServices;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.instance.TaskInstance;
+import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.api.model.definition.TaskField;
+import org.kie.server.api.model.definition.TaskQueryFilterSpec;
+import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
+
+import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.assertj.core.api.Assertions;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.kie.api.KieServices;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.definition.TaskField;
-import org.kie.server.api.model.definition.TaskQueryFilterSpec;
-import org.kie.server.api.model.instance.TaskInstance;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.api.util.TaskQueryFilterSpecBuilder;
-import org.kie.server.integrationtests.shared.KieServerDeployer;
-
-import static org.kie.server.remote.rest.jbpm.resources.Messages.BAD_REQUEST;
 
 public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIntegrationTest {
 
@@ -64,8 +63,9 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     @Test
     public void testFindTaskWithIncompatibleTypeFilter() throws Exception {
         assertClientException(
-                               () -> searchServicesClient.findHumanTasksWithFilters( createQueryFilterEqualsTo( TaskField.NAME,
-                                                                                                                1 ),
+                               () -> searchServicesClient.findHumanTasksWithFilters( createQueryFilterGreaterThanOrEqualsTo( TaskField.CREATEDON,
+                                                                                                                             "invalid data type" ),
+
                                                                                      0,
                                                                                      100 ),
                                400,
@@ -74,7 +74,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     }
 
     @Test
-    public void testFindTaskWithCreatedOnEqualsToFilter() throws Exception {
+    public void testFindTaskWithCreatedOnGreaterThanOrEqualsToFilter() throws Exception {
         Long processInstanceId = processClient.startProcess( CONTAINER_ID,
                                                              PROCESS_ID_USERTASK );
         Assertions.assertThat( processInstanceId ).isNotNull();
@@ -84,8 +84,8 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                 10 );
         Assertions.assertThat( tasks ).isNotEmpty();
         TaskSummary task = tasks.get( 0 );
-        testFindTaskInstanceWithSearchService( createQueryFilterEqualsTo( TaskField.CREATEDON,
-                                                                          task.getCreatedOn() ),
+        testFindTaskInstanceWithSearchService( createQueryFilterGreaterThanOrEqualsTo( TaskField.CREATEDON,
+                                                                                       subtractOneMinuteFromDate( task.getCreatedOn() ) ),
                                                task.getId() );
     }
 
@@ -250,7 +250,7 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
     }
 
     @Test
-    public void testFindTaskWithActivationTimeEqualsToFilter() throws Exception {
+    public void testFindTaskWithActivationTimeGreaterThanEqualsToFilter() throws Exception {
         Long processInstanceId = processClient.startProcess( CONTAINER_ID,
                                                              PROCESS_ID_USERTASK );
         Assertions.assertThat( processInstanceId ).isNotNull();
@@ -260,8 +260,8 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                 10 );
         Assertions.assertThat( tasks ).isNotEmpty();
         TaskSummary task = tasks.get( 0 );
-        testFindTaskInstanceWithSearchService( createQueryFilterEqualsTo( TaskField.ACTIVATIONTIME,
-                                                                          task.getActivationTime() ),
+        testFindTaskInstanceWithSearchService( createQueryFilterGreaterThanOrEqualsTo( TaskField.ACTIVATIONTIME,
+                                                                                       subtractOneMinuteFromDate( task.getActivationTime() ) ),
                                                task.getId() );
     }
 

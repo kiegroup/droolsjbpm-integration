@@ -18,7 +18,6 @@ package org.kie.server.integrationtests.jbpm.search;
 import org.assertj.core.api.Assertions;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
@@ -64,8 +63,8 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
     @Test
     public void testFindProcessWithIncompatibleTypeFilter() throws Exception {
         assertClientException(
-                               () -> searchServicesClient.findProcessInstancesWithFilters( createQueryFilterEqualsTo( ProcessInstanceField.PROCESSID,
-                                                                                                                      1 ),
+                               () -> searchServicesClient.findProcessInstancesWithFilters( createQueryFilterGreaterThanOrEqualsTo( ProcessInstanceField.START_DATE,
+                                                                                                                                   "incompatible data type" ),
                                                                                            0,
                                                                                            100 ),
                                400,

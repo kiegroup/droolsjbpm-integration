@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.kie.server.api.model.instance.ProcessInstanceList;
+import org.kie.server.common.rest.HttpStatusCodeException;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.search.ProcessInstanceSearchServiceBase;
@@ -92,7 +93,7 @@ public class ProcessInstanceSearchResource {
                                          conversationIdHeader );
         } catch ( Exception e ) {
             Throwable root = ExceptionUtils.getRootCause( e );
-            if ( root instanceof NumberFormatException ) {
+            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) ) {
 
                 logger.error( "{}",
                               MessageFormat.format( BAD_REQUEST,
