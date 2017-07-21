@@ -21,11 +21,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.balancer.BalancerStrategy;
 import org.kie.server.client.balancer.LoadBalancer;
@@ -264,7 +266,16 @@ public class LoadBalancerClientTest {
         assertEquals("Server version", "1", response.getResult().getVersion());
     }
 
+    @Test
+    public void testDefaultLoadBalancerFirstServerNotAvailable() throws Exception {
+        KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 
+        wireMockServer1.stop();
+
+        ServiceResponse<KieServerStateInfo> response = client.getServerState();
+        assertSuccess(response);
+        Assertions.assertThat(response.getResult().getContainers()).isEmpty();
+    }
 
     private void assertSuccess(ServiceResponse<?> response) {
         assertEquals("Response type", ServiceResponse.ResponseType.SUCCESS, response.getType());
