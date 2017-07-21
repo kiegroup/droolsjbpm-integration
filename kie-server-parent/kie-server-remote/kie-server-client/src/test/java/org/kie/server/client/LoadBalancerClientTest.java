@@ -60,6 +60,16 @@ public class LoadBalancerClientTest {
                                 "    <version>" + version + "</version>\n" +
                                 "  </kie-server-info>\n" +
                                 "</response>")));
+        wireMockServer.stubFor(get(urlEqualTo("/state"))
+                .withHeader("Accept", equalTo("application/xml"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/xml")
+                        .withBody("<response type=\"SUCCESS\" msg=\"Kie Server state\">\n" +
+                                "  <kie-server-state-info>\n" +
+                                "    <version>" + version + "</version>\n" +
+                                "  </kie-server-state-info>\n" +
+                                "</response>")));
 
         return wireMockServer;
     }

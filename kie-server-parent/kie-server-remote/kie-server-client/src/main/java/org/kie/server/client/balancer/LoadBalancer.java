@@ -52,15 +52,19 @@ public class LoadBalancer {
         return selectedUrl;
     }
 
-    public void markAsFailed(String url) {
-        failedEndpoints.add(url);
-        balancerStrategy.markAsOffline(url);
+    public String markAsFailed(String url) {
+        
+        String baseUrl = balancerStrategy.markAsOffline(url);
+        failedEndpoints.add(baseUrl);
         logger.debug("Url '{}' is marked as failed and will be considered offline by {}", url, balancerStrategy);
+        
+        return baseUrl;
     }
 
     public void activate(String url) {
-        failedEndpoints.remove(url);
-        balancerStrategy.markAsOnline(url);
+        
+        String baseUrl = balancerStrategy.markAsOnline(url);
+        failedEndpoints.remove(baseUrl);
         logger.debug("Url '{}' is marked as activated and will be considered online by {}", url, balancerStrategy);
     }
 

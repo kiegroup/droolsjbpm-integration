@@ -27,4 +27,8 @@ public abstract class AbstractBalancerStrategy implements BalancerStrategy {
             throw new KieServerHttpRequestException("No available endpoints found");
         }
     }
+    
+    protected String locateUrl(Collection<String> baseUrls, String url) {
+    	return baseUrls.stream().filter(baseUrl -> url.startsWith(baseUrl)).findFirst().orElse(url);
+    }
 }

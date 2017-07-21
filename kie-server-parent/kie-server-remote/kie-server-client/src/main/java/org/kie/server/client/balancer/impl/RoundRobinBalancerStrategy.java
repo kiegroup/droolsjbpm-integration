@@ -18,7 +18,6 @@ package org.kie.server.client.balancer.impl;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 public class RoundRobinBalancerStrategy extends AbstractBalancerStrategy {
@@ -43,18 +42,25 @@ public class RoundRobinBalancerStrategy extends AbstractBalancerStrategy {
     }
 
     @Override
-    public void markAsOffline(String url) {
+    public String markAsOffline(String url) {
         synchronized (availableEndpoints) {
-            availableEndpoints.remove(url);
+            String baseUrl = locateUrl(availableEndpoints, url);
+            availableEndpoints.remove(baseUrl);
+            
+            return baseUrl;
         }
     }
 
     @Override
-    public void markAsOnline(String url) {
+    public String markAsOnline(String url) {
         synchronized (availableEndpoints) {
-            if (!availableEndpoints.contains(url)) {
-                availableEndpoints.addLast(url);
+            String baseUrl = locateUrl(availableEndpoints, url);
+        	
+            if (!availableEndpoints.contains(baseUrl)) {
+                availableEndpoints.addLast(baseUrl);
             }
+            
+            return baseUrl;
         }
     }
 
