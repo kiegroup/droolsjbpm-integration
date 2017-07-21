@@ -15,6 +15,13 @@
 
 package org.kie.server.integrationtests.jbpm.admin;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,6 +37,7 @@ import org.kie.api.KieServices;
 import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.admin.EmailNotification;
+import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.OrgEntities;
 import org.kie.server.api.model.admin.TaskNotification;
 import org.kie.server.api.model.admin.TaskReassignment;
@@ -851,6 +859,63 @@ public class UserTaskAdminServiceIntegrationTest extends JbpmKieServerBaseIntegr
             Assertions.assertThat(reassignments).isNotNull();
             Assertions.assertThat(reassignments).hasSize(0);
 
+        } finally {
+            if (processInstanceId != null) {
+                processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
+            }
+        }
+    }
+    
+    @Test
+    public void testErrorHandling() throws Exception {
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("nullAccepted", false);
+        Long processInstanceId = null;
+        try {
+            processInstanceId = processClient.startProcess(CONTAINER_ID, PROCESS_ID_SIGNAL_PROCESS, parameters);
+
+            List<ExecutionErrorInstance> errors = processAdminClient.getErrors(CONTAINER_ID, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(0, errors.size());
+
+            try {
+                processClient.signalProcessInstance(CONTAINER_ID, processInstanceId, "Signal1", null);
+                fail("Process instance signal fail as it provides null as event");
+            } catch (KieServicesException e) {
+                // expected
+            }
+
+            errors = processAdminClient.getErrorsByProcessInstance(CONTAINER_ID, processInstanceId, false, 0, 10);
+            assertNotNull(errors);
+            assertEquals(1, errors.size());
+            ExecutionErrorInstance errorInstance = errors.get(0);
+            assertNotNull(errorInstance.getErrorId());
+            assertNull(errorInstance.getError());
+            assertNotNull(errorInstance.getProcessInstanceId());
+            assertNotNull(errorInstance.getActivityId());
+            assertNotNull(errorInstance.getErrorDate());
+
+            assertEquals(CONTAINER_ID, errorInstance.getContainerId());
+            assertEquals(PROCESS_ID_SIGNAL_PROCESS, errorInstance.getProcessId());
+            assertEquals("Signal 1 data", errorInstance.getActivityName());
+
+            assertFalse(errorInstance.isAcknowledged());
+            assertNull(errorInstance.getAcknowledgedAt());
+            assertNull(errorInstance.getAcknowledgedBy());
+
+            
+            userTaskAdminClient.acknowledgeError(CONTAINER_ID, errorInstance.getErrorId());
+
+            errorInstance = userTaskAdminClient.getError(CONTAINER_ID, errorInstance.getErrorId());
+            assertNotNull(errorInstance);
+            assertNotNull(errorInstance.getErrorId());
+            assertTrue(errorInstance.isAcknowledged());
+            assertNotNull(errorInstance.getAcknowledgedAt());
+            assertEquals(USER_YODA, errorInstance.getAcknowledgedBy());
+        } catch (KieServicesException e) {
+            logger.error("Unexpected error", e);
+            fail(e.getMessage());
         } finally {
             if (processInstanceId != null) {
                 processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);

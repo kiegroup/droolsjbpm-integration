@@ -141,7 +141,25 @@
          "methodName": "getComments",
          "elementKind": "method",
          "justification": "Added new method to support case instance comments basic sorting"
-         }
+         },
+         {
+		   "code": "java.method.addedToInterface",
+		   "new": "method void org.kie.server.client.admin.UserTaskAdminServicesClient::acknowledgeError(java.lang.String, java.lang.String[])",
+		   "package": "org.kie.server.client.admin",
+		   "classSimpleName": "UserTaskAdminServicesClient",
+		   "methodName": "acknowledgeError",
+		   "elementKind": "method",
+		   "justification": "JBPM-5851 Technical Error Events"
+		 },
+		 {
+		   "code": "java.method.addedToInterface",
+		   "new": "method org.kie.server.api.model.admin.ExecutionErrorInstance org.kie.server.client.admin.UserTaskAdminServicesClient::getError(java.lang.String, java.lang.String)",
+		   "package": "org.kie.server.client.admin",
+		   "classSimpleName": "UserTaskAdminServicesClient",
+		   "methodName": "getError",
+		   "elementKind": "method",
+		   "justification": "JBPM-5851 Technical Error Events"
+		 }
       ]
     }
   }
