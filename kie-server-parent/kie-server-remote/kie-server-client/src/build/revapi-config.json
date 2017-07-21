@@ -159,7 +159,31 @@
 		   "methodName": "getError",
 		   "elementKind": "method",
 		   "justification": "JBPM-5851 Technical Error Events"
-		 }
+		 },
+		 {
+		  "code": "java.method.returnTypeChanged",
+		  "old": "method void org.kie.server.client.balancer.BalancerStrategy::markAsOffline(java.lang.String)",
+		  "new": "method java.lang.String org.kie.server.client.balancer.BalancerStrategy::markAsOffline(java.lang.String)",
+		  "oldType": "void",
+		  "newType": "java.lang.String",
+		  "package": "org.kie.server.client.balancer",
+		  "classSimpleName": "BalancerStrategy",
+		  "methodName": "markAsOffline",
+		  "elementKind": "method",
+		  "justification": "Fixed handling of urls within load balancer to take into account base url"
+		},
+		{
+		  "code": "java.method.returnTypeChanged",
+		  "old": "method void org.kie.server.client.balancer.BalancerStrategy::markAsOnline(java.lang.String)",
+		  "new": "method java.lang.String org.kie.server.client.balancer.BalancerStrategy::markAsOnline(java.lang.String)",
+		  "oldType": "void",
+		  "newType": "java.lang.String",
+		  "package": "org.kie.server.client.balancer",
+		  "classSimpleName": "BalancerStrategy",
+		  "methodName": "markAsOnline",
+		  "elementKind": "method",
+		  "justification": "Fixed handling of urls within load balancer to take into account base url"
+		}
       ]
     }
   }

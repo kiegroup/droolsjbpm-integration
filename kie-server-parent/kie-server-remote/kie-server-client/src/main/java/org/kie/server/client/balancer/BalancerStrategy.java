@@ -26,9 +26,9 @@ public interface BalancerStrategy {
 
     String next();
 
-    void markAsOffline(String url);
+    String markAsOffline(String url);
 
-    void markAsOnline(String url);
+    String markAsOnline(String url);
 
     List<String> getAvailableEndpoints();
 }

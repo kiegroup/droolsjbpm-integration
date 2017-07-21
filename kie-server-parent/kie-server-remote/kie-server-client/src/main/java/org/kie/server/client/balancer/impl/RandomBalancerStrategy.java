@@ -40,18 +40,26 @@ public class RandomBalancerStrategy extends AbstractBalancerStrategy {
     }
 
     @Override
-    public void markAsOffline(String url) {
+    public String markAsOffline(String url) {
         synchronized (availableEndpoints) {
-            availableEndpoints.remove(url);
+            String baseUrl = locateUrl(availableEndpoints, url);
+        	
+            availableEndpoints.remove(baseUrl);
+            
+            return baseUrl;
         }
     }
 
     @Override
-    public void markAsOnline(String url) {
+    public String markAsOnline(String url) {
         synchronized (availableEndpoints) {
-            if (!availableEndpoints.contains(url)) {
-                availableEndpoints.add(url);
+            String baseUrl = locateUrl(availableEndpoints, url);
+        	
+            if (!availableEndpoints.contains(baseUrl)) {
+                availableEndpoints.add(baseUrl);
             }
+            
+            return baseUrl;
         }
     }
 
