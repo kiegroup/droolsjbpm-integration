@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.naming.InitialContext;
 
 import org.appformer.maven.support.DependencyFilter;
-import org.drools.compiler.kie.builder.impl.InternalKieContainer;
+import org.drools.core.impl.InternalKieContainer;
 import org.kie.api.KieServices;
 import org.kie.api.builder.Message.Level;
 import org.kie.api.builder.Results;
