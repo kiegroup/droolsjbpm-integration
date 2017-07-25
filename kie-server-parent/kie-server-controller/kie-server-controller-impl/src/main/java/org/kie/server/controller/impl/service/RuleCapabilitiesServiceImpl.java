@@ -17,6 +17,7 @@ package org.kie.server.controller.impl.service;
 
 import java.util.List;
 
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -34,7 +35,8 @@ import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 
 public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
-    private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();;
+    private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
+    ;
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
     private NotificationService notificationService = LoggingNotificationService.getInstance();
 
@@ -47,13 +49,17 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
         ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
 
-        List<Container> containers = kieServerInstanceManager.scanNow(serverTemplate, containerSpec);
+        List<Container> containers = kieServerInstanceManager.scanNow(serverTemplate,
+                                                                      containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        notificationService.notify(serverTemplate,
+                                   containerSpec,
+                                   containers);
     }
 
     @Override
-    public void startScanner(final ContainerSpecKey containerSpecKey, long interval) {
+    public void startScanner(final ContainerSpecKey containerSpecKey,
+                             long interval) {
 
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
@@ -65,7 +71,8 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
         ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
         if (containerConfig == null) {
             containerConfig = new RuleConfig();
-            containerSpec.getConfigs().put(Capability.RULE, containerConfig);
+            containerSpec.getConfigs().put(Capability.RULE,
+                                           containerConfig);
         }
 
         ((RuleConfig) containerConfig).setPollInterval(interval);
@@ -73,9 +80,13 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
         templateStorage.update(serverTemplate);
 
-        List<Container> containers = kieServerInstanceManager.startScanner(serverTemplate, containerSpec, interval);
+        List<Container> containers = kieServerInstanceManager.startScanner(serverTemplate,
+                                                                           containerSpec,
+                                                                           interval);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        notificationService.notify(serverTemplate,
+                                   containerSpec,
+                                   containers);
     }
 
     @Override
@@ -90,7 +101,8 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
         ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
         if (containerConfig == null) {
             containerConfig = new RuleConfig();
-            containerSpec.getConfigs().put(Capability.RULE, containerConfig);
+            containerSpec.getConfigs().put(Capability.RULE,
+                                           containerConfig);
         }
 
         ((RuleConfig) containerConfig).setPollInterval(null);
@@ -98,13 +110,17 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
         templateStorage.update(serverTemplate);
 
-        List<Container> containers = kieServerInstanceManager.stopScanner(serverTemplate, containerSpec);
+        List<Container> containers = kieServerInstanceManager.stopScanner(serverTemplate,
+                                                                          containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        notificationService.notify(serverTemplate,
+                                   containerSpec,
+                                   containers);
     }
 
     @Override
-    public void upgradeContainer(final ContainerSpecKey containerSpecKey, ReleaseId releaseId) {
+    public void upgradeContainer(final ContainerSpecKey containerSpecKey,
+                                 ReleaseId releaseId) {
         ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
         if (serverTemplate == null) {
             throw new RuntimeException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
@@ -114,17 +130,20 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
         if (releaseId.getGroupId() == null) {
             releaseId.setGroupId(containerSpec.getReleasedId().getGroupId());
         }
-        if (releaseId.getArtifactId()== null) {
+        if (releaseId.getArtifactId() == null) {
             releaseId.setArtifactId(containerSpec.getReleasedId().getArtifactId());
         }
 
         containerSpec.setReleasedId(releaseId);
-
+        containerSpec.setStatus(KieContainerStatus.STARTED);
         templateStorage.update(serverTemplate);
 
-        List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
+        List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate,
+                                                                               containerSpec);
 
-        notificationService.notify(serverTemplate, containerSpec, containers);
+        notificationService.notify(serverTemplate,
+                                   containerSpec,
+                                   containers);
     }
 
     public KieServerTemplateStorage getTemplateStorage() {
