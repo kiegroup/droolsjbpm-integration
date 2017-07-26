@@ -29,6 +29,7 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.model.KieContainerKjarResourcesRequest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
@@ -189,6 +190,20 @@ public class KieServicesClientImpl extends AbstractKieServicesClientImpl impleme
             ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
             return getResponseOrNullIfNoResponse(response);
         }
+    }
+    
+    
+    public ServiceResponse<KieContainerResource> createContainerFromResources(String id, KieContainerKjarResourcesRequest containerAndResources) {
+    	if( config.isRest() ) {
+            return makeHttpPostRequestAndCreateServiceResponse( loadBalancer.getUrl() + "/containers/" + id + "/resources", containerAndResources, KieContainerResource.class );
+        } else {
+        	/* TODO: Provide JMS support
+            CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new CreateContainerCommand(containerAndResources)));
+            ServiceResponse<KieContainerResource> response = (ServiceResponse<KieContainerResource>) executeJmsCommand(script, null, null, id).getResponses().get(0);
+            return getResponseOrNullIfNoResponse(response);
+            */
+        	throw new UnsupportedOperationException("We don't yet support JMS.");
+        }	
     }
 
     @Override

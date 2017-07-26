@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -61,8 +62,8 @@ import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
+import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
@@ -70,6 +71,7 @@ import org.kie.server.api.marshalling.Marshaller;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.marshalling.ModelWrapper;
+import org.kie.server.api.model.KieContainerKjarResourcesRequest;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -79,9 +81,11 @@ import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.api.model.KieServerStateInfo;
+import org.kie.server.api.model.KjarResource;
 import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
+import org.kie.server.api.model.ResourceTypeEnum;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
 import org.kie.server.api.model.admin.EmailNotification;
@@ -198,6 +202,9 @@ public class JaxbMarshaller implements Marshaller {
                 ServiceResponse.class,
                 ServiceResponsesList.class,
                 KieServerStateInfo.class,
+                KieContainerKjarResourcesRequest.class,
+                KjarResource.class,
+                ResourceTypeEnum.class,
 
                 ReleaseIdFilter.class,
                 KieContainerStatusFilter.class,

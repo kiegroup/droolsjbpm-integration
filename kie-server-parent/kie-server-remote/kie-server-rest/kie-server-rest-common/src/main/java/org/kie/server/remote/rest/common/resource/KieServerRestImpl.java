@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Red Hat, Inc. and/or its affiliates.
+q * Copyright 2015 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,7 @@
 
 package org.kie.server.remote.rest.common.resource;
 
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceFilter;
-import org.kie.server.api.model.KieContainerStatusFilter;
-import org.kie.server.api.model.KieScannerResource;
-import org.kie.server.api.model.ReleaseId;
-import org.kie.server.api.model.ReleaseIdFilter;
-import org.kie.server.api.model.ServiceResponse;
-import org.kie.server.remote.rest.common.Header;
-import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
-import org.kie.server.services.impl.marshal.MarshallerHelper;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,9 +32,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import org.kie.server.api.model.KieContainerKjarResourcesRequest;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieContainerResourceFilter;
+import org.kie.server.api.model.KieContainerStatusFilter;
+import org.kie.server.api.model.KieScannerResource;
+import org.kie.server.api.model.ReleaseId;
+import org.kie.server.api.model.ReleaseIdFilter;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.remote.rest.common.Header;
+import org.kie.server.services.impl.KieServerImpl;
+import org.kie.server.services.impl.KieServerLocator;
+import org.kie.server.services.impl.marshal.MarshallerHelper;
 
 @Path("server")
 public class KieServerRestImpl {
@@ -114,7 +113,25 @@ public class KieServerRestImpl {
         }
         return createCorrectVariant( response, headers, Status.BAD_REQUEST );
     }
+    
+    @POST
+    @Path("containers/{id}/resources")
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response createContainerFromResources(@Context HttpHeaders headers, @PathParam("id") String id, String resourcesPayload) {
+    	String contentType = getContentType( headers );
 
+        KieContainerKjarResourcesRequest containerAndResources = marshallerHelper.unmarshal( resourcesPayload, contentType, KieContainerKjarResourcesRequest.class );
+
+        ServiceResponse<KieContainerResource> response = server.createContainerFromResources( id, containerAndResources );
+
+        Header conversationIdHeader = buildConversationIdHeader(id, server.getServerRegistry(), headers);
+        if ( response.getType() == ServiceResponse.ResponseType.SUCCESS ) {
+            return createCorrectVariant( response, headers, Status.CREATED, conversationIdHeader );
+        }
+        return createCorrectVariant( response, headers, Status.BAD_REQUEST );
+    }
+    
     @GET
     @Path("containers/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
