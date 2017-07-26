@@ -60,6 +60,7 @@ import org.kie.server.services.api.KieControllerNotDefinedException;
 import org.kie.server.services.api.KieServer;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
+import org.kie.server.services.api.KieServerRegistryAware;
 import org.kie.server.services.impl.controller.ControllerConnectRunnable;
 import org.kie.server.services.impl.controller.DefaultRestControllerImpl;
 import org.kie.server.services.impl.locator.ContainerLocatorProvider;
@@ -806,9 +807,17 @@ public class KieServerImpl implements KieServer {
 
     protected KieServerController getController() {
         KieServerController controller = new DefaultRestControllerImpl(context);
-        Iterator<KieServerController> it = kieControllers.iterator();
-        if (it != null && it.hasNext()) {
-            controller = it.next();
+        try {
+            Iterator<KieServerController> it = kieControllers.iterator();
+            if (it != null && it.hasNext()) {
+                controller = it.next();
+                
+                if (controller instanceof KieServerRegistryAware) {
+                    ((KieServerRegistryAware) controller).setRegistry(context);
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Exception when looking up controller implementations {}", e.getMessage(), e);
         }
 
         return controller;

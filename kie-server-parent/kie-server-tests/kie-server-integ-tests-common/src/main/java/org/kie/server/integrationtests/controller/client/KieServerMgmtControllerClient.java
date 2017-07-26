@@ -76,7 +76,7 @@ public class KieServerMgmtControllerClient {
         this.controllerBaseUrl = controllerBaseUrl;
         httpClient = new ResteasyClientBuilder()
                 .establishConnectionTimeout(10, TimeUnit.SECONDS)
-                .socketTimeout(10, TimeUnit.SECONDS)
+                .socketTimeout(60, TimeUnit.SECONDS)
                 .build();
         if (login == null) {
             login = TestConfig.getUsername();

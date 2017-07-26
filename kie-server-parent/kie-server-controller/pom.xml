@@ -20,6 +20,9 @@
     <module>kie-server-controller-rest</module>
     <module>kie-server-controller-standalone-impl</module>
     <module>kie-server-controller-standalone</module>
+    <module>kie-server-controller-websocket</module>
+    <module>kie-server-controller-websocket-client</module>
+    <module>kie-server-controller-websocket-common</module>
   </modules>
 
 </project>
