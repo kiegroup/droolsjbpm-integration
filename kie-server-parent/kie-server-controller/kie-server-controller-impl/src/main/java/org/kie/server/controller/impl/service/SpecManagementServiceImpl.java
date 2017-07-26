@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.KieServerControllerException;
 import org.kie.server.controller.api.KieServerControllerNotFoundException;
@@ -42,12 +43,15 @@ import org.kie.server.controller.api.service.SpecManagementService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpecManagementServiceImpl implements SpecManagementService {
 
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
     private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
     private NotificationService notificationService = LoggingNotificationService.getInstance();
+    private static Logger logger = LoggerFactory.getLogger(SpecManagementServiceImpl.class);
 
     @Override
     public void saveContainerSpec( String serverTemplateId,
@@ -68,6 +72,10 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         templateStorage.update( serverTemplate );
 
         notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
+            List<Container> containers = kieServerInstanceManager.startContainer( serverTemplate, containerSpec );
+            notificationService.notify( serverTemplate, containerSpec, containers );
+        }
     }
 
     @Override
@@ -114,7 +122,10 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         if ( serverTemplate == null ) {
             throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
         }
+
         if (serverTemplate.hasContainerSpec(containerSpecId)) {
+            ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecId );
+            kieServerInstanceManager.stopContainer( serverTemplate, containerSpec );
             serverTemplate.deleteContainerSpec(containerSpecId);
 
             templateStorage.update(serverTemplate);
@@ -207,6 +218,31 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecId );
         if ( containerSpec == null ) {
             throw new KieServerControllerNotFoundException( "No container spec found for id " + containerSpecId + " within server template with id " + serverTemplateId );
+        }
+        List<Container> affectedContainers = null;
+        if ( containerConfig instanceof RuleConfig ) {
+            RuleConfig rc = (RuleConfig)containerConfig;
+            long interval = rc.getPollInterval();
+            KieScannerStatus status = rc.getScannerStatus();
+            if ( status == KieScannerStatus.STARTED ) {
+                affectedContainers = kieServerInstanceManager.startScanner( serverTemplate, containerSpec, interval );
+            } else if ( status == KieScannerStatus.STOPPED ) {
+                affectedContainers = kieServerInstanceManager.stopScanner( serverTemplate, containerSpec );
+            }
+        } else if (containerConfig instanceof ProcessConfig) {
+            ProcessConfig pc = (ProcessConfig)containerConfig;
+            kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
+            containerSpec.getConfigs().put(capability, pc);
+            affectedContainers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
+        }
+        if (affectedContainers == null) {
+            logger.info("Update of container configuration resulted in no changes to containers running on kie-servers");
+        } else {
+            for ( Container ac: affectedContainers ) {
+                logger.debug("Container {} on server {} was affected by a change in the scanner"
+                        ,ac.getContainerSpecId()
+                        ,ac.getServerInstanceKey());
+            }
         }
 
         containerSpec.getConfigs().put( capability, containerConfig );
