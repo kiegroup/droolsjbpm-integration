@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -152,6 +153,7 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(updatedContainer.getReleasedId());
         assertNotEquals(initial, updatedContainer.getReleasedId());
         assertEquals(upgradeTo, updatedContainer.getReleasedId());
+        assertEquals(updatedContainer.getStatus(), KieContainerStatus.STARTED);
     }
 
 }

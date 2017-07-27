@@ -17,6 +17,7 @@ package org.kie.server.controller.impl.service;
 
 import java.util.List;
 
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -119,7 +120,7 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
         }
 
         containerSpec.setReleasedId(releaseId);
-
+        containerSpec.setStatus(KieContainerStatus.STARTED);
         templateStorage.update(serverTemplate);
 
         List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
