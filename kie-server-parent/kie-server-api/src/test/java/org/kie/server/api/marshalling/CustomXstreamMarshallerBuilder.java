@@ -34,6 +34,8 @@ public class CustomXstreamMarshallerBuilder extends BaseMarshallerBuilder {
                 @Override
                 protected void buildMarshaller(Set<Class<?>> classes, ClassLoader classLoader) {
                     xstream = new XStream(new PureJavaReflectionProvider(), new DomDriver("UTF-8", new XmlFriendlyNameCoder("_-", "_")));
+                    String[] voidDeny = {"void.class", "Void.class"};
+                    xstream.denyTypes(voidDeny);
                 }
             };
         }
