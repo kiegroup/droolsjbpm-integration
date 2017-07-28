@@ -17,6 +17,7 @@ package org.kie.server.integrationtests.controller;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -26,8 +27,11 @@ import org.junit.experimental.categories.Category;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
+import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.controller.api.ModelFactory;
@@ -459,6 +463,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
         // Check process config and rule config
         checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
+
     }
 
     @Test
@@ -550,4 +555,94 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertEquals(kieServerInfo.getServerId(), actual.getId());
         assertEquals(kieServerInfo.getName(), actual.getName());
     }
+
+    @Test
+    public void testUpdateContainerConfigSent() {
+        // The usual setup of the kie-server along with a container spec
+        ServerTemplate serverTemplate = createServerTemplate();
+        Map<Capability, ContainerConfig> containerConfigMap = new HashMap();
+        ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
+        containerConfigMap.put(Capability.PROCESS, processConfig);
+        RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.STARTED);
+        containerConfigMap.put(Capability.RULE, ruleConfig);
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
+
+        // Tell the controller to save the spec for the given template, which since the
+        // container status is STARTED should also cause it to be deployed to the kie-server
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        checkContainerConfigAgainstServer(processConfig,ruleConfig);
+
+        // Update the container configuration, turning off the scanner
+        ruleConfig = new RuleConfig(1000l, KieScannerStatus.STOPPED);
+        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        checkContainerConfigAgainstServer(ruleConfig);
+
+        processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
+        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+        checkContainerConfigAgainstServer(processConfig);
+
+        // Restart the scanner with the new interval
+        ruleConfig.setScannerStatus(KieScannerStatus.STARTED);
+        mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        checkContainerConfigAgainstServer(ruleConfig,processConfig);
+    }
+
+    @Test
+    public void testDeleteContainerStopsContainer() {
+        ServerTemplate serverTemplate = createServerTemplate();
+        Map<Capability, ContainerConfig> containerConfigMap = new HashMap();
+
+        ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
+        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+
+        ServiceResponse<KieServerStateInfo> response = client.getServerState();
+        assumeThat(response.getType(), is(ServiceResponse.ResponseType.SUCCESS));
+
+        KieServerStateInfo serverState = response.getResult();
+        assertNotNull(serverState);
+        assertTrue("Expected to find containers, but none were found", serverState.getContainers() != null && serverState.getContainers().size() > 0);
+
+        mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
+        response = client.getServerState();
+        serverState = response.getResult();
+        assertNotNull(serverState);
+        assertFalse("Did not expect to find containers", serverState.getContainers() != null && serverState.getContainers().size() > 0);
+    }
+
+    protected void checkContainerConfigAgainstServer(ContainerConfig...configs) {
+        ServiceResponse<KieContainerResource> containerResource = client.getContainerInfo(CONTAINER_ID);
+        assumeThat(containerResource.getType(), is(ServiceResponse.ResponseType.SUCCESS));
+
+        KieContainerResource kcr = containerResource.getResult();
+        assertNotNull(kcr);
+        for (ContainerConfig config: configs) {
+            if (config instanceof ProcessConfig) {
+                ProcessConfig pc = (ProcessConfig)config;
+                Map<String, String> configMap = new HashMap();
+                configMap.put("KBase", pc.getKBase());
+                configMap.put("KSession", pc.getKSession());
+                configMap.put("MergeMode", pc.getMergeMode());
+                configMap.put("RuntimeStrategy", pc.getRuntimeStrategy());
+
+                assertNotNull("No configuration items found for checking process configuration",kcr.getConfigItems());
+                List<KieServerConfigItem> kci = kcr.getConfigItems();
+                for (KieServerConfigItem item: kci) {
+                    String name = item.getName();
+                    String value = item.getValue();
+                    assertEquals(configMap.get(name),value);
+                }
+            } else if (config instanceof RuleConfig) {
+                RuleConfig rc = (RuleConfig)config;
+                KieScannerResource scanner = kcr.getScanner();
+                assertNotNull("No scanner resource found",scanner);
+                assertEquals(rc.getScannerStatus(),scanner.getStatus());
+                // Only test the polling interval when starting the scanner
+                // since it could be wrong at any other time
+                if (rc.getScannerStatus() == KieScannerStatus.STARTED) {
+                    assertEquals(rc.getPollInterval(),scanner.getPollInterval());
+                }
+            }
+        }
+    }
+
 }
