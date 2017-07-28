@@ -27,6 +27,7 @@ import org.kie.server.api.model.instance.ScoreWrapper;
 import org.kie.server.api.model.instance.SolverInstance;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.api.exception.KieServicesException;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
@@ -337,17 +338,17 @@ public class OptaplannerIntegrationTest
         // A soft score of 0 is impossible because we'll always need at least 1 computer
         assertTrue(score.getSoftScore() < 0);
 
-        List<?> computerList = (List<?>) valueOf(solution,
-                                                 "computerList");
+        List<?> computerList = (List<?>) KieServerReflections.valueOf(solution,
+                                                                      "computerList");
         assertEquals(10,
                      computerList.size());
-        List<?> processList = (List<?>) valueOf(solution,
-                                                "processList");
+        List<?> processList = (List<?>) KieServerReflections.valueOf(solution,
+                                                                     "processList");
         assertEquals(30,
                      processList.size());
         for (Object process : processList) {
-            Object computer = valueOf(process,
-                                      "computer");
+            Object computer = KieServerReflections.valueOf(process,
+                                                           "computer");
             assertNotNull(computer);
             // TODO: Change to identity comparation after @XmlID is implemented
             assertTrue(computerList.contains(computer));

@@ -40,6 +40,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.core.AnyOf.*;
 import static org.hamcrest.core.IsEqual.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -183,7 +184,7 @@ public class JobServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest 
         assertTrue(String.class.isAssignableFrom(requestData.get("businessKey").getClass()));
         assertTrue(String.class.isAssignableFrom(requestData.get("deploymentId").getClass()));
 
-        assertEquals(USER_JOHN, valueOf(requestData.get("person"), "name"));
+        assertEquals(USER_JOHN, KieServerReflections.valueOf(requestData.get("person"), "name"));
         assertEquals(CONTAINER_ID, requestData.get("deploymentId"));
         assertEquals(BUSINESS_KEY, requestData.get("businessKey"));
 

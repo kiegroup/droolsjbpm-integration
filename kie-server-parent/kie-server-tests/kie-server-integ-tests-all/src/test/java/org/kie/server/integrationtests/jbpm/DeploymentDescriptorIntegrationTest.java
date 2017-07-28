@@ -32,6 +32,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 
 public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -76,7 +77,7 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         assertNotNull(actualData);
         Object personVar = actualData.getValue(GLOBAL_PERSON_IDENTIFIER);
         assertNotNull(personVar);
-        assertEquals(GLOBAL_PERSON_NAME, valueOf(personVar, PERSON_NAME_FIELD));
+        assertEquals(GLOBAL_PERSON_NAME, KieServerReflections.valueOf(personVar, PERSON_NAME_FIELD));
     }
 
     @Test
@@ -98,7 +99,7 @@ public class DeploymentDescriptorIntegrationTest extends JbpmKieServerBaseIntegr
         assertNotNull(actualData);
         ArrayList<Object> personVar = (ArrayList<Object>) actualData.getValue(personOutIdentifier);
         assertEquals(1, personVar.size());
-        assertEquals(personName, valueOf(personVar.get(0), PERSON_NAME_FIELD));
+        assertEquals(personName, KieServerReflections.valueOf(personVar.get(0), PERSON_NAME_FIELD));
 
         // try to retrieve person object by new request
         commands.clear();

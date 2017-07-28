@@ -33,6 +33,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 
 public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
@@ -120,6 +121,6 @@ public class PerProcessInstanceIntegrationTest extends JbpmKieServerBaseIntegrat
         assertNotNull(actualData);
         ArrayList<Object> personList = (ArrayList<Object>) actualData.getValue(personListOutputId);
         assertEquals(1, personList.size());
-        assertEquals(valueOf(person, PERSON_NAME_FIELD), valueOf(personList.get(0), PERSON_NAME_FIELD));
+        assertEquals(KieServerReflections.valueOf(person, PERSON_NAME_FIELD), KieServerReflections.valueOf(personList.get(0), PERSON_NAME_FIELD));
     }
 }

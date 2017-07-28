@@ -32,6 +32,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static final ReleaseId kjar1 = new ReleaseId("org.kie.server.testing", "container-isolation-kjar1",
@@ -76,7 +77,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         ExecutionResults result1 = response1.getResult();
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", valueOf(outcome, "id"));
+        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", KieServerReflections.valueOf(outcome, "id"));
 
         // now execute the same commands, but for the second container. The rule in there should set different id
         // (namely "Person from kjar2") for the inserted person
@@ -92,7 +93,7 @@ public class ContainerIsolationIntegrationTest extends DroolsKieServerBaseIntegr
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar2'!", "Person from kjar2", valueOf(outcome2, "id"));
+        assertEquals("Person's id should be 'Person from kjar2'!", "Person from kjar2", KieServerReflections.valueOf(outcome2, "id"));
     }
 
 }

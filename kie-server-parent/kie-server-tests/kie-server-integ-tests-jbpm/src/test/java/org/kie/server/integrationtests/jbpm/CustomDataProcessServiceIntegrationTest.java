@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 import static org.junit.Assert.*;
 
@@ -76,18 +77,18 @@ public class CustomDataProcessServiceIntegrationTest extends JbpmKieServerBaseIn
             assertNotNull(pojoVariable);
             assertTrue(pojo1Class.isAssignableFrom(pojoVariable.getClass()));
 
-            assertEquals("one", valueOf(pojoVariable, "desc"));
+            assertEquals("one", KieServerReflections.valueOf(pojoVariable, "desc"));
 
-            Object pojo2Variable = valueOf(pojoVariable, "pojo2");
+            Object pojo2Variable = KieServerReflections.valueOf(pojoVariable, "pojo2");
             assertNotNull(pojo2Variable);
 
-            assertEquals("two", valueOf(pojo2Variable, "desc2"));
-            assertEquals(true, valueOf(pojo2Variable, "primitiveBoolean"));
+            assertEquals("two", KieServerReflections.valueOf(pojo2Variable, "desc2"));
+            assertEquals(true, KieServerReflections.valueOf(pojo2Variable, "primitiveBoolean"));
 
-            Object pojo3Variable = valueOf(pojo2Variable, "pojo3");
+            Object pojo3Variable = KieServerReflections.valueOf(pojo2Variable, "pojo3");
             assertNotNull(pojo3Variable);
 
-            assertEquals("three", valueOf(pojo3Variable, "desc3"));
+            assertEquals("three", KieServerReflections.valueOf(pojo3Variable, "desc3"));
 
         } finally {
             if (processInstanceId != null) {
