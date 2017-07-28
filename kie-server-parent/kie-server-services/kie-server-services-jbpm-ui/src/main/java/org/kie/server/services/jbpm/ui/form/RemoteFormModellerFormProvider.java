@@ -32,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.drools.core.util.MVELSafeHelper;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.form.provider.AbstractFormProvider;
@@ -58,7 +59,9 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
     public static final String ATTR_NAME = "name";
     public static final String ATTR_VALUE = "value";
     public static final String ATTR_TYPE = "type";
-    public static final List<String> ATTR_LANG_NAMES = Arrays.asList("label", "errorMessage", "title");
+    public static final List<String> ATTR_LANG_NAMES = Arrays.asList("label",
+                                                                     "errorMessage",
+                                                                     "title");
 
     public static final String SUB_FORM_TYPE = "Subform";
     public static final String MULTI_SUB_FORM_TYPE = "MultipleSubform";
@@ -72,14 +75,18 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
     }
 
     @Override
-    public String render(String name, ProcessDefinition process, Map<String, Object> renderContext) {
+    public String render(String name,
+                         ProcessDefinition process,
+                         Map<String, Object> renderContext) {
         if (!(process instanceof ProcessAssetDesc)) {
             return null;
         }
 
-        String templateString = formManagerService.getFormByKey(process.getDeploymentId(), process.getId());
+        String templateString = formManagerService.getFormByKey(process.getDeploymentId(),
+                                                                process.getId());
         if (templateString == null) {
-            templateString = formManagerService.getFormByKey(process.getDeploymentId(), process.getId() + getFormSuffix());
+            templateString = formManagerService.getFormByKey(process.getDeploymentId(),
+                                                             process.getId() + getFormSuffix());
         }
 
         if (templateString == null || templateString.isEmpty()) {
@@ -89,23 +96,36 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
             Boolean filterContent = (Boolean) renderContext.get("filterForm");
 
             if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
-                templateString = filterXML(templateString, lang, process.getDeploymentId(), null, null);
+                templateString = filterXML(templateString,
+                                           lang,
+                                           process.getDeploymentId(),
+                                           null,
+                                           null);
             } else {
-                templateString = attachSubForms(templateString, process.getDeploymentId());
+                templateString = attachSubForms(templateString,
+                                                process.getDeploymentId());
             }
             return templateString;
         }
     }
 
     @Override
-    public String render(String name, Task task, ProcessDefinition process, Map<String, Object> renderContext) {
-        if (task == null) return null;
+    public String render(String name,
+                         Task task,
+                         ProcessDefinition process,
+                         Map<String, Object> renderContext) {
+        if (task == null) {
+            return null;
+        }
 
-        String lookupName = getTaskFormName( task );
+        String lookupName = getTaskFormName(task);
 
-        if ( lookupName == null || lookupName.isEmpty()) return null;
+        if (lookupName == null || lookupName.isEmpty()) {
+            return null;
+        }
 
-        String templateString = formManagerService.getFormByKey(task.getTaskData().getDeploymentId(), lookupName);
+        String templateString = formManagerService.getFormByKey(task.getTaskData().getDeploymentId(),
+                                                                lookupName);
 
         if (templateString == null || templateString.isEmpty()) {
             return null;
@@ -126,15 +146,24 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
             Boolean filterContent = (Boolean) renderContext.get("filterForm");
 
             if (filterContent == null || Boolean.TRUE.equals(filterContent)) {
-                templateString = filterXML(templateString, lang, task.getTaskData().getDeploymentId(), inputs, outputs);
+                templateString = filterXML(templateString,
+                                           lang,
+                                           task.getTaskData().getDeploymentId(),
+                                           inputs,
+                                           outputs);
             } else {
-                templateString = attachSubForms(templateString, task.getTaskData().getDeploymentId());
+                templateString = attachSubForms(templateString,
+                                                task.getTaskData().getDeploymentId());
             }
             return templateString;
         }
     }
 
-    protected String filterXML(String document, String lang, String deploymentId, Map inputs, Map outputs) {
+    protected String filterXML(String document,
+                               String lang,
+                               String deploymentId,
+                               Map inputs,
+                               Map outputs) {
         try {
             if (inputs == null) {
                 inputs = Collections.emptyMap();
@@ -159,10 +188,12 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
                     String fieldType = node.getAttributes().getNamedItem(ATTR_TYPE).getNodeValue();
                     if (SUB_FORM_TYPE.equals(fieldType)) {
 
-                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
+                        String defaultSubForm = findPropertyValue(node,
+                                                                  "defaultSubform");
                         if (defaultSubForm != null) {
 
-                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
+                            String subFormContent = formManagerService.getFormByKey(deploymentId,
+                                                                                    defaultSubForm);
 
                             if (subFormContent != null) {
                                 // read once to find out input binding name
@@ -170,73 +201,96 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
 
                                 Node firstFieldNode = tmpSubForm.getElementsByTagName(NODE_FIELD).item(0);
                                 // inputs - current node
-                                String currentNodeInputBinding = findPropertyValue(node, "inputBinding");
-                                currentNodeInputBinding = currentNodeInputBinding.replaceAll("/", ".");
+                                String currentNodeInputBinding = findPropertyValue(node,
+                                                                                   "inputBinding");
+                                currentNodeInputBinding = currentNodeInputBinding.replaceAll("/",
+                                                                                             ".");
 
                                 // outputs current node
-                                String currentNodeOutputBinding = findPropertyValue(node, "outputBinding");
-                                currentNodeOutputBinding = currentNodeOutputBinding.replaceAll("/", ".");
+                                String currentNodeOutputBinding = findPropertyValue(node,
+                                                                                    "outputBinding");
+                                currentNodeOutputBinding = currentNodeOutputBinding.replaceAll("/",
+                                                                                               ".");
 
                                 // inputs sub form
-                                String inputBindingSubForm = findPropertyValue(firstFieldNode, "inputBinding");
+                                String inputBindingSubForm = findPropertyValue(firstFieldNode,
+                                                                               "inputBinding");
                                 inputBindingSubForm = inputBindingSubForm.split("/")[0];
 
                                 // outputs sub form
-                                String outputBindingSubForm = findPropertyValue(firstFieldNode, "outputBinding");
+                                String outputBindingSubForm = findPropertyValue(firstFieldNode,
+                                                                                "outputBinding");
                                 outputBindingSubForm = outputBindingSubForm.split("/")[0];
 
                                 Map<String, Object> subFormInputs = new HashMap<String, Object>(inputs);
                                 try {
-                                    subFormInputs.put(inputBindingSubForm, MVELSafeHelper.getEvaluator().eval(currentNodeInputBinding, inputs));
+                                    subFormInputs.put(inputBindingSubForm,
+                                                      MVELSafeHelper.getEvaluator().eval(currentNodeInputBinding,
+                                                                                         inputs));
                                 } catch (Exception e) {
 
                                 }
 
                                 Map<String, Object> subFormOutputs = new HashMap<String, Object>(outputs);
                                 try {
-                                    subFormOutputs.put(outputBindingSubForm, MVELSafeHelper.getEvaluator().eval(currentNodeOutputBinding, outputs));
+                                    subFormOutputs.put(outputBindingSubForm,
+                                                       MVELSafeHelper.getEvaluator().eval(currentNodeOutputBinding,
+                                                                                          outputs));
                                 } catch (Exception e) {
 
                                 }
 
                                 // run the transformation
-                                String filtered = filterXML(subFormContent, lang, deploymentId, subFormInputs, subFormOutputs);
+                                String filtered = filterXML(subFormContent,
+                                                            lang,
+                                                            deploymentId,
+                                                            subFormInputs,
+                                                            subFormOutputs);
 
                                 Document docSubForm = builder.parse(new ByteArrayInputStream(filtered.getBytes()));
                                 NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
                                 Node nodeFormSubForm = nodesSubForm.item(0);
 
-                                Node imported = doc.importNode(nodeFormSubForm, true);
+                                Node imported = doc.importNode(nodeFormSubForm,
+                                                               true);
 
-                                node.getParentNode().replaceChild(imported, node);
+                                node.getParentNode().appendChild(imported);
                             }
                         }
                     } else if (MULTI_SUB_FORM_TYPE.equals(fieldType)) {
 
-                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
+                        String defaultSubForm = findPropertyValue(node,
+                                                                  "defaultSubform");
                         if (defaultSubForm != null) {
 
-                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
+                            String subFormContent = formManagerService.getFormByKey(deploymentId,
+                                                                                    defaultSubForm);
                             if (subFormContent != null) {
 
-                                String inputBinding = findPropertyValue(node, "inputBinding");
-                                inputBinding = inputBinding.replaceAll("/", ".");
+                                String inputBinding = findPropertyValue(node,
+                                                                        "inputBinding");
+                                inputBinding = inputBinding.replaceAll("/",
+                                                                       ".");
 
-                                String outputBinding = findPropertyValue(node, "outputBinding");
-                                outputBinding = outputBinding.replaceAll("/", ".");
+                                String outputBinding = findPropertyValue(node,
+                                                                         "outputBinding");
+                                outputBinding = outputBinding.replaceAll("/",
+                                                                         ".");
 
                                 Collection<Object> list = new ArrayList<Object>();
                                 Collection<Object> listOut = new ArrayList<Object>();
                                 Map<String, Object> subFormInputs = new HashMap<String, Object>(inputs);
                                 Map<String, Object> subFormOutputs = new HashMap<String, Object>(outputs);
                                 try {
-                                    list = (Collection<Object>) MVELSafeHelper.getEvaluator().eval(inputBinding, inputs);
+                                    list = (Collection<Object>) MVELSafeHelper.getEvaluator().eval(inputBinding,
+                                                                                                   inputs);
                                 } catch (Exception e) {
                                     // no elements found add simple object to generate single line
                                     list.add(new Object());
                                 }
                                 try {
-                                    listOut = (Collection<Object>) MVELSafeHelper.getEvaluator().eval(outputBinding, outputs);
+                                    listOut = (Collection<Object>) MVELSafeHelper.getEvaluator().eval(outputBinding,
+                                                                                                      outputs);
                                 } catch (Exception e) {
                                     // no elements found add simple object to generate single line
                                     list.add(new Object());
@@ -247,80 +301,73 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
 
                                 Node firstFieldNode = tmpSubForm.getElementsByTagName(NODE_FIELD).item(0);
 
-                                String inputBindingSubForm = findPropertyValue(firstFieldNode, "inputBinding");
+                                String inputBindingSubForm = findPropertyValue(firstFieldNode,
+                                                                               "inputBinding");
                                 inputBindingSubForm = inputBindingSubForm.split("/")[0];
 
-                                String outputBindingSubForm = findPropertyValue(firstFieldNode, "outputBinding");
+                                String outputBindingSubForm = findPropertyValue(firstFieldNode,
+                                                                                "outputBinding");
                                 outputBindingSubForm = outputBindingSubForm.split("/")[0];
+
+                                Node nodeFormSubForm = null;
+
                                 // inputs
                                 for (Object element : list) {
-                                    subFormInputs.put(inputBindingSubForm, element);
+                                    subFormInputs.put(inputBindingSubForm,
+                                                      element);
 
-                                    String filtered = filterXML(subFormContent, lang, deploymentId, subFormInputs, subFormOutputs);
+                                    String filtered = filterXML(subFormContent,
+                                                                lang,
+                                                                deploymentId,
+                                                                subFormInputs,
+                                                                subFormOutputs);
 
                                     Document docSubForm = builder.parse(new ByteArrayInputStream(filtered.getBytes()));
                                     NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
-                                    Node nodeFormSubForm = nodesSubForm.item(0);
-
-                                    Node imported = doc.importNode(nodeFormSubForm, true);
-
-                                    node.getParentNode().appendChild(imported);
+                                    nodeFormSubForm = nodesSubForm.item(0);
                                 }
                                 // outputs
                                 for (Object element : listOut) {
-                                    subFormOutputs.put(outputBindingSubForm, element);
+                                    subFormOutputs.put(outputBindingSubForm,
+                                                       element);
 
-                                    String filtered = filterXML(subFormContent, lang, deploymentId, Collections.emptyMap(), subFormOutputs);
+                                    String filtered = filterXML(subFormContent,
+                                                                lang,
+                                                                deploymentId,
+                                                                Collections.emptyMap(),
+                                                                subFormOutputs);
 
                                     Document docSubForm = builder.parse(new ByteArrayInputStream(filtered.getBytes()));
                                     NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
-                                    Node nodeFormSubForm = nodesSubForm.item(0);
-
-                                    Node imported = doc.importNode(nodeFormSubForm, true);
-
-                                    node.getParentNode().appendChild(imported);
+                                    nodeFormSubForm = nodesSubForm.item(0);
                                 }
 
-                                node.getParentNode().removeChild(node);
+                                // Adding nestedForm after filtering inputs & outputs
+                                Node imported = doc.importNode(nodeFormSubForm,
+                                                               true);
+                                node.getParentNode().appendChild(imported);
                             }
-
                         }
+                    }
 
-                    } else {
-
-                        NodeList fieldPropsNodes = node.getChildNodes();
-                        for (int j = 0; j < fieldPropsNodes.getLength(); j++) {
-                            Node nodeFieldProp = fieldPropsNodes.item(j);
-                            if (nodeFieldProp.getNodeName().equals(NODE_PROPERTY)) {
-                                String propName = nodeFieldProp.getAttributes().getNamedItem(ATTR_NAME).getNodeValue();
-                                String value = StringEscapeUtils.unescapeXml(nodeFieldProp.getAttributes().getNamedItem(ATTR_VALUE).getNodeValue());
-                                if (inputs != null && propName != null && value != null && "inputBinding".equals(propName)) {
-                                    if (!value.isEmpty()) {
-                                        value = value.replaceAll("/", ".");
-                                        try {
-                                            Object actualValue = MVELSafeHelper.getEvaluator().eval(value, inputs);
-
-                                            nodeFieldProp.getAttributes().getNamedItem(ATTR_VALUE).setNodeValue(String.valueOf(actualValue));
-                                        } catch (Exception e) {
-                                            // no elements found add simple object to generate single line
-
-                                        }
-                                    }
-                                } else if (outputs != null && propName != null && value != null && "outputBinding".equals(propName)) {
-                                    if (!value.isEmpty()) {
-                                        value = value.replaceAll("/", ".");
-                                        try {
-                                            Object actualValue = MVELSafeHelper.getEvaluator().eval(value, outputs);
-
-                                            nodeFieldProp.getAttributes().getNamedItem(ATTR_VALUE).setNodeValue(String.valueOf(actualValue));
-                                        } catch (Exception e) {
-                                            // no elements found add simple object to generate single line
-
-                                        }
-                                    }
-                                } else if (propName != null && value != null && ATTR_LANG_NAMES.contains(propName)) {
-                                    filterProperty(nodeFieldProp, lang, value);
-                                }
+                    NodeList fieldPropsNodes = node.getChildNodes();
+                    for (int j = 0; j < fieldPropsNodes.getLength(); j++) {
+                        Node nodeFieldProp = fieldPropsNodes.item(j);
+                        if (nodeFieldProp.getNodeName().equals(NODE_PROPERTY)) {
+                            String propName = nodeFieldProp.getAttributes().getNamedItem(ATTR_NAME).getNodeValue();
+                            String value = StringEscapeUtils.unescapeXml(nodeFieldProp.getAttributes().getNamedItem(ATTR_VALUE).getNodeValue());
+                            if (inputs != null && propName != null && value != null && "inputBinding".equals(propName)) {
+                                setPropertyNodeValue(nodeFieldProp,
+                                                     value,
+                                                     inputs);
+                            } else if (outputs != null && propName != null && value != null && "outputBinding".equals(propName)) {
+                                setPropertyNodeValue(nodeFieldProp,
+                                                     value,
+                                                     outputs);
+                            } else if (propName != null && ATTR_LANG_NAMES.contains(propName) && !StringUtils.isEmpty(value)) {
+                                filterProperty(nodeFieldProp,
+                                               lang,
+                                               value);
                             }
                         }
                     }
@@ -328,14 +375,32 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
             }
 
             document = asString(doc);
-
         } catch (Exception ex) {
-            logger.error("Error when filtering form", ex);
+            logger.error("Error when filtering form",
+                         ex);
         }
         return document;
     }
 
-    protected String attachSubForms(String document, String deploymentId) {
+    protected void setPropertyNodeValue(Node propertyNode,
+                                        String value,
+                                        Map values) {
+        if (!value.isEmpty()) {
+            value = value.replaceAll("/",
+                                     ".");
+            try {
+                Object actualValue = MVELSafeHelper.getEvaluator().eval(value,
+                                                                        values);
+
+                propertyNode.getAttributes().getNamedItem(ATTR_VALUE).setNodeValue(String.valueOf(actualValue));
+            } catch (Exception e) {
+                // no elements found add simple object to generate single line
+            }
+        }
+    }
+
+    protected String attachSubForms(String document,
+                                    String deploymentId) {
         try {
             if (!document.contains(SUB_FORM_TYPE) && !document.contains(MULTI_SUB_FORM_TYPE)) {
                 return document;
@@ -354,12 +419,14 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
                 if (node.getNodeName().equals(NODE_FIELD)) {
 
                     String fieldType = node.getAttributes().getNamedItem(ATTR_TYPE).getNodeValue();
-                    if (SUB_FORM_TYPE.equals(fieldType)) {
+                    if (SUB_FORM_TYPE.equals(fieldType) || MULTI_SUB_FORM_TYPE.equals(fieldType)) {
 
-                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
+                        String defaultSubForm = findPropertyValue(node,
+                                                                  "defaultSubform");
                         if (defaultSubForm != null) {
 
-                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
+                            String subFormContent = formManagerService.getFormByKey(deploymentId,
+                                                                                    defaultSubForm);
 
                             if (subFormContent != null) {
                                 Document docSubForm = builder.parse(new ByteArrayInputStream(subFormContent.getBytes()));
@@ -367,38 +434,19 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
                                 NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
                                 Node nodeFormSubForm = nodesSubForm.item(0);
 
-                                Node imported = doc.importNode(nodeFormSubForm, true);
+                                Node imported = doc.importNode(nodeFormSubForm,
+                                                               true);
 
                                 nodeForm.appendChild(imported);
                             }
                         }
-                    } else if (MULTI_SUB_FORM_TYPE.equals(fieldType)) {
-
-                        String defaultSubForm = findPropertyValue(node, "defaultSubform");
-                        if (defaultSubForm != null) {
-
-                            String subFormContent = formManagerService.getFormByKey(deploymentId, defaultSubForm);
-                            if (subFormContent != null) {
-                                Document docSubForm = builder.parse(new ByteArrayInputStream(subFormContent.getBytes()));
-
-                                NodeList nodesSubForm = docSubForm.getElementsByTagName(NODE_FORM);
-                                Node nodeFormSubForm = nodesSubForm.item(0);
-
-                                Node imported = doc.importNode(nodeFormSubForm, true);
-
-                                nodeForm.appendChild(imported);
-
-                            }
-
-                        }
-
                     }
                 }
             }
             document = asString(doc);
-
         } catch (Exception ex) {
-            logger.error("Error when attaching subform", ex);
+            logger.error("Error when attaching subform",
+                         ex);
         }
         return document;
     }
@@ -409,30 +457,35 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
         StreamResult result = new StreamResult(writer);
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
-        transformer.transform(domSource, result);
+        transformer.transform(domSource,
+                              result);
         return writer.toString();
     }
 
-    private void filterProperty(Node property, String lang, String value) {
-        String label = getLabel(lang, value);
+    private void filterProperty(Node property,
+                                String lang,
+                                String value) {
+        String label = getLabel(lang,
+                                value);
         property.getAttributes().getNamedItem(ATTR_VALUE).setNodeValue(label);
     }
 
-    private static String getLabel(String lang, String value) {
+    private static String getLabel(String lang,
+                                   String value) {
         // logic based on form modeler way of taking values - applies to .form files
         String[] values = value.split("quot;");
-        Map<String,String> langWord = new HashMap<String,String>();
+        Map<String, String> langWord = new HashMap<String, String>();
 
-        for (int i = 0; i < values.length;i=i+4) {
+        for (int i = 0; i < values.length; i = i + 4) {
             String key = values[i + 1];
-            String valueTmp="";
-            if( i+3 < values.length){
+            String valueTmp = "";
+            if (i + 3 < values.length) {
                 valueTmp = values[i + 3];
             }
-            if(key.length()==2){
-                langWord.put(key, valueTmp);
+            if (key.length() == 2) {
+                langWord.put(key,
+                             valueTmp);
             }
-
         }
         // end of logic based on form modeler
         String response = langWord.get(lang);
@@ -452,7 +505,8 @@ public class RemoteFormModellerFormProvider extends AbstractFormProvider impleme
         return ".form";
     }
 
-    protected String findPropertyValue(Node node, String propertyName) {
+    protected String findPropertyValue(Node node,
+                                       String propertyName) {
         NodeList fieldPropsNodes = node.getChildNodes();
         for (int j = 0; j < fieldPropsNodes.getLength(); j++) {
             Node nodeFieldProp = fieldPropsNodes.item(j);

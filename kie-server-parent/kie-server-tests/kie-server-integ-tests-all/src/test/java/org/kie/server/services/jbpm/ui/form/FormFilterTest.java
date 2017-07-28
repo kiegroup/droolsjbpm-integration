@@ -13,38 +13,70 @@
  * limitations under the License.
 */
 
-
 package org.kie.server.services.jbpm.ui.form;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.jbpm.kie.services.impl.FormManagerService;
 import org.jbpm.kie.services.impl.FormManagerServiceImpl;
+import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import static org.junit.Assert.*;
 
 public class FormFilterTest {
 
+    public static final int EXPECTED_FORMS = 3;
+    public static final int PURCHASE_ORDER_FIELDS = 5;
+
+    private FormManagerService formManagerService;
+
+    private RemoteFormModellerFormProvider formProvider;
+
+    private String createOrderFormContent;
+    private String headerFormContent;
+    private String orderLineFormContent;
+
+    @Before
+    public void setup() throws IOException {
+        formManagerService = new FormManagerServiceImpl();
+
+        createOrderFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/CreateOrder.form"),
+                                                  "UTF-8");
+        headerFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/PurchaseHeader.form"),
+                                             "UTF-8");
+        orderLineFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/PurchaseLine.form"),
+                                                "UTF-8");
+
+        formManagerService.registerForm("test",
+                                        "CreateOrder.form",
+                                        createOrderFormContent);
+        formManagerService.registerForm("test",
+                                        "PurchaseHeader.form",
+                                        headerFormContent);
+        formManagerService.registerForm("test",
+                                        "PurchaseLine.form",
+                                        orderLineFormContent);
+
+        formProvider = new RemoteFormModellerFormProvider();
+        formProvider.configure(formManagerService);
+    }
 
     @Test
-    public void testSubForm() throws Exception {
-
-        FormManagerService formManagerService = new FormManagerServiceImpl();
-
-        String createOrderFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/CreateOrder.form"));
-        String headerFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/PurchaseHeader.form"));
-        String orderLineFormContent = IOUtils.toString(this.getClass().getResourceAsStream("/test-forms/PurchaseLine.form"));
-
-        formManagerService.registerForm("test", "CreateOrder.form", createOrderFormContent);
-        formManagerService.registerForm("test", "PurchaseHeader.form", headerFormContent);
-        formManagerService.registerForm("test", "PurchaseLine.form", orderLineFormContent);
-
-        RemoteFormModellerFormProvider formProvider = new RemoteFormModellerFormProvider();
-        formProvider.configure(formManagerService);
+    public void testFilterSubForm() throws Exception {
 
         // setup some test data
         Map<String, Object> inputs = new HashMap<String, Object>();
@@ -81,7 +113,8 @@ public class FormFilterTest {
 
         purchaseOrder.setLines(orderLines);
 
-        inputs.put("po_in", purchaseOrder);
+        inputs.put("po_in",
+                   purchaseOrder);
 
         // outputs
         Map<String, Object> outputs = new HashMap<String, Object>();
@@ -109,10 +142,57 @@ public class FormFilterTest {
 
         purchaseOrderOut.setLines(orderLinesOut);
 
-        outputs.put("po_out", purchaseOrderOut);
+        outputs.put("po_out",
+                    purchaseOrderOut);
 
-        String filtered = formProvider.filterXML(createOrderFormContent, "en", "test", inputs, outputs);
+        String filteredForm = formProvider.filterXML(createOrderFormContent,
+                                                     "en",
+                                                     "test",
+                                                     inputs,
+                                                     outputs);
 
-        System.out.println(filtered);
+        validateFormXML(filteredForm);
+    }
+
+    @Test
+    public void testAddSubForm() throws Exception {
+        String allForms = formProvider.attachSubForms(createOrderFormContent,
+                                                      "test");
+
+        validateFormXML(allForms);
+    }
+
+    private void validateFormXML(String formXML) throws Exception {
+        assertNotNull(formXML);
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        Document doc = builder.parse(new ByteArrayInputStream(formXML.getBytes()));
+
+        assertNotNull(doc);
+
+        NodeList allForms = doc.getElementsByTagName(RemoteFormModellerFormProvider.NODE_FORM);
+
+        assertEquals(EXPECTED_FORMS,
+                     allForms.getLength());
+
+        Node nodeForm = allForms.item(0);
+
+        NodeList childNodes = nodeForm.getChildNodes();
+
+        int childCount = 0;
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (node.getNodeName().equals(RemoteFormModellerFormProvider.NODE_FIELD)) {
+                childCount++;
+            }
+        }
+
+        assertEquals(PURCHASE_ORDER_FIELDS,
+                     childCount);
     }
 }
