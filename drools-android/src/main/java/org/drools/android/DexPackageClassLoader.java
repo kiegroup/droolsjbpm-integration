@@ -17,7 +17,7 @@
 package org.drools.android;
 
 import org.drools.core.rule.JavaDialectRuntimeData;
-import org.kie.internal.utils.FastClassLoader;
+import org.kie.api.utils.FastClassLoader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
