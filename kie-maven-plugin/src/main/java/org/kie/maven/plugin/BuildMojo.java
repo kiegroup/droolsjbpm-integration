@@ -43,13 +43,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.drools.compiler.compiler.BPMN2ProcessFactory;
-import org.drools.compiler.compiler.DecisionTableFactory;
-import org.drools.compiler.compiler.GuidedDecisionTableFactory;
-import org.drools.compiler.compiler.GuidedRuleTemplateFactory;
-import org.drools.compiler.compiler.GuidedScoreCardFactory;
-import org.drools.compiler.compiler.PMMLCompilerFactory;
-import org.drools.compiler.compiler.ProcessBuilderFactory;
 import org.drools.compiler.kie.builder.impl.FileKieModule;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieContainerImpl;
@@ -143,14 +136,6 @@ public class BuildMojo extends AbstractKieMojo {
                                                                         Thread.currentThread().getContextClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
-
-            BPMN2ProcessFactory.loadProvider(projectClassLoader);
-            DecisionTableFactory.loadProvider(projectClassLoader);
-            ProcessBuilderFactory.loadProvider(projectClassLoader);
-            PMMLCompilerFactory.loadProvider(projectClassLoader);
-            GuidedDecisionTableFactory.loadProvider(projectClassLoader);
-            GuidedRuleTemplateFactory.loadProvider(projectClassLoader);
-            GuidedScoreCardFactory.loadProvider(projectClassLoader);
         } catch (DependencyResolutionRequiredException e) {
             throw new RuntimeException(e);
         } catch (MalformedURLException e) {
