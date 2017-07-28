@@ -133,6 +133,8 @@ public class XStreamMarshaller
 
     protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
         this.xstream.setClassLoader( classLoader );
+        String[] voidDeny = {"void.class", "Void.class"};
+        this.xstream.denyTypes(voidDeny);
 
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 
