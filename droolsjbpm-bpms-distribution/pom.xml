@@ -183,6 +183,12 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-maven-plugin</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>log4j</artifactId>
+          <groupId>log4j</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
