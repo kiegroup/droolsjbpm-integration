@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.controller.api.model.runtime.Container;
@@ -45,7 +46,7 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
         specManagementService = new SpecManagementServiceImpl();
         kieServerInstanceManager = Mockito.mock(KieServerInstanceManager.class);
 
-        ((RuleCapabilitiesServiceImpl)ruleCapabilitiesService).setKieServerInstanceManager(kieServerInstanceManager);
+        ((RuleCapabilitiesServiceImpl) ruleCapabilitiesService).setKieServerInstanceManager(kieServerInstanceManager);
 
         createServerTemplateWithContainer();
     }
@@ -60,11 +61,14 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
 
         List<Container> fakeResult = new ArrayList<Container>();
         fakeResult.add(container);
-        when(kieServerInstanceManager.scanNow(any(ServerTemplate.class), any(ContainerSpec.class))).thenReturn(fakeResult);
+        when(kieServerInstanceManager.scanNow(any(ServerTemplate.class),
+                                              any(ContainerSpec.class))).thenReturn(fakeResult);
 
         ruleCapabilitiesService.scanNow(containerSpec);
 
-        verify(kieServerInstanceManager, times(1)).scanNow(any(ServerTemplate.class), any(ContainerSpec.class));
+        verify(kieServerInstanceManager,
+               times(1)).scanNow(any(ServerTemplate.class),
+                                 any(ContainerSpec.class));
     }
 
     @Test
@@ -72,17 +76,24 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
 
         List<Container> fakeResult = new ArrayList<Container>();
         fakeResult.add(container);
-        when(kieServerInstanceManager.startScanner(any(ServerTemplate.class), any(ContainerSpec.class), anyLong())).thenReturn(fakeResult);
+        when(kieServerInstanceManager.startScanner(any(ServerTemplate.class),
+                                                   any(ContainerSpec.class),
+                                                   anyLong())).thenReturn(fakeResult);
 
-        ruleCapabilitiesService.startScanner(containerSpec, 100l);
+        ruleCapabilitiesService.startScanner(containerSpec,
+                                             100l);
 
-        verify(kieServerInstanceManager, times(1)).startScanner(any(ServerTemplate.class), any(ContainerSpec.class), anyLong());
+        verify(kieServerInstanceManager,
+               times(1)).startScanner(any(ServerTemplate.class),
+                                      any(ContainerSpec.class),
+                                      anyLong());
 
         ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
 
         Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
         assertNotNull(containerSpecs);
-        assertEquals(1, containerSpecs.size());
+        assertEquals(1,
+                     containerSpecs.size());
 
         ContainerSpec updatedContainer = containerSpecs.iterator().next();
         assertNotNull(updatedContainer);
@@ -93,25 +104,31 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
 
         RuleConfig ruleCg = (RuleConfig) ruleConfig;
 
-        assertEquals(KieScannerStatus.STARTED, ruleCg.getScannerStatus());
-        assertEquals(100l, ruleCg.getPollInterval().longValue());
+        assertEquals(KieScannerStatus.STARTED,
+                     ruleCg.getScannerStatus());
+        assertEquals(100l,
+                     ruleCg.getPollInterval().longValue());
     }
 
     @Test
     public void testStopScanner() {
         List<Container> fakeResult = new ArrayList<Container>();
         fakeResult.add(container);
-        when(kieServerInstanceManager.stopScanner(any(ServerTemplate.class), any(ContainerSpec.class))).thenReturn(fakeResult);
+        when(kieServerInstanceManager.stopScanner(any(ServerTemplate.class),
+                                                  any(ContainerSpec.class))).thenReturn(fakeResult);
 
         ruleCapabilitiesService.stopScanner(containerSpec);
 
-        verify(kieServerInstanceManager, times(1)).stopScanner(any(ServerTemplate.class), any(ContainerSpec.class));
+        verify(kieServerInstanceManager,
+               times(1)).stopScanner(any(ServerTemplate.class),
+                                     any(ContainerSpec.class));
 
         ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
 
         Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
         assertNotNull(containerSpecs);
-        assertEquals(1, containerSpecs.size());
+        assertEquals(1,
+                     containerSpecs.size());
 
         ContainerSpec updatedContainer = containerSpecs.iterator().next();
         assertNotNull(updatedContainer);
@@ -122,7 +139,8 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
 
         RuleConfig ruleCg = (RuleConfig) ruleConfig;
 
-        assertEquals(KieScannerStatus.STOPPED, ruleCg.getScannerStatus());
+        assertEquals(KieScannerStatus.STOPPED,
+                     ruleCg.getScannerStatus());
         assertNull(ruleCg.getPollInterval());
     }
 
@@ -131,27 +149,37 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
 
         List<Container> fakeResult = new ArrayList<Container>();
         fakeResult.add(container);
-        when(kieServerInstanceManager.upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class))).thenReturn(fakeResult);
+        when(kieServerInstanceManager.upgradeContainer(any(ServerTemplate.class),
+                                                       any(ContainerSpec.class))).thenReturn(fakeResult);
 
         ReleaseId initial = containerSpec.getReleasedId();
-        ReleaseId upgradeTo = new ReleaseId("org.kie", "kie-server-kjar", "2.0");
+        ReleaseId upgradeTo = new ReleaseId("org.kie",
+                                            "kie-server-kjar",
+                                            "2.0");
 
-        ruleCapabilitiesService.upgradeContainer(containerSpec, upgradeTo);
+        ruleCapabilitiesService.upgradeContainer(containerSpec,
+                                                 upgradeTo);
 
-        verify(kieServerInstanceManager, times(1)).upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class));
+        verify(kieServerInstanceManager,
+               times(1)).upgradeContainer(any(ServerTemplate.class),
+                                          any(ContainerSpec.class));
 
         ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
 
         Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
         assertNotNull(containerSpecs);
-        assertEquals(1, containerSpecs.size());
+        assertEquals(1,
+                     containerSpecs.size());
 
         ContainerSpec updatedContainer = containerSpecs.iterator().next();
         assertNotNull(updatedContainer);
 
         assertNotNull(updatedContainer.getReleasedId());
-        assertNotEquals(initial, updatedContainer.getReleasedId());
-        assertEquals(upgradeTo, updatedContainer.getReleasedId());
+        assertNotEquals(initial,
+                        updatedContainer.getReleasedId());
+        assertEquals(upgradeTo,
+                     updatedContainer.getReleasedId());
+        assertEquals(updatedContainer.getStatus(),
+                     KieContainerStatus.STARTED);
     }
-
 }
