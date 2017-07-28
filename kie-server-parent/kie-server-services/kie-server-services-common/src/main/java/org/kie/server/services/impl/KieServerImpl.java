@@ -270,9 +270,10 @@ public class KieServerImpl implements KieServer {
                         if (kieContainer != null) {
                             ci.setKieContainer(kieContainer);
                             ci.getResource().setConfigItems(container.getConfigItems());
+                            ci.getResource().setMessages(messages);
                             logger.debug("Container {} (for release id {}) general initialization: DONE", containerId, releaseId);
 
-                            Map<String, Object> parameters = getCreateContainerParameters(releaseId);
+                            Map<String, Object> parameters = getCreateContainerParameters(releaseId, messages);
                             // process server extensions
                             List<KieServerExtension> extensions = context.getServerExtensions();
                             for (KieServerExtension extension : extensions) {
@@ -299,11 +300,18 @@ public class KieServerImpl implements KieServer {
                             currentState.getContainers().add(container);
 
                             repository.store(KieServerEnvironment.getServerId(), currentState);
+                            // add successful message only when there are no errors
+                            if (!messages.stream().filter(m-> m.getSeverity().equals(Severity.ERROR)).findAny().isPresent()) {
+                                messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully created with module " + releaseId + "."));
+                                eventSupport.fireAfterContainerStarted(this, ci);
 
-                            messages.add(new Message(Severity.INFO, "Container " + containerId + " successfully created with module " + releaseId + "."));
-                            eventSupport.fireAfterContainerStarted(this, ci);
+                                return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
+                            } else {
+                                ci.getResource().setStatus(KieContainerStatus.FAILED);
+                                ci.getResource().setReleaseId(releaseId);                                
+                                return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.FAILURE, "Failed to create container " + containerId + " with module " + releaseId + ".");
+                            }
 
-                            return new ServiceResponse<KieContainerResource>(ServiceResponse.ResponseType.SUCCESS, "Container " + containerId + " successfully deployed with module " + releaseId + ".", ci.getResource());
                         } else {
                             messages.add(new Message(Severity.ERROR, "KieContainer could not be found for release id " + releaseId));
                             ci.getResource().setStatus(KieContainerStatus.FAILED);
@@ -404,7 +412,7 @@ public class KieServerImpl implements KieServer {
 
                             // since the dispose fail rollback must take place to put it back to running state
                             org.kie.api.builder.ReleaseId releaseId = kci.getKieContainer().getReleaseId();
-                            Map<String, Object> parameters = getCreateContainerParameters(releaseId);
+                            Map<String, Object> parameters = getCreateContainerParameters(releaseId, messages);
                             for (KieServerExtension extension : disposedExtensions) {
                                 extension.createContainer(containerId, kci, parameters);
                                 logger.debug("Container {} (for release id {}) {} restart: DONE", containerId, kci.getResource().getReleaseId(), extension);
@@ -796,11 +804,12 @@ public class KieServerImpl implements KieServer {
         }
     }
 
-    private Map<String, Object> getCreateContainerParameters(org.kie.api.builder.ReleaseId releaseId) {
+    private Map<String, Object> getCreateContainerParameters(org.kie.api.builder.ReleaseId releaseId, List<Message> messages) {
         KieModuleMetaData metaData = KieModuleMetaData.Factory.newKieModuleMetaData(releaseId, DependencyFilter.COMPILE_FILTER);
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA, metaData);
+        parameters.put(KieServerConstants.KIE_SERVER_PARAM_MESSAGES, messages);
         return parameters;
     }
 
