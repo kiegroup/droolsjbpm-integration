@@ -122,17 +122,6 @@
     </dependency>
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-ci</artifactId>
-      <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.kie</groupId>
       <artifactId>kie-api</artifactId>
     </dependency>
     <dependency>
@@ -148,6 +137,20 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <!-- Include all dependencies needed to support all resource types out-of-the-box -->
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-ci</artifactId>
+      <scope>runtime</scope>
+      <exclusions>
+        <!-- This exclusion is necessary to avoid conflicts with the plexus version of the plugn itself
+             In reality all kie-ci transitive dependencies are not necessary here, but the wildcard (*)
+             exclusion is not recognized by the maven enforcer. See: https://stackoverflow.com/questions/31372637/maven-enforcer-and-wilcard-dependency-exclusion -->
+        <exclusion>
+          <groupId>org.eclipse.sisu</groupId>
+          <artifactId>org.eclipse.sisu.plexus</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-decisiontables</artifactId>
