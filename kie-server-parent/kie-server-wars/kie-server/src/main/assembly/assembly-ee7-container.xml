@@ -85,7 +85,7 @@
         <exclude>stax:stax-api</exclude>
         <exclude>javax.activation:activation</exclude>
         <exclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</exclude>
-        <exclude>xml-apis:xml-apis</exclude>
+        <exclude>xml-apis:xml-apis:*</exclude>
       </excludes>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveFiltering>true</useTransitiveFiltering>
