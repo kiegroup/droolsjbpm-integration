@@ -39,6 +39,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -167,10 +168,10 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
 
     private void provideAndAssertClaimReport(String caseId, Long taskId, String insured) {
         Object claimReport = createInstance(CLAIM_REPORT_CLASS_NAME);
-        setValue(claimReport, "name", "John Doe");
-        setValue(claimReport, "address", "Main street, NY");
-        setValue(claimReport, "accidentDescription", "It happened so sudden...");
-        setValue(claimReport, "accidentDate", new Date());
+        KieServerReflections.setValue(claimReport, "name", "John Doe");
+        KieServerReflections.setValue(claimReport, "address", "Main street, NY");
+        KieServerReflections.setValue(claimReport, "accidentDescription", "It happened so sudden...");
+        KieServerReflections.setValue(claimReport, "accidentDate", new Date());
 
         Map<String, Object> params = new HashMap<>();
         params.put("claimReport_", claimReport);
@@ -179,16 +180,16 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         // claim report should be stored in case file data
         Object caseClaimReport = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "claimReport");
         assertNotNull(caseClaimReport);
-        assertEquals("John Doe", valueOf(caseClaimReport, "name"));
-        assertEquals("Main street, NY", valueOf(caseClaimReport, "address"));
-        assertEquals("It happened so sudden...", valueOf(caseClaimReport, "accidentDescription"));
-        assertNotNull(valueOf(caseClaimReport, "accidentDate"));
+        assertEquals("John Doe", KieServerReflections.valueOf(caseClaimReport, "name"));
+        assertEquals("Main street, NY", KieServerReflections.valueOf(caseClaimReport, "address"));
+        assertEquals("It happened so sudden...", KieServerReflections.valueOf(caseClaimReport, "accidentDescription"));
+        assertNotNull(KieServerReflections.valueOf(caseClaimReport, "accidentDate"));
     }
 
     private void provideAndAssertPropertyDamageReport(String caseId, Long taskId, String insured) {
         Object damageReport = createInstance(PROPERTY_DAMAGE_REPORT_CLASS_NAME);
-        setValue(damageReport, "description", "Car is completely destroyed");
-        setValue(damageReport, "value", 1000.0);
+        KieServerReflections.setValue(damageReport, "description", "Car is completely destroyed");
+        KieServerReflections.setValue(damageReport, "value", 1000.0);
 
         Map<String, Object> params = new HashMap<>();
         params.put("propertyDamageReport_", damageReport);
@@ -197,8 +198,8 @@ public class CarInsuranceClaimCaseIntegrationTest extends JbpmKieServerBaseInteg
         // property damage report should be stored in case file data
         Object casePropertyDamageReport = caseClient.getCaseInstanceData(CONTAINER_ID, caseId, "propertyDamageReport");
         assertNotNull(casePropertyDamageReport);
-        assertEquals("Car is completely destroyed", valueOf(casePropertyDamageReport, "description"));
-        assertEquals(1000.0, ((Double)valueOf(casePropertyDamageReport, "value")).doubleValue(), 0);
+        assertEquals("Car is completely destroyed", KieServerReflections.valueOf(casePropertyDamageReport, "description"));
+        assertEquals(1000.0, ((Double)KieServerReflections.valueOf(casePropertyDamageReport, "value")).doubleValue(), 0);
     }
 
     private void assertAndAcceptClaimOffer(String insured) throws Exception {

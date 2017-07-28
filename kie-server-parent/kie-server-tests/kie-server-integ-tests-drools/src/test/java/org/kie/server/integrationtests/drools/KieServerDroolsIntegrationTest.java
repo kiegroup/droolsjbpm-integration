@@ -46,6 +46,7 @@ import org.kie.server.integrationtests.category.Smoke;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -83,7 +84,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     @Category(Smoke.class)
     public void testCallContainer() throws Exception {
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -95,7 +96,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
@@ -103,7 +104,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -117,7 +118,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
@@ -125,7 +126,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
     public void testCommandScript() throws Exception {
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         Command<?> insert = commandsFactory.newInsert(message, MESSAGE_OUT_IDENTIFIER);
         Command<?> fire = commandsFactory.newFireAllRules();
@@ -165,7 +166,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         assertNotNull(conversationId);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -177,7 +178,7 @@ public class KieServerDroolsIntegrationTest extends DroolsKieServerBaseIntegrati
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = reply.getResult();
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
 
         String afterNextCallConversationId = client.getConversationId();
         assertEquals(conversationId, afterNextCallConversationId);
