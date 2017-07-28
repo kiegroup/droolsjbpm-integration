@@ -40,6 +40,7 @@ import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.model.instance.WorkItemInstance;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest {
 
@@ -134,7 +135,7 @@ public class RollingUpdateProcessServiceIntegrationTest extends JbpmKieServerBas
         assertThat(variables.get("number")).isEqualTo(12345);
         assertThat((List) variables.get("list")).hasSize(1);
         assertThat(((List) variables.get("list")).get(0)).isEqualTo("item");
-        assertThat(valueOf(variables.get("person"), "name")).isEqualTo(USER_JOHN);
+        assertThat(KieServerReflections.valueOf(variables.get("person"), "name")).isEqualTo(USER_JOHN);
         assertThat(variables.get("initiator")).isEqualTo(TestConfig.getUsername());
 
         processClient.setProcessVariable(CONTAINER_ALIAS, processInstanceId, "test", USER_JOHN);

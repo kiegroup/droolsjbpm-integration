@@ -31,6 +31,7 @@ import org.kie.server.api.model.ServiceResponse;
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 /**
  * Test used for verification of spreadsheet decision table processing.
@@ -75,6 +76,6 @@ public class GuidedDecisionTableIntegrationTest extends DroolsKieServerBaseInteg
         KieServerAssert.assertSuccess(response);
         ExecutionResults results = response.getResult();
         Object value = results.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Bob", valueOf(value, PERSON_SURNAME_FIELD));
+        assertEquals("Bob", KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
     }
 }

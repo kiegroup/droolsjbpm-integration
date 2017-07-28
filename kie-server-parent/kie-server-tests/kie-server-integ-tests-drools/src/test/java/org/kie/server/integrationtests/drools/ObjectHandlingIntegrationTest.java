@@ -16,6 +16,7 @@ import org.kie.server.api.model.ServiceResponse;
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -68,6 +69,6 @@ public class ObjectHandlingIntegrationTest extends DroolsKieServerBaseIntegratio
 
         Object returnedPerson = listOfObjects.get(0);
         assertEquals("Expected surname to be set to 'Vader'",
-                PERSON_EXPECTED_SURNAME, valueOf(returnedPerson, PERSON_SURNAME_FIELD));
+                PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(returnedPerson, PERSON_SURNAME_FIELD));
     }
 }

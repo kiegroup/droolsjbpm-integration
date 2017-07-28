@@ -39,6 +39,7 @@ import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -117,9 +118,9 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", false, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
 
         // insert second person and fire the rules. The duplicated field will be set to true if there are two
@@ -141,7 +142,7 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
         // and 'duplicated' flag should be true, because second person was added
-        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be true!", true, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
     }
 
@@ -163,9 +164,9 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", false, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
         QueryResults queryResult = (QueryResults) actualData.getValue("query-result");
         assertNotNull(queryResult);
@@ -178,13 +179,13 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
             assertNotNull(row);
 
             Object personResult = row.get("person");
-            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(personResult, PERSON_SURNAME_FIELD));
+            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(personResult, PERSON_SURNAME_FIELD));
 
             FactHandle personFH = row.getFactHandle("person");
             assertNotNull(personFH);
 
             personResult = personFH;
-            assertEquals("Expected surname to be null", null, valueOf(personResult, PERSON_SURNAME_FIELD));
+            assertEquals("Expected surname to be null", null, KieServerReflections.valueOf(personResult, PERSON_SURNAME_FIELD));
         }
     }
 
@@ -207,15 +208,15 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'.", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'.", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should be true, because was added 2 persons
-        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be true!", true, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should be true, because was added 2 persons
-        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be true!", true, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
         QueryResults queryResult = (QueryResults) actualData.getValue("query-result");
         assertNotNull(queryResult);
@@ -228,13 +229,13 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
             assertNotNull(row);
 
             Object personResult = row.get("person");
-            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(personResult, PERSON_SURNAME_FIELD));
+            assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(personResult, PERSON_SURNAME_FIELD));
 
             FactHandle personFH = row.getFactHandle("person");
             assertNotNull(personFH);
 
             personResult = personFH;
-            assertEquals("Expected surname to be null", null, valueOf(personResult, PERSON_SURNAME_FIELD));
+            assertEquals("Expected surname to be null", null, KieServerReflections.valueOf(personResult, PERSON_SURNAME_FIELD));
         }
     }
 
@@ -255,9 +256,9 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", false, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
         // get fact handles
         commands = new ArrayList<Command<?>>();
@@ -305,7 +306,7 @@ public class StatefulSessionUsageIntegrationTest extends DroolsKieServerBaseInte
 
         Object returnedPerson = listOfObjects.get(0);
         assertEquals("Expected surname to be set to 'Lord Vader'",
-                PERSON_EXPECTED_SURNAME_AFTER_UPDATE, valueOf(returnedPerson, PERSON_SURNAME_FIELD));
+                PERSON_EXPECTED_SURNAME_AFTER_UPDATE, KieServerReflections.valueOf(returnedPerson, PERSON_SURNAME_FIELD));
 
         // delete object by fact handle
         commands = new ArrayList<Command<?>>();

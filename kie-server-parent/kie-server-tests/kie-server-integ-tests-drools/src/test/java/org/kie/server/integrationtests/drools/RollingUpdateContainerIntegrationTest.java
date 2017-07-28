@@ -33,6 +33,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 import static org.junit.Assert.*;
 
@@ -94,7 +95,7 @@ public class RollingUpdateContainerIntegrationTest extends DroolsKieServerBaseIn
         ExecutionResults result1 = response1.getResult();
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", valueOf(outcome, "id"));
+        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", KieServerReflections.valueOf(outcome, "id"));
 
         createExtraContainer();
 
@@ -110,6 +111,6 @@ public class RollingUpdateContainerIntegrationTest extends DroolsKieServerBaseIn
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar101'!", "Person from kjar101", valueOf(outcome2, "id"));
+        assertEquals("Person's id should be 'Person from kjar101'!", "Person from kjar101", KieServerReflections.valueOf(outcome2, "id"));
     }
 }

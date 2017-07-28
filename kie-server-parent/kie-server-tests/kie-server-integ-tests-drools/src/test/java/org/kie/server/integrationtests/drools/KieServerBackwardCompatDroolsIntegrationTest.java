@@ -35,6 +35,7 @@ import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServerBaseIntegrationTest {
     private static ReleaseId releaseId = new ReleaseId("foo.bar", "baz", "2.1.0.GA");
@@ -71,7 +72,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -83,7 +84,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
@@ -91,7 +92,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -105,7 +106,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
@@ -113,7 +114,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -125,7 +126,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test
@@ -133,7 +134,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Marshaller marshaller = MarshallerFactory.getMarshaller(new HashSet<Class<?>>(extraClasses.values()), configuration.getMarshallingFormat(), kjarClassLoader);
 
         Object message = createInstance(MESSAGE_CLASS_NAME);
-        setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
+        KieServerReflections.setValue(message, MESSAGE_TEXT_FIELD, MESSAGE_REQUEST);
 
         List<Command<?>> commands = new ArrayList<Command<?>>();
         BatchExecutionCommand batchExecution = commandsFactory.newBatchExecution(commands, KIE_SESSION);
@@ -147,7 +148,7 @@ public class KieServerBackwardCompatDroolsIntegrationTest extends DroolsKieServe
         Assert.assertEquals(ServiceResponse.ResponseType.SUCCESS, reply.getType());
         ExecutionResults results = marshaller.unmarshall(reply.getResult(), ExecutionResultImpl.class);
         Object value = results.getValue(MESSAGE_OUT_IDENTIFIER);
-        Assert.assertEquals(MESSAGE_RESPONSE, valueOf(value, MESSAGE_TEXT_FIELD));
+        Assert.assertEquals(MESSAGE_RESPONSE, KieServerReflections.valueOf(value, MESSAGE_TEXT_FIELD));
     }
 
     @Test

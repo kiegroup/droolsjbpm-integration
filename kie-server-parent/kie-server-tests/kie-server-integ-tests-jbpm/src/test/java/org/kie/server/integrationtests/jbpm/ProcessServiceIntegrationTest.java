@@ -46,6 +46,7 @@ import static org.junit.Assert.*;
 import org.kie.server.api.model.instance.VariableInstance;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 
@@ -127,7 +128,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             assertEquals(12345, variables.get("number"));
             assertEquals(1, ((List) variables.get("list")).size());
             assertEquals("item", ((List) variables.get("list")).get(0));
-            assertEquals(USER_JOHN, valueOf(variables.get("person"), "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(variables.get("person"), "name"));
             assertEquals(TestConfig.getUsername(), variables.get("initiator"));
         } finally {
             if (processInstanceId != null) {
@@ -300,7 +301,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals(USER_JOHN, valueOf(personVar, "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(personVar, "name"));
 
 
             processClient.setProcessVariable(CONTAINER_ID, processInstanceId, "stringData", "custom value");
@@ -352,7 +353,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
 
             personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals(USER_JOHN, valueOf(personVar, "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(personVar, "name"));
 
             stringVar = (String) processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "stringData");
             assertNotNull(personVar);
@@ -414,7 +415,7 @@ public class ProcessServiceIntegrationTest extends JbpmKieServerBaseIntegrationT
             String initiator = (String) variables.get("initiator");
 
             assertNotNull(personVar);
-            assertEquals(USER_JOHN, valueOf(personVar, "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(personVar, "name"));
 
             assertNotNull(personVar);
             assertEquals("waiting for signal", stringVar);

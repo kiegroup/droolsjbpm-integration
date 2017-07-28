@@ -15,7 +15,6 @@
 
 package org.kie.server.integrationtests.shared.basetests;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,6 +36,7 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 @RunWith(Parameterized.class)
 public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseIntegrationTest {
@@ -97,21 +97,7 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
      * @return Instantiated object.
      */
     protected Object createInstance(String objectClassIdentifier, Object... constructorParameters) {
-        Class<?>[] parameterClasses = new Class[constructorParameters.length];
-        for(int i = 0; i < constructorParameters.length; i++) {
-            parameterClasses[i] = constructorParameters[i].getClass();
-        }
-
-        try {
-            Class<?> clazz = extraClasses.get(objectClassIdentifier);
-            if (clazz != null) {
-                Object object = clazz.getConstructor(parameterClasses).newInstance(constructorParameters);
-                return object;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to create object due " + e.getMessage(), e);
-        }
-        throw new RuntimeException("Instantiated class isn't defined in extraClasses set. Please define it first.");
+        return KieServerReflections.createInstance(objectClassIdentifier, extraClasses.get(objectClassIdentifier).getClassLoader(), constructorParameters);
     }
 
     protected Object createPersonInstance(String name) {
@@ -129,26 +115,6 @@ public abstract class RestJmsSharedBaseIntegrationTest extends KieServerBaseInte
         }
         configuration.setUserName(username);
         client = createDefaultClient();
-    }
-
-    protected Object valueOf(Object object, String fieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(object);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    protected void setValue(Object object, String fieldName, Object newValue) {
-        try {
-            Field field = object.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(object, newValue);
-        } catch (Exception e) {
-            throw new RuntimeException(String.format("Unable to set value to field %s in object %s due " + e.getMessage(), fieldName, object), e);
-        }
     }
 
     protected static KieServicesConfiguration createKieServicesJmsConfiguration() {

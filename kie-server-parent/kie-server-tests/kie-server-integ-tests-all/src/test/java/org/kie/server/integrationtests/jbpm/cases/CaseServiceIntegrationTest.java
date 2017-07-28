@@ -31,6 +31,7 @@ import org.kie.server.api.model.cases.CaseStage;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.integrationtests.jbpm.JbpmKieServerBaseIntegrationTest;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 import static org.junit.Assert.*;
 
@@ -157,7 +158,7 @@ public class CaseServiceIntegrationTest extends JbpmKieServerBaseIntegrationTest
 
         Map<String, Object> output = new HashMap<>();
         Object claimReport = createInstance(CLAIM_REPORT_CLASS_NAME);
-        setValue(claimReport, "name", "John Doe");
+        KieServerReflections.setValue(claimReport, "name", "John Doe");
 
         output.put("claimReport_", claimReport);
         taskClient.completeAutoProgress(CONTAINER_ID, task.getId(), USER_YODA, output);
