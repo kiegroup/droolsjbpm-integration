@@ -116,7 +116,7 @@ public class KieServerInstanceManager {
     }
 
 
-    public List<Container> startContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public synchronized List<Container> startContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
@@ -181,7 +181,7 @@ public class KieServerInstanceManager {
         });
     }
 
-    public List<Container> stopContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
+    public synchronized List<Container> stopContainer(ServerTemplate serverTemplate, final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate, containerSpec, new RemoteKieServerOperation<Void>(){
             @Override
