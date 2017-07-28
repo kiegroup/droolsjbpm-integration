@@ -35,7 +35,7 @@
           <pom>${project.basedir}/src/test/resources/kjar-with-instrumentation/pom.xml</pom>
           <streamLogs>true</streamLogs>
           <goals>
-            <goal>install</goal>
+            <goal>deploy</goal>
           </goals>
           <filterProperties>
             <version.org.kie>${version.org.kie}</version.org.kie>
