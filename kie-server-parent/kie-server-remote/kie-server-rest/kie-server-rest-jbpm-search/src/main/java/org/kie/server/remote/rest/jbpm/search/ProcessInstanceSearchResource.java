@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dashbuilder.dataset.exception.DataSetLookupException;
 import org.kie.server.api.model.instance.ProcessInstanceList;
 import org.kie.server.common.rest.HttpStatusCodeException;
 import org.kie.server.remote.rest.common.Header;
@@ -93,7 +94,7 @@ public class ProcessInstanceSearchResource {
                                          conversationIdHeader );
         } catch ( Exception e ) {
             Throwable root = ExceptionUtils.getRootCause( e );
-            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) ) {
+            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) || e instanceof DataSetLookupException) {
 
                 logger.error( "{}",
                               MessageFormat.format( BAD_REQUEST,
