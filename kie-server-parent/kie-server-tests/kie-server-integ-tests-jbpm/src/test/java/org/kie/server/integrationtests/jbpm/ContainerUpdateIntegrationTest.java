@@ -26,11 +26,15 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.Severity;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.instance.TaskSummary;
+import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -46,6 +50,7 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         KieServerDeployer.buildAndDeployCommonMavenParent();
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project-101").getFile());
+        KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/broken-project").getFile());
     }
 
     @Before
@@ -119,6 +124,34 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         } finally {
             processClient.abortProcessInstance(CONTAINER_ID, processInstanceId);
         }
+    }
+    
+    @Test
+    public void testMessagesOfContainer() throws Exception {
+        ServiceResponse<KieContainerResource> response = client.getContainerInfo(CONTAINER_ID);
+        KieServerAssert.assertSuccess(response);
+        
+        KieContainerResource resource = response.getResult();
+        assertEquals("Shound not have any messages", 1, resource.getMessages().size());
+        Message message = resource.getMessages().get(0);
+        assertEquals("Message should be of type info", Severity.INFO, message.getSeverity());
+     
+        ServiceResponse<KieContainerResource> createNotExsting = client.createContainer(
+                "broken-project", 
+                new KieContainerResource("broken-project",
+                        new ReleaseId(
+                                "org.kie.server.testing", 
+                                "broken-project",
+                                "1.0.0.Final")));
+        KieServerAssert.assertFailure(createNotExsting);
+               
+        response = client.getContainerInfo("broken-project");
+        KieServerAssert.assertSuccess(response);
+        
+        resource = response.getResult();
+        assertEquals("Shound have one message", 1, resource.getMessages().size());
+        message = resource.getMessages().get(0);
+        assertEquals("Message should be of type error", Severity.ERROR, message.getSeverity());
     }
 
     protected Map<String, UserTaskDefinition> mapByName(List<UserTaskDefinition> taskDefinitions) {

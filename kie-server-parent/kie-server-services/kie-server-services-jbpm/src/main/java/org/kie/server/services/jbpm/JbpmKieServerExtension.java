@@ -17,6 +17,7 @@ package org.kie.server.services.jbpm;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
 import javax.naming.InitialContext;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
@@ -36,6 +38,7 @@ import javax.persistence.spi.PersistenceProviderResolverHolder;
 import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.drools.core.impl.InternalKieContainer;
 import org.jbpm.document.service.impl.DocumentImpl;
 import org.jbpm.executor.ExecutorServiceFactory;
@@ -94,8 +97,9 @@ import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.api.model.definition.QueryDefinition;
-import org.kie.server.api.model.definition.QueryDefinitionList;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -312,8 +316,10 @@ public class JbpmKieServerExtension implements KieServerExtension {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
+        List<Message> messages = (List<Message>) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MESSAGES);
         try {
             KieModuleMetaData metaData = (KieModuleMetaData) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MODULE_METADATA);
             if (metaData.getProcesses() == null || metaData.getProcesses().isEmpty()) {
@@ -321,6 +327,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 return;
             }
 
+            
             boolean hasStatefulSession = false;
             boolean hasDefaultSession = false;
             // let validate if they are any stateful sessions defined and in case there are not, skip this container
@@ -412,7 +419,7 @@ public class JbpmKieServerExtension implements KieServerExtension {
                 URL definitionsURL = queryDefinitionsFiles.nextElement();
                 InputStream qdStream = definitionsURL.openStream();
                 if (qdStream != null) {
-                    String qdString = IOUtils.toString(qdStream);
+                    String qdString = IOUtils.toString(qdStream, Charset.forName("UTF-8"));
 
                     try {
                         QueryDefinition[] queryDefinitionList = kieContainerInstance.getMarshaller(MarshallingFormat.JSON).unmarshall(qdString, QueryDefinition[].class);
@@ -432,6 +439,8 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
             logger.debug("Container {} created successfully by extension {}", id, this);
         } catch (Exception e) {
+            
+            messages.add(new Message(Severity.ERROR, "Error when creating container " + id +" by extension " + this + " due to " + ExceptionUtils.getRootCause(e).getMessage()));
             logger.error("Error when creating container {} by extension {}", id, this, e);
         }
     }
