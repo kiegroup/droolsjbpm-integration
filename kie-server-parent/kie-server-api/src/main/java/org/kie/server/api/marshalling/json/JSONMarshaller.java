@@ -179,6 +179,8 @@ public class JSONMarshaller implements Marshaller {
             typer = typer.init(JsonTypeInfo.Id.CLASS, null);
             typer = typer.inclusion(JsonTypeInfo.As.WRAPPER_OBJECT);
             customObjectMapper.setDefaultTyping(typer);
+            
+            customObjectMapper.setConfig(customObjectMapper.getSerializationConfig().with(introspectorPair).with(SerializationFeature.INDENT_OUTPUT));
 
             SimpleModule mod = new SimpleModule("custom-object-mapper", Version.unknownVersion());
             CustomObjectSerializer customObjectSerializer = new CustomObjectSerializer(customObjectMapper);
@@ -226,6 +228,7 @@ public class JSONMarshaller implements Marshaller {
             modDeser.addDeserializer(Object.class, new CustomObjectDeserializer(classes));
 
             deserializeObjectMapper.registerModule(modDeser);
+            deserializeObjectMapper.setConfig(deserializeObjectMapper.getDeserializationConfig().with(introspectorPair));
         }
 
         if (formatDate) {
