@@ -16,6 +16,8 @@
 package org.kie.server.remote.rest.jbpm;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dashbuilder.dataset.exception.DataSetLookupException;
+
 import static org.kie.server.api.rest.RestURI.CREATE_QUERY_DEF_POST_URI;
 import static org.kie.server.api.rest.RestURI.DROP_QUERY_DEF_DELETE_URI;
 import static org.kie.server.api.rest.RestURI.QUERY_DEF_GET_URI;
@@ -320,7 +322,7 @@ public class QueryDataResource {
                                          conversationIdHeader );
         } catch ( Exception e ) {
             Throwable root = ExceptionUtils.getRootCause( e );
-            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) ) {
+            if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) || e instanceof DataSetLookupException) {
 
                 logger.error( "{}",
                               MessageFormat.format( BAD_REQUEST,
