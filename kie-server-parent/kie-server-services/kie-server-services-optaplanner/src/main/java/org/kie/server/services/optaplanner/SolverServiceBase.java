@@ -201,7 +201,7 @@ public class SolverServiceBase {
                                                          "Solver '" + solverId + "' on container '" + containerId + "' is already executing.");
                         }
                         case TERMINATING_EARLY: {
-                            return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                            return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
                                                          "Solver '" + solverId + "' on container '" + containerId + "' has already terminated.");
                         }
                         case NOT_SOLVING: {
@@ -334,7 +334,7 @@ public class SolverServiceBase {
                                                      "Problem fact changes have been successfully submitted to solver '" + solverId + "' on container '" + containerId + "'.");
                     }
                     case TERMINATING_EARLY: {
-                        return new ServiceResponse<>(ServiceResponse.ResponseType.SUCCESS,
+                        return new ServiceResponse<>(ServiceResponse.ResponseType.FAILURE,
                                                      "Solver '" + solverId + "' on container '" + containerId + "' has already terminated.");
                     }
                     case NOT_SOLVING: {
