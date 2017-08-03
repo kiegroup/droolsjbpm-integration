@@ -84,6 +84,9 @@
         <include>org.kie.server:kie-server-router-client</include>
         <include>org.kie.server:kie-server-client</include>
         <include>org.kie:jbpm-process-svg</include>
+        
+        <include>org.kie.server:kie-server-controller-websocket-client</include>
+        <include>org.kie.server:kie-server-controller-websocket-common</include>
 
         <include>org.jbpm:jbpm-services-ejb-timer</include>
 
