@@ -249,7 +249,7 @@ public class SolverServicesClientImpl
 
         if (config.isRest()) {
             String uri = getURI(containerId,
-                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACT_CHANGES;
             makeHttpPostRequestAndCreateCustomResponse(uri,
                                                        problemFactChange,
                                                        ServiceResponse.class,
@@ -279,7 +279,7 @@ public class SolverServicesClientImpl
 
         if (config.isRest()) {
             String uri = getURI(containerId,
-                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACT_CHANGES;
             makeHttpPostRequestAndCreateCustomResponse(uri,
                                                        problemFactChanges,
                                                        ServiceResponse.class,
@@ -307,7 +307,7 @@ public class SolverServicesClientImpl
         Object result = null;
         if (config.isRest()) {
             String uri = getURI(containerId,
-                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED;
+                                solverId) + "/" + RestURI.SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED;
 
             result = makeHttpGetRequestAndCreateCustomResponse(uri,
                                                                Object.class);
