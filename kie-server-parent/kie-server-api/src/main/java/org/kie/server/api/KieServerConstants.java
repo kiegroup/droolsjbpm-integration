@@ -91,6 +91,7 @@ public class KieServerConstants {
     public static final String CFG_SYNC_DEPLOYMENT = "org.kie.server.sync.deploy";
 
     public static final String KIE_SERVER_PARAM_MODULE_METADATA = "KieModuleMetaData";
+    public static final String KIE_SERVER_PARAM_MESSAGES = "ContainerMessages";
 
     public static final String KIE_SERVER_ROUTER = "org.kie.server.router";
     public static final String KIE_SERVER_ROUTER_ATTEMPT_INTERVAL = "org.kie.server.router.connect";
