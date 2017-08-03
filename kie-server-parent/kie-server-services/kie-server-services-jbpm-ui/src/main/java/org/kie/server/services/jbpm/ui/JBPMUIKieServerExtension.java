@@ -30,6 +30,8 @@ import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.model.Message;
+import org.kie.server.api.model.Severity;
 import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
@@ -134,11 +136,13 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void createContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> parameters) {
         if (!initialized) {
             return;
         }
+        List<Message> messages = (List<Message>) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MESSAGES);
         try {
 
             String kieBaseName = ((KModuleDeploymentUnit)deploymentService.getDeployedUnit(id).getDeploymentUnit()).getKbaseName();
@@ -146,7 +150,8 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
             KieContainer kieContainer = kieContainerInstance.getKieContainer();
             imageReferences.putIfAbsent(id, new ImageReference(kieContainer, kieBaseName));
         } catch (Exception e) {
-            logger.warn("Unable to create image reference for container {} due to {}", id, e.getMessage());
+            messages.add(new Message(Severity.WARN, "Unable to create image reference for container " + id +" by extension " + this + " due to " + e.getMessage()));
+            logger.warn("Unable to create image reference for container {} due to {}", id, e.getMessage(), e);
         }
 
     }
