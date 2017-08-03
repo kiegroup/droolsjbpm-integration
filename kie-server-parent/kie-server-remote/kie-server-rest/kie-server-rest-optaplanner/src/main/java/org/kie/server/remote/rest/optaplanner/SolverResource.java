@@ -44,8 +44,8 @@ import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 import static org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION;
 import static org.kie.server.api.rest.RestURI.SOLVER_ID;
 import static org.kie.server.api.rest.RestURI.SOLVER_ID_URI;
-import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGED;
-import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACT_CHANGES;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED;
 import static org.kie.server.api.rest.RestURI.SOLVER_STATE_RUNNING;
 import static org.kie.server.api.rest.RestURI.SOLVER_STATE_TERMINATING;
 import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
@@ -324,7 +324,7 @@ public class SolverResource {
     }
 
     @POST
-    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGED)
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACT_CHANGES)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response addProblemFactChanges(@javax.ws.rs.core.Context HttpHeaders headers,
                                           @PathParam(CONTAINER_ID) String containerId,
@@ -369,7 +369,7 @@ public class SolverResource {
     }
 
     @GET
-    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED)
+    @Path(RestURI.SOLVER_ID_URI + "/" + SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response isEveryProblemFactChangeProcessed(@javax.ws.rs.core.Context HttpHeaders headers,
                                                       @PathParam(CONTAINER_ID) String containerId,

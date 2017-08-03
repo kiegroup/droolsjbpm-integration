@@ -215,8 +215,8 @@ public class RestURI {
     public static final String SOLVER_URI = "containers/{" + CONTAINER_ID + "}/solvers";
     public static final String SOLVER_ID_URI = "{" + SOLVER_ID + "}";
     public static final String SOLVER_BEST_SOLUTION = "bestsolution";
-    public static final String SOLVER_PROBLEM_FACTS_CHANGED = "problemfactschanged";
-    public static final String SOLVER_PROBLEM_FACTS_CHANGED_PROCESSED = SOLVER_PROBLEM_FACTS_CHANGED + "/processed";
+    public static final String SOLVER_PROBLEM_FACT_CHANGES = "problemfactchanges";
+    public static final String SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED = SOLVER_PROBLEM_FACT_CHANGES + "/processed";
     public static final String SOLVER_STATE_RUNNING = "state/solving";
     public static final String SOLVER_STATE_TERMINATING = "state/terminating-early";
 
