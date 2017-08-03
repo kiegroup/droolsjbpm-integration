@@ -46,8 +46,9 @@ public class KieServerExecutor {
             throw new RuntimeException("Kie execution server is already created!");
         }
 
-        setKieServerProperties();
         registerKieServerId();
+        setKieServerProperties();
+        
 
         server = new TJWSEmbeddedJaxrsServer();
         server.setPort(TestConfig.getKieServerAllocatedPort());
@@ -55,7 +56,7 @@ public class KieServerExecutor {
 
         addServerSingletonResources();
     }
-    private void setKieServerProperties() {
+    protected void setKieServerProperties() {
         System.setProperty(KieServerConstants.CFG_BYPASS_AUTH_USER, "true");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK, "custom");
         System.setProperty(KieServerConstants.CFG_HT_CALLBACK_CLASS, "org.kie.server.integrationtests.jbpm.util.FixedUserGroupCallbackImpl");

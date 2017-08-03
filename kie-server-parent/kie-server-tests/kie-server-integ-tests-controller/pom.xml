@@ -88,6 +88,28 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
+    <!-- websocket -->
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-servlet</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-websockets-jsr</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-websocket-client</artifactId>
+      <scope>test</scope>
+    </dependency>    
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-controller-websocket-common</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Logging -->
     <dependency>
