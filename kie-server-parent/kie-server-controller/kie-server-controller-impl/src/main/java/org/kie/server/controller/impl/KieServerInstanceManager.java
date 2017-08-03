@@ -17,9 +17,9 @@ package org.kie.server.controller.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieScannerResource;
@@ -29,9 +29,6 @@ import org.kie.server.api.model.Message;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
-import org.kie.server.client.credentials.EnteredTokenCredentialsProvider;
 import org.kie.server.controller.api.model.runtime.Container;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
@@ -40,6 +37,7 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.controller.impl.client.KieServicesClientProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +46,17 @@ public class KieServerInstanceManager {
     private static final Logger logger = LoggerFactory.getLogger(KieServerInstanceManager.class);
     private static final String CONTAINERS_URI_PART = "/containers/";
 
+    private List<KieServicesClientProvider> clientProviders = new ArrayList<>();
+
     private static KieServerInstanceManager INSTANCE = new KieServerInstanceManager();
+
+    public KieServerInstanceManager() {
+        ServiceLoader<KieServicesClientProvider> loader = ServiceLoader.load(KieServicesClientProvider.class);
+
+        loader.forEach(provider -> clientProviders.add(provider));
+
+        clientProviders.sort((KieServicesClientProvider one, KieServicesClientProvider two) -> one.getPriority().compareTo(two.getPriority()));
+    }
 
     public static KieServerInstanceManager getInstance() {
         return INSTANCE;
@@ -401,22 +409,9 @@ public class KieServerInstanceManager {
     }
 
     protected KieServicesClient getClient(String url) {
-
-        KieServicesConfiguration configuration = KieServicesFactory.newRestConfiguration(url,
-                                                                                         getUser(),
-                                                                                         getPassword());
-        configuration.setTimeout(60000);
-
-        configuration.setMarshallingFormat(MarshallingFormat.JSON);
-
-        String authToken = getToken();
-        if (authToken != null && !authToken.isEmpty()) {
-            configuration.setCredentialsProvider(new EnteredTokenCredentialsProvider(authToken));
-        }
-
-        KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(configuration);
-
-        return kieServicesClient;
+        KieServicesClient client = clientProviders.stream().filter(provider -> provider.supports(url)).findFirst().get().get(url);
+        logger.debug("Using client {}", client);
+        return client;
     }
 
     protected void collectContainerInfo(ContainerSpec containerSpec,
@@ -431,20 +426,6 @@ public class KieServerInstanceManager {
         }
     }
 
-    protected String getUser() {
-        return System.getProperty(KieServerConstants.CFG_KIE_USER,
-                                  "kieserver");
-    }
-
-    protected String getPassword() {
-        return System.getProperty(KieServerConstants.CFG_KIE_PASSWORD,
-                                  "kieserver1!");
-    }
-
-    protected String getToken() {
-        return System.getProperty(KieServerConstants.CFG_KIE_TOKEN);
-    }
-
     protected class RemoteKieServerOperation<T> {
 
         public T doOperation(KieServicesClient client,
@@ -453,4 +434,5 @@ public class KieServerInstanceManager {
             return null;
         }
     }
+
 }

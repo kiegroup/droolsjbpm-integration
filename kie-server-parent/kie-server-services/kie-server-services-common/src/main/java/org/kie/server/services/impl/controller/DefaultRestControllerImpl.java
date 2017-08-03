@@ -17,11 +17,10 @@ package org.kie.server.services.impl.controller;
 
 import java.net.URLEncoder;
 import java.util.Set;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.kie.server.common.rest.KieServerHttpRequest;
-import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.marshalling.MarshallerFactory;
@@ -29,6 +28,8 @@ import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
 import org.kie.server.api.model.KieServerInfo;
+import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpResponse;
 import org.kie.server.controller.api.KieServerController;
 import org.kie.server.controller.api.model.KieServerSetup;
 import org.kie.server.services.api.KieControllerNotConnectedException;
@@ -146,28 +147,10 @@ public class DefaultRestControllerImpl implements KieServerController {
             for (String controllerUrl : controllers) {
 
                 if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                    String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
-
-                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-
-                    try {
-                        KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
-
-                        if (kieServerSetup != null) {
-                            // once there is non null list let's return it
-                            return kieServerSetup;
-
-                        }
-
-                        break;
-                    } catch (Exception e) {
-                        // let's check all other controllers in case of running in cluster of controllers
-                        logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
-                        logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+                    KieServerSetup kieServerSetup = connectToSingleController(serverInfo, config, controllerUrl);
+                    if (kieServerSetup != null) {
+                        return kieServerSetup;
                     }
-
                 }
             }
 
@@ -187,24 +170,58 @@ public class DefaultRestControllerImpl implements KieServerController {
         for (String controllerUrl : controllers ) {
 
             if (controllerUrl != null && !controllerUrl.isEmpty()) {
-                String connectAndSyncUrl = null;
-                try {
-                    connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
-
-                    String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
-                    String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
-                    String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
-
-                    makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password, token);
-
-
+                
+                boolean disconnected = disconnectFromSingleController(serverInfo, config, controllerUrl);
+                if (disconnected) {
                     break;
-                } catch (Exception e) {
-                    // let's check all other controllers in case of running in cluster of controllers
-                    logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
                 }
+            }
+        }
+    }
+    
+    public KieServerSetup connectToSingleController(KieServerInfo serverInfo, KieServerConfig config, String controllerUrl) {
+        String connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId();
+
+        String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+        String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+        String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+        try {
+            KieServerSetup kieServerSetup = makeHttpPutRequestAndCreateCustomResponse(connectAndSyncUrl, serialize(serverInfo), KieServerSetup.class, userName, password, token);
+
+            if (kieServerSetup != null) {
+                // once there is non null list let's return it
+                return kieServerSetup;
 
             }
+            
+        } catch (Exception e) {
+            // let's check all other controllers in case of running in cluster of controllers
+            logger.warn("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getCause() == null ? e.getMessage() : e.getCause().getMessage());
+            logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+                        
+        }
+        return null;
+    }
+    
+    public boolean disconnectFromSingleController(KieServerInfo serverInfo, KieServerConfig config, String controllerUrl) {
+        String connectAndSyncUrl = null;
+        try {
+            connectAndSyncUrl = controllerUrl + "/server/" + KieServerEnvironment.getServerId()+"/?location="+ URLEncoder.encode(serverInfo.getLocation(), "UTF-8");
+
+            String userName = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_USER, "kieserver");
+            String password = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_PASSWORD, "kieserver1!");
+            String token = config.getConfigItemValue(KieServerConstants.CFG_KIE_CONTROLLER_TOKEN);
+
+            makeHttpDeleteRequestAndCreateCustomResponse(connectAndSyncUrl, null, userName, password, token);
+
+
+            return true;
+        } catch (Exception e) {
+            // let's check all other controllers in case of running in cluster of controllers
+            logger.debug("Exception encountered while syncing with controller at {} error {}", connectAndSyncUrl, e.getMessage(), e);
+            
+            return false;
         }
     }
 
