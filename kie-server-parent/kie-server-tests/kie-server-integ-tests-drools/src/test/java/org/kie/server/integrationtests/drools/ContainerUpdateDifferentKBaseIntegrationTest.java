@@ -31,6 +31,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +80,7 @@ public class ContainerUpdateDifferentKBaseIntegrationTest extends DroolsKieServe
         ExecutionResults result1 = response1.getResult();
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", valueOf(outcome, "id"));
+        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", KieServerReflections.valueOf(outcome, "id"));
 
         // now update container with second release id. The rule in there should set different id
         // (namely "Person from kjar101") for the inserted person
@@ -97,6 +98,6 @@ public class ContainerUpdateDifferentKBaseIntegrationTest extends DroolsKieServe
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar103'!", "Person from kjar103", valueOf(outcome2, "id"));
+        assertEquals("Person's id should be 'Person from kjar103'!", "Person from kjar103", KieServerReflections.valueOf(outcome2, "id"));
     }
 }

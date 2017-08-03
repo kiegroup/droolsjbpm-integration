@@ -31,6 +31,7 @@ import org.kie.api.runtime.ExecutionResults;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -77,7 +78,7 @@ public class StatelessSessionUsageIntegrationTest extends DroolsKieServerBaseInt
         Object value = actualData.getValue(PERSON_OUT_IDENTIFIER);
 
         assertEquals("Expected surname to be set to 'Vader'",
-                PERSON_EXPECTED_SURNAME, valueOf(value, PERSON_SURNAME_FIELD));
+                PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(value, PERSON_SURNAME_FIELD));
     }
 
 }

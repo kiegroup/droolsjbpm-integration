@@ -87,6 +87,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.ServiceResponsesList;
+import org.kie.server.api.model.Wrapped;
 import org.kie.server.api.model.admin.EmailNotification;
 import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
@@ -398,10 +399,18 @@ public class JaxbMarshaller implements Marshaller {
     @Override
     public <T> T unmarshall(String input, Class<T> type) {
         try {
-            return (T) getUnmarshaller().unmarshal(new StringReader(input));
+            return (T) unwrap(getUnmarshaller().unmarshal(new StringReader(input)));
         } catch ( JAXBException e ) {
             throw new MarshallingException( "Can't unmarshall input string: "+input, e );
         }
+    }
+
+    protected Object unwrap(Object data) {
+        if (data instanceof Wrapped) {
+            return ((Wrapped) data).unwrap();
+        }
+
+        return data;
     }
 
 
