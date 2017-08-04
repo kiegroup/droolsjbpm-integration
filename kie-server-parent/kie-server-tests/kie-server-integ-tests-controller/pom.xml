@@ -12,6 +12,10 @@
   <name>KIE :: Execution Server :: Tests :: Controller Integration Tests</name>
   <description>KIE Execution Server Integration Tests (REST, JMS). Can be configured to run on different supported containers.</description>
 
+  <properties>
+    <version.org.glassfish.tyrus>1.11.1</version.org.glassfish.tyrus>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -37,6 +41,26 @@
         <type>war</type>
         <scope>test</scope>
         <version>${project.version}</version>
+      </dependency>
+     <dependency>
+        <groupId>org.glassfish.tyrus</groupId>
+        <artifactId>tyrus-container-jdk-client</artifactId>
+        <version>${version.org.glassfish.tyrus}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.tyrus</groupId>
+        <artifactId>tyrus-spi</artifactId>
+        <version>${version.org.glassfish.tyrus}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.tyrus</groupId>
+        <artifactId>tyrus-client</artifactId>
+        <version>${version.org.glassfish.tyrus}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish.tyrus</groupId>
+        <artifactId>tyrus-core</artifactId>
+        <version>${version.org.glassfish.tyrus}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -93,11 +117,6 @@
     <dependency>
       <groupId>io.undertow</groupId>
       <artifactId>undertow-servlet</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.undertow</groupId>
-      <artifactId>undertow-websockets-jsr</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -251,4 +270,72 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>tomcat8</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>wildfly10</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>eap7</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>oracle-wls-12</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.glassfish.tyrus</groupId>
+          <artifactId>tyrus-container-jdk-client</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.tyrus</groupId>
+          <artifactId>tyrus-spi</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.tyrus</groupId>
+          <artifactId>tyrus-client</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.tyrus</groupId>
+          <artifactId>tyrus-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>websphere9</id>
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-websockets-jsr</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>

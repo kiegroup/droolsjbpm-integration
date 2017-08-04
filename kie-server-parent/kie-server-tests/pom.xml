@@ -811,7 +811,7 @@
                     <org.kie.server.controller.connect>50000</org.kie.server.controller.connect>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
                     <org.kie.executor.jms>false</org.kie.executor.jms>
-                    <org.kie.server.sync.deploy>true</org.kie.server.sync.deploy>
+                    <org.kie.server.sync.deploy>false</org.kie.server.sync.deploy>
                   </systemProperties>
                   <dependencies>
                     <dependency>
