@@ -31,6 +31,7 @@ import org.kie.server.api.model.ServiceResponse;
 
 import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
@@ -84,9 +85,9 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
 
         Object result = actualData.getValue(PERSON_1_OUT_IDENTIFIER);
 
-        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, valueOf(result, PERSON_SURNAME_FIELD));
+        assertEquals("Expected surname to be set to 'Vader'", PERSON_EXPECTED_SURNAME, KieServerReflections.valueOf(result, PERSON_SURNAME_FIELD));
         // and 'duplicated' flag should stay false, as only one person is in working memory
-        assertEquals("The 'duplicated' field should be false!", false, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be false!", false, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
 
         // insert second person and fire the rules. The duplicated field will be set to true if there are two
@@ -108,7 +109,7 @@ public class ClassesInludedInKJarIntegrationTest extends DroolsKieServerBaseInte
 
         result = actualData.getValue(PERSON_2_OUT_IDENTIFIER);
         // and 'duplicated' flag should be true, because second person was added.
-        assertEquals("The 'duplicated' field should be true!", true, valueOf(result, PERSON_DUPLICATED_FIELD));
+        assertEquals("The 'duplicated' field should be true!", true, KieServerReflections.valueOf(result, PERSON_DUPLICATED_FIELD));
 
     }
 

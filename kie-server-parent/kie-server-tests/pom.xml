@@ -67,6 +67,7 @@
     <module>kie-server-integ-tests-router</module>
     <module>kie-server-integ-tests-case-id-generator</module>
     <module>kie-server-integ-tests-dmn</module>
+    <module>kie-server-integ-tests-custom-extension</module>
   </modules>
 
   <dependencyManagement>
@@ -119,6 +120,21 @@
       <dependency>
         <groupId>org.kie.server</groupId>
         <artifactId>kie-server-integ-tests-all</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-jbpm-search</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-custom-extension-rest</artifactId>
+        <version>${version.org.kie}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.server</groupId>
+        <artifactId>kie-server-integ-tests-custom-extension-services</artifactId>
         <version>${version.org.kie}</version>
       </dependency>
       <dependency>

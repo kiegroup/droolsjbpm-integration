@@ -52,6 +52,7 @@ import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_NOT_FOUND;
 
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 
 
 
@@ -102,7 +103,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // check if task outcomes are properly set as process variables
             Object personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals(USER_MARY, valueOf(personVar, "name"));
+            assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
 
             String stringVar = (String) processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "stringData");
             assertNotNull(personVar);
@@ -182,7 +183,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // check if task outcomes are properly set as process variables
             Object personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals(USER_MARY, valueOf(personVar, "name"));
+            assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
 
             String stringVar = (String) processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "stringData");
             assertNotNull(personVar);
@@ -401,7 +402,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertTrue(taskInput.containsKey("_person"));
 
             assertEquals("john is working on it", taskInput.get("_string"));
-            assertEquals(USER_JOHN, valueOf(taskInput.get("_person"), "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(taskInput.get("_person"), "name"));
 
             Map<String, Object> taskOutcome = new HashMap<String, Object>();
             taskOutcome.put("string_", "my custom data");
@@ -416,7 +417,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertTrue(taskInput.containsKey("person_"));
 
             assertEquals("my custom data", taskInput.get("string_"));
-            assertEquals(USER_MARY, valueOf(taskInput.get("person_"), "name"));
+            assertEquals(USER_MARY, KieServerReflections.valueOf(taskInput.get("person_"), "name"));
 
             // let's delete the content as we won't need it
             taskClient.deleteTaskContent(CONTAINER_ID, taskSummary.getId(), outputContentId);
@@ -435,7 +436,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // check if task outcomes are properly set as process variables
             Object personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals("peter", valueOf(personVar, "name"));
+            assertEquals("peter", KieServerReflections.valueOf(personVar, "name"));
 
             String stringVar = (String) processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "stringData");
             assertNotNull(personVar);
@@ -562,7 +563,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             assertEquals("john is working on it", inputs.get("_string"));
             assertEquals("true", inputs.get("Skippable"));
             assertEquals("First task", inputs.get("NodeName"));
-            assertEquals(USER_JOHN, valueOf(inputs.get("_person"), "name"));
+            assertEquals(USER_JOHN, KieServerReflections.valueOf(inputs.get("_person"), "name"));
 
             assertNotNull(taskInstance.getOutputData());
             assertEquals(0, taskInstance.getOutputData().size());
@@ -1183,7 +1184,7 @@ public class UserTaskServiceIntegrationTest extends JbpmKieServerBaseIntegration
             // check if task outcomes are properly set as process variables
             Object personVar = processClient.getProcessInstanceVariable(CONTAINER_ID, processInstanceId, "personData");
             assertNotNull(personVar);
-            assertEquals(USER_MARY, valueOf(personVar, "name"));
+            assertEquals(USER_MARY, KieServerReflections.valueOf(personVar, "name"));
 
             afterNextCallConversationId = ((AbstractKieServicesClientImpl)processClient).getConversationId();
             assertNotEquals(conversationId, afterNextCallConversationId);

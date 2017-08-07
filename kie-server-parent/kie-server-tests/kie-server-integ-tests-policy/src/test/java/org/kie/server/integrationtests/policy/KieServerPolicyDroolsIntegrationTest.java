@@ -34,6 +34,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerReflections;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
@@ -98,7 +99,7 @@ public class KieServerPolicyDroolsIntegrationTest extends KieServerPolicyBaseInt
         ExecutionResults result1 = response1.getResult();
 
         Object outcome = result1.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", valueOf(outcome, "id"));
+        assertEquals("Person's id should be 'Person from kjar1'!", "Person from kjar1", KieServerReflections.valueOf(outcome, "id"));
 
         ServiceResponse<KieContainerResourceList> containersResponse = client.listContainers();
         KieServerAssert.assertSuccess(containersResponse);
@@ -120,7 +121,7 @@ public class KieServerPolicyDroolsIntegrationTest extends KieServerPolicyBaseInt
         ExecutionResults result2 = response2.getResult();
 
         Object outcome2 = result2.getValue(PERSON_OUT_IDENTIFIER);
-        assertEquals("Person's id should be 'Person from kjar101'!", "Person from kjar101", valueOf(outcome2, "id"));
+        assertEquals("Person's id should be 'Person from kjar101'!", "Person from kjar101", KieServerReflections.valueOf(outcome2, "id"));
 
         // wait for policy to be activated
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
