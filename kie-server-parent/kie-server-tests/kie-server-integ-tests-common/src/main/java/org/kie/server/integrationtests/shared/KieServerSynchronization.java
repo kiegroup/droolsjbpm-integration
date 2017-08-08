@@ -47,6 +47,8 @@ import org.kie.server.client.QueryServicesClient;
 import org.kie.server.client.RuleServicesClient;
 import org.kie.server.client.SolverServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.controller.api.model.spec.ServerTemplate;
+import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 
 public class KieServerSynchronization {
 
@@ -238,6 +240,16 @@ public class KieServerSynchronization {
                 // Query doesn't exist any more
                 return true;
             }
+        });
+    }
+
+    public static void waitForServerInstanceSynchronization(final KieServerMgmtControllerClient controllerClient, String serverTemplateId, final int numberOfExpectedServerInstances) throws Exception {
+        waitForCondition(() -> {
+            ServerTemplate serverTemplate = controllerClient.getServerTemplate(serverTemplateId);
+            if (serverTemplate != null && serverTemplate.getServerInstanceKeys().size() == numberOfExpectedServerInstances) {
+                return true;
+            }
+            return false;
         });
     }
 
