@@ -55,6 +55,7 @@ public class TestConfig {
     private static final StringTestParameter PROVIDED_HTTP_URL = new StringTestParameter("kie.server.base.http.url");
     private static final StringTestParameter PROVIDED_CONTEXT = new StringTestParameter("kie.server.context");
     private static final StringTestParameter PROVIDED_CONTROLLER_HTTP_URL = new StringTestParameter("kie.server.controller.base.http.url");
+    private static final StringTestParameter PROVIDED_CONTROLLER_CONTEXT = new StringTestParameter("kie.server.controller.context");
 
     private static final StringTestParameter USERNAME = new StringTestParameter("username", "yoda");
     private static final StringTestParameter PASSWORD = new StringTestParameter("password", "usetheforce123@");
@@ -343,6 +344,13 @@ public class TestConfig {
      */
     public static String getKieServerContext() {
         return TestConfig.PROVIDED_CONTEXT.getParameterValue();
+    }
+
+    /**
+     * @return Kie server controller context value.
+     */
+    public static String getKieServerControllerContext() {
+        return TestConfig.PROVIDED_CONTROLLER_CONTEXT.getParameterValue();
     }
 
     /**
