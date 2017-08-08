@@ -32,6 +32,11 @@
       <artifactId>kie-server-integ-tests-custom-extension-services</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-integ-tests-custom-extension-client</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!-- Logging -->
     <dependency>
