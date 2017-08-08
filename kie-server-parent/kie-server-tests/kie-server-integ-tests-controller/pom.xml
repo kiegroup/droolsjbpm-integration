@@ -216,6 +216,7 @@
               <!-- Values are supplied by specific profiles -->
               <kie.server.base.http.url>${kie.server.base.http.url}</kie.server.base.http.url>
               <kie.server.controller.base.http.url>${kie.server.controller.base.http.url}</kie.server.controller.base.http.url>
+              <kie.server.controller.context>${kie.server.controller.context}</kie.server.controller.context>
               <kie.server.testing.kjars.build.settings.xml>${kie.server.testing.kjars.build.settings.xml}</kie.server.testing.kjars.build.settings.xml>
             </systemPropertyVariables>
           </configuration>

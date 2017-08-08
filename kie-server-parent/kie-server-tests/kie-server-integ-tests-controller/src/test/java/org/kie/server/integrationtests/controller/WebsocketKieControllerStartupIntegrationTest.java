@@ -87,7 +87,8 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
                     try {
                         origControllerUrl = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
                         controllerUrl = new URL(origControllerUrl);
-                        String wsControllerUrl = "ws://" + controllerUrl.getHost() + ":" + controllerUrl.getPort() + "/kie-server-controller-services/websocket/controller";
+                        String controllerContext = TestConfig.getKieServerControllerContext();
+                        String wsControllerUrl = "ws://" + controllerUrl.getHost() + ":" + controllerUrl.getPort() + "/" + controllerContext + "/websocket/controller";
                         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, wsControllerUrl);
                        
                     } catch (MalformedURLException e) {
