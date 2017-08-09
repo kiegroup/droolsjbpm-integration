@@ -74,7 +74,7 @@ public class ServerTemplate extends ServerTemplateKey {
         if (configs == null) {
             configs = new HashMap<Capability, ServerConfig>();
         }
-        return configs;
+        return new HashMap<Capability, ServerConfig>( configs );
     }
 
     public Collection<ContainerSpec> getContainersSpec() {
@@ -89,7 +89,7 @@ public class ServerTemplate extends ServerTemplateKey {
         if (serverInstances == null) {
             serverInstances = new ArrayList<ServerInstanceKey>();
         }
-        return serverInstances;
+        return new ArrayList<ServerInstanceKey>( serverInstances );
     }
 
     public boolean hasContainerSpec(String containerSpecId) {

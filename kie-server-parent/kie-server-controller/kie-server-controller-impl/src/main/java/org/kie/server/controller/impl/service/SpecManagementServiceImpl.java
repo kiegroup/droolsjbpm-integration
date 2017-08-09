@@ -315,7 +315,9 @@ public class SpecManagementServiceImpl implements SpecManagementService {
             throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
         }
 
-        serverTemplate.getConfigs().put( capability, serverTemplateConfig );
+        Map<Capability, ServerConfig> configs = serverTemplate.getConfigs();
+        configs.put( capability, serverTemplateConfig );
+        serverTemplate.setConfigs( configs );
 
         templateStorage.update( serverTemplate );
 
