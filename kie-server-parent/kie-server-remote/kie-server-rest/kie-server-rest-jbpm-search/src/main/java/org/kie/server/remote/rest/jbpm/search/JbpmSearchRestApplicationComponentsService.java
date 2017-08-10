@@ -41,14 +41,18 @@ public class JbpmSearchRestApplicationComponentsService implements KieServerAppl
         
         KieServerRegistry context = null;
 
-        QueryService queryService = null;
+        ProcessInstanceSearchServiceBase processInstanceQueryServiceBase = null;
+        TaskSearchServiceBase taskQueryServiceBase = null;
         
         for ( Object object : services ) {
             // in case given service is null (meaning was not configured) continue with next one
             if ( object == null ) {
                 continue;
-            } else if ( QueryService.class.isAssignableFrom( object.getClass() ) ) {
-            	queryService = (QueryService) object;
+            } else if ( ProcessInstanceSearchServiceBase.class.isAssignableFrom( object.getClass() ) ) {
+                processInstanceQueryServiceBase = (ProcessInstanceSearchServiceBase) object;
+                continue;
+            } else if ( TaskSearchServiceBase.class.isAssignableFrom( object.getClass() ) ) {
+                taskQueryServiceBase = (TaskSearchServiceBase) object;
                 continue;
             } else if( KieServerRegistry.class.isAssignableFrom(object.getClass()) ) {
                 context = (KieServerRegistry) object;
@@ -56,13 +60,10 @@ public class JbpmSearchRestApplicationComponentsService implements KieServerAppl
             }
         }
         
-        if (queryService == null) {
-        	throw new IllegalStateException("No QueryService found. Unable to bootstrap jBPM TaskQuery Extension.");
+        
+        if (processInstanceQueryServiceBase == null || taskQueryServiceBase == null) {
+            throw new IllegalStateException("No QueryService found. Unable to bootstrap jBPM TaskQuery Extension.");
         }
-        
-        ProcessInstanceSearchServiceBase processInstanceQueryServiceBase = new ProcessInstanceSearchServiceBase(queryService, context);
-        
-        TaskSearchServiceBase taskQueryServiceBase = new TaskSearchServiceBase(queryService, context);
         
         List<Object> components = new ArrayList<Object>( 1 );
         components.add(new ProcessInstanceSearchResource (processInstanceQueryServiceBase, context));
