@@ -66,7 +66,7 @@ public class JbpmSearchKieServerExtensionTest {
 		@Override
 		public Collection<Object> getAppComponents(String extension, SupportedTransports type, Object... services) {
 			// The services past by the JbpmKieServerExtension test.
-			assertEquals(2, services.length);
+			assertEquals(3, services.length);
 			
 			//Return services to the JbpmKieServerExtension.
 			List<Object> appComponents = new ArrayList<>();
