@@ -87,7 +87,8 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
                     try {
                         origControllerUrl = System.getProperty(KieServerConstants.KIE_SERVER_CONTROLLER);
                         controllerUrl = new URL(origControllerUrl);
-                        String wsControllerUrl = "ws://" + controllerUrl.getHost() + ":" + controllerUrl.getPort() + "/kie-server-controller-services/websocket/controller";
+                        String controllerContext = TestConfig.getKieServerControllerContext();
+                        String wsControllerUrl = "ws://" + controllerUrl.getHost() + ":" + controllerUrl.getPort() + "/" + controllerContext + "/websocket/controller";
                         System.setProperty(KieServerConstants.KIE_SERVER_CONTROLLER, wsControllerUrl);
                        
                     } catch (MalformedURLException e) {
@@ -249,6 +250,7 @@ public class WebsocketKieControllerStartupIntegrationTest extends KieControllerM
 
         // Turn kie server off, dispose container and start kie server again.
         server.stopKieServer();
+        KieServerSynchronization.waitForServerInstanceSynchronization(mgmtControllerClient, kieServerInfo.getResult().getServerId(), 0);
 
         mgmtControllerClient.stopContainer(kieServerInfo.getResult().getServerId(), CONTAINER_ID);
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
