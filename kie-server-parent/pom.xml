@@ -25,6 +25,7 @@
     <module>kie-server-wars</module>
     <module>kie-server-tests</module>
     <module>kie-server-maven-plugin</module>
+    <module>kie-server-controller-plugin</module>
   </modules>
 
   <dependencyManagement>
