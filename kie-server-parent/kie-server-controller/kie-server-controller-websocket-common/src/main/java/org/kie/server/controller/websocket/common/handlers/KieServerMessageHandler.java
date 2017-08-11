@@ -50,6 +50,8 @@ public class KieServerMessageHandler implements MessageHandler.Whole<String> {
             try {
                 session.getBasicRemote().sendText(response);
                 logger.debug("Response successfully sent");
+                
+                handler.afterResponseSent();
             } catch (IOException e) {
                 logger.error("Error when sending response", e);
             }

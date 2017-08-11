@@ -32,6 +32,7 @@ import javax.websocket.server.ServerEndpoint;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.controller.api.model.runtime.ServerInstance;
 import org.kie.server.controller.api.service.NotificationService;
 import org.kie.server.controller.api.service.PersistingServerTemplateStorageService;
 import org.kie.server.controller.api.storage.KieServerTemplateStorage;
@@ -82,22 +83,7 @@ public class WebsocketKieServerControllerImpl extends KieServerControllerImpl {
     public void onKieServerConnect(@PathParam("server-id") String serverId, Session session) {
         manager.addSession(session);
         
-        manager.getHandler(session.getId()).addHandler((String message) -> {
-
-            String contentType = MarshallingFormat.JSON.getType();
-            
-            KieServerInfo serverInfo = WebsocketUtils.unmarshal(message, contentType, KieServerInfo.class);
-            manager.addSession(serverInfo.getLocation(), session);
-            
-            logger.debug("Server info {}", serverInfo);
-            KieServerSetup serverSetup = connect(serverInfo);
-
-            logger.info("Server with id '{}' connected", serverId);
-            String response = WebsocketUtils.marshal(contentType, serverSetup);
-            
-            return response;
-
-        });
+        manager.getHandler(session.getId()).addHandler(new ConnectedKieServerHandler(manager, session, this, serverId));
     }
     
     @OnClose
@@ -116,4 +102,11 @@ public class WebsocketKieServerControllerImpl extends KieServerControllerImpl {
 //        manager.removeSession(session);
         logger.error("Unexpected error", e);
     }
+
+    @Override
+    protected void notifyOnConnect(ServerInstance serverInstance) {
+        // mute the events until server is notified with configuration
+    }
+    
+    
 }

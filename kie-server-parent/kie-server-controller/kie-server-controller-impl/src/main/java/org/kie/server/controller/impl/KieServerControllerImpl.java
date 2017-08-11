@@ -201,8 +201,7 @@ public abstract class KieServerControllerImpl implements KieServerController {
         serverInstance.setContainers(containerList);
 
 
-        notificationService.notify(new ServerInstanceUpdated(serverInstance));
-        notificationService.notify(new ServerInstanceConnected(serverInstance));
+        notifyOnConnect(serverInstance);
         return serverSetup;
     }
 
@@ -219,13 +218,22 @@ public abstract class KieServerControllerImpl implements KieServerController {
 
                 templateStorage.update(serverTemplate);
 
-                notificationService.notify(new ServerInstanceDeleted(serverInstanceKey.getServerInstanceId()));
-                notificationService.notify(new ServerTemplateUpdated(serverTemplate));
-                notificationService.notify(new ServerInstanceDisconnected(serverInstanceKey.getServerInstanceId()));
+                notifyOnDisconnect(serverInstanceKey, serverTemplate);
             }
         }
     }
 
+    protected void notifyOnConnect(ServerInstance serverInstance) {
+        notificationService.notify(new ServerInstanceUpdated(serverInstance));
+        notificationService.notify(new ServerInstanceConnected(serverInstance));
+    }
+    
+    protected void notifyOnDisconnect(ServerInstanceKey serverInstanceKey, ServerTemplate serverTemplate) {
+        notificationService.notify(new ServerInstanceDeleted(serverInstanceKey.getServerInstanceId()));
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+        notificationService.notify(new ServerInstanceDisconnected(serverInstanceKey.getServerInstanceId()));
+    }
+    
     public KieServerTemplateStorage getTemplateStorage() {
         return templateStorage;
     }
