@@ -28,6 +28,7 @@ import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerResource;
 import org.kie.server.api.model.KieScannerStatus;
+import org.kie.server.api.model.KieServerConfigItem;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ReleaseIdFilter;
 import org.kie.server.api.model.ServiceResponse;
@@ -253,6 +254,65 @@ public class KieServerSynchronization {
                     }
                 }
                 return true;
+            }
+        });
+    }
+
+    public static void waitForKieServerScannerStatus(final KieServicesClient client, final String containerId, final KieScannerStatus scannerStatus) throws Exception {
+        waitForCondition(new WaitingCondition() {
+            @Override
+            public boolean conditionPassed() {
+                ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(containerId);
+                if (!containerResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
+                    return false;
+                }
+
+                KieScannerResource scanner = containerResponse.getResult().getScanner();
+                if (scanner.getStatus().equals(scannerStatus)) {
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    public static void waitForKieServerScannerStatus(final KieServicesClient client, final String containerId, final KieScannerStatus scannerStatus, final Long pollInterval) throws Exception {
+        waitForCondition(new WaitingCondition() {
+            @Override
+            public boolean conditionPassed() {
+                ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(containerId);
+                if (!containerResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
+                    return false;
+                }
+
+                KieScannerResource scanner = containerResponse.getResult().getScanner();
+                if (scanner.getStatus().equals(scannerStatus) && scanner.getPollInterval().equals(pollInterval)) {
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    public static void waitForKieServerConfig(final KieServicesClient client, final String containerId, final String configItemName, final String configItemValue) throws Exception {
+        waitForCondition(new WaitingCondition() {
+            @Override
+            public boolean conditionPassed() {
+                ServiceResponse<KieContainerResource> containerResponse = client.getContainerInfo(containerId);
+                if (!containerResponse.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
+                    return false;
+                }
+
+                List<KieServerConfigItem> configItems = containerResponse.getResult().getConfigItems();
+                for (KieServerConfigItem configItem : configItems) {
+                    if (configItem.getName().equals(configItemName) && configItem.getValue().equals(configItemValue)) {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         });
     }
