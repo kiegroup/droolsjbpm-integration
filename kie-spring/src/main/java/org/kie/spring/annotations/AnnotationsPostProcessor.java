@@ -255,7 +255,7 @@ class AnnotationsPostProcessor implements InstantiationAwareBeanPostProcessor,
                 }
                 return kieContainer.getKieBase();
             }
-            if( getReleaseId().equals(AnnotationsPostProcessor.this.getReleaseId())) {
+            if( getReleaseId() == null || getReleaseId().equals(AnnotationsPostProcessor.this.getReleaseId())) {
                 return beanFactory.getBean(name);
             } else {
                 KieContainer kieContainer = kieContainerMap.get(getReleaseId());
@@ -282,7 +282,7 @@ class AnnotationsPostProcessor implements InstantiationAwareBeanPostProcessor,
         }
 
         protected Object getResourceToInject(Object target, String requestingBeanName) {
-            if( getReleaseId().equals(AnnotationsPostProcessor.this.getReleaseId())) {
+            if( getReleaseId() == null || getReleaseId().equals(AnnotationsPostProcessor.this.getReleaseId())) {
                 return beanFactory.getBean(name);
             } else {
                 KieContainer kieContainer = kieContainerMap.get(getReleaseId());
