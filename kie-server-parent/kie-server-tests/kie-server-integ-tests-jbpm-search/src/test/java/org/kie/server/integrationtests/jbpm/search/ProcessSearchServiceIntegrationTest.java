@@ -69,7 +69,8 @@ public class ProcessSearchServiceIntegrationTest extends JbpmQueriesKieServerBas
                                                                                            100 ),
                                400,
                                BAD_REQUEST.split( "\\{",
-                                                  2 )[0] );
+                                                  2 )[0],
+                               "Can't lookup on specified data set: getProcessInstancesWithFilters");
     }
 
     @Test

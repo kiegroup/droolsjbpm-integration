@@ -21,6 +21,11 @@ import static org.kie.server.api.rest.RestURI.TASKS_GET_FILTERED_URI;
 import java.util.Collections;
 import java.util.List;
 
+import org.kie.server.api.commands.CommandScript;
+import org.kie.server.api.commands.DescriptorCommand;
+import org.kie.server.api.model.KieServerCommand;
+import org.kie.server.api.model.ServiceResponse;
+import org.kie.server.api.model.definition.ProcessDefinitionList;
 import org.kie.server.api.model.definition.ProcessInstanceQueryFilterSpec;
 import org.kie.server.api.model.definition.TaskQueryFilterSpec;
 import org.kie.server.api.model.instance.ProcessInstance;
@@ -50,8 +55,14 @@ public class SearchServicesClientImpl extends AbstractKieServicesClientImpl impl
 					filterSpec, ProcessInstanceList.class);
 
 		} else {
-			// TODO: Need to implement the command (used for non-REST scenarios). Look at QueryServicesClientImpl for examples.
-			throw new UnsupportedOperationException("This operation does not yet provide support for non-REST commands.");
+		    CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("ProcessInstanceSeachService", "getProcessInstancesWithFilters", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{page, pageSize})));
+            ServiceResponse<ProcessInstanceList> response = (ServiceResponse<ProcessInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPMQueries").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();		    
 		}
 
 		if (result != null) {
@@ -72,8 +83,14 @@ public class SearchServicesClientImpl extends AbstractKieServicesClientImpl impl
 					filterSpec, TaskInstanceList.class);
 
 		} else {
-			// TODO: Need to implement the command (used for non-REST scenarios). Look at QueryServicesClientImpl for examples.
-			throw new UnsupportedOperationException("This operation does not yet provide support for non-REST commands.");
+		    CommandScript script = new CommandScript(Collections.singletonList((KieServerCommand) new DescriptorCommand("TaskSearchService", "getHumanTasksWithFilters", serialize(filterSpec), marshaller.getFormat().getType(), new Object[]{page, pageSize})));
+            ServiceResponse<TaskInstanceList> response = (ServiceResponse<TaskInstanceList>) executeJmsCommand(script, DescriptorCommand.class.getName(), "BPMQueries").getResponses().get(0);
+
+            throwExceptionOnFailure(response);
+            if (shouldReturnWithNullResponse(response)) {
+                return null;
+            }
+            result = response.getResult();  
 		}
 
 		if (result != null) {

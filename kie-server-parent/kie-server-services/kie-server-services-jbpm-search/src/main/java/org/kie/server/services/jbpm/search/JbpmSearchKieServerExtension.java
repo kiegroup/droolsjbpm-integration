@@ -22,6 +22,7 @@ import java.util.ServiceLoader;
 
 import org.jbpm.services.api.query.QueryService;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.services.api.KieContainerCommandService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerApplicationComponentsService;
 import org.kie.server.services.api.KieServerExtension;
@@ -48,6 +49,11 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
     
     private List<Object> services = new ArrayList<Object>();
     private boolean initialized = false;
+    
+    private TaskSearchServiceBase taskSearchServiceBase;
+    private ProcessInstanceSearchServiceBase processInstanceSearchServiceBase;
+    
+    private KieContainerCommandService kieContainerCommandService;
 
     @Override
     public boolean isInitialized() {
@@ -70,8 +76,15 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
         	logger.error("No jBPM extension available, quiting...");
             return;
         }
-        queryService = jBpmExtension.getAppComponents(QueryService.class);
-        services.add(queryService);
+        queryService = jBpmExtension.getAppComponents(QueryService.class);              
+        
+        this.processInstanceSearchServiceBase = new ProcessInstanceSearchServiceBase(queryService, context);
+        this.taskSearchServiceBase = new TaskSearchServiceBase(queryService, context);
+        
+        services.add(processInstanceSearchServiceBase);
+        services.add(taskSearchServiceBase);
+        
+        this.kieContainerCommandService = new JbpmSearchKieContainerCommandServiceImpl(context, taskSearchServiceBase, processInstanceSearchServiceBase);
         initialized = true;
     }
 
@@ -108,7 +121,7 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
         if (!initialized) {
             return appComponentsList;
         }
-        Object[] services = {queryService, context};
+        Object[] services = {processInstanceSearchServiceBase, taskSearchServiceBase, context};
         for ( KieServerApplicationComponentsService appComponentsService : appComponentsServices ) {
             appComponentsList.addAll( appComponentsService.getAppComponents( EXTENSION_NAME, type, services ) );
         }
@@ -120,8 +133,9 @@ public class JbpmSearchKieServerExtension implements KieServerExtension {
         if (!initialized) {
             return null;
         }
-        if ( serviceType.isAssignableFrom( queryService.getClass() ) ) {
-            return (T) queryService;
+  
+        if (serviceType.isAssignableFrom(kieContainerCommandService.getClass())) {
+            return (T) kieContainerCommandService;
         }
         return null;
     }

@@ -70,7 +70,8 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                      100 ),
                                400,
                                BAD_REQUEST.split( "\\{",
-                                                  2 )[0] );
+                                                  2 )[0],
+                               "Can't lookup on specified data set: getTasksWithFilters");
     }
 
     @Test
