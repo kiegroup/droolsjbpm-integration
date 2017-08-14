@@ -51,7 +51,7 @@ public class DefaultRestControllerImpl implements KieServerController {
 
     @SuppressWarnings("unchecked")
     protected <T> T makeHttpPutRequestAndCreateCustomResponse(String uri, String body, Class<T> resultType, String user, String password, String token) {
-        logger.debug("About to send PUT request to '{}' with payload '{}'", uri, body);
+        logger.debug("About to send PUT request to '{}' with payload '{}' by thread {}", uri, body, Thread.currentThread().getId());
         KieServerHttpRequest request = newRequest( uri, user, password, token ).body(body).put();
         KieServerHttpResponse response = request.response();
 

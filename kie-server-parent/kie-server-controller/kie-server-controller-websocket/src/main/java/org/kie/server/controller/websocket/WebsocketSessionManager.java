@@ -27,6 +27,7 @@ import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.Session;
 
+import org.kie.server.api.model.KieServerInfo;
 import org.kie.server.controller.websocket.common.handlers.KieServerMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class WebsocketSessionManager {
     
     private ConcurrentMap<String, Session> availableSessionsById = new ConcurrentHashMap<>();
     private ConcurrentMap<String, List<Session>> availableSessionsByUrl = new ConcurrentHashMap<>();
-    private ConcurrentMap<String, String> sessionToUrl = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, KieServerInfo> sessionToUrl = new ConcurrentHashMap<>();
     private ConcurrentMap<String, KieServerMessageHandler> handlersPerSession = new ConcurrentHashMap<>();
         
     private static WebsocketSessionManager INSTANCE = new WebsocketSessionManager();
@@ -52,22 +53,22 @@ public class WebsocketSessionManager {
         logger.debug("Session '" + session.getId() + "' added to websocket manager");
     }
     
-    public void addSession(String url, Session session) {
+    public void addSession(KieServerInfo serverInfo, Session session) {
         List<Session> newSessions =  new ArrayList<>();
-        List<Session> sessions = this.availableSessionsByUrl.putIfAbsent(url, newSessions);
+        List<Session> sessions = this.availableSessionsByUrl.putIfAbsent(serverInfo.getLocation(), newSessions);
         if (sessions == null) {
             sessions = newSessions;
         }
         sessions.add(session);
-        this.sessionToUrl.put(session.getId(), url);        
-        logger.debug("Session '" + session.getId() + "' associated with url: " + url);
+        this.sessionToUrl.put(session.getId(), serverInfo);        
+        logger.debug("Session '" + session.getId() + "' associated with url: " + serverInfo.getLocation());
     }
     
     public String removeSession(Session session) {
         this.availableSessionsById.remove(session.getId());
-        String url = sessionToUrl.remove(session.getId());
+        KieServerInfo serverInfo = sessionToUrl.remove(session.getId());
         
-        List<Session> sessions = availableSessionsByUrl.get(url);
+        List<Session> sessions = availableSessionsByUrl.get(serverInfo.getLocation());
         Iterator<Session> it = sessions.iterator();
         
         while (it.hasNext()) {
@@ -81,8 +82,8 @@ public class WebsocketSessionManager {
         this.handlersPerSession.remove(session.getId());
         logger.debug("Session '" + session.getId() + "' removed to websocket manager");
         
-        if (availableSessionsByUrl.get(url).isEmpty()) {
-            return url;
+        if (availableSessionsByUrl.get(serverInfo.getLocation()).isEmpty()) {
+            return serverInfo.getLocation();
         }
         
         return null;
@@ -96,6 +97,12 @@ public class WebsocketSessionManager {
         }
         
         return sessions.stream().filter(s -> s.isOpen()).collect(Collectors.toList());
+    }
+    
+    public KieServerInfo getServerInfoByUrl(String url) {
+                
+        String sessionId = getByUrl(url).get(0).getId();
+        return this.sessionToUrl.get(sessionId);
     }
     
     public KieServerMessageHandler getHandler(String sessionId) {
