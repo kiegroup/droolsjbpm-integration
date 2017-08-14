@@ -47,9 +47,7 @@ import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
-import static org.hamcrest.core.Is.*;
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
@@ -72,7 +70,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         InMemoryKieServerTemplateStorage.getInstance().clear();
         // Getting info from currently started kie server.
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
-        assumeThat(reply.getType(), is(ServiceResponse.ResponseType.SUCCESS));
+        KieServerAssert.assertSuccess(reply);
         kieServerInfo = reply.getResult();
     }
 
@@ -557,52 +555,60 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
     }
 
     @Test
-    public void testUpdateContainerConfigSent() {
+    public void testUpdateContainerConfigSent() throws Exception {
         // The usual setup of the kie-server along with a container spec
         ServerTemplate serverTemplate = createServerTemplate();
-        Map<Capability, ContainerConfig> containerConfigMap = new HashMap();
+        Map<Capability, ContainerConfig> containerConfigMap = new HashMap<>();
         ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
         containerConfigMap.put(Capability.PROCESS, processConfig);
-        RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.STARTED);
+        RuleConfig ruleConfig = new RuleConfig(500L, KieScannerStatus.STARTED);
         containerConfigMap.put(Capability.RULE, ruleConfig);
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
 
         // Tell the controller to save the spec for the given template, which since the
         // container status is STARTED should also cause it to be deployed to the kie-server
         mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         checkContainerConfigAgainstServer(processConfig,ruleConfig);
 
         // Update the container configuration, turning off the scanner
-        ruleConfig = new RuleConfig(1000l, KieScannerStatus.STOPPED);
+        ruleConfig.setScannerStatus(KieScannerStatus.STOPPED);
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STOPPED);
         checkContainerConfigAgainstServer(ruleConfig);
 
         processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+        KieServerSynchronization.waitForKieServerConfig(client, CONTAINER_ID, "MergeMode", "OVERRIDE_ALL");
         checkContainerConfigAgainstServer(processConfig);
 
         // Restart the scanner with the new interval
         ruleConfig.setScannerStatus(KieScannerStatus.STARTED);
+        ruleConfig.setPollInterval(1000L);
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+        KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STARTED, 1000L);
         checkContainerConfigAgainstServer(ruleConfig,processConfig);
     }
 
     @Test
-    public void testDeleteContainerStopsContainer() {
+    public void testDeleteContainerStopsContainer() throws Exception {
         ServerTemplate serverTemplate = createServerTemplate();
-        Map<Capability, ContainerConfig> containerConfigMap = new HashMap();
+        Map<Capability, ContainerConfig> containerConfigMap = new HashMap<>();
 
         ContainerSpec containerSpec = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
         mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
+        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
 
         ServiceResponse<KieServerStateInfo> response = client.getServerState();
-        assumeThat(response.getType(), is(ServiceResponse.ResponseType.SUCCESS));
+        KieServerAssert.assertSuccess(response);
 
         KieServerStateInfo serverState = response.getResult();
         assertNotNull(serverState);
         assertTrue("Expected to find containers, but none were found", serverState.getContainers() != null && serverState.getContainers().size() > 0);
 
         mgmtControllerClient.deleteContainerSpec(serverTemplate.getId(), CONTAINER_ID);
+        KieServerSynchronization.waitForKieServerSynchronization(client, 0);
+
         response = client.getServerState();
         serverState = response.getResult();
         assertNotNull(serverState);
@@ -611,14 +617,14 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
     protected void checkContainerConfigAgainstServer(ContainerConfig...configs) {
         ServiceResponse<KieContainerResource> containerResource = client.getContainerInfo(CONTAINER_ID);
-        assumeThat(containerResource.getType(), is(ServiceResponse.ResponseType.SUCCESS));
+        KieServerAssert.assertSuccess(containerResource);
 
         KieContainerResource kcr = containerResource.getResult();
         assertNotNull(kcr);
         for (ContainerConfig config: configs) {
             if (config instanceof ProcessConfig) {
                 ProcessConfig pc = (ProcessConfig)config;
-                Map<String, String> configMap = new HashMap();
+                Map<String, String> configMap = new HashMap<>();
                 configMap.put("KBase", pc.getKBase());
                 configMap.put("KSession", pc.getKSession());
                 configMap.put("MergeMode", pc.getMergeMode());
