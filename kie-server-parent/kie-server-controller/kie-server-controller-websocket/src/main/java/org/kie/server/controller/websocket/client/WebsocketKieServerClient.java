@@ -26,6 +26,7 @@ import javax.websocket.Session;
 
 import org.kie.api.command.Command;
 import org.kie.internal.process.CorrelationKey;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.commands.CommandScript;
 import org.kie.server.api.commands.CreateContainerCommand;
 import org.kie.server.api.commands.DescriptorCommand;
@@ -38,6 +39,7 @@ import org.kie.server.api.commands.GetServerStateCommand;
 import org.kie.server.api.commands.ListContainersCommand;
 import org.kie.server.api.commands.UpdateReleaseIdCommand;
 import org.kie.server.api.commands.UpdateScannerCommand;
+import org.kie.server.api.exception.KieServicesException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
@@ -71,15 +73,19 @@ public class WebsocketKieServerClient implements KieServicesClient {
     
     private WebsocketSessionManager manager = WebsocketSessionManager.getInstance();
     private String url;
-    
+    private KieServerInfo serverInfo;
     
     public WebsocketKieServerClient(String url) {
         this.url = url;
+        this.serverInfo = manager.getServerInfoByUrl(url);
     }
 
     @Override
     public <T> T getServicesClient(Class<T> serviceClient) {
         if (QueryServicesClient.class.isAssignableFrom(serviceClient)) {
+            if (!serverInfo.getCapabilities().contains(KieServerConstants.CAPABILITY_BPM)) {
+                throw new KieServicesException("Server that this client is connected to has no capabilities to handle " + serviceClient.getSimpleName());
+            }
             return (T) new QueryServicesClient() {
                 
                 
