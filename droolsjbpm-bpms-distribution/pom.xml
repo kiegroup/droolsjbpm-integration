@@ -252,6 +252,11 @@
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
       <artifactId>jboss-jacc-api_1.5_spec</artifactId>
     </dependency>
+    <dependency>
+      <groupId>simple-jndi</groupId>
+      <artifactId>simple-jndi</artifactId>
+      <scope>compile</scope>
+    </dependency>
 
   </dependencies>
 </project>
