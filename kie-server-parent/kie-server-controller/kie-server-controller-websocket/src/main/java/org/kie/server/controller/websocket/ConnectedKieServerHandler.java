@@ -55,7 +55,7 @@ public class ConnectedKieServerHandler implements InternalMessageHandler {
         String contentType = MarshallingFormat.JSON.getType();
         
         serverInfo = WebsocketUtils.unmarshal(message, contentType, KieServerInfo.class);
-        manager.addSession(serverInfo.getLocation(), session);
+        manager.addSession(serverInfo, session);
         
         logger.debug("Server info {}", serverInfo);
         KieServerSetup serverSetup = controller.connect(serverInfo);

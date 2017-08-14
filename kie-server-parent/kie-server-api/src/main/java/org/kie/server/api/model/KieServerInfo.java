@@ -114,6 +114,7 @@ public class KieServerInfo {
                 "serverId='" + serverId + '\'' +
                 ", version='" + version + '\'' +
                 ", location='" + location + '\'' +
+                ", capabilities=" + capabilities  +
                 '}';
     }
 }
