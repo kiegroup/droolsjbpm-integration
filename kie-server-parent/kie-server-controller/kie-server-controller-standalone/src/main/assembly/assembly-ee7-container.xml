@@ -46,6 +46,7 @@
     <dependencySet>
       <excludes>
         <exclude>org.jboss.resteasy:resteasy-jaxrs</exclude>
+        <exclude>org.jboss.spec.javax.ws.rs:*</exclude>
       </excludes>
       <includes>
         <include>org.kie.server:kie-server-controller-api</include>
