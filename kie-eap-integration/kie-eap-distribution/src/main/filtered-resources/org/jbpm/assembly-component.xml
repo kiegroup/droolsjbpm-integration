@@ -43,7 +43,12 @@
         <include>org.jbpm:jbpm-runtime-manager</include>
         <include>org.jbpm:jbpm-services-api</include>
         <include>org.jbpm:jbpm-shared-services</include>
-        <include>org.jbpm:jbpm-workitems</include>
+        <include>org.jbpm:jbpm-workitems-core</include>
+        <include>org.jbpm:jbpm-workitems-bpmn2</include>
+        <include>org.jbpm:jbpm-workitems-email</include>
+        <include>org.jbpm:jbpm-workitems-jms</include>
+        <include>org.jbpm:jbpm-workitems-rest</include>
+        <include>org.jbpm:jbpm-workitems-webservice</include>
       </includes>
       <outputDirectory>modules/system/layers/bpms/org/jbpm/main</outputDirectory>
       <outputFileNameMapping>${artifact.artifactId}-${version.org.kie}.${artifact.extension}</outputFileNameMapping>
