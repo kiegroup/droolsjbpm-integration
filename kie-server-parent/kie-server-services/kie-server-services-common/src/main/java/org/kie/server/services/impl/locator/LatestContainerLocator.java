@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
+import org.kie.api.builder.ReleaseIdComparator.ComparableVersion;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.services.api.ContainerLocator;
 import org.kie.server.services.api.KieContainerInstance;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Finds latest container for given alias based on GAV comparison.
  * It searches by same group id and artifact id and then uses maven resolution
- * to fine the latest version of all found containers.
+ * to find the latest version of all found containers.
  */
 public class LatestContainerLocator implements ContainerLocator {
     private static final Logger logger = LoggerFactory.getLogger(LatestContainerLocator.class);
@@ -48,17 +48,17 @@ public class LatestContainerLocator implements ContainerLocator {
             return alias;
         }
         logger.debug("Searching for latest container for alias {} within available containers {}", alias, containerInstances);
-        List<KieRepositoryImpl.ComparableVersion> comparableVersions = new ArrayList<KieRepositoryImpl.ComparableVersion>();
+        List<ComparableVersion> comparableVersions = new ArrayList<ComparableVersion>();
         Map<String, String> versionToIdentifier = new HashMap<String, String>();
         containerInstances.forEach(c ->
                 {
                     if (c.getStatus().equals(KieContainerStatus.STARTED)) {
-                        comparableVersions.add(new KieRepositoryImpl.ComparableVersion(c.getKieContainer().getReleaseId().getVersion()));
+                        comparableVersions.add(new ComparableVersion(c.getKieContainer().getReleaseId().getVersion()));
                         versionToIdentifier.put(c.getKieContainer().getReleaseId().getVersion(), c.getContainerId());
                     }
                 }
         );
-        KieRepositoryImpl.ComparableVersion latest = Collections.max(comparableVersions);
+        ComparableVersion latest = Collections.max(comparableVersions);
         logger.debug("Latest version for alias {} is {}", alias, comparableVersions);
         return versionToIdentifier.get(latest.toString());
     }
