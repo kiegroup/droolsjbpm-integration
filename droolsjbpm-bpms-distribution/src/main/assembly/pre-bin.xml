@@ -14,7 +14,12 @@
         <include>org.jbpm:jbpm-persistence-jpa</include>
         <include>org.jbpm:jbpm-bpmn2</include>
         <include>org.jbpm:jbpm-audit</include>
-        <include>org.jbpm:jbpm-workitems</include>
+        <include>org.jbpm:jbpm-workitems-core</include>
+        <include>org.jbpm:jbpm-workitems-bpmn2</include>
+        <include>org.jbpm:jbpm-workitems-email</include>
+        <include>org.jbpm:jbpm-workitems-jms</include>
+        <include>org.jbpm:jbpm-workitems-rest</include>
+        <include>org.jbpm:jbpm-workitems-webservice</include>
         <include>org.jbpm:jbpm-services-api</include>
         <include>org.jbpm:jbpm-kie-services</include>
         <include>org.jbpm:jbpm-executor</include>
