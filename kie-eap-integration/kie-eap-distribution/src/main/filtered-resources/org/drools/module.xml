@@ -48,5 +48,7 @@
     <module name="org.slf4j" slot="main" services="import"/>
     <module name="org.eclipse.jdt.core.compiler"/>
     <module name="org.uberfire.maven-support" slot="main" services="import"/>
+    <module name="org.uberfire.project-datamodel-api" slot="main" services="import"/>
+    <module name="org.uberfire.project-datamodel-commons" slot="main" services="import"/>
   </dependencies>
 </module>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="org.uberfire.project-datamodel-commons" slot="main">
+
+  <resources>
+    <resource-root path="uberfire-project-datamodel-commons-${version.org.uberfire}.jar"/>
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" slot="main" services="import"/>
+    <module name="org.uberfire.commons" slot="main" services="import"/>
+  </dependencies>
+</module>
