@@ -25,7 +25,12 @@
     <resource-root path="jbpm-runtime-manager-${version.org.kie}.jar"/>
     <resource-root path="jbpm-services-api-${version.org.kie}.jar"/>
     <resource-root path="jbpm-shared-services-${version.org.kie}.jar"/>
-    <resource-root path="jbpm-workitems-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-core-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-bpmn2-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-email-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-jms-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-rest-${version.org.kie}.jar"/>
+    <resource-root path="jbpm-workitems-webservice-${version.org.kie}.jar"/>
   </resources>
 
   <dependencies>
