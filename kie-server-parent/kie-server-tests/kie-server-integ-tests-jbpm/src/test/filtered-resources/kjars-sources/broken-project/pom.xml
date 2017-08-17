@@ -9,9 +9,9 @@
     <version>1.0.0.Final</version>
   </parent>
 
-  <artifactId>broken-project</artifactId>
-  <version>1.0.0.Final</version>
-  <name>broken-project</name>
+  <artifactId>definition-project</artifactId>
+  <version>1.0.2.Final</version>
+  <name>definition-project</name>
 
   <build>
     <plugins>
