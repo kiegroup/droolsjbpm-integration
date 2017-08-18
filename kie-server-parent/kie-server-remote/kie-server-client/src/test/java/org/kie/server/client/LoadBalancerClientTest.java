@@ -15,6 +15,7 @@
 
 package org.kie.server.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -31,6 +32,7 @@ import org.kie.server.api.model.KieServerStateInfo;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.balancer.BalancerStrategy;
 import org.kie.server.client.balancer.LoadBalancer;
+import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
 import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -216,7 +218,18 @@ public class LoadBalancerClientTest {
 
     @Test
     public void testDefaultLoadBalancerNoServersAvailable() throws Exception {
+        final List<Future<?>> checkFailedEndpointsJob = new ArrayList<>();
+        config.setLoadBalancer(new LoadBalancer(new RoundRobinBalancerStrategy(Arrays.asList(config.getServerUrl().split("\\|")))) {
 
+            @Override
+            public Future<?> checkFailedEndpoints() {
+                Future<?> future = super.checkFailedEndpoints();
+                checkFailedEndpointsJob.add(future);
+                return future;
+            }
+            
+        });
+        
         KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
         ServiceResponse<KieServerInfo> response = client.getServerInfo();
         assertSuccess(response);
@@ -242,10 +255,11 @@ public class LoadBalancerClientTest {
         } catch (KieServerHttpRequestException e) {
             assertEquals("No available endpoints found", e.getMessage());
         }
-        // now let's refresh load balancer info
-        Future waitForResult = ((AbstractKieServicesClientImpl)client).getLoadBalancer().checkFailedEndpoints();
-        waitForResult.get(5, TimeUnit.SECONDS);
-
+        
+        assertEquals(2, checkFailedEndpointsJob.size());
+        Future<?> waitingForJobsToComplete = checkFailedEndpointsJob.get(1);
+        waitingForJobsToComplete.get(5, TimeUnit.SECONDS);
+        
         response = client.getServerInfo();
         assertSuccess(response);
         assertEquals("Server version", "1", response.getResult().getVersion());

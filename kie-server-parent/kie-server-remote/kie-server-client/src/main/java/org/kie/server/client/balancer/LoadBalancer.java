@@ -24,10 +24,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.kie.server.common.rest.KieServerHttpRequest;
-import org.kie.server.common.rest.KieServerHttpRequestException;
 import org.kie.server.client.balancer.impl.RandomBalancerStrategy;
 import org.kie.server.client.balancer.impl.RoundRobinBalancerStrategy;
+import org.kie.server.common.rest.KieServerHttpRequest;
+import org.kie.server.common.rest.KieServerHttpRequestException;
+import org.kie.server.common.rest.NoEndpointFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +48,14 @@ public class LoadBalancer {
     }
 
     public String getUrl() throws KieServerHttpRequestException {
-        String selectedUrl = balancerStrategy.next();
-        logger.debug("Load balancer {} selected url '{}'", balancerStrategy, selectedUrl);
-        return selectedUrl;
+        try {
+            String selectedUrl = balancerStrategy.next();
+            logger.debug("Load balancer {} selected url '{}'", balancerStrategy, selectedUrl);
+            return selectedUrl;
+        } catch (NoEndpointFoundException e) {
+            checkFailedEndpoints();
+            throw e;
+        }
     }
 
     public String markAsFailed(String url) {
