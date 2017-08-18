@@ -28,6 +28,7 @@ import org.jbpm.services.api.DefinitionService;
 import org.jbpm.services.api.DeploymentService;
 import org.jbpm.services.api.RuntimeDataService;
 import org.jbpm.services.api.UserTaskService;
+import org.jbpm.services.api.model.DeployedUnit;
 import org.kie.api.runtime.KieContainer;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.Message;
@@ -145,10 +146,14 @@ public class JBPMUIKieServerExtension implements KieServerExtension {
         List<Message> messages = (List<Message>) parameters.get(KieServerConstants.KIE_SERVER_PARAM_MESSAGES);
         try {
 
-            String kieBaseName = ((KModuleDeploymentUnit)deploymentService.getDeployedUnit(id).getDeploymentUnit()).getKbaseName();
+            DeployedUnit deployedUnit = deploymentService.getDeployedUnit(id);
 
-            KieContainer kieContainer = kieContainerInstance.getKieContainer();
-            imageReferences.putIfAbsent(id, new ImageReference(kieContainer, kieBaseName));
+            if(deployedUnit != null) {
+                String kieBaseName = ((KModuleDeploymentUnit)deployedUnit.getDeploymentUnit()).getKbaseName();
+
+                KieContainer kieContainer = kieContainerInstance.getKieContainer();
+                imageReferences.putIfAbsent(id, new ImageReference(kieContainer, kieBaseName));
+            }
         } catch (Exception e) {
             messages.add(new Message(Severity.WARN, "Unable to create image reference for container " + id +" by extension " + this + " due to " + e.getMessage()));
             logger.warn("Unable to create image reference for container {} due to {}", id, e.getMessage(), e);
