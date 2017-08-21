@@ -37,12 +37,15 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
     private final File repositoryDir;
 
-    private XStream xs = new XStream(new PureJavaReflectionProvider());
+    private XStream xs;
 
     private Map<String, KieServerState> knownStates = new ConcurrentHashMap<String, KieServerState>();
 
     public KieServerStateFileRepository(File repositoryDir) {
         this.repositoryDir = repositoryDir;
+        xs = new XStream(new PureJavaReflectionProvider());
+        String[] voidDeny = {"void.class", "Void.class"};
+        xs.denyTypes(voidDeny);
         xs.alias("kie-server-state", KieServerState.class);
         xs.alias("container", KieContainerResource.class);
         xs.alias("config-item", KieServerConfigItem.class);
