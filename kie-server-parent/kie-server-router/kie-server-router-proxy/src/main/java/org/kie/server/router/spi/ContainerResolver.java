@@ -15,11 +15,12 @@
 
 package org.kie.server.router.spi;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.kie.server.router.ContainerInfo;
 
 import io.undertow.server.HttpServerExchange;
-import org.kie.server.router.ContainerInfo;
 
 /**
  * Responsible for finding the proper container to deal with request
@@ -35,6 +36,6 @@ public interface ContainerResolver {
      * @param containerInfoPerContainer set of known containers with mapped details
      * @return actual container id if found otherwise <code>NOT_FOUND</code> should be returned
      */
-    String resolveContainerId(HttpServerExchange exchange, Map<String, Set<ContainerInfo>> containerInfoPerContainer);
+    String resolveContainerId(HttpServerExchange exchange, Map<String, List<ContainerInfo>> containerInfoPerContainer);
 
 }

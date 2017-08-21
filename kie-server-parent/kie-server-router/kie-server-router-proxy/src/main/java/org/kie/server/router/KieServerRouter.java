@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -94,10 +95,11 @@ public class KieServerRouter {
         }
         AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
         final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
-        Map<String, Set<String>> perContainer = configuration.getHostsPerContainer();
+        Map<String, List<String>> perContainer = configuration.getHostsPerContainer();
 
-        for (Map.Entry<String, Set<String>> entry : perContainer.entrySet()) {
-            entry.getValue().forEach(url -> {
+        for (Map.Entry<String, List<String>> entry : perContainer.entrySet()) {
+            Set<String> uniqueUrls = new LinkedHashSet<>(entry.getValue());
+            uniqueUrls.forEach(url -> {
                 proxyClient.addContainer(entry.getKey(), URI.create(url));
             });
         }
@@ -149,7 +151,7 @@ public class KieServerRouter {
             return;
         }
         try {
-            String jsonResponse = HttpUtils.putHttpCall(CONTROLLER + "/server/kie-server-router", SERVER_INFO_JSON);
+            String jsonResponse = HttpUtils.putHttpCall(CONTROLLER + "/server/" + KieServerInfoHandler.getRouterId(), SERVER_INFO_JSON);
             log.debugf("Controller response :: ", jsonResponse);
             List<String> containers = new ArrayList<>();
 
@@ -179,7 +181,7 @@ public class KieServerRouter {
             return;
         }
         try {
-            HttpUtils.deleteHttpCall(CONTROLLER + "/server/kie-server-router/?location="+ URLEncoder.encode(KieServerInfoHandler.getLocationUrl(), "UTF-8"));
+            HttpUtils.deleteHttpCall(CONTROLLER + "/server/" + KieServerInfoHandler.getRouterId() + "/?location="+ URLEncoder.encode(KieServerInfoHandler.getLocationUrl(), "UTF-8"));
             log.infof("KieServerRouter disconnected from controller at " + CONTROLLER);
         } catch (Exception e) {
             log.error("Error when disconnecting from controller at " + CONTROLLER, e);
