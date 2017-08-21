@@ -15,6 +15,7 @@
 
 package org.kie.server.integrationtests.jbpm;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +35,6 @@ import org.kie.server.api.model.Severity;
 import org.kie.server.api.model.definition.UserTaskDefinition;
 import org.kie.server.api.model.definition.UserTaskDefinitionList;
 import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.impl.AbstractKieServicesClientImpl;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 
@@ -44,6 +44,8 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
             "1.0.0.Final");
     private static final ReleaseId releaseId101 = new ReleaseId("org.kie.server.testing", "definition-project",
             "1.0.1.Final");
+    private static final ReleaseId releaseIdBroken = new ReleaseId("org.kie.server.testing", "definition-project",
+            "1.0.2.Final");
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -138,11 +140,9 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
      
         ServiceResponse<KieContainerResource> createNotExsting = client.createContainer(
                 "broken-project", 
-                new KieContainerResource("broken-project",
-                        new ReleaseId(
-                                "org.kie.server.testing", 
-                                "broken-project",
-                                "1.0.0.Final")));
+                new KieContainerResource(
+                        "broken-project",
+                        releaseIdBroken));
         KieServerAssert.assertFailure(createNotExsting);
                
         response = client.getContainerInfo("broken-project");
@@ -152,6 +152,32 @@ public class ContainerUpdateIntegrationTest extends JbpmKieServerBaseIntegration
         assertEquals("Shound have one message", 1, resource.getMessages().size());
         message = resource.getMessages().get(0);
         assertEquals("Message should be of type error", Severity.ERROR, message.getSeverity());
+    }
+
+    @Test
+    public void testMessagesOfContainerUpdateContainerToBroken() throws Exception {
+        ServiceResponse<KieContainerResource> response = client.getContainerInfo(CONTAINER_ID);
+        KieServerAssert.assertSuccess(response);
+
+        KieContainerResource resource = response.getResult();
+        assertThat(resource.getMessages()).as("Shound have one message").hasSize(1);
+        Message message = resource.getMessages().get(0);
+        assertThat(message.getSeverity()).as("Message should be of type info").isEqualTo(Severity.INFO);
+
+        ServiceResponse<ReleaseId> updateReleaseId = client.updateReleaseId(CONTAINER_ID, releaseIdBroken);
+        KieServerAssert.assertFailure(updateReleaseId);
+
+        response = client.getContainerInfo(CONTAINER_ID);
+        KieServerAssert.assertSuccess(response);
+
+        resource = response.getResult();
+        assertThat(resource.getMessages()).as("Shound have two messages").hasSize(2);
+        message = resource.getMessages().get(0);
+        assertThat(message.getSeverity()).as("Message should be of type error").isEqualTo(Severity.ERROR);
+        message = resource.getMessages().get(1);
+        assertThat(message.getSeverity()).as("Message should be of type warn").isEqualTo(Severity.WARN);
+        assertThat(message.getMessages()).hasSize(1);
+        assertThat(message.getMessages().iterator().next()).contains("release id returned back");
     }
 
     protected Map<String, UserTaskDefinition> mapByName(List<UserTaskDefinition> taskDefinitions) {
