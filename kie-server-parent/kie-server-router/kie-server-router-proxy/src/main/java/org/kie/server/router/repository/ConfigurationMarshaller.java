@@ -17,6 +17,7 @@ package org.kie.server.router.repository;
 
 import java.io.Reader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -31,16 +32,16 @@ import org.kie.server.router.ContainerInfo;
 public class ConfigurationMarshaller {
 
     public String marshall(Configuration configuration) throws Exception {
-        Map<String, Set<String>> perContainer = configuration.getHostsPerContainer();
-        Map<String, Set<String>> perServer = configuration.getHostsPerServer();
-        Map<String, Set<ContainerInfo>> containerInfo = configuration.getContainerInfosPerContainer();
+        Map<String, List<String>> perContainer = configuration.getHostsPerContainer();
+        Map<String, List<String>> perServer = configuration.getHostsPerServer();
+        Map<String, List<ContainerInfo>> containerInfo = configuration.getContainerInfosPerContainer();
         
         JSONArray servers = new JSONArray();
         JSONArray containers = new JSONArray();
         JSONArray infos = new JSONArray();
         JSONObject config = new JSONObject();            
         
-        for (Entry<String, Set<String>> entry : perContainer.entrySet()) {
+        for (Entry<String, List<String>> entry : perContainer.entrySet()) {
             JSONArray array = new JSONArray();
             entry.getValue().forEach(url -> array.put(url));
             
@@ -50,7 +51,7 @@ public class ConfigurationMarshaller {
             containers.put(container);
         }
         
-        for (Entry<String, Set<String>> entry : perServer.entrySet()) {
+        for (Entry<String, List<String>> entry : perServer.entrySet()) {
             JSONArray array = new JSONArray();
             entry.getValue().forEach(url -> array.put(url));
             
@@ -60,7 +61,7 @@ public class ConfigurationMarshaller {
             servers.put(server);
         }
         Set<String> processed = new HashSet<>();
-        for (Entry<String, Set<ContainerInfo>> entry : containerInfo.entrySet()) {
+        for (Entry<String, List<ContainerInfo>> entry : containerInfo.entrySet()) {
             if (processed.contains(entry.getKey())) {
                 continue;
             }
