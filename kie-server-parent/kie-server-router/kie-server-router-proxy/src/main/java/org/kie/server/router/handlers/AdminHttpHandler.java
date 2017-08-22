@@ -15,14 +15,11 @@
 
 package org.kie.server.router.handlers;
 
-import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jboss.logging.Logger;
@@ -30,20 +27,18 @@ import org.json.JSONObject;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouterConstants;
-import org.kie.server.router.proxy.KieServerProxyClient;
 import org.kie.server.router.proxy.aggragate.JSONResponseAggregator;
 import org.kie.server.router.proxy.aggragate.JaxbXMLResponseAggregator;
 import org.kie.server.router.proxy.aggragate.ResponseAggregator;
 import org.kie.server.router.proxy.aggragate.XstreamXMLResponseAggregator;
 import org.kie.server.router.repository.ConfigurationMarshaller;
-import org.kie.server.router.repository.FileRepository;
+import org.kie.server.router.spi.ConfigRepository;
+import org.kie.server.router.utils.HttpUtils;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
-import org.kie.server.router.spi.ConfigRepository;
-import org.kie.server.router.utils.HttpUtils;
 
 public class AdminHttpHandler implements HttpHandler {
     
@@ -136,7 +131,7 @@ public class AdminHttpHandler implements HttpHandler {
                                 .replaceFirst("#3@", gav[0])
                                 .replaceFirst("#4@", gav[1])
                                 .replaceFirst("#5@", gav[2]);
-                        HttpUtils.putHttpCall(CONTROLLER + "/management/servers/kie-server-router/containers/" + containerId, jsonPayload);
+                        HttpUtils.putHttpCall(CONTROLLER + "/management/servers/" + KieServerInfoHandler.getRouterId() + "/containers/" + containerId, jsonPayload);
                         controllerContainers.add(containerId);
                         log.infof("Added %s container into controller at %s ", containerId, CONTROLLER);
                     } catch (Exception e) {
@@ -154,17 +149,17 @@ public class AdminHttpHandler implements HttpHandler {
                     configuration.removeContainerHost(alias, serverUrl);
                     configuration.removeServerHost(serverId, serverUrl);
 
-                    configuration.removeContainerInfo(containerInfo.getContainerId(), containerInfo.getAlias());
+                    configuration.removeContainerInfo(containerInfo);
                     
                     repository.persist(configuration);
                 }
 
                 if (CONTROLLER != null && controllerContainers.contains(containerId)) {
-                    Set<String> hostsPerContainer = configuration.getHostsPerContainer().getOrDefault(containerId, Collections.EMPTY_SET);
+                    List<String> hostsPerContainer = configuration.getHostsPerContainer().getOrDefault(containerId, Collections.emptyList());
                     if (hostsPerContainer.isEmpty()) {
 
                         try {
-                            HttpUtils.deleteHttpCall(CONTROLLER + "/management/servers/kie-server-router/containers/" + containerId);
+                            HttpUtils.deleteHttpCall(CONTROLLER + "/management/servers/" + KieServerInfoHandler.getRouterId() + "/containers/" + containerId);
                             controllerContainers.remove(containerId);
                             log.infof("Removed %s container from controller at %s ", containerId, CONTROLLER);
                         } catch (Exception e) {
@@ -185,7 +180,7 @@ public class AdminHttpHandler implements HttpHandler {
         });        
     }
     
-    public Map<String, Set<String>> getHostsPerServer() {
+    public Map<String, List<String>> getHostsPerServer() {
         return configuration.getHostsPerServer();
     }
 
