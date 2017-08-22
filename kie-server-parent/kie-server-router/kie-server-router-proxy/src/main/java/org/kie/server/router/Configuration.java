@@ -15,39 +15,39 @@
 
 package org.kie.server.router;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Configuration {
 
-    private Map<String, Set<String>> hostsPerServer = new ConcurrentHashMap<>();
-    private Map<String, Set<String>> hostsPerContainer = new ConcurrentHashMap<>();
-    private Map<String, Set<ContainerInfo>> containerInfosPerContainer = new ConcurrentHashMap<>();
+    private Map<String, List<String>> hostsPerServer = new ConcurrentHashMap<>();
+    private Map<String, List<String>> hostsPerContainer = new ConcurrentHashMap<>();
+    private Map<String, List<ContainerInfo>> containerInfosPerContainer = new ConcurrentHashMap<>();
 
     private Set<ConfigurationListener> listeners = new CopyOnWriteArraySet<>();
     
-    public Map<String, Set<String>> getHostsPerServer() {
+    public Map<String, List<String>> getHostsPerServer() {
         return hostsPerServer;
     }
     
-    public Map<String, Set<String>> getHostsPerContainer() {
+    public Map<String, List<String>> getHostsPerContainer() {
         return hostsPerContainer;
     }
 
-    public Map<String, Set<ContainerInfo>> getContainerInfosPerContainer() {
+    public Map<String, List<ContainerInfo>> getContainerInfosPerContainer() {
         return containerInfosPerContainer;
     }
 
     public void addContainerHost(String containerId, String serverUrl) {
-        Set<String> hosts = hostsPerContainer.get(containerId);
+        List<String> hosts = hostsPerContainer.get(containerId);
         if (hosts == null) {
-            hosts = new LinkedHashSet<>();
+            hosts = new ArrayList<>();
             hostsPerContainer.put(containerId, hosts);
         }
         hosts.add(serverUrl);
@@ -56,9 +56,9 @@ public class Configuration {
     }
     
     public void addServerHost(String serverId, String serverUrl) {
-        Set<String> hosts = hostsPerServer.get(serverId);
+        List<String> hosts = hostsPerServer.get(serverId);
         if (hosts == null) {
-            hosts = new LinkedHashSet<>();
+            hosts = new ArrayList<>();
             hostsPerServer.put(serverId, hosts);
         }
         hosts.add(serverUrl);
@@ -67,23 +67,23 @@ public class Configuration {
     }
 
     public void addContainerInfo(ContainerInfo containerInfo) {
-        Set<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
+        List<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
         if (containersByAlias == null) {
-            containersByAlias = new LinkedHashSet<>();
+            containersByAlias = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getAlias(), containersByAlias);
         }
         containersByAlias.add(containerInfo);
 
-        Set<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+        List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
         if (containersById == null) {
-            containersById = new LinkedHashSet<>();
+            containersById = new ArrayList<>();
             containerInfosPerContainer.put(containerInfo.getContainerId(), containersById);
         }
         containersById.add(containerInfo);
     }
     
     public void removeContainerHost(String containerId, String serverUrl) {
-        Set<String> hosts = hostsPerContainer.get(containerId);
+        List<String> hosts = hostsPerContainer.get(containerId);
         if (hosts != null) {
             hosts.remove(serverUrl);
         }
@@ -92,7 +92,7 @@ public class Configuration {
     }
     
     public void removeServerHost(String serverId, String serverUrl) {
-        Set<String> hosts = hostsPerServer.get(serverId);
+        List<String> hosts = hostsPerServer.get(serverId);
         if (hosts != null) {
             hosts.remove(serverUrl);
         }
@@ -100,14 +100,21 @@ public class Configuration {
         this.listeners.forEach(l -> l.onServerRemoved(serverId, serverUrl));
     }
 
-    public void removeContainerInfo(String containerId, String alias) {
-        Set<String> hosts = hostsPerContainer.getOrDefault(containerId, Collections.emptySet());
+    public void removeContainerInfo(ContainerInfo containerInfo) {
+        List<ContainerInfo> containersById = containerInfosPerContainer.get(containerInfo.getContainerId());
+        containersById.remove(containerInfo);
+        
+        List<String> hosts = hostsPerContainer.getOrDefault(containerInfo.getContainerId(), Collections.emptyList());
         if (hosts.isEmpty()) {
-            containerInfosPerContainer.remove(containerId);
+            containerInfosPerContainer.remove(containerInfo.getContainerId());
         }
-        hosts = hostsPerContainer.getOrDefault(alias, Collections.emptySet());
+        
+        List<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
+        containersByAlias.remove(containerInfo);
+        
+        hosts = hostsPerContainer.getOrDefault(containerInfo.getAlias(), Collections.emptyList());
         if (hosts.isEmpty()) {
-            containerInfosPerContainer.remove(alias);
+            containerInfosPerContainer.remove(containerInfo.getAlias());
         }
     }
 
@@ -116,8 +123,8 @@ public class Configuration {
         String serverId = null;
 
         // locate server id for request url
-        for (Map.Entry<String, Set<String>> entry : hostsPerServer.entrySet()) {
-            Set<String> hosts = entry.getValue();
+        for (Map.Entry<String, List<String>> entry : hostsPerServer.entrySet()) {
+            List<String> hosts = entry.getValue();
 
             for (String host : hosts) {
                 if (requestURL.startsWith(host)) {
@@ -136,8 +143,8 @@ public class Configuration {
         // locate containers for request url
         Set<String> containers = new HashSet<>();
 
-        for (Map.Entry<String, Set<String>> entry : hostsPerContainer.entrySet()) {
-            Set<String> hosts = entry.getValue();
+        for (Map.Entry<String, List<String>> entry : hostsPerContainer.entrySet()) {
+            List<String> hosts = entry.getValue();
 
             for (String host : hosts) {
                 if (requestURL.startsWith(host)) {
@@ -169,17 +176,17 @@ public class Configuration {
     }
 
     public void addEmptyContainerHost(String containerId) {
-        Set<String> hosts = hostsPerContainer.get(containerId);
+        List<String> hosts = hostsPerContainer.get(containerId);
         if (hosts == null) {
-            hosts = new LinkedHashSet<>();
+            hosts = new ArrayList<>();
             hostsPerContainer.put(containerId, hosts);
         }
     }
 
     public void addEmptyServerHost(String serverId) {
-        Set<String> hosts = hostsPerServer.get(serverId);
+        List<String> hosts = hostsPerServer.get(serverId);
         if (hosts == null) {
-            hosts = new LinkedHashSet<>();
+            hosts = new ArrayList<>();
             hostsPerServer.put(serverId, hosts);
         }
     }
