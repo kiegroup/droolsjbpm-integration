@@ -112,11 +112,15 @@ public class KieServerStateFileRepository implements KieServerStateRepository {
 
     protected void populateWithSystemProperties(KieServerConfig config) {
         // populate the config state with system properties that are valid to kie server
-        Properties systemProperties = System.getProperties();
-        for (String property : systemProperties.stringPropertyNames()) {
+        populateWithProperties(config, System.getProperties());
+    }
+
+    void populateWithProperties(KieServerConfig config, Properties properties) {
+        // populate the config state with properties that are valid to kie server
+        for (String property : properties.stringPropertyNames()) {
 
             if (property.startsWith("org.kie.server") || property.startsWith("org.kie.executor")) {
-                KieServerConfigItem configItem = new KieServerConfigItem(property, systemProperties.getProperty(property), String.class.getName());
+                KieServerConfigItem configItem = new KieServerConfigItem(property, properties.getProperty(property), String.class.getName());
                 config.addConfigItem(configItem);
             }
         }

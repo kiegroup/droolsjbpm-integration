@@ -40,6 +40,7 @@ public class KieServerConstants {
     public static final String KIE_SERVER_JAAS_DOMAIN = "org.kie.server.domain";
     public static final String KIE_SERVER_CONTROLLER = "org.kie.server.controller";
     public static final String KIE_SERVER_STATE_REPO = "org.kie.server.repo";
+    public static final String KIE_SERVER_CONTAINER_DEPLOYMENT = "org.kie.server.container.deployment";
     public static final String KIE_SERVER_CONTAINER_LOCATOR = "org.kie.server.container.locator";
     public static final String KIE_SERVER_ACTIVATE_POLICIES = "org.kie.server.policy.activate";
 
