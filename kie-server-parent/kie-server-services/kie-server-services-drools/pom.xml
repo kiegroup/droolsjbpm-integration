@@ -51,6 +51,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- appformer workbench models -->
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-project-datamodel-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <!-- drools workbench models -->
     <dependency>
       <groupId>org.drools</groupId>

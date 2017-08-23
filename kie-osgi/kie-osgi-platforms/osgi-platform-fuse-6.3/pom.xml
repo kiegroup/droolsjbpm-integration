@@ -451,6 +451,39 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-commons</artifactId>
+        <version>${version.org.uberfire}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-project-datamodel-api</artifactId>
+        <version>${version.org.uberfire}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-project-datamodel-commons</artifactId>
+        <version>${version.org.uberfire}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-commons</artifactId>
+        <version>${version.org.uberfire}</version>
+        <classifier>tests</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-project-datamodel-api</artifactId>
+        <version>${version.org.uberfire}</version>
+        <classifier>tests</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-project-datamodel-commons</artifactId>
+        <version>${version.org.uberfire}</version>
+        <classifier>tests</classifier>
+      </dependency>
+      <dependency>
         <groupId>org.drools</groupId>
         <artifactId>drools-workbench-models-datamodel-api</artifactId>
         <version>${project.version}</version>
@@ -1610,6 +1643,14 @@
       <!--<scope>test</scope>-->
     <!--</dependency>-->
     <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-commons</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-project-datamodel-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-datamodel-api</artifactId>
     </dependency>
@@ -1619,6 +1660,10 @@
       <!--<classifier>tests</classifier>-->
       <!--<scope>test</scope>-->
     <!--</dependency>-->
+    <dependency>
+      <groupId>org.uberfire</groupId>
+      <artifactId>uberfire-project-datamodel-commons</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.drools</groupId>
       <artifactId>drools-workbench-models-commons</artifactId>

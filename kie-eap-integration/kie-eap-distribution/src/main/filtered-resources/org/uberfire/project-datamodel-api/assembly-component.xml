@@ -17,17 +17,17 @@
 
   <files>
     <file>
-      <source>${project.build.outputDirectory}/org/uberfire/maven-integration/module.xml</source>
-      <outputDirectory>modules/system/layers/bpms/org/uberfire/maven-integration/main</outputDirectory>
+      <source>${project.build.outputDirectory}/org/uberfire/project-datamodel-api/module.xml</source>
+      <outputDirectory>modules/system/layers/bpms/org/uberfire/project-datamodel-api/main</outputDirectory>
     </file>
   </files>
   <dependencySets>
     <dependencySet>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
-        <include>org.uberfire:uberfire-maven-integration</include>
+        <include>org.uberfire:uberfire-project-datamodel-api</include>
       </includes>
-      <outputDirectory>modules/system/layers/bpms/org/uberfire/maven-integration/main</outputDirectory>
+      <outputDirectory>modules/system/layers/bpms/org/uberfire/project-datamodel-api/main</outputDirectory>
       <outputFileNameMapping>${artifact.artifactId}-${version.org.uberfire}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
   </dependencySets>
