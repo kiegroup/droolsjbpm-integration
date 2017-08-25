@@ -90,9 +90,7 @@ public class KieServerRouter {
         System.setProperty(KieServerRouterConstants.ROUTER_PORT, port.toString());
 
         Configuration configuration = repository.load();
-        if (configuration == null) {
-            configuration = new Configuration();
-        }
+        
         AdminHttpHandler adminHandler = new AdminHttpHandler(configuration, repository);
         final KieServerProxyClient proxyClient = new KieServerProxyClient(configuration, adminHandler);
         Map<String, List<String>> perContainer = configuration.getHostsPerContainer();
@@ -137,6 +135,7 @@ public class KieServerRouter {
         disconnectToController();
         if (server != null) {
             server.stop();
+            repository.close();
             if (clean) {
                 repository.clean();
             }

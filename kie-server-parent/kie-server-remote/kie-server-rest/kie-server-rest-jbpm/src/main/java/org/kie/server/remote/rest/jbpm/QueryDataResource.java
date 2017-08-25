@@ -322,6 +322,9 @@ public class QueryDataResource {
                                          conversationIdHeader );
         } catch ( Exception e ) {
             Throwable root = ExceptionUtils.getRootCause( e );
+            if ( root == null ) {
+                root = e;
+            }
             if ( HttpStatusCodeException.BAD_REQUEST.contains( root.getClass() ) || e instanceof DataSetLookupException) {
 
                 logger.error( "{}",
