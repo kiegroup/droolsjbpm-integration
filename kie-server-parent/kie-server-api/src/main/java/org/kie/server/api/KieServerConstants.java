@@ -86,6 +86,8 @@ public class KieServerConstants {
     public static final String CFG_JBPM_TASK_CLEANUP_LISTENER = "org.jbpm.task.cleanup.enabled";
     public static final String CFG_JBPM_TASK_BAM_LISTENER = "org.jbpm.task.bam.enabled";
     public static final String CFG_JBPM_PROCESS_IDENTITY_LISTENER = "org.jbpm.process.identity.enabled";
+    
+    public static final String CFG_DEFAULT_QUERY_DEFS_LOCATION = "org.jbpm.query.definitions.location";
 
     public static final String CFG_KIE_MVN_SETTINGS = "kie.maven.settings.custom";
 
@@ -132,4 +134,5 @@ public class KieServerConstants {
 
     public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";
     public static final String CFG_KIE_SERVER_JMS_SESSION_ACK = "org.kie.server.jms.session.ack";
+
 }

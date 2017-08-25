@@ -30,6 +30,11 @@ public class FileRepository implements ConfigRepository {
     private final File repositoryDir; 
     private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
     
+    private Configuration configuration;
+    
+    private ConfigFileWatcher watcher;
+    private boolean configWatcherEnabled = Boolean.parseBoolean(System.getProperty(KieServerRouterConstants.CONFIG_FILE_WATCHER_ENABLED, "false"));
+    
     public FileRepository() {
         this(new File(System.getProperty(KieServerRouterConstants.ROUTER_REPOSITORY_DIR, ".")));
     }
@@ -44,13 +49,16 @@ public class FileRepository implements ConfigRepository {
         
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(new File(repositoryDir, "kie-server-router" + ".json"));
+            File configFile = new File(repositoryDir, "kie-server-router.json");
+            fos = new FileOutputStream(configFile);
             
             String config = marshaller.marshall(configuration);
             
             PrintWriter writer = new PrintWriter(fos);
             writer.write(config);
             writer.close();
+            
+            configFile.setLastModified(System.currentTimeMillis());
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -66,23 +74,35 @@ public class FileRepository implements ConfigRepository {
 
     @Override
     public Configuration load() {
-        Configuration configuration = new Configuration();
+        this.configuration = new Configuration();
         File serverStateFile = new File(repositoryDir, "kie-server-router" + ".json");
         if (serverStateFile.exists()) {
             try (FileReader reader = new FileReader(serverStateFile)){
                 
-                configuration = marshaller.unmarshall(reader);
-                return configuration;
+                this.configuration = marshaller.unmarshall(reader);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        
-        return null;
+        // setup config file watcher to be updated when changes are discovered
+        if (configWatcherEnabled ) {
+            this.watcher = new ConfigFileWatcher(serverStateFile.getParentFile().getAbsolutePath(), marshaller, configuration);
+            Thread watcherThread = new Thread(watcher, "Kie Router Config Watch Thread");
+            watcherThread.start();
+        }
+        return this.configuration;
     }
 
     @Override
     public void clean() {
         persist(new Configuration());
+    }
+    
+    @Override
+    public void close() {
+        if (watcher != null) {
+            watcher.stop();
+        }
     }
 }

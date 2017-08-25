@@ -24,4 +24,8 @@ public interface ConfigRepository {
     Configuration load();
 
     void clean();
+    
+    default void close() {
+        
+    }
 }
