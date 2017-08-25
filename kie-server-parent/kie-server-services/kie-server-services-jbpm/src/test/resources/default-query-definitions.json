@@ -1,0 +1,51 @@
+[ {
+  "query-name" : "jbpmHumanTasksWithUser",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select t.activationTime, t.actualOwner, t.createdBy, t.createdOn, t.deploymentId, t.description, t.dueDate, t.name, t.parentId, t.priority, t.processId, t.processInstanceId, t.processSessionId, t.status, t.taskId, t.workItemId, t.lastModificationDate, pil.correlationKey, pil.processInstanceDescription , oe.id from AuditTaskImpl t left join PeopleAssignments_PotOwners po on t.taskId=po.task_id left join OrganizationalEntity oe on po.entity_id=oe.id left join ProcessInstanceLog pil on pil.id=t.processInstanceId",
+  "query-target" : "FILTERED_PO_TASK"
+}, {
+  "query-name" : "jbpmProcessInstances",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select log.processInstanceId, log.processId, log.start_date, log.end_date, log.status, log.parentProcessInstanceId, log.outcome, log.duration, log.user_identity, log.processVersion, log.processName, log.correlationKey, log.externalId, log.processInstanceDescription, COALESCE(info.lastModificationDate, log.end_date) as lastModificationDate, COALESCE((select COUNT(errInfo.id) from ExecutionErrorInfo errInfo where errInfo.process_inst_id=log.processInstanceId and errInfo.error_ack=0 group by errInfo.process_inst_id), 0) as errorCount from ProcessInstanceLog log left join ProcessInstanceInfo info on info.InstanceId=log.processInstanceId ",
+  "query-target" : "FILTERED_PROCESS"
+}, {
+  "query-name" : "processesMonitoring",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select log.processInstanceId, log.processId, log.start_date, log.end_date, log.status, log.duration, log.user_identity, log.processVersion, log.processName, log.externalId from ProcessInstanceLog log",
+  "query-target" : "FILTERED_PROCESS"
+}, {
+  "query-name" : "jbpmRequestList",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select ri.id, ri.timestamp, ri.status, ri.commandName, ri.message, ri.businessKey, ri.retries, ri.executions, pil.processName, pil.processInstanceId, pil.processInstanceDescription from RequestInfo ri left join ProcessInstanceLog pil on pil.processInstanceId=ri.processInstanceId",
+  "query-target" : "CUSTOM"
+}, {
+  "query-name" : "jbpmExecutionErrorList",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select eri.ERROR_ACK, eri.ERROR_ACK_BY, eri.ERROR_ACK_AT, eri.ACTIVITY_ID, eri.ACTIVITY_NAME, eri.DEPLOYMENT_ID, eri.ERROR_DATE, eri.ERROR_ID, eri.ERROR_MSG, eri.JOB_ID, eri.PROCESS_ID, eri.PROCESS_INST_ID, eri.ERROR_TYPE from ExecutionErrorInfo eri ",
+  "query-target" : "CUSTOM"
+}, {
+  "query-name" : "tasksMonitoring",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select p.processName, p.externalId, t.taskId, t.taskName, t.status, t.createdDate, t.startDate, t.endDate, t.processInstanceId, t.userId, t.duration from ProcessInstanceLog p inner join BAMTaskSummary t on (t.processInstanceId = p.processInstanceId) inner join (select min(pk) as pk from BAMTaskSummary group by taskId) d on t.pk = d.pk",
+  "query-target" : "FILTERED_PROCESS"
+}, {
+  "query-name" : "jbpmProcessInstancesWithVariables",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select vil.processInstanceId, vil.processId, vil.id, vil.variableId, vil.value from VariableInstanceLog vil where vil.id = (select MAX(v.id) from VariableInstanceLog v where v.variableId = vil.variableId and v.processInstanceId = vil.processInstanceId)",
+  "query-target" : "CUSTOM"
+}, {
+  "query-name" : "jbpmHumanTasksWithAdmin",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select t.activationTime, t.actualOwner, t.createdBy, t.createdOn, t.deploymentId, t.description, t.dueDate, t.name, t.parentId, t.priority, t.processId, t.processInstanceId, t.processSessionId, t.status, t.taskId, t.workItemId, t.lastModificationDate, pil.correlationKey, pil.processInstanceDescription from AuditTaskImpl t  left join ProcessInstanceLog pil on pil.id=t.processInstanceId",
+  "query-target" : "FILTERED_BA_TASK"
+}, {
+  "query-name" : "jbpmHumanTasks",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select t.activationTime, t.actualOwner, t.createdBy, t.createdOn, t.deploymentId, t.description, t.dueDate, t.name, t.parentId, t.priority, t.processId, t.processInstanceId, t.processSessionId, t.status, t.taskId, t.workItemId, t.lastModificationDate, pil.correlationKey, pil.processInstanceDescription from AuditTaskImpl t left join ProcessInstanceLog pil on pil.id=t.processInstanceId",
+  "query-target" : "CUSTOM"
+}, {
+  "query-name" : "jbpmHumanTasksWithVariables",
+  "query-source" : "${org.kie.server.persistence.ds}",
+  "query-expression" : "select tvi.taskId, (select ati.name from AuditTaskImpl ati where ati.taskId = tvi.taskId) as \"TASKNAME\", tvi.name, tvi.value from TaskVariableImpl tvi",
+  "query-target" : "CUSTOM"
+} ]

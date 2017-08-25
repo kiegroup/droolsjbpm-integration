@@ -361,7 +361,7 @@ public class KieServerInstanceManager {
                                                            RemoteKieServerOperation operation) {
         List<Container> containers = new ArrayList<org.kie.server.controller.api.model.runtime.Container>();
 
-        if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty()) {
+        if (serverTemplate.getServerInstanceKeys() == null || serverTemplate.getServerInstanceKeys().isEmpty() || containerSpec == null) {
 
             return containers;
         }

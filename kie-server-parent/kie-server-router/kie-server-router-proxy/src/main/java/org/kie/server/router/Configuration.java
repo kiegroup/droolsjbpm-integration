@@ -18,6 +18,7 @@ package org.kie.server.router;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,11 +111,13 @@ public class Configuration {
         }
         
         List<ContainerInfo> containersByAlias = containerInfosPerContainer.get(containerInfo.getAlias());
-        containersByAlias.remove(containerInfo);
-        
-        hosts = hostsPerContainer.getOrDefault(containerInfo.getAlias(), Collections.emptyList());
-        if (hosts.isEmpty()) {
-            containerInfosPerContainer.remove(containerInfo.getAlias());
+        if (containersByAlias != null) {
+            containersByAlias.remove(containerInfo);
+            
+            hosts = hostsPerContainer.getOrDefault(containerInfo.getAlias(), Collections.emptyList());
+            if (hosts.isEmpty()) {
+                containerInfosPerContainer.remove(containerInfo.getAlias());
+            }
         }
     }
 
@@ -189,5 +192,84 @@ public class Configuration {
             hosts = new ArrayList<>();
             hostsPerServer.put(serverId, hosts);
         }
+    }
+    
+    public synchronized void reloadFrom(Configuration updated) {
+        this.containerInfosPerContainer = updated.getContainerInfosPerContainer();
+        
+        // remove items if they are not existing in updated configuration        
+        this.hostsPerServer.keySet().forEach(server -> {
+            if (!updated.hostsPerServer.containsKey(server)) {
+                
+                List<String> serverUrls = new ArrayList<>(this.hostsPerServer.remove(server));
+                
+                serverUrls.forEach(url -> removeServerHost(server, url));
+            }
+        });
+        
+        this.hostsPerContainer.keySet().forEach(container -> {
+            if (!updated.hostsPerContainer.containsKey(container)) {
+                
+                List<String> serverUrls = new ArrayList<>(this.hostsPerContainer.remove(container));
+                
+                serverUrls.forEach(url -> removeContainerHost(container, url));
+            }
+        });
+        
+        // update remaining items hosts per server
+        this.hostsPerServer.keySet().forEach(server -> {
+            
+            List<String> serverUrls = this.hostsPerServer.get(server);            
+            List<String> updatedServerUrls = updated.hostsPerServer.remove(server);            
+            Iterator<String> currentIt = serverUrls.iterator();
+            
+            while (currentIt.hasNext()) {
+                String url = currentIt.next();
+                
+                if (updatedServerUrls.contains(url)) {
+                    updatedServerUrls.remove(url);
+                } else {
+                    currentIt.remove();
+                    removeServerHost(server, url);
+                }
+            }
+            
+            // all remaining from updated list add to this configuration
+            updatedServerUrls.forEach(url -> addServerHost(server, url));
+        });
+        // update remaining items hosts per container
+        this.hostsPerContainer.keySet().forEach(container -> {
+            
+            List<String> serverUrls = this.hostsPerContainer.get(container);            
+            List<String> updatedServerUrls = updated.hostsPerContainer.remove(container);            
+            Iterator<String> currentIt = serverUrls.iterator();
+            
+            while (currentIt.hasNext()) {
+                String url = currentIt.next();
+                
+                if (updatedServerUrls.contains(url)) {
+                    updatedServerUrls.remove(url);
+                } else {
+                    currentIt.remove();
+                    removeContainerHost(container, url);
+                }
+            }
+            
+            // all remaining from updated list add to this configuration
+            updatedServerUrls.forEach(url -> addContainerHost(container, url));
+        });
+        
+        // last add all left items
+        updated.hostsPerServer.forEach((server, urls) -> {
+            
+            urls.forEach(url -> addServerHost(server, url));
+        });
+        
+        updated.hostsPerContainer.forEach((container, urls) -> {
+            
+            urls.forEach(url -> addContainerHost(container, url));
+        });
+        
+        this.listeners.forEach(l -> l.onConfigurationReloaded());
     }
 }

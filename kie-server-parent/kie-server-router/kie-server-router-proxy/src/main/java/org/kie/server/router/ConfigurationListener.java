@@ -32,4 +32,8 @@ public interface ConfigurationListener {
     default void onServerRemoved(String serverId, String serverUrl) {
 
     }
+    
+    default void onConfigurationReloaded() {
+
+    }
 }

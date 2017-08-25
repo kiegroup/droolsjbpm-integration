@@ -18,6 +18,7 @@ package org.kie.server.router;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class ConfigurationTest {
 
@@ -125,5 +126,147 @@ public class ConfigurationTest {
 
         assertEquals(1, config.getHostsPerContainer().get("container1").size());       
         assertEquals(1, config.getHostsPerServer().get("server1").size());
+    }
+    
+    @Test
+    public void testReloadFromConfigurationAddedServersAndContainers() {
+        
+        Configuration config = new Configuration();
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addServerHost("server1", "http://localhost:8080/server");
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        
+        Configuration updated = new Configuration();
+        updated.addContainerHost("container1", "http://localhost:8080/server");
+        updated.addServerHost("server1", "http://localhost:8080/server");
+        updated.addContainerHost("container2", "http://localhost:8081/server");
+        updated.addServerHost("server2", "http://localhost:8081/server");
+        ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        updated.addContainerInfo(updatedContainerInfo);
+        
+        config.reloadFrom(updated);
+        
+        assertEquals(2, config.getHostsPerContainer().size());
+        assertEquals(2, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        assertEquals(1, config.getHostsPerContainer().get("container2").size());        
+        assertEquals(1, config.getHostsPerServer().get("server2").size());
+    }
+    
+    @Test
+    public void testReloadFromConfigurationReplacedServersAndContainers() {
+        
+        Configuration config = new Configuration();
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addServerHost("server1", "http://localhost:8080/server");
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        
+        Configuration updated = new Configuration();
+        updated.addContainerHost("container2", "http://localhost:8081/server");
+        updated.addServerHost("server2", "http://localhost:8081/server");
+        ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        updated.addContainerInfo(updatedContainerInfo);
+        
+        config.reloadFrom(updated);
+        
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertNull(config.getHostsPerContainer().get("container1"));        
+        assertNull(config.getHostsPerServer().get("server1"));
+        assertEquals(1, config.getHostsPerContainer().get("container2").size());        
+        assertEquals(1, config.getHostsPerServer().get("server2").size());
+    }
+    
+    @Test
+    public void testReloadFromConfigurationUpdatedUrls() {
+        
+        Configuration config = new Configuration();
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addServerHost("server1", "http://localhost:8080/server");
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        
+        assertEquals("http://localhost:8080/server", config.getHostsPerContainer().get("container1").get(0));        
+        assertEquals("http://localhost:8080/server", config.getHostsPerServer().get("server1").get(0));
+               
+        Configuration updated = new Configuration();
+        updated.addContainerHost("container1", "http://localhost:8081/server");
+        updated.addServerHost("server1", "http://localhost:8081/server");
+        ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        updated.addContainerInfo(updatedContainerInfo);
+        
+        config.reloadFrom(updated);
+        
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+
+        assertEquals("http://localhost:8081/server", config.getHostsPerContainer().get("container1").get(0));        
+        assertEquals("http://localhost:8081/server", config.getHostsPerServer().get("server1").get(0));
+    }
+    
+    @Test
+    public void testReloadFromConfigurationUpdatedAndAddedUrls() {
+        
+        Configuration config = new Configuration();
+        config.addContainerHost("container1", "http://localhost:8080/server");
+        config.addServerHost("server1", "http://localhost:8080/server");
+        ContainerInfo containerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        config.addContainerInfo(containerInfo);
+
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(1, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(1, config.getHostsPerServer().get("server1").size());
+        
+        assertEquals("http://localhost:8080/server", config.getHostsPerContainer().get("container1").get(0));        
+        assertEquals("http://localhost:8080/server", config.getHostsPerServer().get("server1").get(0));
+               
+        Configuration updated = new Configuration();
+        updated.addContainerHost("container1", "http://localhost:8081/server");
+        updated.addServerHost("server1", "http://localhost:8081/server");
+        updated.addContainerHost("container1", "http://localhost:8080/server");
+        updated.addServerHost("server1", "http://localhost:8080/server");
+        ContainerInfo updatedContainerInfo = new ContainerInfo("test1.0", "test", "org.kie:test:1.0");
+        updated.addContainerInfo(updatedContainerInfo);
+        
+        config.reloadFrom(updated);
+        
+        assertEquals(1, config.getHostsPerContainer().size());
+        assertEquals(1, config.getHostsPerServer().size());
+
+        assertEquals(2, config.getHostsPerContainer().get("container1").size());        
+        assertEquals(2, config.getHostsPerServer().get("server1").size());
+
+        assertEquals("http://localhost:8080/server", config.getHostsPerContainer().get("container1").get(0));        
+        assertEquals("http://localhost:8080/server", config.getHostsPerServer().get("server1").get(0));
+        assertEquals("http://localhost:8081/server", config.getHostsPerContainer().get("container1").get(1));        
+        assertEquals("http://localhost:8081/server", config.getHostsPerServer().get("server1").get(1));
     }
 }
