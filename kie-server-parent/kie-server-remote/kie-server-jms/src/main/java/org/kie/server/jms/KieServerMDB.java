@@ -70,6 +70,7 @@ public class KieServerMDB
 
     // Constants / properties
     private              String RESPONSE_QUEUE_NAME          = null;
+    private static final String RESPONSE_QUEUE_NAME_PROPERTY = "kie.server.jms.queues.response";
     private static final String DEFAULT_RESPONSE_QUEUE_NAME  = "queue/KIE.SERVER.RESPONSE";
 
     private static final String ID_NECESSARY = "This id is needed to be able to match a request to a response message.";
@@ -77,34 +78,23 @@ public class KieServerMDB
     @Resource(mappedName = "java:/JmsXA")
     private ConnectionFactory factory;
 
-    // Initialized in @PostConstruct
     private Session    session;
     private Connection connection;
+    private boolean sessionTransacted;
+    private int sessionAck;
 
     //    @Resource(lookup = "java:app/RetryTrackerSingleton")
     //    private RetryTrackerSingleton retryTracker;
 
     private KieServerImpl kieServer;
-
     private Map<MarshallingFormat, Marshaller> marshallers;
 
     @PostConstruct
     public void init() {
-        RESPONSE_QUEUE_NAME = System.getProperty( KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE, DEFAULT_RESPONSE_QUEUE_NAME );
+        RESPONSE_QUEUE_NAME = System.getProperty( RESPONSE_QUEUE_NAME_PROPERTY, DEFAULT_RESPONSE_QUEUE_NAME );
 
-        boolean sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
-        int sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
-        try {
-            connection = factory.createConnection();
-            session = connection.createSession( sessionTransacted, sessionAck );
-            connection.start();
-        } catch ( JMSException jmse ) {
-            // Unable to create connection/session, so no need to try send the message (4.) either
-            String errMsg = "Unable to open new session to send response messages";
-            logger.error( errMsg, jmse );
-            throw new JMSRuntimeException( errMsg, jmse );
-        }
-
+        sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
+        sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
         kieServer = KieServerLocator.getInstance();
 
         marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>(  );
@@ -115,25 +105,55 @@ public class KieServerMDB
         marshallers.put( MarshallingFormat.JSON, MarshallerFactory.getMarshaller( MarshallingFormat.JSON, classLoader ) );
     }
 
+    /**
+     * This method is used to initialize the JMS connection and
+     * session. It is done in its own method so that if the
+     * point at which it is done needs to be changed then
+     * it can be done by just changing the invocation point.
+     */
+    private void startConnectionAndSession() {
+       try {
+          connection = factory.createConnection();
+          if ( connection != null ) {
+             session = connection.createSession( sessionTransacted, sessionAck );
+             if ( logger.isDebugEnabled() ) {
+                logger.debug( "KieServerMDB::onMessage::sessionTransacted=" + sessionTransacted
+                      +", sessionAck="+sessionAck);
+             }
+          }
+       } catch (JMSException jmse) {
+          String errMsg = "Unable to obtain connection/session";
+          logger.error( errMsg, jmse );
+          throw new JMSRuntimeException( errMsg, jmse );
+       }
+    }
+
+    private void closeConnectionAndSession() {
+       try {
+          if ( connection != null ) {
+              if ( session != null ) {
+                 session.close();
+                 session = null;
+              }
+              connection.close();
+              connection = null;
+          }
+       } catch ( JMSException jmse ) {
+          String errMsg = "Unable to close session";
+          logger.error( errMsg, jmse );
+          throw new JMSRuntimeException( errMsg, jmse );
+       }
+    }
+
     @PreDestroy
     public void cleanup() {
-        try {
-            if ( connection != null ) {
-                connection.close();
-                connection = null;
-            }
-            if ( session != null ) {
-                session.close();
-                session = null;
-            }
-        } catch ( JMSException jmse ) {
-            String errMsg = "Unable to close " + (connection == null ? "session" : "connection");
-            logger.error( errMsg, jmse );
-            throw new JMSRuntimeException( errMsg, jmse );
-        }
+       // Just in case it doesn't get done
+       // elsewhere
+       closeConnectionAndSession();
     }
 
     public void onMessage(Message message) {
+        startConnectionAndSession();
         try {
             String username = null;
             String password = null;
@@ -247,7 +267,7 @@ public class KieServerMDB
             }
 
         } finally {
-
+            closeConnectionAndSession();
             JMSSecurityAdapter.logout();
         }
 
