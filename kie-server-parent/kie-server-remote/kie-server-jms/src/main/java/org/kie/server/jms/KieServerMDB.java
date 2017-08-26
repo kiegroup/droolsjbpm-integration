@@ -70,15 +70,14 @@ public class KieServerMDB
 
     // Constants / properties
     private              String RESPONSE_QUEUE_NAME          = null;
-    private static final String RESPONSE_QUEUE_NAME_PROPERTY = "kie.server.jms.queues.response";
     private static final String DEFAULT_RESPONSE_QUEUE_NAME  = "queue/KIE.SERVER.RESPONSE";
 
     private static final String ID_NECESSARY = "This id is needed to be able to match a request to a response message.";
 
     @Resource(mappedName = "java:/JmsXA")
     private ConnectionFactory factory;
-
-    // Initialized in @PostConstruct
+    private boolean sessionTransacted;
+    private int sessionAck;
     private Session    session;
     private Connection connection;
 
@@ -91,21 +90,10 @@ public class KieServerMDB
 
     @PostConstruct
     public void init() {
-        RESPONSE_QUEUE_NAME = System.getProperty( RESPONSE_QUEUE_NAME_PROPERTY, DEFAULT_RESPONSE_QUEUE_NAME );
+        RESPONSE_QUEUE_NAME = System.getProperty( KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE, DEFAULT_RESPONSE_QUEUE_NAME );
 
-        boolean sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
-        int sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
-        try {
-            connection = factory.createConnection();
-            session = connection.createSession( sessionTransacted, sessionAck );
-            connection.start();
-        } catch ( JMSException jmse ) {
-            // Unable to create connection/session, so no need to try send the message (4.) either
-            String errMsg = "Unable to open new session to send response messages";
-            logger.error( errMsg, jmse );
-            throw new JMSRuntimeException( errMsg, jmse );
-        }
-
+        sessionTransacted = Boolean.parseBoolean(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_TX, "false"));
+        sessionAck = Integer.parseInt(System.getProperty(KieServerConstants.CFG_KIE_SERVER_JMS_SESSION_ACK, String.valueOf(Session.AUTO_ACKNOWLEDGE)));
         kieServer = KieServerLocator.getInstance();
 
         marshallers = new ConcurrentHashMap<MarshallingFormat, Marshaller>(  );
@@ -116,25 +104,83 @@ public class KieServerMDB
         marshallers.put( MarshallingFormat.JSON, MarshallerFactory.getMarshaller( MarshallingFormat.JSON, classLoader ) );
     }
 
-    @PreDestroy
-    public void cleanup() {
-        try {
-            if ( connection != null ) {
-                connection.close();
-                connection = null;
-            }
-            if ( session != null ) {
+
+    private void startConnectionAndSession() {
+       try {
+          connection = factory.createConnection();
+          if ( connection != null ) {
+             session = connection.createSession( sessionTransacted, sessionAck );
+             if ( logger.isDebugEnabled() ) {
+                logger.debug( "KieServerMDB sessionTransacted={}, sessionAck={}",
+                        sessionTransacted,
+                        sessionAck);
+             }
+          }
+       } catch (JMSException jmse) {
+          String errMsg = "Unable to obtain connection/session";
+          logger.error( errMsg, jmse );
+          throw new JMSRuntimeException( errMsg, jmse );
+       } finally {
+           if (connection != null && session == null){
+               logger.error("KieServerMDB: Session creation failed - closing connection");
+               closeConnectionAndSession(); // this should close the connection and set the value to null
+           }
+       }
+    }
+
+
+    private void closeConnectionAndSession() {
+        JMSException sessionError = null;
+        if (session != null) {
+            try {
                 session.close();
+                logger.debug("KieServerMDB: Session closed");
+            } catch (JMSException jmse) {
+                sessionError = jmse;
+            } finally {
                 session = null;
             }
-        } catch ( JMSException jmse ) {
-            String errMsg = "Unable to close " + (connection == null ? "session" : "connection");
-            logger.error( errMsg, jmse );
-            throw new JMSRuntimeException( errMsg, jmse );
+        } else {
+            logger.debug("KieServerMDB: session was 'null', so cannot be closed");
+        }
+        if (connection != null) {
+            try {
+                connection.close();
+                connection = null;
+                logger.debug("KieServerMDB: Connection closed");
+            } catch (JMSException jmse) {
+                String errMsg = (sessionError != null) ?
+                        "KieServerMDB: Error closing both session and connection" :
+                        "KieServerMDB: Error closing connection";
+                logger.error(errMsg, jmse);
+                throw new JMSRuntimeException( errMsg, jmse );
+            } finally {
+                if (connection == null && sessionError != null) {
+                    logger.warn("KieServerMDB: Error closing session",sessionError);
+                    logger.warn("KieServerMDB: Assuming session was closed by connection closure");
+                    session = null;
+                }
+            }
+        } else {
+            logger.debug("KieServerMDB: connection was 'null', so cannot be closed");
+            if ( sessionError != null ) {
+                String errMsg = "KieServerMDB: Error closing session";
+                logger.error( errMsg, sessionError );
+                session = null;
+                throw new JMSRuntimeException(errMsg,sessionError);
+            }
         }
     }
 
+
+    @PreDestroy
+    public void cleanup() {
+        // Just in case someone doesn't do clean up
+        closeConnectionAndSession();
+    }
+
     public void onMessage(Message message) {
+        startConnectionAndSession();
         try {
             String username = null;
             String password = null;
@@ -142,10 +188,12 @@ public class KieServerMDB
                 username = message.getStringProperty(USER_PROPERTY_NAME);
                 password = message.getStringProperty(PASSWRD_PROPERTY_NAME);
             } catch (JMSException jmse) {
-
+                logger.warn("Unable to retrieve user name and/or password, from message");
             }
             if (username != null && password != null) {
                 JMSSecurityAdapter.login(username, password);
+            } else {
+                logger.warn("Unable to login to JMSSecurityAdapter, user name and/or password missing");
             }
 
             KieContainerCommandService executor = null;
@@ -176,9 +224,9 @@ public class KieServerMDB
                 } else {
 
                     int intFormat = message.getIntProperty(SERIALIZATION_FORMAT_PROPERTY_NAME);
-                    logger.debug("Serialization format (int) is " + intFormat);
+                    logger.debug("Serialization format (int) is {}", intFormat);
                     format = MarshallingFormat.fromId(intFormat);
-                    logger.debug("Serialization format is " + format);
+                    logger.debug("Serialization format is {}", format);
                     if (format == null) {
                         String errMsg = "Unsupported marshalling format '" + intFormat + "' from message " + msgCorrId + ".";
                         throw new JMSRuntimeException(errMsg);
@@ -191,7 +239,7 @@ public class KieServerMDB
 
             // 2. get marshaller
             Marshaller marshaller = getMarshaller(containerId, format);
-            logger.debug("Selected marshaller is " + marshaller);
+            logger.debug("Selected marshaller is {}", marshaller);
 
             // 3. deserialize request
             CommandScript script = unmarshallRequest(message, msgCorrId, marshaller, format);
@@ -248,8 +296,13 @@ public class KieServerMDB
             }
 
         } finally {
-
-            JMSSecurityAdapter.logout();
+            try {
+                closeConnectionAndSession();
+            } catch (JMSRuntimeException runtimeException) {
+                logger.error("Error while closing connection/session",runtimeException);
+            } finally {
+                JMSSecurityAdapter.logout();
+            }
         }
 
     }
@@ -305,7 +358,7 @@ public class KieServerMDB
             producer.send(msg);
         } catch (NamingException ne) {
             String errMsg = "Unable to lookup response queue " + RESPONSE_QUEUE_NAME + " to send msg " + msgCorrId
-                            + " (Is " + RESPONSE_QUEUE_NAME_PROPERTY + " incorrect?).";
+                            + " (Is " + KieServerConstants.CFG_KIE_SERVER_RESPONSE_QUEUE + " incorrect?).";
             logger.error(errMsg, ne);
         } catch (JMSException jmse) {
             String errMsg = "Unable to send msg " + msgCorrId + " to " + RESPONSE_QUEUE_NAME;
