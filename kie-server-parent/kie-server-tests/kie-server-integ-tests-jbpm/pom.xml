@@ -266,7 +266,7 @@
 
   <profiles>
     <profile>
-      <id>tomcat7x</id>
+      <id>tomcat7</id>
       <build>
         <pluginManagement>
           <plugins>
@@ -286,7 +286,7 @@
       </build>
     </profile>
     <profile>
-      <id>tomcat8x</id>
+      <id>tomcat8</id>
       <build>
         <pluginManagement>
           <plugins>
@@ -306,7 +306,7 @@
       </build>
     </profile>
     <profile>
-      <id>eap64x</id>
+      <id>eap64</id>
       <build>
         <pluginManagement>
           <plugins>
