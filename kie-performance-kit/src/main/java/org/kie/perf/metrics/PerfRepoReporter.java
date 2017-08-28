@@ -14,6 +14,7 @@ import org.kie.perf.TestConfig;
 import org.kie.perf.TestConfig.RunType;
 import org.perfrepo.client.PerfRepoClient;
 import org.perfrepo.model.Metric;
+import org.perfrepo.model.MetricComparator;
 import org.perfrepo.model.Test;
 import org.perfrepo.model.TestExecution;
 import org.perfrepo.model.builder.TestExecutionBuilder;
@@ -99,6 +100,7 @@ public class PerfRepoReporter extends ScheduledReporter {
         } else {
             if (tc.getScenario() != null) {
                 testName += " - " + tc.getScenario();
+                testExecutionName = testName;
             }
             
             if (tc.getRunType() == RunType.DURATION) {
@@ -194,6 +196,11 @@ public class PerfRepoReporter extends ScheduledReporter {
                     Metric m = new Metric();
                     m.setName(getMeterName(ml));
                     m.setDescription("TBD");
+                    if (ml.contains("throughput")) {
+                        m.setComparator(MetricComparator.HB);
+                    } else {
+                        m.setComparator(MetricComparator.LB);
+                    }
                     metrics.add(m);
                 }
 
@@ -294,7 +301,7 @@ public class PerfRepoReporter extends ScheduledReporter {
         if (scheduled) { // we report more than 1 scenario at once
             return name;
         }
-        String a = name.substring(name.indexOf(".", "org.kie.perf.scenario".length() + 1) + 1);
+        String a = name.substring(name.indexOf(".", "org.jbpm.test.performance.scenario".length() + 1) + 1);
         return a.substring(a.indexOf(".") + 1);
     }
 }

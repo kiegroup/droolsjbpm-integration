@@ -20,7 +20,7 @@ import com.codahale.metrics.Timer;
 
 public class SoakSuite implements ITestSuite {
     
-    public static final String TEST_PACKAGE = "org.kie.perf.scenario.soak";
+    public static final String TEST_PACKAGE = "org.jbpm.test.performance.scenario.soak";
 
     protected int iterations;
     protected int expectedRate;
