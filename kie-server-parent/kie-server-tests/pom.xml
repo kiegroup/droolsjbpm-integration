@@ -47,8 +47,8 @@
          and for free (e.g. from http://jbossas.jboss.org/downloads.html). The zip file location needs to be specified
          here or via system property when running the build (don't forget to use the `file://` prefix when
          referencing the zip from local filesystem). -->
-    <eap64x.download.url>valid-url-for-eap-6.4.x-needs-to-be-specified-here-or-via-cmd-line</eap64x.download.url>
-    <eap7x.download.url>valid-url-for-eap-7.x-needs-to-be-specified-here-or-via-cmd-line</eap7x.download.url>
+    <eap64.download.url>valid-url-for-eap-6.4.x-needs-to-be-specified-here-or-via-cmd-line</eap64.download.url>
+    <eap7.download.url>valid-url-for-eap-7.x-needs-to-be-specified-here-or-via-cmd-line</eap7.download.url>
   </properties>
 
   <modules>
@@ -176,7 +176,7 @@
 
   <profiles>
     <profile>
-      <id>wildfly81x</id>
+      <id>wildfly81</id>
       <properties>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
         <cargo.container.id>wildfly8x</cargo.container.id>
@@ -220,7 +220,7 @@
       </build>
     </profile>
     <profile>
-      <id>wildfly82x</id>
+      <id>wildfly82</id>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -377,7 +377,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>wildfly10x</id>
+      <id>wildfly10</id>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -529,7 +529,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat7x</id>
+      <id>tomcat7</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>tomcat7x</cargo.container.id>
@@ -639,7 +639,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>tomcat8x</id>
+      <id>tomcat8</id>
       <properties>
         <org.kie.server.persistence.ds>java:comp/env/jdbc/jbpm</org.kie.server.persistence.ds>
         <cargo.container.id>tomcat8x</cargo.container.id>
@@ -749,7 +749,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>eap64x</id>
+      <id>eap64</id>
       <properties>
         <kie.server.remoting.url>remote://${container.hostname}:4447</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -765,7 +765,7 @@
                 <container>
                   <type>installed</type>
                   <zipUrlInstaller>
-                    <url>${eap64x.download.url}</url>
+                    <url>${eap64.download.url}</url>
                   </zipUrlInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
@@ -829,7 +829,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>eap7x</id>
+      <id>eap7</id>
       <properties>
         <kie.server.remoting.url>http-remoting://${container.hostname}:${container.port}</kie.server.remoting.url>
         <org.kie.server.persistence.ds>java:jboss/datasources/ExampleDS</org.kie.server.persistence.ds>
@@ -847,7 +847,7 @@
                 <container>
                   <type>installed</type>
                   <zipUrlInstaller>
-                    <url>${eap7x.download.url}</url>
+                    <url>${eap7.download.url}</url>
                   </zipUrlInstaller>
                   <systemProperties>
                     <!-- disable JMS support for executor touse same tests for all containers for jbpm excutor -->
@@ -1113,7 +1113,7 @@
       </dependencies>
     </profile>
     <profile>
-      <id>was85x</id>
+      <id>was85</id>
       <properties>
         <container.port>9080</container.port>
         <kie.server.remoting.url>iiop://${container.hostname}:2809</kie.server.remoting.url>

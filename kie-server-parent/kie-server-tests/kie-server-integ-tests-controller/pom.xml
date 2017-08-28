@@ -210,25 +210,25 @@
 
   <profiles>
     <profile>
-      <id>tomcat7x</id>
+      <id>tomcat7</id>
       <properties>
         <kie.server.wars.classifier>webc</kie.server.wars.classifier>
       </properties>
     </profile>
     <profile>
-      <id>tomcat8x</id>
+      <id>tomcat8</id>
       <properties>
         <kie.server.wars.classifier>webc</kie.server.wars.classifier>
       </properties>
     </profile>
     <profile>
-      <id>wildfly10x</id>
+      <id>wildfly10</id>
       <properties>
         <kie.server.wars.classifier>ee7</kie.server.wars.classifier>
       </properties>
     </profile>
     <profile>
-      <id>eap7x</id>
+      <id>eap7</id>
       <properties>
         <kie.server.wars.classifier>ee7</kie.server.wars.classifier>
       </properties>
