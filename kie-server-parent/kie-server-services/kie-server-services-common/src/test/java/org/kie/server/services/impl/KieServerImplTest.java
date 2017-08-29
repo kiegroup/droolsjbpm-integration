@@ -31,6 +31,7 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
 import org.kie.scanner.KieMavenRepository;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceFilter;
 import org.kie.server.api.model.KieContainerResourceList;
@@ -53,10 +54,14 @@ public class KieServerImplTest {
 
     private KieServerImpl kieServer;
     private org.kie.api.builder.ReleaseId releaseId;
+    private String origServerId = null;
 
     @Before
     public void setupKieServerImpl() throws Exception {
+        origServerId = KieServerEnvironment.getServerId();
         System.setProperty("org.kie.server.id", KIE_SERVER_ID);
+        KieServerEnvironment.setServerId(KIE_SERVER_ID);
+
         FileUtils.deleteDirectory(REPOSITORY_DIR);
         FileUtils.forceMkdir(REPOSITORY_DIR);
         kieServer = new KieServerImpl(new KieServerStateFileRepository(REPOSITORY_DIR));
@@ -67,6 +72,7 @@ public class KieServerImplTest {
         if (kieServer != null) {
             kieServer.destroy();
         }
+        KieServerEnvironment.setServerId(origServerId);
     }
 
     @Test
