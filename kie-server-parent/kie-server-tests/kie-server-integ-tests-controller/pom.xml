@@ -125,6 +125,19 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
+    <!-- This is an artificial dependency to make sure the kie-server-tests modules are executed one at a time during
+         parallel build (otherwise the tests fail because of conflicting port binding) -->
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-integ-tests-all</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <properties>
