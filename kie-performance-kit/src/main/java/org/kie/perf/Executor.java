@@ -209,10 +209,12 @@ public class Executor {
                 if (tc.isWarmUp()) {
                     SharedMetricRegistry.setWarmUp(true);
                     scenario.initMetrics();
-                    long endWarmUpTime = System.currentTimeMillis() + 5000;
+                    long endWarmUpTime = System.currentTimeMillis() + tc.getWarmUpTime() * 1000; // warmUpTime is in seconds
+                    log.debug("Starting JVM WarmUp for {} iterations or {} seconds, whatever comes first", tc.getWarmUpCount(), tc.getWarmUpTime());
                     for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
                         scenario.execute();
                     }
+                    log.debug("JVM WarmUp has ended");
                     SharedMetricRegistry.setWarmUp(false);
                 }
                 scenario.initMetrics();
