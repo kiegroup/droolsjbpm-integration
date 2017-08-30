@@ -456,13 +456,13 @@
         <version>${version.org.uberfire}</version>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-project-datamodel-api</artifactId>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-api</artifactId>
         <version>${version.org.uberfire}</version>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-project-datamodel-commons</artifactId>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-commons</artifactId>
         <version>${version.org.uberfire}</version>
       </dependency>
       <dependency>
@@ -472,14 +472,14 @@
         <classifier>tests</classifier>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-project-datamodel-api</artifactId>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-api</artifactId>
         <version>${version.org.uberfire}</version>
         <classifier>tests</classifier>
       </dependency>
       <dependency>
-        <groupId>org.uberfire</groupId>
-        <artifactId>uberfire-project-datamodel-commons</artifactId>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-project-datamodel-commons</artifactId>
         <version>${version.org.uberfire}</version>
         <classifier>tests</classifier>
       </dependency>
@@ -1647,8 +1647,8 @@
       <artifactId>uberfire-commons</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-project-datamodel-api</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-project-datamodel-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>
@@ -1661,8 +1661,8 @@
       <!--<scope>test</scope>-->
     <!--</dependency>-->
     <dependency>
-      <groupId>org.uberfire</groupId>
-      <artifactId>uberfire-project-datamodel-commons</artifactId>
+      <groupId>org.kie.soup</groupId>
+      <artifactId>kie-soup-project-datamodel-commons</artifactId>
     </dependency>
     <dependency>
       <groupId>org.drools</groupId>

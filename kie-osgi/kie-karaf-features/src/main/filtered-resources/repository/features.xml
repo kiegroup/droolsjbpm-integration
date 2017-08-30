@@ -37,9 +37,9 @@
 
   <feature name="drools-wb-guided-decisiontables" description="Drools Workbench Guided Decision Tables" version="${project.version}">
      <feature version="${project.version}">drools-module</feature>
-     <bundle>mvn:org.uberfire/uberfire-commons/${version.org.uberfire}</bundle>
-     <bundle>mvn:org.uberfire/uberfire-project-datamodel-api/${version.org.uberfire}</bundle>
-     <bundle>mvn:org.uberfire/uberfire-project-datamodel-commons/${version.org.uberfire}</bundle>
+     <bundle>mvn:org.kie.soup/kie-soup-commons/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-api/${version.org.kie}</bundle>
+     <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-commons/${version.org.kie}</bundle>
      <bundle>mvn:org.drools/drools-workbench-models-datamodel-api/${version.org.kie}</bundle>
      <bundle>mvn:org.drools/drools-workbench-models-commons/${version.org.kie}</bundle>
      <bundle>mvn:org.apache.commons/commons-lang3/${version.org.apache.commons.lang3}</bundle>

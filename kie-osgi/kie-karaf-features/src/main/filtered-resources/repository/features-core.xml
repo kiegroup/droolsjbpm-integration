@@ -28,6 +28,9 @@
 
   <feature name="kie" version="${project.version}" description="KIE API">
     <feature version="${project.version}">drools-common</feature>
+    <bundle>mvn:org.kie.soup/kie-soup-commons/${version.org.kie}</bundle>
+    <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-api/${version.org.kie}</bundle>
+    <bundle>mvn:org.kie.soup/kie-soup-project-datamodel-commons/${version.org.kie}</bundle>
     <bundle>mvn:org.uberfire/uberfire-maven-support/${version.org.uberfire}</bundle>
     <bundle>mvn:org.kie/kie-api/${version.org.drools}</bundle>
     <bundle>mvn:org.kie/kie-internal/${version.org.drools}</bundle>
