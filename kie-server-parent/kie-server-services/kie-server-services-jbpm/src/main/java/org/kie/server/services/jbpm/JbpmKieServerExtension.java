@@ -15,6 +15,8 @@
 
 package org.kie.server.services.jbpm;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -94,6 +96,7 @@ import org.kie.internal.runtime.conf.RuntimeStrategy;
 import org.kie.internal.task.api.UserInfo;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
+import org.kie.server.api.marshalling.MarshallerFactory;
 import org.kie.server.api.marshalling.MarshallingException;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieServerConfig;
@@ -298,9 +301,12 @@ public class JbpmKieServerExtension implements KieServerExtension {
         services.add(processInstanceMigrationService);
         services.add(processInstanceAdminService);
         services.add(userTaskAdminService);
-
+        
+        registerDefaultQueryDefinitions();
         initialized = true;
     }
+
+
 
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
@@ -418,29 +424,17 @@ public class JbpmKieServerExtension implements KieServerExtension {
 
                 URL definitionsURL = queryDefinitionsFiles.nextElement();
                 InputStream qdStream = definitionsURL.openStream();
-                if (qdStream != null) {
-                    String qdString = IOUtils.toString(qdStream, Charset.forName("UTF-8"));
-
-                    try {
-                        QueryDefinition[] queryDefinitionList = kieContainerInstance.getMarshaller(MarshallingFormat.JSON).unmarshall(qdString, QueryDefinition[].class);
-                        List<String> queries = new ArrayList<>();
-                        Arrays.asList(queryDefinitionList).forEach(qd ->
-                        {
-                            queryService.replaceQuery(QueryDataServiceBase.build(context, qd));
-                            queries.add(qd.getName());
-                            logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), id);
-                        });
-                        containerQueries.put(id, queries);
-                    } catch (MarshallingException e) {
-                        logger.error("Error when unmarshalling query definitions from query-definitions.json.", e);
-                    }
-                }
+                
+                loadAndRegisterQueryDefinitions(qdStream, kieContainerInstance.getMarshaller(MarshallingFormat.JSON), id);
             }
 
             logger.debug("Container {} created successfully by extension {}", id, this);
         } catch (Exception e) {
-            
-            messages.add(new Message(Severity.ERROR, "Error when creating container " + id +" by extension " + this + " due to " + ExceptionUtils.getRootCause(e).getMessage()));
+            Throwable root = ExceptionUtils.getRootCause( e );
+            if ( root == null ) {
+                root = e;
+            }
+            messages.add(new Message(Severity.ERROR, "Error when creating container " + id +" by extension " + this + " due to " + root.getMessage()));
             logger.error("Error when creating container {} by extension {}", id, this, e);
         }
     }
@@ -716,6 +710,60 @@ public class JbpmKieServerExtension implements KieServerExtension {
         } catch (Exception e) {
             throw new RuntimeException("Unable to create EntityManagerFactory due to " + e.getMessage(), e);
         }
+    }
+    
+    protected void loadAndRegisterQueryDefinitions(InputStream qdStream, org.kie.server.api.marshalling.Marshaller marshaller, String containerId) throws IOException {
+        if (qdStream != null) {
+            String qdString = IOUtils.toString(qdStream, Charset.forName("UTF-8"));
+
+            try {
+                QueryDefinition[] queryDefinitionList = marshaller.unmarshall(qdString, QueryDefinition[].class);
+                List<String> queries = new ArrayList<>();
+                Arrays.asList(queryDefinitionList).forEach(qd ->
+                {
+                    queryService.replaceQuery(QueryDataServiceBase.build(context, qd));
+                    queries.add(qd.getName());
+                    logger.debug("Registered '{}' query from container '{}' successfully", qd.getName(), containerId);
+                });
+                
+                if (containerId != null) {
+                    containerQueries.put(containerId, queries);
+                }
+            } catch (MarshallingException e) {
+                logger.error("Error when unmarshalling query definitions from stream.", e);
+            }
+        }
+    }
+    
+    protected void registerDefaultQueryDefinitions() {
+        try {
+            // load any default query definitions
+            InputStream qdStream = this.getClass().getResourceAsStream("/default-query-definitions.json"); 
+            if (qdStream == null) {
+                String externalLocationQueryDefinitions = System.getProperty(KieServerConstants.CFG_DEFAULT_QUERY_DEFS_LOCATION);
+                if (externalLocationQueryDefinitions != null) {
+                    qdStream = new FileInputStream(externalLocationQueryDefinitions);
+                }
+            }
+            
+            loadAndRegisterQueryDefinitions(qdStream, MarshallerFactory.getMarshaller(MarshallingFormat.JSON, this.getClass().getClassLoader()), null);
+            
+            if (qdStream != null) {
+                qdStream.close();
+            }
+        } catch (Exception e) {
+            logger.error("Error when loading default query definitions from default-query-definitions.json", e);
+        }
+    }
+
+    // just for tests
+    void setQueryService(QueryService queryService) {
+        this.queryService = queryService;
+    }
+
+    
+    void setContext(KieServerRegistry context) {
+        this.context = context;
     }
 
 }

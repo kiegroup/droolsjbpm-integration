@@ -29,4 +29,5 @@ public class KieServerRouterConstants {
     public static final String KIE_CONTROLLER_USER = "org.kie.server.controller.user";
     public static final String KIE_CONTROLLER_PASSWORD = "org.kie.server.controller.pwd";
     public static final String KIE_CONTROLLER_TOKEN = "org.kie.server.controller.token";
+    public static final String CONFIG_FILE_WATCHER_ENABLED = "org.kie.server.router.config.watcher.enabled";
 }
