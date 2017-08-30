@@ -39,6 +39,7 @@ public class TestConfig {
 
     protected boolean warmUp;
     protected int warmUpCount;
+    protected int warmUpTime;
 
     protected String perfRepoHost;
     protected String perfRepoUrlPath;
@@ -113,9 +114,11 @@ public class TestConfig {
 
         warmUp = Boolean.valueOf(System.getProperty("warmUp"));
         warmUpCount = Integer.valueOf(System.getProperty("warmUpCount"));
+        warmUpTime = Integer.valueOf(System.getProperty("warmUpTime"));
 
         properties.put("warmUp", warmUp);
         properties.put("warmUpCount", warmUpCount);
+        properties.put("warmUpTime", warmUpTime);
 
         measure = new ArrayList<TestConfig.Measure>();
         String mprop = System.getProperty("measure");
@@ -233,6 +236,10 @@ public class TestConfig {
 
     public int getWarmUpCount() {
         return warmUpCount;
+    }
+
+    public int getWarmUpTime() {
+        return warmUpTime;
     }
 
     public List<Measure> getMeasure() {

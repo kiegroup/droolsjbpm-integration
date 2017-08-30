@@ -24,7 +24,7 @@ import com.codahale.metrics.Timer;
 public class ConcurrentLoadSuite implements ITestSuite {
 
     protected static final Logger log = LoggerFactory.getLogger(LoadSuite.class);
-    public static final String TEST_PACKAGE = "org.kie.perf.scenario.load";
+    public static final String TEST_PACKAGE = "org.jbpm.test.performance.scenario.load";
 
     protected int iterations;
     protected IRunType run;
@@ -46,13 +46,7 @@ public class ConcurrentLoadSuite implements ITestSuite {
 
             exec.initMetrics(scenario);
             if (tc.isWarmUp()) {
-                SharedMetricRegistry.setWarmUp(true);
-                scenario.initMetrics();
-                long endWarmUpTime = System.currentTimeMillis() + 5000;
-                for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
-                    scenario.execute();
-                }
-                SharedMetricRegistry.setWarmUp(false);
+                exec.performWarmUp(scenario);
             }
 
             CPUUsageHistogramSet cpuusage = null;
