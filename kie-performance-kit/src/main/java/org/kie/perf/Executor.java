@@ -189,6 +189,19 @@ public class Executor {
         return null;
     }
 
+    public void performWarmUp(IPerfTest scenario) {
+        TestConfig tc = TestConfig.getInstance();
+        SharedMetricRegistry.setWarmUp(true);
+        scenario.initMetrics();
+        long endWarmUpTime = System.currentTimeMillis() + tc.getWarmUpTime() * 1000; // warmUpTime is in seconds
+        log.debug("Starting JVM WarmUp for {} iterations or {} seconds, whatever comes first", tc.getWarmUpCount(), tc.getWarmUpTime());
+        for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
+            scenario.execute();
+        }
+        log.debug("JVM WarmUp has ended");
+        SharedMetricRegistry.setWarmUp(false);
+    }
+
     public static void main(String[] args) {
         try {
             Executor exec = getInstance();
