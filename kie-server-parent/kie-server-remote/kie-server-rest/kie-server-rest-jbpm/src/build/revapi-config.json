@@ -84,7 +84,13 @@
 	"annotationType": "javax.ws.rs.Path",
 	"elementKind": "annotation",
 	"justification": "JBPM-6120 Invalid Kie Server REST endpoints for processes"
-	}
+	},
+     {
+	    "code": "java.annotation.added",
+	    "annotationType": "io.swagger.annotations.Api",
+	    "elementKind": "annotation",
+	    "justification": "Added Swagger annotations for kie server docs"
+     }	
       ]
     }
   }
