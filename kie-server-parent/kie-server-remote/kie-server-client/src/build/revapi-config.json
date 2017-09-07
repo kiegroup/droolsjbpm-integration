@@ -209,7 +209,34 @@
           "methodName": "isEveryProblemFactChangeProcessed",
           "elementKind": "method",
           "justification": "PLANNER-815 Support real-time planning"
-        }
+        },
+        {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.JobServicesClient::cancelRequest(java.lang.String, long)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "JobServicesClient",
+		  "methodName": "cancelRequest",
+		  "elementKind": "method",
+		  "justification": "added support for jobs over kie server router"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method void org.kie.server.client.JobServicesClient::requeueRequest(java.lang.String, long)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "JobServicesClient",
+		  "methodName": "requeueRequest",
+		  "elementKind": "method",
+		  "justification": "added support for jobs over kie server router"
+		 },
+		 {
+		  "code": "java.method.addedToInterface",
+		  "new": "method org.kie.server.api.model.instance.RequestInfoInstance org.kie.server.client.JobServicesClient::getRequestById(java.lang.String, java.lang.Long, boolean, boolean)",
+		  "package": "org.kie.server.client",
+		  "classSimpleName": "JobServicesClient",
+		  "methodName": "getRequestById",
+		  "elementKind": "method",
+		  "justification": "added support for jobs over kie server router"
+		 }
       ]
     }
   }

@@ -15,6 +15,7 @@
 
 package org.kie.server.router.proxy;
 
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,11 @@ public class DefaultContainerResolver implements ContainerResolver {
 
         if (matcher.find()) {
             return matcher.group(1);
+        }
+        
+        Deque<String> containerIdQueryParam = exchange.getQueryParameters().get("containerId");
+        if (containerIdQueryParam != null && !containerIdQueryParam.isEmpty()) {
+            return containerIdQueryParam.getFirst();
         }
         return NOT_FOUND;
     }

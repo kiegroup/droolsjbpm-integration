@@ -180,7 +180,7 @@ public abstract class AbstractAggregateHttpHandler implements HttpHandler {
 
         return adminHandler.getHostsPerServer().values().stream().map(hosts -> {
             Set<String> uniqueHosts = new LinkedHashSet<>(hosts);
-            return selector.selectHost(uniqueHosts.toArray(new String[hosts.size()]));
+            return selector.selectHost(uniqueHosts.toArray(new String[uniqueHosts.size()]));
         }).filter(host -> host != null)
          .collect(Collectors.toSet());
     }

@@ -48,6 +48,8 @@ public class RequestInfoInstance {
     private Map<String, Object> responseData;
     @XmlElement(name="request-errors")
     private ErrorInfoInstanceList errors;
+    @XmlElement(name="request-container-id")
+    private String containerId;
 
     public RequestInfoInstance() {
     }
@@ -144,6 +146,14 @@ public class RequestInfoInstance {
         this.responseData = responseData;
     }
 
+    public String getContainerId() {
+        return containerId;
+    }
+    
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
+
     @Override
     public String toString() {
         return "RequestInfoInstance{" +
@@ -217,6 +227,11 @@ public class RequestInfoInstance {
 
         public Builder errors(ErrorInfoInstanceList errors) {
             requestInfoInstance.setErrors(errors);
+            return this;
+        }
+        
+        public Builder containerId(String containerId) {
+            requestInfoInstance.setContainerId(containerId);
             return this;
         }
     }

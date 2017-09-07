@@ -15,15 +15,12 @@
 
 package org.kie.server.router.client;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.KieContainerResource;
@@ -45,8 +42,8 @@ public class KieServerRouterEventListener implements KieServerEventListener {
     
     private static final Logger logger = LoggerFactory.getLogger(KieServerRouterEventListener.class);
 
-    private static final String ROUTER_ADD_URL = "/admin/add";
-    private static final String ROUTER_REMOVE_URL = "/admin/remove";
+    private static final String ROUTER_ADD_URL = "/mgmt/add";
+    private static final String ROUTER_REMOVE_URL = "/mgmt/remove";
     
     private String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
     private String serverURL = System.getProperty(KieServerConstants.KIE_SERVER_LOCATION);

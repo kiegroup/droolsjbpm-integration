@@ -116,7 +116,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
 
         Response response = null;
         try {
-            WebTarget clientRequest = newRequest(serverUrl + "/admin/list");
+            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.info( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
@@ -145,7 +145,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             response.close();
 
 
-            clientRequest = newRequest(serverUrl + "/admin/list");
+            clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.debug("[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
@@ -178,7 +178,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
 
         Response response = null;
         try {
-            WebTarget clientRequest = newRequest(serverUrl + "/admin/list");
+            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.debug( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
@@ -206,7 +206,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
             response.close();
 
-            clientRequest = newRequest(serverUrl + "/admin/list");
+            clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.debug( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
@@ -240,7 +240,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
 
         Response response = null;
         try {
-            WebTarget clientRequest = newRequest(serverUrl + "/admin/list");
+            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.debug( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
@@ -272,7 +272,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
                 response.close();
             }
 
-            clientRequest = newRequest(serverUrl + "/admin/list");
+            clientRequest = newRequest(serverUrl + "/mgmt/list");
             logger.debug( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
