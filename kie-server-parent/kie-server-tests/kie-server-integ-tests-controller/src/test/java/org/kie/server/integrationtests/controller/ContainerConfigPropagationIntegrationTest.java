@@ -15,11 +15,6 @@
 
 package org.kie.server.integrationtests.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeThat;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -40,11 +35,15 @@ import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
-import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.KieServerSynchronization;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
 
 public class ContainerConfigPropagationIntegrationTest extends KieControllerManagementBaseTest {
 
@@ -71,34 +70,6 @@ public class ContainerConfigPropagationIntegrationTest extends KieControllerMana
         ServiceResponse<KieServerInfo> reply = client.getServerInfo();
         assumeThat(reply.getType(), is(ServiceResponse.ResponseType.SUCCESS));
         kieServerInfo = reply.getResult();
-    }
-
-    @Test
-    public void testPropagateScannerContainerConfig() throws Exception {
-        Long pollInterval = 500L;
-        ServerTemplate serverTemplate = createServerTemplate();
-
-        Map<Capability, ContainerConfig> containerConfigMap = new HashMap<>();
-
-        RuleConfig ruleConfig = new RuleConfig(pollInterval, KieScannerStatus.STARTED);
-        containerConfigMap.put(Capability.RULE, ruleConfig);
-
-        // Deploy container for kie server instance with started scanner.
-        ContainerSpec containerToDeploy = new ContainerSpec(CONTAINER_ID, CONTAINER_NAME, serverTemplate, releaseId, KieContainerStatus.STARTED, containerConfigMap);
-        mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerToDeploy);
-
-        // Check that container is deployed in kie server.
-        KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-
-        assertContainerInfoWithScanner(releaseId, pollInterval);
-
-        containerToDeploy.setReleasedId(releaseIdLatest);
-        mgmtControllerClient.updateContainerSpec(serverTemplate.getId(), containerToDeploy);
-
-        // Check that container is updated
-        KieServerSynchronization.waitForContainerWithReleaseId(client, releaseId101);
-
-        assertContainerInfoWithScanner(releaseId101, pollInterval);
     }
 
     @Test
