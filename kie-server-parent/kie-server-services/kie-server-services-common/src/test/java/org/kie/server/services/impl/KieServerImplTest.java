@@ -120,29 +120,6 @@ public class KieServerImplTest {
     }
 
     @Test
-    public void testReturnRefreshedResolvedReleaseIdAfterUpdateFromScanner() throws Exception {
-        // first create a simple container with fixed kjar version
-        String artifactId = "refreshed-resource-test";
-        String version1 = "1.0.0.Final";
-        createEmptyKjar(artifactId, version1);
-        ReleaseId releaseId1 = new ReleaseId(GROUP_ID, artifactId, version1);
-        String containerId = "refreshed-resource-container";
-        ServiceResponse<KieContainerResource> createResponse = kieServer.createContainer(containerId, new KieContainerResource(containerId, releaseId1));
-        Assertions.assertThat(createResponse.getType()).isEqualTo(ServiceResponse.ResponseType.SUCCESS);
-        Assertions.assertThat(createResponse.getResult().getReleaseId()).isEqualTo(releaseId1);
-        Assertions.assertThat(createResponse.getResult().getResolvedReleaseId()).isEqualTo(releaseId1);
-        // now update the version to LATEST and start the scanner
-        ReleaseId latestReleaseId = new ReleaseId(GROUP_ID, artifactId, "LATEST");
-        kieServer.updateContainerReleaseId(containerId, latestReleaseId);
-        kieServer.updateScanner(containerId, new KieScannerResource(KieScannerStatus.STARTED, 200L));
-        // deploy newer version of the kjar; it should get picked up by the scanner
-        String version2 = "1.0.1.Final";
-        createEmptyKjar(artifactId, version2);
-        // the scanner operation is async, so it will take some time until the releaseId gets updated
-        assertReleaseIds(containerId, latestReleaseId, new ReleaseId(GROUP_ID, artifactId, version2), 10000L);
-    }
-
-    @Test
     public void testExecutorPropertiesInStateRepository() {
         KieServerStateFileRepository stateRepository = new KieServerStateFileRepository(REPOSITORY_DIR);
         KieServerState state = stateRepository.load(KIE_SERVER_ID);
