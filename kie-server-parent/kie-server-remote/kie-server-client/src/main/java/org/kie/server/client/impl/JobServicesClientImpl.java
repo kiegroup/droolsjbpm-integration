@@ -82,15 +82,25 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
         return ((Number) result).longValue();
     }
-
+    
     @Override
     public void cancelRequest(long requestId) {
+        cancelRequest(null, requestId);
+    }
+
+    @Override
+    public void cancelRequest(String containerId, long requestId) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(JOB_ID, requestId);
+            
+            String queryString = "";
+            if (containerId != null && !containerId.isEmpty()) {
+                queryString = "?containerId=" + containerId;
+            }
 
             makeHttpDeleteRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), JOB_URI + "/" + CANCEL_JOB_DEL_URI, valuesMap),
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + CANCEL_JOB_DEL_URI, valuesMap) + queryString,
                     null);
 
         } else {
@@ -127,15 +137,25 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
             throwExceptionOnFailure(response);
         }
     }
-
+    
     @Override
     public void requeueRequest(long requestId) {
+        requeueRequest(null, requestId);
+    }
+
+    @Override
+    public void requeueRequest(String containerId, long requestId) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(JOB_ID, requestId);
+            
+            String queryString = "";
+            if (containerId != null && !containerId.isEmpty()) {
+                queryString = "?containerId=" + containerId;
+            }
 
             makeHttpPutRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), JOB_URI + "/" + REQUEUE_JOB_PUT_URI, valuesMap), "", String.class, new HashMap<String, String>());
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + REQUEUE_JOB_PUT_URI, valuesMap) + queryString, "", String.class, new HashMap<String, String>());
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
                     (KieServerCommand) new DescriptorCommand( "JobService", "requeueRequest", new Object[]{requestId})));
@@ -370,12 +390,22 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
 
     @Override
     public RequestInfoInstance getRequestById(Long requestId, boolean withErrors, boolean withData) {
+        return getRequestById(null, requestId, withErrors, withData);
+    }
+    
+    @Override
+    public RequestInfoInstance getRequestById(String containerId, Long requestId, boolean withErrors, boolean withData) {
         if( config.isRest() ) {
             Map<String, Object> valuesMap = new HashMap<String, Object>();
             valuesMap.put(JOB_ID, requestId);
+            
+            String queryString = "";
+            if (containerId != null && !containerId.isEmpty()) {
+                queryString = "&containerId=" + containerId;
+            }
 
             return makeHttpGetRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCE_GET_URI, valuesMap) + "?withErrors=" + withErrors + "&withData=" + withData , RequestInfoInstance.class);
+                    build(loadBalancer.getUrl(), JOB_URI + "/" + JOB_INSTANCE_GET_URI, valuesMap) + "?withErrors=" + withErrors + "&withData=" + withData + queryString, RequestInfoInstance.class);
 
         } else {
             CommandScript script = new CommandScript( Collections.singletonList(
