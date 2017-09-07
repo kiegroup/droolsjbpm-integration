@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.kie.perf.TestConfig.Measure;
 import org.kie.perf.TestConfig.ReporterType;
 import org.kie.perf.annotation.KPKConstraint;
+import org.kie.perf.annotation.KPKLimit;
 import org.kie.perf.metrics.CPUUsageHistogramSet;
 import org.kie.perf.metrics.CsvSingleReporter;
 import org.kie.perf.metrics.MemoryUsageGaugeSet;
@@ -209,9 +210,20 @@ public class Executor {
                 if (tc.isWarmUp()) {
                     SharedMetricRegistry.setWarmUp(true);
                     scenario.initMetrics();
+
+                    // We have to handle KPKLimit hard constraint on the number of iterations
+                    KPKLimit kpkAnnotation = scenario.getClass().getAnnotation(KPKLimit.class);
+                    int kpkLimit = kpkAnnotation != null ? kpkAnnotation.value() : Integer.MAX_VALUE;
+                    int warmUpIterations = tc.getWarmUpCount();
+                    if (kpkLimit < tc.getWarmUpCount()) {
+                        log.info("Scenario has KPKLimit of {} iterations which overrides warmUpCount of {} iterations", kpkLimit, tc.getWarmUpCount());
+                        warmUpIterations = kpkLimit;
+                    }
+
                     long endWarmUpTime = System.currentTimeMillis() + tc.getWarmUpTime() * 1000; // warmUpTime is in seconds
-                    log.info("Starting JVM WarmUp for {} iterations or {} seconds, whatever comes first", tc.getWarmUpCount(), tc.getWarmUpTime());
-                    for (int i = 0; i < tc.getWarmUpCount() && endWarmUpTime > System.currentTimeMillis(); ++i) {
+
+                    log.info("Starting JVM WarmUp for {} iterations or {} seconds, whatever comes first", warmUpIterations, tc.getWarmUpTime());
+                    for (int i = 0; i < warmUpIterations && endWarmUpTime > System.currentTimeMillis(); ++i) {
                         scenario.execute();
                     }
                     log.info("JVM WarmUp has ended");
