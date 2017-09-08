@@ -126,6 +126,7 @@ public class Executor {
                     continue;
                 }
                 ProcessBuilder processBuilder = new ProcessBuilder(tc.getStartScriptLocation(), c.getSimpleName());
+                processBuilder.redirectErrorStream(true);
                 try {
                     Process process = processBuilder.start();
                     InputStreamReader isr = new InputStreamReader(process.getInputStream());
