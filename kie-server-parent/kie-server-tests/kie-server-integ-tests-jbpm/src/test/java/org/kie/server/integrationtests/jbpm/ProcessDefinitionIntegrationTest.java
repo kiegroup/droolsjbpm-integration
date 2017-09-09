@@ -202,7 +202,7 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         assertEquals(USER_YODA, evaluateItemsEntities[0]);
         assertEquals("HR,PM", evaluateItemsEntities[1]);
     }
-
+ 
     @Test
     public void testUserTasksDefinition() {
         UserTaskDefinitionList result = processClient.getUserTaskDefinitions(CONTAINER_ID, PROCESS_ID_EVALUATION);
@@ -222,6 +222,8 @@ public class ProcessDefinitionIntegrationTest extends JbpmKieServerBaseIntegrati
         assertEquals("", task.getCreatedBy());
         assertEquals(0, task.getPriority().intValue());
         assertEquals(true, task.isSkippable());
+        assertEquals("2", task.getId());
+        assertEquals("", task.getFormName());
 
         // assert associated entities - users and groups
         String[] evaluateItemsEntities = task.getAssociatedEntities();
