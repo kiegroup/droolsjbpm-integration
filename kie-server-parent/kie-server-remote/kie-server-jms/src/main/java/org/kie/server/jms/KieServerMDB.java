@@ -197,7 +197,7 @@ public class KieServerMDB
     }
 
     public void onMessage(Message message) {
-        JMSConnection connect = startConnectionAndSession();
+        JMSConnection connect = null;
         try {
             String username = null;
             String password = null;
@@ -279,6 +279,7 @@ public class KieServerMDB
             ServiceResponsesList response = executor.executeScript(script, format, classType);
 
             if (interactionPattern < UPPER_LIMIT_REPLY_INTERACTION_PATTERNS) {
+                connect = startConnectionAndSession();
                 logger.debug("Response message is about to be sent according to selected interaction pattern {}", interactionPattern);
                 // 5. serialize response
                 Message msg = marshallResponse(connect.getSession(), msgCorrId, format, marshaller, response);
@@ -313,11 +314,15 @@ public class KieServerMDB
             }
 
         } finally {
-            try {
-                closeConnectionAndSession(connect);
-            } catch (JMSRuntimeException runtimeException) {
-                logger.error("Error while attempting to close connection/session",runtimeException);
-            } finally {
+            if (connect != null) { // Only attempt to close the connection/session if they were actually created
+                try {
+                    closeConnectionAndSession(connect);
+                } catch (JMSRuntimeException runtimeException) {
+                    logger.error("Error while attempting to close connection/session",runtimeException);
+                } finally {
+                    JMSSecurityAdapter.logout();
+                }
+            } else {
                 JMSSecurityAdapter.logout();
             }
         }
