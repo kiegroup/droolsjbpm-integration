@@ -16,20 +16,25 @@
 package org.kie.server.integrationtests.router;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.internal.executor.api.STATUS;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.api.model.definition.QueryDefinition;
 import org.kie.server.api.model.definition.QueryFilterSpec;
+import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.ProcessInstance;
+import org.kie.server.api.model.instance.RequestInfoInstance;
 import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.api.util.QueryFilterSpecBuilder;
 import org.kie.server.client.QueryServicesClient;
@@ -45,6 +50,8 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
 
 
     protected static final String CONTAINER_ALIAS = "project";
+    protected static final String BUSINESS_KEY = "test key";
+    protected static final String PRINT_OUT_COMMAND = "org.jbpm.executor.commands.PrintOutCommand";
 
     @BeforeClass
     public static void buildAndDeployArtifacts() {
@@ -214,5 +221,51 @@ public class KieServerRouterJbpmIntegrationTest extends KieServerRouterBaseInteg
             queryClient.unregisterQuery(query.getName());
         }
 
+    }
+    
+    @Test
+    public void testScheduleViewAndCancelJob() {
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DATE, 1);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("businessKey", BUSINESS_KEY);
+
+        JobRequestInstance jobRequestInstance = new JobRequestInstance();
+        jobRequestInstance.setCommand(PRINT_OUT_COMMAND);
+        jobRequestInstance.setData(data);
+        jobRequestInstance.setScheduledDate(tomorrow.getTime());
+
+        Long jobId = jobServicesClient.scheduleRequest(CONTAINER_ID, jobRequestInstance);
+        assertNotNull(jobId);
+        assertTrue( jobId.longValue() > 0);
+
+        RequestInfoInstance jobRequest = jobServicesClient.getRequestById(CONTAINER_ID, jobId, false, false);
+        RequestInfoInstance expected = createExpectedRequestInfoInstance(jobId, STATUS.QUEUED);
+        assertRequestInfoInstance(expected, jobRequest);
+        assertNotNull(jobRequest.getScheduledDate());
+
+        jobServicesClient.cancelRequest(CONTAINER_ID, jobId);
+
+        jobRequest = jobServicesClient.getRequestById(CONTAINER_ID, jobId, false, false);
+        expected.setStatus(STATUS.CANCELLED.toString());
+        assertRequestInfoInstance(expected, jobRequest);
+    }
+    
+    private void assertRequestInfoInstance(RequestInfoInstance expected, RequestInfoInstance actual) {
+        assertNotNull(actual);
+        assertEquals(expected.getId(), actual.getId());
+        assertEquals(expected.getBusinessKey(), actual.getBusinessKey());
+        assertEquals(expected.getStatus(), actual.getStatus());
+        assertEquals(expected.getCommandName(), actual.getCommandName());
+    }
+    
+    private RequestInfoInstance createExpectedRequestInfoInstance(Long jobId, STATUS expected) {
+        return RequestInfoInstance.builder()
+                .id(jobId)
+                .businessKey(BUSINESS_KEY)
+                .status(expected.toString())
+                .command(PRINT_OUT_COMMAND)
+                .build();
     }
 }

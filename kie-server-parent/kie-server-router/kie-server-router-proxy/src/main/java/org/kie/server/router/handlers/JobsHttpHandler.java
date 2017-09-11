@@ -16,11 +16,32 @@
 package org.kie.server.router.handlers;
 
 import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HttpString;
 
 public class JobsHttpHandler extends AbstractAggregateHttpHandler {
+    
+    private static final String PREFIX = "/jobs";
 
     public JobsHttpHandler(HttpHandler httpHandler, AdminHttpHandler adminHandler) {
         super(httpHandler, adminHandler);
+    }
+
+    @Override
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (!exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))) {
+            exchange.setRelativePath(PREFIX + exchange.getRelativePath());
+            
+        }
+        if (exchange.getRequestMethod().equals(HttpString.tryFromString("GET"))
+                && exchange.getQueryParameters().containsKey("containerId")) {
+            exchange.setRelativePath(PREFIX + exchange.getRelativePath());
+            httpHandler.handleRequest(exchange);
+            
+            return;
+            
+        }
+        super.handleRequest(exchange);
     }
 
 }
