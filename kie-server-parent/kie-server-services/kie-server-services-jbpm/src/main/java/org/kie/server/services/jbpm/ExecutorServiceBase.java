@@ -228,7 +228,8 @@ public class ExecutorServiceBase {
                 .message(request.getMessage())
                 .retries(request.getRetries())
                 .scheduledDate(request.getTime())
-                .status(request.getStatus().toString());
+                .status(request.getStatus().toString())
+                .containerId(request.getDeploymentId());
 
         if (withErrors) {
             ErrorInfoInstance[] errors = new ErrorInfoInstance[request.getErrorInfo().size()];

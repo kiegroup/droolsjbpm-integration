@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.kie.server.api.model.instance.JobRequestInstance;
 import org.kie.server.api.model.instance.RequestInfoInstance;
-import org.kie.server.api.model.instance.RequestInfoInstanceList;
 import org.kie.server.client.jms.ResponseHandler;
 
 public interface JobServicesClient {
@@ -30,10 +29,14 @@ public interface JobServicesClient {
     Long scheduleRequest(String containerId, JobRequestInstance jobRequest);
 
     void cancelRequest(long requestId);
+    
+    void cancelRequest(String containerId, long requestId);
 
     void updateRequestData(long requestId, String containerId, Map<String, Object> data);
 
     void requeueRequest(long requestId);
+    
+    void requeueRequest(String containerId, long requestId);
 
     List<RequestInfoInstance> getRequestsByStatus(List<String> statuses, Integer page, Integer pageSize);
 
@@ -50,6 +53,8 @@ public interface JobServicesClient {
     List<RequestInfoInstance> getRequestsByProcessInstance(Long processInstanceId, List<String> statuses, Integer page, Integer pageSize);
 
     RequestInfoInstance getRequestById(Long requestId, boolean withErrors, boolean withData);
+    
+    RequestInfoInstance getRequestById(String containerId, Long requestId, boolean withErrors, boolean withData);
 
     void setResponseHandler(ResponseHandler responseHandler);
 }

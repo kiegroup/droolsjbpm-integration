@@ -90,7 +90,7 @@ public class KieServerRouterEventListenerRetryTest {
                 failureLatch.countDown();
             }
         });
-        wireMockServer = createMockServer(routerPort, "/admin/add");
+        wireMockServer = createMockServer(routerPort, "/mgmt/add");
 
         client.afterContainerStarted(null, containerInstance);
         failureLatch.await();
@@ -98,7 +98,7 @@ public class KieServerRouterEventListenerRetryTest {
         wireMockServer.start();
         successLatch.await();
 
-        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/admin/add")));
+        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/mgmt/add")));
     }
 
     @Test(timeout = 10000)
@@ -120,7 +120,7 @@ public class KieServerRouterEventListenerRetryTest {
                 failureLatch.countDown();
             }
         });
-        wireMockServer = createMockServer(routerPort, "/admin/remove");
+        wireMockServer = createMockServer(routerPort, "/mgmt/remove");
 
         client.afterContainerStopped(null, containerInstance);
         failureLatch.await();
@@ -128,7 +128,7 @@ public class KieServerRouterEventListenerRetryTest {
         wireMockServer.start();
         successLatch.await();
 
-        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/admin/remove")));
+        wireMockServer.verify(1, postRequestedFor(urlEqualTo("/mgmt/remove")));
     }
 
     @Test(timeout = 10000)
@@ -150,7 +150,7 @@ public class KieServerRouterEventListenerRetryTest {
                 failureLatch.countDown();
             }
         });
-        wireMockServer = createMockServer(routerPort, "/admin/remove");
+        wireMockServer = createMockServer(routerPort, "/mgmt/remove");
 
         client.beforeServerStopped(new KieServer() {
             @Override
@@ -225,7 +225,7 @@ public class KieServerRouterEventListenerRetryTest {
         boolean met = successLatch.await(4L, TimeUnit.SECONDS);
         assertFalse("On success should not be invoked", met);
 
-        wireMockServer.verify(0, postRequestedFor(urlEqualTo("/admin/remove")));
+        wireMockServer.verify(0, postRequestedFor(urlEqualTo("/mgmt/remove")));
     }
 
     protected WireMockServer createMockServer(int port, String url) {
