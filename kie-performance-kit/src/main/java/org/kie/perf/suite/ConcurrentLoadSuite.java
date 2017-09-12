@@ -45,6 +45,7 @@ public class ConcurrentLoadSuite implements ITestSuite {
             IPerfTest scenario = scenarios.iterator().next().newInstance();
 
             exec.initMetrics(scenario);
+            scenario.init();
             if (tc.isWarmUp()) {
                 exec.performWarmUp(scenario);
             }
