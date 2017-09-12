@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.drools.core.command.GetVariableCommand;
 import org.drools.core.command.runtime.AdvanceSessionTimeCommand;
 import org.drools.core.command.runtime.BatchExecutionCommandImpl;
+import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.command.runtime.GetFactCountCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.GetIdCommand;
@@ -217,6 +218,7 @@ public class JaxbMarshaller implements Marshaller {
                 UpdateCommand.class,
                 ClearAgendaCommand.class,
                 FireAllRulesCommand.class,
+                DisposeCommand.class,
                 GetIdCommand.class,
                 GetGlobalCommand.class,
                 InsertObjectCommand.class,
