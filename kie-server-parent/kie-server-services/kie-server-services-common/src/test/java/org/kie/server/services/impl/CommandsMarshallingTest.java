@@ -15,6 +15,7 @@
 
 package org.kie.server.services.impl;
 
+import org.drools.core.command.runtime.DisposeCommand;
 import org.drools.core.command.runtime.GetGlobalCommand;
 import org.drools.core.command.runtime.SetGlobalCommand;
 import org.drools.core.command.runtime.process.StartProcessCommand;
@@ -89,6 +90,14 @@ public class CommandsMarshallingTest {
         String xmlCommand = "<fire-all-rules max=\"10\" out-identifier=\"result\"/>";
         FireAllRulesCommand command = marshaller.unmarshall(xmlCommand, FireAllRulesCommand.class);
         assertEquals(10, command.getMax());
+
+        assertEquals(xmlCommand, marshaller.marshall(command));
+    }
+    
+    @Test
+    public void testMarshallDisposeCommand() {
+        String xmlCommand = "<dispose/>";
+        DisposeCommand command = marshaller.unmarshall(xmlCommand, DisposeCommand.class);
 
         assertEquals(xmlCommand, marshaller.marshall(command));
     }
