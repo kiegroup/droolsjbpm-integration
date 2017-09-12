@@ -15,6 +15,14 @@
 
 package org.kie.server.api.marshalling.xstream;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.Set;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
@@ -34,10 +42,10 @@ import org.kie.server.api.commands.optaplanner.AddProblemFactChangeCommand;
 import org.kie.server.api.commands.optaplanner.AddProblemFactChangesCommand;
 import org.kie.server.api.commands.optaplanner.CreateSolverCommand;
 import org.kie.server.api.commands.optaplanner.DisposeSolverCommand;
-import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverCommand;
 import org.kie.server.api.commands.optaplanner.GetSolverWithBestSolutionCommand;
 import org.kie.server.api.commands.optaplanner.GetSolversCommand;
+import org.kie.server.api.commands.optaplanner.IsEveryProblemFactChangeProcessedCommand;
 import org.kie.server.api.commands.optaplanner.SolvePlanningProblemCommand;
 import org.kie.server.api.commands.optaplanner.TerminateSolverEarlyCommand;
 import org.kie.server.api.marshalling.Marshaller;
@@ -66,13 +74,7 @@ import org.optaplanner.persistence.xstream.api.score.AbstractScoreXStreamConvert
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
+import static org.kie.internal.xstream.XStreamUtils.createXStream;
 
 public class XStreamMarshaller
         implements Marshaller {
@@ -106,20 +108,18 @@ public class XStreamMarshaller
     }
 
     protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
-        this.xstream = XStreamXML.newXStreamMarshaller( new XStream( new PureJavaReflectionProvider() ) {
-            protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS), next)) {
-                    public Class realClass(String elementName) {
+        this.xstream = XStreamXML.newXStreamMarshaller( createXStream( new PureJavaReflectionProvider(), next -> {
+            return new MapperWrapper( chainMapperWrappers( new ArrayList<>( EXTENSIONS ), next ) ) {
+                public Class realClass( String elementName ) {
 
-                        Class customClass = classNames.get(elementName);
-                        if (customClass != null) {
-                            return customClass;
-                        }
-                        return super.realClass(elementName);
+                    Class customClass = classNames.get( elementName );
+                    if ( customClass != null ) {
+                        return customClass;
                     }
-                };
-            }
-        });
+                    return super.realClass( elementName );
+                }
+            };
+        } ));
     }
 
     private MapperWrapper chainMapperWrappers(List<XStreamMarshallerExtension> extensions, MapperWrapper last) {
