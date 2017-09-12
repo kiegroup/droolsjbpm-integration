@@ -26,6 +26,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "user-task-definition")
 public class UserTaskDefinition {
 
+    @XmlElement(name="task-id")
+    private String id;
     @XmlElement(name="task-name")
     private String name;
     @XmlElement(name="task-priority")
@@ -36,6 +38,8 @@ public class UserTaskDefinition {
     private String createdBy;
     @XmlElement(name="task-skippable")
     private boolean skippable;
+    @XmlElement(name="task-form-name")
+    private String formName;
 
     @XmlElementWrapper(name="associated-entities")
     private String[] associatedEntities;
@@ -48,6 +52,14 @@ public class UserTaskDefinition {
         return new Builder();
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     public String getName() {
         return name;
     }
@@ -86,6 +98,14 @@ public class UserTaskDefinition {
 
     public void setSkippable(boolean skippable) {
         this.skippable = skippable;
+    }
+    
+    public String getFormName() {
+        return formName;
+    }
+
+    public void setFormName(String formName) {
+        this.formName = formName;
     }
 
     public String[] getAssociatedEntities() {
@@ -130,6 +150,12 @@ public class UserTaskDefinition {
         public UserTaskDefinition build() {
             return definition;
         }
+        
+        public Builder id(String id) {
+            definition.setId(id);
+
+            return this;
+        }
 
         public Builder name(String name) {
             definition.setName(name);
@@ -157,6 +183,12 @@ public class UserTaskDefinition {
 
         public Builder skippable(boolean skippable) {
             definition.setSkippable(skippable);
+
+            return this;
+        }
+        
+        public Builder formName(String formName) {
+            definition.setFormName(formName);
 
             return this;
         }

@@ -156,11 +156,13 @@ public class DefinitionServiceBase {
                 entities = Collections.emptyList();
             }
             org.kie.server.api.model.definition.UserTaskDefinition definition = org.kie.server.api.model.definition.UserTaskDefinition.builder()
+                    .id(orig.getId())
                     .name(orig.getName())
                     .comment(orig.getComment())
                     .createdBy(orig.getCreatedBy())
                     .priority(orig.getPriority())
                     .skippable(orig.isSkippable())
+                    .formName(orig.getFormName())
                     .entities(entities.toArray(new String[entities.size()]))
                     .taskInputs(orig.getTaskInputMappings())
                     .taskOutputs(orig.getTaskOutputMappings())
