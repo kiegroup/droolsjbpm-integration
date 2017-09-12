@@ -16,31 +16,21 @@
 package org.kie.server.integrationtests.drools;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.drools.core.command.runtime.rule.GetFactHandlesCommand;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.command.BatchExecutionCommand;
 import org.kie.api.command.Command;
-import org.kie.api.command.Setter;
 import org.kie.api.runtime.ExecutionResults;
-import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
-
-import static org.junit.Assert.*;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
-import org.kie.server.integrationtests.shared.KieServerReflections;
+
+import static org.junit.Assert.assertEquals;
 
 public class DisposeCommandTest extends DroolsKieServerBaseIntegrationTest {
 
