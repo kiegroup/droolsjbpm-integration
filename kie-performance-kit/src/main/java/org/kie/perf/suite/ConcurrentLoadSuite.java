@@ -77,7 +77,7 @@ public class ConcurrentLoadSuite implements ITestSuite {
     private void startScenario(Class<? extends IPerfTest> scenario) {
         List<Thread> threadsList = new ArrayList<Thread>();
 
-        KPKLimit limit = scenario.getClass().getAnnotation(KPKLimit.class);
+        KPKLimit limit = scenario.getAnnotation(KPKLimit.class);
         final int max = (limit != null) ? limit.value() : Integer.MAX_VALUE;
 
         TestConfig tc = TestConfig.getInstance();
