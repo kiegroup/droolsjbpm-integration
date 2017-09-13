@@ -17,8 +17,8 @@ package org.kie.server.integrationtests.controller;
 
 import org.junit.After;
 import org.junit.Before;
-import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.config.TestConfig;
+import org.kie.server.integrationtests.controller.client.KieServerMgmtControllerClient;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 
 public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegrationTest {
@@ -45,7 +45,8 @@ public abstract class KieControllerManagementBaseTest extends RestOnlyBaseIntegr
 
     @After
     public void closeControllerClient() {
-        mgmtControllerClient.close();
+        if (mgmtControllerClient != null) {
+            mgmtControllerClient.close();
+        }
     }
-
 }
