@@ -254,6 +254,10 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.jboss.narayana.jta</groupId>
+      <artifactId>narayana-jta</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
       <exclusions>
