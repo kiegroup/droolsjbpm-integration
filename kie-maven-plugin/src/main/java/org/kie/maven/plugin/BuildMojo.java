@@ -133,7 +133,7 @@ public class BuildMojo extends AbstractKieMojo {
             urls.add(outputDirectory.toURI().toURL());
 
             ClassLoader projectClassLoader = URLClassLoader.newInstance(urls.toArray(new URL[0]),
-                                                                        Thread.currentThread().getContextClassLoader());
+                                                                        getClass().getClassLoader());
 
             Thread.currentThread().setContextClassLoader(projectClassLoader);
         } catch (DependencyResolutionRequiredException e) {
