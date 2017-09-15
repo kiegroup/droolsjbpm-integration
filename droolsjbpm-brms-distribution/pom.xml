@@ -112,6 +112,10 @@
       <artifactId>slf4j-jdk14</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.jboss.narayana.jta</groupId>
+      <artifactId>narayana-jta</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jboss.spec.javax.security.jacc</groupId>
       <artifactId>jboss-jacc-api_1.5_spec</artifactId>
     </dependency>
