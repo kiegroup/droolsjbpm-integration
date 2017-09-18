@@ -55,10 +55,13 @@ public class JobServicesClientImpl extends AbstractKieServicesClientImpl impleme
         if( config.isRest() ) {
 
             Map<String, Object> valuesMap = new HashMap<String, Object>();
-            valuesMap.put(CONTAINER_ID, containerId);
+            String queryString = "";
+            if (containerId != null && !containerId.isEmpty()) {
+                queryString = "?containerId=" + containerId;
+            }
 
             result = makeHttpPostRequestAndCreateCustomResponse(
-                    build(loadBalancer.getUrl(), JOB_URI, valuesMap) + "?containerId="+containerId, jobRequest,
+                    build(loadBalancer.getUrl(), JOB_URI, valuesMap) + queryString, jobRequest,
                     Object.class);
 
         } else {
