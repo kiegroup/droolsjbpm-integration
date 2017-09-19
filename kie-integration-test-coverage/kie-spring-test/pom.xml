@@ -21,7 +21,7 @@
   <parent>
     <artifactId>kie-integration-test-coverage-parent</artifactId>
     <groupId>org.drools.testcoverage</groupId>
-    <version>7.3.1-SNAPSHOT</version>
+    <version>7.3.1.t013</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
