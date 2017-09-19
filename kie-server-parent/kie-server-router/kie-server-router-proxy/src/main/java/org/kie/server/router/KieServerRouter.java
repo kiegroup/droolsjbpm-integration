@@ -114,7 +114,7 @@ public class KieServerRouter {
         HttpHandler notFoundHandler = ResponseCodeHandler.HANDLE_404;        
 
 
-        ProxyHandler proxyHandler = new ProxyHandler(proxyClient, notFoundHandler);
+        ProxyHandler proxyHandler = new ProxyHandler(proxyClient, -1, notFoundHandler, true, false);
         PathHandler pathHandler = Handlers.path(proxyHandler);
         pathHandler.addPrefixPath("/queries/definitions", new QueriesDataHttpHandler(notFoundHandler, adminHandler));
         pathHandler.addPrefixPath("/queries", new QueriesHttpHandler(notFoundHandler, adminHandler));
