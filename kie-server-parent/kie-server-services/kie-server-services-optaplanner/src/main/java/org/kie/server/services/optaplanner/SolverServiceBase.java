@@ -33,6 +33,7 @@ import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
+import org.optaplanner.core.api.solver.event.SolverEventListener;
 import org.optaplanner.core.impl.solver.ProblemFactChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -514,5 +515,43 @@ public class SolverServiceBase {
             }
         }
         sic.getSolver().terminateEarly();
+    }
+    
+    protected void boostrapContinuousPlanning(String containerId, List<RealtimePlanning> plannings) {
+        this.executor.execute(() -> {
+            for (RealtimePlanning planning : plannings) {
+                if (planning.accept(containerId)) {                
+                    logger.info("ContinuousPlanning {} is going to be used for container {}", planning, containerId);
+                    
+                    String solverId = planning.getSolverId();
+                    SolverInstance instance = new SolverInstance();
+                    instance.setSolverConfigFile(planning.getSolverConfigPath());
+                    instance.setContainerId(containerId);
+                    instance.setSolverId(solverId);
+                    
+                    logger.debug("About to start solver {}", instance);
+                    createSolver(containerId, solverId, instance);
+                    
+                    logger.debug("Solver with id {} created successfully", solverId);
+                    SolverInstanceContext solverInstance = solvers.get(SolverInstance.getSolverInstanceKey(containerId, solverId));
+                    
+                    Solver<Object> solver = solverInstance.getSolver();
+                    SolverEventListener<Object> eventListener = planning.getCallback();
+                    solver.addEventListener(eventListener);
+                    logger.debug("Added solver event listner {} to solver {}", eventListener, solver);
+                    
+                    List<ProblemFactChange<Object>> problemFacts = planning.loadFacts();
+                    logger.debug("About to add following problem fact changes {} to solver {}", problemFacts, solverId);
+                    if (!problemFacts.isEmpty()) {
+                        solver.addProblemFactChanges(problemFacts);
+                    }
+                    
+                    solver.solve(planning.getPlanningProblem());
+                    logger.info("ContinuousPlanning {} successfully started for container {}", planning, containerId);
+                    
+                }
+            }
+    
+        });
     }
 }
