@@ -151,18 +151,12 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     @Test
     public void testUpdateReleaseIdForNotExistingContainer() throws Exception {
-        ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
-        KieServerAssert.assertSuccess(reply);
-        Assert.assertEquals(releaseId2, reply.getResult());
 
-        ServiceResponse<KieContainerResourceList> replyList = client.listContainers();
-        KieServerAssert.assertSuccess(replyList);
-        List<KieContainerResource> containers = replyList.getResult().getContainers();
-        Assert.assertEquals("Number of listed containers!", 1, containers.size());
-        assertContainsContainer(containers, "update-releaseId");
+        final String updateErrorMessage = "Container update-releaseId is not instantiated.";
+        final ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
 
-        ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
-        KieServerAssert.assertSuccess(disposeReply);
+        KieServerAssert.assertFailure(reply);
+        Assertions.assertThat(reply.getMsg()).contains(updateErrorMessage);
     }
 
     @Test
