@@ -15,11 +15,6 @@
 
 package org.kie.server.services.jbpm.search.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jbpm.services.api.query.model.QueryParam;
-import org.kie.server.api.model.definition.TaskField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,80 +27,6 @@ public class TaskQueryStrategy implements QueryStrategy {
 	@Override
 	public String getQueryExpression() {
 		return TASK_QUERY;
-	}
-	
-	@Override
-	public Map<String, String> getColumnMapping(QueryParam[] params) {
-		Map<String, String> mapping = new HashMap<>();
-		
-		for (QueryParam nextParam: params) {
-			mapping.put(nextParam.getColumn(), getColumnType(nextParam.getColumn()));
-		}
-		
-		return mapping;
-	}
-	
-	private String getColumnType(String param) {
-		String columnType = null;
-		
-		switch(TaskField.valueOf(param)) {
-		case ID:
-			columnType = "integer";
-			break;
-		case ACTIVATIONTIME:
-			columnType = "date";
-			break;
-		case ACTUALOWNER:
-			columnType = "string";
-			break;
-		case CREATEDBY:
-			columnType = "string";
-			break;
-		case CREATEDON:
-			columnType = "date";
-			break;
-		case DEPLOYMENTID:
-			columnType = "string";
-			break;
-		case DESCRIPTION:
-			columnType = "string";
-			break;
-		case DUEDATE:
-			columnType = "date";
-			break;
-		case NAME:
-			columnType = "string";
-			break;
-		case PARENTID:
-			columnType = "integer";
-			break;
-		case PRIORITY:
-			columnType = "integer";
-			break;
-		case PROCESSID:
-			columnType = "string";
-			break;
-		case PROCESSINSTANCEID:
-			columnType = "integer";
-			break;
-		case PROCESSSESSIONID:
-			columnType = "integer";
-			break;
-		case STATUS:
-			columnType = "string";
-			break;
-		case TASKID:
-			columnType = "integer";
-			break;
-		case WORKITEMID:
-			columnType = "integer";
-			break;
-		default:
-			String message = "Unknown paramater.";
-			logger.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return columnType;
-	}
+	}	
 
 }

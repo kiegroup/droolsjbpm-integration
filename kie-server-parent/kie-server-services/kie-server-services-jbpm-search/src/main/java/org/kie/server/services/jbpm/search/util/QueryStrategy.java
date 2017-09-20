@@ -15,17 +15,12 @@
 
 package org.kie.server.services.jbpm.search.util;
 
-import java.util.Map;
-
-import org.jbpm.services.api.query.model.QueryParam;
-
 /**
  * Provides DB specific query and column-mappings for queries.
  */
 public interface QueryStrategy {
 
-		String getQueryExpression();
+	String getQueryExpression();
 	
-		Map<String, String> getColumnMapping(QueryParam[] params);
 	
 }

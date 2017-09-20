@@ -34,7 +34,7 @@ public class ProcessInstanceSearchServiceBase extends AbstractSearchServiceBase 
 	
 	private static final Logger logger = LoggerFactory.getLogger(TaskSearchServiceBase.class);
 
-	private static final String MAPPER_NAME = "ProcessInstancesWithCustomVariables";
+	private static final String MAPPER_NAME = "ProcessInstances";
 
 	private static final String PROCESS_INSTANCE_QUERY_NAME = "getProcessInstancesWithFilters";
 	
