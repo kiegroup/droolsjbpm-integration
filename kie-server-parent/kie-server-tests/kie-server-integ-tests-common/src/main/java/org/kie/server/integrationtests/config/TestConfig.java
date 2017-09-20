@@ -68,6 +68,7 @@ public class TestConfig {
 
     private static final StringTestParameter KJARS_BUILD_SETTINGS_XML = new StringTestParameter("kie.server.testing.kjars.build.settings.xml");
     private static final StringTestParameter KIE_CLIENT_DEPLOYMENT_SETTINGS = new StringTestParameter("kie.server.client.deployment.settings.xml");
+    private static final StringTestParameter KIE_SERVER_MAVEN_SETTINGS = new StringTestParameter("kie.server.server.deployment.settings.xml");
 
     private static final StringTestParameter CONTAINER_ID = new StringTestParameter("cargo.container.id");
     private static final StringTestParameter CONTAINER_PORT = new StringTestParameter("cargo.servlet.port");
@@ -421,6 +422,13 @@ public class TestConfig {
      */
     public static String getKieServerDataSourceDriverClass() {
         return TestConfig.ORG_KIE_SERVER_DATASOURCE_DRIVER_CLASS.getParameterValue();
+    }
+
+    /**
+     * @return Location of settings.xml file used for Kie server maven settings.
+     */
+    public static String getKieServerMavenSettings() {
+        return TestConfig.KIE_SERVER_MAVEN_SETTINGS.getParameterValue();
     }
 
     /**
