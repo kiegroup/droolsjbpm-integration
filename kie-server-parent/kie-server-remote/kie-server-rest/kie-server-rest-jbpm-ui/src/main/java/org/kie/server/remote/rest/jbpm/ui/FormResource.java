@@ -16,15 +16,8 @@
 package org.kie.server.remote.rest.jbpm.ui;
 
 
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.FORM_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_FORM_GET_URI;
-import static org.kie.server.api.rest.RestURI.PROCESS_ID;
-import static org.kie.server.api.rest.RestURI.TASK_FORM_GET_URI;
-import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ID;
+import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import org.jbpm.services.api.DeploymentNotFoundException;
-import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 
 import java.text.MessageFormat;
 
@@ -40,6 +33,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jbpm.services.api.DeploymentNotFoundException;
+import org.jbpm.services.api.ProcessDefinitionNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,6 +45,9 @@ import org.kie.server.services.jbpm.ui.FormServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+
+@Api(value="jbpm-forms")
 @Path("server/" + FORM_URI)
 public class FormResource {
 

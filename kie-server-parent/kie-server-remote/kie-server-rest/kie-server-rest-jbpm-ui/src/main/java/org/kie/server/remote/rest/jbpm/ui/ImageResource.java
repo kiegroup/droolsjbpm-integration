@@ -15,7 +15,11 @@
 
 package org.kie.server.remote.rest.jbpm.ui;
 
+import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
+
 import java.text.MessageFormat;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,9 +36,9 @@ import org.kie.server.services.jbpm.ui.ImageServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import io.swagger.annotations.Api;
 
+@Api(value="jbpm-images")
 @Path("server/" + IMAGE_URI)
 public class ImageResource {
 

@@ -28,6 +28,7 @@ public class KieServerEnvironment {
     private static Version version;
     private static String serverId = System.getProperty(KieServerConstants.KIE_SERVER_ID);
     private static String name = System.getProperty(KieServerConstants.KIE_SERVER_ID);
+    private static String contextRoot;
 
     static {
         String kieServerString = KieServerEnvironment.class.getPackage().getImplementationVersion();
@@ -86,4 +87,12 @@ public class KieServerEnvironment {
         name = nameIn;
     }
 
+	public static String getContextRoot() {
+		return contextRoot;
+	}
+
+	public static void setContextRoot(String contextRootIn) {
+		contextRoot = contextRootIn;
+	}
+    
 }

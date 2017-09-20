@@ -15,7 +15,23 @@
 
 package org.kie.server.remote.rest.optaplanner;
 
+import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
+import static org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION;
+import static org.kie.server.api.rest.RestURI.SOLVER_ID;
+import static org.kie.server.api.rest.RestURI.SOLVER_ID_URI;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACT_CHANGES;
+import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED;
+import static org.kie.server.api.rest.RestURI.SOLVER_STATE_RUNNING;
+import static org.kie.server.api.rest.RestURI.SOLVER_STATE_TERMINATING;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+
 import java.text.MessageFormat;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -40,21 +56,9 @@ import org.kie.server.services.optaplanner.SolverServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
-import static org.kie.server.api.rest.RestURI.SOLVER_BEST_SOLUTION;
-import static org.kie.server.api.rest.RestURI.SOLVER_ID;
-import static org.kie.server.api.rest.RestURI.SOLVER_ID_URI;
-import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACT_CHANGES;
-import static org.kie.server.api.rest.RestURI.SOLVER_PROBLEM_FACTS_CHANGES_PROCESSED;
-import static org.kie.server.api.rest.RestURI.SOLVER_STATE_RUNNING;
-import static org.kie.server.api.rest.RestURI.SOLVER_STATE_TERMINATING;
-import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
-import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
-import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
-import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
-import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import io.swagger.annotations.Api;
 
+@Api(value="planner-solvers")
 @Path("server/" + RestURI.SOLVER_URI)
 public class SolverResource {
 

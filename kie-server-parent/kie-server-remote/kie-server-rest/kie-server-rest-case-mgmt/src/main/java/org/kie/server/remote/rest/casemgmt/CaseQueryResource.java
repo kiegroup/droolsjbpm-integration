@@ -15,7 +15,11 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
+import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
+
 import java.util.List;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,7 +31,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 
-import org.jbpm.casemgmt.api.model.CaseStatus;
 import org.kie.server.api.model.cases.CaseDefinitionList;
 import org.kie.server.api.model.cases.CaseFileDataItemList;
 import org.kie.server.api.model.cases.CaseInstanceList;
@@ -39,9 +42,9 @@ import org.kie.server.services.casemgmt.CaseManagementRuntimeDataServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import io.swagger.annotations.Api;
 
+@Api(value="case-query")
 @Path("server/" + CASE_QUERY_URI)
 public class CaseQueryResource extends AbstractCaseResource {
 

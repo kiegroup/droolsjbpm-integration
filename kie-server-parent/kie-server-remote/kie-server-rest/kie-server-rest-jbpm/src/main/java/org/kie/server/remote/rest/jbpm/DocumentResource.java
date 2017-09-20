@@ -46,10 +46,13 @@ import org.kie.server.services.jbpm.DocumentServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
 
+@Api(value="jbpm-documents")
 @Path("server/" + DOCUMENT_URI)
 public class DocumentResource {
 

@@ -31,6 +31,7 @@ public class KieServerConstants {
     public static final String KIE_CASE_SERVER_EXT_DISABLED = "org.jbpm.case.server.ext.disabled";
     public static final String KIE_DMN_SERVER_EXT_DISABLED = "org.kie.dmn.server.ext.disabled";
     public static final String KIE_JBM_SEARCH_SERVER_EXT_DISABLED = "org.jbpm.search.server.ext.disabled";
+    public static final String KIE_SWAGGER_SERVER_EXT_DISABLED = "org.kie.swagger.server.ext.disabled";
 
     public static final String KIE_DROOLS_FILTER_REMOTEABLE_CLASSES = "org.drools.server.filter.classes";
 
@@ -112,6 +113,7 @@ public class KieServerConstants {
     public static final String CAPABILITY_CASE = "CaseMgmt"; // Case Management
     public static final String CAPABILITY_DMN = "DMN"; // DMN
     public static final String CAPABILITY_BPM_QUERIES = "BPMQueries"; // BPM Queries
+    public static final String CAPABILITY_SWAGGER = "Swagger"; // Swagger
 
     public static final String FAILURE_REASON_PROP = "failure-reason";
 

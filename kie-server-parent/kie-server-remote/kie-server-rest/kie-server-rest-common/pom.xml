@@ -67,6 +67,13 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId> jackson-module-jaxb-annotations</artifactId>
     </dependency>
+    
+    <!-- Swagger -->
+    <dependency>
+    	<groupId>io.swagger</groupId>
+    	<artifactId>swagger-annotations</artifactId>
+    </dependency>
+    
   </dependencies>
 
   <build>

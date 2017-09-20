@@ -15,9 +15,14 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
+import static org.kie.server.api.rest.RestURI.*;
+import static org.kie.server.remote.rest.casemgmt.Messages.*;
+import static org.kie.server.remote.rest.common.util.RestUtils.*;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -52,10 +57,9 @@ import org.kie.server.services.casemgmt.CaseManagementServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.casemgmt.Messages.*;
+import io.swagger.annotations.Api;
 
+@Api(value="case")
 @Path("server/" + CASE_URI)
 public class CaseResource extends AbstractCaseResource {
 

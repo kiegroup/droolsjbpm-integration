@@ -80,6 +80,12 @@
          "methodName": "getCaseInstanceComments",
          "elementKind": "method",
          "justification": "Added new method to support case instance comments basic sorting"
+         },
+         {
+ 		 "code": "java.annotation.added",
+ 		 "annotationType": "io.swagger.annotations.Api",
+ 		 "elementKind": "annotation",
+ 		 "justification": "Added Swagger annotations for kie server docs"
          }
       ]
     }

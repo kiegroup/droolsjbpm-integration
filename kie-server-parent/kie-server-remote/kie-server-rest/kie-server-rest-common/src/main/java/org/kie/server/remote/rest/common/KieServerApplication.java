@@ -19,9 +19,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 
+import org.kie.server.api.KieServerEnvironment;
 import org.kie.server.remote.rest.common.resource.KieServerRestImpl;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.SupportedTransports;
@@ -31,30 +35,34 @@ import org.kie.server.services.impl.KieServerLocator;
 @ApplicationPath("/")
 public class KieServerApplication extends Application {
 
-    private final Set<Object> instances = new CopyOnWriteArraySet<Object>() {
-        private static final long serialVersionUID = 1763183096852523317L;
-        {
-            KieServerImpl server = KieServerLocator.getInstance();
+	private final Set<Object> instances;
+	
+	public KieServerApplication() {
+		instances = new CopyOnWriteArraySet<Object>() {
+			private static final long serialVersionUID = 1763183096852523317L;
+			{
+				KieServerImpl server = KieServerLocator.getInstance();
 
-            add(new KieServerRestImpl(server));
+				add(new KieServerRestImpl(server));
 
-            // next add any resources from server extensions
-            List<KieServerExtension> extensions = server.getServerExtensions();
+				// next add any resources from server extensions
+				List<KieServerExtension> extensions = server.getServerExtensions();
 
-            for (KieServerExtension extension : extensions) {
-                addAll(extension.getAppComponents(SupportedTransports.REST));
-            }
-        }
-    };
+				for (KieServerExtension extension : extensions) {
+					addAll(extension.getAppComponents(SupportedTransports.REST));
+				}
+			}
+		};
+	}
 
-    @Override
-    public Set<Class<?>> getClasses() {
-        return Collections.emptySet();
-    }
+	@Override
+	public Set<Class<?>> getClasses() {
+		return Collections.emptySet();
+	}
 
-    @Override
-    public Set<Object> getSingletons() {
-        return instances;
-    }
+	@Override
+	public Set<Object> getSingletons() {
+		return instances;
+	}
 
 }

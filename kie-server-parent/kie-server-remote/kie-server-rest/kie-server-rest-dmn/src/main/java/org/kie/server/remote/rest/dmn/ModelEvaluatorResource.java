@@ -42,9 +42,12 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+
 import static org.kie.server.api.rest.RestURI.*;
 import static org.kie.server.remote.rest.common.util.RestUtils.*;
 
+@Api(value="dmn")
 @Path("server/"+ RestURI.DMN_URI )
 public class ModelEvaluatorResource {
 

@@ -15,6 +15,14 @@
 
   <security-constraint>
     <web-resource-collection>
+      <web-resource-name>Swagger web resources</web-resource-name>
+      <url-pattern>/services/rest/server/swagger.json</url-pattern>
+      <http-method>GET</http-method>
+    </web-resource-collection>
+    <!-- No authentication. Swagger resources should be accessible without authentication. -->
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
       <web-resource-name>REST web resources</web-resource-name>
       <url-pattern>/services/rest/*</url-pattern>
       <http-method>GET</http-method>

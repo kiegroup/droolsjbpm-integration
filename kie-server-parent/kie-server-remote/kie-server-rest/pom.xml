@@ -23,6 +23,7 @@
     <module>kie-server-rest-case-mgmt</module>
     <module>kie-server-rest-dmn</module>
     <module>kie-server-rest-jbpm-search</module>
+    <module>kie-server-rest-swagger</module>
   </modules>
 
 </project>
