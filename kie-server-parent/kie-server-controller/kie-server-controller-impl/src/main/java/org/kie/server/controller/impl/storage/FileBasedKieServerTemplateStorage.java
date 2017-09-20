@@ -15,6 +15,7 @@
 package org.kie.server.controller.impl.storage;
 
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -118,6 +119,8 @@ public class FileBasedKieServerTemplateStorage implements KieServerTemplateStora
         	} else {
         		logger.error("Unable to read server template maps from file due to stream error",se);
         	}
+        } catch (FileNotFoundException e) {
+            logger.warn("Unable to read server template maps from file {}. File does not exist.", templatesLocation);
         } catch (Throwable e) {
             logger.error("Unable to read server template maps from file",e);
         }
