@@ -355,6 +355,9 @@ public class TaskSearchServiceIntegrationTest extends JbpmQueriesKieServerBaseIn
                                                                                      100 );
         for ( TaskInstance res : results ) {
             resultsIds.add( res.getId() );
+            
+            Assertions.assertThat(res.getInputData()).isNullOrEmpty();
+            Assertions.assertThat(res.getOutputData()).isNullOrEmpty();
         }
 
         Assertions.assertThat( results ).isNotNull();

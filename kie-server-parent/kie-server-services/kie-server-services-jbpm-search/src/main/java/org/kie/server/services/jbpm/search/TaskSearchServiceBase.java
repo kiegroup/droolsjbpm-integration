@@ -34,7 +34,7 @@ public class TaskSearchServiceBase extends AbstractSearchServiceBase {
 
 	private static final Logger logger = LoggerFactory.getLogger(TaskSearchServiceBase.class);
 
-	private static final String MAPPER_NAME = "UserTasksWithCustomVariables";
+	private static final String MAPPER_NAME = "UserTasks";
 
 	private static final String TASK_QUERY_NAME = "getTasksWithFilters";
 
