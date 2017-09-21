@@ -39,6 +39,7 @@
     <!-- Custom settings.xml used when building the testing kjars. By default there is no additional configuration needed,
          but for testing e.g. stated builds it is necessary to pass additional repository with the staged artifacts. -->
     <kie.server.testing.kjars.build.settings.xml/>
+    <kie.server.server.deployment.settings.xml>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.server.server.deployment.settings.xml>
     <org.jbpm.document.storage>${project.build.directory}/docs</org.jbpm.document.storage>
     <kie.server.router.url>http://localhost:${router.port}</kie.server.router.url>
     <!-- This property can be overridden to exclude specific test category according to specific needs. -->
@@ -193,7 +194,7 @@
             <container>
               <containerId>${cargo.container.id}</containerId>
               <systemProperties>
-                <kie.maven.settings.custom>${project.build.testOutputDirectory}/kie-server-testing-server-custom-settings.xml</kie.maven.settings.custom>
+                <kie.maven.settings.custom>${kie.server.server.deployment.settings.xml}</kie.maven.settings.custom>
                 <!-- Fixes issue when Tomcat hangs during deployment due to insufficient amount of entropy.
                      The property specifies less secure source of entropy, which is fine for testing.
                      See https://wiki.apache.org/tomcat/HowTo/FasterStartUp#Entropy_Source for more info -->
@@ -297,6 +298,9 @@
                 <additionalClasspathElements combine.children="append">
                   <additionalClasspathElement>${maven.jdbc.driver.jar}</additionalClasspathElement>
                 </additionalClasspathElements>
+                <systemPropertyVariables>
+                  <kie.server.server.deployment.settings.xml>${kie.server.server.deployment.settings.xml}</kie.server.server.deployment.settings.xml>
+                </systemPropertyVariables>
               </configuration>
             </execution>
           </executions>
