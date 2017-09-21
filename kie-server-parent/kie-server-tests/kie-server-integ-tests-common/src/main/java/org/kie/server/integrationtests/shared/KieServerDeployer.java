@@ -27,12 +27,14 @@ import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
 import org.appformer.maven.integration.MavenRepository;
 import org.appformer.maven.integration.embedder.MavenProjectLoader;
+import org.appformer.maven.integration.embedder.MavenSettings;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.junit.Assert;
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.scanner.KieMavenRepository;
+import org.kie.server.api.KieServerConstants;
 import org.kie.server.api.model.ReleaseId;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.slf4j.Logger;
@@ -143,6 +145,24 @@ public class KieServerDeployer {
 
         // make sure it is not deployed in the in-memory repository
         ks.getRepository().removeKieModule(releaseId);
+    }
+
+    /**
+     * Remove artifact from Kie server's local maven repository.
+     *
+     * @param releaseId Release id.
+     */
+    public static void removeLocalArtifact(ReleaseId releaseId) {
+        String originalMavenSettings = System.getProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS);
+        String kieServerMavenSettings = TestConfig.getKieServerMavenSettings();
+
+        System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, kieServerMavenSettings);
+        MavenSettings.reinitSettings();
+
+        getRepository().removeLocalArtifact(releaseId);
+
+        System.setProperty(KieServerConstants.CFG_KIE_MVN_SETTINGS, originalMavenSettings);
+        MavenSettings.reinitSettings();
     }
 
     public static MavenRepository getRepository() {

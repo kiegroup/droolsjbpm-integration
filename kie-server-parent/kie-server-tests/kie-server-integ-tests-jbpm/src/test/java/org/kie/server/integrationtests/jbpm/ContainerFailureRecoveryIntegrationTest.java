@@ -18,15 +18,10 @@ package org.kie.server.integrationtests.jbpm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,9 +50,9 @@ public class ContainerFailureRecoveryIntegrationTest extends JbpmKieServerBaseIn
     }
 
     @Before
-    public void cleanContainers() throws IOException {
+    public void cleanContainers() {
         disposeAllContainers(); 
-        cleanProjectFromLocalRepo();
+        KieServerDeployer.removeLocalArtifact(releaseId);
     }
 
     @Test
@@ -84,7 +79,7 @@ public class ContainerFailureRecoveryIntegrationTest extends JbpmKieServerBaseIn
         assertEquals("Message should be of type info", Severity.ERROR, message.getSeverity());
 
         client.disposeContainer(CONTAINER_ID);
-        cleanProjectFromLocalRepo();
+        KieServerDeployer.removeLocalArtifact(releaseId);
         KieServerDeployer.buildAndDeployMavenProject(ClassLoader.class.getResource("/kjars-sources/definition-project").getFile());
         
         client.createContainer(CONTAINER_ID, containerResource);
@@ -107,28 +102,6 @@ public class ContainerFailureRecoveryIntegrationTest extends JbpmKieServerBaseIn
             return new String(Files.readAllBytes(Paths.get(resourceUri)));
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-    
-    protected void cleanProjectFromLocalRepo() throws IOException {
-        File currentDir = new File("target");
-        Path localRepoPath = Paths.get(currentDir.getAbsolutePath(), "kie-server-testing-server-local-repo", "org", "kie", "server", "testing", "definition-project");
-        
-        if (Files.exists(localRepoPath)) {
-        
-            Files.walkFileTree(localRepoPath, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-    
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-             });
         }
     }
 }
