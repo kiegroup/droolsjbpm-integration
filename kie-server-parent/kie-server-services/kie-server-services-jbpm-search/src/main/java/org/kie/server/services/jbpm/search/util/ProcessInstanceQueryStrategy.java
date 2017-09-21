@@ -15,11 +15,6 @@
 
 package org.kie.server.services.jbpm.search.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jbpm.services.api.query.model.QueryParam;
-import org.kie.server.api.model.definition.ProcessInstanceField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,77 +27,6 @@ public class ProcessInstanceQueryStrategy implements QueryStrategy {
 	@Override
 	public String getQueryExpression() {
 		return PROCESS_INSTANCE_QUERY;
-	}
-
-	@Override
-	public Map<String, String> getColumnMapping(QueryParam[] params) {
-		Map<String, String> mapping = new HashMap<>();
-
-		for (QueryParam nextParam : params) {
-			mapping.put(nextParam.getColumn(), getColumnType(nextParam.getColumn()));
-		}
-
-		return mapping;
-	}
-
-	private String getColumnType(String param) {
-		String columnType = null;
-
-		switch (ProcessInstanceField.valueOf(param)) {
-		case ID:
-			columnType = "integer";
-			break;
-		case CORRELATIONKEY:
-			columnType = "string";
-			break;
-		case DURATION:
-			columnType = "integer";
-			break;
-		case END_DATE:
-			columnType = "date";
-			break;
-		case EXTERNALID:
-			columnType = "string";
-			break;
-		case USER_IDENTITY:
-			columnType = "string";
-			break;
-		case OUTCOME:
-			columnType = "string";
-			break;
-		case PARENTPROCESSINSTANCEID:
-			columnType = "integer";
-			break;
-		case PROCESSID:
-			columnType = "string";
-			break;
-		case PROCESSINSTANCEDESCRIPTION:
-			columnType = "string";
-			break;
-		case PROCESSINSTANCEID:
-			columnType = "integer";
-			break;
-		case PROCESSNAME:
-			columnType = "string";
-			break;
-		case PROCESSTYPE:
-			columnType = "integer";
-			break;
-		case PROCESSVERSION:
-			columnType = "string";
-			break;
-		case START_DATE:
-			columnType = "date";
-			break;
-		case STATUS:
-			columnType = "integer";
-			break;
-		default:
-			String message = "Unknown paramater.";
-			logger.error(message);
-			throw new IllegalArgumentException(message);
-		}
-		return columnType;
 	}
 	
 }
