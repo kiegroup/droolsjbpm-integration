@@ -15,6 +15,10 @@
 
 package org.kie.server.integrationtests.common;
 
+import java.util.List;
+import java.util.Set;
+
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,9 +34,6 @@ import org.kie.server.integrationtests.category.Smoke;
 import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
 import org.kie.server.integrationtests.shared.basetests.RestJmsSharedBaseIntegrationTest;
-
-import java.util.List;
-import java.util.Set;
 
 public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseIntegrationTest {
 
@@ -67,7 +68,6 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
                                                                                                               "bar",
                                                                                                               "0.0.0")));
         KieServerAssert.assertFailure(reply);
-
     }
 
     @Test
@@ -148,18 +148,12 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
 
     @Test
     public void testUpdateReleaseIdForNotExistingContainer() throws Exception {
-        ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
-        KieServerAssert.assertSuccess(reply);
-        Assert.assertEquals(releaseId2, reply.getResult());
 
-        ServiceResponse<KieContainerResourceList> replyList = client.listContainers();
-        KieServerAssert.assertSuccess(replyList);
-        List<KieContainerResource> containers = replyList.getResult().getContainers();
-        Assert.assertEquals("Number of listed containers!", 1, containers.size());
-        assertContainsContainer(containers, "update-releaseId");
+        final String updateErrorMessage = "Container update-releaseId is not instantiated.";
+        final ServiceResponse<ReleaseId> reply = client.updateReleaseId("update-releaseId", releaseId2);
 
-        ServiceResponse<Void> disposeReply = client.disposeContainer("update-releaseId");
-        KieServerAssert.assertSuccess(disposeReply);
+        KieServerAssert.assertFailure(reply);
+        Assertions.assertThat(reply.getMsg()).contains(updateErrorMessage);
     }
 
     @Test
@@ -198,5 +192,4 @@ public class KieServerContainerCRUDIntegrationTest extends RestJmsSharedBaseInte
         Assert.fail(
                 "Container list " + containers + " does not contain expected container with id " + expectedContainerId);
     }
-
 }

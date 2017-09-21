@@ -35,7 +35,8 @@ import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 
 public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
 
-    private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();;
+    private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
+    ;
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
     private NotificationService notificationService = LoggingNotificationService.getInstance();
 
@@ -115,15 +116,22 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
         if (releaseId.getGroupId() == null) {
             releaseId.setGroupId(containerSpec.getReleasedId().getGroupId());
         }
-        if (releaseId.getArtifactId()== null) {
+        if (releaseId.getArtifactId() == null) {
             releaseId.setArtifactId(containerSpec.getReleasedId().getArtifactId());
         }
 
+        final List<Container> containers;
+
         containerSpec.setReleasedId(releaseId);
+
+        if (containerSpec.getStatus() == KieContainerStatus.STARTED) {
+            containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
+        } else {
+            containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
+        }
+
         containerSpec.setStatus(KieContainerStatus.STARTED);
         templateStorage.update(serverTemplate);
-
-        List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
 
         notificationService.notify(serverTemplate, containerSpec, containers);
     }
