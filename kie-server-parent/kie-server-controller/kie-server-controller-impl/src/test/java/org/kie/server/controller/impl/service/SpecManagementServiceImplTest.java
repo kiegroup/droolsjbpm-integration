@@ -24,11 +24,17 @@ import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.kie.server.api.model.KieContainerStatus;
 import org.kie.server.api.model.KieScannerStatus;
 import org.kie.server.api.model.ReleaseId;
+import org.kie.server.controller.api.KieServerControllerNotFoundException;
+import org.kie.server.controller.api.model.events.ServerTemplateUpdated;
 import org.kie.server.controller.api.model.runtime.Container;
+import org.kie.server.controller.api.model.runtime.ServerInstanceKey;
 import org.kie.server.controller.api.model.spec.Capability;
 import org.kie.server.controller.api.model.spec.ContainerConfig;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
@@ -36,26 +42,40 @@ import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
+import org.kie.server.controller.api.service.NotificationService;
+import org.kie.server.controller.api.storage.KieServerTemplateStorage;
 import org.kie.server.controller.impl.KieServerInstanceManager;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Mock
+    private KieServerTemplateStorage templateStorage;
+
+    @Mock
+    private KieServerInstanceManager kieServerInstanceManager;
+
+    @Mock
+    private NotificationService notificationService;
 
     @Before
     public void setup() {
         specManagementService = new SpecManagementServiceImpl();
-        kieServerInstanceManager = Mockito.mock(KieServerInstanceManager.class);
 
-        ((SpecManagementServiceImpl)specManagementService).setKieServerInstanceManager(kieServerInstanceManager);
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
 
+        specManagementService.setKieServerInstanceManager(kieServerInstanceManager);
     }
-
 
     @After
     public void cleanup() {
@@ -136,7 +156,6 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(container.getConfigs());
         assertEquals(containerSpec.getConfigs().size(), container.getConfigs().size());
 
-
         Collection<org.kie.server.controller.api.model.spec.ContainerSpec> specs = specManagementService.listContainerSpec(serverTemplate.getId());
         assertNotNull(specs);
         assertEquals(1, specs.size());
@@ -172,7 +191,6 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         Collection<org.kie.server.controller.api.model.spec.ServerTemplate> allTemplates = specManagementService.listServerTemplates();
         assertNotNull(allTemplates);
         assertEquals(limit, allTemplates.size());
-
     }
 
     @Test
@@ -243,14 +261,13 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(createdServerTemplate.getContainersSpec());
         assertEquals(limit, createdServerTemplate.getContainersSpec().size());
 
-
         // remove first container with suffix 0
         specManagementService.deleteContainerSpec(serverTemplate.getId(), "test container " + 0);
 
         createdServerTemplate = specManagementService.getServerTemplate(serverTemplate.getId());
         assertNotNull(createdServerTemplate);
         assertNotNull(createdServerTemplate.getContainersSpec());
-        assertEquals(limit-1, createdServerTemplate.getContainersSpec().size());
+        assertEquals(limit - 1, createdServerTemplate.getContainersSpec().size());
     }
 
     @Test
@@ -389,8 +406,8 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         ContainerConfig ruleConfigCurrent = containerSpec.getConfigs().get(Capability.RULE);
         assertNotNull(ruleConfigCurrent);
         assertTrue(ruleConfigCurrent instanceof org.kie.server.controller.api.model.spec.RuleConfig);
-        assertEquals(ruleConfig.getPollInterval(), ((org.kie.server.controller.api.model.spec.RuleConfig)ruleConfigCurrent).getPollInterval());
-        assertEquals(ruleConfig.getScannerStatus(), ((org.kie.server.controller.api.model.spec.RuleConfig)ruleConfigCurrent).getScannerStatus());
+        assertEquals(ruleConfig.getPollInterval(), ((org.kie.server.controller.api.model.spec.RuleConfig) ruleConfigCurrent).getPollInterval());
+        assertEquals(ruleConfig.getScannerStatus(), ((org.kie.server.controller.api.model.spec.RuleConfig) ruleConfigCurrent).getScannerStatus());
 
         ContainerConfig containerConfig = new RuleConfig();
         ((RuleConfig) containerConfig).setScannerStatus(KieScannerStatus.SCANNING);
@@ -416,9 +433,8 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         ContainerConfig ruleConfigCurrent2 = containerSpec.getConfigs().get(Capability.RULE);
         assertNotNull(ruleConfigCurrent2);
         assertTrue(ruleConfigCurrent2 instanceof org.kie.server.controller.api.model.spec.RuleConfig);
-        assertEquals(((org.kie.server.controller.api.model.spec.RuleConfig)containerConfig).getPollInterval(), ((org.kie.server.controller.api.model.spec.RuleConfig)ruleConfigCurrent2).getPollInterval());
-        assertEquals(((org.kie.server.controller.api.model.spec.RuleConfig)containerConfig).getScannerStatus(), ((org.kie.server.controller.api.model.spec.RuleConfig)ruleConfigCurrent2).getScannerStatus());
-
+        assertEquals(((org.kie.server.controller.api.model.spec.RuleConfig) containerConfig).getPollInterval(), ((org.kie.server.controller.api.model.spec.RuleConfig) ruleConfigCurrent2).getPollInterval());
+        assertEquals(((org.kie.server.controller.api.model.spec.RuleConfig) containerConfig).getScannerStatus(), ((org.kie.server.controller.api.model.spec.RuleConfig) ruleConfigCurrent2).getScannerStatus());
     }
 
     @Test
@@ -459,6 +475,264 @@ public class SpecManagementServiceImplTest extends AbstractServiceImplTest {
         assertNotNull(updatedContainer);
 
         assertEquals(KieContainerStatus.STOPPED, updatedContainer.getStatus());
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenContainerConfigIsARuleConfig() {
+
+        final SpecManagementServiceImpl specManagementService = spy((SpecManagementServiceImpl) this.specManagementService);
+        final Capability capability = Capability.RULE;
+        final RuleConfig ruleConfig = mock(RuleConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+
+        final List<?> expectedContainers = mock(List.class);
+
+        doReturn(expectedContainers).when(specManagementService).updateContainerRuleConfig(ruleConfig,
+                                                                                           serverTemplate,
+                                                                                           containerSpec);
+
+        final List<Container> actualContainers = specManagementService.updateContainerConfig(capability,
+                                                                                             ruleConfig,
+                                                                                             serverTemplate,
+                                                                                             containerSpec);
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenContainerConfigIsAProcessConfig() {
+
+        final SpecManagementServiceImpl specManagementService = spy((SpecManagementServiceImpl) this.specManagementService);
+        final Capability capability = Capability.PROCESS;
+        final ProcessConfig processConfig = mock(ProcessConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+
+        final List<?> expectedContainers = mock(List.class);
+
+        doReturn(expectedContainers).when(specManagementService).updateContainerProcessConfig(processConfig,
+                                                                                              capability,
+                                                                                              serverTemplate,
+                                                                                              containerSpec);
+
+        final List<Container> actualContainers = specManagementService.updateContainerConfig(capability,
+                                                                                             processConfig,
+                                                                                             serverTemplate,
+                                                                                             containerSpec);
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenServerTemplateIsNull() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final String serverTemplateId = "serverTemplateId";
+        final String containerSpecId = "containerSpecId";
+        final Capability capability = Capability.PROCESS;
+        final ContainerConfig containerConfig = mock(ContainerConfig.class);
+
+        specManagementService.setTemplateStorage(templateStorage);
+
+        doReturn(null).when(templateStorage).load(serverTemplateId);
+
+        expectedException.expect(KieServerControllerNotFoundException.class);
+        expectedException.expectMessage("No server template found for id serverTemplateId");
+
+        specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenContainerSpecIsNull() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final String serverTemplateId = "serverTemplateId";
+        final String containerSpecId = "containerSpecId";
+        final Capability capability = Capability.PROCESS;
+        final ContainerConfig containerConfig = mock(ContainerConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+
+        specManagementService.setTemplateStorage(templateStorage);
+
+        doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
+        doReturn(null).when(serverTemplate).getContainersSpec();
+
+        expectedException.expect(KieServerControllerNotFoundException.class);
+        expectedException.expectMessage("No container spec found for id containerSpecId within server template with id serverTemplateId");
+
+        specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenAffectedContainersIsEmpty() {
+
+        final SpecManagementServiceImpl specManagementService = spy((SpecManagementServiceImpl) this.specManagementService);
+        final String serverTemplateId = "serverTemplateId";
+        final String containerSpecId = "containerSpecId";
+        final Capability capability = Capability.PROCESS;
+        final ContainerConfig containerConfig = mock(ContainerConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final Map<Capability, ContainerConfig> configs = spy(new HashMap<>());
+        final List<?> expectedContainers = new ArrayList<>();
+
+        specManagementService.setTemplateStorage(templateStorage);
+        specManagementService.setNotificationService(notificationService);
+
+        doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
+        doReturn(containerSpec).when(serverTemplate).getContainerSpec(containerSpecId);
+        doReturn(expectedContainers).when(specManagementService).updateContainerConfig(capability, containerConfig, serverTemplate, containerSpec);
+        doReturn(configs).when(containerSpec).getConfigs();
+
+        specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
+
+        verify(specManagementService).logInfo("Update of container configuration resulted in no changes to containers running on kie-servers");
+        verify(specManagementService, never()).logDebug(any(), any());
+        verify(configs).put(capability, containerConfig);
+        verify(templateStorage).update(serverTemplate);
+        verify(notificationService).notify(any(ServerTemplateUpdated.class));
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenAffectedContainersIsNotEmpty() {
+
+        final SpecManagementServiceImpl specManagementService = spy((SpecManagementServiceImpl) this.specManagementService);
+        final String serverTemplateId = "serverTemplateId";
+        final String containerSpecId = "containerSpecId";
+        final Capability capability = Capability.PROCESS;
+        final ContainerConfig containerConfig = mock(ContainerConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final Map<Capability, ContainerConfig> configs = spy(new HashMap<>());
+        final Container container1 = makeContainer("1");
+        final Container container2 = makeContainer("2");
+        final List<Container> expectedContainers = new ArrayList<Container>() {{
+            add(container1);
+            add(container2);
+        }};
+
+        specManagementService.setTemplateStorage(templateStorage);
+        specManagementService.setNotificationService(notificationService);
+
+        doReturn(serverTemplate).when(templateStorage).load(serverTemplateId);
+        doReturn(containerSpec).when(serverTemplate).getContainerSpec(containerSpecId);
+        doReturn(expectedContainers).when(specManagementService).updateContainerConfig(capability, containerConfig, serverTemplate, containerSpec);
+        doReturn(configs).when(containerSpec).getConfigs();
+
+        specManagementService.updateContainerConfig(serverTemplateId, containerSpecId, capability, containerConfig);
+
+        verify(specManagementService).logDebug("Container {} on server {} was affected by a change in the scanner",
+                                               container1.getContainerSpecId(),
+                                               container1.getServerInstanceKey());
+        verify(specManagementService).logDebug("Container {} on server {} was affected by a change in the scanner",
+                                               container2.getContainerSpecId(),
+                                               container2.getServerInstanceKey());
+        verify(specManagementService, never()).logInfo(any());
+        verify(configs).put(capability, containerConfig);
+        verify(templateStorage).update(serverTemplate);
+        verify(notificationService).notify(any(ServerTemplateUpdated.class));
+    }
+
+    private Container makeContainer(final String seed) {
+
+        final Container container = mock(Container.class);
+
+        doReturn(seed).when(container).getContainerSpecId();
+        doReturn(mock(ServerInstanceKey.class)).when(container).getServerInstanceKey();
+
+        return container;
+    }
+
+    @Test
+    public void testUpdateContainerConfigWhenContainerConfigIsNotAProcessConfigNeitherARuleConfig() {
+
+        final SpecManagementServiceImpl specManagementService = spy((SpecManagementServiceImpl) this.specManagementService);
+        final Capability capability = Capability.PROCESS;
+        final ContainerConfig containerConfig = mock(ContainerConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final List<?> expectedContainers = new ArrayList<>();
+
+        final List<Container> actualContainers = specManagementService.updateContainerConfig(capability,
+                                                                                             containerConfig,
+                                                                                             serverTemplate,
+                                                                                             containerSpec);
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerProcessConfig() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final ProcessConfig processConfig = mock(ProcessConfig.class);
+        final Capability capability = Capability.PROCESS;
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final Map<Capability, ProcessConfig> configs = spy(new HashMap<>());
+        final List<?> expectedContainers = mock(List.class);
+
+        doReturn(configs).when(containerSpec).getConfigs();
+        doReturn(expectedContainers).when(kieServerInstanceManager).upgradeContainer(serverTemplate, containerSpec);
+
+        final List<Container> actualContainers = specManagementService.updateContainerProcessConfig(processConfig,
+                                                                                                    capability,
+                                                                                                    serverTemplate,
+                                                                                                    containerSpec);
+
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerRuleConfigWhenKieScannerStatusIsStarted() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final RuleConfig ruleConfig = mock(RuleConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final Long interval = 1L;
+        final List<?> expectedContainers = mock(List.class);
+
+        doReturn(interval).when(ruleConfig).getPollInterval();
+        doReturn(KieScannerStatus.STARTED).when(ruleConfig).getScannerStatus();
+        doReturn(expectedContainers).when(kieServerInstanceManager).startScanner(serverTemplate, containerSpec, interval);
+
+        final List<Container> actualContainers = specManagementService.updateContainerRuleConfig(ruleConfig,
+                                                                                                 serverTemplate,
+                                                                                                 containerSpec);
+
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerRuleConfigWhenKieScannerStatusIsStopped() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final RuleConfig ruleConfig = mock(RuleConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final List<?> expectedContainers = mock(List.class);
+
+        doReturn(KieScannerStatus.STOPPED).when(ruleConfig).getScannerStatus();
+        doReturn(expectedContainers).when(kieServerInstanceManager).stopScanner(serverTemplate, containerSpec);
+
+        final List<Container> actualContainers = specManagementService.updateContainerRuleConfig(ruleConfig, serverTemplate, containerSpec);
+
+        assertEquals(expectedContainers, actualContainers);
+    }
+
+    @Test
+    public void testUpdateContainerRuleConfigWhenKieScannerStatusIsNotStartedNeitherStopped() {
+
+        final SpecManagementServiceImpl specManagementService = (SpecManagementServiceImpl) this.specManagementService;
+        final RuleConfig ruleConfig = mock(RuleConfig.class);
+        final ServerTemplate serverTemplate = mock(ServerTemplate.class);
+        final ContainerSpec containerSpec = mock(ContainerSpec.class);
+        final List<?> expectedContainers = new ArrayList<>();
+
+        doReturn(KieScannerStatus.UNKNOWN).when(ruleConfig).getScannerStatus();
+
+        final List<Container> actualContainers = specManagementService.updateContainerRuleConfig(ruleConfig, serverTemplate, containerSpec);
+
+        assertEquals(expectedContainers, actualContainers);
     }
 
     protected int getRandomInt(int min, int max) {

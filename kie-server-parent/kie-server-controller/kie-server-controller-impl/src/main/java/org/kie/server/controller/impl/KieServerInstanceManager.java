@@ -148,83 +148,113 @@ public class KieServerInstanceManager {
                                             });
     }
 
-    public synchronized List<Container> startContainer(ServerTemplate serverTemplate,
+    public synchronized List<Container> startContainer(final ServerTemplate serverTemplate,
                                                        final ContainerSpec containerSpec) {
 
-        return callRemoteKieServerOperation(serverTemplate,
-                                            containerSpec,
-                                            new RemoteKieServerOperation<Void>() {
-                                                @Override
-                                                public Void doOperation(KieServicesClient client,
-                                                                        Container container) {
-                                                    KieContainerResource containerResource = new KieContainerResource(containerSpec.getId(),
-                                                                                                                      containerSpec.getReleasedId(),
-                                                                                                                      container.getResolvedReleasedId(),
-                                                                                                                      container.getStatus());
-                                                    containerResource.setContainerAlias(containerSpec.getContainerName());
-                                                    containerResource.setMessages((List<Message>) container.getMessages());
+        final RemoteKieServerOperation<Void> startContainerOperation = makeStartContainerOperation(containerSpec);
 
-                                                    if (containerSpec.getConfigs() != null) {
-                                                        // cover scanner and rules config
-                                                        ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
-                                                        if (containerConfig != null) {
-                                                            RuleConfig ruleConfig = (RuleConfig) containerConfig;
+        return callRemoteKieServerOperation(serverTemplate, containerSpec, startContainerOperation);
+    }
 
-                                                            KieScannerResource scannerResource = new KieScannerResource();
-                                                            scannerResource.setPollInterval(ruleConfig.getPollInterval());
-                                                            scannerResource.setStatus(ruleConfig.getScannerStatus());
+    RemoteKieServerOperation<Void> makeStartContainerOperation(final ContainerSpec containerSpec) {
+        return new RemoteKieServerOperation<Void>() {
+            @Override
+            public Void doOperation(final KieServicesClient client,
+                                    final Container container) {
 
-                                                            containerResource.setScanner(scannerResource);
-                                                        }
-                                                        // cover process config
-                                                        containerConfig = containerSpec.getConfigs().get(Capability.PROCESS);
-                                                        if (containerConfig != null) {
-                                                            ProcessConfig processConfig = (ProcessConfig) containerConfig;
+                final KieContainerResource resource = makeContainerResource(container, containerSpec);
+                final ServiceResponse<KieContainerResource> response = client.createContainer(containerSpec.getId(), resource);
 
-                                                            KieServerConfigItem configItem = new KieServerConfigItem();
-                                                            configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                                                            configItem.setName(KieServerConstants.PCFG_KIE_BASE);
-                                                            configItem.setValue(processConfig.getKBase());
+                if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
+                    log("Container {} failed to start on server instance {} due to {}", container, response, containerSpec);
+                }
 
-                                                            containerResource.addConfigItem(configItem);
+                collectContainerInfo(containerSpec, client, container);
 
-                                                            configItem = new KieServerConfigItem();
-                                                            configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                                                            configItem.setName(KieServerConstants.PCFG_KIE_SESSION);
-                                                            configItem.setValue(processConfig.getKSession());
+                return null;
+            }
+        };
+    }
 
-                                                            containerResource.addConfigItem(configItem);
+    void log(final String message,
+             final Object... objects) {
+        logger.debug(message, objects);
+    }
 
-                                                            configItem = new KieServerConfigItem();
-                                                            configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                                                            configItem.setName(KieServerConstants.PCFG_MERGE_MODE);
-                                                            configItem.setValue(processConfig.getMergeMode());
+    KieContainerResource makeContainerResource(final Container container,
+                                               final ContainerSpec containerSpec) {
 
-                                                            containerResource.addConfigItem(configItem);
+        final KieContainerResource containerResource = new KieContainerResource(containerSpec.getId(),
+                                                                                containerSpec.getReleasedId(),
+                                                                                container.getResolvedReleasedId(),
+                                                                                container.getStatus());
 
-                                                            configItem = new KieServerConfigItem();
-                                                            configItem.setType(KieServerConstants.CAPABILITY_BPM);
-                                                            configItem.setName(KieServerConstants.PCFG_RUNTIME_STRATEGY);
-                                                            configItem.setValue(processConfig.getRuntimeStrategy());
+        containerResource.setContainerAlias(containerSpec.getContainerName());
+        containerResource.setMessages((List<Message>) container.getMessages());
 
-                                                            containerResource.addConfigItem(configItem);
-                                                        }
-                                                    }
+        if (containerSpec.getConfigs() != null) {
+            setRuleConfigAttributes(containerSpec, containerResource);
+            setProcessConfigAttributes(containerSpec, containerResource);
+        }
 
-                                                    ServiceResponse<KieContainerResource> response = client.createContainer(containerSpec.getId(),
-                                                                                                                            containerResource);
-                                                    if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
-                                                        logger.debug("Container {} failed to start on server instance {} due to {}",
-                                                                     containerSpec.getId(),
-                                                                     container.getUrl(),
-                                                                     response.getMsg());
-                                                    }
-                                                    collectContainerInfo(containerSpec,
-                                                                         client,
-                                                                         container);
-                                                    return null;
-                                                }
-                                            });
+        return containerResource;
+    }
+
+    KieServerConfigItem makeKieServerConfigItem(final String type,
+                                                final String name,
+                                                final String value) {
+
+        final KieServerConfigItem configItem = new KieServerConfigItem();
+
+        configItem.setType(type);
+        configItem.setName(name);
+        configItem.setValue(value);
+
+        return configItem;
+    }
+
+    void setRuleConfigAttributes(final ContainerSpec containerSpec,
+                                 final KieContainerResource containerResource) {
+
+        final ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.RULE);
+
+        if (containerConfig != null) {
+
+            final RuleConfig ruleConfig = (RuleConfig) containerConfig;
+            final KieScannerResource scannerResource = new KieScannerResource();
+
+            scannerResource.setPollInterval(ruleConfig.getPollInterval());
+            scannerResource.setStatus(ruleConfig.getScannerStatus());
+
+            containerResource.setScanner(scannerResource);
+        }
+    }
+
+    void setProcessConfigAttributes(final ContainerSpec containerSpec,
+                                    final KieContainerResource containerResource) {
+
+        final ContainerConfig containerConfig = containerSpec.getConfigs().get(Capability.PROCESS);
+
+        if (containerConfig != null) {
+
+            final ProcessConfig processConfig = (ProcessConfig) containerConfig;
+
+            containerResource.addConfigItem(makeKieServerConfigItem(KieServerConstants.CAPABILITY_BPM,
+                                                                    KieServerConstants.PCFG_KIE_BASE,
+                                                                    processConfig.getKBase()));
+
+            containerResource.addConfigItem(makeKieServerConfigItem(KieServerConstants.CAPABILITY_BPM,
+                                                                    KieServerConstants.PCFG_KIE_SESSION,
+                                                                    processConfig.getKSession()));
+
+            containerResource.addConfigItem(makeKieServerConfigItem(KieServerConstants.CAPABILITY_BPM,
+                                                                    KieServerConstants.PCFG_MERGE_MODE,
+                                                                    processConfig.getMergeMode()));
+
+            containerResource.addConfigItem(makeKieServerConfigItem(KieServerConstants.CAPABILITY_BPM,
+                                                                    KieServerConstants.PCFG_RUNTIME_STRATEGY,
+                                                                    processConfig.getRuntimeStrategy()));
+        }
     }
 
     public synchronized List<Container> stopContainer(ServerTemplate serverTemplate,
@@ -252,30 +282,63 @@ public class KieServerInstanceManager {
                                             });
     }
 
-    public List<Container> upgradeContainer(ServerTemplate serverTemplate,
+    public List<Container> upgradeContainer(final ServerTemplate serverTemplate,
                                             final ContainerSpec containerSpec) {
 
         return callRemoteKieServerOperation(serverTemplate,
                                             containerSpec,
-                                            new RemoteKieServerOperation<Void>() {
-                                                @Override
-                                                public Void doOperation(KieServicesClient client,
-                                                                        Container container) {
+                                            makeUpgradeContainerOperation(containerSpec));
+    }
 
-                                                    ServiceResponse<ReleaseId> response = client.updateReleaseId(containerSpec.getId(),
-                                                                                                                 containerSpec.getReleasedId());
-                                                    if (!response.getType().equals(ServiceResponse.ResponseType.SUCCESS)) {
-                                                        logger.debug("Container {} failed to upgrade on server instance {} due to {}",
-                                                                     containerSpec.getId(),
-                                                                     container.getUrl(),
-                                                                     response.getMsg());
-                                                    }
-                                                    collectContainerInfo(containerSpec,
-                                                                         client,
-                                                                         container);
-                                                    return null;
-                                                }
-                                            });
+    public List<Container> upgradeAndStartContainer(final ServerTemplate serverTemplate,
+                                                    final ContainerSpec containerSpec) {
+
+        return callRemoteKieServerOperation(serverTemplate,
+                                            containerSpec,
+                                            makeUpgradeAndStartContainerOperation(containerSpec));
+    }
+
+    RemoteKieServerOperation<Void> makeUpgradeContainerOperation(final ContainerSpec containerSpec) {
+        return new RemoteKieServerOperation<Void>() {
+            @Override
+            public Void doOperation(final KieServicesClient client,
+                                    final Container container) {
+
+                remoteUpgradeContainer(client, container, containerSpec);
+
+                return null;
+            }
+        };
+    }
+
+    RemoteKieServerOperation<Void> makeUpgradeAndStartContainerOperation(final ContainerSpec containerSpec) {
+        return new RemoteKieServerOperation<Void>() {
+            @Override
+            public Void doOperation(final KieServicesClient client,
+                                    final Container container) {
+
+                final KieContainerResource containerResource = makeContainerResource(container, containerSpec);
+
+                remoteCreateContainer(client, containerResource, containerSpec);
+                remoteUpgradeContainer(client, container, containerSpec);
+
+                return null;
+            }
+        };
+    }
+
+    private void remoteCreateContainer(final KieServicesClient client, final KieContainerResource containerResource, final ContainerSpec containerSpec) {
+        client.createContainer(containerSpec.getId(), containerResource);
+    }
+
+    private void remoteUpgradeContainer(final KieServicesClient client, final Container container, final ContainerSpec containerSpec) {
+        final ServiceResponse<ReleaseId> response = client.updateReleaseId(containerSpec.getId(), containerSpec.getReleasedId());
+
+        if (response.getType() != ServiceResponse.ResponseType.SUCCESS) {
+            log("Container {} failed to upgrade on server instance {} due to {}", containerSpec.getId(), container.getUrl(), response.getMsg());
+        }
+
+        collectContainerInfo(containerSpec, client, container);
     }
 
     public List<Container> getContainers(final ServerTemplate serverTemplate,
