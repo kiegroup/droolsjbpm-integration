@@ -32,7 +32,7 @@ import org.kie.server.integrationtests.shared.KieServerDeployer;
 
 import static org.junit.Assert.assertEquals;
 
-public class DisposeCommandTest extends DroolsKieServerBaseIntegrationTest {
+public class DisposeCommandIntegrationTest extends DroolsKieServerBaseIntegrationTest {
 
     private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "kjar-JBPM-5019",
             "1.0.0-SNAPSHOT");
