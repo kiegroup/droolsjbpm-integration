@@ -134,12 +134,18 @@ public class RuleCapabilitiesServiceImpl implements RuleCapabilitiesService {
             releaseId.setArtifactId(containerSpec.getReleasedId().getArtifactId());
         }
 
+        final List<Container> containers;
+
         containerSpec.setReleasedId(releaseId);
+
+        if (containerSpec.getStatus() == KieContainerStatus.STARTED) {
+            containers = kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
+        } else {
+            containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
+        }
+
         containerSpec.setStatus(KieContainerStatus.STARTED);
         templateStorage.update(serverTemplate);
-
-        List<Container> containers = kieServerInstanceManager.upgradeContainer(serverTemplate,
-                                                                               containerSpec);
 
         notificationService.notify(serverTemplate,
                                    containerSpec,

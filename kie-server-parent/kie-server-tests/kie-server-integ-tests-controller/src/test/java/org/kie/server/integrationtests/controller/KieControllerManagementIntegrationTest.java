@@ -908,14 +908,23 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
         checkContainerConfigAgainstServer(processConfig,ruleConfig);
 
-        // Update the container configuration, turning off the scanner
+        // Update the rule configuration, turning off the scanner
         ruleConfig.setScannerStatus(KieScannerStatus.STOPPED);
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+
+        // Check the rule configuration
         KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STOPPED);
         checkContainerConfigAgainstServer(ruleConfig);
 
+        // Update the configuration
         processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+
+        // Reset the container, since the update process should not do that by itself
+        mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+
+        // Update the process configuration
         KieServerSynchronization.waitForKieServerConfig(client, CONTAINER_ID, KieServerConstants.PCFG_MERGE_MODE, "OVERRIDE_ALL");
         checkContainerConfigAgainstServer(processConfig);
 
