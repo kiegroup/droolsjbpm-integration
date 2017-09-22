@@ -15,40 +15,31 @@
 
 package org.kie.server.integrationtests.router.rest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.ServerSocket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
+
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
-import org.kie.server.api.KieServerConstants;
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.router.DBExternalResource;
+import org.kie.server.integrationtests.router.client.KieServerRouterClient;
 import org.kie.server.integrationtests.shared.basetests.RestOnlyBaseIntegrationTest;
 import org.kie.server.router.Configuration;
 import org.kie.server.router.ContainerInfo;
 import org.kie.server.router.KieServerRouter;
 import org.kie.server.router.KieServerRouterConstants;
-import org.kie.server.router.repository.ConfigurationMarshaller;
 import org.kie.server.router.repository.FileRepository;
-
-import static org.junit.Assert.*;
-import static org.kie.server.api.rest.RestURI.*;
 
 public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIntegrationTest {
 
@@ -59,8 +50,6 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
     private static File repository;
 
     private static String serverUrl;
-
-    private ConfigurationMarshaller marshaller = new ConfigurationMarshaller();
 
     @Before
     public void startStandaloneRouter(){
@@ -115,18 +104,8 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
     public void testReactToUnavailableServersInRouterContainerBasedOperations() throws Exception {
 
         Response response = null;
-        try {
-            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.info( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            String responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
-            Configuration initialConfig = marshaller.unmarshall(new StringReader(responseBody));
+        try (KieServerRouterClient routerClient = new KieServerRouterClient(serverUrl)) {
+            Configuration initialConfig = routerClient.getRouterConfig();
             assertEquals(3, initialConfig.getHostsPerContainer().size());
             assertEquals(3, initialConfig.getHostsPerServer().size());
 
@@ -137,25 +116,14 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             assertEquals(1, initialConfig.getHostsPerServer().get("server2").size());
             assertEquals(1, initialConfig.getHostsPerServer().get("server3").size());
 
-            clientRequest = newRequest(serverUrl + "/containers/container1/instances");
+            WebTarget clientRequest = newRequest(serverUrl + "/containers/container1/instances");
             logger.debug("[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
             Assert.assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
             response.close();
 
-
-            clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.debug("[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
-            Configuration config = marshaller.unmarshall(new StringReader(responseBody));
+            Configuration config = routerClient.getRouterConfig();
 
             assertEquals(3, config.getHostsPerContainer().size());
             assertEquals(3, config.getHostsPerServer().size());
@@ -177,18 +145,8 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
     public void testReactToUnavailableServersInRouterQueryBasedOperations() throws Exception {
 
         Response response = null;
-        try {
-            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.debug( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            String responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
-            Configuration initialConfig = marshaller.unmarshall(new StringReader(responseBody));
+        try (KieServerRouterClient routerClient = new KieServerRouterClient(serverUrl)) {
+            Configuration initialConfig = routerClient.getRouterConfig();
             assertEquals(3, initialConfig.getHostsPerContainer().size());
             assertEquals(3, initialConfig.getHostsPerServer().size());
 
@@ -199,25 +157,15 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             assertEquals(1, initialConfig.getHostsPerServer().get("server2").size());
             assertEquals(1, initialConfig.getHostsPerServer().get("server3").size());
 
-            clientRequest = newRequest(serverUrl + "/containers");
+            WebTarget clientRequest = newRequest(serverUrl + "/containers");
             logger.debug( "[GET] " + clientRequest.getUri());
 
             response = clientRequest.request(getMediaType()).get();
             Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
             response.close();
 
-            clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.debug( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
             // since there are no servers connected and query operations are broadcasts all should be cleared
-            Configuration config = marshaller.unmarshall(new StringReader(responseBody));
+            Configuration config = routerClient.getRouterConfig();
             assertEquals(3, config.getHostsPerContainer().size());
             assertEquals(3, config.getHostsPerServer().size());
 
@@ -239,18 +187,8 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
     public void testReactToUnavailableServersInRouterContainerBasedOperationsInvalidHost() throws Exception {
 
         Response response = null;
-        try {
-            WebTarget clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.debug( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            String responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
-            Configuration initialConfig = marshaller.unmarshall(new StringReader(responseBody));
+        try (KieServerRouterClient routerClient = new KieServerRouterClient(serverUrl)) {
+            Configuration initialConfig = routerClient.getRouterConfig();
             assertEquals(3, initialConfig.getHostsPerContainer().size());
             assertEquals(3, initialConfig.getHostsPerServer().size());
 
@@ -261,7 +199,7 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             assertEquals(1, initialConfig.getHostsPerServer().get("server2").size());
             assertEquals(1, initialConfig.getHostsPerServer().get("server3").size());
 
-            clientRequest = newRequest(serverUrl + "/containers/container3/instances");
+            WebTarget clientRequest = newRequest(serverUrl + "/containers/container3/instances");
             logger.debug("[GET] " + clientRequest.getUri());
             try {
                 response = clientRequest.request(getMediaType()).get();
@@ -269,20 +207,12 @@ public class KieServerRouterUnavailabilityIntegrationTest extends RestOnlyBaseIn
             } catch (Exception e) {
                 // expected
             } finally {
-                response.close();
+                if(response != null) {
+                    response.close();
+                }
             }
 
-            clientRequest = newRequest(serverUrl + "/mgmt/list");
-            logger.debug( "[GET] " + clientRequest.getUri());
-
-            response = clientRequest.request(getMediaType()).get();
-            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-
-            responseBody = response.readEntity(String.class);
-            logger.debug(responseBody);
-            response.close();
-
-            Configuration config = marshaller.unmarshall(new StringReader(responseBody));
+            Configuration config = routerClient.getRouterConfig();
 
             assertEquals(3, config.getHostsPerContainer().size());
             assertEquals(3, config.getHostsPerServer().size());
