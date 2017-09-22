@@ -42,22 +42,20 @@ import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ProcessConfig;
 import org.kie.server.controller.api.model.spec.RuleConfig;
 import org.kie.server.controller.api.model.spec.ServerTemplate;
-import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
 import org.kie.server.controller.impl.storage.InMemoryKieServerTemplateStorage;
 import org.kie.server.integrationtests.category.Smoke;
+import org.kie.server.integrationtests.controller.client.exception.UnexpectedResponseCodeException;
+import org.kie.server.integrationtests.shared.KieServerAssert;
 import org.kie.server.integrationtests.shared.KieServerDeployer;
+import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 import static org.junit.Assert.*;
-import org.kie.server.integrationtests.shared.KieServerAssert;
-import org.kie.server.integrationtests.shared.KieServerSynchronization;
 
 public class KieControllerManagementIntegrationTest extends KieControllerManagementBaseTest {
 
-    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
-
     private static final String CONTAINER_ID = "kie-concurrent";
     private static final String CONTAINER_NAME = "containerName";
-
+    private static ReleaseId releaseId = new ReleaseId("org.kie.server.testing", "stateless-session-kjar", "1.0.0-SNAPSHOT");
     private KieServerInfo kieServerInfo;
 
     @BeforeClass
@@ -185,7 +183,6 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         ServerInstanceKey managedInstance = serverInstance.getServerInstanceKeys().iterator().next();
         assertNotNull(managedInstance);
         assertEquals(kieServerInfo.getLocation(), managedInstance.getUrl());
-
     }
 
     @Test
@@ -461,7 +458,6 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
 
         // Check process config and rule config
         checkContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, processConfig, ruleConfig);
-
     }
 
     @Test
@@ -479,7 +475,6 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         // Try update not existing ProcessConfig
         ProcessConfig processConfig = new ProcessConfig("PER_PROCESS_INSTANCE", "kieBase", "kieSession", "MERGE_COLLECTION");
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
-
 
         // Try update not existing RuleConfig
         RuleConfig ruleConfig = new RuleConfig(500l, KieScannerStatus.SCANNING);
@@ -569,16 +564,25 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         // container status is STARTED should also cause it to be deployed to the kie-server
         mgmtControllerClient.saveContainerSpec(serverTemplate.getId(), containerSpec);
         KieServerSynchronization.waitForKieServerSynchronization(client, 1);
-        checkContainerConfigAgainstServer(processConfig,ruleConfig);
+        checkContainerConfigAgainstServer(processConfig, ruleConfig);
 
-        // Update the container configuration, turning off the scanner
+        // Update the rule configuration, turning off the scanner
         ruleConfig.setScannerStatus(KieScannerStatus.STOPPED);
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
+
+        // Check the rule configuration
         KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STOPPED);
         checkContainerConfigAgainstServer(ruleConfig);
 
+        // Update the configuration
         processConfig = new ProcessConfig("SINGLETON", "defaultKieBase", "defaultKieSession", "OVERRIDE_ALL");
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.PROCESS, processConfig);
+
+        // Reset the container, since the update process should not do that by itself
+        mgmtControllerClient.stopContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+        mgmtControllerClient.startContainer(kieServerInfo.getServerId(), CONTAINER_ID);
+
+        // Update the process configuration
         KieServerSynchronization.waitForKieServerConfig(client, CONTAINER_ID, "MergeMode", "OVERRIDE_ALL");
         checkContainerConfigAgainstServer(processConfig);
 
@@ -587,7 +591,7 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         ruleConfig.setPollInterval(1000L);
         mgmtControllerClient.updateContainerConfig(kieServerInfo.getServerId(), CONTAINER_ID, Capability.RULE, ruleConfig);
         KieServerSynchronization.waitForKieServerScannerStatus(client, CONTAINER_ID, KieScannerStatus.STARTED, 1000L);
-        checkContainerConfigAgainstServer(ruleConfig,processConfig);
+        checkContainerConfigAgainstServer(ruleConfig, processConfig);
     }
 
     @Test
@@ -615,40 +619,39 @@ public class KieControllerManagementIntegrationTest extends KieControllerManagem
         assertFalse("Did not expect to find containers", serverState.getContainers() != null && serverState.getContainers().size() > 0);
     }
 
-    protected void checkContainerConfigAgainstServer(ContainerConfig...configs) {
+    protected void checkContainerConfigAgainstServer(ContainerConfig... configs) {
         ServiceResponse<KieContainerResource> containerResource = client.getContainerInfo(CONTAINER_ID);
         KieServerAssert.assertSuccess(containerResource);
 
         KieContainerResource kcr = containerResource.getResult();
         assertNotNull(kcr);
-        for (ContainerConfig config: configs) {
+        for (ContainerConfig config : configs) {
             if (config instanceof ProcessConfig) {
-                ProcessConfig pc = (ProcessConfig)config;
+                ProcessConfig pc = (ProcessConfig) config;
                 Map<String, String> configMap = new HashMap<>();
                 configMap.put("KBase", pc.getKBase());
                 configMap.put("KSession", pc.getKSession());
                 configMap.put("MergeMode", pc.getMergeMode());
                 configMap.put("RuntimeStrategy", pc.getRuntimeStrategy());
 
-                assertNotNull("No configuration items found for checking process configuration",kcr.getConfigItems());
+                assertNotNull("No configuration items found for checking process configuration", kcr.getConfigItems());
                 List<KieServerConfigItem> kci = kcr.getConfigItems();
-                for (KieServerConfigItem item: kci) {
+                for (KieServerConfigItem item : kci) {
                     String name = item.getName();
                     String value = item.getValue();
-                    assertEquals(configMap.get(name),value);
+                    assertEquals(configMap.get(name), value);
                 }
             } else if (config instanceof RuleConfig) {
-                RuleConfig rc = (RuleConfig)config;
+                RuleConfig rc = (RuleConfig) config;
                 KieScannerResource scanner = kcr.getScanner();
-                assertNotNull("No scanner resource found",scanner);
-                assertEquals(rc.getScannerStatus(),scanner.getStatus());
+                assertNotNull("No scanner resource found", scanner);
+                assertEquals(rc.getScannerStatus(), scanner.getStatus());
                 // Only test the polling interval when starting the scanner
                 // since it could be wrong at any other time
                 if (rc.getScannerStatus() == KieScannerStatus.STARTED) {
-                    assertEquals(rc.getPollInterval(),scanner.getPollInterval());
+                    assertEquals(rc.getPollInterval(), scanner.getPollInterval());
                 }
             }
         }
     }
-
 }

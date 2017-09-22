@@ -46,7 +46,7 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
         specManagementService = new SpecManagementServiceImpl();
         kieServerInstanceManager = Mockito.mock(KieServerInstanceManager.class);
 
-        ((RuleCapabilitiesServiceImpl)ruleCapabilitiesService).setKieServerInstanceManager(kieServerInstanceManager);
+        ((RuleCapabilitiesServiceImpl) ruleCapabilitiesService).setKieServerInstanceManager(kieServerInstanceManager);
 
         createServerTemplateWithContainer();
     }
@@ -128,22 +128,27 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
     }
 
     @Test
-    public void testUpgradeContainer() {
+    public void testUpgradeContainerWhenContainerSpecStatusIsStarted() {
 
-        List<Container> fakeResult = new ArrayList<Container>();
-        fakeResult.add(container);
-        when(kieServerInstanceManager.upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class))).thenReturn(fakeResult);
+        final List<Container> fakeResult = new ArrayList<Container>() {{
+            add(container);
+        }};
 
-        ReleaseId initial = containerSpec.getReleasedId();
-        ReleaseId upgradeTo = new ReleaseId("org.kie", "kie-server-kjar", "2.0");
+        doReturn(fakeResult).when(kieServerInstanceManager).upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class));
+
+        containerSpec.setStatus(KieContainerStatus.STARTED);
+
+        final ReleaseId initial = containerSpec.getReleasedId();
+        final ReleaseId upgradeTo = new ReleaseId("org.kie", "kie-server-kjar", "2.0");
 
         ruleCapabilitiesService.upgradeContainer(containerSpec, upgradeTo);
 
-        verify(kieServerInstanceManager, times(1)).upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class));
+        verify(kieServerInstanceManager).upgradeContainer(any(ServerTemplate.class), any(ContainerSpec.class));
 
-        ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
+        final ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
 
-        Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
+        final Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
+
         assertNotNull(containerSpecs);
         assertEquals(1, containerSpecs.size());
 
@@ -156,4 +161,37 @@ public class RuleCapabilitiesServiceImplTest extends AbstractServiceImplTest {
         assertEquals(updatedContainer.getStatus(), KieContainerStatus.STARTED);
     }
 
+    @Test
+    public void testUpgradeContainerWhenContainerSpecStatusIsStopped() {
+
+        final List<Container> fakeResult = new ArrayList<Container>() {{
+            add(container);
+        }};
+
+        doReturn(fakeResult).when(kieServerInstanceManager).startContainer(any(ServerTemplate.class), any(ContainerSpec.class));
+
+        containerSpec.setStatus(KieContainerStatus.STOPPED);
+
+        final ReleaseId initial = containerSpec.getReleasedId();
+        final ReleaseId upgradeTo = new ReleaseId("org.kie", "kie-server-kjar", "2.0");
+
+        ruleCapabilitiesService.upgradeContainer(containerSpec, upgradeTo);
+
+        verify(kieServerInstanceManager).startContainer(any(ServerTemplate.class), any(ContainerSpec.class));
+
+        final ServerTemplate updated = specManagementService.getServerTemplate(serverTemplate.getId());
+
+        final Collection<ContainerSpec> containerSpecs = updated.getContainersSpec();
+
+        assertNotNull(containerSpecs);
+        assertEquals(1, containerSpecs.size());
+
+        ContainerSpec updatedContainer = containerSpecs.iterator().next();
+        assertNotNull(updatedContainer);
+
+        assertNotNull(updatedContainer.getReleasedId());
+        assertNotEquals(initial, updatedContainer.getReleasedId());
+        assertEquals(upgradeTo, updatedContainer.getReleasedId());
+        assertEquals(updatedContainer.getStatus(), KieContainerStatus.STARTED);
+    }
 }

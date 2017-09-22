@@ -48,51 +48,51 @@ import org.slf4j.LoggerFactory;
 
 public class SpecManagementServiceImpl implements SpecManagementService {
 
+    private static Logger logger = LoggerFactory.getLogger(SpecManagementServiceImpl.class);
     private KieServerInstanceManager kieServerInstanceManager = KieServerInstanceManager.getInstance();
     private KieServerTemplateStorage templateStorage = InMemoryKieServerTemplateStorage.getInstance();
     private NotificationService notificationService = LoggingNotificationService.getInstance();
-    private static Logger logger = LoggerFactory.getLogger(SpecManagementServiceImpl.class);
 
     @Override
-    public void saveContainerSpec( String serverTemplateId,
-                                   ContainerSpec containerSpec ) {
-        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public void saveContainerSpec(String serverTemplateId,
+                                  ContainerSpec containerSpec) {
+        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
         if (serverTemplate.hasContainerSpec(containerSpec.getId())) {
-            throw new KieServerControllerException( "Server template with id " + serverTemplateId + " associated already with container " + containerSpec.getId());
+            throw new KieServerControllerException("Server template with id " + serverTemplateId + " associated already with container " + containerSpec.getId());
         }
         // make sure correct server template is set
         containerSpec.setServerTemplateKey(new ServerTemplateKey(serverTemplate.getId(), serverTemplate.getName()));
 
-        serverTemplate.addContainerSpec( containerSpec );
+        serverTemplate.addContainerSpec(containerSpec);
 
-        templateStorage.update( serverTemplate );
+        templateStorage.update(serverTemplate);
 
-        notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
         if (containerSpec.getStatus().equals(KieContainerStatus.STARTED)) {
-            List<Container> containers = kieServerInstanceManager.startContainer( serverTemplate, containerSpec );
-            notificationService.notify( serverTemplate, containerSpec, containers );
+            List<Container> containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
+            notificationService.notify(serverTemplate, containerSpec, containers);
         }
     }
 
     @Override
-    public void saveServerTemplate( ServerTemplate serverTemplate ) {
-        if ( templateStorage.exists( serverTemplate.getId() ) ) {
-            templateStorage.update( serverTemplate );
+    public void saveServerTemplate(ServerTemplate serverTemplate) {
+        if (templateStorage.exists(serverTemplate.getId())) {
+            templateStorage.update(serverTemplate);
         } else {
 
-            templateStorage.store( serverTemplate );
+            templateStorage.store(serverTemplate);
         }
 
-        notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
     }
 
     @Override
-    public ServerTemplate getServerTemplate( String serverTemplateId ) {
-        return templateStorage.load( serverTemplateId );
+    public ServerTemplate getServerTemplate(String serverTemplateId) {
+        return templateStorage.load(serverTemplateId);
     }
 
     @Override
@@ -106,26 +106,26 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public Collection<ContainerSpec> listContainerSpec( String serverTemplateId ) {
-        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public Collection<ContainerSpec> listContainerSpec(String serverTemplateId) {
+        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
         return serverTemplate.getContainersSpec();
     }
 
     @Override
-    public void deleteContainerSpec( String serverTemplateId,
-                                     String containerSpecId ) {
-        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public void deleteContainerSpec(String serverTemplateId,
+                                    String containerSpecId) {
+        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
         if (serverTemplate.hasContainerSpec(containerSpecId)) {
-            ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecId );
-            kieServerInstanceManager.stopContainer( serverTemplate, containerSpec );
+            ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecId);
+            kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
             serverTemplate.deleteContainerSpec(containerSpecId);
 
             templateStorage.update(serverTemplate);
@@ -137,183 +137,225 @@ public class SpecManagementServiceImpl implements SpecManagementService {
     }
 
     @Override
-    public void deleteServerTemplate( String serverTemplateId ) {
-        if ( !templateStorage.exists( serverTemplateId ) ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public void deleteServerTemplate(String serverTemplateId) {
+        if (!templateStorage.exists(serverTemplateId)) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
-        templateStorage.delete( serverTemplateId );
+        templateStorage.delete(serverTemplateId);
 
-        notificationService.notify( new ServerTemplateDeleted( serverTemplateId ) );
+        notificationService.notify(new ServerTemplateDeleted(serverTemplateId));
     }
 
     @Override
-    public void copyServerTemplate( String serverTemplateId,
-                                    String newServerTemplateId,
-                                    String newServerTemplateName ) {
-        final ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public void copyServerTemplate(String serverTemplateId,
+                                   String newServerTemplateId,
+                                   String newServerTemplateName) {
+        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
-        final Map<Capability, ServerConfig> configMap = new HashMap<Capability, ServerConfig>( serverTemplate.getConfigs().size() );
-        for ( final Map.Entry<Capability, ServerConfig> entry : serverTemplate.getConfigs().entrySet() ) {
-            configMap.put( entry.getKey(), copy( entry.getValue() ) );
+        final Map<Capability, ServerConfig> configMap = new HashMap<Capability, ServerConfig>(serverTemplate.getConfigs().size());
+        for (final Map.Entry<Capability, ServerConfig> entry : serverTemplate.getConfigs().entrySet()) {
+            configMap.put(entry.getKey(), copy(entry.getValue()));
         }
 
-        final Collection<ContainerSpec> containerSpecs = new ArrayList<ContainerSpec>( serverTemplate.getContainersSpec().size() );
-        for ( final ContainerSpec entry : serverTemplate.getContainersSpec() ) {
-            containerSpecs.add( copy( entry, newServerTemplateId, newServerTemplateName ) );
+        final Collection<ContainerSpec> containerSpecs = new ArrayList<ContainerSpec>(serverTemplate.getContainersSpec().size());
+        for (final ContainerSpec entry : serverTemplate.getContainersSpec()) {
+            containerSpecs.add(copy(entry, newServerTemplateId, newServerTemplateName));
         }
 
-        final ServerTemplate copy = new ServerTemplate( newServerTemplateId,
-                                                        newServerTemplateName,
-                                                        serverTemplate.getCapabilities(),
-                                                        configMap,
-                                                        containerSpecs );
+        final ServerTemplate copy = new ServerTemplate(newServerTemplateId,
+                                                       newServerTemplateName,
+                                                       serverTemplate.getCapabilities(),
+                                                       configMap,
+                                                       containerSpecs);
 
-        templateStorage.store( copy );
+        templateStorage.store(copy);
     }
 
-    private ContainerSpec copy( final ContainerSpec origin,
-                                final String newServerTemplateId,
-                                final String newServerTemplateName ) {
+    private ContainerSpec copy(final ContainerSpec origin,
+                               final String newServerTemplateId,
+                               final String newServerTemplateName) {
         final Map<Capability, ContainerConfig> configMap = origin.getConfigs();
-        for ( Map.Entry<Capability, ContainerConfig> entry : origin.getConfigs().entrySet() ) {
-            configMap.put( entry.getKey(), copy( entry.getValue() ) );
+        for (Map.Entry<Capability, ContainerConfig> entry : origin.getConfigs().entrySet()) {
+            configMap.put(entry.getKey(), copy(entry.getValue()));
         }
-        return new ContainerSpec( origin.getId(),
-                                  origin.getContainerName(),
-                                  new ServerTemplateKey( newServerTemplateId, newServerTemplateName ),
-                                  new ReleaseId( origin.getReleasedId() ),
-                                  origin.getStatus(),
-                                  configMap );
+        return new ContainerSpec(origin.getId(),
+                                 origin.getContainerName(),
+                                 new ServerTemplateKey(newServerTemplateId, newServerTemplateName),
+                                 new ReleaseId(origin.getReleasedId()),
+                                 origin.getStatus(),
+                                 configMap);
     }
 
-    private ContainerConfig copy( final ContainerConfig _value ) {
-        if ( _value instanceof RuleConfig ) {
+    private ContainerConfig copy(final ContainerConfig _value) {
+        if (_value instanceof RuleConfig) {
             final RuleConfig value = (RuleConfig) _value;
-            return new RuleConfig( value.getPollInterval(), value.getScannerStatus() );
-        } else if ( _value instanceof ProcessConfig ) {
+            return new RuleConfig(value.getPollInterval(), value.getScannerStatus());
+        } else if (_value instanceof ProcessConfig) {
             final ProcessConfig value = (ProcessConfig) _value;
-            return new ProcessConfig( value.getRuntimeStrategy(), value.getKBase(), value.getKSession(), value.getMergeMode() );
+            return new ProcessConfig(value.getRuntimeStrategy(), value.getKBase(), value.getKSession(), value.getMergeMode());
         }
         return null;
     }
 
-    private ServerConfig copy( final ServerConfig value ) {
+    private ServerConfig copy(final ServerConfig value) {
         return new ServerConfig();
     }
 
     @Override
-    public void updateContainerConfig( String serverTemplateId,
-                                       String containerSpecId,
-                                       Capability capability,
-                                       ContainerConfig containerConfig ) {
-        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public synchronized void updateContainerConfig(final String serverTemplateId,
+                                                   final String containerSpecId,
+                                                   final Capability capability,
+                                                   final ContainerConfig containerConfig) {
+
+        final ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
-        ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecId );
-        if ( containerSpec == null ) {
-            throw new KieServerControllerNotFoundException( "No container spec found for id " + containerSpecId + " within server template with id " + serverTemplateId );
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecId);
+        if (containerSpec == null) {
+            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecId + " within server template with id " + serverTemplateId);
         }
-        List<Container> affectedContainers = null;
-        if ( containerConfig instanceof RuleConfig ) {
-            RuleConfig rc = (RuleConfig)containerConfig;
-            long interval = rc.getPollInterval();
-            KieScannerStatus status = rc.getScannerStatus();
-            if ( status == KieScannerStatus.STARTED ) {
-                affectedContainers = kieServerInstanceManager.startScanner( serverTemplate, containerSpec, interval );
-            } else if ( status == KieScannerStatus.STOPPED ) {
-                affectedContainers = kieServerInstanceManager.stopScanner( serverTemplate, containerSpec );
-            }
+
+        final List<Container> affectedContainers = updateContainerConfig(capability, containerConfig, serverTemplate, containerSpec);
+
+        if (affectedContainers.isEmpty()) {
+            logInfo("Update of container configuration resulted in no changes to containers running on kie-servers");
+        }
+
+        for (Container ac : affectedContainers) {
+            logDebug("Container {} on server {} was affected by a change in the scanner", ac.getContainerSpecId(), ac.getServerInstanceKey());
+        }
+
+        containerSpec.getConfigs().put(capability, containerConfig);
+
+        templateStorage.update(serverTemplate);
+
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
+    }
+
+    void logInfo(final String message) {
+        logger.info(message);
+    }
+
+    void logDebug(final String message,
+                  final Object... objects) {
+        logger.debug(message, objects);
+    }
+
+    List<Container> updateContainerConfig(final Capability capability,
+                                          final ContainerConfig containerConfig,
+                                          final ServerTemplate serverTemplate,
+                                          final ContainerSpec containerSpec) {
+
+        if (containerConfig instanceof RuleConfig) {
+
+            final RuleConfig ruleConfig = (RuleConfig) containerConfig;
+
+            return updateContainerRuleConfig(ruleConfig, serverTemplate, containerSpec);
         } else if (containerConfig instanceof ProcessConfig) {
-            ProcessConfig pc = (ProcessConfig)containerConfig;
-            kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
-            containerSpec.getConfigs().put(capability, pc);
-            affectedContainers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
-        }
-        if (affectedContainers == null) {
-            logger.info("Update of container configuration resulted in no changes to containers running on kie-servers");
+
+            final ProcessConfig processConfig = (ProcessConfig) containerConfig;
+
+            return updateContainerProcessConfig(processConfig, capability, serverTemplate, containerSpec);
         } else {
-            for ( Container ac: affectedContainers ) {
-                logger.debug("Container {} on server {} was affected by a change in the scanner"
-                        ,ac.getContainerSpecId()
-                        ,ac.getServerInstanceKey());
-            }
+            return new ArrayList<>();
         }
+    }
 
-        containerSpec.getConfigs().put( capability, containerConfig );
+    List<Container> updateContainerProcessConfig(final ProcessConfig processConfig,
+                                                 final Capability capability,
+                                                 final ServerTemplate serverTemplate,
+                                                 final ContainerSpec containerSpec) {
 
-        templateStorage.update( serverTemplate );
+        containerSpec.getConfigs().put(capability, processConfig);
 
-        notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        return kieServerInstanceManager.upgradeContainer(serverTemplate, containerSpec);
+    }
+
+    List<Container> updateContainerRuleConfig(final RuleConfig ruleConfig,
+                                              final ServerTemplate serverTemplate,
+                                              final ContainerSpec containerSpec) {
+
+        final Long interval = ruleConfig.getPollInterval();
+        final KieScannerStatus status = ruleConfig.getScannerStatus();
+
+        switch (status) {
+            case STARTED:
+                return kieServerInstanceManager.startScanner(serverTemplate, containerSpec, interval);
+            case STOPPED:
+                return kieServerInstanceManager.stopScanner(serverTemplate, containerSpec);
+            default:
+                return new ArrayList<>();
+        }
     }
 
     @Override
-    public void updateServerTemplateConfig( String serverTemplateId,
-                                            Capability capability,
-                                            ServerConfig serverTemplateConfig ) {
-        ServerTemplate serverTemplate = templateStorage.load( serverTemplateId );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + serverTemplateId );
+    public void updateServerTemplateConfig(String serverTemplateId,
+                                           Capability capability,
+                                           ServerConfig serverTemplateConfig) {
+        ServerTemplate serverTemplate = templateStorage.load(serverTemplateId);
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + serverTemplateId);
         }
 
-        serverTemplate.getConfigs().put( capability, serverTemplateConfig );
+        serverTemplate.getConfigs().put(capability, serverTemplateConfig);
 
-        templateStorage.update( serverTemplate );
+        templateStorage.update(serverTemplate);
 
-        notificationService.notify( new ServerTemplateUpdated( serverTemplate ) );
+        notificationService.notify(new ServerTemplateUpdated(serverTemplate));
     }
 
     @Override
-    public void startContainer( ContainerSpecKey containerSpecKey ) {
-        ServerTemplate serverTemplate = templateStorage.load( containerSpecKey.getServerTemplateKey().getId() );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + containerSpecKey.getServerTemplateKey().getId() );
+    public void startContainer(ContainerSpecKey containerSpecKey) {
+        ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
-        final ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecKey.getId() );
-        if ( containerSpec == null ) {
-            throw new KieServerControllerNotFoundException( "No container spec found for id " + containerSpecKey.getId()
-                    + " within server template with id " + serverTemplate.getId() );
+        final ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecKey.getId()
+                                                                   + " within server template with id " + serverTemplate.getId());
         }
-        containerSpec.setStatus( KieContainerStatus.STARTED );
+        containerSpec.setStatus(KieContainerStatus.STARTED);
 
-        templateStorage.update( serverTemplate );
+        templateStorage.update(serverTemplate);
 
-        List<Container> containers = kieServerInstanceManager.startContainer( serverTemplate, containerSpec );
+        List<Container> containers = kieServerInstanceManager.startContainer(serverTemplate, containerSpec);
 
-        notificationService.notify( serverTemplate, containerSpec, containers );
+        notificationService.notify(serverTemplate, containerSpec, containers);
     }
 
     @Override
-    public void stopContainer( ContainerSpecKey containerSpecKey ) {
-        ServerTemplate serverTemplate = templateStorage.load( containerSpecKey.getServerTemplateKey().getId() );
-        if ( serverTemplate == null ) {
-            throw new KieServerControllerNotFoundException( "No server template found for id " + containerSpecKey.getServerTemplateKey().getId() );
+    public void stopContainer(ContainerSpecKey containerSpecKey) {
+        ServerTemplate serverTemplate = templateStorage.load(containerSpecKey.getServerTemplateKey().getId());
+        if (serverTemplate == null) {
+            throw new KieServerControllerNotFoundException("No server template found for id " + containerSpecKey.getServerTemplateKey().getId());
         }
 
-        ContainerSpec containerSpec = serverTemplate.getContainerSpec( containerSpecKey.getId() );
-        if ( containerSpec == null ) {
-            throw new KieServerControllerNotFoundException( "No container spec found for id " + containerSpecKey.getId() + " within server template with id " + serverTemplate.getId() );
+        ContainerSpec containerSpec = serverTemplate.getContainerSpec(containerSpecKey.getId());
+        if (containerSpec == null) {
+            throw new KieServerControllerNotFoundException("No container spec found for id " + containerSpecKey.getId() + " within server template with id " + serverTemplate.getId());
         }
-        containerSpec.setStatus( KieContainerStatus.STOPPED );
+        containerSpec.setStatus(KieContainerStatus.STOPPED);
 
-        templateStorage.update( serverTemplate );
+        templateStorage.update(serverTemplate);
 
-        List<Container> containers = kieServerInstanceManager.stopContainer( serverTemplate, containerSpec );
+        List<Container> containers = kieServerInstanceManager.stopContainer(serverTemplate, containerSpec);
 
-        notificationService.notify( serverTemplate, containerSpec, containers );
+        notificationService.notify(serverTemplate, containerSpec, containers);
     }
 
     public KieServerTemplateStorage getTemplateStorage() {
         return templateStorage;
     }
 
-    public void setTemplateStorage( KieServerTemplateStorage templateStorage ) {
+    public void setTemplateStorage(KieServerTemplateStorage templateStorage) {
         this.templateStorage = templateStorage;
     }
 
@@ -321,7 +363,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         return notificationService;
     }
 
-    public void setNotificationService( NotificationService notificationService ) {
+    public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
@@ -329,7 +371,7 @@ public class SpecManagementServiceImpl implements SpecManagementService {
         return kieServerInstanceManager;
     }
 
-    public void setKieServerInstanceManager( KieServerInstanceManager kieServerInstanceManager ) {
+    public void setKieServerInstanceManager(KieServerInstanceManager kieServerInstanceManager) {
         this.kieServerInstanceManager = kieServerInstanceManager;
     }
 }
