@@ -80,7 +80,6 @@ public class QueryServiceTemplate {
 				}
 			}
 
-			columnMapping = queryCallback.getQueryStrategy().getColumnMapping(params);
 		}
 
 		QueryResultMapper<?> resultMapper = QueryMapperRegistry.get().mapperFor(queryCallback.getMapperName(), columnMapping);
