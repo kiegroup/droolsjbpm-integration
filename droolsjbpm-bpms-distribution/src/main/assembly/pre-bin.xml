@@ -61,7 +61,6 @@
         <include>org.drools:drools-rhq-plugin</include>
         <include>org.drools:drools-scorecards</include>
         <include>org.drools:drools-templates</include>
-        <include>org.drools:drools-verifier</include>
         <include>org.drools:drools-pmml</include>
       </includes>
       <outputDirectory/>
@@ -117,7 +116,6 @@
         <exclude>org.drools:drools-rhq-plugin</exclude>
         <exclude>org.drools:drools-scorecards</exclude>
         <exclude>org.drools:drools-templates</exclude>
-        <exclude>org.drools:drools-verifier</exclude>
         <exclude>org.drools:drools-pmml</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
