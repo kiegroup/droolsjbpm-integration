@@ -39,8 +39,10 @@ public class KieServerGateway {
         String serverUrl = new StringBuilder(protocol)
                 .append("://").append(hostname)
                 .append(":").append(port)
-                .append("/").append(contextPath)
-                .append("/services/rest/server")
+                .append(contextPath.startsWith("/") ? "" : "/")
+                .append(contextPath)
+                .append(contextPath.endsWith("/") ? "" : "/")
+                .append("services/rest/server")
                 .toString();
 
         LOG.info("Server Url {}", serverUrl);
