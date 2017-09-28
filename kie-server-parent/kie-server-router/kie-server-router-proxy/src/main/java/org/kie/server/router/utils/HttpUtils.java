@@ -15,6 +15,7 @@
 package org.kie.server.router.utils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,9 +45,34 @@ public class HttpUtils {
 
         con.setDoOutput(true);
 
-        log.debugf("Sending 'POST' request to URL : %s", controllerURL);
+        log.debugf("Sending 'DELETE' request to URL : %s", controllerURL);
         int responseCode = con.getResponseCode();
         log.debugf("Response Code : %s", responseCode);
+        if (responseCode > 204) {
+            throw new IOException("Unsucessful response code " + responseCode);
+        }
+
+    }
+    
+    public static void getHttpCall(String url) throws Exception {
+
+        URL controllerURL = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) controllerURL.openConnection();
+        con.setRequestMethod("GET");
+
+        con.setRequestProperty(Headers.ACCEPT_STRING, "application/json");
+        con.setRequestProperty(Headers.CONTENT_TYPE_STRING, "application/json");
+        con.setRequestProperty(Headers.AUTHORIZATION_STRING, getAuthorization());
+
+        con.setDoOutput(true);
+
+        log.debugf("Sending 'GET' request to URL : %s", controllerURL);
+        int responseCode = con.getResponseCode();
+        log.debugf("Response Code : %s", responseCode);
+        
+        if (responseCode != 200) {
+            throw new IOException("Unsucessful response code " + responseCode);
+        }
 
     }
 
@@ -65,10 +91,12 @@ public class HttpUtils {
             con.getOutputStream().write(body.getBytes("UTF-8"));
         }
 
-        log.debugf("Sending 'POST' request to URL : %s", controllerURL);
+        log.debugf("Sending 'PUT' request to URL : %s", controllerURL);
         int responseCode = con.getResponseCode();
         log.debugf("Response Code : %s", responseCode);
-
+        if (responseCode > 201) {
+            throw new IOException("Unsucessful response code " + responseCode);
+        }
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();
