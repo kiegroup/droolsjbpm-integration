@@ -26,6 +26,8 @@ import java.util.Set;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
+import org.apache.commons.lang3.StringUtils;
 import org.drools.core.runtime.help.impl.XStreamXML;
 import org.kie.server.api.commands.CallContainerCommand;
 import org.kie.server.api.commands.CommandScript;
@@ -75,9 +77,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.kie.internal.xstream.XStreamUtils.createXStream;
+import static org.kie.server.api.KieServerConstants.SYSTEM_XSTREAM_ENABLED_PACKAGES;
 
 public class XStreamMarshaller
         implements Marshaller {
+
+    public static final String DEFAULT_PACKAGES_WILDCARD = "**";
 
     private static final Logger logger = LoggerFactory.getLogger(XStreamMarshaller.class);
     protected XStream xstream;
@@ -92,115 +97,140 @@ public class XStreamMarshaller
         ServiceLoader<XStreamMarshallerExtension> plugins = ServiceLoader.load(XStreamMarshallerExtension.class);
         List<XStreamMarshallerExtension> loadedPlugins = new ArrayList<>();
         plugins.forEach(plugin -> {
-            logger.info("XStreamMarshallerExtension implementation found: {}", plugin.getClass().getName());
+            logger.info("XStreamMarshallerExtension implementation found: {}",
+                        plugin.getClass().getName());
             loadedPlugins.add(plugin);
         });
         EXTENSIONS = Collections.unmodifiableList(loadedPlugins);
     }
 
-    public XStreamMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
+    public XStreamMarshaller(Set<Class<?>> classes,
+                             final ClassLoader classLoader) {
         this.classLoader = classLoader;
-        buildMarshaller(classes, classLoader);
+        buildMarshaller(classes,
+                        classLoader);
 
-        configureMarshaller(classes, classLoader);
+        configureMarshaller(classes,
+                            classLoader);
         // Extend the marshaller with optional extensions
         EXTENSIONS.forEach(ext -> ext.extend(this));
     }
 
-    protected void buildMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
-        this.xstream = XStreamXML.newXStreamMarshaller( createXStream( new PureJavaReflectionProvider(), next -> {
-            return new MapperWrapper( chainMapperWrappers( new ArrayList<>( EXTENSIONS ), next ) ) {
-                public Class realClass( String elementName ) {
+    protected void buildMarshaller(Set<Class<?>> classes,
+                                   final ClassLoader classLoader) {
+        this.xstream = XStreamXML.newXStreamMarshaller(createXStream(new PureJavaReflectionProvider(),
+                                                                     next -> {
+                                                                         return new MapperWrapper(chainMapperWrappers(new ArrayList<>(EXTENSIONS),
+                                                                                                                      next)) {
+                                                                             public Class realClass(String elementName) {
 
-                    Class customClass = classNames.get( elementName );
-                    if ( customClass != null ) {
-                        return customClass;
-                    }
-                    return super.realClass( elementName );
-                }
-            };
-        } ));
+                                                                                 Class customClass = classNames.get(elementName);
+                                                                                 if (customClass != null) {
+                                                                                     return customClass;
+                                                                                 }
+                                                                                 return super.realClass(elementName);
+                                                                             }
+                                                                         };
+                                                                     }));
     }
 
-    private MapperWrapper chainMapperWrappers(List<XStreamMarshallerExtension> extensions, MapperWrapper last) {
+    private MapperWrapper chainMapperWrappers(List<XStreamMarshallerExtension> extensions,
+                                              MapperWrapper last) {
         if (extensions.isEmpty()) {
             return last;
         } else {
             XStreamMarshallerExtension head = extensions.remove(0);
-            return head.chainMapperWrapper(chainMapperWrappers(extensions, last));
+            return head.chainMapperWrapper(chainMapperWrappers(extensions,
+                                                               last));
         }
     }
 
-    protected void configureMarshaller( Set<Class<?>> classes, final ClassLoader classLoader ) {
-        this.xstream.setClassLoader( classLoader );
+    protected void configureMarshaller(Set<Class<?>> classes,
+                                       final ClassLoader classLoader) {
+        this.xstream.setClassLoader(classLoader);
+
         String[] voidDeny = {"void.class", "Void.class"};
         this.xstream.denyTypes(voidDeny);
 
+        String packageList = System.getProperty(SYSTEM_XSTREAM_ENABLED_PACKAGES,
+                                                DEFAULT_PACKAGES_WILDCARD);
+
+        String[] filter;
+
+        if (StringUtils.isEmpty(packageList)) {
+            filter = new String[]{DEFAULT_PACKAGES_WILDCARD};
+        } else {
+            filter = packageList.split(",");
+        }
+
+        this.xstream.addPermission(new WildcardTypePermission(filter));
+
         AbstractScoreXStreamConverter.registerScoreConverters(xstream);
 
-        this.xstream.processAnnotations( CommandScript.class );
-        this.xstream.processAnnotations( CallContainerCommand.class );
-        this.xstream.processAnnotations( CreateContainerCommand.class );
-        this.xstream.processAnnotations( DisposeContainerCommand.class );
-        this.xstream.processAnnotations( GetContainerInfoCommand.class );
-        this.xstream.processAnnotations( GetScannerInfoCommand.class );
-        this.xstream.processAnnotations( UpdateScannerCommand.class );
-        this.xstream.processAnnotations( GetReleaseIdCommand.class );
-        this.xstream.processAnnotations( UpdateReleaseIdCommand.class );
-        this.xstream.processAnnotations( GetServerInfoCommand.class );
-        this.xstream.processAnnotations( ListContainersCommand.class );
-        this.xstream.processAnnotations( ServiceResponsesList.class );
-        this.xstream.processAnnotations( ServiceResponse.class );
-        this.xstream.processAnnotations( KieContainerResourceList.class );
-        this.xstream.processAnnotations( KieContainerResource.class );
-        this.xstream.processAnnotations( ReleaseId.class );
-        this.xstream.processAnnotations( KieContainerStatus.class );
-        this.xstream.processAnnotations( KieScannerResource.class );
-        this.xstream.processAnnotations( KieServerInfo.class );
+        this.xstream.processAnnotations(CommandScript.class);
+        this.xstream.processAnnotations(CallContainerCommand.class);
+        this.xstream.processAnnotations(CreateContainerCommand.class);
+        this.xstream.processAnnotations(DisposeContainerCommand.class);
+        this.xstream.processAnnotations(GetContainerInfoCommand.class);
+        this.xstream.processAnnotations(GetScannerInfoCommand.class);
+        this.xstream.processAnnotations(UpdateScannerCommand.class);
+        this.xstream.processAnnotations(GetReleaseIdCommand.class);
+        this.xstream.processAnnotations(UpdateReleaseIdCommand.class);
+        this.xstream.processAnnotations(GetServerInfoCommand.class);
+        this.xstream.processAnnotations(ListContainersCommand.class);
+        this.xstream.processAnnotations(ServiceResponsesList.class);
+        this.xstream.processAnnotations(ServiceResponse.class);
+        this.xstream.processAnnotations(KieContainerResourceList.class);
+        this.xstream.processAnnotations(KieContainerResource.class);
+        this.xstream.processAnnotations(ReleaseId.class);
+        this.xstream.processAnnotations(KieContainerStatus.class);
+        this.xstream.processAnnotations(KieScannerResource.class);
+        this.xstream.processAnnotations(KieServerInfo.class);
 
-        this.xstream.processAnnotations( ReleaseIdFilter.class );
-        this.xstream.processAnnotations( KieContainerStatusFilter.class );
-        this.xstream.processAnnotations( KieContainerResourceFilter.class );
+        this.xstream.processAnnotations(ReleaseIdFilter.class);
+        this.xstream.processAnnotations(KieContainerStatusFilter.class);
+        this.xstream.processAnnotations(KieContainerResourceFilter.class);
 
-        this.xstream.processAnnotations( SolverInstance.class );
-        this.xstream.processAnnotations( CreateSolverCommand.class );
-        this.xstream.processAnnotations( DisposeSolverCommand.class );
-        this.xstream.processAnnotations( GetSolverWithBestSolutionCommand.class );
-        this.xstream.processAnnotations( GetSolversCommand.class );
-        this.xstream.processAnnotations( GetSolverCommand.class );
-        this.xstream.processAnnotations( SolvePlanningProblemCommand.class );
-        this.xstream.processAnnotations( TerminateSolverEarlyCommand.class );
-        this.xstream.processAnnotations( AddProblemFactChangeCommand.class );
-        this.xstream.processAnnotations( AddProblemFactChangesCommand.class );
-        this.xstream.processAnnotations( IsEveryProblemFactChangeProcessedCommand.class );
+        this.xstream.processAnnotations(SolverInstance.class);
+        this.xstream.processAnnotations(CreateSolverCommand.class);
+        this.xstream.processAnnotations(DisposeSolverCommand.class);
+        this.xstream.processAnnotations(GetSolverWithBestSolutionCommand.class);
+        this.xstream.processAnnotations(GetSolversCommand.class);
+        this.xstream.processAnnotations(GetSolverCommand.class);
+        this.xstream.processAnnotations(SolvePlanningProblemCommand.class);
+        this.xstream.processAnnotations(TerminateSolverEarlyCommand.class);
+        this.xstream.processAnnotations(AddProblemFactChangeCommand.class);
+        this.xstream.processAnnotations(AddProblemFactChangesCommand.class);
+        this.xstream.processAnnotations(IsEveryProblemFactChangeProcessedCommand.class);
 
-        this.xstream.processAnnotations( DMNContextKS.class );
-        this.xstream.processAnnotations( DMNResultKS.class );
-        this.xstream.processAnnotations( DMNNodeStub.class );
-        this.xstream.processAnnotations( DMNMessageKS.class );
-        this.xstream.processAnnotations( DMNDecisionResultKS.class);
-        this.xstream.processAnnotations( DMNModelInfoList.class );
-        this.xstream.processAnnotations( DMNModelInfo.class );
-        this.xstream.processAnnotations( DMNDecisionInfo.class);
-        
+        this.xstream.processAnnotations(DMNContextKS.class);
+        this.xstream.processAnnotations(DMNResultKS.class);
+        this.xstream.processAnnotations(DMNNodeStub.class);
+        this.xstream.processAnnotations(DMNMessageKS.class);
+        this.xstream.processAnnotations(DMNDecisionResultKS.class);
+        this.xstream.processAnnotations(DMNModelInfoList.class);
+        this.xstream.processAnnotations(DMNModelInfo.class);
+        this.xstream.processAnnotations(DMNDecisionInfo.class);
+
         if (classes != null) {
             for (Class<?> clazz : classes) {
-                this.xstream.processAnnotations( clazz );
-                this.classNames.put(clazz.getName(), clazz);
+                this.xstream.processAnnotations(clazz);
+                this.classNames.put(clazz.getName(),
+                                    clazz);
             }
         }
     }
 
     @Override
     public String marshall(Object objectInput) {
-        return xstream.toXML( objectInput );
+        return xstream.toXML(objectInput);
     }
 
     @Override
-    public <T> T unmarshall(String input, Class<T> type) {
-        return (T) xstream.fromXML( input );
+    public <T> T unmarshall(String input,
+                            Class<T> type) {
+        return (T) xstream.fromXML(input);
     }
-
 
     @Override
     public void dispose() {
@@ -220,7 +250,7 @@ public class XStreamMarshaller
     @Override
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.xstream.setClassLoader( classLoader );
+        this.xstream.setClassLoader(classLoader);
     }
 
     @Override
@@ -231,5 +261,4 @@ public class XStreamMarshaller
     public XStream getXstream() {
         return xstream;
     }
-
 }

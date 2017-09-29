@@ -135,4 +135,7 @@ public class KieServerConstants {
     public static final String CFG_KIE_SERVER_JMS_SESSION_TX = "org.kie.server.jms.session.tx";
     public static final String CFG_KIE_SERVER_JMS_SESSION_ACK = "org.kie.server.jms.session.ack";
 
+    // System variable to store the enabled packages for the XStreamMarshaller
+    public static final String SYSTEM_XSTREAM_ENABLED_PACKAGES = "org.kie.server.xstream.enabled.packages";
+
 }
