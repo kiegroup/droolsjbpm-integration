@@ -202,6 +202,11 @@
     </dependency>
     <dependency>
       <groupId>org.optaplanner</groupId>
+      <artifactId>optaplanner-workbench-models-datamodel-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-core</artifactId>
       <scope>runtime</scope>
     </dependency>
