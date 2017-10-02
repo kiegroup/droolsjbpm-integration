@@ -15,10 +15,24 @@
 
 package org.kie.server.remote.rest.jbpm;
 
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_CONTENT_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_GET_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_INSTANCE_PUT_URI;
+import static org.kie.server.api.rest.RestURI.DOCUMENT_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
+
 import javax.mail.internet.MimeUtility;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -47,12 +61,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ResponseHeader;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
-
-@Api(value="jbpm-documents")
+@Api(value="Documents :: BPM")
 @Path("server/" + DOCUMENT_URI)
 public class DocumentResource {
 
@@ -70,10 +85,15 @@ public class DocumentResource {
         this.context = context;
     }
 
+    @ApiOperation(value="Retrieves document's content identified by given documentId",
+            response=byte[].class, code=200, responseHeaders={@ResponseHeader(name="Content-Disposition", description="provides file name of the document")})
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Document with given id not found") })
     @GET
     @Path(DOCUMENT_INSTANCE_CONTENT_GET_URI)
     @Produces({MediaType.APPLICATION_OCTET_STREAM})
-    public Response getDocumentContent(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("documentId") String documentId) {
+    public Response getDocumentContent(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "document id of a document that content should be retruned from", required = true) @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -105,10 +125,15 @@ public class DocumentResource {
         }
     }
 
+    @ApiOperation(value="Retrieves document identified by given documentId",
+            response=DocumentInstance.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Document with given id not found") })
     @GET
     @Path(DOCUMENT_INSTANCE_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDocument(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("documentId") String documentId) {
+    public Response getDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "document id of a document that should be retruned", required = true) @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -125,9 +150,14 @@ public class DocumentResource {
         }
     }
 
+    @ApiOperation(value="Retrieves documents that are stored in the system, with pagination",
+            response=DocumentInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response listDocuments(@javax.ws.rs.core.Context HttpHeaders headers, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
+    public Response listDocuments(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);
@@ -142,10 +172,14 @@ public class DocumentResource {
         }
     }
 
+    @ApiOperation(value="Creates new document based on given content (body)",
+            response=String.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @POST
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createDocument(@javax.ws.rs.core.Context HttpHeaders headers, String payload) {
+    public Response createDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -161,11 +195,17 @@ public class DocumentResource {
         }
     }
 
+    @ApiOperation(value="Updates document identified by given document id based on given content (body)",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Document with given id not found") })
     @PUT
     @Path(DOCUMENT_INSTANCE_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response updateDocument(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("documentId") String documentId, String payload) {
+    public Response updateDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "document id of a document that should be updated", required = true) @PathParam("documentId") String documentId, 
+            @ApiParam(value = "document content represented as DocumentInstance", required = true, type="DocumentInstance") String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         // no container id available so only used to transfer conversation id if given by client
@@ -183,10 +223,15 @@ public class DocumentResource {
         }
     }
 
+    @ApiOperation(value="Deletes document identified by given document id",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Document with given id not found") })
     @DELETE
     @Path(DOCUMENT_INSTANCE_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response deleteDocument(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("documentId") String documentId) {
+    public Response deleteDocument(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "document id of a document that should be deleted", required = true) @PathParam("documentId") String documentId) {
         Variant v = getVariant(headers);
         // no container id available so only used to transfer conversation id if given by client
         Header conversationIdHeader = buildConversationIdHeader("", context, headers);

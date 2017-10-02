@@ -19,15 +19,22 @@ import org.jbpm.test.util.PoolingDataSource;
 import org.junit.rules.ExternalResource;
 import org.kie.server.integrationtests.config.TestConfig;
 import org.kie.server.integrationtests.shared.basetests.KieServerBaseIntegrationTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DBExternalResource extends ExternalResource {
+    private static final Logger logger = LoggerFactory.getLogger(DBExternalResource.class);
     PoolingDataSource pds;
-
+    
     @Override
     protected void after() {
 
         if (pds != null) {
-            pds.close();
+           try {
+               pds.close();
+           } catch (Exception e) {
+               logger.debug("Exception closing data source", e);
+           }
         }
     };
 

@@ -15,8 +15,9 @@
 
 package org.kie.server.remote.rest.casemgmt;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
+import static org.kie.server.api.rest.RestURI.ADMIN_CASE_URI;
+import static org.kie.server.api.rest.RestURI.CASE_ALL_INSTANCES_GET_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
 
 import java.util.List;
 
@@ -38,8 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="case-admin")
+@Api(value="Administration of cases :: Case Management")
 @Path("server/" + ADMIN_CASE_URI)
 public class CaseAdminResource extends AbstractCaseResource {
 
@@ -56,15 +61,18 @@ public class CaseAdminResource extends AbstractCaseResource {
               context);
     }
 
+    @ApiOperation(value="Retrieves case instances without authntication checks and applies pagination",
+            response=CaseInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error")})
     @GET
     @Path(CASE_ALL_INSTANCES_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCaseInstances(@javax.ws.rs.core.Context HttpHeaders headers,
-                                     @QueryParam("status") List<String> status,
-                                     @QueryParam("page") @DefaultValue("0") Integer page,
-                                     @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
-                                     @QueryParam("sort") String sort,
-                                     @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+                                     @ApiParam(value = "optional case instance status (open, closed, canceled) - defaults ot open (1) only", required = false, allowableValues="open,closed,cancelled") @QueryParam("status") List<String> status,
+                                     @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page,
+                                     @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize,
+                                     @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort,
+                                     @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
 
         return invokeCaseOperation(headers,
                                    "",

@@ -46,8 +46,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
-@Api(value="jbpm-forms")
+@Api(value="Process and task forms :: BPM")
 @Path("server/" + FORM_URI)
 public class FormResource {
 
@@ -68,13 +72,20 @@ public class FormResource {
         this.context = context;
     }
 
+    @ApiOperation(value="Retrieves form for process definition within a container",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Process definition, form or Container Id not found") })
     @GET
     @Path(PROCESS_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getProcessForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CONTAINER_ID) String containerId, @PathParam(PROCESS_ID) String processId,
-            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
-            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent) {
+            @ApiParam(value = "container id that process definition belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of process definition that form should be fetched for", required = true) @PathParam(PROCESS_ID) String processId,
+            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
+            @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
+            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
+            @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent) {
 
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -100,13 +111,20 @@ public class FormResource {
         }
     }
 
+    @ApiOperation(value="Retrieves form for task instance within a container",
+            response=String.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task, form or Container Id not found") })
     @GET
     @Path(TASK_FORM_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getTaskForm(@javax.ws.rs.core.Context HttpHeaders headers,
-            @PathParam(CONTAINER_ID) String containerId, @PathParam(TASK_INSTANCE_ID) Long taskId,
-            @QueryParam("lang") @DefaultValue("en") String language, @QueryParam("filter") boolean filter,
-            @QueryParam("type") @DefaultValue("ANY") String formType, @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent ) {
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam(CONTAINER_ID) String containerId, 
+            @ApiParam(value = "identifier of task instance that form should be fetched for", required = true) @PathParam(TASK_INSTANCE_ID) Long taskId,
+            @ApiParam(value = "optional language that the form should be found for", required = false) @QueryParam("lang") @DefaultValue("en") String language, 
+            @ApiParam(value = "optional filter flag if form should be filtered or returned as is", required = false) @QueryParam("filter") boolean filter,
+            @ApiParam(value = "optional type of the form, defaults to ANY so system will find the most current one", required = false) @QueryParam("type") @DefaultValue("ANY") String formType, 
+            @ApiParam(value = "optional marshall content flag if the content should be transformed or not, defaults to true", required = false) @QueryParam("marshallContent") @DefaultValue("true") boolean marshallContent ) {
 
         Variant variant = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);

@@ -15,9 +15,44 @@
 
 package org.kie.server.remote.rest.jbpm.admin;
 
+import static org.kie.server.api.rest.RestURI.ACK_ERRORS_PUT_URI;
+import static org.kie.server.api.rest.RestURI.ACK_ERROR_PUT_URI;
+import static org.kie.server.api.rest.RestURI.ADMIN_TASK_URI;
+import static org.kie.server.api.rest.RestURI.ERRORS_BY_TASK_ID_GET_URI;
+import static org.kie.server.api.rest.RestURI.ERRORS_GET_URI;
+import static org.kie.server.api.rest.RestURI.ERROR_GET_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ADMINS_USERS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_ADMINS_USERS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_EXL_OWNERS_USERS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_INPUTS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NOTIFICATIONS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NOTIFICATION_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUTS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_POT_OWNERS_USERS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_REASSIGNMENTS_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_REASSIGNMENT_DELETE_URI;
+import static org.kie.server.remote.rest.common.util.RestUtils.badRequest;
+import static org.kie.server.remote.rest.common.util.RestUtils.buildConversationIdHeader;
+import static org.kie.server.remote.rest.common.util.RestUtils.createCorrectVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.createResponse;
+import static org.kie.server.remote.rest.common.util.RestUtils.getContentType;
+import static org.kie.server.remote.rest.common.util.RestUtils.getVariant;
+import static org.kie.server.remote.rest.common.util.RestUtils.internalServerError;
+import static org.kie.server.remote.rest.common.util.RestUtils.noContent;
+import static org.kie.server.remote.rest.common.util.RestUtils.notFound;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.CONTAINER_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.TASK_INSTANCE_NOT_FOUND;
+import static org.kie.server.remote.rest.jbpm.resources.Messages.UNEXPECTED_ERROR;
+
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -40,17 +75,19 @@ import org.kie.server.api.model.admin.ExecutionErrorInstance;
 import org.kie.server.api.model.admin.ExecutionErrorInstanceList;
 import org.kie.server.api.model.admin.TaskNotificationList;
 import org.kie.server.api.model.admin.TaskReassignmentList;
-import org.kie.server.api.model.admin.TimerInstanceList;
 import org.kie.server.remote.rest.common.Header;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.jbpm.admin.UserTaskAdminServiceBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.kie.server.api.rest.RestURI.*;
-import static org.kie.server.remote.rest.common.util.RestUtils.*;
-import static org.kie.server.remote.rest.jbpm.resources.Messages.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
+@Api(value="User tasks administration :: BPM")
 @Path("server/" + ADMIN_TASK_URI)
 public class UserTaskAdminResource {
 
@@ -72,82 +109,156 @@ public class UserTaskAdminResource {
         this.context = context;
     }
 
+    @ApiOperation(value="Adds potential owners to given task instance, optionally removing existing ones",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addPotentialOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "optional flag that indicates if existing potential owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
+            @ApiParam(value = "list of users/groups to be added as potential owners, as OrgEntities type", required = true) String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, POT_OWNER);
     }
 
+    @ApiOperation(value="Adds excluded owners to given task instance, optionally removing existing ones",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addExcludedOwners(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "optional flag that indicates if existing excluded owners should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
+            @ApiParam(value = "list of users/groups to be added as excluded owners, as OrgEntities type", required = true) String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, EXL_OWNER);
     }
 
+    @ApiOperation(value="Adds business admins to given task instance, optionally removing existing ones",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_ADMINS_USERS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("remove") @DefaultValue("false") boolean removeExisting, String payload) {
+    public Response addAdmins(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "optional flag that indicates if existing business admins should be removed, defaults to false", required = false) @QueryParam("remove") @DefaultValue("false") boolean removeExisting, 
+            @ApiParam(value = "list of users/groups to be added as business admins, as OrgEntities type", required = true) String payload) {
 
         return addToTask(headers, containerId, tInstanceId, removeExisting, payload, ADMIN);
     }
 
+    
+    @ApiOperation(value="Removes potential owners from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
+    public Response removePotentialOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of users to be removed from potantial owners list", required = true) @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, POT_OWNER);
     }
 
+    @ApiOperation(value="Removes excluded owners from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
+    public Response removeExcludedOwnersUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of users to be removed from excluded owners list", required = true) @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, EXL_OWNER);
     }
 
+    @ApiOperation(value="Removes business admins from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_USERS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String users) {
+    public Response removeAdminsUsers(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of users to be removed from business admin list", required = true) @PathParam("entityId") String users) {
 
         return removeFromTask(headers, containerId, tInstanceId, true, users, ADMIN);
     }
 
+    @ApiOperation(value="Removes potential owner groups from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_POT_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
+    public Response removePotentialOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of groups to be removed from potantial owners list", required = true) @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, POT_OWNER);
     }
 
+    @ApiOperation(value="Removes excluded owners groups from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_EXL_OWNERS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
+    public Response removeExcludedOwnersGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of groups to be removed from excluded owners list", required = true) @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, EXL_OWNER);
     }
 
+    @ApiOperation(value="Removes business admin groups from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_ADMINS_GROUPS_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("entityId") String groups) {
+    public Response removeAdminsGroups(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "list of groups to be removed from business admin list", required = true) @PathParam("entityId") String groups) {
 
         return removeFromTask(headers, containerId, tInstanceId, false, groups, ADMIN);
     }
 
+    @ApiOperation(value="Adds task inputs to given task instance",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response addTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, String payload) {
+    public Response addTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "map of data to be set as task inputs, as Map", required = true) String payload) {
 
         Variant v = getVariant(headers);
         String type = getContentType(headers);
@@ -165,10 +276,17 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Removes task inputs referenced by names from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_INPUTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("name") List<String> inputNames) {
+    public Response removeTaskInputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "one or more names of task inputs to be removed", required = true) @QueryParam("name") List<String> inputNames) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -185,15 +303,22 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Removes task outputs referenced by names from given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_OUTPUTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response removeTaskOutputs(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("name") List<String> inputNames) {
+    public Response removeTaskOutputs(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "one or more names of task outputs to be removed", required = true) @QueryParam("name") List<String> outputNames) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
-            userTaskAdminServiceBase.removeTaskOutputs(containerId, tInstanceId, inputNames);
+            userTaskAdminServiceBase.removeTaskOutputs(containerId, tInstanceId, outputNames);
             return noContent(v, conversationIdHeader);
         } catch (TaskNotFoundException e) {
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, tInstanceId), v, conversationIdHeader);
@@ -205,10 +330,20 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Schedules new reassign of given task instance",
+            response=Long.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @POST
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response reassign(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("expiresAt") String expiresAt, @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
+    public Response reassign(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "time expression for reassignmnet", required = true) @QueryParam("expiresAt") String expiresAt, 
+            @ApiParam(value = "optional flag that indicates the type of reassignment, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, 
+            @ApiParam(value = "optional flag that indicates the type of reassignment, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, 
+            @ApiParam(value = "list of users/groups that task should be reassined to, as OrgEntities type", required = true) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -241,10 +376,20 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Schedules new notification for given task instance",
+            response=Long.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @POST
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response notify(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("expiresAt") String expiresAt, @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, String payload) {
+    public Response notify(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "time expression for notification", required = true) @QueryParam("expiresAt") String expiresAt, 
+            @ApiParam(value = "optional flag that indicates the type of notification, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotStarted") @DefaultValue("false") boolean whenNotStarted, 
+            @ApiParam(value = "optional flag that indicates the type of notification, either whenNotStarted or whenNotCompleted must be set", required = false) @QueryParam("whenNotCompleted") @DefaultValue("false") boolean whenNotCompleted, 
+            @ApiParam(value = "email notification details, as EmailNotification type", required = true) String payload) {
         Variant v = getVariant(headers);
         String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -274,10 +419,17 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Cancels reassignment for given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_REASSIGNMENT_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response cancelReassignment(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("reassignmentId") Long reassignmentId) {
+    public Response cancelReassignment(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "identifier of reassignment to be canceled", required = true) @PathParam("reassignmentId") Long reassignmentId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -294,10 +446,17 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Cancels notification for given task instance",
+            response=Void.class, code=204)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @DELETE
     @Path(TASK_INSTANCE_NOTIFICATION_DELETE_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response cancelNotification(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @PathParam("notificationId") Long notificationId) {
+    public Response cancelNotification(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "identifier of notification to be canceled", required = true) @PathParam("notificationId") Long notificationId) {
         Variant v = getVariant(headers);
 
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
@@ -314,10 +473,17 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Retrieves reassignments for given task",
+            response=TaskReassignmentList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @GET
     @Path(TASK_INSTANCE_REASSIGNMENTS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getTaskReassignments(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
+    public Response getTaskReassignments(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "optional flag that indicates if active only reassignmnets should be collected, defaults to true", required = false) @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -334,10 +500,17 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Retrieves notifications for given task",
+            response=TaskNotificationList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @GET
     @Path(TASK_INSTANCE_NOTIFICATIONS_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getTaskNotifications(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long tInstanceId, @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
+    public Response getTaskNotifications(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of task instance to be updated", required = true) @PathParam("tInstanceId") Long tInstanceId, 
+            @ApiParam(value = "optional flag that indicates if active only notifications should be collected, defaults to true", required = false) @QueryParam("activeOnly") @DefaultValue("true") boolean activeOnly) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -354,10 +527,16 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Acknowledges given execution error",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(ACK_ERROR_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response acknowledgeError(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("errorId") String errorId) {
+    public Response acknowledgeError(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that error belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of the execution error to be acknowledged", required = true) @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -374,10 +553,16 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Acknowledges given execution errors",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @PUT
     @Path(ACK_ERRORS_PUT_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response acknowledgeErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("errorId") List<String> errorIds) {
+    public Response acknowledgeErrors(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that errors belong to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "list of identifiers of execution errors to be acknowledged", required = true) @QueryParam("errorId") List<String> errorIds) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -394,10 +579,16 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Retrieve execution error by its identifier",
+            response=ExecutionErrorInstance.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Task instance or Container Id not found") })
     @GET
     @Path(ERROR_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrorById(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("errorId") String errorId) {
+    public Response getExecutionErrorById(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that error belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of the execution error to load", required = true) @PathParam("errorId") String errorId) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -414,10 +605,21 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Retrieves execution errors for task instance and container, applies pagination",
+            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container Id not found") })
     @GET
     @Path(ERRORS_BY_TASK_ID_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @PathParam("tInstanceId") Long taskId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrorsByTask(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "identifier of the task instance that errors should be collected for", required = true) @PathParam("tInstanceId") Long taskId, 
+            @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -434,10 +636,22 @@ public class UserTaskAdminResource {
         }
     }
 
+    @ApiOperation(value="Retrieves execution errors for container, allows to filter by task name and/or process id, applies pagination",
+            response=ExecutionErrorInstanceList.class, code=200)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"),
+            @ApiResponse(code = 404, message = "Container Id not found") })
     @GET
     @Path(ERRORS_GET_URI)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, @PathParam("id") String containerId, @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, @QueryParam("name") String taskName, @QueryParam("process") String processId, @QueryParam("page") @DefaultValue("0") Integer page, @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, @QueryParam("sort") String sort, @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
+    public Response getExecutionErrors(@javax.ws.rs.core.Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId, 
+            @ApiParam(value = "optional flag that indicates if acknowledged errors should also be collected, defaults to false", required = false) @QueryParam("includeAck") @DefaultValue("false") boolean includeAcknowledged, 
+            @ApiParam(value = "optional name of the task to filter by", required = false) @QueryParam("name") String taskName, 
+            @ApiParam(value = "optional process id that the task belongs to to filter by", required = false) @QueryParam("process") String processId, 
+            @ApiParam(value = "optional pagination - at which page to start, defaults to 0 (meaning first)", required = false) @QueryParam("page") @DefaultValue("0") Integer page, 
+            @ApiParam(value = "optional pagination - size of the result, defaults to 10", required = false) @QueryParam("pageSize") @DefaultValue("10") Integer pageSize, 
+            @ApiParam(value = "optional sort column, no default", required = false) @QueryParam("sort") String sort, 
+            @ApiParam(value = "optional sort direction (asc, desc) - defaults to asc", required = false) @QueryParam("sortOrder") @DefaultValue("true") boolean sortOrder) {
         Variant v = getVariant(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
@@ -490,7 +704,6 @@ public class UserTaskAdminResource {
 
     protected Response removeFromTask(HttpHeaders headers, String containerId, Long tInstanceId, boolean isUser, String entities, int operation) {
         Variant v = getVariant(headers);
-        String type = getContentType(headers);
         Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
         try {
 
