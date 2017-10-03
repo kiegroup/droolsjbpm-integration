@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.jbpm.kie.services.impl.model.UserTaskInstanceDesc;
 import org.jbpm.services.api.TaskNotFoundException;
 import org.jbpm.services.api.UserTaskService;
 import org.kie.api.task.model.Attachment;
@@ -499,6 +500,20 @@ public class UserTaskServiceBase {
         return response;
     }
 
+    public void update(String containerId, Number taskId, String userId, String payload, String marshallerType) {
+
+        userId = getUser(userId);
+        
+        logger.debug("About to unmarshal task instances from payload: '{}'", payload, new ByTaskIdContainerLocator(taskId.longValue()));
+        TaskInstance updatedTask = marshallerHelper.unmarshal(containerId, payload, marshallerType, TaskInstance.class);
+
+        logger.debug("About to update task with id '{}' as user '{}' with data {}", taskId, userId, updatedTask);
+        
+        UserTaskInstanceDesc task = new UserTaskInstanceDesc(taskId.longValue(), updatedTask.getName(), updatedTask.getDescription(), updatedTask.getPriority(), updatedTask.getExpirationDate(), updatedTask.getFormName());
+        userTaskService.updateTask(taskId.longValue(), userId, task, updatedTask.getInputData(), updatedTask.getOutputData());
+
+    }
+    
     private String getOrgEntityIfNotNull(OrganizationalEntity organizationalEntity) {
         if (organizationalEntity == null) {
             return "";

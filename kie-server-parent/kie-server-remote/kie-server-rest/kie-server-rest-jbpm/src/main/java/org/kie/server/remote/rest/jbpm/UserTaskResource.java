@@ -42,6 +42,7 @@ import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_NOMINATE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_GET_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_OUTPUT_DATA_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PRIORITY_PUT_URI;
+import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RELEASE_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_RESUME_PUT_URI;
 import static org.kie.server.api.rest.RestURI.TASK_INSTANCE_SKIPABLE_PUT_URI;
@@ -1017,6 +1018,34 @@ public class UserTaskResource {
             TaskEventInstanceList result = runtimeDataServiceBase.getTaskEvents(taskId, page, pageSize, sort, sortOrder);
             return createCorrectVariant(result, headers, Response.Status.OK, conversationIdHeader);
         } catch (TaskNotFoundException e) {
+            return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
+        } catch (Exception e) {
+            logger.error("Unexpected error during processing {}", e.getMessage(), e);
+            return internalServerError(MessageFormat.format(UNEXPECTED_ERROR, e.getMessage()), v, conversationIdHeader);
+        }
+    }
+    
+    @ApiOperation(value="Updates task with given id that belongs to given container with given task instance details in body, updates name, description, priority, expiration date, form name, input and output variables",
+            response=Void.class, code=201)
+    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error"), @ApiResponse(code = 404, message = "Task with given id not found") })
+    @PUT
+    @Path(TASK_INSTANCE_PUT_URI)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response update(@Context HttpHeaders headers, 
+            @ApiParam(value = "container id that task instance belongs to", required = true) @PathParam("id") String containerId,
+            @ApiParam(value = "identifier of the task instance that should be updated", required = true) @PathParam("tInstanceId") Long taskId, 
+            @ApiParam(value = "optional user id to be used instead of authenticated user - only when bypass authenticated user is enabled", required = false) @QueryParam("user") String userId,             
+            @ApiParam(value = "task instance with updates as TaskInstance type", required = true) String payload) {
+
+        Variant v = getVariant(headers);
+        String type = getContentType(headers);
+        Header conversationIdHeader = buildConversationIdHeader(containerId, context, headers);
+        try {
+            
+            userTaskServiceBase.update(containerId, taskId, userId, payload, type);
+            
+            return createResponse("", v, Response.Status.CREATED, conversationIdHeader);
+        } catch (TaskNotFoundException e){
             return notFound(MessageFormat.format(TASK_INSTANCE_NOT_FOUND, taskId), v, conversationIdHeader);
         } catch (Exception e) {
             logger.error("Unexpected error during processing {}", e.getMessage(), e);
